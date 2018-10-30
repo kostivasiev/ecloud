@@ -23,9 +23,11 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-// $app->withFacades();
+$app->configure('database');
 
-// $app->withEloquent();
+$app->withFacades();
+
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -63,9 +65,10 @@ $app->singleton(
 //    App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+ $app->routeMiddleware([
+     'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
+     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class
+ ]);
 
 /*
 |--------------------------------------------------------------------------
@@ -77,10 +80,9 @@ $app->singleton(
 | totally optional, so you are not required to uncomment this line.
 |
 */
-
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
+$app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
+$app->register(UKFast\Providers\LogServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
