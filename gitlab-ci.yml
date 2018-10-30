@@ -51,7 +51,6 @@ php_md:
     paths: [messdetector.txt]
     when: on_failure
     
-#Unit tests
 unit_tests:
   stage: Tests
   image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
