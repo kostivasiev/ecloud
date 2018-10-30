@@ -1,0 +1,64 @@
+before_script:
+- eval $(ssh-agent -s)
+- echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+- mkdir -p ~/.ssh
+- chmod 700 ~/.ssh
+- ssh-keyscan gitlab.devops.ukfast.co.uk >> ~/.ssh/known_hosts
+- chmod 644 ~/.ssh/known_hosts
+- mv .env.testing .env
+
+stages:
+- Build
+- Standards
+- Tests
+
+php_lint:
+  stage: Build
+  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
+  script:
+  - '! find . -type f -name "*.php" -exec php -l "{}" \; | grep -iv "No syntax errors detected";'
+  tags:
+  - rnd
+  - php
+
+php_cs:
+  stage: Standards
+  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
+  tags:
+  - rnd
+  - php
+  script:
+  - pwd
+  - composer install --dev --prefer-dist > /dev/null --quiet
+  - composer dump-autoload
+  - vendor/bin/phpcs --standard=psr2 app > codesniffer.txt
+  artifacts:
+    paths: [codesniffer.txt]
+    when: on_failure
+
+php_md:
+  stage: Standards
+  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
+  tags:
+  - rnd
+  - php
+  script:
+  - pwd
+  - composer install --dev --prefer-dist > /dev/null --quiet
+  - composer dump-autoload
+  - vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml > messdetector.txt
+  artifacts:
+    paths: [messdetector.txt]
+    when: on_failure
+
+unit_tests:
+  stage: Tests
+  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
+  tags:
+  - rnd
+  - php
+  script:
+  - pwd
+  - composer install --dev --prefer-dist > /dev/null --quiet
+  - composer dump-autoload
+  - vendor/bin/phpunit --coverage-text --colors=never
