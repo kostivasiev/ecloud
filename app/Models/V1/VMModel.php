@@ -4,7 +4,7 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\Scopes\eCloudVmServersScope;
+use App\Scopes\ECloudVmServersScope;
 
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\ResourceInterface;
@@ -65,7 +65,7 @@ class VMModel extends Model implements Filterable, Sortable, Selectable, Resourc
     {
         parent::boot();
 
-        static::addGlobalScope(new eCloudVmServersScope);
+        static::addGlobalScope(new ECloudVmServersScope);
     }
 
     /**
@@ -174,15 +174,13 @@ class VMModel extends Model implements Filterable, Sortable, Selectable, Resourc
         ];
     }
 
-
-
     /**
      * Scope a query to only include firewalls for a given reseller
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param int $resellerId
      * @return \Illuminate\Database\Eloquent\Builder $query
      */
-    public function scopeWithReseller($query, $resellerId)
+    public function scopeWithResellerId($query, $resellerId)
     {
         $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
 
@@ -192,5 +190,4 @@ class VMModel extends Model implements Filterable, Sortable, Selectable, Resourc
 
         return $query;
     }
-
 }

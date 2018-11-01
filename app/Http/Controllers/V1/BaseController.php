@@ -19,6 +19,8 @@ class BaseController extends Controller
 
     protected $is_admin = false;
 
+    protected $resellerId;
+
     /**
      * Controller constructor.
      * @param Request $request
@@ -31,5 +33,7 @@ class BaseController extends Controller
         if ($request->user->resellerId == 0) {
             $this->is_admin = true;
         }
+
+        $this->resellerId = $request->user->resellerId;
     }
 }
