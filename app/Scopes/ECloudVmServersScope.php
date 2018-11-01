@@ -19,7 +19,7 @@ class ECloudVmServersScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      *
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function apply(Builder $builder, Model $model)
     {
