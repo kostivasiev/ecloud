@@ -25,35 +25,6 @@ class VMController extends BaseController
     }
 
     /**
-     * Show a specific VM
-     * @param Request $request
-     * @param $vmId
-     * @return \Illuminate\Http\Response
-     * @throws Exceptions\NotFoundException
-     * @throws Exceptions\ForbiddenException
-     */
-    public function show(Request $request, $vmId)
-    {
-        $this->validateSolutionId($request, $solutionId);
-        $solutions = $this->getVMs($solutionId);
-        $this->transformQuery($solutions, SolutionModel::class);
-        $solution = $solutions->first();
-        if (!$solution) {
-            throw new Exceptions\NotFoundException("Solution '$solutionId' Not Found");
-        }
-
-        return $this->respondItem(
-            $request,
-            $solution,
-            200,
-            null,
-            [],
-            ($this->is_admin) ? null : SolutionModel::VISIBLE_SCOPE_RESELLER
-        );
-    }
-
-
-    /**
      * List VM's
      * For admin list all except when $resellerId is passed in
      * @param null $resellerId
