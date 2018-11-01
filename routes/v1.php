@@ -1,9 +1,30 @@
 <?php
-/**
- * @author: paul.mcnally <paul.mcnally@ukfast.co.uk>
- * @date: 29/10/2018
- * @copyright  Copyright (c) 2018, UKFast.Net Ltd
- */
+
+$middleware = [
+    'auth',
+    'paginator-limit:'.env('PAGINATION_LIMIT')
+];
+
+$baseRouteParameters = [
+    'prefix' => 'v1',
+    'middleware' => $middleware
+];
 
 
+// VM's
+$hostRouteParameters = $baseRouteParameters;
+$hostRouteParameters['namespace'] = 'V1';
+$router->group($hostRouteParameters, function () use ($router) {
 
+    /**
+     * GET /vms
+     * Return a VM Collection
+     */
+    $router->get('vms', 'VMController@index');
+
+    /**
+     * GET vms/{vm_id}
+     * Return a VM Resource
+     */
+    $router->get('vms/{vm_id}', 'VMController@show');
+});
