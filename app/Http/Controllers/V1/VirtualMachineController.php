@@ -62,7 +62,6 @@ class VirtualMachineController extends BaseController
         return $VirtualMachine;
     }
 
-
     /**
      * List VM's
      * For admin list all except when $resellerId is passed in
@@ -89,7 +88,6 @@ class VirtualMachineController extends BaseController
         //For non-admin filter on reseller ID
         return $virtualMachineQuery->withResellerId($this->resellerId);
     }
-
 
     /**
      * Validates the solution id
