@@ -16,7 +16,7 @@ use UKFast\DB\Ditto\Selectable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Sort;
 
-class VMModel extends Model implements Filterable, Sortable, Selectable, ResourceInterface
+class VirtualMachineModel extends Model implements Filterable, Sortable, Selectable, ResourceInterface
 {
 
     /**

@@ -20,11 +20,11 @@ $router->group($hostRouteParameters, function () use ($router) {
      * GET /vms
      * Return a VM Collection
      */
-    $router->get('vms', 'VMController@index');
+    $router->get('vms', 'VirtualMachineController@index');
 
     /**
      * GET vms/{vm_id}
      * Return a VM Resource
      */
-    $router->get('vms/{vm_id}', 'VMController@show');
+    $router->get('vms/{vm_id}', 'VirtualMachineController@show');
 });
