@@ -4,19 +4,32 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 
+use UKFast\DB\Ditto\QueryTransformer;
+
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\DB\Ditto\TransformsQueries;
 
-use UKFast\Api\Exceptions\NotFoundException;
-//use App\Exceptions\V1\SolutionNotFoundException;
+use Illuminate\Http\Request;
 
 use App\Models\V1\Solution;
-use Illuminate\Http\Request;
+
+use UKFast\Api\Exceptions\NotFoundException;
 
 class SolutionController extends Controller
 {
-    use ResponseHelper, RequestHelper, TransformsQueries;
+    use ResponseHelper, RequestHelper;
+
+    private $per_page;
+
+    /**
+     * Controller constructor.
+     * @param Request $request
+     */
+    public function __construct(Request $request)
+    {
+        // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
+        $this->per_page = $request->input('per_page', env('PAGINATION_LIMIT'));
+    }
 
     /**
      * List all solutions
@@ -29,9 +42,11 @@ class SolutionController extends Controller
         $collectionQuery = Solution::withReseller($request->user->resellerId)
             ->where('ucs_reseller_active', 'Yes');
 
-        $this->transformQuery($collectionQuery, Solution::class);
+        (new QueryTransformer($request))
+            ->config(Solution::class)
+            ->transform($collectionQuery);
 
-        $solutions = $collectionQuery->paginate($request->input('per_page', env('PAGINATION_LIMIT')));
+        $solutions = $collectionQuery->paginate($this->per_page);
 
         return $this->respondCollection(
             $request,
@@ -49,17 +64,8 @@ class SolutionController extends Controller
      */
     public function show(Request $request, $solutionId)
     {
-        $this->validateSolutionId($request, $solutionId);
-
-        $collectionQuery = Solution::withReseller($request->user->resellerId)
-            ->where('ucs_reseller_active', 'Yes');
-
-        $this->transformQuery($collectionQuery, Solution::class);
-
-        $solution = $collectionQuery->find($solutionId);
-
-        if (empty($solution)) {
-//            throw new SolutionNotFoundException('Solution #' . $solutionId . ' not found', 'solution_id');
+        $solution = Solution::find($solutionId);
+        if (is_null($solution)) {
             throw new NotFoundException('Solution #' . $solutionId . ' not found', 'solution_id');
         }
 
@@ -67,21 +73,5 @@ class SolutionController extends Controller
             $request,
             $solution
         );
-    }
-
-    /**
-     * Validates the solution ID
-     *
-     * @param  Request $request
-     * @param  int     $solutionId
-     * @return void
-     */
-    protected function validateSolutionId(Request $request, $solutionId)
-    {
-        $request['solution_id'] = $solutionId;
-        $this->validate($request, ['solution_id' => 'required|integer']);
-
-        unset($request['solution_id']);
-        $request['id'] = intval($solutionId);
     }
 }
