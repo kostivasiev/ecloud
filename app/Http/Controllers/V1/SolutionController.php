@@ -12,8 +12,7 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 use Illuminate\Http\Request;
 
 use App\Models\V1\Solution;
-
-use UKFast\Api\Exceptions\NotFoundException;
+use App\Exceptions\V1\SolutionNotFoundException;
 
 class SolutionController extends Controller
 {
@@ -60,13 +59,13 @@ class SolutionController extends Controller
      * @param Request $request
      * @param $solutionId
      * @return \Illuminate\http\Response
-     * @throws NotFoundException
+     * @throws SolutionNotFoundException
      */
     public function show(Request $request, $solutionId)
     {
         $solution = Solution::find($solutionId);
         if (is_null($solution)) {
-            throw new NotFoundException('Solution #' . $solutionId . ' not found', 'solution_id');
+            throw new SolutionNotFoundException('Solution ID #' . $solutionId . ' not found', 'solution_id');
         }
 
         return $this->respondItem(
