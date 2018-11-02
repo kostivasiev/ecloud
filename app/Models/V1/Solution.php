@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\ResourceInterface;
 use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 
 use UKFast\DB\Ditto\Filterable;
@@ -15,13 +13,11 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Selectable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Sort;
-use UKFast\DB\Ditto\Filters\BooleanFilter;
 
 class Solution extends Model implements Filterable, Sortable, Selectable, ResourceInterface
 {
     protected $casts = [
         'ucs_reseller_id' => 'integer',
-        'ucs_reseller_reseller_id' => 'integer',
     ];
 
     /**
@@ -59,10 +55,9 @@ class Solution extends Model implements Filterable, Sortable, Selectable, Resour
     {
         return [
             'id' => 'ucs_reseller_id',
-            'reseller_id' => 'ucs_reseller_reseller_id',
             'name' => 'ucs_reseller_solution_name',
-            'active' => 'ucs_reseller_active',
             'type'   => 'ucs_reseller_type',
+            'active'   => 'ucs_reseller_active',
         ];
     }
 
@@ -75,7 +70,6 @@ class Solution extends Model implements Filterable, Sortable, Selectable, Resour
         return [
             Filter::create('id', Filter::$primaryKeyDefaults),
             Filter::create('name', Filter::$stringDefaults),
-            BooleanFilter::create('active', 'Yes', 'No'),
             Filter::create('type', Filter::$stringDefaults),
         ];
     }
@@ -90,6 +84,7 @@ class Solution extends Model implements Filterable, Sortable, Selectable, Resour
         return [
             Sort::create('id', 'asc'),
             Sort::create('name', 'asc'),
+            Sort::create('type', 'asc'),
         ];
     }
 
@@ -123,9 +118,8 @@ class Solution extends Model implements Filterable, Sortable, Selectable, Resour
     {
         return [
             IdProperty::create('ucs_reseller_id', 'id'),
-            IntProperty::create('ucs_reseller_reseller_id', 'reseller_id'),
             StringProperty::create('ucs_reseller_solution_name', 'name'),
-            BooleanProperty::create('ucs_reseller_active', 'active', null, 'Yes', 'No'),
+            StringProperty::create('ucs_reseller_type', 'type'),
         ];
     }
 

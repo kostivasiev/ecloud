@@ -40,7 +40,6 @@ $solutionRouteParameters = array_merge($baseRouteParameters, array(
     'prefix' => 'v1',
 ));
 $router->group($solutionRouteParameters, function () use ($router) {
-
-    // get solution collection
     $router->get('solutions', 'SolutionController@index');
+    $router->get('solutions/{solution_id}', 'SolutionController@show');
 });
