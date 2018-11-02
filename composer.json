@@ -13,7 +13,7 @@
         "ukfast/api-helper-datetime": "^1.2",
         "ukfast/api-auth": "^2.1",
         "ukfast/api-paginator": "^2.0",
-        "ukfast/ditto": "4.0.*",
+        "ukfast/ditto": "4.1.*",
         "ukfast/api-validation": "~1.0",
         "ukfast/log-provider": "~1.0"
     },
