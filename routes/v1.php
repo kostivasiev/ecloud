@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * v1 Routes
+ */
+
 $middleware = [
     'auth',
     'paginator-limit:'.env('PAGINATION_LIMIT')
@@ -27,4 +31,15 @@ $router->group($hostRouteParameters, function () use ($router) {
      * Return a VM Resource
      */
     $router->get('vms/{vm_id}', 'VMController@show');
+});
+
+
+// Hybrid/Private Solution's
+$solutionRouteParameters = array_merge($baseRouteParameters, array(
+    'namespace' => 'V1',
+    'prefix' => 'v1',
+));
+$router->group($solutionRouteParameters, function () use ($router) {
+    $router->get('solutions', 'SolutionController@index');
+    $router->get('solutions/{solution_id}', 'SolutionController@show');
 });
