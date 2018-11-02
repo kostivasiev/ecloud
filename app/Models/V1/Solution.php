@@ -57,7 +57,6 @@ class Solution extends Model implements Filterable, Sortable, Selectable, Resour
             'id' => 'ucs_reseller_id',
             'name' => 'ucs_reseller_solution_name',
             'type'   => 'ucs_reseller_type',
-            'active'   => 'ucs_reseller_active',
         ];
     }
 
