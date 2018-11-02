@@ -4,22 +4,17 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-use UKFast\Api\Resource\ResourceInterface;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 
+use UKFast\DB\Ditto\Factories\FilterFactory;
+use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Selectable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Sort;
+use UKFast\DB\Ditto\Filter;
 
-class Solution extends Model implements Filterable, Sortable, Selectable, ResourceInterface
+class Solution extends Model implements Filterable, Sortable
 {
-    protected $casts = [
-        'ucs_reseller_id' => 'integer',
-    ];
-
     /**
      * The table associated with the model.
      *
@@ -40,6 +35,15 @@ class Solution extends Model implements Filterable, Sortable, Selectable, Resour
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The attributes that should be cast to native types
+     *
+     * @var array
+     */
+    protected $casts = [
+        'ucs_reseller_id' => 'integer',
+    ];
 
 
     /**
@@ -62,40 +66,47 @@ class Solution extends Model implements Filterable, Sortable, Selectable, Resour
 
     /**
      * Ditto filtering configuration
+     * @param FilterFactory $factory
      * @return array
      */
-    public function filterableColumns()
+    public function filterableColumns($factory)
     {
         return [
-            Filter::create('id', Filter::$primaryKeyDefaults),
-            Filter::create('name', Filter::$stringDefaults),
-            Filter::create('type', Filter::$stringDefaults),
+            $factory->create('id', Filter::$primaryKeyDefaults),
+            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('type', Filter::$stringDefaults),
         ];
     }
 
+
     /**
      * Ditto sorting configuration
+     * @param SortFactory $factory
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function sortableColumns()
+    public function sortableColumns($factory)
     {
         return [
-            Sort::create('id', 'asc'),
-            Sort::create('name', 'asc'),
-            Sort::create('type', 'asc'),
+            $factory->create('id'),
+            $factory->create('name'),
+            $factory->create('type'),
         ];
     }
 
     /**
      * Ditto sorting
-     * @return mixed
+     * @param SortFactory $sortFactory
+     * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function defaultSort()
+    public function defaultSort($sortFactory)
     {
-        return Sort::create('id', 'asc');
+        return [
+            $sortFactory->create('id', 'asc'),
+        ];
     }
+
 
     /**
      * Ditto Selectable persistent Properties
