@@ -217,11 +217,12 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
         $str = trim(substr($value, 0, 2));
         if (is_numeric($str)) {
             $cpuNum = intval($str);
-        } else {
-            $str = trim(substr($value, 0, 1));
-            if (is_numeric($str)) {
-                $cpuNum = intval($str);
-            }
+            return $cpuNum;
+        }
+
+        $str = trim(substr($value, 0, 1));
+        if (is_numeric($str)) {
+            $cpuNum = intval($str);
         }
 
         return $cpuNum;
@@ -346,5 +347,4 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
         }
         return $externalIp;
     }
-
 }

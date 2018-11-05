@@ -9,6 +9,7 @@ class VirtualMachineResource extends CustomResource
     /**
      * Transform the data resource into an array.
      *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param \Illuminate\Http\Request $request
      * @return array
      */

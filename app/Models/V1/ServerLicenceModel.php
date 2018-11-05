@@ -26,6 +26,4 @@ class ServerLicenceModel extends Model
      * @var bool
      */
     public $timestamps = false;
-
-
 }

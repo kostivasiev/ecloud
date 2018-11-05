@@ -26,6 +26,4 @@ class ServerIPAddressModel extends Model
      * @var bool
      */
     public $timestamps = false;
-
-
 }
