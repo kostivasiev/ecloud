@@ -13,7 +13,6 @@ class BaseController extends Controller
 {
     use ResponseHelper;
     use RequestHelper;
-    use TransformsQueries;
 
     // Number of items to return per page
     protected $count;

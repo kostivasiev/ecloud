@@ -6,6 +6,7 @@ use App\Models\V1\VirtualMachineModel;
 use App\Resources\V1\VirtualMachineResource;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class VirtualMachineController extends BaseController
 {
@@ -18,7 +19,11 @@ class VirtualMachineController extends BaseController
     public function index(Request $request)
     {
         $virtualMachinesQuery = $this->getVirtualMachines();
-        $this->transformQuery($virtualMachinesQuery, VirtualMachineModel::class);
+
+        (new QueryTransformer($request))
+            ->config(VirtualMachineModel::class)
+            ->transform($virtualMachinesQuery);
+
         return $this->respondCollection(
             $request,
             $virtualMachinesQuery->paginate($this->count)
@@ -74,7 +79,6 @@ class VirtualMachineController extends BaseController
     protected function getVirtualMachines($resellerId = null, $vmIds = [])
     {
         $virtualMachineQuery = VirtualMachineModel::query();
-        // Load the license relation
         if (!empty($vmIds)) {
             $virtualMachineQuery->whereIn('servers_id', $vmIds);
         }

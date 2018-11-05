@@ -8,16 +8,15 @@ use App\Scopes\ECloudVmServersScope;
 
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\ResourceInterface;
 use UKFast\Api\Resource\Property\IdProperty;
 
+use UKFast\DB\Ditto\Factories\FilterFactory;
+use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Selectable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Sort;
+use UKFast\DB\Ditto\Filter;
 
-class VirtualMachineModel extends Model implements Filterable, Sortable, Selectable, ResourceInterface
+class VirtualMachineModel extends Model implements Filterable, Sortable
 {
 
     /**
@@ -95,51 +94,54 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
 
     /**
      * Ditto filtering configuration
+     * @param FilterFactory $factory
      * @return array
      */
-    public function filterableColumns()
+    public function filterableColumns($factory)
     {
         return [
-            Filter::create('id', Filter::$primaryKeyDefaults),
-            Filter::create('name', Filter::$stringDefaults),
-            Filter::create('cpu', Filter::$stringDefaults),
-            Filter::create('ram', Filter::$numericDefaults),
-            Filter::create('hdd', Filter::$stringDefaults),
-            Filter::create('platform', Filter::$stringDefaults),
-            Filter::create('backup', Filter::$stringDefaults),
-            Filter::create('support', Filter::$stringDefaults),
-            Filter::create('type', Filter::$stringDefaults),
+            $factory->create('id', Filter::$primaryKeyDefaults),
+            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('cpu', Filter::$stringDefaults),
+            $factory->create('ram', Filter::$numericDefaults),
+            $factory->create('hdd', Filter::$stringDefaults),
+            $factory->create('platform', Filter::$stringDefaults),
+            $factory->create('backup', Filter::$stringDefaults),
+            $factory->create('support', Filter::$stringDefaults),
+            $factory->create('type', Filter::$stringDefaults),
         ];
     }
 
     /**
      * Ditto sorting configuration
+     * @param SortFactory $factory
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function sortableColumns()
+    public function sortableColumns($factory)
     {
         return [
-            Sort::create('id', 'asc'),
-            Sort::create('name', 'asc'),
-            Sort::create('cpu', 'asc'),
-            Sort::create('ram', 'asc'),
-            Sort::create('hdd', 'asc'),
-            Sort::create('platform', 'asc'),
-            Sort::create('backup', 'asc'),
-            Sort::create('support', 'asc'),
-            Sort::create('type', 'asc'),
+            $factory->create('id', 'asc'),
+            $factory->create('name', 'asc'),
+            $factory->create('cpu', 'asc'),
+            $factory->create('ram', 'asc'),
+            $factory->create('hdd', 'asc'),
+            $factory->create('platform', 'asc'),
+            $factory->create('backup', 'asc'),
+            $factory->create('support', 'asc'),
+            $factory->create('type', 'asc'),
         ];
     }
 
     /**
      * Ditto sorting
+     * @param SortFactory $factory
      * @return mixed
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function defaultSort()
+    public function defaultSort($factory)
     {
-        return Sort::create('id', 'asc');
+        return $factory->create('id', 'asc');
     }
 
     /**
