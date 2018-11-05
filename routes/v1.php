@@ -40,6 +40,10 @@ $solutionRouteParameters = array_merge($baseRouteParameters, array(
     'prefix' => 'v1',
 ));
 $router->group($solutionRouteParameters, function () use ($router) {
+    // solutions
     $router->get('solutions', 'SolutionController@index');
     $router->get('solutions/{solution_id}', 'SolutionController@show');
+
+    // solution vlan's
+    $router->get('solutions/{solution_id}/vlans', 'VlanController@getSolutionVlans');
 });
