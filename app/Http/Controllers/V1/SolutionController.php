@@ -28,6 +28,8 @@ class SolutionController extends Controller
     {
         // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
         $this->per_page = $request->input('per_page', env('PAGINATION_LIMIT'));
+
+        $request->user->isAdmin = ($request->user->resellerId === 0);
     }
 
     /**
@@ -38,8 +40,10 @@ class SolutionController extends Controller
      */
     public function index(Request $request)
     {
-        $collectionQuery = Solution::withReseller($request->user->resellerId)
-            ->where('ucs_reseller_active', 'Yes');
+        $collectionQuery = Solution::withReseller($request->user->resellerId);
+        if (!$request->user->isAdmin) {
+            $collectionQuery->where('ucs_reseller_active', 'Yes');
+        }
 
         (new QueryTransformer($request))
             ->config(Solution::class)
@@ -63,7 +67,12 @@ class SolutionController extends Controller
      */
     public function show(Request $request, $solutionId)
     {
-        $solution = Solution::find($solutionId);
+        $solutionQuery = Solution::withReseller($request->user->resellerId);
+        if (!$request->user->isAdmin) {
+            $solutionQuery->where('ucs_reseller_active', 'Yes');
+        }
+
+        $solution = $solutionQuery->find($solutionId);
         if (is_null($solution)) {
             throw new SolutionNotFoundException('Solution ID #' . $solutionId . ' not found', 'solution_id');
         }
