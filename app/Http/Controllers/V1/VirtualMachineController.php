@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Models\V1\VirtualMachineModel;
+use App\Resources\V1\VirtualMachineResource;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions;
 
@@ -34,14 +35,15 @@ class VirtualMachineController extends BaseController
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachines = $this->getVirtualMachines(null, [$vmId]);
-        $this->transformQuery($virtualMachines, VirtualMachineModel::class);
         $virtualMachine = $virtualMachines->first();
         if (!$virtualMachine) {
             throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
         }
         return $this->respondItem(
             $request,
-            $virtualMachine
+            $virtualMachine,
+            200,
+            VirtualMachineResource::class
         );
     }
 
@@ -72,11 +74,10 @@ class VirtualMachineController extends BaseController
     protected function getVirtualMachines($resellerId = null, $vmIds = [])
     {
         $virtualMachineQuery = VirtualMachineModel::query();
-
+        // Load the license relation
         if (!empty($vmIds)) {
             $virtualMachineQuery->whereIn('servers_id', $vmIds);
         }
-
         if ($this->is_admin) {
             if (!is_null($resellerId)) {
                 $virtualMachineQuery->withResellerId($resellerId);

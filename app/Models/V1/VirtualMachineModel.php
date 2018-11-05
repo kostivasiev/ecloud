@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Scopes\ECloudVmServersScope;
 
 use UKFast\Api\Resource\Property\StringProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\ResourceInterface;
 use UKFast\Api\Resource\Property\IdProperty;
 
@@ -28,7 +29,7 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
         'servers_id' => 'integer',
         'servers_friendly_name' => 'string',
         'servers_cpu' => 'string',
-        'servers_memory' => 'integer',
+        'servers_memory' => 'string',
         'servers_hdd' => 'string',
         'servers_platform' => 'string',
         'servers_backup' => 'string',
@@ -87,7 +88,8 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
             'hdd' => 'servers_hdd',
             'platform' => 'servers_platform',
             'backup' => 'servers_backup',
-            'support' => 'servers_advanced_support'
+            'support' => 'servers_advanced_support',
+            'type' => 'servers_ecloud_type'
         ];
     }
 
@@ -106,6 +108,7 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
             Filter::create('platform', Filter::$stringDefaults),
             Filter::create('backup', Filter::$stringDefaults),
             Filter::create('support', Filter::$stringDefaults),
+            Filter::create('type', Filter::$stringDefaults),
         ];
     }
 
@@ -125,7 +128,7 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
             Sort::create('platform', 'asc'),
             Sort::create('backup', 'asc'),
             Sort::create('support', 'asc'),
-
+            Sort::create('type', 'asc'),
         ];
     }
 
@@ -162,16 +165,27 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
      */
     public function properties()
     {
-        return [
+        $array = [
             IdProperty::create('servers_id', 'id'),
             StringProperty::create('servers_friendly_name', 'name'),
-            StringProperty::create('servers_cpu', 'cpu'),
-            StringProperty::create('servers_ram', 'ram'),
+            IntProperty::create('servers_cpu', 'cpu'),
+            StringProperty::create('servers_memory', 'ram'),
             StringProperty::create('servers_hdd', 'hdd'),
             StringProperty::create('servers_platform', 'platform'),
+            StringProperty::create('server_license_friendly_name', 'operating_system'),
             StringProperty::create('servers_backup', 'backup'),
-            StringProperty::create('support', 'support'),
+            StringProperty::create('servers_advanced_support', 'support'),
+            StringProperty::create('ip_internal', 'ip_internal'),
+            StringProperty::create('ip_external', 'ip_external'),
+            StringProperty::create('servers_ecloud_type', 'type')
         ];
+
+        // Add solution_id for non Public VM's
+        if ($this->attributes['servers_ecloud_type'] != 'Public') {
+            $array[] = IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id');
+        }
+
+        return $array;
     }
 
     /**
@@ -190,4 +204,147 @@ class VirtualMachineModel extends Model implements Filterable, Sortable, Selecta
 
         return $query;
     }
+
+    /**
+     * Mutate the servers_cpu attribute to just the number of cpu's
+     * @param $value
+     * @return int
+     */
+    public function getServersCpuAttribute($value)
+    {
+        $cpuNum = 0;
+
+        $str = trim(substr($value, 0, 2));
+        if (is_numeric($str)) {
+            $cpuNum = intval($str);
+        } else {
+            $str = trim(substr($value, 0, 1));
+            if (is_numeric($str)) {
+                $cpuNum = intval($str);
+            }
+        }
+
+        return $cpuNum;
+    }
+
+    /**
+     * Relation Mappings
+     */
+
+    /**
+     * Map a server_license to the Virtual Machine
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function license()
+    {
+        return $this->hasOne(
+            'App\Models\V1\ServerLicenceModel',
+            'server_license_name',
+            'servers_license'
+        )->select(
+            'server_license_id',
+            'server_license_friendly_name'
+        );
+    }
+
+    /**
+     * Map a server_license to the Virtual Machine
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function serverIPAddress()
+    {
+        return $this->hasMany(
+            'App\Models\V1\ServerIPAddressModel',
+            'server_ip_address_server_id',
+            'servers_id'
+        )->select(
+            'server_ip_address_id',
+            'server_ip_address_internal_ip',
+            'server_ip_address_external_ip',
+            'server_ip_address_active'
+        );
+    }
+
+    /**
+     * Non-database / server_table attributes
+     * @var array
+     */
+    protected $appends = [
+        'server_license_friendly_name',
+        'ip_internal',
+        'ip_external',
+    ];
+
+    /**
+     * Creates the server_license_friendly_name attribute
+     * @return null
+     */
+    public function getServerLicenseFriendlyNameAttribute()
+    {
+        if (!empty($this->license)) {
+            return !empty($this->license->server_license_friendly_name) ?
+                $this->license->server_license_friendly_name : null;
+        }
+    }
+
+    /**
+     * Append ip_internal attribute
+     * @return null
+     */
+    public function getIpInternalAttribute()
+    {
+        // Load the IP from the server_ip_address table
+        $internalIP = null;
+        // Use IP Management?
+        if ($this->attributes['servers_use_ip_management'] == 'Yes') {
+            $serverIPAddress = $this->serverIPAddress->where('server_ip_address_active', '=', 'Yes')->first();
+
+            if ($serverIPAddress) {
+                $internalIP = $serverIPAddress->server_ip_address_internal_ip;
+            }
+        }
+
+        if (empty($internalIP)) {
+            // Load from the servers table,
+            if (!empty($this->attributes['servers_ip'])) {
+                // Check it's an internal Ip (192. or 10. ranges)
+                if (preg_match('/^192\.|10\./', $this->attributes['servers_ip']) === 1) {
+                    return $this->attributes['servers_ip'];
+                }
+            }
+        }
+        return $internalIP;
+    }
+
+
+    /**
+     * Get the ip_external attribute
+     * @return null
+     */
+    public function getIpExternalAttribute()
+    {
+        // Load the IP from the server_ip_address table
+        $externalIp = null;
+
+        // Use IP Management?
+        if ($this->attributes['servers_use_ip_management'] == 'Yes') {
+            $serverIPAddress = $this->serverIPAddress->where('server_ip_address_active', '=', 'Yes')->first();
+
+            if ($serverIPAddress) {
+                $externalIp = $serverIPAddress->server_ip_address_external_ip;
+            }
+        }
+
+        if (empty($externalIp)) {
+            // Load from the servers table,
+            if (!empty($this->attributes['servers_ip'])) {
+                // Check it's an internal Ip (192. or 10. ranges)
+                if (preg_match('/^192\.|10\./', $this->attributes['servers_ip']) === 0) {
+                    $externalIp = $this->attributes['servers_ip'];
+                }
+            }
+        }
+        return $externalIp;
+    }
+
 }
