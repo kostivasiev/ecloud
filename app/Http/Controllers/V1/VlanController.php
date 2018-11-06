@@ -29,7 +29,7 @@ class VlanController extends BaseController
             ->config(Vlan::class)
             ->transform($collectionQuery);
 
-        $vlans = $collectionQuery->paginate($this->per_page);
+        $vlans = $collectionQuery->paginate($this->perPage);
 
         return $this->respondCollection(
             $request,
