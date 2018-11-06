@@ -15,10 +15,12 @@ class BaseController extends Controller
     use RequestHelper;
 
     // Number of items to return per page
-    protected $per_page;
+    protected $perPage;
 
-    protected $is_admin = false;
+    // User is Admin
+    protected $isAdmin = false;
 
+    // Clients Reseller ID
     protected $resellerId;
 
     /**
@@ -28,11 +30,14 @@ class BaseController extends Controller
     public function __construct(Request $request)
     {
         // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
-        $this->per_page = $request->input('per_page', env('PAGINATION_LIMIT'));
+        $this->perPage = $request->input('per_page', env('PAGINATION_LIMIT'));
 
-        if ($request->user->resellerId == 0) {
-            $this->is_admin = true;
+        //is the client an admin
+        if (!isset($request->user->isAdmin)) {
+            $request->user->isAdmin = ($request->user->resellerId === 0);
         }
+        $this->isAdmin = $request->user->isAdmin;
+
 
         $this->resellerId = $request->user->resellerId;
     }
