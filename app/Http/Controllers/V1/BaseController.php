@@ -14,15 +14,17 @@ class BaseController extends Controller
     use ResponseHelper;
     use RequestHelper;
 
+
     // Number of items to return per page
     protected $perPage;
 
-    // User is Admin
+    // API clients admin status
     protected $isAdmin = false;
 
-    // Clients Reseller ID
+    // Customers Reseller ID
     protected $resellerId;
 
+    
     /**
      * Controller constructor.
      * @param Request $request
@@ -32,12 +34,11 @@ class BaseController extends Controller
         // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
         $this->perPage = $request->input('per_page', env('PAGINATION_LIMIT'));
 
-        //is the client an admin
+        // is the client an admin
         if (!isset($request->user->isAdmin)) {
             $request->user->isAdmin = ($request->user->resellerId === 0);
         }
         $this->isAdmin = $request->user->isAdmin;
-
 
         $this->resellerId = $request->user->resellerId;
     }
