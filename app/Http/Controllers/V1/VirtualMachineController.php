@@ -26,7 +26,7 @@ class VirtualMachineController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $virtualMachinesQuery->paginate($this->count)
+            $virtualMachinesQuery->paginate($this->per_page)
         );
     }
 
