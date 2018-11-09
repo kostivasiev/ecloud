@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
-
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -14,23 +12,9 @@ use Illuminate\Http\Request;
 use App\Models\V1\Vlan;
 use App\Exceptions\V1\VlanNotFoundException;
 
-class VlanController extends Controller
+class VlanController extends BaseController
 {
     use ResponseHelper, RequestHelper;
-
-    private $per_page;
-
-    /**
-     * Controller constructor.
-     * @param Request $request
-     */
-    public function __construct(Request $request)
-    {
-        // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
-        $this->per_page = $request->input('per_page', env('PAGINATION_LIMIT'));
-
-        $request->user->isAdmin = ($request->user->resellerId === 0);
-    }
 
     public function getSolutionVlans(Request $request, $solutionId)
     {
@@ -45,7 +29,7 @@ class VlanController extends Controller
             ->config(Vlan::class)
             ->transform($collectionQuery);
 
-        $vlans = $collectionQuery->paginate($this->per_page);
+        $vlans = $collectionQuery->paginate($this->perPage);
 
         return $this->respondCollection(
             $request,

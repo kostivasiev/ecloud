@@ -27,7 +27,7 @@ class VirtualMachineController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $virtualMachinesQuery->paginate($this->count)
+            $virtualMachinesQuery->paginate($this->perPage)
         );
     }
 
@@ -84,7 +84,7 @@ class VirtualMachineController extends BaseController
         if (!empty($vmIds)) {
             $virtualMachineQuery->whereIn('servers_id', $vmIds);
         }
-        if ($this->is_admin) {
+        if ($this->isAdmin) {
             if (!is_null($resellerId)) {
                 $virtualMachineQuery->withResellerId($resellerId);
             }

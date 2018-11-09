@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
-
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -14,23 +12,9 @@ use Illuminate\Http\Request;
 use App\Models\V1\Solution;
 use App\Exceptions\V1\SolutionNotFoundException;
 
-class SolutionController extends Controller
+class SolutionController extends BaseController
 {
     use ResponseHelper, RequestHelper;
-
-    private $per_page;
-
-    /**
-     * Controller constructor.
-     * @param Request $request
-     */
-    public function __construct(Request $request)
-    {
-        // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
-        $this->per_page = $request->input('per_page', env('PAGINATION_LIMIT'));
-
-        $request->user->isAdmin = ($request->user->resellerId === 0);
-    }
 
     /**
      * List all solutions
@@ -49,7 +33,7 @@ class SolutionController extends Controller
             ->config(Solution::class)
             ->transform($collectionQuery);
 
-        $solutions = $collectionQuery->paginate($this->per_page);
+        $solutions = $collectionQuery->paginate($this->perPage);
 
         return $this->respondCollection(
             $request,
