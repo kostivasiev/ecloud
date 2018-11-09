@@ -50,3 +50,17 @@ $router->group($solutionRouteParameters, function () use ($router) {
     // solution sites
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
 });
+
+// Hybrid/Private Sites
+$solutionRouteParameters = array_merge($baseRouteParameters, array(
+    'namespace' => 'V1',
+    'prefix' => 'v1',
+));
+$router->group($solutionRouteParameters, function () use ($router) {
+    // solutions
+    $router->get('sites', 'SolutionSiteController@index');
+    $router->get('sites/{site_id}', 'SolutionSiteController@show');
+
+    // sites VMs
+//    $router->get('sites/{site_id}/vms', 'SiteController@getSolutionVlans');
+});

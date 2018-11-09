@@ -45,8 +45,8 @@ class SolutionSite extends Model implements Filterable, Sortable
     protected $casts = [
         'ucs_site_id' => 'integer',
         'ucs_site_order' => 'integer',
-        'ucs_site_reseller_id' => 'integer',
-        'ucs_site_datacentre_id' => 'integer',
+        'ucs_site_ucs_reseller_id' => 'integer',
+        'ucs_site_ucs_datacentre_id' => 'integer',
     ];
 
 
@@ -80,8 +80,8 @@ class SolutionSite extends Model implements Filterable, Sortable
             'id'            => 'ucs_site_id',
             'state'         => 'ucs_site_state',
             'order'         => 'ucs_site_order',
-            'reseller_id'   => 'ucs_site_reseller_id',
-            'datacentre_id' => 'ucs_site_datacentre_id',
+            'solution_id'   => 'ucs_site_ucs_reseller_id',
+            'pod_id'        => 'ucs_site_ucs_datacentre_id',
         ];
     }
 
@@ -96,8 +96,8 @@ class SolutionSite extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('state', Filter::$stringDefaults),
             $factory->create('order', Filter::$numericDefaults),
-            $factory->create('reseller_id', Filter::$numericDefaults),
-            $factory->create('datacentre_id', Filter::$numericDefaults),
+            $factory->create('solution_id', Filter::$numericDefaults),
+            $factory->create('pod_id', Filter::$numericDefaults),
         ];
     }
 
@@ -114,8 +114,8 @@ class SolutionSite extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('state'),
             $factory->create('order'),
-            $factory->create('reseller_id'),
-            $factory->create('datacentre_id'),
+            $factory->create('solution_id'),
+            $factory->create('pod_id'),
         ];
     }
 
@@ -155,13 +155,12 @@ class SolutionSite extends Model implements Filterable, Sortable
             IdProperty::create('ucs_site_id', 'id'),
             StringProperty::create('ucs_site_state', 'state'),
             IntProperty::create('ucs_site_order', 'order'),
-            IntProperty::create('ucs_site_reseller_id', 'reseller_id'),
-            IntProperty::create('ucs_site_datacentre_id', 'datacentre_id'),
+            IntProperty::create('ucs_site_ucs_reseller_id', 'solution_id'),
         ];
     }
 
     /**
-     * Scope a query to only include vlan's for a given solution
+     * Scope a query to only include sites for a given solution
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param $solutionId
      * @return \Illuminate\Database\Eloquent\Builder $query
@@ -172,6 +171,25 @@ class SolutionSite extends Model implements Filterable, Sortable
 
         $query->where('ucs_site_ucs_reseller_id', $solutionId)
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'ucs_site_ucs_reseller_id');
+
+        return $query;
+    }
+
+    /**
+     * Scope a query to only include sites for a given reseller
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $resellerId
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeWithReseller($query, $resellerId)
+    {
+        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
+
+        if (!empty($resellerId)) {
+            $query->where('ucs_reseller_reseller_id', $resellerId);
+        }
+
+        $query->join('ucs_reseller', 'ucs_reseller_id', '=', 'ucs_site_ucs_reseller_id');
 
         return $query;
     }
