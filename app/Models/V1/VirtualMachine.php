@@ -17,6 +17,12 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
+/**
+ * Class VirtualMachine
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @package App\Models\V1
+ */
 class VirtualMachine extends Model implements Filterable, Sortable
 {
     /**
