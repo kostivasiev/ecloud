@@ -54,6 +54,42 @@ class VirtualMachineController extends BaseController
         );
     }
 
+    public function powerOn(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachines = $this->getVirtualMachines(null, [$vmId]);
+        $virtualMachine = $virtualMachines->first();
+        if (!$virtualMachine) {
+            throw new Exceptions\NotFoundException("Virtual Machine '$vmId' Not Found");
+        }
+
+
+    }
+
+    public function powerOff(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachines = $this->getVirtualMachines(null, [$vmId]);
+        $virtualMachine = $virtualMachines->first();
+        if (!$virtualMachine) {
+            throw new Exceptions\NotFoundException("Virtual Machine '$vmId' Not Found");
+        }
+
+
+    }
+
+    public function powerCycle(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachines = $this->getVirtualMachines(null, [$vmId]);
+        $virtualMachine = $virtualMachines->first();
+        if (!$virtualMachine) {
+            throw new Exceptions\NotFoundException("Virtual Machine '$vmId' Not Found");
+        }
+
+
+    }
+
     /**
      * Get a VM (Model, not query builder - use for updates etc)
      * @param $vmId int ID of the VM to return

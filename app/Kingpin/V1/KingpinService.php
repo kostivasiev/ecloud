@@ -276,7 +276,6 @@ class KingpinService
                     $hdds[] = $hdd;
                 }
             }
-
         } catch (TransferException $exception) {
             return false;
         }

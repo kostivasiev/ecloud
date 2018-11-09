@@ -13,7 +13,8 @@ class KingpinServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
+     * 
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @return void
      */
     public function register()

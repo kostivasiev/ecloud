@@ -242,11 +242,12 @@ class VirtualMachine extends Model implements Filterable, Sortable
         $str = trim(substr($value, 0, 2));
         if (is_numeric($str)) {
             $ramGB = intval($str);
-        } else {
-            $str = trim(substr($value, 0, 1));
-            if (is_numeric($str)) {
-                $ramGB = intval($str);
-            }
+            return $ramGB;
+        }
+
+        $str = trim(substr($value, 0, 1));
+        if (is_numeric($str)) {
+            $ramGB = intval($str);
         }
 
         if (stripos($value, 'MB') !== false) {
@@ -268,21 +269,24 @@ class VirtualMachine extends Model implements Filterable, Sortable
         $str = trim(substr($value, 0, 4));
         if (is_numeric($str)) {
             $hddGB = intval($str);
-        } else {
-            $str = trim(substr($value, 0, 3));
-            if (is_numeric($str)) {
-                $hddGB = intval($str);
-            } else {
-                $str = trim(substr($value, 0, 2));
-                if (is_numeric($str)) {
-                    $hddGB = intval($str);
-                } else {
-                    $str = trim(substr($value, 0, 1));
-                    if (is_numeric($str)) {
-                        $hddGB = intval($str);
-                    }
-                }
-            }
+            return $hddGB;
+        }
+
+        $str = trim(substr($value, 0, 3));
+        if (is_numeric($str)) {
+            $hddGB = intval($str);
+            return $hddGB;
+        }
+
+        $str = trim(substr($value, 0, 2));
+        if (is_numeric($str)) {
+            $hddGB = intval($str);
+            return $hddGB;
+        }
+
+        $str = trim(substr($value, 0, 1));
+        if (is_numeric($str)) {
+            $hddGB = intval($str);
         }
 
         return $hddGB;
@@ -522,7 +526,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
     /**
      * Get active HDD's for the VM
-     * @return bool
+     * @return array|bool
      */
     public function getActiveHDDs()
     {
@@ -544,5 +548,4 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
         return $response;
     }
-
 }
