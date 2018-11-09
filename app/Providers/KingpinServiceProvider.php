@@ -9,6 +9,9 @@ use App\Models\V1\UCSDatacentre;
 use GuzzleHttp\Client;
 use Log;
 
+/**
+ * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+ */
 class KingpinServiceProvider extends ServiceProvider
 {
     /**
