@@ -55,6 +55,21 @@ class SolutionSite extends Model implements Filterable, Sortable
      * ----------------------
      */
 
+
+    /**
+     * Fudge until ditto supports column aliases
+     * @param $key
+     * @return string
+     */
+    public function __get($key)
+    {
+        return $this->attributes[$this->table . '_' . $key];
+    }
+    public function __set($key, $value)
+    {
+        $this->attributes[$this->table . '_' . $key] = $value;
+    }
+
     /**
      * Ditto maps raw database names to friendly names.
      * @return array

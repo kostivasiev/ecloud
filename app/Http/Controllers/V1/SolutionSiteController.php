@@ -19,7 +19,7 @@ class SolutionSiteController extends BaseController
     {
         $solution = SolutionController::getSolutionById($request, $solutionId);
 
-        $collectionQuery = SolutionSite::withSolution($solution->ucs_reseller_id);
+        $collectionQuery = SolutionSite::withSolution($solution->id);
 
         (new QueryTransformer($request))
             ->config(SolutionSite::class)

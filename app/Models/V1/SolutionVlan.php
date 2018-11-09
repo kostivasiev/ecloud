@@ -13,7 +13,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class Vlan extends Model implements Filterable, Sortable
+class SolutionVlan extends Model implements Filterable, Sortable
 {
     /**
      * The table associated with the model.
@@ -50,6 +50,20 @@ class Vlan extends Model implements Filterable, Sortable
      * Ditto configuration
      * ----------------------
      */
+
+    /**
+     * Fudge until ditto supports column aliases
+     * @param $key
+     * @return string
+     */
+    public function __get($key)
+    {
+        return $this->attributes[$this->table . '_' . $key];
+    }
+    public function __set($key, $value)
+    {
+        $this->attributes[$this->table . '_' . $key] = $value;
+    }
 
     /**
      * Ditto maps raw database names to friendly names.

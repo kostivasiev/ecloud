@@ -45,7 +45,7 @@ $router->group($solutionRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}', 'SolutionController@show');
 
     // solution vlan's
-    $router->get('solutions/{solution_id}/vlans', 'VlanController@getSolutionVlans');
+    $router->get('solutions/{solution_id}/vlans', 'SolutionVlanController@getSolutionVlans');
 
     // solution sites
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
