@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Models\V1\VirtualMachineModel;
+use App\Models\V1\VirtualMachine;
 use App\Resources\V1\VirtualMachineResource;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions;
 use UKFast\DB\Ditto\QueryTransformer;
 
+use App\Kingpin\V1\KingpinService as Kingpin;
+
 class VirtualMachineController extends BaseController
 {
-
     /**
      * List all VM's
      * @param Request $request
@@ -21,7 +22,7 @@ class VirtualMachineController extends BaseController
         $virtualMachinesQuery = $this->getVirtualMachines();
 
         (new QueryTransformer($request))
-            ->config(VirtualMachineModel::class)
+            ->config(VirtualMachine::class)
             ->transform($virtualMachinesQuery);
 
         return $this->respondCollection(
@@ -42,8 +43,9 @@ class VirtualMachineController extends BaseController
         $virtualMachines = $this->getVirtualMachines(null, [$vmId]);
         $virtualMachine = $virtualMachines->first();
         if (!$virtualMachine) {
-            throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
+            throw new Exceptions\NotFoundException("Virtual Machine '$vmId' Not Found");
         }
+
         return $this->respondItem(
             $request,
             $virtualMachine,
@@ -78,7 +80,7 @@ class VirtualMachineController extends BaseController
      */
     protected function getVirtualMachines($resellerId = null, $vmIds = [])
     {
-        $virtualMachineQuery = VirtualMachineModel::query();
+        $virtualMachineQuery = VirtualMachine::query();
         if (!empty($vmIds)) {
             $virtualMachineQuery->whereIn('servers_id', $vmIds);
         }
@@ -89,6 +91,8 @@ class VirtualMachineController extends BaseController
             // Return ALL VM's
             return $virtualMachineQuery;
         }
+
+        $virtualMachineQuery->where('servers_active', '=', 'y');
 
         //For non-admin filter on reseller ID
         return $virtualMachineQuery->withResellerId($this->resellerId);
