@@ -447,7 +447,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     }
 
     /**
-     * Get the datacentre pod name for this VM
+     * Get the datacentre for this VM
      * @return null
      */
     public function getDatacentre()

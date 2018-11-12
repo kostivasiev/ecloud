@@ -26,7 +26,7 @@ class BaseController extends Controller
 
     
     /**
-     * Controller constructor.php7
+     * Controller constructor.
      * @param Request $request
      */
     public function __construct(Request $request)
