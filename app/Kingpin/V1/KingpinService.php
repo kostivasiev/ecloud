@@ -347,8 +347,7 @@ class KingpinService
             Log::debug(
                 'Connection attempt to Kingpin returned an Unauthorized response,'
                 . ' check datacentre and VMWare API URL for VM are correct.'
-        );
-
+            );
         }
 
         return true;

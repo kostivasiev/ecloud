@@ -97,7 +97,7 @@ class VirtualMachineResource extends CustomResource
 
         // If not public, add the solution ID
         if ($this->resource->servers_ecloud_type != 'Public') {
-            $array['solution_id'] = $this->resource->servers_ecloud_ucs_reseller_id;
+            $data['solution_id'] = $this->resource->servers_ecloud_ucs_reseller_id;
         }
 
         return $this->filterProperties($request, $data);
