@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Exceptions\V1\KingpinException;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Scopes\ECloudVmServersScope;
@@ -16,9 +17,14 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class VirtualMachineModel extends Model implements Filterable, Sortable
+/**
+ * Class VirtualMachine
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @package App\Models\V1
+ */
+class VirtualMachine extends Model implements Filterable, Sortable
 {
-
     /**
      * Cast our database columns to the correct data type.
      *
@@ -83,8 +89,8 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
             'id' => 'servers_id',
             'name' => 'servers_friendly_name',
             'cpu' => 'servers_cpu',
-            'ram' => 'servers_memory',
-            'hdd' => 'servers_hdd',
+            'ram_gb' => 'servers_memory',
+            'hdd_gb' => 'servers_hdd',
             'platform' => 'servers_platform',
             'backup' => 'servers_backup',
             'support' => 'servers_advanced_support',
@@ -103,8 +109,8 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('cpu', Filter::$stringDefaults),
-            $factory->create('ram', Filter::$numericDefaults),
-            $factory->create('hdd', Filter::$stringDefaults),
+            $factory->create('ram_gb', Filter::$numericDefaults),
+            $factory->create('hdd_gb', Filter::$stringDefaults),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup', Filter::$stringDefaults),
             $factory->create('support', Filter::$stringDefaults),
@@ -124,8 +130,8 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
             $factory->create('id', 'asc'),
             $factory->create('name', 'asc'),
             $factory->create('cpu', 'asc'),
-            $factory->create('ram', 'asc'),
-            $factory->create('hdd', 'asc'),
+            $factory->create('ram_gb', 'asc'),
+            $factory->create('hdd_gb', 'asc'),
             $factory->create('platform', 'asc'),
             $factory->create('backup', 'asc'),
             $factory->create('support', 'asc'),
@@ -171,8 +177,8 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
             IdProperty::create('servers_id', 'id'),
             StringProperty::create('servers_friendly_name', 'name'),
             IntProperty::create('servers_cpu', 'cpu'),
-            StringProperty::create('servers_memory', 'ram'),
-            StringProperty::create('servers_hdd', 'hdd'),
+            IntProperty::create('servers_memory', 'ram_gb'),
+            IntProperty::create('servers_hdd', 'hdd_gb'),
             StringProperty::create('servers_platform', 'platform'),
             StringProperty::create('server_license_friendly_name', 'operating_system'),
             StringProperty::create('servers_backup', 'backup'),
@@ -231,6 +237,68 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
     }
 
     /**
+     * Mutate the server's memory attribute to an integer
+     * @param $value
+     * @return float|int
+     */
+    public function getServersMemoryAttribute($value)
+    {
+        $ramGB = 0;
+
+        $str = trim(substr($value, 0, 2));
+        if (is_numeric($str)) {
+            $ramGB = intval($str);
+            return $ramGB;
+        }
+
+        $str = trim(substr($value, 0, 1));
+        if (is_numeric($str)) {
+            $ramGB = intval($str);
+        }
+
+        if (stripos($value, 'MB') !== false) {
+            $ramGB = $ramGB / 1024;
+        }
+
+        return $ramGB;
+    }
+
+    /**
+     * Mutate the server's hdd attribute to an integer
+     * @param $value
+     * @return float|int
+     */
+    public function getServersHddAttribute($value)
+    {
+        $hddGB = 0;
+
+        $str = trim(substr($value, 0, 4));
+        if (is_numeric($str)) {
+            $hddGB = intval($str);
+            return $hddGB;
+        }
+
+        $str = trim(substr($value, 0, 3));
+        if (is_numeric($str)) {
+            $hddGB = intval($str);
+            return $hddGB;
+        }
+
+        $str = trim(substr($value, 0, 2));
+        if (is_numeric($str)) {
+            $hddGB = intval($str);
+            return $hddGB;
+        }
+
+        $str = trim(substr($value, 0, 1));
+        if (is_numeric($str)) {
+            $hddGB = intval($str);
+        }
+
+        return $hddGB;
+    }
+
+    /**
      * Relation Mappings
      */
 
@@ -241,7 +309,7 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
     public function license()
     {
         return $this->hasOne(
-            'App\Models\V1\ServerLicenceModel',
+            'App\Models\V1\ServerLicence',
             'server_license_name',
             'servers_license'
         )->select(
@@ -257,7 +325,7 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
     public function serverIPAddress()
     {
         return $this->hasMany(
-            'App\Models\V1\ServerIPAddressModel',
+            'App\Models\V1\ServerIPAddress',
             'server_ip_address_server_id',
             'servers_id'
         )->select(
@@ -267,6 +335,34 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
             'server_ip_address_active'
         );
     }
+
+    /**
+     * Map the UCS reseller id
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function UCSReseller()
+    {
+        return $this->hasOne(
+            'App\Models\V1\UCSReseller',
+            'ucs_reseller_id',
+            'servers_ecloud_ucs_reseller_id'
+        );
+    }
+
+
+    /**
+     * Map a UCSDatacentre to the Virtual Machine
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function UCSDatacentre()
+    {
+        return $this->hasOne(
+            'App\Models\V1\UCSDatacentre',
+            'ucs_datacentre_id',
+            'servers_ecloud_datacentre_id'
+        );
+    }
+
 
     /**
      * Non-database / server_table attributes
@@ -348,5 +444,114 @@ class VirtualMachineModel extends Model implements Filterable, Sortable
             }
         }
         return $externalIp;
+    }
+
+    /**
+     * Get the datacentre for this VM
+     * @return null
+     */
+    public function getDatacentre()
+    {
+        if (!empty($this->UCSDatacentre)) {
+            return $this->UCSDatacentre;
+        }
+
+        if ($this->servers_ecloud_datacentre_id == 0) {
+            if (!empty($this->UCSReseller)) {
+                return $this->UCSReseller->UCSDatacentre;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Non-database functions
+     */
+
+
+    /**
+     *  Check the current state of the VM
+     * @return string
+     */
+    public function stateCheck()
+    {
+        $config = [
+            $this->getDatacentre(),
+            $this->servers_ecloud_type
+        ];
+
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+        } catch (\Exception $exception) {
+            return 'Unknown';
+        }
+
+        $isOnline = $kingpin->checkVMOnline(
+            $this->getKey(),
+            $this->servers_ecloud_ucs_reseller_id
+        );
+
+        if ($isOnline === true) {
+            return 'Online';
+        }
+
+        if (empty($kingpin->getLastError())) {
+            return 'Offline';
+        }
+
+        return 'Unknown';
+    }
+
+
+    /**
+     * Return the current status of the VM's vmware tools
+     * @return mixed
+     */
+    public function vmwareToolsStatus()
+    {
+        $config = [
+            $this->getDatacentre(),
+            $this->servers_ecloud_type
+        ];
+
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+        } catch (\Exception $exception) {
+            return false;
+        }
+
+        $response = $kingpin->vmwareToolsStatus(
+            $this->getKey(),
+            $this->servers_ecloud_ucs_reseller_id
+        );
+
+        return $response;
+    }
+
+    /**
+     * Get active HDD's for the VM
+     * @return array|bool
+     */
+    public function getActiveHDDs()
+    {
+        $config = [
+            $this->getDatacentre(),
+            $this->servers_ecloud_type
+        ];
+
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+        } catch (\Exception $exception) {
+            return false;
+        }
+
+        $response = $kingpin->getActiveHDDs(
+            $this->getKey(),
+            $this->servers_ecloud_ucs_reseller_id
+        );
+
+        return $response;
     }
 }
