@@ -523,8 +523,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
         }
 
         $response = $kingpin->vmwareToolsStatus(
-            $this->servers_ecloud_ucs_reseller_id,
-            $this->getKey()
+            $this->getKey(),
+            $this->servers_ecloud_ucs_reseller_id
         );
 
         return $response;
@@ -548,8 +548,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
         }
 
         $response = $kingpin->getActiveHDDs(
-            $this->servers_ecloud_ucs_reseller_id,
-            $this->getKey()
+            $this->getKey(),
+            $this->servers_ecloud_ucs_reseller_id
         );
 
         return $response;

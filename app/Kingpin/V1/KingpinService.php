@@ -209,7 +209,7 @@ class KingpinService
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function vmwareToolsStatus($solutionId, $vmId)
+    public function vmwareToolsStatus($vmId, $solutionId = null)
     {
         $url = $this->generateV1URL();
         if (in_array($this->environment, ['Hybrid', 'Burst'])) {
@@ -246,7 +246,7 @@ class KingpinService
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function getActiveHDDs($solutionId, $vmId)
+    public function getActiveHDDs($vmId, $solutionId = null)
     {
         $url = $this->generateV1URL();
         if (in_array($this->environment, ['Hybrid', 'Burst'])) {
