@@ -340,6 +340,15 @@ class KingpinService
 
         if (is_null($response)) {
             Log::debug('No response body from Kingpin request, service may be unavailable.');
+            return true;
+        }
+
+        if ($response->getStatusCode() == 401) {
+            Log::debug(
+                'Connection attempt to Kingpin returned an Unauthorized response,'
+                . ' check datacentre and VMWare API URL for VM are correct.'
+        );
+
         }
 
         return true;

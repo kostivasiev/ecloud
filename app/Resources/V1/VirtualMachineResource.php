@@ -92,9 +92,13 @@ class VirtualMachineResource extends CustomResource
             'computername' => $this->resource->servers_netnios_name,
             'status' => $this->stateCheck(),
             'vmware-tools' => $this->vmwareToolsStatus(),
-            'hdd_disk' => $this->getActiveHDDs(),
-            'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id
+            'hdd_disk' => $this->getActiveHDDs()
         ];
+
+        // If not public, add the solution ID
+        if ($this->resource->servers_ecloud_type != 'Public') {
+            $array['solution_id'] = $this->resource->servers_ecloud_ucs_reseller_id;
+        }
 
         return $this->filterProperties($request, $data);
     }

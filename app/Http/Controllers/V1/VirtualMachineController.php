@@ -24,7 +24,6 @@ class VirtualMachineController extends BaseController
         (new QueryTransformer($request))
             ->config(VirtualMachine::class)
             ->transform($virtualMachinesQuery);
-
         return $this->respondCollection(
             $request,
             $virtualMachinesQuery->paginate($this->perPage)
@@ -53,7 +52,7 @@ class VirtualMachineController extends BaseController
             VirtualMachineResource::class
         );
     }
-    
+
     /**
      * Get a VM (Model, not query builder - use for updates etc)
      * @param $vmId int ID of the VM to return
