@@ -479,7 +479,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     {
         $config = [
             $this->getDatacentre(),
-            $this->servers_ecloud_type
+            $this->type()
         ];
 
         try {
@@ -490,7 +490,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
         $isOnline = $kingpin->checkVMOnline(
             $this->getKey(),
-            $this->servers_ecloud_ucs_reseller_id
+            $this->solutionId()
         );
 
         if ($isOnline === true) {
@@ -513,7 +513,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     {
         $config = [
             $this->getDatacentre(),
-            $this->servers_ecloud_type
+            $this->type()
         ];
 
         try {
@@ -524,7 +524,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
         $response = $kingpin->vmwareToolsStatus(
             $this->getKey(),
-            $this->servers_ecloud_ucs_reseller_id
+            $this->solutionId()
         );
 
         return $response;
@@ -538,7 +538,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     {
         $config = [
             $this->getDatacentre(),
-            $this->servers_ecloud_type
+            $this->type()
         ];
 
         try {
@@ -549,9 +549,32 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
         $response = $kingpin->getActiveHDDs(
             $this->getKey(),
-            $this->servers_ecloud_ucs_reseller_id
+            $this->solutionId()
         );
 
         return $response;
+    }
+
+
+    /**
+     * Return the VM solutionId
+     * @return mixed
+     */
+    public function solutionId()
+    {
+        if ($this->servers_ecloud_type == 'Public') {
+            return null;
+        }
+
+        return $this->servers_ecloud_ucs_reseller_id;
+    }
+
+    /**
+     * Return the type of VM, Hybrid / Public etc
+     * @return mixed
+     */
+    public function type()
+    {
+        return $this->servers_ecloud_type;
     }
 }
