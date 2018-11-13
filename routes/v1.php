@@ -26,13 +26,13 @@ $router->group($virtualMachineRouteParameters, function () use ($router) {
     $router->get('vms/{vm_id}', 'VirtualMachineController@show');
 
     //Power the VM On
-    $router->get('vms/{vm_id}/power-on', 'VirtualMachineController@powerOn');
+    $router->put('vms/{vm_id}/power-on', 'VirtualMachineController@powerOn');
 
     //Power the VM Off
-    $router->get('vms/{vm_id}/power-off', 'VirtualMachineController@powerOff');
+    $router->put('vms/{vm_id}/power-off', 'VirtualMachineController@powerOff');
 
     //Power-cycle the VM
-    $router->get('vms/{vm_id}/power-cycle', 'VirtualMachineController@powerCycle');
+    $router->put('vms/{vm_id}/power-cycle', 'VirtualMachineController@powerCycle');
 });
 
 
