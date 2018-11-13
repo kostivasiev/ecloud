@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\KingpinException;
+use App\Exceptions\V1\ServiceTimeoutException;
 use App\Models\V1\VirtualMachine;
 use App\Resources\V1\VirtualMachineResource;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions;
 use UKFast\DB\Ditto\QueryTransformer;
-
-use App\Kingpin\V1\KingpinService as Kingpin;
 
 class VirtualMachineController extends BaseController
 {
@@ -51,6 +51,149 @@ class VirtualMachineController extends BaseController
             200,
             VirtualMachineResource::class
         );
+    }
+
+    /**
+     * @param Request $request
+     * @param $vmId
+     * @throws Exceptions\NotFoundException
+     * @throws KingpinException
+     * @throws ServiceTimeoutException
+     */
+    public function powerOff(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        $result = $this->shutDownVirtualMachine($virtualMachine);
+        if (!$result) {
+            $errorMessage = 'Failed to power off virtual machine';
+            throw new KingpinException($errorMessage);
+        }
+
+        $this->respondEmpty();
+    }
+
+    /**
+     * Power on a virtual machine
+     * @param Request $request
+     * @param $vmId
+     * @throws Exceptions\NotFoundException
+     * @throws KingpinException
+     */
+    public function powerOn(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        $result = $this->powerOnVirtualMachine($virtualMachine);
+        if (!$result) {
+            throw new KingpinException('Failed to power on virtual machine');
+        }
+
+        $this->respondEmpty();
+    }
+
+    /**
+     * Power-cycle the virtual machine - Power off then on again.
+     * @param Request $request
+     * @param $vmId
+     * @throws Exceptions\NotFoundException
+     * @throws KingpinException
+     * @throws ServiceTimeoutException
+     */
+    public function powerCycle(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+        //Power down
+        $shutDownResult = $this->shutDownVirtualMachine($virtualMachine);
+        if (!$shutDownResult) {
+            throw new KingpinException('Failed to power down virtual machine');
+        }
+        sleep(3);
+        //Power up
+        $powerOnResult = $this->powerOnVirtualMachine($virtualMachine);
+        if (!$powerOnResult) {
+            throw new KingpinException('Failed to power on virtual machine');
+        }
+
+        $this->respondEmpty();
+    }
+
+
+    /**
+     * Power on a virtual machine
+     * @param VirtualMachine $virtualMachine
+     * @return bool
+     * @throws KingpinException
+     */
+    protected function powerOnVirtualMachine(VirtualMachine $virtualMachine)
+    {
+        $kingpin = $this->loadKingpinService($virtualMachine);
+
+        $powerOnResult = $kingpin->powerOnVirtualMachine(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+
+        if (!$powerOnResult) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param VirtualMachine $virtualMachine
+     * @return bool
+     * @throws KingpinException
+     * @throws ServiceTimeoutException
+     */
+    protected function shutDownVirtualMachine(VirtualMachine $virtualMachine)
+    {
+        $kingpin = $this->loadKingpinService($virtualMachine);
+
+        $shutDownResult = $kingpin->shutDownVirtualMachine(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+
+        if (!$shutDownResult) {
+            return false;
+        }
+
+        $startTime = time();
+
+        do {
+            sleep(10);
+            $isOnline = $kingpin->checkVMOnline($virtualMachine->getKey(), $virtualMachine->solutionId());
+            if ($isOnline === false) {
+                return true;
+            }
+        } while (time() - $startTime < 120);
+
+        throw new ServiceTimeoutException('Timeout waiting for Virtual Machine to power off.');
+    }
+
+    /**
+     * Load and configure the Kingpin service for a Virtual Machine
+     * @param VirtualMachine $virtualMachine
+     * @return mixed
+     * @throws KingpinException
+     */
+    protected function loadKingpinService(VirtualMachine $virtualMachine)
+    {
+        try {
+            $kingpin = app()->makeWith(
+                'App\Kingpin\V1\KingpinService',
+                [$virtualMachine->getDatacentre(), $virtualMachine->type()]
+            );
+        } catch (\Exception $exception) {
+            throw new KingpinException('Unable to connect to Virtual Machine');
+        }
+
+        return $kingpin;
     }
 
     /**

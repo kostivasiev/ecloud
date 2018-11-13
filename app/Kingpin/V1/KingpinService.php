@@ -2,7 +2,6 @@
 
 namespace App\Kingpin\V1;
 
-use App\Exceptions\V1\ArtisanException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TransferException;
 use Log;
@@ -179,10 +178,7 @@ class KingpinService
      */
     public function checkVMOnline($vmId, $solutionId = null)
     {
-        $url = $this->generateV1URL();
-        if (in_array($this->environment, ['Hybrid', 'Burst'])) {
-            $url .= 'solution/' . $solutionId . '/';
-        }
+        $url = $this->generateV1URL($solutionId);
         $url .= 'vm/' . $vmId;
 
         $model = [
@@ -211,10 +207,7 @@ class KingpinService
      */
     public function vmwareToolsStatus($vmId, $solutionId = null)
     {
-        $url = $this->generateV1URL();
-        if (in_array($this->environment, ['Hybrid', 'Burst'])) {
-            $url .= 'solution/' . $solutionId . '/';
-        }
+        $url = $this->generateV1URL($solutionId);
         $url .= 'vm/' . $vmId;
 
         $model = [
@@ -248,10 +241,7 @@ class KingpinService
      */
     public function getActiveHDDs($vmId, $solutionId = null)
     {
-        $url = $this->generateV1URL();
-        if (in_array($this->environment, ['Hybrid', 'Burst'])) {
-            $url .= 'solution/' . $solutionId . '/';
-        }
+        $url = $this->generateV1URL($solutionId);
         $url .= 'vm/' . $vmId;
 
         $model = [
@@ -283,23 +273,65 @@ class KingpinService
         return $hdds;
     }
 
+
+    /**
+     * @param $vmId
+     * @param null $solutionId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function shutDownVirtualMachine($vmId, $solutionId = null)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'vm/' . $vmId . '/power/shutdown';
+
+        try {
+            $this->makeRequest('PUT', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $vmId
+     * @param null $solutionId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function powerOnVirtualMachine($vmId, $solutionId = null)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'vm/' . $vmId . '/power';
+
+        try {
+            $this->makeRequest('POST', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+
     /**
      * Generates the base URL
+     * @param null $solutionId
      * @return string
-     * @throws \Exception
      */
-    protected function generateV1URL(): string
+    protected function generateV1URL($solutionId = null)
     {
         switch ($this->environment) {
             case 'Public':
                 return 'api/v1/public/';
                 break;
             case 'Burst':
-                return 'api/v1/burst';
+                return 'api/v1/burst/solution/' . $solutionId . '/';
                 break;
             case 'Hybrid':
             default:
-                return 'api/v1/';
+                return 'api/v1/solution/' . $solutionId . '/';
         }
     }
 
