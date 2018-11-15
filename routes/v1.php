@@ -16,21 +16,23 @@ $baseRouteParameters = [
 
 
 // VM's
-$hostRouteParameters = $baseRouteParameters;
-$hostRouteParameters['namespace'] = 'V1';
-$router->group($hostRouteParameters, function () use ($router) {
-
-    /**
-     * GET /vms
-     * Return a VM Collection
-     */
+$virtualMachineRouteParameters = $baseRouteParameters;
+$virtualMachineRouteParameters['namespace'] = 'V1';
+$router->group($virtualMachineRouteParameters, function () use ($router) {
+    // Return a VM Collection
     $router->get('vms', 'VirtualMachineController@index');
 
-    /**
-     * GET vms/{vm_id}
-     * Return a VM Resource
-     */
+    //Return a VM Resource
     $router->get('vms/{vm_id}', 'VirtualMachineController@show');
+
+    //Power the VM On
+    $router->put('vms/{vm_id}/power-on', 'VirtualMachineController@powerOn');
+
+    //Power the VM Off
+    $router->put('vms/{vm_id}/power-off', 'VirtualMachineController@powerOff');
+
+    //Power-cycle the VM
+    $router->put('vms/{vm_id}/power-cycle', 'VirtualMachineController@powerCycle');
 });
 
 

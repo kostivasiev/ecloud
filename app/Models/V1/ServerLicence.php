@@ -4,7 +4,7 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ServerLicenceModel extends Model
+class ServerLicence extends Model
 {
     /**
      * The table associated with the model.

@@ -65,10 +65,10 @@ $app->singleton(
 //    App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
- $app->routeMiddleware([
-     'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
-     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class
- ]);
+$app->routeMiddleware([
+    'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
+    'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +83,8 @@ $app->singleton(
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 $app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(UKFast\Providers\LogServiceProvider::class);
+//VMWare service provider (Kingpin)
+$app->register(App\Providers\KingpinServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

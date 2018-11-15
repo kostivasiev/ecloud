@@ -4,21 +4,21 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ServerIPAddressModel extends Model
+class UCSDatacentre extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'server_ip_address';
+    protected $table = 'ucs_datacentre';
 
     /**
      * The primary key associated with the model.
      *
      * @var string
      */
-    protected $primaryKey = 'server_ip_address_id';
+    protected $primaryKey = 'ucs_datacentre_id';
 
     /**
      * Indicates if the model should be timestamped
