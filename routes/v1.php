@@ -51,6 +51,9 @@ $router->group($solutionRouteParameters, function () use ($router) {
 
     // solution sites
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
+
+    // firewalls
+    $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
 });
 
 // Hybrid/Private Sites
