@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -13,21 +14,21 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class Solution extends Model implements Filterable, Sortable
+class SolutionSite extends Model implements Filterable, Sortable
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'ucs_reseller';
+    protected $table = 'ucs_site';
 
     /**
      * The primary key associated with the model.
      *
      * @var string
      */
-    protected $primaryKey = 'ucs_reseller_id';
+    protected $primaryKey = 'ucs_site_id';
 
     /**
      * Indicates if the model should be timestamped
@@ -42,7 +43,10 @@ class Solution extends Model implements Filterable, Sortable
      * @var array
      */
     protected $casts = [
-        'ucs_reseller_id' => 'integer',
+        'ucs_site_id' => 'integer',
+        'ucs_site_order' => 'integer',
+        'ucs_site_ucs_reseller_id' => 'integer',
+        'ucs_site_ucs_datacentre_id' => 'integer',
     ];
 
 
@@ -66,7 +70,6 @@ class Solution extends Model implements Filterable, Sortable
         $this->attributes[$this->table . '_' . $key] = $value;
     }
 
-
     /**
      * Ditto maps raw database names to friendly names.
      * @return array
@@ -74,9 +77,11 @@ class Solution extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id' => 'ucs_reseller_id',
-            'name' => 'ucs_reseller_solution_name',
-            'type'   => 'ucs_reseller_type',
+            'id'            => 'ucs_site_id',
+            'state'         => 'ucs_site_state',
+            'order'         => 'ucs_site_order',
+            'solution_id'   => 'ucs_site_ucs_reseller_id',
+            'pod_id'        => 'ucs_site_ucs_datacentre_id',
         ];
     }
 
@@ -89,8 +94,10 @@ class Solution extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
+            $factory->create('state', Filter::$stringDefaults),
+            $factory->create('order', Filter::$numericDefaults),
+            $factory->create('solution_id', Filter::$numericDefaults),
+            $factory->create('pod_id', Filter::$numericDefaults),
         ];
     }
 
@@ -105,8 +112,10 @@ class Solution extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('type'),
+            $factory->create('state'),
+            $factory->create('order'),
+            $factory->create('solution_id'),
+            $factory->create('pod_id'),
         ];
     }
 
@@ -119,7 +128,7 @@ class Solution extends Model implements Filterable, Sortable
     public function defaultSort($sortFactory)
     {
         return [
-            $sortFactory->create('id', 'asc'),
+            $sortFactory->create('order', 'asc'),
         ];
     }
 
@@ -143,15 +152,31 @@ class Solution extends Model implements Filterable, Sortable
     public function properties()
     {
         return [
-            IdProperty::create('ucs_reseller_id', 'id'),
-            StringProperty::create('ucs_reseller_solution_name', 'name'),
-            StringProperty::create('ucs_reseller_type', 'type'),
+            IdProperty::create('ucs_site_id', 'id'),
+            StringProperty::create('ucs_site_state', 'state'),
+            IntProperty::create('ucs_site_order', 'order'),
+            IntProperty::create('ucs_site_ucs_reseller_id', 'solution_id'),
         ];
     }
 
+    /**
+     * Scope a query to only include sites for a given solution
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param $solutionId
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeWithSolution($query, $solutionId)
+    {
+        $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
+
+        $query->where('ucs_site_ucs_reseller_id', $solutionId)
+            ->join('ucs_reseller', 'ucs_reseller_id', '=', 'ucs_site_ucs_reseller_id');
+
+        return $query;
+    }
 
     /**
-     * Scope a query to only include solutions for a given reseller
+     * Scope a query to only include sites for a given reseller
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param int $resellerId
      * @return \Illuminate\Database\Eloquent\Builder $query
@@ -163,6 +188,8 @@ class Solution extends Model implements Filterable, Sortable
         if (!empty($resellerId)) {
             $query->where('ucs_reseller_reseller_id', $resellerId);
         }
+
+        $query->join('ucs_reseller', 'ucs_reseller_id', '=', 'ucs_site_ucs_reseller_id');
 
         return $query;
     }

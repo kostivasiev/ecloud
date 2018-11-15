@@ -24,10 +24,7 @@ class SolutionController extends BaseController
      */
     public function index(Request $request)
     {
-        $collectionQuery = Solution::withReseller($request->user->resellerId);
-        if (!$request->user->isAdmin) {
-            $collectionQuery->where('ucs_reseller_active', 'Yes');
-        }
+        $collectionQuery = static::getSolutionQuery($request);
 
         (new QueryTransformer($request))
             ->config(Solution::class)
@@ -51,19 +48,40 @@ class SolutionController extends BaseController
      */
     public function show(Request $request, $solutionId)
     {
+        return $this->respondItem(
+            $request,
+            static::getSolutionById($request, $solutionId)
+        );
+    }
+
+    /**
+     * get solution by ID
+     * @param Request $request
+     * @param $solutionId
+     * @return mixed
+     * @throws SolutionNotFoundException
+     */
+    public static function getSolutionById(Request $request, $solutionId)
+    {
+        $solution = static::getSolutionQuery($request)->find($solutionId);
+        if (is_null($solution)) {
+            throw new SolutionNotFoundException('Solution ID #' . $solutionId . ' not found', 'solution_id');
+        }
+
+        return $solution;
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public static function getSolutionQuery(Request $request)
+    {
         $solutionQuery = Solution::withReseller($request->user->resellerId);
         if (!$request->user->isAdmin) {
             $solutionQuery->where('ucs_reseller_active', 'Yes');
         }
 
-        $solution = $solutionQuery->find($solutionId);
-        if (is_null($solution)) {
-            throw new SolutionNotFoundException('Solution ID #' . $solutionId . ' not found', 'solution_id');
-        }
-
-        return $this->respondItem(
-            $request,
-            $solution
-        );
+        return $solutionQuery;
     }
 }

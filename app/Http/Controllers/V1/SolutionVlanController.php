@@ -9,31 +9,30 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 
 use Illuminate\Http\Request;
 
-use App\Models\V1\Vlan;
-use App\Exceptions\V1\VlanNotFoundException;
+use App\Models\V1\SolutionVlan;
 
-class VlanController extends BaseController
+class SolutionVlanController extends BaseController
 {
     use ResponseHelper, RequestHelper;
 
     public function getSolutionVlans(Request $request, $solutionId)
     {
-        $collectionQuery = Vlan::withReseller($request->user->resellerId)
-            ->withSolution($solutionId);
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+
+        $collectionQuery = SolutionVlan::withReseller($request->user->resellerId)
+            ->withSolution($solution->id);
 
         if (!$request->user->isAdmin) {
             $collectionQuery->where('ucs_reseller_active', 'Yes');
         }
 
         (new QueryTransformer($request))
-            ->config(Vlan::class)
+            ->config(SolutionVlan::class)
             ->transform($collectionQuery);
-
-        $vlans = $collectionQuery->paginate($this->perPage);
 
         return $this->respondCollection(
             $request,
-            $vlans
+            $collectionQuery->paginate($this->perPage)
         );
     }
 }

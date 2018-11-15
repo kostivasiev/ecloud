@@ -13,7 +13,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class Vlan extends Model implements Filterable, Sortable
+class SolutionVlan extends Model implements Filterable, Sortable
 {
     /**
      * The table associated with the model.
@@ -50,6 +50,20 @@ class Vlan extends Model implements Filterable, Sortable
      * Ditto configuration
      * ----------------------
      */
+
+    /**
+     * Fudge until ditto supports column aliases
+     * @param $key
+     * @return string
+     */
+    public function __get($key)
+    {
+        return $this->attributes[$this->table . '_' . $key];
+    }
+    public function __set($key, $value)
+    {
+        $this->attributes[$this->table . '_' . $key] = $value;
+    }
 
     /**
      * Ditto maps raw database names to friendly names.
@@ -157,11 +171,9 @@ class Vlan extends Model implements Filterable, Sortable
     {
         $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
 
-        if (!empty($solutionId)) {
-            $query->where('ucs_reseller_id', $solutionId)
-                ->join('vlan_ucs_reseller', 'vlan_ucs_reseller_vlan_id', '=', 'vlan_id')
-                ->join('ucs_reseller', 'ucs_reseller_id', '=', 'vlan_ucs_reseller_ucs_reseller_id');
-        }
+        $query->where('ucs_reseller_id', $solutionId)
+            ->join('vlan_ucs_reseller', 'vlan_ucs_reseller_vlan_id', '=', 'vlan_id')
+            ->join('ucs_reseller', 'ucs_reseller_id', '=', 'vlan_ucs_reseller_ucs_reseller_id');
 
         return $query;
     }
