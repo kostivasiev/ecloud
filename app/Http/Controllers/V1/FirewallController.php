@@ -33,9 +33,12 @@ class FirewallController extends BaseController
     {
         //$firewalls = $this->networkingService->getSolutionFirewalls($request, $solutionId);
 
-        $collectionQuery = Firewall::withReseller($request->user->resellerId)
-            ->whereIn('servers_type', ['firewall', 'virtual firewall'])
+        $collectionQuery = static::getFirewallQuery($request)
             ->withSolution($solutionId);
+
+        if (!$request->user->isAdmin) {
+            $collectionQuery->where('servers_active', 'y');
+        }
 
         (new QueryTransformer($request))
             ->config(Firewall::class)
@@ -47,5 +50,23 @@ class FirewallController extends BaseController
             $request,
             $firewalls
         );
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public static function getFirewallQuery(Request $request)
+    {
+        $solutionQuery = Firewall::withReseller($request->user->resellerId)
+            ->whereIn('servers_type', ['firewall', 'virtual firewall'])
+            ->join('server_subtype', 'server_subtype_id', '=', 'servers_subtype_id')
+            ->where('server_subtype_name', 'eCloud Dedicated');
+
+        if (!$request->user->isAdmin) {
+            $solutionQuery->where('ucs_reseller_active', 'Yes');
+        }
+
+        return $solutionQuery;
     }
 }

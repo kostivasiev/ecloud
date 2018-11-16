@@ -158,23 +158,6 @@ class Firewall extends Model implements Filterable, Sortable
         ];
     }
 
-
-    /**
-     * Scope a query to only include sites for a given solution
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param $solutionId
-     * @return \Illuminate\Database\Eloquent\Builder $query
-     */
-    public function scopeWithSolution($query, $solutionId)
-    {
-        $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
-
-        $query->where('servers_ecloud_ucs_reseller_id', $solutionId)
-            ->join('ucs_reseller', 'ucs_reseller_id', '=', 'servers_ecloud_ucs_reseller_id');
-
-        return $query;
-    }
-
     /**
      * Scope a query to only include sites for a given reseller
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -188,6 +171,22 @@ class Firewall extends Model implements Filterable, Sortable
         if (!empty($resellerId)) {
             $query->where('servers_reseller_id', $resellerId);
         }
+
+        return $query;
+    }
+
+    /**
+     * Scope a query to only include sites for a given solution
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param $solutionId
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeWithSolution($query, $solutionId)
+    {
+        $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
+
+        $query->where('servers_ecloud_ucs_reseller_id', $solutionId)
+            ->join('ucs_reseller', 'ucs_reseller_id', '=', 'servers_ecloud_ucs_reseller_id');
 
         return $query;
     }
