@@ -4,17 +4,17 @@ namespace App\Http\Controllers\V1;
 
 use App\Models\V1\ServerLicense;
 use Illuminate\Http\Request;
-use UKFast\Api\Resource\Traits\ResourceHelper;
 use App\Models\V1\Solution;
-
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-
+/**
+ * Class TemplateController
+ * @package App\Http\Controllers\V1
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class TemplateController extends BaseController
 {
-    use ResourceHelper;
-
     /**
      * List all Solution and System Templates
      * @param Request $request
@@ -112,14 +112,14 @@ class TemplateController extends BaseController
                     continue;
                 }
 
-                $solutionTemplatesResult = $kingpin->getSolutionTemplates($solution->getKey());
-                if (empty($solutionTemplatesResult) || !is_array($solutionTemplatesResult)) {
+                $result = $kingpin->getSolutionTemplates($solution->getKey());
+                if (empty($result) || !is_array($result)) {
                     //Failed to retrieve templates or empty array
                     continue;
                 }
 
                 //Add the solution_id to the template data
-                foreach ($solutionTemplatesResult as &$template) {
+                foreach ($result as &$template) {
                     $template->solution_id = $solution->getKey();
                     // Check the template license
                     $serverLicense = ServerLicense::checkTemplateLicense($solution->UCSDatacentre->getKey(), $template);
@@ -127,7 +127,7 @@ class TemplateController extends BaseController
                     $template = $this->convertToPublicTemplate($template, $serverLicense);
                 }
 
-                $templates = array_merge($templates, $solutionTemplatesResult);
+                $templates = array_merge($templates, $result);
             }
         }
         return $templates;
@@ -171,36 +171,36 @@ class TemplateController extends BaseController
                 continue;
             }
 
-            $systemTemplatesResult = $kingpin->getSystemTemplates();
+            $result = $kingpin->getSystemTemplates();
 
-            if (empty($systemTemplatesResult) || !is_array($systemTemplatesResult)) {
+            if (empty($result) || !is_array($result)) {
                 continue;
             }
 
-            $templates = $systemTemplatesResult;
+            $templates = $result;
 
             //===========
             // Check against available server licenses
-            // TODO: Need to double check we need this bit of code, or just return all templates
-            $availableEcloudLicenses = ServerLicense::availableToInstall(
-                'ecloud vm',
-                true,
-                'OS',
-                $UCSDatacentre->getKey()
-            );
+//            $availableEcloudLicenses = ServerLicense::availableToInstall(
+//                'ecloud vm',
+//                true,
+//                'OS',
+//                $UCSDatacentre->getKey()
+//            );
 
             foreach ($templates as &$template) {
                 $serverLicense = ServerLicense::checkTemplateLicense($UCSDatacentre->getKey(), $template);
+                // TODO: Need to double check we need this bit of code, or just return all templates
                 //need to filter UKFast templates
-                if ($this->findTemplateByName($template->name, $availableEcloudLicenses) !== false) {
-                    continue; //skip and dont show to customer
-                }
-
-                if (!empty($serverLicense->name)) { //TODO: Added this if, need to check it's right
-                    if ($this->findTemplateByName($serverLicense->name, $availableEcloudLicenses) === false) {
-                        continue; //skip and dont show to customer
-                    }
-                }
+//                if ($this->findTemplateByName($template->name, $availableEcloudLicenses) !== false) {
+//                    continue; //skip and dont show to customer
+//                }
+//
+//                if (!empty($serverLicense->name)) {
+//                    if ($this->findTemplateByName($serverLicense->name, $availableEcloudLicenses) === false) {
+//                        continue; //skip and dont show to customer
+//                    }
+//                }
 
                 $template = $this->convertToPublicTemplate($template, $serverLicense);
             }

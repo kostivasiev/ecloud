@@ -96,6 +96,4 @@ class Template extends Model implements Filterable, Sortable
             StringProperty::create('ucs_reseller_type', 'type'),
         ];
     }
-
-
 }

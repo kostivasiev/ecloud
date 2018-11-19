@@ -4,6 +4,11 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class ServerLicense
+ * @package App\Models\V1
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ServerLicense extends Model
 {
     /**
@@ -99,9 +104,9 @@ class ServerLicense extends Model
      */
     public static function checkTemplateLicense($datacentreId, $template)
     {
-        $availableEcloudLicenses = ServerLicense::availableToInstall('ecloud vm', true, 'OS', $datacentreId);
+        $ecloudLicenses = ServerLicense::availableToInstall('ecloud vm', true, 'OS', $datacentreId);
 
-        $availableServerLicenses = ServerLicense::withType('OS')->get();
+        $serverLicenses = ServerLicense::withType('OS')->get();
 
         // Because PHP's similar_text doesn't always match the correct result
         // let's try and make a more direct comparison by removing known flaws
@@ -114,7 +119,7 @@ class ServerLicense extends Model
         if ($serverLicense->count() < 1) {
             $similarText = [];
             //If no match found, try similar_text
-            foreach ($availableEcloudLicenses as $availableLicence) {
+            foreach ($ecloudLicenses as $availableLicence) {
                 similar_text($availableLicence->friendly_name, $template->guest_os, $percent);
 
                 // Increase the confidence required. We need it.
@@ -123,7 +128,7 @@ class ServerLicense extends Model
                 }
                 if (!empty($similarText)) {
                     $mostLikelyLicence = array_keys($similarText, max($similarText));
-                     $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
+                    $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
                 }
             }
         }
@@ -131,7 +136,7 @@ class ServerLicense extends Model
         //If still no match found
         if ($serverLicense->count() < 1) {
             $similarText = [];
-            foreach ($availableServerLicenses as $availableLicence) {
+            foreach ($serverLicenses as $availableLicence) {
                 similar_text($availableLicence->friendly_name, $template->guest_os, $percent);
                 // Increase the confidence required. We need it.
                 if ($percent > 50) {
@@ -154,5 +159,4 @@ class ServerLicense extends Model
 
         return $serverLicence;
     }
-
 }

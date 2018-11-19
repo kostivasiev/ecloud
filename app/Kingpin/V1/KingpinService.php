@@ -364,6 +364,11 @@ class KingpinService
         return $templates;
     }
 
+    /**
+     * Process and format template data from getSystemTemplates() & getSolutionTemplates()
+     * @param $templates
+     * @return array
+     */
     protected function processTemplateData($templates)
     {
         $forattedTemplates = [];
