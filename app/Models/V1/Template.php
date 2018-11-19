@@ -13,44 +13,8 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class Solution extends Model implements Filterable, Sortable
+class Template extends Model implements Filterable, Sortable
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'ucs_reseller';
-
-    /**
-     * The primary key associated with the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'ucs_reseller_id';
-
-    /**
-     * Indicates if the model should be timestamped
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The attributes that should be cast to native types
-     *
-     * @var array
-     */
-    protected $casts = [
-        'ucs_reseller_id' => 'integer',
-    ];
-
-
-    /**
-     * Ditto configuration
-     * ----------------------
-     */
-
     /**
      * Ditto maps raw database names to friendly names.
      * @return array
@@ -133,34 +97,5 @@ class Solution extends Model implements Filterable, Sortable
         ];
     }
 
-    /**
-     * Maps a UCS Reseller to a UCS Datacentre
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function UCSDatacentre()
-    {
-        return $this->hasOne(
-            'App\Models\V1\UCSDatacentre',
-            'ucs_datacentre_id',
-            'ucs_reseller_datacentre_id'
-        );
-    }
 
-
-    /**
-     * Scope a query to only include solutions for a given reseller
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $resellerId
-     * @return \Illuminate\Database\Eloquent\Builder $query
-     */
-    public function scopeWithReseller($query, $resellerId)
-    {
-        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
-
-        if (!empty($resellerId)) {
-            $query->where('ucs_reseller_reseller_id', $resellerId);
-        }
-
-        return $query;
-    }
 }

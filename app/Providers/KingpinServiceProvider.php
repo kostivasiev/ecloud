@@ -8,6 +8,7 @@ use App\Kingpin\V1\KingpinService;
 use App\Models\V1\UCSDatacentre;
 use GuzzleHttp\Client;
 use Log;
+use App\Models\V1\VirtualMachine;
 
 /**
  * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -24,14 +25,48 @@ class KingpinServiceProvider extends ServiceProvider
     {
         $this->app->bind('App\Kingpin\V1\KingpinService', function ($app, $parameters) {
 
-            if (count($parameters) < 1) {
-                throw new \Exception('Required paramaters to connect to Kingpin service are not available');
-            }
-
             $environment = null;
 
-            // First paramater is a datacentre object
-            $UCSDatacentre = $parameters[0];
+            /**
+             * Load via dependency injection in a controller which has vm_id in the route
+             * Loads a KingpinService configured for that VM
+             */
+
+            $routeParams = $this->app['request']->route()[2];
+
+            // Do we have a VM to get the config from in a route? (i.e does the route have vm_id?
+            if (in_array('vm_id', array_keys($routeParams))) {
+                $virtualMachineQuery = VirtualMachine::query();
+                if (!empty($vmIds)) {
+                    $virtualMachineQuery->where('servers_id', '=', $routeParams['vm_id']);
+                }
+
+                $virtualMachine = $virtualMachineQuery->first();
+
+                if ($virtualMachine !== false) {
+                    $UCSDatacentre = $virtualMachine->getDatacentre();
+                    $environment = $virtualMachine->type();
+                }
+            }
+
+            /**
+             * Or
+             * Load using $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$datacentre, $environment]);
+             */
+
+            if (count($parameters) > 0) {
+                // First paramater is a datacentre object
+                $UCSDatacentre = $parameters[0];
+
+                // Kingpin environment, e.g. Public/Hybrid etc
+                if (isset($parameters[1])) {
+                    $environment = $parameters[1];
+                }
+            }
+
+            /**
+             * Load the service
+             */
 
             if (!is_object($UCSDatacentre) || get_class($UCSDatacentre) != 'App\Models\V1\UCSDatacentre') {
                 $log_message = 'Unable to create KingpinService: Invalid Datacentre Object';
@@ -39,12 +74,8 @@ class KingpinServiceProvider extends ServiceProvider
                 throw new \Exception($log_message);
             }
 
-            // Kingpin environment, e.g. Public/Hybrid etc
-            if (isset($parameters[1])) {
-                $environment = $parameters[1];
-            }
-
             $serviceBaseUri = $UCSDatacentre->ucs_datacentre_vmware_api_url;
+
             if (!empty(env('VMWARE_API_PORT'))) {
                 $serviceBaseUri .= ':' . env('VMWARE_API_PORT');
             }

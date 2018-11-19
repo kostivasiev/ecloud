@@ -316,12 +316,95 @@ class KingpinService
 
 
     /**
+     * Retrieve Virtual Machine Solution Specific Templates
+     * @param $solutionId
+     * @return array|bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getSolutionTemplates($solutionId)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'template';
+
+        $templates = [];
+        try {
+            $this->makeRequest('GET', $url);
+            if (!empty($this->responseData) && is_array($this->responseData)) {
+                $templates = $this->processTemplateData($this->responseData);
+            }
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return $templates;
+    }
+
+
+    /**
+     * Get the Virtual Machine 'System Templates' for a datacentre/pod
+     * @return array|bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getSystemTemplates()
+    {
+        $url = $this->generateV1URL(null, true);
+        $url .= 'system/template';
+
+        $templates = [];
+        try {
+            $this->makeRequest('GET', $url);
+
+            if (!empty($this->responseData) && is_array($this->responseData)) {
+                $templates = $this->processTemplateData($this->responseData);
+            }
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return $templates;
+    }
+
+    protected function processTemplateData($templates)
+    {
+        $forattedTemplates = [];
+        foreach ($templates as $template) {
+            $temp_template = new \stdClass();
+            $temp_template->name = (string)$template->name;
+            $temp_template->size_gb = (string)$template->capacityGB;
+            $temp_template->guest_os = (string)$template->guestOS;
+            $temp_template->actual_os = trim((string)$template->actualOS);
+            $temp_template->cpu = intval($template->numCPU);
+            $temp_template->ram = intval($template->ramGB);
+
+            $hard_drives = array();
+            foreach ($template->disks as $hard_drive) {
+                $hdd = new \stdClass();
+                $hdd->name = (string)$hard_drive->name;
+                $hdd->capacitygb = intval($hard_drive->capacityGB);
+                $hard_drives[] = $hdd;
+            }
+
+            $temp_template->hard_drives = $hard_drives;
+
+            $forattedTemplates[] = $temp_template;
+        }
+
+        return $forattedTemplates;
+    }
+
+
+    /**
      * Generates the base URL
      * @param null $solutionId
+     * @param bool $ignoreEnvironment
      * @return string
      */
-    protected function generateV1URL($solutionId = null)
+    protected function generateV1URL($solutionId = null, $ignoreEnvironment = false)
     {
+        if ($ignoreEnvironment) {
+            return 'api/v1/';
+        }
+
         switch ($this->environment) {
             case 'Public':
                 return 'api/v1/public/';

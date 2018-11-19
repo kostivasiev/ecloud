@@ -35,6 +35,15 @@ $router->group($virtualMachineRouteParameters, function () use ($router) {
     $router->put('vms/{vm_id}/power-cycle', 'VirtualMachineController@powerCycle');
 });
 
+// Templates
+$templateRouteParameters = array_merge($baseRouteParameters, [
+    'namespace' => 'V1',
+    'prefix' => 'v1',
+]);
+$router->group($templateRouteParameters, function () use ($router) {
+    // Return a VM Collection
+    $router->get('templates', 'TemplateController@index');
+});
 
 // Hybrid/Private Solution's
 $solutionRouteParameters = array_merge($baseRouteParameters, array(
