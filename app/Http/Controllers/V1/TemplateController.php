@@ -137,6 +137,7 @@ class TemplateController extends BaseController
     /**
      * Get system templates - Loops through the pods for each of the resellers solutions
      * and extracts the system templates from each.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @return array
      */
     protected function getSystemTemplates()

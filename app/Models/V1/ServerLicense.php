@@ -96,11 +96,12 @@ class ServerLicense extends Model
     }
 
     /**
-     * check that a template has a correct os licence and return the licence if true
-     *
+     * Check that a template has a correct os licence and return the licence if true
      * @param $datacentreId
      * @param $template
      * @return \stdClass
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public static function checkTemplateLicense($datacentreId, $template)
     {
