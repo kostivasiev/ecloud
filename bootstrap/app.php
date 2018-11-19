@@ -83,8 +83,12 @@ $app->routeMiddleware([
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 $app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(UKFast\Providers\LogServiceProvider::class);
+
 //VMWare service provider (Kingpin)
 $app->register(App\Providers\KingpinServiceProvider::class);
+
+// APIo service providers
+$app->register(App\Providers\NetworkingServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
