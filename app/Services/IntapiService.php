@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use GuzzleHttp\Exception\RequestException;
+
 use App\Exceptions\V1\IntapiServiceException;
 
 class IntapiService
@@ -18,7 +20,13 @@ class IntapiService
         $this->client = $httpClient;
     }
 
-
+    /**
+     * Load Firewall Config
+     *
+     * @param $firewallId
+     * @return mixed
+     * @throws IntapiServiceException
+     */
     public function getFirewallConfig($firewallId)
     {
         try {
@@ -41,7 +49,7 @@ class IntapiService
     }
 
     /**
-     * Makes a request to the Networking APIo.
+     * Makes a request to the UKFast Api.
      *
      * @param $method
      * @param $endpoint
