@@ -90,6 +90,11 @@ $app->register(App\Providers\KingpinServiceProvider::class);
 // APIo service providers
 $app->register(App\Providers\NetworkingServiceProvider::class);
 
+// Heartbeat
+$app->register(App\Providers\IntapiServiceProvider::class);
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

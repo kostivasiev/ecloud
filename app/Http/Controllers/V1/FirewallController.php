@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V1;
 
-use UKFast\Api\Exceptions\ApiException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -11,8 +10,8 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-use App\Services\NetworkingService;
-use App\Exceptions\V1\NetworkingServiceException;
+use App\Services\IntapiService;
+use App\Exceptions\V1\IntapiServiceException;
 
 use App\Models\V1\Firewall;
 use App\Exceptions\V1\FirewallNotFoundException;
@@ -20,14 +19,6 @@ use App\Exceptions\V1\FirewallNotFoundException;
 class FirewallController extends BaseController
 {
     use ResponseHelper, RequestHelper;
-
-    protected $networkingService;
-
-    public function __construct(Request $request, NetworkingService $networkingService)
-    {
-        parent::__construct($request);
-        $this->networkingService = $networkingService;
-    }
 
     /**
      * List all firewalls
@@ -99,25 +90,24 @@ class FirewallController extends BaseController
      * @throws FirewallNotFoundException
      * @throws NetworkingServiceException
      */
-    public function getFirewallConfig(Request $request, $firewallId)
+    public function getFirewallConfig(Request $request, IntapiService $intapiService, $firewallId)
     {
         // verify fw owner until networking service supports it
         static::getFirewallById($request, $firewallId);
 
         try {
-            $this->networkingService->scopeResellerID($request->user->resellerId);
-            $firewallConfig = $this->networkingService->getFirewallConfig($firewallId);
-        } catch (NetworkingServiceException $exception) {
-            if ($exception->statusCode == 404) {
-                throw new FirewallNotFoundException('Firewall ID #' . $firewallId . ' not found', 'firewall_id');
-            }
-
-            throw $exception;
+            $firewallConfig = $intapiService->getFirewallConfig($firewallId);
+        } catch (IntapiServiceException $exception) {
+            throw new FirewallNotFoundException(
+                'Firewall ID #' . $firewallId . ' not found',
+                'firewall_id'
+            );
         }
 
         return new Response([
             'data' => (object) [
-                'config' => base64_encode($firewallConfig)
+//                'config' => base64_encode($firewallConfig)
+                'config' => ($firewallConfig)
             ],
             'meta' => (object) []
         ], 200);
