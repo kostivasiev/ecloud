@@ -85,29 +85,27 @@ class FirewallController extends BaseController
 
     /**
      * @param Request $request
+     * @param IntapiService $intapiService
      * @param $firewallId
      * @return Response
      * @throws FirewallNotFoundException
-     * @throws NetworkingServiceException
      */
     public function getFirewallConfig(Request $request, IntapiService $intapiService, $firewallId)
     {
-        // verify fw owner until networking service supports it
-        static::getFirewallById($request, $firewallId);
+        $firewall = static::getFirewallById($request, $firewallId);
 
         try {
-            $firewallConfig = $intapiService->getFirewallConfig($firewallId);
+            $firewallConfig = $intapiService->getFirewallConfig($firewall->id);
         } catch (IntapiServiceException $exception) {
             throw new FirewallNotFoundException(
-                'Firewall ID #' . $firewallId . ' not found',
+                'Firewall ID #' . $firewall->id . ' not found',
                 'firewall_id'
             );
         }
 
         return new Response([
             'data' => (object) [
-//                'config' => base64_encode($firewallConfig)
-                'config' => ($firewallConfig)
+                'config' => $firewallConfig
             ],
             'meta' => (object) []
         ], 200);
