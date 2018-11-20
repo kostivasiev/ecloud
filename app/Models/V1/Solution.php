@@ -149,6 +149,19 @@ class Solution extends Model implements Filterable, Sortable
         ];
     }
 
+    /**
+     * Maps a UCS Reseller to a UCS Datacentre
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function UCSDatacentre()
+    {
+        return $this->hasOne(
+            'App\Models\V1\UCSDatacentre',
+            'ucs_datacentre_id',
+            'ucs_reseller_datacentre_id'
+        );
+    }
+
 
     /**
      * Scope a query to only include solutions for a given reseller
