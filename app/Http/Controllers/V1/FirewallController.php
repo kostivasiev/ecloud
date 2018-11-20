@@ -8,8 +8,10 @@ use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
-use App\Services\NetworkingService;
+use App\Services\IntapiService;
+use App\Exceptions\V1\IntapiServiceException;
 
 use App\Models\V1\Firewall;
 use App\Exceptions\V1\FirewallNotFoundException;
@@ -17,14 +19,6 @@ use App\Exceptions\V1\FirewallNotFoundException;
 class FirewallController extends BaseController
 {
     use ResponseHelper, RequestHelper;
-
-    protected $networkingService;
-
-    public function __construct(Request $request, NetworkingService $networkingService)
-    {
-        parent::__construct($request);
-        $this->networkingService = $networkingService;
-    }
 
     /**
      * List all firewalls
@@ -52,20 +46,21 @@ class FirewallController extends BaseController
      * Show specific solution
      *
      * @param Request $request
-     * @param $solutionId
+     * @param $firewallId
      * @return \Illuminate\http\Response
      * @throws FirewallNotFoundException
      */
-    public function show(Request $request, $solutionId)
+    public function show(Request $request, $firewallId)
     {
         return $this->respondItem(
             $request,
-            static::getFirewallById($request, $solutionId)
+            static::getFirewallById($request, $firewallId)
         );
     }
 
     /**
      * @param Request $request
+     * @param $solutionId
      * @return mixed
      */
     public function getSolutionFirewalls(Request $request, $solutionId)
@@ -87,8 +82,39 @@ class FirewallController extends BaseController
         );
     }
 
+
     /**
-     * get solution by ID
+     * @param Request $request
+     * @param $firewallId
+     * @return Response
+     * @throws FirewallNotFoundException
+     * @throws NetworkingServiceException
+     */
+    public function getFirewallConfig(Request $request, IntapiService $intapiService, $firewallId)
+    {
+        // verify fw owner until networking service supports it
+        static::getFirewallById($request, $firewallId);
+
+        try {
+            $firewallConfig = $intapiService->getFirewallConfig($firewallId);
+        } catch (IntapiServiceException $exception) {
+            throw new FirewallNotFoundException(
+                'Firewall ID #' . $firewallId . ' not found',
+                'firewall_id'
+            );
+        }
+
+        return new Response([
+            'data' => (object) [
+//                'config' => base64_encode($firewallConfig)
+                'config' => ($firewallConfig)
+            ],
+            'meta' => (object) []
+        ], 200);
+    }
+
+
+    /**
      * @param Request $request
      * @param $firewallId
      * @return mixed
