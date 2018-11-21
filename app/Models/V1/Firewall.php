@@ -150,9 +150,9 @@ class Firewall extends Model implements Filterable, Sortable
     {
         return [
             IdProperty::create('servers_id', 'id'),
-            StringProperty::create('servers_ip', 'ip'),
-            StringProperty::create('servers_hostname', 'hostname'),
             StringProperty::create('servers_friendly_name', 'name'),
+            StringProperty::create('servers_hostname', 'hostname'),
+            StringProperty::create('servers_ip', 'ip'),
             StringProperty::create('servers_firewall_role', 'role'),
             IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
         ];
