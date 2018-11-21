@@ -61,13 +61,13 @@ class SolutionSite extends Model implements Filterable, Sortable
      * @param $key
      * @return string
      */
-    public function __get($key)
+    public function getAttribute($key)
     {
-        return $this->attributes[$this->table . '_' . $key];
-    }
-    public function __set($key, $value)
-    {
-        $this->attributes[$this->table . '_' . $key] = $value;
+        if (array_key_exists($this->table . '_' . $key, $this->attributes) || $this->hasGetMutator($key)) {
+            return $this->getAttributeValue($this->table . '_' . $key);
+        }
+
+        return $this->getRelationValue($key);
     }
 
     /**
