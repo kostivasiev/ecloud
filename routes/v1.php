@@ -67,6 +67,13 @@ $router->group($baseRouteParameters, function () use ($router) {
 });
 
 
+// Datastores
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->get('datastores', 'DatastoreController@index');
+    $router->get('datastores/{datastore_id}', 'DatastoreController@show');
+});
+
+
 // Firewalls
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('firewalls', 'FirewallController@index');
