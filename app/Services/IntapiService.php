@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Exception\RequestException;
+
 use App\Exceptions\V1\IntapiServiceException;
 
 class IntapiService
@@ -18,7 +19,6 @@ class IntapiService
     {
         $this->client = $httpClient;
     }
-
 
     /**
      * Load Firewall Config

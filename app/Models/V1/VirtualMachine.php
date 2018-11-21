@@ -309,7 +309,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function license()
     {
         return $this->hasOne(
-            'App\Models\V1\ServerLicence',
+            'App\Models\V1\ServerLicense',
             'server_license_name',
             'servers_license'
         )->select(

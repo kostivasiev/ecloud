@@ -9,6 +9,7 @@ use App\Resources\V1\VirtualMachineResource;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions;
 use UKFast\DB\Ditto\QueryTransformer;
+use App\Kingpin\V1\KingpinService as Kingpin;
 
 class VirtualMachineController extends BaseController
 {
@@ -24,6 +25,7 @@ class VirtualMachineController extends BaseController
         (new QueryTransformer($request))
             ->config(VirtualMachine::class)
             ->transform($virtualMachinesQuery);
+
         return $this->respondCollection(
             $request,
             $virtualMachinesQuery->paginate($this->perPage)
