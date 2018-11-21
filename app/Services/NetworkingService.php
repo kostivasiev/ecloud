@@ -56,7 +56,7 @@ class NetworkingService
             );
         }
 
-        $data = $this->parseResponseData($response);
+//        $data = $this->parseResponseData($response);
 //        if ($data->id != $firewallId) {
 //            throw new NetworkingServiceException('unexpected data in response');
 //        }
