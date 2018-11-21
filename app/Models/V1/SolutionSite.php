@@ -154,7 +154,6 @@ class SolutionSite extends Model implements Filterable, Sortable
         return [
             IdProperty::create('ucs_site_id', 'id'),
             StringProperty::create('ucs_site_state', 'state'),
-            IntProperty::create('ucs_site_order', 'order'),
             IntProperty::create('ucs_site_ucs_reseller_id', 'solution_id'),
         ];
     }
