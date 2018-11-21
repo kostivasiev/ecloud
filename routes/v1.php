@@ -76,17 +76,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('firewalls/{firewall_id}/config', 'FirewallController@getFirewallConfig');
 });
 
-
-//$router->get('test', function (App\Services\NetworkingService $networkingService) {
-////    $httpClient = new GuzzleHttp\Client([
-////        'base_uri' => env('APIO_NETWORKING_HOST'),
-////        'timeout'  => 10,
-////        'verify' => app()->environment() === 'production',
-////    ]);
-////
-////    $networkingService = new App\Services\NetworkingService($httpClient);
-//
-//    var_dump($networkingService->client);
-//
-//    return;
-//});
+// Pods
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->get('pods', 'PodController@index');
+    $router->get('pods/{pod_id}', 'PodController@show');
+});
