@@ -69,12 +69,11 @@ class NetworkingService
      *
      * @param $method
      * @param $endpoint
-     * @param array $data
      * @param array $options
      *
      * @return Response
      */
-    public function request($method, $endpoint, $data = null, $options = [])
+    public function request($method, $endpoint, $options = [])
     {
         return $this->response = $this->client->request($method, $endpoint, array_merge_recursive([
             'debug' => false,
