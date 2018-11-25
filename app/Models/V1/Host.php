@@ -38,13 +38,20 @@ class Host extends Model implements Filterable, Sortable
      */
     public function databaseNames()
     {
-        $names = [];
+        $databaseNames = [];
 
         foreach ($this->properties() as $property) {
-            $names[$property->getFriendlyName()] = $property->getDatabaseName();
+            if (is_array($property)) {
+                foreach ($property as $subProperty) {
+                    $databaseNames[$subProperty->getFriendlyName()] = $subProperty->getDatabaseName();
+                }
+                continue;
+            }
+
+            $databaseNames[$property->getFriendlyName()] = $property->getDatabaseName();
         }
 
-        return $names;
+        return $databaseNames;
     }
 
     /**
