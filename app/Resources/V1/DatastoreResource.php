@@ -18,12 +18,11 @@ class DatastoreResource extends CustomResource
      */
     public function toArray($request, $visible = [])
     {
+        $response_type = null;
         if ($visible == Datastore::$collectionProperties) {
             $response_type = 'collection';
         } elseif ($visible == Datastore::$itemProperties) {
             $response_type = 'item';
-        } else {
-            $response_type = null;
         }
 
         // return additional admin properties if required

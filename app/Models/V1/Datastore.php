@@ -195,7 +195,10 @@ class Datastore extends Model implements Filterable, Sortable
         $name_number = array_pop($name_parts);
         $name_number = is_numeric($name_number) ? $name_number : 1;
 
-        return 'Datastore ' . ucwords(strtolower($this->reseller_lun_lun_type)) . '-' . str_pad($name_number, 2, '0', STR_PAD_LEFT);
+        return
+            'Datastore ' . ucwords(strtolower($this->reseller_lun_lun_type)) .
+            '-' .
+            str_pad($name_number, 2, '0', STR_PAD_LEFT);
     }
 
     /**
