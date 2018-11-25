@@ -3,7 +3,6 @@
 namespace App\Resources\V1;
 
 use UKFast\Api\Resource\CustomResource;
-use UKFast\Api\Resource\ResourceCollection as FastResourceCollection;
 use App\Models\V1\Datastore;
 
 class DatastoreResource extends CustomResource
