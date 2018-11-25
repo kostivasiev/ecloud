@@ -99,21 +99,42 @@ class Host extends Model implements Filterable, Sortable
      */
     public function properties()
     {
-        return [
+        $properties = [
             IdProperty::create('ucs_node_id', 'id'),
-            IntProperty::create('ucs_node_reseller_id', 'reseller_id'),
 
             IntProperty::create('ucs_node_ucs_reseller_id', 'solution_id'),
             IntProperty::create('ucs_node_datacentre_id', 'datacentre_id'),
 
-            StringProperty::create('ucs_node_specification', 'specification'),
+            StringProperty::create('ucs_specification_friendly_name', 'name'),
+            StringProperty::create('ucs_specification_name', 'specification'),
+
+            'cpu' => [
+                IntProperty::create('ucs_specification_cpu_qty', 'qty'),
+                IntProperty::create('ucs_specification_cpu_cores', 'cores'),
+                StringProperty::create('ucs_specification_cpu_speed', 'speed'),
+            ],
+
+            'ram' => [
+                IntProperty::create('ucs_specification_ram', 'capacity'),
+            ],
         ];
+
+        $request = app('request');
+        if (!$request->user->isAdmin) {
+            return $properties;
+        }
+
+        // admin only properties
+        return array_merge($properties, [
+            IntProperty::create('ucs_node_reseller_id', 'reseller_id'),
+        ]);
     }
 
     /**
      * End Package Config
      * ----------------------
      */
+
 
     /**
      * Scope a query for a given reseller
