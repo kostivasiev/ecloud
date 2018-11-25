@@ -31,7 +31,7 @@ php_cs:
   - pwd
   - composer install --dev --prefer-dist > /dev/null --quiet
   - composer dump-autoload
-  - vendor/bin/phpcs --standard=psr2 app > codesniffer.txt
+  - vendor/bin/phpcs --standard=psr2 app |& tee -a codesniffer.txt
   artifacts:
     paths: [codesniffer.txt]
     when: on_failure
@@ -46,7 +46,7 @@ php_md:
   - pwd
   - composer install --dev --prefer-dist > /dev/null --quiet
   - composer dump-autoload
-  - vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml > messdetector.txt
+  - vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml |& tee -a messdetector.txt
   artifacts:
     paths: [messdetector.txt]
     when: on_failure
