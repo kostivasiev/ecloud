@@ -2,6 +2,7 @@
 
 namespace App\Kingpin\V1;
 
+use App\Exceptions\V1\KingpinException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TransferException;
 use Log;
@@ -362,6 +363,56 @@ class KingpinService
         }
 
         return $templates;
+    }
+
+    /**
+     * return vmware datastore
+     * @param $solutionId
+     * @param $datastoreName
+     * @return null
+     * @throws KingpinException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getDatastore($solutionId, $datastoreName)
+    {
+        try {
+            $this->makeRequest(
+                'GET',
+                $this->generateV1URL($solutionId) . 'datastore/'.$datastoreName.''
+            );
+        } catch (TransferException $exception) {
+            throw new KingpinException($exception->getMessage());
+        }
+
+        if (!is_object($this->responseData)) {
+            throw new KingpinException('failed to load datastore');
+        }
+
+        if ($this->responseData->name != $datastoreName) {
+            throw new KingpinException('unexpected datastore response');
+        }
+
+        return $this->formatDatastore($this->responseData);
+    }
+
+    /**
+     * format datastore object to standard response
+     * @param $vmwareObject
+     * @return object
+     */
+    protected function formatDatastore($vmwareObject)
+    {
+        return (object) [
+            'uuid' => $vmwareObject->modelRef,
+            'name' => $vmwareObject->name,
+            'type' => $vmwareObject->type,
+            'capacity' => $vmwareObject->capacityGB,
+            'freeSpace' => $vmwareObject->freeSpaceGB,
+            'uncommitted' => $vmwareObject->uncommittedGB,
+            'provisioned' => $vmwareObject->provisionedGB,
+            'available' => $vmwareObject->availableGB,
+            'used' => $vmwareObject->usedGB,
+        ];
     }
 
     /**

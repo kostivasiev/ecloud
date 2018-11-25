@@ -64,9 +64,8 @@ class SolutionSiteController extends BaseController
      */
     public function getSolutionSites(Request $request, $solutionId)
     {
-        $solution = SolutionController::getSolutionById($request, $solutionId);
-
-        $collectionQuery = SolutionSite::withSolution($solution->id);
+        SolutionController::getSolutionById($request, $solutionId);
+        $collectionQuery = SolutionSite::withSolution($solutionId);
 
         (new QueryTransformer($request))
             ->config(SolutionSite::class)
