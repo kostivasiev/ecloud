@@ -17,38 +17,13 @@ use UKFast\DB\Ditto\Filter;
 class Datastore extends Model implements Filterable, Sortable
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
+     * Eloquent configuration
+     * ----------------------
      */
+
     protected $table = 'reseller_lun';
-
-    /**
-     * The primary key associated with the model.
-     *
-     * @var string
-     */
     protected $primaryKey = 'reseller_lun_id';
-
-    /**
-     * Indicates if the model should be timestamped
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The attributes that should be cast to native types
-     *
-     * @var array
-     */
-    protected $casts = [
-        'reseller_lun_id' => 'integer',
-        'reseller_lun_size_gb' => 'integer',
-        'reseller_lun_friendly_name' => 'string',
-        'reseller_lun_ucs_reseller_id' => 'integer',
-        'reseller_lun_ucs_site_id' => 'integer',
-    ];
 
 
     /**
@@ -58,33 +33,18 @@ class Datastore extends Model implements Filterable, Sortable
 
 
     /**
-     * Fudge until ditto supports column aliases
-     * @param $key
-     * @return string
-     */
-    public function getAttribute($key)
-    {
-        if (array_key_exists($this->table . '_' . $key, $this->attributes) || $this->hasGetMutator($key)) {
-            return $this->getAttributeValue($this->table . '_' . $key);
-        }
-
-        return $this->getRelationValue($key);
-    }
-
-
-    /**
      * Ditto maps raw database names to friendly names.
      * @return array
      */
     public function databaseNames()
     {
-        return [
-            'id' => 'reseller_lun_id',
-            'name' => 'reseller_lun_friendly_name',
-            'capacity' => 'reseller_lun_size_gb',
-            'solution_id' => 'reseller_lun_ucs_reseller_id',
-            'site_id' => 'reseller_lun_ucs_site_id',
-        ];
+        $names = [];
+
+        foreach ($this->properties() as $property) {
+            $names[$property->getFriendlyName()] = $property->getDatabaseName();
+        }
+
+        return $names;
     }
 
     /**
@@ -130,7 +90,11 @@ class Datastore extends Model implements Filterable, Sortable
 
 
     /**
-     * Resource package
+     * Resource configuration
+     * ----------------------
+     */
+
+    /**
      * Map request property to database field
      *
      * @return array
@@ -139,11 +103,81 @@ class Datastore extends Model implements Filterable, Sortable
     {
         return [
             IdProperty::create('reseller_lun_id', 'id'),
-            StringProperty::create('reseller_lun_friendly_name', 'name'),
-            IntProperty::create('reseller_lun_size_gb', 'capacity'),
+            IntProperty::create('reseller_lun_reseller_id', 'reseller_id'),
+
             IntProperty::create('reseller_lun_ucs_reseller_id', 'solution_id'),
             IntProperty::create('reseller_lun_ucs_site_id', 'site_id'),
+
+            StringProperty::create('reseller_lun_friendly_name', 'name'),
+            StringProperty::create('reseller_lun_status', 'status'),
+            StringProperty::create('reseller_lun_type', 'type'),
+
+            IntProperty::create('reseller_lun_size_gb', 'capacity'),
+            IntProperty::create(null, 'allocated'),
+            IntProperty::create(null, 'available'),
+
+            StringProperty::create('reseller_lun_name', 'lun_name'),
+            StringProperty::create('reseller_lun_wwn', 'lun_wwn'),
+            StringProperty::create('reseller_lun_lun_type', 'lun_type'),
+            StringProperty::create('reseller_lun_lun_sub_type', 'lun_subtype'),
         ];
+    }
+
+    /**
+     * End Package Config
+     * ----------------------
+     */
+
+
+    public static $collectionProperties = [
+        'reseller_lun_id',
+        'reseller_lun_friendly_name',
+        'reseller_lun_status',
+        'reseller_lun_ucs_reseller_id',
+        'reseller_lun_ucs_site_id',
+        'reseller_lun_size_gb',
+    ];
+
+    public static $itemProperties = [
+        'reseller_lun_id',
+        'reseller_lun_friendly_name',
+        'reseller_lun_status',
+        'reseller_lun_ucs_reseller_id',
+        'reseller_lun_ucs_site_id',
+        'reseller_lun_size_gb',
+        'allocated',
+        'available',
+    ];
+
+    public static $adminProperties = [
+        'reseller_lun_reseller_id',
+        'reseller_lun_type',
+        'reseller_lun_name',
+        'reseller_lun_wwn',
+        'reseller_lun_lun_type',
+        'reseller_lun_lun_sub_type',
+    ];
+
+    /**
+     * Return Solution
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function solution()
+    {
+        return $this->hasOne(
+            'App\Models\V1\Solution',
+            'ucs_reseller_id',
+            'reseller_lun_ucs_reseller_id'
+        );
+    }
+
+    /**
+     * Return Pod
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function getPodAttribute()
+    {
+        return $this->solution->pod;
     }
 
     /**
@@ -157,10 +191,38 @@ class Datastore extends Model implements Filterable, Sortable
             return $value;
         }
 
-        $name_parts  = explode('_', $this->name);
+        $name_parts  = explode('_', $this->reseller_lun_name);
         $name_number = array_pop($name_parts);
         $name_number = is_numeric($name_number) ? $name_number : 1;
 
-        return 'Datastore ' . ucwords(strtolower($this->lun_type)) . '-' . str_pad($name_number, 2, '0', STR_PAD_LEFT);
+        return 'Datastore ' . ucwords(strtolower($this->reseller_lun_lun_type)) . '-' . str_pad($name_number, 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * get VMware usage stats
+     */
+    public function getUsage()
+    {
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [
+                $this->pod
+            ]);
+
+            $vmwareDatastore = $kingpin->getDatastore(
+                $this->solution->ucs_reseller_id,
+                $this->reseller_lun_name
+            );
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+
+        return $this->usage = (object) [
+            'capacity' => $vmwareDatastore->capacity,
+            'freeSpace' => $vmwareDatastore->freeSpace,
+            'uncommitted' => $vmwareDatastore->uncommitted,
+            'provisioned' => $vmwareDatastore->provisioned,
+            'available' => $vmwareDatastore->available,
+            'used' => $vmwareDatastore->used,
+        ];
     }
 }

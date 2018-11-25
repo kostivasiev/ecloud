@@ -54,21 +54,6 @@ class Firewall extends Model implements Filterable, Sortable
 
 
     /**
-     * Fudge until ditto supports column aliases
-     * @param $key
-     * @return string
-     */
-    public function getAttribute($key)
-    {
-        if (array_key_exists($this->table . '_' . $key, $this->attributes) || $this->hasGetMutator($key)) {
-            return $this->getAttributeValue($this->table . '_' . $key);
-        }
-
-        return $this->getRelationValue($key);
-    }
-
-
-    /**
      * Ditto maps raw database names to friendly names.
      * @return array
      */

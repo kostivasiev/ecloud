@@ -17,10 +17,10 @@ class SolutionVlanController extends BaseController
 
     public function getSolutionVlans(Request $request, $solutionId)
     {
-        $solution = SolutionController::getSolutionById($request, $solutionId);
+        SolutionController::getSolutionById($request, $solutionId);
 
         $collectionQuery = SolutionVlan::withReseller($request->user->resellerId)
-            ->withSolution($solution->id);
+            ->withSolution($solutionId);
 
         if (!$request->user->isAdmin) {
             $collectionQuery->where('ucs_reseller_active', 'Yes');

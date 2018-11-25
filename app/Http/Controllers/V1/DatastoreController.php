@@ -33,7 +33,11 @@ class DatastoreController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $collectionQuery->paginate($this->perPage)
+            $collectionQuery->paginate($this->perPage),
+            200,
+            DatastoreResource::class,
+            [],
+            Datastore::$collectionProperties
         );
     }
 
@@ -47,10 +51,34 @@ class DatastoreController extends BaseController
      */
     public function show(Request $request, $datastoreId)
     {
+        $datastore = static::getDatastoreById($request, $datastoreId);
+        $datastore->getUsage();
+
         return $this->respondItem(
             $request,
-            static::getDatastoreById($request, $datastoreId)
+            $datastore,
+            200,
+            DatastoreResource::class,
+            [],
+            Datastore::$itemProperties
         );
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public static function getDatastoreQuery(Request $request)
+    {
+        $query = Datastore::query()
+            ->where('reseller_lun_status', '!=', 'Deleted')
+            ->join('ucs_reseller', 'ucs_reseller_id', '=', 'reseller_lun_ucs_reseller_id');
+
+        if (!$request->user->isAdmin) {
+            $query->where('ucs_reseller_active', 'Yes');
+        }
+
+        return $query;
     }
 
     /**
@@ -69,19 +97,5 @@ class DatastoreController extends BaseController
         }
 
         return $datastore;
-    }
-
-    /**
-     * @param Request $request
-     * @return mixed
-     */
-    public static function getDatastoreQuery(Request $request)
-    {
-        $query = Datastore::query('reseller_lun_status', '!=', 'Deleted');
-        if (!$request->user->isAdmin) {
-//            $query->where('ucs_datacentre_active', 'Yes');
-        }
-
-        return $query;
     }
 }

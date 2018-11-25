@@ -92,13 +92,13 @@ class FirewallController extends BaseController
      */
     public function getFirewallConfig(Request $request, IntapiService $intapiService, $firewallId)
     {
-        $firewall = static::getFirewallById($request, $firewallId);
+        static::getFirewallById($request, $firewallId);
 
         try {
-            $firewallConfig = $intapiService->getFirewallConfig($firewall->id);
+            $firewallConfig = $intapiService->getFirewallConfig($firewallId);
         } catch (IntapiServiceException $exception) {
             throw new FirewallNotFoundException(
-                'Firewall ID #' . $firewall->id . ' not found',
+                'Firewall ID #' . $firewallId . ' not found',
                 'firewall_id'
             );
         }
