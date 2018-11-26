@@ -50,7 +50,6 @@ $router->group($templateRouteParameters, function () use ($router) {
     $router->put('templates/{template_name}', 'TemplateController@renameTemplate');
 
     $router->delete('templates/{template_name}', 'TemplateController@deleteTemplate');
-    //DELETE /templates
 });
 
 // Solution's
