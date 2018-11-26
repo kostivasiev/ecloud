@@ -68,7 +68,10 @@ class KingpinServiceProvider extends ServiceProvider
              * Load the service
              */
 
-            if (!is_object($UCSDatacentre) || get_class($UCSDatacentre) != 'App\Models\V1\UCSDatacentre') {
+            if (!is_object($UCSDatacentre) || !in_array(get_class($UCSDatacentre), array(
+                    'App\Models\V1\UCSDatacentre',
+                    'App\Models\V1\Pod',
+                ))) {
                 $log_message = 'Unable to create KingpinService: Invalid Datacentre Object';
                 Log::error($log_message);
                 throw new \Exception($log_message);

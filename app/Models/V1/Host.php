@@ -16,6 +16,9 @@ use UKFast\DB\Ditto\Filter;
 
 class Host extends Model implements Filterable, Sortable
 {
+    const RESERVED_SYSTEM_RAM = 2;
+
+
     /**
      * Eloquent configuration
      * ----------------------
@@ -110,7 +113,7 @@ class Host extends Model implements Filterable, Sortable
             IdProperty::create('ucs_node_id', 'id'),
 
             IntProperty::create('ucs_node_ucs_reseller_id', 'solution_id'),
-            IntProperty::create('ucs_node_datacentre_id', 'datacentre_id'),
+            IntProperty::create('ucs_node_datacentre_id', 'pod_id'),
 
             StringProperty::create('ucs_specification_friendly_name', 'name'),
             StringProperty::create('ucs_specification_name', 'specification'),
@@ -158,5 +161,65 @@ class Host extends Model implements Filterable, Sortable
         }
 
         return $query;
+    }
+
+    /**
+     * Return Solution
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function pod()
+    {
+        return $this->hasOne(
+            'App\Models\V1\Pod',
+            'ucs_datacentre_id',
+            'ucs_node_datacentre_id'
+        );
+    }
+
+
+    /**
+     * get VMware usage stats
+     */
+    public function getVmwareUsage()
+    {
+        if (!is_null($this->usage)) {
+            return $this->usage;
+        }
+
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [
+                $this->pod
+            ]);
+
+            $vmwareHost = $kingpin->getHostByMac(
+                $this->ucs_node_ucs_reseller_id,
+                $this->ucs_node_eth0_mac
+            );
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+
+        //collect host stats
+        $ramCapacity = intval($this->ucs_specification_ram);
+        $ramAllocated = 0;
+        $ramReserved = static::RESERVED_SYSTEM_RAM;
+
+        $virtualMachines = [];
+        foreach ($vmwareHost->vms as $vm) {
+            if ($vm->id > 0) {
+                $ramAllocated += $vm->ramGB;
+                $virtualMachines[] = $vm->id;
+            }
+        }
+
+        return $this->usage = json_decode(json_encode([
+            'ram' => [
+                'capacity' => $ramCapacity,
+                'reserved' => $ramReserved,
+                'allocated' => $ramAllocated,
+                'available' => ($ramCapacity - $ramAllocated - $ramReserved),
+            ],
+            'virtualMachines' => $virtualMachines
+        ]));
     }
 }

@@ -366,6 +366,55 @@ class KingpinService
     }
 
     /**
+     * Get Host by its MAC address
+     * @param $solutionId
+     * @param $eth0_mac
+     * @return object
+     * @throws KingpinException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getHostByMac($solutionId, $eth0_mac)
+    {
+        try {
+            $this->makeRequest(
+                'GET',
+                $this->generateV1URL($solutionId) . 'host/'.$eth0_mac.''
+            );
+        } catch (TransferException $exception) {
+//            throw new KingpinException($exception->getMessage());
+            throw new KingpinException('unable to load host');
+        }
+
+        if (!is_object($this->responseData)) {
+            throw new KingpinException('failed to load host');
+        }
+
+        if ($this->responseData->macAddress != $eth0_mac) {
+            throw new KingpinException('unexpected host response');
+        }
+
+        return $this->formatHost($this->responseData);
+    }
+
+    /**
+     * format host object to standard response
+     * @param $vmwareObject
+     * @return object
+     */
+    protected function formatHost($vmwareObject)
+    {
+        return (object) [
+            'uuid' => $vmwareObject->modelRef,
+            'name' => $vmwareObject->name,
+            'macAddress' => $vmwareObject->macAddress,
+            'powerStatus' => $vmwareObject->powerState,
+            'networkStatus' => $vmwareObject->connectionState,
+            'vms' => $vmwareObject->vms,
+            'stats' => $vmwareObject->stats,
+        ];
+    }
+
+    /**
      * return vmware datastore
      * @param $solutionId
      * @param $datastoreName

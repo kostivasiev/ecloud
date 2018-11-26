@@ -10,6 +10,7 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 use Illuminate\Http\Request;
 
 use App\Models\V1\Host;
+use App\Resources\V1\HostResource;
 use App\Exceptions\V1\HostNotFoundException;
 
 class HostController extends BaseController
@@ -46,9 +47,14 @@ class HostController extends BaseController
      */
     public function show(Request $request, $hostId)
     {
+        $host = static::getHostById($request, $hostId);
+        $host->getVmwareUsage();
+
         return $this->respondItem(
             $request,
-            static::getHostById($request, $hostId)
+            $host,
+            200,
+            HostResource::class
         );
     }
 
