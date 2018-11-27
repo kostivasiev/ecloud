@@ -67,6 +67,13 @@ $router->group($baseRouteParameters, function () use ($router) {
 });
 
 
+// Hosts
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->get('hosts', 'HostController@index');
+    $router->get('hosts/{host_id}', 'HostController@show');
+});
+
+
 // Datastores
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('datastores', 'DatastoreController@index');
