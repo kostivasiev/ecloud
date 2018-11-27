@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f60710717281f6598327fb0d3e2ea145",
+    "content-hash": "c18e62ea2137049807387123fb950cd1",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -1771,16 +1771,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
                 "shasum": ""
             },
             "require": {
@@ -1814,7 +1814,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2018-11-20T15:27:04+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -2745,11 +2745,11 @@
         },
         {
             "name": "ukfast/api-resources",
-            "version": "v3.1.0",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/resources.git",
-                "reference": "27366df4f7aa3147f066edb048d2b5ed4ccb5cfc"
+                "reference": "d5611992bac90474195903f98f0d7d97199e0faa"
             },
             "require": {
                 "illuminate/http": "^5.5",
@@ -2778,7 +2778,7 @@
                 }
             ],
             "description": "Transforms Eloquent database results into a UKFast API response",
-            "time": "2018-11-20T09:49:30+00:00"
+            "time": "2018-11-21T11:34:48+00:00"
         },
         {
             "name": "ukfast/api-validation",

@@ -2,6 +2,7 @@
 
 namespace App\Kingpin\V1;
 
+use App\Exceptions\V1\KingpinException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TransferException;
 use Log;
@@ -388,6 +389,105 @@ class KingpinService
         }
 
         return true;
+    }
+
+    /**
+     * Get Host by its MAC address
+     * @param $solutionId
+     * @param $eth0_mac
+     * @return object
+     * @throws KingpinException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getHostByMac($solutionId, $eth0_mac)
+    {
+        try {
+            $this->makeRequest(
+                'GET',
+                $this->generateV1URL($solutionId) . 'host/'.$eth0_mac.''
+            );
+        } catch (TransferException $exception) {
+//            throw new KingpinException($exception->getMessage());
+            throw new KingpinException('unable to query host');
+        }
+
+        if (!is_object($this->responseData)) {
+            throw new KingpinException('failed to parse host response');
+        }
+
+        if ($this->responseData->macAddress != $eth0_mac) {
+            throw new KingpinException('unexpected host response');
+        }
+
+        return $this->formatHost($this->responseData);
+    }
+
+    /**
+     * format host object to standard response
+     * @param $vmwareObject
+     * @return object
+     */
+    protected function formatHost($vmwareObject)
+    {
+        return (object) [
+            'uuid' => $vmwareObject->modelRef,
+            'name' => $vmwareObject->name,
+            'macAddress' => $vmwareObject->macAddress,
+            'powerStatus' => $vmwareObject->powerState,
+            'networkStatus' => $vmwareObject->connectionState,
+            'vms' => $vmwareObject->vms,
+            'stats' => $vmwareObject->stats,
+        ];
+    }
+
+    /**
+     * return vmware datastore
+     * @param $solutionId
+     * @param $datastoreName
+     * @return null
+     * @throws KingpinException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getDatastore($solutionId, $datastoreName)
+    {
+        try {
+            $this->makeRequest(
+                'GET',
+                $this->generateV1URL($solutionId) . 'datastore/'.$datastoreName.''
+            );
+        } catch (TransferException $exception) {
+            throw new KingpinException($exception->getMessage());
+        }
+
+        if (!is_object($this->responseData)) {
+            throw new KingpinException('failed to load datastore');
+        }
+
+        if ($this->responseData->name != $datastoreName) {
+            throw new KingpinException('unexpected datastore response');
+        }
+
+        return $this->formatDatastore($this->responseData);
+    }
+
+    /**
+     * format datastore object to standard response
+     * @param $vmwareObject
+     * @return object
+     */
+    protected function formatDatastore($vmwareObject)
+    {
+        return (object) [
+            'uuid' => $vmwareObject->modelRef,
+            'name' => $vmwareObject->name,
+            'type' => $vmwareObject->type,
+            'capacity' => $vmwareObject->capacityGB,
+            'freeSpace' => $vmwareObject->freeSpaceGB,
+            'uncommitted' => $vmwareObject->uncommittedGB,
+            'provisioned' => $vmwareObject->provisionedGB,
+            'available' => $vmwareObject->availableGB,
+            'used' => $vmwareObject->usedGB,
+        ];
     }
 
     /**

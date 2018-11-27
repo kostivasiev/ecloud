@@ -405,13 +405,13 @@ class TemplateController extends BaseController
 
         //Collate a list of unique datacentres
         foreach ($solutionsQuery->get() as $solution) {
-            if (!empty($solution->UCSDatacentre)) {
-                $datacentres[$solution->UCSDatacentre->getKey()] = $solution->UCSDatacentre;
+            if (!empty($solution->pod)) {
+                $datacentres[$solution->pod->getKey()] = $solution->pod;
             }
         }
 
         // Get the templates for each pod
-        foreach ($datacentres as $UCSDatacentre) {
+        foreach ($datacentres as $pod) {
             $templates = $this->getTemplatesForPod($UCSDatacentre);
             if (!empty($templates)) {
                 if ($withDatacentre) {

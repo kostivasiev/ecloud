@@ -46,18 +46,17 @@ class VirtualMachineResource extends CustomResource
     protected function getActiveHDDs()
     {
         $disks = $this->resource->getActiveHDDs();
+        if ($disks === false) {
+            return null;
+        }
 
         $hdds = [];
-
-        if ($disks === false) {
-            return 'Unknown';
-        }
 
         if ($disks !== false && count($disks) > 0) {
             foreach ($disks as $disk) {
                 $hdd = new \StdClass();
                 $hdd->name = $disk->name;
-                $hdd->capacity_gb = $disk->capacity;
+                $hdd->capacity = $disk->capacity;
                 $hdds[] = $hdd;
             }
         }
@@ -77,28 +76,33 @@ class VirtualMachineResource extends CustomResource
     {
         $data = [
             'id' => $this->resource->servers_id,
+            'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
+
             'name' => $this->resource->servers_friendly_name,
-            'cpu' => $this->resource->servers_cpu,
-            'ram_gb' => $this->resource->servers_memory,
-            'hdd_gb' => $this->resource->servers_hdd,
-            'platform' => $this->resource->servers_platform,
-            'operating_system' => $this->resource->server_license_friendly_name, //Relation
-            'backup' => $this->resource->servers_backup,
-            'support' => $this->resource->servers_advanced_support,
-            'ip_internal' => $this->resource->ip_internal, //Derived
-            'ip_external' => $this->resource->ip_external, //Derived
-            'type' => $this->resource->servers_ecloud_type,
             'hostname' => $this->resource->servers_hostname,
             'computername' => $this->resource->servers_netnios_name,
-            'status' => $this->stateCheck(),
-            'vmware-tools' => $this->vmwareToolsStatus(),
-            'hdd_disk' => $this->getActiveHDDs()
-        ];
 
-        // If not public, add the solution ID
-        if ($this->resource->servers_ecloud_type != 'Public') {
-            $data['solution_id'] = $this->resource->servers_ecloud_ucs_reseller_id;
-        }
+            'cpu' => $this->resource->servers_cpu,
+            'ram' => $this->resource->servers_memory,
+            'hdd' => $this->resource->servers_hdd,
+
+            'hdd_disks' => $this->getActiveHDDs(),
+
+            'ip_internal' => $this->resource->ip_internal, //Derived
+            'ip_external' => $this->resource->ip_external, //Derived
+
+            'platform' => $this->resource->servers_platform,
+            'operating_system' => $this->resource->server_license_friendly_name, //Relation
+
+            'backup' => $this->resource->servers_backup,
+            'support' => $this->resource->servers_advanced_support,
+
+            'status' => $this->resource->servers_status,
+            'power-status' => $this->resource->stateCheck(),
+            'tools-status' => $this->vmwareToolsStatus(),
+
+            'environment' => $this->resource->servers_ecloud_type,
+        ];
 
         return $this->filterProperties($request, $data);
     }

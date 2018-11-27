@@ -53,20 +53,6 @@ class Solution extends Model implements Filterable, Sortable
 
 
     /**
-     * Fudge until ditto supports column aliases
-     * @param $key
-     * @return string
-     */
-    public function getAttribute($key)
-    {
-        if (array_key_exists($this->table . '_' . $key, $this->attributes) || $this->hasGetMutator($key)) {
-            return $this->getAttributeValue($this->table . '_' . $key);
-        }
-
-        return $this->getRelationValue($key);
-    }
-
-    /**
      * Ditto maps raw database names to friendly names.
      * @return array
      */
@@ -149,20 +135,6 @@ class Solution extends Model implements Filterable, Sortable
     }
 
     /**
-     * Maps a UCS Reseller to a UCS Datacentre
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function UCSDatacentre()
-    {
-        return $this->hasOne(
-            'App\Models\V1\UCSDatacentre',
-            'ucs_datacentre_id',
-            'ucs_reseller_datacentre_id'
-        );
-    }
-
-
-    /**
      * Scope a query to only include solutions for a given reseller
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param int $resellerId
@@ -177,5 +149,18 @@ class Solution extends Model implements Filterable, Sortable
         }
 
         return $query;
+    }
+
+    /**
+     * Return Pod
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function pod()
+    {
+        return $this->hasOne(
+            'App\Models\V1\Pod',
+            'ucs_datacentre_id',
+            'ucs_reseller_datacentre_id'
+        );
     }
 }
