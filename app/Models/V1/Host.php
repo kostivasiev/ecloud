@@ -116,7 +116,6 @@ class Host extends Model implements Filterable, Sortable
             IntProperty::create('ucs_node_datacentre_id', 'pod_id'),
 
             StringProperty::create('ucs_specification_friendly_name', 'name'),
-            StringProperty::create('ucs_specification_name', 'specification'),
 
             'cpu' => [
                 IntProperty::create('ucs_specification_cpu_qty', 'qty'),
@@ -137,6 +136,7 @@ class Host extends Model implements Filterable, Sortable
         // admin only properties
         return array_merge($properties, [
             IntProperty::create('ucs_node_reseller_id', 'reseller_id'),
+            StringProperty::create('ucs_specification_name', 'specification'),
         ]);
     }
 
