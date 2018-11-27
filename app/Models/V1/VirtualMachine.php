@@ -175,23 +175,28 @@ class VirtualMachine extends Model implements Filterable, Sortable
     {
         $array = [
             IdProperty::create('servers_id', 'id'),
+            IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
+
             StringProperty::create('servers_friendly_name', 'name'),
+            StringProperty::create('servers_hostname', 'hostname'),
+            StringProperty::create('servers_netnios', 'computername'),
+
             IntProperty::create('servers_cpu', 'cpu'),
-            IntProperty::create('servers_memory', 'ram_gb'),
-            IntProperty::create('servers_hdd', 'hdd_gb'),
-            StringProperty::create('servers_platform', 'platform'),
-            StringProperty::create('server_license_friendly_name', 'operating_system'),
-            StringProperty::create('servers_backup', 'backup'),
-            StringProperty::create('servers_advanced_support', 'support'),
+            IntProperty::create('servers_memory', 'ram'),
+            IntProperty::create('servers_hdd', 'hdd'),
+
             StringProperty::create('ip_internal', 'ip_internal'),
             StringProperty::create('ip_external', 'ip_external'),
-            StringProperty::create('servers_ecloud_type', 'type')
-        ];
 
-        // Add solution_id for non Public VM's
-        if ($this->attributes['servers_ecloud_type'] != 'Public') {
-            $array[] = IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id');
-        }
+            StringProperty::create('servers_platform', 'platform'),
+            StringProperty::create('server_license_friendly_name', 'operating_system'),
+
+            StringProperty::create('servers_backup', 'backup'),
+            StringProperty::create('servers_advanced_support', 'support'),
+
+            StringProperty::create('servers_status', 'status'),
+            StringProperty::create('servers_ecloud_type', 'environment'),
+        ];
 
         return $array;
     }
