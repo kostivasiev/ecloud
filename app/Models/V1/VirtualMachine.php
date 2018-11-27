@@ -342,27 +342,26 @@ class VirtualMachine extends Model implements Filterable, Sortable
     }
 
     /**
-     * Map the UCS reseller id
+     * Return Solution
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function UCSReseller()
+    public function solution()
     {
         return $this->hasOne(
-            'App\Models\V1\UCSReseller',
+            'App\Models\V1\Solution',
             'ucs_reseller_id',
             'servers_ecloud_ucs_reseller_id'
         );
     }
 
-
     /**
-     * Map a UCSDatacentre to the Virtual Machine
+     * Return Pod
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function UCSDatacentre()
+    public function pod()
     {
         return $this->hasOne(
-            'App\Models\V1\UCSDatacentre',
+            'App\Models\V1\Pod',
             'ucs_datacentre_id',
             'servers_ecloud_datacentre_id'
         );
@@ -455,15 +454,15 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * Get the datacentre for this VM
      * @return null
      */
-    public function getDatacentre()
+    public function getPod()
     {
-        if (!empty($this->UCSDatacentre)) {
-            return $this->UCSDatacentre;
+        if (!empty($this->pod)) {
+            return $this->pod;
         }
 
         if ($this->servers_ecloud_datacentre_id == 0) {
-            if (!empty($this->UCSReseller)) {
-                return $this->UCSReseller->UCSDatacentre;
+            if (!empty($this->solution)) {
+                return $this->solution->pod;
             }
         }
 
@@ -483,7 +482,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function stateCheck()
     {
         $config = [
-            $this->getDatacentre(),
+            $this->getPod(),
             $this->type()
         ];
 
@@ -517,7 +516,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function vmwareToolsStatus()
     {
         $config = [
-            $this->getDatacentre(),
+            $this->getPod(),
             $this->type()
         ];
 
@@ -542,7 +541,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function getActiveHDDs()
     {
         $config = [
-            $this->getDatacentre(),
+            $this->getPod(),
             $this->type()
         ];
 

@@ -106,7 +106,7 @@ class TemplateController extends BaseController
             foreach ($solutionQuery->get() as $solution) {
                 // We need to load a Kingpin service with the datacentre for the solution
                 try {
-                    $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->UCSDatacentre]);
+                    $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->pod]);
                 } catch (\Exception $exception) {
                     //Failed to connect to Kingpin
                     continue;
@@ -122,7 +122,7 @@ class TemplateController extends BaseController
                 foreach ($result as &$template) {
                     $template->solution_id = $solution->getKey();
                     // Check the template license
-                    $serverLicense = ServerLicense::checkTemplateLicense($solution->UCSDatacentre->getKey(), $template);
+                    $serverLicense = ServerLicense::checkTemplateLicense($solution->pod->getKey(), $template);
                     //Convert to public format
                     $template = $this->convertToPublicTemplate($template, $serverLicense);
                 }
@@ -158,15 +158,15 @@ class TemplateController extends BaseController
         $datacentres = [];
 
         foreach ($solutionsQuery->get() as $solution) {
-            if (!empty($solution->UCSDatacentre)) {
-                $datacentres[$solution->UCSDatacentre->getKey()] = $solution->UCSDatacentre;
+            if (!empty($solution->pod)) {
+                $datacentres[$solution->pod->getKey()] = $solution->pod;
             }
         }
 
         // Get the system templates for each pod
-        foreach ($datacentres as $UCSDatacentre) {
+        foreach ($datacentres as $pod) {
             try {
-                $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$UCSDatacentre]);
+                $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$pod]);
             } catch (\Exception $exception) {
                 //Failed to connect to Kingpin
                 continue;
@@ -186,11 +186,11 @@ class TemplateController extends BaseController
 //                'ecloud vm',
 //                true,
 //                'OS',
-//                $UCSDatacentre->getKey()
+//                $pod->getKey()
 //            );
 
             foreach ($templates as &$template) {
-                $serverLicense = ServerLicense::checkTemplateLicense($UCSDatacentre->getKey(), $template);
+                $serverLicense = ServerLicense::checkTemplateLicense($pod->getKey(), $template);
                 // TODO: Need to double check we need this bit of code, or just return all templates
                 //need to filter UKFast templates
 //                if ($this->findTemplateByName($template->name, $availableEcloudLicenses) !== false) {

@@ -46,18 +46,17 @@ class VirtualMachineResource extends CustomResource
     protected function getActiveHDDs()
     {
         $disks = $this->resource->getActiveHDDs();
+        if ($disks === false) {
+            return null;
+        }
 
         $hdds = [];
-
-        if ($disks === false) {
-            return 'Unknown';
-        }
 
         if ($disks !== false && count($disks) > 0) {
             foreach ($disks as $disk) {
                 $hdd = new \StdClass();
                 $hdd->name = $disk->name;
-                $hdd->capacity_gb = $disk->capacity;
+                $hdd->capacity = $disk->capacity;
                 $hdds[] = $hdd;
             }
         }
@@ -87,7 +86,7 @@ class VirtualMachineResource extends CustomResource
             'ram' => $this->resource->servers_memory,
             'hdd' => $this->resource->servers_hdd,
 
-            'hdd_disk' => $this->getActiveHDDs(),
+            'hdd_disks' => $this->getActiveHDDs(),
 
             'ip_internal' => $this->resource->ip_internal, //Derived
             'ip_external' => $this->resource->ip_external, //Derived

@@ -189,7 +189,7 @@ class VirtualMachineController extends BaseController
         try {
             $kingpin = app()->makeWith(
                 'App\Kingpin\V1\KingpinService',
-                [$virtualMachine->getDatacentre(), $virtualMachine->type()]
+                [$virtualMachine->getPod(), $virtualMachine->type()]
             );
         } catch (\Exception $exception) {
             throw new KingpinException('Unable to connect to Virtual Machine');

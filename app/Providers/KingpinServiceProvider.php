@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Kingpin\V1\KingpinService;
 
-use App\Models\V1\UCSDatacentre;
 use GuzzleHttp\Client;
 use Log;
 use App\Models\V1\VirtualMachine;
@@ -44,7 +43,7 @@ class KingpinServiceProvider extends ServiceProvider
                 $virtualMachine = $virtualMachineQuery->first();
 
                 if ($virtualMachine !== false) {
-                    $UCSDatacentre = $virtualMachine->getDatacentre();
+                    $pod = $virtualMachine->getPod();
                     $environment = $virtualMachine->type();
                 }
             }
@@ -55,8 +54,8 @@ class KingpinServiceProvider extends ServiceProvider
              */
 
             if (count($parameters) > 0) {
-                // First paramater is a datacentre object
-                $UCSDatacentre = $parameters[0];
+                // First parameter is a datacentre object
+                $pod = $parameters[0];
 
                 // Kingpin environment, e.g. Public/Hybrid etc
                 if (isset($parameters[1])) {
@@ -68,16 +67,13 @@ class KingpinServiceProvider extends ServiceProvider
              * Load the service
              */
 
-            if (!is_object($UCSDatacentre) || !in_array(get_class($UCSDatacentre), array(
-                    'App\Models\V1\UCSDatacentre',
-                    'App\Models\V1\Pod',
-                ))) {
-                $log_message = 'Unable to create KingpinService: Invalid Datacentre Object';
+            if (!is_object($pod) || !is_a($pod, 'App\Models\V1\Pod')) {
+                $log_message = 'Unable to create KingpinService: Invalid Pod Object';
                 Log::error($log_message);
                 throw new \Exception($log_message);
             }
 
-            $serviceBaseUri = $UCSDatacentre->ucs_datacentre_vmware_api_url;
+            $serviceBaseUri = $pod->ucs_datacentre_vmware_api_url;
 
             if (!empty(env('VMWARE_API_PORT'))) {
                 $serviceBaseUri .= ':' . env('VMWARE_API_PORT');
