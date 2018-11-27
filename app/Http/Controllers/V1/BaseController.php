@@ -9,6 +9,9 @@ use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
 use UKFast\DB\Ditto\TransformsQueries;
 
+use App\Services\IntapiService;
+use App\Exceptions\V1\IntapiServiceException;
+
 class BaseController extends Controller
 {
     use ResponseHelper;

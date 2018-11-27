@@ -346,7 +346,7 @@ class KingpinService
      * @return array|bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getSystemTemplates()
+    public function getPodTemplates()
     {
         $url = $this->generateV1URL(null, true);
         $url .= 'system/template';
@@ -363,6 +363,32 @@ class KingpinService
         }
 
         return $templates;
+    }
+
+    /**
+     * Rename a Solution Template
+     * @param $solutionId
+     * @param $templateName
+     * @param $newTemplateName
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function renameSolutionTemplate($solutionId, $templateName, $newTemplateName)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'template/' . $templateName . '/name';
+
+        $model = [
+            'newTemplateName' => $newTemplateName,
+        ];
+
+        try {
+            $this->makeRequest('POST', $url, $model);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

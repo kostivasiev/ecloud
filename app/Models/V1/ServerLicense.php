@@ -72,7 +72,9 @@ class ServerLicense extends Model
             $query->where('server_license_type', '=', $licenseType);
         }
 
-        $query->where('server_license_available_ucs_datacentre_id', '=', $datacenterId);
+        if (!is_null($datacenterId)) {
+            $query->where('server_license_available_ucs_datacentre_id', '=', $datacenterId);
+        }
 
         return $query->get();
     }

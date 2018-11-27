@@ -42,6 +42,14 @@ $templateRouteParameters = array_merge($baseRouteParameters, [
 $router->group($templateRouteParameters, function () use ($router) {
     // Return a VM Collection
     $router->get('templates', 'TemplateController@index');
+
+    $router->get('templates/{template_name}', 'TemplateController@show');
+
+    $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
+
+    $router->put('templates/{template_name}', 'TemplateController@renameTemplate');
+
+    $router->delete('templates/{template_name}', 'TemplateController@deleteTemplate');
 });
 
 // Solution's
