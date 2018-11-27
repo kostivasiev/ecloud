@@ -382,11 +382,11 @@ class KingpinService
             );
         } catch (TransferException $exception) {
 //            throw new KingpinException($exception->getMessage());
-            throw new KingpinException('unable to load host');
+            throw new KingpinException('unable to query host');
         }
 
         if (!is_object($this->responseData)) {
-            throw new KingpinException('failed to load host');
+            throw new KingpinException('failed to parse host response');
         }
 
         if ($this->responseData->macAddress != $eth0_mac) {
