@@ -4,15 +4,18 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\SolutionNotFoundException;
 use App\Exceptions\V1\TemplateNotFoundException;
+
 use App\Models\V1\ServerLicense;
 use App\Models\V1\Solution;
-use App\Models\V1\UCSDatacentre;
+use App\Models\V1\Pod;
+
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 use App\Services\IntapiService;
 use App\Exceptions\V1\IntapiServiceException;
+
 use UKFast\Api\Exceptions\ForbiddenException;
 use App\Exceptions\V1\TemplateUpdateException;
 use UKFast\Api\Exceptions\NotFoundException;
@@ -154,7 +157,7 @@ class TemplateController extends BaseController
                         'template_name' => $templateName,
                         'new_template_name' => $newTemplateName
                     ],
-                    'ecloud_ucs_' . $solution->UCSDatacentre->getKey()
+                    'ecloud_ucs_' . $solution->pod->getKey()
                 );
 
                 return $this->respondEmpty(202);
@@ -271,7 +274,7 @@ class TemplateController extends BaseController
                         'template_type' => 'solution',
                         'template_name' => $templateName,
                     ],
-                    'ecloud_ucs_' . $solution->UCSDatacentre->getKey()
+                    'ecloud_ucs_' . $solution->pod->getKey()
                 );
 
                 return $this->respondEmpty(202);
@@ -412,10 +415,10 @@ class TemplateController extends BaseController
 
         // Get the templates for each pod
         foreach ($datacentres as $pod) {
-            $templates = $this->getTemplatesForPod($UCSDatacentre);
+            $templates = $this->getTemplatesForPod($pod);
             if (!empty($templates)) {
                 if ($withDatacentre) {
-                    $allTemplates[$UCSDatacentre->getKey()] = $templates;
+                    $allTemplates[$pod->getKey()] = $templates;
                     continue;
                 }
                 $allTemplates = array_merge($allTemplates, $templates);
@@ -435,7 +438,7 @@ class TemplateController extends BaseController
     {
         $templates = [];
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->UCSDatacentre]);
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->pod]);
         } catch (\Exception $exception) {
             //Failed to connect to Kingpin
             return $templates;
@@ -453,7 +456,7 @@ class TemplateController extends BaseController
                 $template->solution_id = $solution->getKey();
             }
             // Check the template license
-            $serverLicense = ServerLicense::checkTemplateLicense($solution->UCSDatacentre->getKey(), $template);
+            $serverLicense = ServerLicense::checkTemplateLicense($solution->pod->getKey(), $template);
             //Convert to public format
             $templates[] = $this->convertToPublicTemplate($template, $serverLicense);
         }
@@ -464,10 +467,10 @@ class TemplateController extends BaseController
 
     /**
      * Get the default templates for this pod/datacentre
-     * @param UCSDatacentre $pod
+     * @param Pod $pod
      * @return array
      */
-    protected function getTemplatesForPod(UCSDatacentre $pod)
+    protected function getTemplatesForPod(Pod $pod)
     {
         $templates = [];
         try {
