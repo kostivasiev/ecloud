@@ -322,22 +322,23 @@ class TemplateController extends BaseController
     {
         $tmp_template = new \stdClass;
         $tmp_template->name = $template->name;
-        $tmp_template->operating_system = $template->guest_os;
-
-        if (!empty($serverLicense)) {
-            $tmp_template->operating_system = $serverLicense->friendly_name;
-            $tmp_template->platform = $serverLicense->category;
-        }
 
         $tmp_template->cpu = $template->cpu;
-        $tmp_template->ram_gb = $template->ram;
-        $tmp_template->hdd_gb = $template->size_gb;
+        $tmp_template->ram = $template->ram;
+        $tmp_template->hdd = $template->size_gb;
 
         foreach ($template->hard_drives as $hard_drive) {
-            $tmp_template->hard_drives[] = (object)array(
+            $tmp_template->hdd_disks[] = (object)array(
                 'name' => $hard_drive->name,
                 'capacity' => $hard_drive->capacitygb,
             );
+        }
+
+        if (!empty($serverLicense)) {
+            $tmp_template->platform = $serverLicense->category;
+            $tmp_template->operating_system = $serverLicense->friendly_name;
+        } else {
+            $tmp_template->operating_system = $template->guest_os;
         }
 
         //Add the solution_id for Solution templates
