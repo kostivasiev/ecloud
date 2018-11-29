@@ -22,6 +22,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     //todo create
 
     $router->get('vms/{vm_id}', 'VirtualMachineController@show');
+    $router->delete('vms/{vm_id}', 'VirtualMachineController@destroy');
     // todo resize
 
     // todo clone

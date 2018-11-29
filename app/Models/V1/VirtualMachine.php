@@ -89,8 +89,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'id' => 'servers_id',
             'name' => 'servers_friendly_name',
             'cpu' => 'servers_cpu',
-            'ram_gb' => 'servers_memory',
-            'hdd_gb' => 'servers_hdd',
+            'ram' => 'servers_memory',
+            'hdd' => 'servers_hdd',
             'platform' => 'servers_platform',
             'backup' => 'servers_backup',
             'support' => 'servers_advanced_support',
@@ -109,8 +109,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('cpu', Filter::$stringDefaults),
-            $factory->create('ram_gb', Filter::$numericDefaults),
-            $factory->create('hdd_gb', Filter::$stringDefaults),
+            $factory->create('ram', Filter::$numericDefaults),
+            $factory->create('hdd', Filter::$stringDefaults),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup', Filter::$stringDefaults),
             $factory->create('support', Filter::$stringDefaults),
@@ -130,8 +130,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('id', 'asc'),
             $factory->create('name', 'asc'),
             $factory->create('cpu', 'asc'),
-            $factory->create('ram_gb', 'asc'),
-            $factory->create('hdd_gb', 'asc'),
+            $factory->create('ram', 'asc'),
+            $factory->create('hdd', 'asc'),
             $factory->create('platform', 'asc'),
             $factory->create('backup', 'asc'),
             $factory->create('support', 'asc'),
@@ -199,6 +199,17 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         return $array;
+    }
+
+    /**
+     * Always join subtype when querying the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function query()
+    {
+        return parent::query()
+            ->leftjoin('server_subtype', 'server_subtype_id', '=', 'servers_subtype_id');
     }
 
     /**
@@ -456,17 +467,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      */
     public function getPod()
     {
-        if (!empty($this->pod)) {
-            return $this->pod;
-        }
-
-        if ($this->servers_ecloud_datacentre_id == 0) {
-            if (!empty($this->solution)) {
-                return $this->solution->pod;
-            }
-        }
-
-        return false;
+        return $this->pod;
     }
 
 
@@ -580,5 +581,184 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function type()
     {
         return $this->servers_ecloud_type;
+    }
+
+    /**
+     * VM is currently being built
+     * @return bool
+     */
+    public function isBuilding()
+    {
+        if (in_array($this->servers_status, array(
+            'Awaiting OS Installation',
+            'Initialising',
+            'Being Built',
+            'Customising OS',
+            'Rebooting',
+            'Install Software Packages',
+            'Update Installed Software',
+            'Configuring Network',
+            'Configuring Backup',
+        ))) {
+            return true;
+        }
+
+        //build also includes resizing steps
+        if ($this->isResizing()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * VM is currently resizing
+     * @return bool
+     */
+    public function isResizing()
+    {
+        if (in_array($this->servers_status, array(
+            'Reconfigure VM',
+            'Configuring RAM',
+            'Configuring CPU/RAM',
+            'Configuring CPU',
+            'Configuring HDD',
+            'Configuring HDD IOPS',
+
+        ))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * VM is involved in a clone process
+     * @return bool
+     */
+    public function isCloning()
+    {
+        if (in_array($this->servers_status, array(
+            'Cloning from Existing',
+            'Cloning To Template',
+
+        ))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * VM is in process of deleting
+     * @return bool
+     */
+    public function isDeleting()
+    {
+        if (in_array($this->servers_status, array(
+            'Deleting',
+            'Pending Deletion'
+        ))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * is VM in a deletable state
+     * @return bool
+     */
+    public function canBeDeleted()
+    {
+        if ($this->isBuilding() || $this->isCloning() || $this->isDeleting()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Is the vm a contracted server
+     *
+     * @return boolean is contracted server
+     */
+    public function isContract()
+    {
+        return ($this->servers_billing_type == 'Contract');
+    }
+
+    /**
+     * Is this VM in contract
+     * @return boolean is eCloud VM in contract
+     */
+    public function inContract()
+    {
+        if ($this->type() != 'Public' || !$this->isContract()) {
+            return false;
+        }
+
+        $contract_end_date = new DateTime($this->servers_contract_end_date);
+        $current_date = new DateTime();
+
+        if ($contract_end_date < $current_date) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Is the vm a managed device
+     *
+     * @return boolean
+     */
+    public function isManaged()
+    {
+        $managedDevices =  array(
+            'UKFast Load Balancer',
+            'UKFast Web Application firewall'
+        );
+
+        return in_array($this->servers_model, $managedDevices)
+            || $this->isClusteredDevice()
+            || $this->isFirewall()
+            || $this->isWebcelerator();
+    }
+
+    /**
+     * Is this a clustered device?
+     * @return bool
+     */
+    public function isClusteredDevice()
+    {
+        return (in_array($this->servers_role, array(
+            'MSSQL Cluster', 'MySQL Cluster', 'File Cluster'
+        )));
+    }
+
+    /**
+     * is this actually a firewall?
+     * @return bool
+     */
+    public function isFirewall()
+    {
+        return in_array($this->servers_type, array(
+            'firewall', 'virtual firewall'
+        ));
+    }
+
+    /**
+     * is the server a webcelerator appliance
+     *
+     * @return bool
+     */
+    public function isWebcelerator()
+    {
+        return (
+            $this->servers_model == 'UKFast Web Accelerator' ||
+            $this->server_subtype_name == 'Webcelerator' ||
+            $this->servers_role == 'Webcelerator Appliance'
+        );
     }
 }

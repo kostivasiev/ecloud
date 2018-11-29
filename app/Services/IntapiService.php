@@ -31,7 +31,7 @@ class IntapiService
     public function getFirewallConfig($firewallId)
     {
         try {
-            $response = $this->request('POST', '/firewall/get-config', [
+            $response = $this->request('/firewall/get-config', [
                 'form_params' => [
                     'server_id' => $firewallId
                 ]
@@ -59,7 +59,7 @@ class IntapiService
      * @return mixed
      * @throws IntapiServiceException
      */
-    public function automationRequest($processName, $reference, $referenceId, $data = null, $queue = null)
+    public function automationRequest($processName, $reference, $referenceId, $data = null, $queue = null, $applicationId = 0)
     {
         $post_data = [
             'process_system' => 'ucs_vmware',
@@ -67,7 +67,7 @@ class IntapiService
             'reference_type' => $reference,
             'reference_id' => $referenceId,
             'submitted_by_type' => 'API Client',
-            'submitted_by_id' => 0,
+            'submitted_by_id' => $applicationId,
             'data' => $data,
             'queue' => $queue
         ];
@@ -75,39 +75,38 @@ class IntapiService
         $model = ['form_params' => $post_data];
 
         try {
-            $response = $this->request('POST', '/automation/request-create', $model);
+            $response = $this->request('/automation/request-create', $model);
         } catch (RequestException $exception) {
             throw new IntapiServiceException('Failed schedule automation request', null, 502);
         }
 
-        $response = $this->parseResponseData($response->getBody()->getContents());
+        $data = $this->parseResponseData($response->getBody()->getContents());
 
-        if (!$response->result) {
+        if (!$data->result) {
             Log::critical(
                 'Failed to schedule automation request:'
-                . end($response->errorset)
+                . end($data->errorset)
                 . ' data:' . serialize($post_data)
             );
-            throw new IntapiServiceException(end($response->errorset));
+            throw new IntapiServiceException(end($data->errorset));
         }
 
-        return $response->automation_request->id;
+        return $data->automation_request->id;
     }
 
 
     /**
-     * Makes a request to the UKFast Api.
+     * Makes a request to the UKFast Internal Api.
      *
-     * @param $method
      * @param $endpoint
      * @param array $options
      *
      * @return Response
      */
-    public function request($method, $endpoint, $options = [])
+    public function request($endpoint, $options = [])
     {
-        return $this->response = $this->client->request($method, $endpoint, array_merge_recursive([
-//            'debug' => true,
+        return $this->response = $this->client->request('POST', $endpoint, array_merge_recursive([
+            'debug' => false,
             'headers' => [
                 'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
                 'Accept' => 'application/json',

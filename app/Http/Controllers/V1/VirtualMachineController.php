@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Exceptions\V1\KingpinException;
-use App\Exceptions\V1\ServiceTimeoutException;
 use App\Models\V1\VirtualMachine;
 use App\Resources\V1\VirtualMachineResource;
+
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions;
+
 use UKFast\DB\Ditto\QueryTransformer;
+
 use App\Kingpin\V1\KingpinService as Kingpin;
+use App\Exceptions\V1\KingpinException;
+
+use App\Services\IntapiService;
+use App\Exceptions\V1\IntapiServiceException;
+
+use App\Exceptions\V1\ServiceTimeoutException;
+use App\Exceptions\V1\ServiceUnavailableException;
 
 class VirtualMachineController extends BaseController
 {
@@ -54,6 +62,72 @@ class VirtualMachineController extends BaseController
             VirtualMachineResource::class
         );
     }
+
+    /**
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\ForbiddenException
+     * @throws ServiceUnavailableException
+     */
+    public function destroy(Request $request, IntapiService $intapiService, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
+
+        //cant delete vm if its doing something that requires it to exist
+        if (!$virtualMachine->canBeDeleted()) {
+            throw new Exceptions\ForbiddenException(
+                'VM cannot be deleted with status of: ' . $virtualMachine->servers_status
+            );
+        }
+
+        //server is in contract
+        if (!$request->user->isAdmin && $virtualMachine->inContract()) {
+            throw new Exceptions\ForbiddenException(
+                'VM cannot be deleted, in contract until ' .
+                date('d/m/Y', strtotime($virtualMachine->servers_contract_end_date))
+            );
+        }
+
+        //server is a managed device
+        if (!$request->user->isAdmin && $virtualMachine->isManaged()) {
+            throw new Exceptions\ForbiddenException(
+                'VM cannot be deleted, device is managed by UKFast'
+            );
+        }
+
+        //schedule automation
+        try {
+            $automationRequestId = $intapiService->automationRequest(
+                'delete_vm',
+                'server',
+                $virtualMachine->getKey(),
+                [
+                    'template_type' => 'solution',
+                ],
+                'ecloud_ucs_' . $virtualMachine->pod->getKey(),
+                $request->user->applicationId
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Unable to schedule deletion request');
+        }
+
+        $virtualMachine->servers_status = 'Pending Deletion';
+        if (!$virtualMachine->save()) {
+            //Log::critical('');
+        }
+
+        if (!$request->user->isAdmin) {
+            $headers = [
+                'X-AutomationRequestId' => $automationRequestId
+            ];
+        }
+
+        return $this->respondEmpty(202, $headers);
+    }
+
 
     /**
      * @param Request $request
