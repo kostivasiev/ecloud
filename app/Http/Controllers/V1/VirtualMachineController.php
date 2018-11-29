@@ -104,9 +104,7 @@ class VirtualMachineController extends BaseController
                 'delete_vm',
                 'server',
                 $virtualMachine->getKey(),
-                [
-                    'template_type' => 'solution',
-                ],
+                [],
                 'ecloud_ucs_' . $virtualMachine->pod->getKey(),
                 $request->user->applicationId
             );
