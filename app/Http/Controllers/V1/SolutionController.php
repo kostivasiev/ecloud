@@ -61,6 +61,9 @@ class SolutionController extends BaseController
      * @param $solutionId
      * @return \Illuminate\Http\Response
      * @throws SolutionNotFoundException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
      */
     public function update(Request $request, $solutionId)
     {
@@ -81,7 +84,7 @@ class SolutionController extends BaseController
             //
         }
 
-        return $this->respondEmpty(200);
+        return $this->respondSave($request, $solution);
     }
 
     /**
