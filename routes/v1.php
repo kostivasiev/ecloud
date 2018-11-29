@@ -18,59 +18,57 @@ $baseRouteParameters = [
 
 // Virtual Machines's
 $router->group($baseRouteParameters, function () use ($router) {
-    // Return a VM Collection
     $router->get('vms', 'VirtualMachineController@index');
+    //todo create
 
-    //Return a VM Resource
     $router->get('vms/{vm_id}', 'VirtualMachineController@show');
+    // todo resize
 
-    //Power the VM On
+    // todo clone
+    // todo create template
+
     $router->put('vms/{vm_id}/power-on', 'VirtualMachineController@powerOn');
-
-    //Power the VM Off
     $router->put('vms/{vm_id}/power-off', 'VirtualMachineController@powerOff');
-
-    //Power-cycle the VM
     $router->put('vms/{vm_id}/power-cycle', 'VirtualMachineController@powerCycle');
+
+    // todo tags
 });
 
+
 // Templates
-$templateRouteParameters = array_merge($baseRouteParameters, [
-    'namespace' => 'V1',
-    'prefix' => 'v1',
-]);
-$router->group($templateRouteParameters, function () use ($router) {
-    // Return a VM Collection
+$router->group($baseRouteParameters, function () use ($router) {
     $router->get('templates', 'TemplateController@index');
 
     $router->get('templates/{template_name}', 'TemplateController@show');
+    $router->put('templates/{template_name}', 'TemplateController@renameTemplate');
+    $router->delete('templates/{template_name}', 'TemplateController@deleteTemplate');
 
     $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
-
-    $router->put('templates/{template_name}', 'TemplateController@renameTemplate');
-
-    $router->delete('templates/{template_name}', 'TemplateController@deleteTemplate');
 });
+
 
 // Solution's
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions', 'SolutionController@index');
-    $router->get('solutions/{solution_id}', 'SolutionController@show');
 
-    // vlan's
+    $router->get('solutions/{solution_id}', 'SolutionController@show');
+    $router->patch('solutions/{solution_id}', 'SolutionController@update');
+
     $router->get('solutions/{solution_id}/vlans', 'SolutionVlanController@getSolutionVlans');
 
-    // sites
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
 
-    // firewalls
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
+
+    // todo tags
+    // todo vms
 });
 
 
 // Solution Sites
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('sites', 'SolutionSiteController@index');
+
     $router->get('sites/{site_id}', 'SolutionSiteController@show');
 });
 
@@ -78,6 +76,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 // Hosts
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('hosts', 'HostController@index');
+
     $router->get('hosts/{host_id}', 'HostController@show');
 });
 
@@ -85,6 +84,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 // Datastores
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('datastores', 'DatastoreController@index');
+
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
 });
 
@@ -92,14 +92,19 @@ $router->group($baseRouteParameters, function () use ($router) {
 // Firewalls
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('firewalls', 'FirewallController@index');
+
     $router->get('firewalls/{firewall_id}', 'FirewallController@show');
 
-    // config
     $router->get('firewalls/{firewall_id}/config', 'FirewallController@getFirewallConfig');
 });
+
 
 // Pods
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('pods', 'PodController@index');
+
     $router->get('pods/{pod_id}', 'PodController@show');
+
+    // todo templates
+    // todo datastores
 });

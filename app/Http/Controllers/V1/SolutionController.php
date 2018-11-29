@@ -55,6 +55,36 @@ class SolutionController extends BaseController
     }
 
     /**
+     * Update Solution
+     *
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\Http\Response
+     * @throws SolutionNotFoundException
+     */
+    public function update(Request $request, $solutionId)
+    {
+        $solution = static::getSolutionQuery($request)->find($solutionId);
+        if (is_null($solution)) {
+            throw new SolutionNotFoundException('Solution ID #' . $solutionId . ' not found');
+        }
+
+        // replace request data with json payload
+        $request->request->replace($request->json()->all());
+
+        $this->validate($request, [
+            'name' => 'regex:/'.Solution::NAME_FORMAT_REGEX.'/',
+        ]);
+
+        $solution->ucs_reseller_solution_name = $request->input('name');
+        if (!$solution->save()) {
+            //
+        }
+
+        return $this->respondEmpty(200);
+    }
+
+    /**
      * get solution by ID
      * @param Request $request
      * @param $solutionId

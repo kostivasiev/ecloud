@@ -15,6 +15,9 @@ use UKFast\DB\Ditto\Filter;
 
 class Solution extends Model implements Filterable, Sortable
 {
+    const NAME_FORMAT_DESC = 'Alphanumeric, spaces, hyphens and underscores';
+    const NAME_FORMAT_REGEX = '^[A-Za-z0-9\-\_\ \.]+$';
+
     /**
      * The table associated with the model.
      *
