@@ -19,7 +19,7 @@ $baseRouteParameters = [
 // Virtual Machines's
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('vms', 'VirtualMachineController@index');
-    //todo create
+    $router->post('vms', 'VirtualMachineController@create');
 
     $router->get('vms/{vm_id}', 'VirtualMachineController@show');
     $router->delete('vms/{vm_id}', 'VirtualMachineController@destroy');

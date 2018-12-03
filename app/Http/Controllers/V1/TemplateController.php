@@ -321,6 +321,7 @@ class TemplateController extends BaseController
     protected function convertToPublicTemplate($template, $serverLicense = null)
     {
         $tmp_template = new \stdClass;
+        $tmp_template->type = $template->type;
         $tmp_template->name = $template->name;
 
         $tmp_template->cpu = $template->cpu;
@@ -336,8 +337,10 @@ class TemplateController extends BaseController
 
         if (!empty($serverLicense)) {
             $tmp_template->platform = $serverLicense->category;
+            $tmp_template->license = $serverLicense->name;
             $tmp_template->operating_system = $serverLicense->friendly_name;
         } else {
+            $tmp_template->license = 'Unknown';
             $tmp_template->operating_system = $template->guest_os;
         }
 
@@ -453,6 +456,8 @@ class TemplateController extends BaseController
 
         //Add the solution_id to the template data
         foreach ($result as &$template) {
+            $template->type = 'Solution';
+
             if ($appendSolutionId) {
                 $template->solution_id = $solution->getKey();
             }
@@ -489,10 +494,44 @@ class TemplateController extends BaseController
 
         foreach ($result as &$template) {
             $serverLicense = ServerLicense::checkTemplateLicense($pod->getKey(), $template);
+
+            if ($template->name == $serverLicense->name) {
+                $template->type = 'Base';
+            } else {
+                $template->type = 'Pod';
+            }
+
             $template = $this->convertToPublicTemplate($template, $serverLicense);
         }
 
         return $result;
+    }
+
+    public static function getTemplateByName(string $name, Pod $pod, Solution $solution = null)
+    {
+        $request = app('request');
+        $TemplateController = new static($request);
+
+        if (!is_null($solution)) {
+            $templates = $TemplateController->getTemplatesForSolution($solution, false);
+            if (is_array($templates) and count($templates) > 0) {
+                $template = $TemplateController->findTemplateByName($name, $templates);
+                if ($template) {
+                    return $template;
+                }
+            }
+        }
+
+        // load pod templates
+        $templates = $TemplateController->getResellerPodTemplates(true)[$pod->getKey()];
+        if (is_array($templates) and count($templates) > 0) {
+            $template = $TemplateController->findTemplateByName($name, $templates);
+            if ($template) {
+                return $template;
+            }
+        }
+
+        throw new TemplateNotFoundException("A template matching the requested name was not found");
     }
 
 

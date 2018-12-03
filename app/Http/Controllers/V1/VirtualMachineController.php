@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Models\V1\Pod;
 use App\Models\V1\VirtualMachine;
 use App\Resources\V1\VirtualMachineResource;
 
@@ -17,6 +18,7 @@ use App\Services\IntapiService;
 use App\Exceptions\V1\IntapiServiceException;
 
 use App\Exceptions\V1\ServiceTimeoutException;
+use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
 
 class VirtualMachineController extends BaseController
@@ -63,6 +65,213 @@ class VirtualMachineController extends BaseController
         );
     }
 
+    /**
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @return \Illuminate\Http\Response
+     * @throws ServiceUnavailableException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     */
+    public function create(Request $request, IntapiService $intapiService)
+    {
+        // default validation
+        $rules = [
+            'environment' => ['required'],
+            'template' => ['required'],
+
+            'cpu' => ['required', 'integer'],
+            'ram' => ['required', 'integer'],
+            'hdd' => ['required', 'integer'],
+        ];
+
+        // todo public iops
+
+        if (strtolower($request->input('environment')) != 'public') {
+            $rules['solution_id'] = ['required', 'integer', 'min:1'];
+        }
+
+        if ($request->has('name')) {
+            $rules['name'] = [
+                'regex:/'.VirtualMachine::NAME_FORMAT_REGEX.'/'
+            ];
+        }
+
+        if ($request->input('platform') == 'Linux') {
+            $rules['computername'] = [
+                'regex:/'.VirtualMachine::HOSTNAME_FORMAT_REGEX.'/'
+            ];
+        } elseif ($request->input('platform') == 'Windows') {
+            $rules['computername'] = [
+                'regex:/'.VirtualMachine::NETBIOS_FORMAT_REGEX.'/'
+            ];
+        }
+
+        if ($request->input('monitoring') === true) {
+            $rules['monitoring-contacts'] = 'required';
+        }
+
+        // todo validate tags
+
+        $this->validate($request, $rules);
+
+
+        // environment specific validation
+        if (strtolower($request->input('environment')) == 'public') {
+            $solution = null;
+            $pod = new Pod();
+        } else {
+            $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
+            $pod = $solution->pod;
+        }
+
+        // todo check available resources
+
+        $rules['cpu'] = array_merge($rules['cpu'], [
+            'min:'.VirtualMachine::MIN_CPU, 'max:'.VirtualMachine::MAX_CPU
+        ]);
+
+        $rules['ram'] = array_merge($rules['ram'], [
+            'min:'.VirtualMachine::MIN_RAM, 'max:'.VirtualMachine::MAX_RAM
+        ]);
+
+        $rules['hdd'] = array_merge($rules['hdd'], [
+            'min:'.VirtualMachine::MIN_HDD, 'max:'.VirtualMachine::MAX_HDD
+        ]);
+
+
+        // todo is multi-vlan
+        // todo is multi-site
+
+        $this->validate($request, $rules);
+
+        // check template is valid
+        $template = TemplateController::getTemplateByName(
+            $request->input('template'),
+            $pod,
+            $solution
+        );
+
+        // todo request is larger than template
+
+        $this->validate($request, $rules);
+
+        // set initial _post data
+        $post_data = array(
+            'reseller_id'       => $request->user->resellerId,
+            'ecloud_type'       => ucfirst(strtolower($request->input('environment'))),
+            'ucs_reseller_id'   => $request->input('solution_id'),
+            'server_active'     => true,
+
+            'name'              => $request->input('name'),
+            'netbios'           => $request->input('computername'),
+
+            'submitted_by_type' => 'API Client',
+            'submitted_by_id'   => $request->user->applicationId,
+            'launched_by'       => '-5',
+        );
+
+
+        // set template
+        $post_data['platform'] = $template->platform;
+        $post_data['license'] = $template->license;
+
+        if ($template->type != 'Base') {
+            $post_data['template'] = $request->input('template');
+
+            if ($template->type != 'Solution') {
+                $post_data['template_type'] = 'System';
+            }
+        }
+
+        if ($request->has('template_password')) {
+            $post_data['template_password'] = $request->input('template_password');
+        }
+
+
+        // set compute
+        $post_data['cpus'] = $request->input('cpu');
+        $post_data['ram_gb'] = $request->input('ram');
+
+
+        // set storage
+        $post_data['hdd_gb'] = $request->input('hdd');
+
+        if ($request->has('datastore_id')) {
+            $post_data['reseller_lun_id'] = $request->input('datastore_id');
+        } else {
+            // todo find the datastore with the most free storage
+        }
+
+
+        // set networking
+        // todo check/set VLAN
+
+        if ($request->has('external_ip_required')) {
+            $post_data['external_ip_required'] = $request->input('external_ip_required');
+        }
+
+        // set nameservers
+        if ($request->has('nameservers')) {
+            $post_data['nameservers'] = $request->input('nameservers');
+        }
+
+        // site id
+            // drs group
+
+
+        // set support
+        if ($request->input('monitoring') === true) {
+            $post_data['advanced_support'] = true;
+        }
+
+        if ($request->input('monitoring') === true) {
+            $post_data['monitoring_enabled'] = true;
+            $post_data['monitoring_contacts'] = $request->input('monitoring-contacts');
+        }
+
+        // todo remove debugging when ready to retest
+        print_r($post_data);
+        exit;
+
+        // schedule automation
+        try {
+            $intapiService->request('/automation/create_ucs_vmware_vm', [
+                'form_params' => $post_data,
+                'headers' => [
+                    'Accept' => 'application/xml',
+                ]
+            ]);
+
+            $intapiData = $intapiService->parseResponseData();
+        } catch (RequestException $exception) {
+            throw new IntapiServiceException('Failed to create new virtual machine', null, 502);
+        }
+
+        if (!$intapiData->result) {
+            $error_msg = end($intapiData->errorset);
+
+            if (!$request->user->isAdmin) {
+                $error_msg = $intapiService->getFriendlyError($error_msg);
+                throw new ServiceResponseException($error_msg);
+            }
+
+            throw new IntapiServiceException($error_msg);
+        }
+
+        $virtualMachine = new VirtualMachine();
+        $virtualMachine->servers_id = $intapiData->data->server_id;
+        $virtualMachine->servers_status = $intapiData->data->server_status;
+
+        if ($request->user->isAdmin) {
+            $headers = [
+                'X-AutomationRequestId' => $intapiData->data->automation_request_id
+            ];
+        }
+
+        return $this->respondSave($request, $virtualMachine, 202, null, $headers);
+    }
     /**
      * @param Request $request
      * @param IntapiService $intapiService

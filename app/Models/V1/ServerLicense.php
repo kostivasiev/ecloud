@@ -97,6 +97,21 @@ class ServerLicense extends Model
         return $query;
     }
 
+    public function getNameAttribute()
+    {
+        return $this->server_license_name;
+    }
+
+    public function getCategoryAttribute()
+    {
+        return $this->server_license_category;
+    }
+
+    public function getFriendlyNameAttribute()
+    {
+        return $this->server_license_friendly_name;
+    }
+
     /**
      * Check that a template has a correct os licence and return the licence if true
      * @param $datacentreId
@@ -109,7 +124,17 @@ class ServerLicense extends Model
     {
         $ecloudLicenses = ServerLicense::availableToInstall('ecloud vm', true, 'OS', $datacentreId);
 
-        $serverLicenses = ServerLicense::withType('OS')->get();
+        // exact name match (aka base templates)
+        $baseTemplate = $ecloudLicenses->filter(function ($license) use ($template) {
+            return $license->server_license_name == $template->name;
+        });
+
+        if ($baseTemplate->count() > 0) {
+            return $baseTemplate->first();
+        }
+
+
+        // partial match (aka customer templates)
 
         // Because PHP's similar_text doesn't always match the correct result
         // let's try and make a more direct comparison by removing known flaws
@@ -118,46 +143,58 @@ class ServerLicense extends Model
         );
 
         $serverLicense = ServerLicense::withFriendlyName($templateFriendlyName);
-
-        if ($serverLicense->count() < 1) {
-            $similarText = [];
-            //If no match found, try similar_text
-            foreach ($ecloudLicenses as $availableLicence) {
-                similar_text($availableLicence->friendly_name, $template->guest_os, $percent);
-
-                // Increase the confidence required. We need it.
-                if ($percent > 50) {
-                    $similarText[$availableLicence->friendly_name] = $percent;
-                }
-                if (!empty($similarText)) {
-                    $mostLikelyLicence = array_keys($similarText, max($similarText));
-                    $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
-                }
-            }
+        if ($serverLicense->count() > 0) {
+            return $serverLicense->first();
         }
 
-        //If still no match found
-        if ($serverLicense->count() < 1) {
-            $similarText = [];
-            foreach ($serverLicenses as $availableLicence) {
-                similar_text($availableLicence->friendly_name, $template->guest_os, $percent);
-                // Increase the confidence required. We need it.
-                if ($percent > 50) {
-                    $similarText[$availableLicence->id] = $percent;
-                }
+        $similarText = [];
+        foreach ($ecloudLicenses as $availableLicence) {
+            similar_text($availableLicence->friendly_name, $template->guest_os, $percent);
+
+            // Increase the confidence required. We need it.
+            if ($percent > 50) {
+                $similarText[$availableLicence->friendly_name] = $percent;
             }
             if (!empty($similarText)) {
                 $mostLikelyLicence = array_keys($similarText, max($similarText));
-                $serverLicense = new server_licence($mostLikelyLicence[0]);
+                $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
+
+                if ($serverLicense->count() > 0) {
+                    return $serverLicense->first();
+                }
             }
         }
 
-        if ($serverLicense->count() < 1) {
-            // Try and load up from all server licences
-            $serverLicence = new \stdClass();
-            $serverLicence->id = 0;
-            $serverLicence->friendly_name = (string)$template->guest_os;
-            $serverLicence->category = 'Unknown';
+
+        //If still no match found
+        $serverLicenses = ServerLicense::withType('OS')->get();
+
+        $similarText = [];
+        foreach ($serverLicenses as $availableLicence) {
+            similar_text($availableLicence->friendly_name, $template->guest_os, $percent);
+            // Increase the confidence required. We need it.
+            if ($percent > 50) {
+                $similarText[$availableLicence->id] = $percent;
+            }
+        }
+        if (!empty($similarText)) {
+            $mostLikelyLicence = array_keys($similarText, max($similarText));
+            $serverLicense = new server_licence($mostLikelyLicence[0]);
+            if ($serverLicense->count() > 0) {
+                return $serverLicense->first();
+            }
+        }
+
+        // no matching license, try to create one
+        $serverLicence = new \stdClass();
+        $serverLicence->id = 0;
+        $serverLicence->name = '';
+        $serverLicence->friendly_name = (string)$template->guest_os;
+
+        if (strpos($template->guest_os, 'Windows') !== false) {
+            $serverLicence->category = 'Windows';
+        } else {
+            $serverLicence->category = 'Linux';
         }
 
         return $serverLicence;

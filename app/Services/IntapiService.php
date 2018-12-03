@@ -21,6 +21,88 @@ class IntapiService
         $this->client = $httpClient;
     }
 
+
+    /**
+     * Makes a request to the UKFast Internal Api.
+     *
+     * @param $endpoint
+     * @param array $options
+     *
+     * @return Response
+     */
+    public function request($endpoint, $options = [])
+    {
+        return $this->response = $this->client->request('POST', $endpoint, array_replace_recursive([
+            'debug' => false,
+            'headers' => [
+                'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ]
+        ], $options));
+    }
+
+    /**
+     * convert response to data object
+     * @return mixed
+     * @throws IntapiServiceException
+     */
+    public function parseResponseData()
+    {
+        $content_type = $this->response->getHeaderLine('Content-Type');
+
+        if (strpos($content_type, 'json') !== false) {
+            $json = json_decode($this->response->getBody()->getContents());
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new IntapiServiceException('failed to parse response data: '.json_last_error_msg());
+            }
+
+            return $json;
+        } elseif (strpos($content_type, 'xml') !== false) {
+            $xml = simplexml_load_string($this->response->getBody()->getContents());
+            if ($xml === false) {
+                throw new IntapiServiceException('failed to parse response data: '.end(libxml_get_errors()));
+            }
+
+            // convert from simplexml to stdClass
+            $json = json_decode(json_encode($xml));
+
+            if (!is_bool($json->result)) {
+                $json->result = ($json->result === 'TRUE');
+            }
+
+            return $json;
+        }
+
+        throw new IntapiServiceException('unknown response format: '.$content_type);
+    }
+
+    public function getFriendlyError($error)
+    {
+        switch ($error) {
+            case (preg_match('/no available.*ip addresses/', $error) == true):
+                $ip_type = 'external';
+                if (strpos($error, 'internal') !== false) {
+                    $ip_type = 'internal';
+                }
+                return 'No ' . $ip_type . ' IP addresses available';
+
+            case (preg_match('/datastore has insufficient space/', $error) == true):
+                $error_msg = 'Insufficient free space on selected datastore';
+
+                $amount_left = filter_var($error, FILTER_SANITIZE_NUMBER_INT);
+                if (is_numeric($amount_left)) {
+                    $error_msg .= ', ' . $amount_left . 'GB remaining';
+                }
+
+                return $error_msg;
+
+            default:
+                return 'Please try again in a few moments or contact our support team if the fault persists.';
+        }
+    }
+
+
     /**
      * Load Firewall Config
      *
@@ -92,41 +174,5 @@ class IntapiService
         }
 
         return $data->automation_request->id;
-    }
-
-
-    /**
-     * Makes a request to the UKFast Internal Api.
-     *
-     * @param $endpoint
-     * @param array $options
-     *
-     * @return Response
-     */
-    public function request($endpoint, $options = [])
-    {
-        return $this->response = $this->client->request('POST', $endpoint, array_merge_recursive([
-            'debug' => false,
-            'headers' => [
-                'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ]
-        ], $options));
-    }
-
-    /**
-     * @param $json
-     * @return mixed
-     * @throws IntapiServiceException
-     */
-    protected function parseResponseData($json)
-    {
-        $data = json_decode($json);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new IntapiServiceException('failed to parse response data');
-        }
-
-        return $data;
     }
 }

@@ -25,6 +25,33 @@ use UKFast\DB\Ditto\Filter;
  */
 class VirtualMachine extends Model implements Filterable, Sortable
 {
+    const NAME_FORMAT_DESC = 'alphanumeric, spaces, hyphens and underscores';
+    const NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ \.]';
+
+    const HOSTNAME_FORMAT_DESC = 'alphanumeric (start/end), hyphens and full stop';
+    const HOSTNAME_FORMAT_REGEX = '^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$';
+
+    const NETBIOS_FORMAT_DESC = 'alphanumeric (start/end) and hyphens, upto 15 characters';
+    const NETBIOS_FORMAT_REGEX = '^(?!-)[a-zA-Z0-9-]{1,15}(?<!-)$';
+
+    // For Linux we want the min CPU's to be 1, but 2 for windows.
+    const MIN_CPU = 1;
+    const MAX_CPU = 10;
+
+    const MIN_RAM = 1;
+    const MAX_RAM = 30;
+
+    const MIN_HDD = 20;
+    const MIN_HDD_LINUX = 20;
+    const MIN_HDD_WINDOWS = 40;
+
+    const MAX_HDD = 300;
+    const MAX_HDD_COUNT = 20;
+
+    protected $attributes = array(
+        'servers_use_ip_management' => 'Yes',
+    );
+
     /**
      * Cast our database columns to the correct data type.
      *
