@@ -69,7 +69,10 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @return \Illuminate\Http\Response
-     * @throws ServiceUnavailableException
+     * @throws IntapiServiceException
+     * @throws ServiceResponseException
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws \App\Exceptions\V1\TemplateNotFoundException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -93,16 +96,6 @@ class VirtualMachineController extends BaseController
         if ($request->has('name')) {
             $rules['name'] = [
                 'regex:/'.VirtualMachine::NAME_FORMAT_REGEX.'/'
-            ];
-        }
-
-        if ($request->input('platform') == 'Linux') {
-            $rules['computername'] = [
-                'regex:/'.VirtualMachine::HOSTNAME_FORMAT_REGEX.'/'
-            ];
-        } elseif ($request->input('platform') == 'Windows') {
-            $rules['computername'] = [
-                'regex:/'.VirtualMachine::NETBIOS_FORMAT_REGEX.'/'
             ];
         }
 
@@ -151,6 +144,19 @@ class VirtualMachineController extends BaseController
             $pod,
             $solution
         );
+
+        if ($request->has('computername')) {
+            if ($template->platform == 'Linux') {
+                $rules['computername'] = [
+                    'regex:/'.VirtualMachine::HOSTNAME_FORMAT_REGEX.'/'
+                ];
+            } elseif ($template->platform == 'Windows') {
+                $rules['computername'] = [
+                    'regex:/'.VirtualMachine::NETBIOS_FORMAT_REGEX.'/'
+                ];
+            }
+        }
+
 
         // todo request is larger than template
 
