@@ -86,8 +86,6 @@ class VirtualMachineController extends BaseController
             'hdd' => ['required', 'integer'],
         ];
 
-        // todo public iops
-
         if (strtolower($request->input('environment')) != 'public') {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
         }
@@ -116,11 +114,12 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
-
         // environment specific validation
         if (strtolower($request->input('environment')) == 'public') {
             $solution = null;
             $pod = new Pod();
+
+            // todo public iops
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
@@ -232,8 +231,8 @@ class VirtualMachineController extends BaseController
         }
 
         // todo remove debugging when ready to retest
-        print_r($post_data);
-        exit;
+//        print_r($post_data);
+//        exit;
 
         // schedule automation
         try {
