@@ -191,7 +191,7 @@ class Datastore extends Model implements Filterable, Sortable
             return $value;
         }
 
-        $name_parts  = explode('_', $this->reseller_lun_name);
+        $name_parts = explode('_', $this->reseller_lun_name);
         $name_number = array_pop($name_parts);
         $name_number = is_numeric($name_number) ? $name_number : 1;
 
@@ -219,7 +219,7 @@ class Datastore extends Model implements Filterable, Sortable
             throw $exception;
         }
 
-        return $this->usage = (object) [
+        return $this->usage = (object)[
             'capacity' => $vmwareDatastore->capacity,
             'freeSpace' => $vmwareDatastore->freeSpace,
             'uncommitted' => $vmwareDatastore->uncommitted,
@@ -227,5 +227,112 @@ class Datastore extends Model implements Filterable, Sortable
             'available' => $vmwareDatastore->available,
             'used' => $vmwareDatastore->used,
         ];
+    }
+
+    /**
+     * Scope a query to only include solutions for a given reseller
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $resellerId
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeWithReseller($query, $resellerId)
+    {
+        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
+
+        if (!empty($resellerId)) {
+            $query->where('reseller_lun_ucs_reseller_id', $resellerId);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Scope datastore query by (LUN) name
+     * @param $query
+     * @param $name
+     * @return mixed
+     */
+    public function scopeWithName($query, $name)
+    {
+        $name = filter_var($name, FILTER_SANITIZE_STRING);
+
+        if (!empty($name)) {
+            $query->where('reseller_lun_name', $name);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Load datastores for a solution
+     * @param $solutionId
+     * @param null $UCSSiteId
+     * @return bool
+     */
+    public static function getForSolution($solutionId, $UCSSiteId = null)
+    {
+        try {
+            return Solution::find($solutionId)->datastores($UCSSiteId);
+        } catch (\Exception $exception) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Gt default datastore
+     * @param $solutionId
+     * @param string $ecloudType
+     * @param bool $backupRequired
+     * @param null $UCSSiteId
+     * @return bool
+     */
+    public static function getDefault($solutionId, $ecloudType = 'shared', $backupRequired = false, $UCSSiteId = null)
+    {
+        switch ($ecloudType) {
+            case 'dedicated':
+                $datastores = static::getForSolution($solutionId, $UCSSiteId);
+                if (!empty($datastores)) {
+                    $defaultDatastore = $datastores[0];
+                    if (count($datastores) > 1) {
+                        //default on dedicated is the one with the most space
+                        foreach ($datastores as &$datastore) {
+                            try {
+                                //get the usage from vmware
+                                $datastore->getUsage();
+                            } catch (\Exception $exception) {
+                                continue;
+                            }
+
+                            if ($datastore->available > $defaultDatastore->available) {
+                                $defaultDatastore = $datastore;
+                            }
+                        }
+                    }
+                }
+
+                // If we cant locate the users LUN try the default.
+                if (!isset($defaultDatastore)) {
+                    $defaultDatastore = static::find(5);
+                }
+
+                break;
+            case 'shared':
+                if (!$backupRequired) {
+                    $defaultDatastore = static::find(3);
+                } else {
+                    $defaultDatastore = static::find(4);
+                }
+                break;
+            default:
+                return false;
+        }
+
+        //allow default datastores to over provision
+        if (!isset($defaultDatastore->usage->available) and $defaultDatastore->reseller_lun_reseller_id == 308) {
+            $defaultDatastore->usage->available = $defaultDatastore->reseller_lun_size_gb;
+        }
+
+        return $defaultDatastore;
     }
 }

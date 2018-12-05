@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Exceptions\V1\SolutionNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\IdProperty;
@@ -64,7 +65,7 @@ class Solution extends Model implements Filterable, Sortable
         return [
             'id' => 'ucs_reseller_id',
             'name' => 'ucs_reseller_solution_name',
-            'type'   => 'ucs_reseller_type',
+            'type' => 'ucs_reseller_type',
         ];
     }
 
@@ -165,5 +166,45 @@ class Solution extends Model implements Filterable, Sortable
             'ucs_datacentre_id',
             'ucs_reseller_datacentre_id'
         );
+    }
+
+
+    /**
+     * Get Datastores for a Solution
+     * @param null $UCSSiteId
+     * @return array
+     * @throws \Exception
+     */
+    public function datastores($UCSSiteId = null)
+    {
+        $solutionDatastores = [];
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$this->pod]);
+            //Load the solution datastores from VMWare
+            $datastores = $kingpin->getDatastores($this->getKey());
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+
+        if (!empty($datastores)) {
+            foreach ($datastores as $datastore) {
+                //Load the datastore record
+                $datastoreQuery = Datastore::query()
+                    ->withName($datastore->name)
+                    ->withReseller($this->attributes['ucs_reseller_id']);
+
+                if (!empty($UCSSiteId)) {
+                    $datastoreQuery->where('reseller_lun_ucs_site_id', '=', $UCSSiteId);
+                }
+
+                $datastoreRes = $datastoreQuery->first();
+
+                if ($datastoreRes instanceof Datastore) {
+                    $solutionDatastores[] = $datastoreRes;
+                }
+            }
+        }
+
+        return $solutionDatastores;
     }
 }

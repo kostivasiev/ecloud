@@ -9,8 +9,8 @@ use Log;
 
 class IntapiService
 {
-    public $response;
-    public $responseData;
+    protected $response;
+    protected $responseData;
 
     protected $client;
     protected $headers;
@@ -29,10 +29,14 @@ class IntapiService
      * @param array $options
      *
      * @return Response
+     * @throws IntapiServiceException
      */
     public function request($endpoint, $options = [])
     {
-        return $this->response = $this->client->request('POST', $endpoint, array_replace_recursive([
+        $this->response = null;
+        $this->responseData = null;
+
+        $this->response = $this->client->request('POST', $endpoint, array_replace_recursive([
             'debug' => false,
             'headers' => [
                 'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
@@ -40,6 +44,32 @@ class IntapiService
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ]
         ], $options));
+
+        //Check if there is a response body and parse response data
+        if (!empty($this->response->getBody()->getContents())) {
+            $this->response->getBody()->rewind();
+            $this->responseData = $this->parseResponseData();
+        }
+
+        return $this->response;
+    }
+
+    /**
+     * return last response
+     * @return mixed
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * Return last response data
+     * @return mixed
+     */
+    public function getResponseData()
+    {
+        return $this->responseData;
     }
 
     /**
@@ -47,7 +77,7 @@ class IntapiService
      * @return mixed
      * @throws IntapiServiceException
      */
-    public function parseResponseData()
+    protected function parseResponseData()
     {
         $content_type = $this->response->getHeaderLine('Content-Type');
 
@@ -60,8 +90,14 @@ class IntapiService
             return $json;
         } elseif (strpos($content_type, 'xml') !== false) {
             $xml = simplexml_load_string($this->response->getBody()->getContents());
+
             if ($xml === false) {
-                throw new IntapiServiceException('failed to parse response data: '.end(libxml_get_errors()));
+                $message = 'failed to parse response data';
+                $errors = libxml_get_errors();
+                if (!empty($errors)) {
+                    $message .= ': ' . end($errors);
+                }
+                throw new IntapiServiceException($message);
             }
 
             // convert from simplexml to stdClass
@@ -113,7 +149,7 @@ class IntapiService
     public function getFirewallConfig($firewallId)
     {
         try {
-            $response = $this->request('/firewall/get-config', [
+            $this->request('/firewall/get-config', [
                 'form_params' => [
                     'server_id' => $firewallId
                 ]
@@ -122,13 +158,35 @@ class IntapiService
             throw new IntapiServiceException('Failed to load config for firewall #' . $firewallId . '', null, 502);
         }
 
-        $data = $this->parseResponseData($response->getBody()->getContents());
-
-        if (!$data->result) {
-            throw new IntapiServiceException(end($data->errorset));
+        if (!$this->responseData->result) {
+            throw new IntapiServiceException(end($this->responseData->result));
         }
 
-        return $data->config;
+        return $this->responseData->config;
+    }
+
+    /**
+     * Clone a virtual machine
+     * @param $postData
+     * @param bool $recordsOnly
+     * @return mixed
+     * @throws IntapiServiceException
+     */
+    public function cloneVM($postData)
+    {
+        $model = ['form_params' => $postData];
+
+        try {
+            $this->request('/automation/clone_ucs_vmware_vm', $model);
+        } catch (RequestException $exception) {
+            throw new IntapiServiceException('Failed to clone vm');
+        }
+
+        if (!$this->responseData->result) {
+            throw new IntapiServiceException(end($this->responseData->errorset));
+        }
+
+        return $this->responseData->data->server_id;
     }
 
     /**
@@ -138,11 +196,18 @@ class IntapiService
      * @param $referenceId
      * @param null $data
      * @param null $queue
+     * @param int $applicationId
      * @return mixed
      * @throws IntapiServiceException
      */
-    public function automationRequest($processName, $reference, $referenceId, $data = null, $queue = null, $applicationId = 0)
-    {
+    public function automationRequest(
+        $processName,
+        $reference,
+        $referenceId,
+        $data = null,
+        $queue = null,
+        $applicationId = 0
+    ) {
         $post_data = [
             'process_system' => 'ucs_vmware',
             'process_name' => $processName,
@@ -157,22 +222,20 @@ class IntapiService
         $model = ['form_params' => $post_data];
 
         try {
-            $response = $this->request('/automation/request-create', $model);
+            $this->request('/automation/request-create', $model);
         } catch (RequestException $exception) {
             throw new IntapiServiceException('Failed schedule automation request', null, 502);
         }
 
-        $data = $this->parseResponseData($response->getBody()->getContents());
-
-        if (!$data->result) {
+        if (!$this->responseData->result) {
             Log::critical(
                 'Failed to schedule automation request:'
-                . end($data->errorset)
+                . end($this->responseData->errorset)
                 . ' data:' . serialize($post_data)
             );
-            throw new IntapiServiceException(end($data->errorset));
+            throw new IntapiServiceException(end($this->responseData->errorset));
         }
 
-        return $data->automation_request->id;
+        return $this->responseData->automation_request->id;
     }
 }

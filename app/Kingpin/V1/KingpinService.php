@@ -470,6 +470,33 @@ class KingpinService
         return $this->formatDatastore($this->responseData);
     }
 
+
+    /**
+     * Returns an array of datastores for the solution
+     * @param $solutionId
+     * @return null
+     * @throws KingpinException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getDatastores($solutionId)
+    {
+        try {
+            $this->makeRequest(
+                'GET',
+                $this->generateV1URL($solutionId) . 'datastore'
+            );
+        } catch (TransferException $exception) {
+            throw new KingpinException($exception->getMessage());
+        }
+
+        $datastores = [];
+        foreach ($this->responseData as $datastore) {
+            $datastores[] = $this->formatDatastore($datastore);
+        }
+
+        return $datastores;
+    }
+
     /**
      * format datastore object to standard response
      * @param $vmwareObject

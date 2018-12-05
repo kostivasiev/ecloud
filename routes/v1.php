@@ -21,16 +21,17 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('vms', 'VirtualMachineController@index');
     $router->post('vms', 'VirtualMachineController@create');
 
-    $router->get('vms/{vm_id}', 'VirtualMachineController@show');
+    $router->get('vms/{vmId}', 'VirtualMachineController@show');
     $router->delete('vms/{vm_id}', 'VirtualMachineController@destroy');
+    $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
+
     // todo resize
 
-    // todo clone
     // todo create template
 
-    $router->put('vms/{vm_id}/power-on', 'VirtualMachineController@powerOn');
-    $router->put('vms/{vm_id}/power-off', 'VirtualMachineController@powerOff');
-    $router->put('vms/{vm_id}/power-cycle', 'VirtualMachineController@powerCycle');
+    $router->put('vms/{vmId}/power-on', 'VirtualMachineController@powerOn');
+    $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
+    $router->put('vms/{vmId}/power-cycle', 'VirtualMachineController@powerCycle');
 
     // todo tags
 });
