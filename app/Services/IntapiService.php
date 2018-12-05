@@ -207,8 +207,7 @@ class IntapiService
         $data = null,
         $queue = null,
         $applicationId = 0
-    )
-    {
+    ) {
         $post_data = [
             'process_system' => 'ucs_vmware',
             'process_name' => $processName,
