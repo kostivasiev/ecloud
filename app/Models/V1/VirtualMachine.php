@@ -341,6 +341,16 @@ class VirtualMachine extends Model implements Filterable, Sortable
         return $hddGB;
     }
 
+
+    /**
+     * is ecloud dedicated?
+     * @return bool
+     */
+    public function isDedicated()
+    {
+        return $this->attributes['servers_ecloud_dedicated'] == 'Yes';
+    }
+
     /**
      * Relation Mappings
      */

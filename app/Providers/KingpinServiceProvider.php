@@ -27,17 +27,17 @@ class KingpinServiceProvider extends ServiceProvider
             $environment = null;
 
             /**
-             * Load via dependency injection in a controller which has vm_id in the route
+             * Load via dependency injection in a controller which has vmId in the route
              * Loads a KingpinService configured for that VM
              */
 
             $routeParams = $this->app['request']->route()[2];
 
-            // Do we have a VM to get the config from in a route? (i.e does the route have vm_id?
-            if (in_array('vm_id', array_keys($routeParams))) {
+            // Do we have a VM to get the config from in a route? (i.e does the route have vmId?
+            if (in_array('vmId', array_keys($routeParams))) {
                 $virtualMachineQuery = VirtualMachine::query();
                 if (!empty($vmIds)) {
-                    $virtualMachineQuery->where('servers_id', '=', $routeParams['vm_id']);
+                    $virtualMachineQuery->where('servers_id', '=', $routeParams['vmId']);
                 }
 
                 $virtualMachine = $virtualMachineQuery->first();

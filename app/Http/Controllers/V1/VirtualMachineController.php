@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\DatastoreInsufficientSpaceException;
+use App\Exceptions\V1\DatastoreNotFoundException;
+use App\Exceptions\V1\SolutionNotFoundException;
 use App\Models\V1\Pod;
 use App\Models\V1\VirtualMachine;
+use App\Models\V1\Solution;
+use App\Models\V1\Datastore;
+
 use App\Resources\V1\VirtualMachineResource;
 
 use Illuminate\Http\Request;
@@ -71,7 +77,7 @@ class VirtualMachineController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws IntapiServiceException
      * @throws ServiceResponseException
-     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws SolutionNotFoundException
      * @throws \App\Exceptions\V1\TemplateNotFoundException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
@@ -88,6 +94,8 @@ class VirtualMachineController extends BaseController
             'ram' => ['required', 'integer'],
             'hdd' => ['required', 'integer'],
         ];
+
+        // todo public iops
 
         if (strtolower($request->input('environment')) != 'public') {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
@@ -107,12 +115,11 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
+
         // environment specific validation
         if (strtolower($request->input('environment')) == 'public') {
             $solution = null;
             $pod = new Pod();
-
-            // todo public iops
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
@@ -249,8 +256,8 @@ class VirtualMachineController extends BaseController
                 ]
             ]);
 
-            $intapiData = $intapiService->parseResponseData();
-        } catch (RequestException $exception) {
+            $intapiData = $intapiService->getResponseData();
+        } catch (\Exception $exception) {
             throw new IntapiServiceException('Failed to create new virtual machine', null, 502);
         }
 
@@ -269,6 +276,7 @@ class VirtualMachineController extends BaseController
         $virtualMachine->servers_id = $intapiData->data->server_id;
         $virtualMachine->servers_status = $intapiData->data->server_status;
 
+        $headers = [];
         if ($request->user->isAdmin) {
             $headers = [
                 'X-AutomationRequestId' => $intapiData->data->automation_request_id
@@ -331,13 +339,125 @@ class VirtualMachineController extends BaseController
             //Log::critical('');
         }
 
-        if (!$request->user->isAdmin) {
+        $headers = [];
+        if ($request->user->isAdmin) {
             $headers = [
                 'X-AutomationRequestId' => $automationRequestId
             ];
         }
 
         return $this->respondEmpty(202, $headers);
+    }
+
+
+    /**
+     * Clone a VM
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws DatastoreInsufficientSpaceException
+     * @throws DatastoreNotFoundException
+     * @throws Exceptions\NotFoundException
+     * @throws ServiceUnavailableException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     */
+    public function clone(Request $request, IntapiService $intapiService, $vmId)
+    {
+        //Validation
+        $rules = [
+            'name' => ['required', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'type' => ['required', 'in:Hybrid'], //Private,Public - Cloning is not currently available for public VM's
+
+        ];
+
+        $this->validateVirtualMachineId($request, $vmId);
+        $this->validate($request, $rules);
+
+        //Load the vm to clone
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        //Load the default datastore and check there's enough space
+        //For Hybrid the default is the available datastore with the most free space
+        if ($virtualMachine->isDedicated()) {
+            $datastore = Datastore::getDefault($virtualMachine->servers_ecloud_ucs_reseller_id, 'dedicated');
+        } else {
+            $datastore = Datastore::getDefault(null, 'shared');
+            if ($datastore instanceof Datastore) {
+                $datastore->usage->available = $datastore->reseller_lun_size_gb;
+            }
+        }
+
+        if (!$datastore instanceof Datastore) {
+            throw new DatastoreNotFoundException('Unable to load datastore');
+        }
+
+        if ($datastore->usage->available < $virtualMachine->servers_hdd) {
+            $message = 'Insufficient free space on selected datastore.' .
+                ' Request required ' . $virtualMachine->servers_hdd . 'GB, datastore has '
+                . $datastore->usage->available . 'GB remaining';
+            throw new DatastoreInsufficientSpaceException($message);
+        }
+
+        //OK, start the clone process ==
+
+        //create new server record
+        $postData['reseller_id'] = $virtualMachine->servers_reseller_id;
+        $postData['reseller_lun_id'] = $datastore->getKey();
+        $postData['ucs_reseller_id'] = $virtualMachine->servers_ecloud_ucs_reseller_id;
+        $postData['launched_by'] = '-5';
+        $postData['server_id'] = $virtualMachine->getKey();
+        $postData['datastore'] = $datastore->reseller_lun_name;
+        $postData['name'] = $request->input('name');
+        $postData['server_active'] = true;
+
+        try {
+            $clonedVirtualMacineId = $intapiService->cloneVM($postData);
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Currently unable to clone virtual machines');
+        }
+
+        if (empty($clonedVirtualMacineId)) {
+            throw new ServiceUnavailableException('Failed to prepare virtual machine for cloning');
+        }
+
+        //Load the cloned virtual machine
+        try {
+            $clonedVirtualMacine = $this->getVirtualMachine($clonedVirtualMacineId);
+        } catch (Exceptions\NotFoundException $exception) {
+            throw new ServiceUnavailableException('Cloned virtual machine failed to initialise');
+        }
+
+        $responseData = $intapiService->getResponseData();
+        $automationRequestId = $responseData->data->automation_request_id;
+
+        // Respond with the new machine id
+        $headers = [];
+        if ($request->user->isAdmin) {
+            $headers = ['X-AutomationRequestId' => $automationRequestId];
+        }
+
+        $respondSave = $this->respondSave(
+            $request,
+            $clonedVirtualMacine,
+            202,
+            null,
+            $headers,
+            [],
+            '/' . $request->segment(1) . '/vms/{vmId}'
+        );
+
+        $originalLocation = $respondSave->original['meta']['location'];
+
+        //Set the meta location to point to the new clone instead of the current resource
+        $respondSave->original['meta']['location'] = substr($originalLocation, 0, strrpos($originalLocation, '/') + 1)
+            . $clonedVirtualMacineId;
+
+        $respondSave->setContent($respondSave->original);
+
+        return $respondSave;
     }
 
 
