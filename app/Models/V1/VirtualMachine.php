@@ -29,7 +29,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
     const NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ \.]';
 
     const HOSTNAME_FORMAT_DESC = 'alphanumeric (start/end), hyphens and full stop';
-    const HOSTNAME_FORMAT_REGEX = '^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$';
+    const HOSTNAME_FORMAT_REGEX =
+        '^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$';
 
     const NETBIOS_FORMAT_DESC = 'alphanumeric (start/end) and hyphens, upto 15 characters';
     const NETBIOS_FORMAT_REGEX = '^(?!-)[a-zA-Z0-9-]{1,15}(?<!-)$';

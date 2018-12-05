@@ -200,7 +200,14 @@ class IntapiService
      * @return mixed
      * @throws IntapiServiceException
      */
-    public function automationRequest($processName, $reference, $referenceId, $data = null, $queue = null, $applicationId = 0)
+    public function automationRequest(
+        $processName,
+        $reference,
+        $referenceId,
+        $data = null,
+        $queue = null,
+        $applicationId = 0
+    )
     {
         $post_data = [
             'process_system' => 'ucs_vmware',

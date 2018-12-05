@@ -193,11 +193,11 @@ class Solution extends Model implements Filterable, Sortable
                     ->withName($datastore->name)
                     ->withReseller($this->attributes['ucs_reseller_id']);
 
-                    if (!empty($UCSSiteId)) {
-                      $datastoreQuery->where('reseller_lun_ucs_site_id', '=', $UCSSiteId);
-                    }
+                if (!empty($UCSSiteId)) {
+                    $datastoreQuery->where('reseller_lun_ucs_site_id', '=', $UCSSiteId);
+                }
 
-                    $datastoreRes = $datastoreQuery->first();
+                $datastoreRes = $datastoreQuery->first();
 
                 if ($datastoreRes instanceof Datastore) {
                     $solutionDatastores[] = $datastoreRes;

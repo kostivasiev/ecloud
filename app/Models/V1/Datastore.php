@@ -335,5 +335,4 @@ class Datastore extends Model implements Filterable, Sortable
 
         return $defaultDatastore;
     }
-
 }
