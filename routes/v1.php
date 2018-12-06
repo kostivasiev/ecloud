@@ -56,6 +56,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}', 'SolutionController@show');
     $router->patch('solutions/{solution_id}', 'SolutionController@update');
 
+    $router->get('solutions/{solution_id}/vms', 'VirtualMachineController@getSolutionVMs');
+
     $router->get('solutions/{solution_id}/vlans', 'SolutionVlanController@getSolutionVlans');
 
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
