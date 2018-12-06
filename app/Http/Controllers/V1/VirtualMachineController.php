@@ -539,4 +539,29 @@ class VirtualMachineController extends BaseController
         $request['vm_id'] = $vmId;
         $this->validate($request, ['vm_id' => 'required|integer']);
     }
+
+    /**
+     * List all VM's for a Solution
+     *
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\Http\Response
+     */
+    public function getSolutionVMs(Request $request, $solutionId)
+    {
+        $collection = VirtualMachine::withResellerId($request->user->resellerId)->withSolutionId($solutionId);
+
+        if (!$this->isAdmin) {
+            $collection->where('servers_active', '=', 'y');
+        }
+
+        (new QueryTransformer($request))
+            ->config(VirtualMachine::class)
+            ->transform($collection);
+
+        return $this->respondCollection(
+            $request,
+            $collection->paginate($this->perPage)
+        );
+    }
 }
