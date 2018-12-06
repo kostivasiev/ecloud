@@ -9,30 +9,30 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 
 use Illuminate\Http\Request;
 
-use App\Models\V1\SolutionVlan;
+use App\Models\V1\SolutionNetwork;
 
-class SolutionVlanController extends BaseController
+class SolutionNetworkController extends BaseController
 {
     use ResponseHelper, RequestHelper;
 
-    public function getSolutionVlans(Request $request, $solutionId)
+    public function getSolutionNetworks(Request $request, $solutionId)
     {
         SolutionController::getSolutionById($request, $solutionId);
 
-        $collectionQuery = SolutionVlan::withReseller($request->user->resellerId)
+        $collection = SolutionNetwork::withReseller($request->user->resellerId)
             ->withSolution($solutionId);
 
         if (!$request->user->isAdmin) {
-            $collectionQuery->where('ucs_reseller_active', 'Yes');
+            $collection->where('ucs_reseller_active', 'Yes');
         }
 
         (new QueryTransformer($request))
-            ->config(SolutionVlan::class)
-            ->transform($collectionQuery);
+            ->config(SolutionNetwork::class)
+            ->transform($collection);
 
         return $this->respondCollection(
             $request,
-            $collectionQuery->paginate($this->perPage)
+            $collection->paginate($this->perPage)
         );
     }
 }

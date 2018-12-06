@@ -4,8 +4,9 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-use UKFast\Api\Resource\Property\StringProperty;
+use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
+use UKFast\Api\Resource\Property\StringProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -13,37 +14,17 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class SolutionVlan extends Model implements Filterable, Sortable
+class SolutionNetwork extends Model implements Filterable, Sortable
 {
+
     /**
-     * The table associated with the model.
-     *
-     * @var string
+     * Eloquent configuration
+     * ----------------------
      */
+
     protected $table = 'vlan';
-
-    /**
-     * The primary key associated with the model.
-     *
-     * @var string
-     */
     protected $primaryKey = 'vlan_id';
-
-    /**
-     * Indicates if the model should be timestamped
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The attributes that should be cast to native types
-     *
-     * @var array
-     */
-    protected $casts = [
-        'vlan_number' => 'integer',
-    ];
 
 
     /**
@@ -58,10 +39,20 @@ class SolutionVlan extends Model implements Filterable, Sortable
      */
     public function databaseNames()
     {
-        return [
-            'name' => 'vlan_public_name',
-            'number'   => 'vlan_number',
-        ];
+        $databaseNames = [];
+
+        foreach ($this->properties() as $property) {
+            if (is_array($property)) {
+                foreach ($property as $subProperty) {
+                    $databaseNames[$subProperty->getFriendlyName()] = $subProperty->getDatabaseName();
+                }
+                continue;
+            }
+
+            $databaseNames[$property->getFriendlyName()] = $property->getDatabaseName();
+        }
+
+        return $databaseNames;
     }
 
     /**
@@ -72,7 +63,7 @@ class SolutionVlan extends Model implements Filterable, Sortable
     public function filterableColumns($factory)
     {
         return [
-            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('number', Filter::$numericDefaults),
         ];
     }
@@ -87,8 +78,8 @@ class SolutionVlan extends Model implements Filterable, Sortable
     public function sortableColumns($factory)
     {
         return [
+            $factory->create('id'),
             $factory->create('name'),
-            $factory->create('number'),
         ];
     }
 
@@ -101,7 +92,7 @@ class SolutionVlan extends Model implements Filterable, Sortable
     public function defaultSort($sortFactory)
     {
         return [
-            $sortFactory->create('number', 'asc'),
+            $sortFactory->create('id', 'asc'),
         ];
     }
 
@@ -112,9 +103,14 @@ class SolutionVlan extends Model implements Filterable, Sortable
      */
     public function persistentProperties()
     {
-        return ['number'];
+        return ['id'];
     }
 
+
+    /**
+     * Resource configuration
+     * ----------------------
+     */
 
     /**
      * Resource package
@@ -124,11 +120,27 @@ class SolutionVlan extends Model implements Filterable, Sortable
      */
     public function properties()
     {
-        return [
+        $properties = [
+            IdProperty::create('vlan_id', 'id'),
             StringProperty::create('vlan_public_name', 'name'),
-            IntProperty::create('vlan_number', 'number'),
         ];
+
+        $request = app('request');
+        if (!$request->user->isAdmin) {
+            return $properties;
+        }
+
+        // admin only properties
+        return array_merge($properties, [
+            IntProperty::create('vlan_number', 'vlan'),
+        ]);
     }
+
+
+    /**
+     * Model Methods
+     * ----------------------
+     */
 
 
     /**
