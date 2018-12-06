@@ -141,7 +141,7 @@ class Host extends Model implements Filterable, Sortable
     }
 
     /**
-     * End Package Config
+     * Model Methods
      * ----------------------
      */
 
