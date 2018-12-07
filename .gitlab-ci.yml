@@ -1,3 +1,10 @@
+image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+  - vendor/
+
 before_script:
 - eval $(ssh-agent -s)
 - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
@@ -9,56 +16,70 @@ before_script:
 
 stages:
 - Build
-- Standards
 - Tests
+- Standards
 
-php_lint:
+check_syntax:
   stage: Build
-  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
-  script:
-  - '! find . -type f -name "*.php" -exec php -l "{}" \; | grep -iv "No syntax errors detected";'
   tags:
   - rnd
   - php
-
-php_cs:
-  stage: Standards
-  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
-  tags:
-  - rnd
-  - php
-  script:
-  - pwd
-  - composer install --dev --prefer-dist > /dev/null --quiet
-  - composer dump-autoload
-  - vendor/bin/phpcs --standard=psr2 app |& tee -a codesniffer.txt
   artifacts:
-    paths: [codesniffer.txt]
-    when: on_failure
-
-php_md:
-  stage: Standards
-  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
-  tags:
-  - rnd
-  - php
+    expire_in: 10 mins
+    paths:
+    - vendor/
   script:
-  - pwd
-  - composer install --dev --prefer-dist > /dev/null --quiet
-  - composer dump-autoload
-  - vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml |& tee -a messdetector.txt
-  artifacts:
-    paths: [messdetector.txt]
-    when: on_failure
+    - composer install
+    - ls -lha vendor
+    - '! find . -path ./vendor -prune -o -type f -name "*.php" -exec php -l "{}" \; | grep -iv "No syntax errors detected";'
 
 unit_tests:
   stage: Tests
-  image: registry.devops.ukfast.co.uk/default-containers/php/ci:71
   tags:
   - rnd
   - php
+  artifacts:
+    expire_in: 10 mins
+    paths:
+    - vendor/
   script:
-  - pwd
-  - composer install --dev --prefer-dist > /dev/null --quiet
-  - composer dump-autoload
+  - ls -lha vendor
   - vendor/bin/phpunit --coverage-text --colors=never
+
+php_cs:
+  stage: Standards
+  tags:
+  - rnd
+  - php
+  artifacts:
+    expire_in: 10 mins
+    paths:
+    - vendor/
+  script:
+  - vendor/bin/phpcs --standard=vendor/ukfast/rulesets/CodeSniffer/UKFDefault.xml app
+
+php_md:
+  stage: Standards
+  allow_failure: false
+  tags:
+  - rnd
+  - php
+  artifacts:
+    expire_in: 10 mins
+    paths:
+    - vendor/
+  script:
+  - vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml
+
+debugging_check:
+  stage: Standards
+  tags:
+    - rnd
+    - php
+  artifacts:
+    expire_in: 10 mins
+    paths:
+    - vendor/
+  script:
+  - export PHP_FILES=$(git diff --diff-filter=d --name-only master | grep '.php')
+  - 'if [ -n "$PHP_FILES" ]; then ! echo "$PHP_FILES" | xargs grep -irnP "\bprint_r\s*\((?!.*,.*).*\)|\b(?:var_dump|dd)\s*\(.*\)"; fi'
