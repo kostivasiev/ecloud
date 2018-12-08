@@ -23,6 +23,7 @@ class CreateInitialTables extends Migration
             $table->increments('ucs_reseller_id');
             $table->integer('ucs_reseller_reseller_id');
             $table->integer('ucs_reseller_datacentre_id');
+            $table->string('ucs_reseller_solution_name');
             $table->string('ucs_reseller_active');
             $table->string('ucs_reseller_status');
         });
