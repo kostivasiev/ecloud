@@ -88,10 +88,10 @@ class GetTest extends TestCase
     }
 
     /**
-     * Test for invalid ownership
+     * Test for valid item belonging to a different owner
      * @return void
      */
-    public function testInvalidOwnershipItem()
+    public function testInvalidOwnerItem()
     {
         factory(Firewall::class, 1)->create([
             'servers_id' => 123,
