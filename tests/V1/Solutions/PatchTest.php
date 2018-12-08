@@ -22,12 +22,13 @@ class PatchTest extends TestCase
      */
     public function testSetName()
     {
+        $testString = 'Super Simulated Solution';
+
         factory(Solution::class, 1)->create([
             'ucs_reseller_id' => 123,
         ]);
 
-        $testString = 'Super Simulated Solution';
-
+        
         $this->missingFromDatabase('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_solution_name' => $testString,
@@ -40,6 +41,7 @@ class PatchTest extends TestCase
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
         ]);
+
 
         $this->assertResponseStatus(200) && $this->seeInDatabase('ucs_reseller', [
             'ucs_reseller_id' => 123,

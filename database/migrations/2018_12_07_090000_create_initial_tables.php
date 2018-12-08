@@ -19,6 +19,7 @@ class CreateInitialTables extends Migration
             $table->string('ucs_datacentre_active');
         });
 
+
         Schema::create('ucs_reseller', function (Blueprint $table) {
             $table->increments('ucs_reseller_id');
             $table->integer('ucs_reseller_reseller_id');
@@ -27,6 +28,7 @@ class CreateInitialTables extends Migration
             $table->string('ucs_reseller_active');
             $table->string('ucs_reseller_status');
         });
+
 
         Schema::create('ucs_node', function (Blueprint $table) {
             $table->increments('ucs_node_id');
@@ -58,6 +60,22 @@ class CreateInitialTables extends Migration
                 'ucs_specification_ram' => '128GB',
             )
         );
+
+
+        Schema::create('reseller_lun', function (Blueprint $table) {
+            $table->increments('reseller_lun_id');
+            $table->integer('reseller_lun_reseller_id');
+            $table->integer('reseller_lun_ucs_reseller_id');
+            $table->integer('reseller_lun_ucs_site_id');
+            $table->string('reseller_lun_friendly_name');
+            $table->string('reseller_lun_status');
+            $table->string('reseller_lun_type');
+            $table->integer('reseller_lun_size_gb');
+            $table->string('reseller_lun_name');
+            $table->string('reseller_lun_wwn');
+            $table->string('reseller_lun_lun_type');
+            $table->string('reseller_lun_lun_sub_type');
+        });
 
 
         Schema::create('servers', function (Blueprint $table) {
