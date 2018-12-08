@@ -17,7 +17,7 @@ class GetTest extends TestCase
 //        $this->artisan('db:seed');
 
         // test firewall
-        factory(Firewall::class, 1)->create();
+//        factory(Firewall::class, 1)->create();
     }
 
     /**
@@ -26,6 +26,8 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
+        factory(Firewall::class, 1)->create();
+
         $this->get('/v1/firewalls', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
@@ -40,7 +42,11 @@ class GetTest extends TestCase
      */
     public function testValidItem()
     {
-        $this->get('/v1/firewalls/1', [
+        factory(Firewall::class, 1)->create([
+            'servers_id' => 123,
+        ]);
+
+        $this->get('/v1/firewalls/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
@@ -55,6 +61,44 @@ class GetTest extends TestCase
     public function testInvalidItem()
     {
         $this->get('/v1/firewalls/abc', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(404);
+    }
+
+    /**
+     * Test for inactive item
+     * @return void
+     */
+    public function testInactiveItem()
+    {
+        factory(Firewall::class, 1)->create([
+            'servers_id' => 123,
+            'servers_active' => 'n',
+        ]);
+
+        $this->get('/v1/firewalls/123', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(404);
+    }
+
+    /**
+     * Test for invalid ownership
+     * @return void
+     */
+    public function testInvalidOwnershipItem()
+    {
+        factory(Firewall::class, 1)->create([
+            'servers_id' => 123,
+            'servers_reseller_id' => 2,
+        ]);
+
+        $this->get('/v1/firewalls/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);

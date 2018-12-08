@@ -44,7 +44,7 @@ class CreateInitialTables extends Migration
             array(
                 'server_subtype_id' => 1,
                 'server_subtype_parent_type' => 'ecloud vm',
-                'server_subtype_name' => 'Vmware',
+                'server_subtype_name' => 'VMware',
             )
         );
 
@@ -65,5 +65,6 @@ class CreateInitialTables extends Migration
     {
         Schema::dropIfExists('ucs_datacentre');
         Schema::dropIfExists('servers');
+        Schema::dropIfExists('server_subtype');
     }
 }
