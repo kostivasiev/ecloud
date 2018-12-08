@@ -16,8 +16,8 @@ before_script:
 
 stages:
 - Build
-- Tests
 - Standards
+- Tests
 
 check_syntax:
   stage: Build
