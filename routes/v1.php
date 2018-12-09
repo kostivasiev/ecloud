@@ -23,11 +23,10 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->get('vms/{vmId}', 'VirtualMachineController@show');
     $router->delete('vms/{vm_id}', 'VirtualMachineController@destroy');
-    $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
 
     // todo resize
-
     // todo create template
+    $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
 
     $router->put('vms/{vmId}/power-on', 'VirtualMachineController@powerOn');
     $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
@@ -65,7 +64,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
 
     // todo tags
-    // todo vms
 });
 
 
@@ -112,3 +110,5 @@ $router->group($baseRouteParameters, function () use ($router) {
     // todo templates
     // todo datastores
 });
+
+// todo prices
