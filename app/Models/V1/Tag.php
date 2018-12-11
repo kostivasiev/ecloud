@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
+use UKFast\Api\Resource\Property\DateTimeProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -108,6 +109,7 @@ class Tag extends Model implements Filterable, Sortable
         $properties = [
             StringProperty::create('metadata_key', 'key'),
             StringProperty::create('metadata_value', 'value'),
+            DateTimeProperty::create('metadata_created', 'created_at'),
         ];
 
         $request = app('request');
@@ -154,10 +156,14 @@ class Tag extends Model implements Filterable, Sortable
     {
         $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
 
-        $query
-            ->where('metadata_resource', 'ucs_reseller')
-            ->where('metadata_resource_id', $solutionId);
+        $query->where('metadata_resource', 'ucs_reseller')
+              ->where('metadata_resource_id', $solutionId);
 
         return $query;
+    }
+
+    public function scopeWithKey($query, $key)
+    {
+        return $query->where('metadata_key', $key);
     }
 }

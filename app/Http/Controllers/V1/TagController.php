@@ -40,4 +40,23 @@ class TagController extends BaseController
             $collection->paginate($this->perPage)
         );
     }
+
+    public function showSolutionTag(Request $request, $solutionId, $tagKey)
+    {
+        SolutionController::getSolutionById($request, $solutionId);
+
+        $tag = Tag::withReseller($request->user->resellerId)
+            ->withSolution($solutionId)
+            ->withKey($tagKey)
+            ->first();
+
+        if (is_null($tag)) {
+            throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
+        }
+
+        return $this->respondItem(
+            $request,
+            $tag
+        );
+    }
 }
