@@ -67,7 +67,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 //    $router->post('solutions/{solution_id}/tags', 'TagController@createSolutionTags');
     $router->get('solutions/{solution_id}/tags/{name}', 'TagController@showSolutionTag');
     $router->patch('solutions/{solution_id}/tags/{name}', 'TagController@updateSolutionTag');
-//    $router->delete('solutions/{solution_id}/tags/{name}', 'TagController@destroySolutionTag');
+    $router->delete('solutions/{solution_id}/tags/{name}', 'TagController@destroySolutionTag');
 });
 
 

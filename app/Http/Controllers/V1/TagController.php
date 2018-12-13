@@ -85,4 +85,32 @@ class TagController extends BaseController
             $tag
         );
     }
+
+    /**
+     * @param Request $request
+     * @param $solutionId
+     * @param $tagKey
+     * @return \Illuminate\Http\Response
+     * @throws TagNotFoundException
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     */
+    public function destroySolutionTag(Request $request, $solutionId, $tagKey)
+    {
+        SolutionController::getSolutionById($request, $solutionId);
+
+        $tag = Tag::withReseller($request->user->resellerId)
+            ->withSolution($solutionId)
+            ->withKey($tagKey)
+            ->first();
+
+        if (is_null($tag)) {
+            throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
+        }
+
+        if (!$tag->delete()) {
+            // todo log and error
+        }
+
+        return $this->respondEmpty();
+    }
 }
