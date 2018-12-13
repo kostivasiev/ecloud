@@ -12,8 +12,6 @@ use Illuminate\Http\Request;
 use App\Models\V1\Tag;
 use App\Exceptions\V1\TagNotFoundException;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
 class TagController extends BaseController
 {
     use ResponseHelper, RequestHelper;
@@ -24,7 +22,7 @@ class TagController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      */
-    public function showSolutionTags(Request $request, $solutionId)
+    public function indexSolutionTags(Request $request, $solutionId)
     {
         SolutionController::getSolutionById($request, $solutionId);
 
@@ -55,6 +53,34 @@ class TagController extends BaseController
         }
 
         return $this->respondItem(
+            $request,
+            $tag
+        );
+    }
+
+    public function updateSolutionTag(Request $request, $solutionId, $tagKey)
+    {
+        SolutionController::getSolutionById($request, $solutionId);
+
+        $tag = Tag::withReseller($request->user->resellerId)
+            ->withSolution($solutionId)
+            ->withKey($tagKey)
+            ->first();
+
+        if (is_null($tag)) {
+            throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
+        }
+
+        $this->validate($request, [
+            'value' => 'regex:/'.Tag::KEY_FORMAT_REGEX.'/',
+        ]);
+
+        $tag->metadata_value = $request->input('value');
+        if (!$tag->save()) {
+            // todo log and error
+        }
+
+        return $this->respondSave(
             $request,
             $tag
         );

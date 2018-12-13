@@ -17,6 +17,9 @@ use UKFast\DB\Ditto\Filter;
 
 class Tag extends Model implements Filterable, Sortable
 {
+    const KEY_FORMAT_DESC = 'alphanumeric characters and hyphens';
+    const KEY_FORMAT_REGEX = '^[a-z0-9]+(?:-[a-z0-9]+)*$';
+
     /**
      * Eloquent configuration
      * ----------------------
