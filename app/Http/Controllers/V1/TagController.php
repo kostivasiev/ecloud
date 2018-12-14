@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 use App\Models\V1\Tag;
 use App\Exceptions\V1\TagNotFoundException;
+use UKFast\Api\Exceptions\BadRequestException;
 
 class TagController extends BaseController
 {
@@ -58,6 +59,48 @@ class TagController extends BaseController
         );
     }
 
+    public function createSolutionTag(Request $request, $solutionId)
+    {
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+
+        $this->validate($request, [
+            'key' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
+            'value' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
+        ]);
+
+        $existingTags = Tag::withReseller($request->user->resellerId)
+            ->withSolution($solutionId)
+            ->withKey($request->input('key'));
+
+        if ($existingTags->count() > 0) {
+            throw new BadRequestException('Solution Tag with key \'' . $request->input('key') . '\' already exists');
+        }
+
+        $tag = new Tag;
+        $tag->metadata_reseller_id = $request->user->resellerId;
+        $tag->metadata_key = $request->input('key');
+        $tag->metadata_value = $request->input('value');
+        $tag->metadata_resource = $solution->getTable();
+        $tag->metadata_resource_id = $solution->getKey();
+        $tag->metadata_created = date('Y-m-d H:i:s');
+        $tag->metadata_createdby = 'API Client';
+        $tag->metadata_createdby_id = $request->user->applicationId;
+
+        if (!$tag->save()) {
+            // todo log and error
+        }
+
+        return $this->respondSave(
+            $request,
+            $tag,
+            200,
+            null,
+            [],
+            [],
+            $request->path() . '/' . $tag->metadata_key
+        );
+    }
+
     public function updateSolutionTag(Request $request, $solutionId, $tagKey)
     {
         SolutionController::getSolutionById($request, $solutionId);
@@ -72,7 +115,7 @@ class TagController extends BaseController
         }
 
         $this->validate($request, [
-            'value' => 'regex:/'.Tag::KEY_FORMAT_REGEX.'/',
+            'value' => ['required'],
         ]);
 
         $tag->metadata_value = $request->input('value');

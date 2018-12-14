@@ -64,7 +64,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
 
     $router->get('solutions/{solution_id}/tags', 'TagController@indexSolutionTags');
-//    $router->post('solutions/{solution_id}/tags', 'TagController@createSolutionTags');
+    $router->post('solutions/{solution_id}/tags', 'TagController@createSolutionTag');
     $router->get('solutions/{solution_id}/tags/{name}', 'TagController@showSolutionTag');
     $router->patch('solutions/{solution_id}/tags/{name}', 'TagController@updateSolutionTag');
     $router->delete('solutions/{solution_id}/tags/{name}', 'TagController@destroySolutionTag');
