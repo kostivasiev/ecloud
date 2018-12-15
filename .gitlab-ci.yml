@@ -43,7 +43,6 @@ unit_tests:
     paths:
     - vendor/
   script:
-  - ls -lha vendor
   - vendor/bin/phpunit --coverage-text --colors=never
 
 php_cs:

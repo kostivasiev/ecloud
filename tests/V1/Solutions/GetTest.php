@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use App\Models\V1\Solution;
+use App\Models\V1\Tag;
 
 class GetTest extends TestCase
 {
@@ -15,11 +16,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
     }
-
-    /**
-     * Test for valid collection
-     * @return void
-     */
+    
     public function testValidCollection()
     {
         $total = rand(1, 2);
@@ -35,10 +32,6 @@ class GetTest extends TestCase
         ]);
     }
 
-    /**
-     * Test for valid item
-     * @return void
-     */
     public function testValidItem()
     {
         factory(Solution::class, 1)->create([
@@ -53,10 +46,6 @@ class GetTest extends TestCase
         $this->assertResponseStatus(200);
     }
 
-    /**
-     * Test for invalid item
-     * @return void
-     */
     public function testInvalidItem()
     {
         $this->get('/v1/solutions/abc', [
@@ -65,5 +54,49 @@ class GetTest extends TestCase
         ]);
 
         $this->assertResponseStatus(404);
+    }
+
+    public function testValidTagCollection()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123,
+        ]);
+
+        $total = rand(1, 2);
+        factory(Tag::class, $total)->create([
+            'metadata_resource' => 'ucs_reseller',
+            'metadata_resource_id' => 123,
+        ]);
+
+        $this->get('/v1/solutions/123/tags', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(200) && $this->seeJson([
+            'total' => $total,
+        ]);
+    }
+
+    public function testValidTagItem()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123,
+        ]);
+
+        factory(Tag::class, 1)->create([
+            'metadata_key' => 'test',
+            'metadata_resource' => 'ucs_reseller',
+            'metadata_resource_id' => 123,
+        ]);
+
+        $this->get('/v1/solutions/123/tags/test', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(200) && $this->seeJson([
+            'key' => 'test',
+        ]);
     }
 }
