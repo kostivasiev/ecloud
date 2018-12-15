@@ -41,6 +41,11 @@ class PostTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ]);
 
-        $this->assertResponseStatus(201);
+        $this->assertResponseStatus(201) && $this->seeInDatabase('metadata', [
+            'metadata_resource' => 'ucs_reseller',
+            'metadata_resource_id' => 123,
+            'metadata_key' => $testKey,
+            'metadata_value' => $testValue,
+        ]);
     }
 }
