@@ -60,7 +60,7 @@ php_cs:
 
 php_md:
   stage: Standards
-  allow_failure: false
+  allow_failure: true
   tags:
   - rnd
   - php
