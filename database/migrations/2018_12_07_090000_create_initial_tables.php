@@ -112,6 +112,19 @@ class CreateInitialTables extends Migration
                 'server_subtype_name' => 'eCloud Dedicated',
             )
         );
+
+
+        Schema::create('metadata', function (Blueprint $table) {
+            $table->increments('metadata_id');
+            $table->string('metadata_key');
+            $table->longText('metadata_value');
+            $table->dateTime('metadata_created');
+            $table->integer('metadata_reseller_id');
+            $table->string('metadata_resource');
+            $table->integer('metadata_resource_id');
+            $table->string('metadata_createdby');
+            $table->integer('metadata_createdby_id');
+        });
     }
     /**
      * Reverse the migrations.
@@ -121,6 +134,9 @@ class CreateInitialTables extends Migration
     public function down()
     {
         Schema::dropIfExists('ucs_datacentre');
+        Schema::dropIfExists('ucs_specification');
+        Schema::dropIfExists('ucs_node');
+        Schema::dropIfExists('reseller_lun');
         Schema::dropIfExists('servers');
         Schema::dropIfExists('server_subtype');
     }

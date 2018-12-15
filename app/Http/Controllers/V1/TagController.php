@@ -65,7 +65,7 @@ class TagController extends BaseController
 
         $this->validate($request, [
             'key' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
-            'value' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
+            'value' => ['required'],
         ]);
 
         $existingTags = Tag::withReseller($request->user->resellerId)
@@ -93,7 +93,7 @@ class TagController extends BaseController
         return $this->respondSave(
             $request,
             $tag,
-            200,
+            201,
             null,
             [],
             [],
