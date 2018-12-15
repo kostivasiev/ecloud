@@ -116,12 +116,12 @@ class CreateInitialTables extends Migration
 
         Schema::create('metadata', function (Blueprint $table) {
             $table->increments('metadata_id');
+            $table->integer('metadata_reseller_id');
             $table->string('metadata_key');
             $table->longText('metadata_value');
-            $table->dateTime('metadata_created');
-            $table->integer('metadata_reseller_id');
             $table->string('metadata_resource');
             $table->integer('metadata_resource_id');
+            $table->dateTime('metadata_created');
             $table->string('metadata_createdby');
             $table->integer('metadata_createdby_id');
         });
