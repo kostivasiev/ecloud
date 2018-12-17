@@ -168,7 +168,6 @@ class IntapiService
     /**
      * Clone a virtual machine
      * @param $postData
-     * @param bool $recordsOnly
      * @return mixed
      * @throws IntapiServiceException
      */
@@ -179,10 +178,12 @@ class IntapiService
         try {
             $this->request('/automation/clone_ucs_vmware_vm', $model);
         } catch (RequestException $exception) {
+            Log::critical($exception->getMessage());
             throw new IntapiServiceException('Failed to clone vm');
         }
 
         if (!$this->responseData->result) {
+            Log::critical(end($this->responseData->errorset));
             throw new IntapiServiceException(end($this->responseData->errorset));
         }
 

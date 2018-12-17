@@ -103,7 +103,7 @@ class VirtualMachineController extends BaseController
 
         if ($request->has('name')) {
             $rules['name'] = [
-                'regex:/'.VirtualMachine::NAME_FORMAT_REGEX.'/'
+                'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'
             ];
         }
 
@@ -128,15 +128,15 @@ class VirtualMachineController extends BaseController
         // todo check available resources
 
         $rules['cpu'] = array_merge($rules['cpu'], [
-            'min:'.VirtualMachine::MIN_CPU, 'max:'.VirtualMachine::MAX_CPU
+            'min:' . VirtualMachine::MIN_CPU, 'max:' . VirtualMachine::MAX_CPU
         ]);
 
         $rules['ram'] = array_merge($rules['ram'], [
-            'min:'.VirtualMachine::MIN_RAM, 'max:'.VirtualMachine::MAX_RAM
+            'min:' . VirtualMachine::MIN_RAM, 'max:' . VirtualMachine::MAX_RAM
         ]);
 
         $rules['hdd'] = array_merge($rules['hdd'], [
-            'min:'.VirtualMachine::MIN_HDD, 'max:'.VirtualMachine::MAX_HDD
+            'min:' . VirtualMachine::MIN_HDD, 'max:' . VirtualMachine::MAX_HDD
         ]);
 
 
@@ -155,11 +155,11 @@ class VirtualMachineController extends BaseController
         if ($request->has('computername')) {
             if ($template->platform == 'Linux') {
                 $rules['computername'] = [
-                    'regex:/'.VirtualMachine::HOSTNAME_FORMAT_REGEX.'/'
+                    'regex:/' . VirtualMachine::HOSTNAME_FORMAT_REGEX . '/'
                 ];
             } elseif ($template->platform == 'Windows') {
                 $rules['computername'] = [
-                    'regex:/'.VirtualMachine::NETBIOS_FORMAT_REGEX.'/'
+                    'regex:/' . VirtualMachine::NETBIOS_FORMAT_REGEX . '/'
                 ];
             }
         }
@@ -171,17 +171,17 @@ class VirtualMachineController extends BaseController
 
         // set initial _post data
         $post_data = array(
-            'reseller_id'       => $request->user->resellerId,
-            'ecloud_type'       => ucfirst(strtolower($request->input('environment'))),
-            'ucs_reseller_id'   => $request->input('solution_id'),
-            'server_active'     => true,
+            'reseller_id' => $request->user->resellerId,
+            'ecloud_type' => ucfirst(strtolower($request->input('environment'))),
+            'ucs_reseller_id' => $request->input('solution_id'),
+            'server_active' => true,
 
-            'name'              => $request->input('name'),
-            'netbios'           => $request->input('computername'),
+            'name' => $request->input('name'),
+            'netbios' => $request->input('computername'),
 
             'submitted_by_type' => 'API Client',
-            'submitted_by_id'   => $request->user->applicationId,
-            'launched_by'       => '-5',
+            'submitted_by_id' => $request->user->applicationId,
+            'launched_by' => '-5',
         );
 
 
@@ -230,7 +230,7 @@ class VirtualMachineController extends BaseController
         }
 
         // site id
-            // drs group
+        // drs group
 
 
         // set support
@@ -285,6 +285,7 @@ class VirtualMachineController extends BaseController
 
         return $this->respondSave($request, $virtualMachine, 202, null, $headers);
     }
+
     /**
      * @param Request $request
      * @param IntapiService $intapiService
@@ -368,9 +369,7 @@ class VirtualMachineController extends BaseController
     {
         //Validation
         $rules = [
-            'name' => ['required', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
-            'type' => ['required', 'in:Hybrid'], //Private,Public - Cloning is not currently available for public VM's
-
+            'name' => ['required', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/']
         ];
 
         $this->validateVirtualMachineId($request, $vmId);
@@ -381,14 +380,7 @@ class VirtualMachineController extends BaseController
 
         //Load the default datastore and check there's enough space
         //For Hybrid the default is the available datastore with the most free space
-        if ($virtualMachine->isDedicated()) {
-            $datastore = Datastore::getDefault($virtualMachine->servers_ecloud_ucs_reseller_id, 'dedicated');
-        } else {
-            $datastore = Datastore::getDefault(null, 'shared');
-            if ($datastore instanceof Datastore) {
-                $datastore->usage->available = $datastore->reseller_lun_size_gb;
-            }
-        }
+        $datastore = Datastore::getDefault($virtualMachine->servers_ecloud_ucs_reseller_id, $virtualMachine->type());
 
         if (!$datastore instanceof Datastore) {
             throw new DatastoreNotFoundException('Unable to load datastore');
@@ -460,6 +452,231 @@ class VirtualMachineController extends BaseController
         return $respondSave;
     }
 
+
+    /**
+     * Update virtual machine
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\BadRequestException
+     * @throws Exceptions\DatabaseException
+     * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
+     * @throws Exceptions\UnauthorisedException
+     * @throws ServiceUnavailableException
+     */
+    public function update(Request $request, IntapiService $intapiService, $vmId)
+    {
+        $rules = [
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'cpu' => ['nullable', 'integer'],
+            'ram' => ['nullable', 'integer'],
+            'hdd' => ['nullable', 'array'],
+        ];
+
+        $this->validateVirtualMachineId($request, $vmId);
+
+        //Load the VM
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        if ($virtualMachine->isManaged()) {
+            throw new Exceptions\UnauthorisedException('Cannot modify virtual machine, it is a UKFast managed device');
+        }
+
+        $this->validate($request, $rules);
+
+        //Define the min/max default sizes
+        $minCpu = VirtualMachine::MIN_CPU;
+        $maxCpu = VirtualMachine::MAX_CPU;
+        $minRam = VirtualMachine::MIN_RAM;
+        $maxRam = VirtualMachine::MAX_RAM;
+        $minHdd = VirtualMachine::MIN_HDD;
+        $maxHdd = VirtualMachine::MAX_HDD;
+
+        switch ($virtualMachine->type()) {
+            case 'Hybrid':
+            case 'Burst':
+            case 'Private':
+                $maxRam = intval($virtualMachine->servers_memory)
+                    + min(VirtualMachine::MAX_RAM, $virtualMachine->solution->ramAvailable());
+
+                $datastore = Datastore::getDefault($virtualMachine->solution->getKey(), $virtualMachine->type());
+
+                $maxHdd = $datastore->usage->available;
+                //TODO: Is this still right? should this be VirtualMachine::MIN_HDD
+//                $minHdd = $virtualMachine->servers_hdd;
+                break;
+            case 'Public':
+                if ($virtualMachine->isContract()) {
+                    //Determine contract specific limits
+                    $contractCpuTrigger = $virtualMachine->trigger('ecloud_cpu');
+                    $contractRamTrigger = $virtualMachine->trigger('ecloud_ram');
+                    $contractHddTrigger = $virtualMachine->trigger('ecloud_hdd');
+
+                    $minCpu = $this->extractTriggerNumeric($contractCpuTrigger);
+                    $minRam = $this->extractTriggerNumeric($contractRamTrigger);
+                    $minHdd = $this->extractTriggerNumeric($contractHddTrigger);
+                }
+                break;
+            default:
+        }
+
+        $automationData = [];
+
+        // Name
+        // We can change the server name in realtime but Compute and Storage changes via automation.
+        // If we are making other changes return 202 otherwise return 200
+        if ($request->has('name')) {
+            $virtualMachine->servers_friendly_name = $request->input('name');
+            if (!$virtualMachine->save()) {
+                throw new Exceptions\DatabaseException('Failed to update virtual machine: name');
+            }
+        }
+
+
+        // CPU
+        if ($request->has('cpu')) {
+            if ($request->input('cpu') < $minCpu) {
+                throw new Exceptions\ForbiddenException('cpu value must be ' . $minCpu . ' or larger');
+            }
+
+            if ($request->input('cpu') > $maxCpu) {
+                throw new Exceptions\ForbiddenException('cpu value must be ' . $maxCpu . ' or smaller');
+            }
+        }
+        $automationData['cpu'] = $request->input('cpu', $virtualMachine->servers_cpu);
+
+        // RAM
+        if ($request->has('ram')) {
+            if ($request->input('ram') < $minRam) {
+                throw new Exceptions\ForbiddenException('ram value must be ' . $minRam . ' or larger');
+            }
+
+            if ($request->input('ram') > $maxRam) {
+                throw new Exceptions\ForbiddenException('ram value must be ' . $maxRam . ' or smaller');
+            }
+        }
+        $automationData['ram'] = $request->input('ram', $virtualMachine->servers_memory);
+
+        // Get the VM's active disks from vmware
+        $disks = $virtualMachine->getActiveHDDs();
+        $existingDisks = [];
+        if ($disks !== false) {
+            foreach ($disks as $disk) {
+                $existingDisks[$disk->name] =  $disk;
+            }
+        }
+
+        // HDD
+        $automationData['hdd'] = [];
+        $totalCapacity = 0;
+
+        if ($request->has('hdd')) {
+            foreach ($request->input('hdd') as $name => $capacity) {
+                // existing disks
+                $isExistingDisk = array_key_exists($name, $existingDisks);
+
+                if ($isExistingDisk) {
+                    $currentDisk = $existingDisks[$name];
+
+                    //capacity can be an integer or the string 'deleted'
+                    //Add disks marked as deleted to automation data
+                    if ($capacity == 'deleted') {
+                        $automationData['hdd'][$name] = $capacity;
+                        continue;
+                    }
+
+                    if (!is_numeric($capacity)) {
+                        throw new Exceptions\BadRequestException("Unexpected hdd_value for '$name'");
+                    }
+
+                    if ($capacity < $currentDisk->capacity) {
+                        $message = 'We are currently unable to shrink HDD capacity, ';
+                        $message .= "hdd '$name' value must be larger than {$currentDisk->capacity}GB";
+                        throw new Exceptions\ForbiddenException($message);
+                    }
+
+                    //disk isn't changed
+                    if ($capacity == $currentDisk->capacity) {
+                        $totalCapacity += $capacity;
+                        continue;
+                    }
+                }
+
+                // New disks must be prefixed with 'New '
+                if (!$isExistingDisk && strpos($name, 'New ') === false) {
+                    throw new Exceptions\ForbiddenException("Non-existent disks names must be prefixed with 'New '");
+                }
+
+                if (!is_numeric($capacity)) {
+                    throw new Exceptions\BadRequestException("Unexpected hdd_value for '$name'");
+                }
+
+                if ($capacity < $minHdd) {
+                    throw new Exceptions\ForbiddenException("hdd '$name' value must be {$minHdd}GB or larger");
+                }
+
+                if ($capacity > $maxHdd) {
+                    throw new Exceptions\ForbiddenException("hdd '$name' value must be {$maxHdd}GB or smaller");
+                }
+
+                $totalCapacity += $capacity;
+                $automationData['hdd'][$name] = $capacity;
+            }
+        }
+
+        // Add any unchanged disks to our automation data
+        $unchangedDisks = array_diff_key($existingDisks, $automationData['hdd']);
+
+        foreach ($unchangedDisks as $diskName => $diskData) {
+            $automationData['hdd'][$diskName] = $diskData->capacity;
+            $totalCapacity += $diskData->capacity;
+        }
+
+        if ($totalCapacity < $virtualMachine->servers_hdd) {
+            throw new Exceptions\ForbiddenException(
+                'HDD capacity for virtual machine must be '
+                . $virtualMachine->servers_hdd . "GB or greater (proposed:{$totalCapacity}GB)"
+            );
+        }
+        // Fire off automation request
+        try {
+            $intapiService->automationRequest(
+                'resize_vm',
+                'server',
+                $virtualMachine->getKey(),
+                $automationData,
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                $request->user->applicationId
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        }
+
+        return $this->respondEmpty(202);
+    }
+
+
+    /**
+     * Extract the numeric value from a trigger description
+     * @param $trigger
+     * @return int
+     */
+    protected function extractTriggerNumeric($trigger)
+    {
+        $noLabel = str_replace(
+            'eCloud VM #' . $trigger->trigger_reference_id,
+            '',
+            $trigger->trigger_description
+        );
+
+        $noPg = preg_replace("/(- PG[0-9]*)/", "", $noLabel);
+
+        $numeric = intval(preg_replace("/[^0-9,.]/", "", $noPg));
+
+        return intval($numeric);
+    }
 
     /**
      * @param Request $request
@@ -656,8 +873,8 @@ class VirtualMachineController extends BaseController
      */
     protected function validateVirtualMachineId(&$request, $vmId)
     {
-        $request['vm_id'] = $vmId;
-        $this->validate($request, ['vm_id' => 'required|integer']);
+        $request['vmId'] = $vmId;
+        $this->validate($request, ['vmId' => 'required|integer']);
     }
 
     /**

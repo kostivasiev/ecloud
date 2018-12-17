@@ -176,6 +176,25 @@ class Host extends Model implements Filterable, Sortable
         );
     }
 
+    /**
+     * Get the RAM from the host specification
+     * todo: can we use ucs_specification_ram?
+     *
+     * @return mixed]
+     */
+    public function getRamSpecification()
+    {
+        $specificationName = $this->hasOne(
+            'App\Models\V1\HostSpecification',
+            'ucs_specification_id',
+            'ucs_node_specification_id'
+        )
+            ->select('ucs_specification_name')
+            ->pluck('ucs_specification_name')
+            ->first();
+
+        return intval(substr($specificationName, strpos($specificationName, '--')+2));
+    }
 
     /**
      * get VMware usage stats

@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Filter;
 class VirtualMachine extends Model implements Filterable, Sortable
 {
     const NAME_FORMAT_DESC = 'alphanumeric, spaces, hyphens and underscores';
-    const NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ \.]';
+    const NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ \.]+$';
 
     const HOSTNAME_FORMAT_DESC = 'alphanumeric (start/end), hyphens and full stop';
     const HOSTNAME_FORMAT_REGEX =
@@ -353,16 +353,6 @@ class VirtualMachine extends Model implements Filterable, Sortable
         return $hddGB;
     }
 
-
-    /**
-     * is ecloud dedicated?
-     * @return bool
-     */
-    public function isDedicated()
-    {
-        return $this->attributes['servers_ecloud_dedicated'] == 'Yes';
-    }
-
     /**
      * Relation Mappings
      */
@@ -425,6 +415,29 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'ucs_datacentre_id',
             'servers_ecloud_datacentre_id'
         );
+    }
+
+
+    /**
+     * Returns the LATEST trigger associated with the VM that matches the given criteria
+     * @param null $category
+     * @return Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
+     */
+    public function trigger($category = null)
+    {
+        $hasMany = $this->hasMany(
+            'App\Models\V1\Triggers',
+            'trigger_reference_id',
+            'servers_id'
+        )
+            ->where('trigger_reference_name', '=', 'server')
+            ->where('trigger_reseller_id', '=', $this->attributes['servers_reseller_id']);
+
+        if (!empty($category)) {
+            $hasMany->where('trigger_reference_category', 'like', $category);
+        }
+
+        return $hasMany->first();
     }
 
 
