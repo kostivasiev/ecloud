@@ -441,6 +441,38 @@ class KingpinService
     }
 
     /**
+     * Get hosts for Solution
+     * @param $solutionId
+     * @param bool $detailVM
+     * @return array
+     * @throws KingpinException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getHostsForSolution($solutionId, $detailVM = false)
+    {
+        try {
+            $this->makeRequest(
+                'GET',
+                $this->generateV1URL($solutionId) . 'host?detailVM=' . ($detailVM ? 'true':'false')
+            );
+        } catch (TransferException $exception) {
+            throw new KingpinException('unable to query hosts');
+        }
+
+        if (!is_array($this->responseData)) {
+            throw new KingpinException('failed to parse hosts query response');
+        }
+
+        $hosts = [];
+
+        foreach ($this->responseData as $host) {
+            $hosts[] = $this->formatHost($host);
+        }
+
+        return $hosts;
+    }
+
+    /**
      * return vmware datastore
      * @param $solutionId
      * @param $datastoreName

@@ -22,10 +22,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('vms', 'VirtualMachineController@create');
 
     $router->get('vms/{vmId}', 'VirtualMachineController@show');
-    $router->delete('vms/{vm_id}', 'VirtualMachineController@destroy');
-    $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
+    $router->put('vms/{vmId}', 'VirtualMachineController@update');
+    $router->delete('vms/{vmId}', 'VirtualMachineController@destroy');
 
-    // todo resize
+    $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
 
     // todo create template
 

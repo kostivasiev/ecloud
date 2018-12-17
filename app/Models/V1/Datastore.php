@@ -284,14 +284,16 @@ class Datastore extends Model implements Filterable, Sortable
      * @param $solutionId
      * @param string $ecloudType
      * @param bool $backupRequired
-     * @param null $UCSSiteId
-     * @return bool
+     * @param null $solutionSiteId
+     * @return mixed|bool
      */
-    public static function getDefault($solutionId, $ecloudType = 'shared', $backupRequired = false, $UCSSiteId = null)
+    public static function getDefault($solutionId, $ecloudType, $backupRequired = false, $solutionSiteId = null)
     {
         switch ($ecloudType) {
-            case 'dedicated':
-                $datastores = static::getForSolution($solutionId, $UCSSiteId);
+            case 'Hybrid':
+            case 'Private':
+            case 'Burst':
+                $datastores = static::getForSolution($solutionId, $solutionSiteId);
                 if (!empty($datastores)) {
                     $defaultDatastore = $datastores[0];
                     if (count($datastores) > 1) {
@@ -317,12 +319,13 @@ class Datastore extends Model implements Filterable, Sortable
                 }
 
                 break;
-            case 'shared':
+            case 'Public':
                 if (!$backupRequired) {
                     $defaultDatastore = static::find(3);
                 } else {
                     $defaultDatastore = static::find(4);
                 }
+                $defaultDatastore->usage->available = $defaultDatastore->reseller_lun_size_gb;
                 break;
             default:
                 return false;
