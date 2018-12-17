@@ -67,10 +67,10 @@ class HostController extends BaseController
         $query = Host::withReseller($request->user->resellerId)
             ->where('ucs_node_status', '!=', 'Cancelled')
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'ucs_node_ucs_reseller_id')
-            ->join('ucs_specification', function ($join) {
-                $join->on('ucs_specification_id', '=', 'ucs_node_specification_id')
-                    ->where('ucs_specification_active', '=', 'Yes');
-            });
+
+            ->join('ucs_specification', 'ucs_specification_id', '=', 'ucs_node_specification_id')
+            ->where('ucs_specification_active', '=', 'Yes')
+        ;
 
         if (!$request->user->isAdmin) {
             $query->where('ucs_reseller_active', 'Yes');

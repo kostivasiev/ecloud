@@ -122,7 +122,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'platform' => 'servers_platform',
             'backup' => 'servers_backup',
             'support' => 'servers_advanced_support',
-            'type' => 'servers_ecloud_type'
+            'environment' => 'servers_ecloud_type'
         ];
     }
 
@@ -142,7 +142,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup', Filter::$stringDefaults),
             $factory->create('support', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
+            $factory->create('environment', Filter::$stringDefaults),
         ];
     }
 
@@ -163,7 +163,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('platform', 'asc'),
             $factory->create('backup', 'asc'),
             $factory->create('support', 'asc'),
-            $factory->create('type', 'asc'),
+            $factory->create('environment', 'asc'),
         ];
     }
 
@@ -255,6 +255,17 @@ class VirtualMachine extends Model implements Filterable, Sortable
         }
 
         return $query;
+    }
+
+    /**
+     * Scope a query to only include VMs for a given solution
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param $solutionId
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeWithSolutionId($query, $solutionId)
+    {
+        return $query->where('servers_ecloud_ucs_reseller_id', $solutionId);
     }
 
     /**

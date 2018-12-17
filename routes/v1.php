@@ -56,14 +56,19 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}', 'SolutionController@show');
     $router->patch('solutions/{solution_id}', 'SolutionController@update');
 
-    $router->get('solutions/{solution_id}/vlans', 'SolutionVlanController@getSolutionVlans');
+    $router->get('solutions/{solution_id}/vms', 'VirtualMachineController@getSolutionVMs');
+
+    $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
 
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
 
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
 
-    // todo tags
-    // todo vms
+    $router->get('solutions/{solution_id}/tags', 'TagController@indexSolutionTags');
+    $router->post('solutions/{solution_id}/tags', 'TagController@createSolutionTag');
+    $router->get('solutions/{solution_id}/tags/{name}', 'TagController@showSolutionTag');
+    $router->patch('solutions/{solution_id}/tags/{name}', 'TagController@updateSolutionTag');
+    $router->delete('solutions/{solution_id}/tags/{name}', 'TagController@destroySolutionTag');
 });
 
 
@@ -110,3 +115,5 @@ $router->group($baseRouteParameters, function () use ($router) {
     // todo templates
     // todo datastores
 });
+
+// todo prices
