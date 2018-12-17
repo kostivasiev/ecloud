@@ -426,7 +426,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function trigger($category = null)
     {
         $hasMany = $this->hasMany(
-            'App\Models\V1\triggers',
+            'App\Models\V1\Triggers',
             'trigger_reference_id',
             'servers_id'
         )

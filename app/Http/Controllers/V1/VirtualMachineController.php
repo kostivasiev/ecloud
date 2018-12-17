@@ -556,7 +556,6 @@ class VirtualMachineController extends BaseController
             if ($request->input('ram') > $maxRam) {
                 throw new Exceptions\ForbiddenException('ram value must be ' . $maxRam . ' or smaller');
             }
-
         }
         $automationData['ram'] = $request->input('ram', $virtualMachine->servers_memory);
 
@@ -625,7 +624,6 @@ class VirtualMachineController extends BaseController
                 $totalCapacity += $capacity;
                 $automationData['hdd'][$name] = $capacity;
             }
-
         }
 
         // Add any unchanged disks to our automation data

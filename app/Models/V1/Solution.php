@@ -297,10 +297,10 @@ class Solution extends Model implements Filterable, Sortable
                 $ramReserved += $hostRam[0] - Host::RESERVED_SYSTEM_RAM;
             } elseif ($this->isMultiSite()) {
                 // N+N requires us to reserve half of all nodes total RAM
-                for ($i = 0; $i < ($totalHostsCount/2); $i++) {
+                for ($i = 0; $i < ($totalHostsCount / 2); $i++) {
                     //todo: need to check this is correct. This is not half the total ram, its half
                     //todo: the largest ram * half the count hosts?
-                    $ramReserved += intval($hostRam[0]/2) - Host::RESERVED_SYSTEM_RAM;
+                    $ramReserved += intval($hostRam[0] / 2) - Host::RESERVED_SYSTEM_RAM;
                 }
             }
 
@@ -324,7 +324,6 @@ class Solution extends Model implements Filterable, Sortable
         $reserved = $this->ramReserved($datacentreId);
 
         return $total - ($allocated + $reserved);
-
     }
 
     /**
@@ -344,9 +343,9 @@ class Solution extends Model implements Filterable, Sortable
     public function isMultiSite()
     {
         return $this->hasMany(
-                'App\Models\V1\SolutionSite',
-                'ucs_site_ucs_reseller_id',
-                'ucs_reseller_id'
+            'App\Models\V1\SolutionSite',
+            'ucs_site_ucs_reseller_id',
+            'ucs_reseller_id'
             )
                 ->where('ucs_site_state', '=', 'Active')
                 ->limit(2)

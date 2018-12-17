@@ -4,7 +4,7 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-class triggers extends Model
+class Triggers extends Model
 {
     /**
      * The table associated with the model.
