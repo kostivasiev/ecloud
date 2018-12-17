@@ -346,7 +346,7 @@ class Solution extends Model implements Filterable, Sortable
             'App\Models\V1\SolutionSite',
             'ucs_site_ucs_reseller_id',
             'ucs_reseller_id'
-            )
+        )
                 ->where('ucs_site_state', '=', 'Active')
                 ->limit(2)
                 ->count() > 1;
