@@ -495,8 +495,9 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         switch ($virtualMachine->type()) {
-            //todo:other types, burst, private
             case 'Hybrid':
+            case 'Burst':
+            case 'Private':
                 $maxRam = intval($virtualMachine->servers_memory)
                     + min(VirtualMachine::MAX_RAM, $virtualMachine->solution->ramAvailable());
 
