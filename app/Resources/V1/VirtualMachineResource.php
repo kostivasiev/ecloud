@@ -98,7 +98,7 @@ class VirtualMachineResource extends CustomResource
             'support' => $this->resource->servers_advanced_support,
 
             'status' => $this->resource->servers_status,
-            'power-status' => $this->resource->stateCheck(),
+            'power_status' => $this->resource->stateCheck(),
             'tools_status' => $this->vmwareToolsStatus(),
 
             'environment' => $this->resource->servers_ecloud_type,
