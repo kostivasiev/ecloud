@@ -165,6 +165,12 @@ class Tag extends Model implements Filterable, Sortable
         return $query;
     }
 
+    public function scopeWithServer($query, $serverId)
+    {
+        return $query->where('metadata_resource', 'server')
+            ->where('metadata_resource_id', $serverId);
+    }
+
     public function scopeWithKey($query, $key)
     {
         return $query->where('metadata_key', $key);
