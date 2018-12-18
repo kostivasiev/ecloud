@@ -73,7 +73,7 @@ class TagController extends BaseController
             ->withKey($request->input('key'));
 
         if ($existingTags->count() > 0) {
-            throw new BadRequestException('Solution Tag with key \'' . $request->input('key') . '\' already exists');
+            throw new BadRequestException('Tag with key \'' . $request->input('key') . '\' already exists');
         }
 
         $tag = new Tag;
@@ -143,6 +143,113 @@ class TagController extends BaseController
 
         $tag = Tag::withReseller($request->user->resellerId)
             ->withSolution($solutionId)
+            ->withKey($tagKey)
+            ->first();
+
+        if (is_null($tag)) {
+            throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
+        }
+
+        if (!$tag->delete()) {
+            // todo log and error
+        }
+
+        return $this->respondEmpty();
+    }
+
+    public function indexVMTags(Request $request, $vmId)
+    {
+        VirtualMachineController::getVirtualMachineById($request, $vmId);
+
+        $collection = Tag::withReseller($request->user->resellerId)
+            ->withServer($vmId);
+
+        (new QueryTransformer($request))
+            ->config(Tag::class)
+            ->transform($collection);
+
+        return $this->respondCollection(
+            $request,
+            $collection->paginate($this->perPage)
+        );
+    }
+
+    public function createVMTag(Request $request, $vmId)
+    {
+        $server = VirtualMachineController::getVirtualMachineById($request, $vmId);
+
+        $this->validate($request, [
+            'key' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
+            'value' => ['required'],
+        ]);
+
+        $existingTags = Tag::withReseller($request->user->resellerId)
+            ->withServer($vmId)
+            ->withKey($request->input('key'));
+
+        if ($existingTags->count() > 0) {
+            throw new BadRequestException('Tag with key \'' . $request->input('key') . '\' already exists');
+        }
+
+        $tag = new Tag;
+        $tag->metadata_reseller_id = $request->user->resellerId;
+        $tag->metadata_key = $request->input('key');
+        $tag->metadata_value = $request->input('value');
+        $tag->metadata_resource = $server->getTable();
+        $tag->metadata_resource_id = $server->getKey();
+        $tag->metadata_created = date('Y-m-d H:i:s');
+        $tag->metadata_createdby = 'API Client';
+        $tag->metadata_createdby_id = $request->user->applicationId;
+
+        if (!$tag->save()) {
+            // todo log and error
+        }
+
+        return $this->respondSave(
+            $request,
+            $tag,
+            201,
+            null,
+            [],
+            [],
+            $request->path() . '/' . $tag->metadata_key
+        );
+    }
+
+    public function updateVMTag(Request $request, $vmId, $tagKey)
+    {
+        VirtualMachineController::getVirtualMachineById($request, $vmId);
+
+        $tag = Tag::withReseller($request->user->resellerId)
+            ->withServer($vmId)
+            ->withKey($tagKey)
+            ->first();
+
+        if (is_null($tag)) {
+            throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
+        }
+
+        $this->validate($request, [
+            'value' => ['required'],
+        ]);
+
+        $tag->metadata_value = $request->input('value');
+        if (!$tag->save()) {
+            // todo log and error
+        }
+
+        return $this->respondSave(
+            $request,
+            $tag
+        );
+    }
+
+    public function destroyVMTag(Request $request, $vmId, $tagKey)
+    {
+        VirtualMachineController::getVirtualMachineById($request, $vmId);
+
+        $tag = Tag::withReseller($request->user->resellerId)
+            ->withServer($vmId)
             ->withKey($tagKey)
             ->first();
 

@@ -34,6 +34,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->put('vms/{vmId}/power-cycle', 'VirtualMachineController@powerCycle');
 
     // todo tags
+    $router->get('vms/{vmId}/tags', 'TagController@indexVMTags');
 });
 
 

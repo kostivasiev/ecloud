@@ -901,4 +901,27 @@ class VirtualMachineController extends BaseController
             $collection->paginate($this->perPage)
         );
     }
+
+    /**
+     * get VM by ID
+     * @param Request $request
+     * @param $vmId
+     * @return mixed
+     * @throws Exceptions\NotFoundException
+     */
+    public static function getVirtualMachineById(Request $request, $vmId)
+    {
+        $collection = VirtualMachine::withResellerId($request->user->resellerId);
+
+        if ($request->user->resellerId != 0) {
+            $collection->where('servers_active', '=', 'y');
+        }
+
+        $VirtualMachine = $collection->find($vmId);
+        if (!$VirtualMachine) {
+            throw new Exceptions\NotFoundException('Virtual Machine ID #' . $vmId . ' not found');
+        }
+
+        return $VirtualMachine;
+    }
 }
