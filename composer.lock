@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "83a92fe1237209758b9cbce87f37118f",
+    "content-hash": "63d90766534b3526a7a007954f3cc2bb",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -2860,11 +2860,11 @@
         },
         {
             "name": "ukfast/api-resources",
-            "version": "v3.1.2",
+            "version": "v3.1.4",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/resources.git",
-                "reference": "a7ac1e045fb861e6d97533ff8a946623325b1bbd"
+                "reference": "ccd4d30c29e2be122f6fcf9ec9d8d70c3381e8ca"
             },
             "require": {
                 "illuminate/http": "^5.5",
@@ -2893,7 +2893,7 @@
                 }
             ],
             "description": "Transforms Eloquent database results into a UKFast API response",
-            "time": "2018-11-23T14:54:38+00:00"
+            "time": "2018-12-18T14:47:06+00:00"
         },
         {
             "name": "ukfast/api-validation",
@@ -4028,16 +4028,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.0",
+            "version": "7.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "520723129e2b3fc1dc4c0953e43c9d40e1ecb352"
+                "reference": "c23d78776ad415d5506e0679723cb461d71f488f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/520723129e2b3fc1dc4c0953e43c9d40e1ecb352",
-                "reference": "520723129e2b3fc1dc4c0953e43c9d40e1ecb352",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c23d78776ad415d5506e0679723cb461d71f488f",
+                "reference": "c23d78776ad415d5506e0679723cb461d71f488f",
                 "shasum": ""
             },
             "require": {
@@ -4108,7 +4108,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-12-07T07:08:12+00:00"
+            "time": "2018-12-12T07:20:32+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
