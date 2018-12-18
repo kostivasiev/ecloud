@@ -574,43 +574,45 @@ class VirtualMachineController extends BaseController
 
         if ($request->has('hdd')) {
             foreach ($request->input('hdd') as $name => $capacity) {
+                if (!is_numeric($capacity) && $capacity != 'deleted') {
+                    throw new Exceptions\BadRequestException("Unexpected hdd_value for '$name'");
+                }
+
+                $diskData = new \stdClass();
+                $diskData->name = $name;
+                $diskData->capacity = $capacity;
+
                 // existing disks
                 $isExistingDisk = array_key_exists($name, $existingDisks);
-
                 if ($isExistingDisk) {
-                    $currentDisk = $existingDisks[$name];
+                    // For existing disks add the disk UUID
+                    $diskData->uuid = $existingDisks[$name]->uuid;
 
                     //capacity can be an integer or the string 'deleted'
                     //Add disks marked as deleted to automation data
                     if ($capacity == 'deleted') {
-                        $automationData['hdd'][$name] = $capacity;
+                        $automationData['hdd'][$name] = $diskData;
                         continue;
                     }
 
-                    if (!is_numeric($capacity)) {
-                        throw new Exceptions\BadRequestException("Unexpected hdd_value for '$name'");
-                    }
-
-                    if ($capacity < $currentDisk->capacity) {
+                    if ($capacity < $existingDisks[$name]->capacity) {
                         $message = 'We are currently unable to shrink HDD capacity, ';
-                        $message .= "hdd '$name' value must be larger than {$currentDisk->capacity}GB";
+                        $message .= "hdd '$name' value must be larger than {$existingDisks[$name]->capacity}GB";
                         throw new Exceptions\ForbiddenException($message);
                     }
 
-                    //disk isn't changed
-                    if ($capacity == $currentDisk->capacity) {
+                    //disk isn't changed, will be added to automation data later
+                    if ($capacity == $existingDisks[$name]->capacity) {
                         $totalCapacity += $capacity;
+                        $automationData['hdd'][$name] = $diskData;
                         continue;
                     }
                 }
 
                 // New disks must be prefixed with 'New '
                 if (!$isExistingDisk && strpos($name, 'New ') === false) {
+                    //TODO: Potentially we don't need this check as existing disks will have a UUID
                     throw new Exceptions\ForbiddenException("Non-existent disks names must be prefixed with 'New '");
-                }
-
-                if (!is_numeric($capacity)) {
-                    throw new Exceptions\BadRequestException("Unexpected hdd_value for '$name'");
                 }
 
                 if ($capacity < $minHdd) {
@@ -622,15 +624,20 @@ class VirtualMachineController extends BaseController
                 }
 
                 $totalCapacity += $capacity;
-                $automationData['hdd'][$name] = $capacity;
+
+                $automationData['hdd'][$name] = $diskData;
             }
         }
 
-        // Add any unchanged disks to our automation data
+        // Add any unspecified disks to our automation data as we want to send the complete required Storage state
         $unchangedDisks = array_diff_key($existingDisks, $automationData['hdd']);
 
-        foreach ($unchangedDisks as $diskName => $diskData) {
-            $automationData['hdd'][$diskName] = $diskData->capacity;
+        foreach ($unchangedDisks as $diskName => $disk) {
+            $diskData = new \stdClass();
+            $diskData->name = $disk->name;
+            $diskData->capacity = $disk->capacity;
+            $diskData->uuid = $disk->uuid;
+            $automationData['hdd'][$diskName] = $diskData;
             $totalCapacity += $diskData->capacity;
         }
 
