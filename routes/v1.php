@@ -33,8 +33,12 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
     $router->put('vms/{vmId}/power-cycle', 'VirtualMachineController@powerCycle');
 
-    // todo tags
     $router->get('vms/{vmId}/tags', 'TagController@indexVMTags');
+    $router->post('vms/{vmId}/tags', 'TagController@createVMTag');
+
+    $router->get('vms/{vmId}/tags/{key}', 'TagController@showVMTag');
+    $router->patch('vms/{vmId}/tags/{key}', 'TagController@updateVMTag');
+    $router->delete('vms/{vmId}/tags/{key}', 'TagController@destroyVMTag');
 });
 
 

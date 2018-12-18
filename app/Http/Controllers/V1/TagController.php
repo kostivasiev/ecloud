@@ -174,6 +174,25 @@ class TagController extends BaseController
         );
     }
 
+    public function showVMTag(Request $request, $vmId, $tagKey)
+    {
+        VirtualMachineController::getVirtualMachineById($request, $vmId);
+
+        $tag = Tag::withReseller($request->user->resellerId)
+            ->withServer($vmId)
+            ->withKey($tagKey)
+            ->first();
+
+        if (is_null($tag)) {
+            throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
+        }
+
+        return $this->respondItem(
+            $request,
+            $tag
+        );
+    }
+
     public function createVMTag(Request $request, $vmId)
     {
         $server = VirtualMachineController::getVirtualMachineById($request, $vmId);
