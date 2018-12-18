@@ -601,7 +601,7 @@ class VirtualMachineController extends BaseController
                         throw new Exceptions\ForbiddenException($message);
                     }
 
-                    //disk isn't changed, will be added to automation data later
+                    //disk isn't changed
                     if ($capacity == $existingDisks[$name]->capacity) {
                         $totalCapacity += $capacity;
                         $automationData['hdd'][$name] = $diskData;
