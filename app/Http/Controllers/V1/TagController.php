@@ -77,7 +77,7 @@ class TagController extends BaseController
         }
 
         $tag = new Tag;
-        $tag->metadata_reseller_id = $request->user->resellerId;
+        $tag->metadata_reseller_id = $solution->ucs_reseller_reseller_id;
         $tag->metadata_key = $request->input('key');
         $tag->metadata_value = $request->input('value');
         $tag->metadata_resource = $solution->getTable();
@@ -211,7 +211,7 @@ class TagController extends BaseController
         }
 
         $tag = new Tag;
-        $tag->metadata_reseller_id = $request->user->resellerId;
+        $tag->metadata_reseller_id = $server->servers_reseller_id;
         $tag->metadata_key = $request->input('key');
         $tag->metadata_value = $request->input('value');
         $tag->metadata_resource = $server->getTable();
