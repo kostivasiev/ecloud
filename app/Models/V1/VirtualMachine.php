@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Scopes\ECloudVmServersScope;
 
 use UKFast\Api\Resource\Property\StringProperty;
+use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 
@@ -219,7 +220,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             StringProperty::create('servers_platform', 'platform'),
             StringProperty::create('server_license_friendly_name', 'operating_system'),
 
-            StringProperty::create('servers_backup', 'backup'),
+            BooleanProperty::create('servers_backup', 'backup'),
             StringProperty::create('servers_advanced_support', 'support'),
 
             StringProperty::create('servers_status', 'status'),
@@ -266,6 +267,16 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function scopeWithSolutionId($query, $solutionId)
     {
         return $query->where('servers_ecloud_ucs_reseller_id', $solutionId);
+    }
+
+    /**
+     * Mutate the servers_backup property to a boolean
+     * @param $value
+     * @return bool
+     */
+    public function getServersBackupAttribute($value)
+    {
+        return ($value != 'None');
     }
 
     /**
