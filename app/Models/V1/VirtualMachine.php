@@ -123,6 +123,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'platform' => 'servers_platform',
             'backup' => 'servers_backup',
             'support' => 'servers_advanced_support',
+            'status' => 'servers_status',
             'environment' => 'servers_ecloud_type'
         ];
     }
@@ -143,6 +144,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup', Filter::$stringDefaults),
             $factory->create('support', Filter::$stringDefaults),
+            $factory->create('status', Filter::$stringDefaults),
             $factory->create('environment', Filter::$stringDefaults),
         ];
     }
@@ -164,6 +166,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('platform', 'asc'),
             $factory->create('backup', 'asc'),
             $factory->create('support', 'asc'),
+            $factory->create('status', 'asc'),
             $factory->create('environment', 'asc'),
         ];
     }
