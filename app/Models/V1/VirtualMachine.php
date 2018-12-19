@@ -66,6 +66,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         'servers_memory' => 'string',
         'servers_hdd' => 'string',
         'servers_platform' => 'string',
+        'servers_backup' => 'string',
         'servers_advanced_support' => 'string'
     ];
 
