@@ -221,7 +221,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             StringProperty::create('server_license_friendly_name', 'operating_system'),
 
             BooleanProperty::create('servers_backup', 'backup'),
-            StringProperty::create('servers_advanced_support', 'support'),
+            BooleanProperty::create('servers_advanced_support', 'support'),
 
             StringProperty::create('servers_status', 'status'),
             StringProperty::create('servers_ecloud_type', 'environment'),
@@ -277,6 +277,16 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function getServersBackupAttribute($value)
     {
         return ($value != 'None');
+    }
+
+    /**
+     * Mutate servers_advanced_support attribute to boolean
+     * @param $value
+     * @return bool
+     */
+    public function getServersAdvancedSupportAttribute($value)
+    {
+        return ($value == 'Yes');
     }
 
     /**
