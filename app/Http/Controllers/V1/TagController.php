@@ -80,7 +80,7 @@ class TagController extends BaseController
         $tag->metadata_reseller_id = $solution->ucs_reseller_reseller_id;
         $tag->metadata_key = $request->input('key');
         $tag->metadata_value = $request->input('value');
-        $tag->metadata_resource = $solution->getTable();
+        $tag->metadata_resource = 'ucs_reseller';
         $tag->metadata_resource_id = $solution->getKey();
         $tag->metadata_created = date('Y-m-d H:i:s');
         $tag->metadata_createdby = 'API Client';
@@ -214,7 +214,7 @@ class TagController extends BaseController
         $tag->metadata_reseller_id = $server->servers_reseller_id;
         $tag->metadata_key = $request->input('key');
         $tag->metadata_value = $request->input('value');
-        $tag->metadata_resource = $server->getTable();
+        $tag->metadata_resource = 'server';
         $tag->metadata_resource_id = $server->getKey();
         $tag->metadata_created = date('Y-m-d H:i:s');
         $tag->metadata_createdby = 'API Client';
