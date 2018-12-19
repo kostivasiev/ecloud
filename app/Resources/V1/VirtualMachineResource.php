@@ -94,7 +94,6 @@ class VirtualMachineResource extends CustomResource
             'platform' => $this->resource->servers_platform,
             'operating_system' => $this->resource->server_license_friendly_name, //Relation
 
-            //'backup' => ($this->resource->servers_backup != 'None'),
             'backup' => $this->resource->servers_backup,
             'support' => $this->resource->servers_advanced_support,
 
