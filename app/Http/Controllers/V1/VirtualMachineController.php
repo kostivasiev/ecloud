@@ -688,6 +688,7 @@ class VirtualMachineController extends BaseController
     /**
      * @param Request $request
      * @param $vmId
+     * @return \Illuminate\Http\Response
      * @throws Exceptions\NotFoundException
      * @throws KingpinException
      * @throws ServiceTimeoutException
@@ -703,13 +704,14 @@ class VirtualMachineController extends BaseController
             throw new KingpinException($errorMessage);
         }
 
-        $this->respondEmpty();
+        return $this->respondEmpty();
     }
 
     /**
      * Power on a virtual machine
      * @param Request $request
      * @param $vmId
+     * @return \Illuminate\Http\Response
      * @throws Exceptions\NotFoundException
      * @throws KingpinException
      */
@@ -723,13 +725,14 @@ class VirtualMachineController extends BaseController
             throw new KingpinException('Failed to power on virtual machine');
         }
 
-        $this->respondEmpty();
+        return $this->respondEmpty();
     }
 
     /**
      * Power-cycle the virtual machine - Power off then on again.
      * @param Request $request
      * @param $vmId
+     * @return \Illuminate\Http\Response
      * @throws Exceptions\NotFoundException
      * @throws KingpinException
      * @throws ServiceTimeoutException
@@ -750,7 +753,7 @@ class VirtualMachineController extends BaseController
             throw new KingpinException('Failed to power on virtual machine');
         }
 
-        $this->respondEmpty();
+        return $this->respondEmpty();
     }
 
 
