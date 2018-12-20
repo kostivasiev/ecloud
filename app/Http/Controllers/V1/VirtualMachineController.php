@@ -816,8 +816,7 @@ class VirtualMachineController extends BaseController
 
         $result = $this->shutDownVirtualMachine($virtualMachine);
         if (!$result) {
-            $errorMessage = 'Failed to shut down virtual machine';
-            throw new KingpinException($errorMessage);
+            throw new KingpinException('Failed to shut down virtual machine');
         }
 
         return $this->respondEmpty();
@@ -880,7 +879,8 @@ class VirtualMachineController extends BaseController
     }
 
     /**
-     * Suspend virtual machine
+     * Suspend virtual machine (Admin Only)
+     * Customers don't need to suspend and resume, it eats resources on the datastore(dumps memory onto disk)
      * @param Request $request
      * @param $vmId
      * @return \Illuminate\Http\Response

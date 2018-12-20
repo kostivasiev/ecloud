@@ -317,7 +317,7 @@ class KingpinService
     }
 
     /**
-     * Power On Virtual Machine
+     * Power Off Virtual Machine
      * @param $vmId
      * @param null $solutionId
      * @return bool
