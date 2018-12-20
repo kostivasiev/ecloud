@@ -31,7 +31,10 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->put('vms/{vmId}/power-on', 'VirtualMachineController@powerOn');
     $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
-    $router->put('vms/{vmId}/power-cycle', 'VirtualMachineController@powerCycle');
+    $router->put('vms/{vmId}/power-shutdown', 'VirtualMachineController@shutdown');
+    $router->put('vms/{vmId}/power-restart', 'VirtualMachineController@restart');
+    $router->put('vms/{vmId}/power-reset', 'VirtualMachineController@reset');
+    $router->put('vms/{vmId}/power-suspend', 'VirtualMachineController@suspend');
 
     $router->get('vms/{vmId}/tags', 'TagController@indexVMTags');
     $router->post('vms/{vmId}/tags', 'TagController@createVMTag');

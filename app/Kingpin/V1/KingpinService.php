@@ -296,6 +296,7 @@ class KingpinService
     }
 
     /**
+     * Power On Virtual Machine
      * @param $vmId
      * @param null $solutionId
      * @return bool
@@ -308,6 +309,48 @@ class KingpinService
 
         try {
             $this->makeRequest('POST', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Power On Virtual Machine
+     * @param $vmId
+     * @param null $solutionId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function powerOffVirtualMachine($vmId, $solutionId = null)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'vm/' . $vmId . '/power';
+
+        try {
+            $this->makeRequest('DELETE', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Suspend / Pause Virtual Machine
+     * @param $vmId
+     * @param null $solutionId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function powerSuspend($vmId, $solutionId = null)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'vm/' . $vmId . '/power/suspend';
+
+        try {
+            $this->makeRequest('PUT', $url);
         } catch (TransferException $exception) {
             return false;
         }

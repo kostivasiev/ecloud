@@ -153,7 +153,7 @@ class VirtualMachineController extends BaseController
                 $maxRam = min($maxRam, $solution->ramAvailable());
                 if ($maxRam < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'host has insufficient ram, '.$maxRam.' remaining'
+                        'host has insufficient ram, ' . $maxRam . ' remaining'
                     ));
                 }
 
@@ -167,7 +167,7 @@ class VirtualMachineController extends BaseController
                 $maxHdd = $datastore->usage->available;
                 if ($maxHdd < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'datastore has insufficient space, '.$maxRam.' remaining'
+                        'datastore has insufficient space, ' . $maxRam . ' remaining'
                     ));
                 }
             }
@@ -637,7 +637,7 @@ class VirtualMachineController extends BaseController
         $existingDisks = [];
         if ($disks !== false) {
             foreach ($disks as $disk) {
-                $existingDisks[$disk->name] =  $disk;
+                $existingDisks[$disk->name] = $disk;
             }
         }
 
@@ -759,29 +759,7 @@ class VirtualMachineController extends BaseController
     }
 
     /**
-     * @param Request $request
-     * @param $vmId
-     * @return \Illuminate\Http\Response
-     * @throws Exceptions\NotFoundException
-     * @throws KingpinException
-     * @throws ServiceTimeoutException
-     */
-    public function powerOff(Request $request, $vmId)
-    {
-        $this->validateVirtualMachineId($request, $vmId);
-        $virtualMachine = $this->getVirtualMachine($vmId);
-
-        $result = $this->shutDownVirtualMachine($virtualMachine);
-        if (!$result) {
-            $errorMessage = 'Failed to power off virtual machine';
-            throw new KingpinException($errorMessage);
-        }
-
-        return $this->respondEmpty();
-    }
-
-    /**
-     * Power on a virtual machine
+     * Hard Power-on or Resume a virtual machine
      * @param Request $request
      * @param $vmId
      * @return \Illuminate\Http\Response
@@ -802,7 +780,28 @@ class VirtualMachineController extends BaseController
     }
 
     /**
-     * Power-cycle the virtual machine - Power off then on again.
+     * Hard Power-off a virtual machine
+     * @param Request $request
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\NotFoundException
+     * @throws KingpinException
+     */
+    public function powerOff(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        $result = $this->powerOffVirtualMachine($virtualMachine);
+        if (!$result) {
+            throw new KingpinException('Failed to power off virtual machine');
+        }
+
+        return $this->respondEmpty();
+    }
+
+    /**
+     * Gracefully shut down a virtual machine
      * @param Request $request
      * @param $vmId
      * @return \Illuminate\Http\Response
@@ -810,16 +809,39 @@ class VirtualMachineController extends BaseController
      * @throws KingpinException
      * @throws ServiceTimeoutException
      */
-    public function powerCycle(Request $request, $vmId)
+    public function shutdown(Request $request, $vmId)
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
-        //Power down
+
+        $result = $this->shutDownVirtualMachine($virtualMachine);
+        if (!$result) {
+            $errorMessage = 'Failed to shut down virtual machine';
+            throw new KingpinException($errorMessage);
+        }
+
+        return $this->respondEmpty();
+    }
+
+    /**
+     * Restart the virtual machine.
+     * Gracefully shutdown from guest, then power on again.
+     * @param Request $request
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\NotFoundException
+     * @throws KingpinException
+     * @throws ServiceTimeoutException
+     */
+    public function restart(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+        //Shut down
         $shutDownResult = $this->shutDownVirtualMachine($virtualMachine);
         if (!$shutDownResult) {
             throw new KingpinException('Failed to power down virtual machine');
         }
-        sleep(3);
         //Power up
         $powerOnResult = $this->powerOnVirtualMachine($virtualMachine);
         if (!$powerOnResult) {
@@ -829,6 +851,81 @@ class VirtualMachineController extends BaseController
         return $this->respondEmpty();
     }
 
+    /**
+     * Reset the virtual machine.
+     * Hard power-off, then power on again.
+     * @param Request $request
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\NotFoundException
+     * @throws KingpinException
+     */
+    public function reset(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        //Hard power-off
+        $powerOffResult = $this->powerOffVirtualMachine($virtualMachine);
+        if (!$powerOffResult) {
+            throw new KingpinException('Failed to power off virtual machine');
+        }
+        //Power up
+        $powerOnResult = $this->powerOnVirtualMachine($virtualMachine);
+        if (!$powerOnResult) {
+            throw new KingpinException('Failed to power on virtual machine');
+        }
+
+        return $this->respondEmpty();
+    }
+
+    /**
+     * Suspend virtual machine
+     * @param Request $request
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\NotFoundException
+     * @throws KingpinException
+     * @throws Exceptions\ForbiddenException
+     */
+    public function suspend(Request $request, $vmId)
+    {
+        if (!$this->isAdmin) {
+            throw new Exceptions\ForbiddenException();
+        }
+
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        $result = $this->suspendVirtualMachine($virtualMachine);
+        if (!$result) {
+            $errorMessage = 'Failed to suspend virtual machine';
+            throw new KingpinException($errorMessage);
+        }
+
+        return $this->respondEmpty();
+    }
+
+    /**
+     * @param VirtualMachine $virtualMachine
+     * @return bool
+     * @throws KingpinException
+     */
+    protected function suspendVirtualMachine(VirtualMachine $virtualMachine)
+    {
+        $kingpin = $this->loadKingpinService($virtualMachine);
+
+        $powerOnResult = $kingpin->powerSuspend(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+
+        if (!$powerOnResult) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Power on a virtual machine
@@ -846,6 +943,28 @@ class VirtualMachineController extends BaseController
         );
 
         if (!$powerOnResult) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Power off a virtual machine
+     * @param VirtualMachine $virtualMachine
+     * @return bool
+     * @throws KingpinException
+     */
+    protected function powerOffVirtualMachine(VirtualMachine $virtualMachine)
+    {
+        $kingpin = $this->loadKingpinService($virtualMachine);
+
+        $powerOffResult = $kingpin->powerOffVirtualMachine(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+
+        if (!$powerOffResult) {
             return false;
         }
 
