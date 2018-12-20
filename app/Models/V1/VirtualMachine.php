@@ -211,7 +211,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
             StringProperty::create('servers_friendly_name', 'name'),
             StringProperty::create('servers_hostname', 'hostname'),
-            StringProperty::create('servers_netnios', 'computername'),
+            StringProperty::create('servers_netnios_name', 'computername'),
 
             IntProperty::create('servers_cpu', 'cpu'),
             IntProperty::create('servers_memory', 'ram'),
