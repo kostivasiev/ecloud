@@ -82,14 +82,54 @@ class CreateInitialTables extends Migration
             $table->increments('servers_id');
             $table->integer('servers_reseller_id');
             $table->string('servers_type');
+            $table->string('servers_use_ip_management')->default('No');
+            $table->string('servers_friendly_name');
+            $table->string('servers_hostname');
+            $table->string('servers_netnios_name')->default('');
+            $table->string('servers_cpu')->default('');
+            $table->string('servers_memory')->default('');
+            $table->string('servers_hdd')->default('');
+            $table->string('servers_platform')->default('');
+            $table->string('servers_license')->default('');
+            $table->string('servers_backup')->default('None');
+            $table->string('servers_advanced_support')->default('No');
+            $table->string('servers_status')->default('');
+            $table->string('servers_ecloud_type')->default('');
             $table->string('servers_subtype_id');
             $table->string('servers_active');
-            $table->string('servers_ip');
-            $table->string('servers_hostname');
-            $table->string('servers_friendly_name');
+            $table->string('servers_ip')->default('');
             $table->integer('servers_ecloud_ucs_reseller_id');
-            $table->string('servers_firewall_role');
+            $table->string('servers_firewall_role')->default('N/A');
         });
+
+        Schema::create('server_license', function (Blueprint $table) {
+            $table->increments('server_license_id');
+            $table->string('server_license_name');
+            $table->string('server_license_friendly_name');
+        });
+
+        DB::table('server_license')->insert(
+            [
+                'server_license_id' => 1,
+                'server_license_name' => 'CentOS7 x86_64',
+                'server_license_friendly_name' => 'CentOS 7 64-bit'
+            ],
+            [
+                'server_license_id' => 2,
+                'server_license_name' => 'CentOS6 x86_64',
+                'server_license_friendly_name' => 'CentOS 6 64-bit',
+            ]
+        );
+
+
+        Schema::create('server_ip_address', function (Blueprint $table) {
+            $table->increments('server_ip_address_id');
+            $table->string('server_ip_address_server_id');
+            $table->string('server_ip_address_internal_ip');
+            $table->string('server_ip_address_external_ip');
+            $table->string('server_ip_address_active');
+        });
+
 
         Schema::create('server_subtype', function (Blueprint $table) {
             $table->increments('server_subtype_id');
@@ -138,6 +178,9 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('ucs_node');
         Schema::dropIfExists('reseller_lun');
         Schema::dropIfExists('servers');
+        Schema::dropIfExists('servers');
+        Schema::dropIfExists('server_license');
+        Schema::dropIfExists('server_ip_address');
         Schema::dropIfExists('server_subtype');
     }
 }
