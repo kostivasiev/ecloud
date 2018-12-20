@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Exceptions\V1\DatastoreInsufficientSpaceException;
-use App\Exceptions\V1\DatastoreNotFoundException;
-use App\Exceptions\V1\SolutionNotFoundException;
-use App\Models\V1\Pod;
-use App\Models\V1\VirtualMachine;
-use App\Models\V1\Solution;
-use App\Models\V1\Datastore;
+use Illuminate\Http\Request;
+use UKFast\DB\Ditto\QueryTransformer;
 
+use App\Models\V1\VirtualMachine;
 use App\Resources\V1\VirtualMachineResource;
 
-use Illuminate\Http\Request;
-use UKFast\Api\Exceptions;
+use App\Models\V1\Pod;
+use App\Models\V1\Tag;
 
-use UKFast\DB\Ditto\QueryTransformer;
+use App\Models\V1\Solution;
+use App\Exceptions\V1\SolutionNotFoundException;
+
+use App\Models\V1\SolutionNetwork;
+use App\Models\V1\SolutionSite;
+
+use App\Models\V1\Datastore;
+use App\Exceptions\V1\DatastoreNotFoundException;
+use App\Exceptions\V1\DatastoreInsufficientSpaceException;
 
 use App\Kingpin\V1\KingpinService as Kingpin;
 use App\Exceptions\V1\KingpinException;
@@ -23,9 +27,11 @@ use App\Exceptions\V1\KingpinException;
 use App\Services\IntapiService;
 use App\Exceptions\V1\IntapiServiceException;
 
+use UKFast\Api\Exceptions;
 use App\Exceptions\V1\ServiceTimeoutException;
 use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
+use App\Exceptions\V1\InsufficientResourceException;
 
 class VirtualMachineController extends BaseController
 {
@@ -75,6 +81,8 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @return \Illuminate\Http\Response
+     * @throws Exceptions\BadRequestException
+     * @throws InsufficientResourceException
      * @throws IntapiServiceException
      * @throws ServiceResponseException
      * @throws SolutionNotFoundException
@@ -87,17 +95,19 @@ class VirtualMachineController extends BaseController
     {
         // default validation
         $rules = [
-            'environment' => ['required'],
+            'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
             'template' => ['required'],
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
             'hdd' => ['required', 'integer'],
+
+            'tags' => ['nullable', 'array'],
         ];
 
-        // todo public iops
-
-        if (strtolower($request->input('environment')) != 'public') {
+        if ($request->input('environment') == 'Public') {
+            $rules['hdd_iops'] = ['required', 'integer'];
+        } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
         }
 
@@ -107,41 +117,81 @@ class VirtualMachineController extends BaseController
             ];
         }
 
-        if ($request->input('monitoring') === true) {
-            $rules['monitoring-contacts'] = 'required';
+        if ($request->has('tags')) {
+            $rules['tags.*.key'] = [
+                'required', 'regex:/' . Tag::KEY_FORMAT_REGEX . '/'
+            ];
+            $rules['tags.*.value'] = [
+                'required', 'string'
+            ];
         }
 
-        // todo validate tags
+        if ($request->input('monitoring') === true) {
+            $rules['monitoring-contacts'] = ['required', 'numericarray'];
+        }
 
         $this->validate($request, $rules);
 
 
         // environment specific validation
-        if (strtolower($request->input('environment')) == 'public') {
+        $minCpu = VirtualMachine::MIN_CPU;
+        $maxCpu = VirtualMachine::MAX_CPU;
+        $minRam = VirtualMachine::MIN_RAM;
+        $maxRam = VirtualMachine::MAX_RAM;
+        $minHdd = VirtualMachine::MIN_HDD;
+        $maxHdd = VirtualMachine::MAX_HDD;
+
+        if ($request->input('environment') == 'Public') {
             $solution = null;
             $pod = new Pod();
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
+
+            if ($request->input('environment') != 'Burst') {
+                // get available compute
+                $maxRam = min($maxRam, $solution->ramAvailable());
+                if ($maxRam < 1) {
+                    throw new InsufficientResourceException($intapiService->getFriendlyError(
+                        'host has insufficient ram, '.$maxRam.' remaining'
+                    ));
+                }
+
+                // get available storage
+                if ($request->has('datastore_id')) {
+                    $datastore = Datastore::find($request->input('datastore_id'));
+                } else {
+                    $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
+                }
+
+                $maxHdd = $datastore->usage->available;
+                if ($maxHdd < 1) {
+                    throw new InsufficientResourceException($intapiService->getFriendlyError(
+                        'datastore has insufficient space, '.$maxRam.' remaining'
+                    ));
+                }
+            }
+
+            if ($solution->isMultiSite()) {
+                $rules['site_id'] = ['required', 'integer'];
+            }
+
+            if ($solution->isMultiNetwork()) {
+                $rules['network_id'] = ['required', 'integer'];
+            }
         }
 
-        // todo check available resources
-
         $rules['cpu'] = array_merge($rules['cpu'], [
-            'min:' . VirtualMachine::MIN_CPU, 'max:' . VirtualMachine::MAX_CPU
+            'min:' . $minCpu, 'max:' . $maxCpu
         ]);
 
         $rules['ram'] = array_merge($rules['ram'], [
-            'min:' . VirtualMachine::MIN_RAM, 'max:' . VirtualMachine::MAX_RAM
+            'min:' . $minRam, 'max:' . $maxRam
         ]);
 
         $rules['hdd'] = array_merge($rules['hdd'], [
-            'min:' . VirtualMachine::MIN_HDD, 'max:' . VirtualMachine::MAX_HDD
+            'min:' . $minHdd, 'max:' . $maxHdd
         ]);
-
-
-        // todo is multi-vlan
-        // todo is multi-site
 
         $this->validate($request, $rules);
 
@@ -164,15 +214,12 @@ class VirtualMachineController extends BaseController
             }
         }
 
-
-        // todo request is larger than template
-
         $this->validate($request, $rules);
 
         // set initial _post data
         $post_data = array(
             'reseller_id' => $request->user->resellerId,
-            'ecloud_type' => ucfirst(strtolower($request->input('environment'))),
+            'ecloud_type' => $request->input('environment'),
             'ucs_reseller_id' => $request->input('solution_id'),
             'server_active' => true,
 
@@ -209,16 +256,26 @@ class VirtualMachineController extends BaseController
 
         // set storage
         $post_data['hdd_gb'] = $request->input('hdd');
-
         if ($request->has('datastore_id')) {
             $post_data['reseller_lun_id'] = $request->input('datastore_id');
-        } else {
-            // todo find the datastore with the most free storage
         }
 
+        // todo check template disks not larger than request
 
         // set networking
-        // todo check/set VLAN
+        if ($request->has('network_id')) {
+            $network = SolutionNetwork::withSolution($request->input('solution_id'))
+                ->find($request->input('network_id'));
+
+            if (is_null($network)) {
+                throw new Exceptions\BadRequestException(
+                    "A network matching the requested ID was not found",
+                    'network_id'
+                );
+            }
+
+            $post_data['internal_vlan'] = $network->vlan_number;
+        }
 
         if ($request->has('external_ip_required')) {
             $post_data['external_ip_required'] = $request->input('external_ip_required');
@@ -229,18 +286,34 @@ class VirtualMachineController extends BaseController
             $post_data['nameservers'] = $request->input('nameservers');
         }
 
-        // site id
-        // drs group
+        if ($request->has('site_id')) {
+            $site = SolutionSite::withSolution($request->input('solution_id'))
+                ->find($request->input('site_id'));
+
+            if (is_null($site)) {
+                throw new Exceptions\BadRequestException(
+                    "A site matching the requested ID was not found",
+                    'site_id'
+                );
+            }
+
+            $post_data['ucs_site_id'] = $site->getKey();
+        }
 
 
         // set support
-        if ($request->input('monitoring') === true) {
+        if ($request->input('support') === true) {
             $post_data['advanced_support'] = true;
         }
 
         if ($request->input('monitoring') === true) {
             $post_data['monitoring_enabled'] = true;
             $post_data['monitoring_contacts'] = $request->input('monitoring-contacts');
+        }
+
+        //set tags
+        if ($request->has('tags')) {
+            $post_data['tags'] = $request->input('tags');
         }
 
         // todo remove debugging when ready to retest

@@ -2,10 +2,8 @@
 
 namespace App\Exceptions\V1;
 
-use UKFast\Api\Exceptions\ApiException;
-
-class DatastoreInsufficientSpaceException extends ApiException
+class DatastoreInsufficientSpaceException extends InsufficientResourceException
 {
-    public $statusCode = 500;
+    public $statusCode = 403;
     public $title = 'Datastore has insufficient space';
 }
