@@ -124,11 +124,21 @@ class IntapiService
                 return 'No ' . $ip_type . ' IP addresses available';
 
             case (preg_match('/datastore has insufficient space/', $error) == true):
-                $error_msg = 'Insufficient free space on selected datastore';
+                $error_msg = 'Insufficient free storage available';
 
                 $amount_left = filter_var($error, FILTER_SANITIZE_NUMBER_INT);
                 if (is_numeric($amount_left)) {
-                    $error_msg .= ', ' . $amount_left . 'GB remaining';
+                    $error_msg .= ', ' . max($amount_left, 0) . 'GB remaining';
+                }
+
+                return $error_msg;
+
+            case (preg_match('/host has insufficient ram/', $error) == true):
+                $error_msg = 'Insufficient free ram available';
+
+                $amount_left = filter_var($error, FILTER_SANITIZE_NUMBER_INT);
+                if (is_numeric($amount_left)) {
+                    $error_msg .= ', ' . max($amount_left, 0) . 'GB remaining';
                 }
 
                 return $error_msg;

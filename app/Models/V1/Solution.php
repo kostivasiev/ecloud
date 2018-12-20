@@ -352,6 +352,14 @@ class Solution extends Model implements Filterable, Sortable
                 ->count() > 1;
     }
 
+    public function isMultiNetwork()
+    {
+        return SolutionNetwork::withSolution($this->getKey())
+            ->limit(2)
+            ->count() > 1
+        ;
+    }
+
 
     /**
      * Get Datastores for a Solution
