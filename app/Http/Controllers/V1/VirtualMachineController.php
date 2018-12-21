@@ -106,7 +106,8 @@ class VirtualMachineController extends BaseController
         ];
 
         if ($request->input('environment') == 'Public') {
-            $rules['hdd_iops'] = ['required', 'integer'];
+            $rules['hdd_iops'] = ['nullable', 'integer'];
+            // todo public iops
         } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
         }
@@ -319,7 +320,7 @@ class VirtualMachineController extends BaseController
 
         if ($request->input('monitoring') === true) {
             $post_data['monitoring_enabled'] = true;
-            $post_data['monitoring_contacts'] = $request->input('monitoring-contacts');
+            $post_data['monitoring_contacts'] = $request->input('monitoring_contacts');
         }
 
         //set tags
