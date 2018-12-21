@@ -163,6 +163,14 @@ class Host extends Model implements Filterable, Sortable
         return $query;
     }
 
+    public function scopeWithSolution($query, $solutionId)
+    {
+        $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
+
+        $query->where('ucs_node_ucs_reseller_id', $solutionId);
+        return $query;
+    }
+
     /**
      * Return Solution
      * @return \Illuminate\Database\Eloquent\Relations\HasOne

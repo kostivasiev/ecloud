@@ -96,4 +96,25 @@ class HostController extends BaseController
 
         return $host;
     }
+
+    /**
+     * List Solution Hosts
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\Http\Response
+     */
+    public function indexSolution(Request $request, $solutionId)
+    {
+        $collectionQuery = static::getHostQuery($request)
+            ->withSolution($solutionId);
+
+        (new QueryTransformer($request))
+            ->config(Host::class)
+            ->transform($collectionQuery);
+
+        return $this->respondCollection(
+            $request,
+            $collectionQuery->paginate($this->perPage)
+        );
+    }
 }

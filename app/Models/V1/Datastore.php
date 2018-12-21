@@ -246,6 +246,14 @@ class Datastore extends Model implements Filterable, Sortable
         return $query;
     }
 
+    public function scopeWithSolution($query, $solutionId)
+    {
+        $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
+
+        $query->where('reseller_lun_ucs_reseller_id', $solutionId);
+        return $query;
+    }
+
     /**
      * Scope datastore query by (LUN) name
      * @param $query

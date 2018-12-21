@@ -65,11 +65,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->patch('solutions/{solution_id}', 'SolutionController@update');
 
     $router->get('solutions/{solution_id}/vms', 'VirtualMachineController@getSolutionVMs');
-
-    $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
-
+    $router->get('solutions/{solution_id}/hosts', 'HostController@indexSolution');
+    $router->get('solutions/{solution_id}/datastores', 'DatastoreController@indexSolution');
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
-
+    $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
 
     $router->get('solutions/{solution_id}/tags', 'TagController@indexSolutionTags');

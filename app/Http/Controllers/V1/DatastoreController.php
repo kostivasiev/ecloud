@@ -98,4 +98,29 @@ class DatastoreController extends BaseController
 
         return $datastore;
     }
+
+    /**
+     * List Solution Datastores
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\Http\Response
+     */
+    public function indexSolution(Request $request, $solutionId)
+    {
+        $collectionQuery = static::getDatastoreQuery($request)
+            ->withSolution($solutionId);
+
+        (new QueryTransformer($request))
+            ->config(Datastore::class)
+            ->transform($collectionQuery);
+
+        return $this->respondCollection(
+            $request,
+            $collectionQuery->paginate($this->perPage),
+            200,
+            DatastoreResource::class,
+            [],
+            Datastore::$collectionProperties
+        );
+    }
 }
