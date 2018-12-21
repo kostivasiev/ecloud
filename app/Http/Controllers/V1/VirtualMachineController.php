@@ -106,7 +106,8 @@ class VirtualMachineController extends BaseController
         ];
 
         if ($request->input('environment') == 'Public') {
-            $rules['hdd_iops'] = ['required', 'integer'];
+            $rules['hdd_iops'] = ['nullable', 'integer'];
+            // todo public iops
         } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
         }
@@ -127,7 +128,8 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->input('monitoring') === true) {
-            $rules['monitoring-contacts'] = ['required', 'numericarray'];
+            $rules['monitoring-contacts'] = ['required', 'array'];
+            $rules['monitoring-contacts.*'] = ['integer'];
         }
 
         $this->validate($request, $rules);
@@ -143,7 +145,7 @@ class VirtualMachineController extends BaseController
 
         if ($request->input('environment') == 'Public') {
             $solution = null;
-            $pod = new Pod();
+            $pod = Pod::find(14);
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
@@ -192,6 +194,16 @@ class VirtualMachineController extends BaseController
         $rules['hdd'] = array_merge($rules['hdd'], [
             'min:' . $minHdd, 'max:' . $maxHdd
         ]);
+
+//        if ($request->has('hdd_disks')) {
+//            // todo add support for multiple disks
+//
+//            $hdd_disks = $request->input('hdd');
+//        } else {
+//            $hdd_disks = [
+//                'Hard disk 1' => $request->input('hdd')
+//            ];
+//        }
 
         $this->validate($request, $rules);
 
@@ -308,7 +320,7 @@ class VirtualMachineController extends BaseController
 
         if ($request->input('monitoring') === true) {
             $post_data['monitoring_enabled'] = true;
-            $post_data['monitoring_contacts'] = $request->input('monitoring-contacts');
+            $post_data['monitoring_contacts'] = $request->input('monitoring_contacts');
         }
 
         //set tags
