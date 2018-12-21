@@ -343,7 +343,7 @@ class VirtualMachineController extends BaseController
 
             $intapiData = $intapiService->getResponseData();
         } catch (\Exception $exception) {
-            throw new IntapiServiceException('Failed to create new virtual machine', null, 502);
+            throw new ServiceUnavailableException('Failed to create new virtual machine', null, 502);
         }
 
         if (!$intapiData->result) {

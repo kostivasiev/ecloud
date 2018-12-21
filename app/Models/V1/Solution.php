@@ -258,6 +258,10 @@ class Solution extends Model implements Filterable, Sortable
 
         // Foreach vmware host check against db host record and add RAM or continue
         foreach ($vmwareHosts as $vmwareHost) {
+            if (!array_key_exists($vmwareHost->macAddress, $hostsDatabaseRecordsSorted)) {
+                continue;
+            }
+
             $hostDatabaseRecord = $hostsDatabaseRecordsSorted[$vmwareHost->macAddress];
             if (!$hostDatabaseRecord instanceof Host) {
                 continue;
