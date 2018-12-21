@@ -458,10 +458,6 @@ class KingpinService
             throw new KingpinException('failed to parse host response');
         }
 
-        if (strtolower($this->responseData->macAddress) != strtolower($eth0_mac)) {
-            throw new KingpinException('unexpected host response');
-        }
-
         return $this->formatHost($this->responseData);
     }
 
