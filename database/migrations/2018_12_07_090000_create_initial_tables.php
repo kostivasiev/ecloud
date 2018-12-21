@@ -96,7 +96,7 @@ class CreateInitialTables extends Migration
             $table->string('servers_status')->default('');
             $table->string('servers_ecloud_type')->default('');
             $table->string('servers_subtype_id');
-            $table->string('servers_active');
+            $table->string('servers_active')->default('y');
             $table->string('servers_ip')->default('');
             $table->integer('servers_ecloud_ucs_reseller_id');
             $table->string('servers_firewall_role')->default('N/A');
