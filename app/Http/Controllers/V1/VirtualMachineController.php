@@ -127,7 +127,8 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->input('monitoring') === true) {
-            $rules['monitoring-contacts'] = ['required', 'numericarray'];
+            $rules['monitoring-contacts'] = ['required', 'array'];
+            $rules['monitoring-contacts.*'] = ['integer'];
         }
 
         $this->validate($request, $rules);
@@ -192,6 +193,16 @@ class VirtualMachineController extends BaseController
         $rules['hdd'] = array_merge($rules['hdd'], [
             'min:' . $minHdd, 'max:' . $maxHdd
         ]);
+
+//        if ($request->has('hdd_disks')) {
+//            // todo add support for multiple disks
+//
+//            $hdd_disks = $request->input('hdd');
+//        } else {
+//            $hdd_disks = [
+//                'Hard disk 1' => $request->input('hdd')
+//            ];
+//        }
 
         $this->validate($request, $rules);
 
