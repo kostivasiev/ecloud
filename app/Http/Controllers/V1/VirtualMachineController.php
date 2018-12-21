@@ -145,7 +145,7 @@ class VirtualMachineController extends BaseController
 
         if ($request->input('environment') == 'Public') {
             $solution = null;
-            $pod = new Pod();
+            $pod = Pod::find(14);
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
