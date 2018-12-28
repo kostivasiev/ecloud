@@ -207,7 +207,6 @@ class VirtualMachine extends Model implements Filterable, Sortable
     {
         $array = [
             IdProperty::create('servers_id', 'id'),
-            IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
 
             StringProperty::create('servers_friendly_name', 'name'),
             StringProperty::create('servers_hostname', 'hostname'),
@@ -220,14 +219,16 @@ class VirtualMachine extends Model implements Filterable, Sortable
             StringProperty::create('ip_internal', 'ip_internal'),
             StringProperty::create('ip_external', 'ip_external'),
 
+            StringProperty::create('template', 'template'),
             StringProperty::create('servers_platform', 'platform'),
-            StringProperty::create('server_license_friendly_name', 'operating_system'),
 
             BooleanProperty::create('servers_backup', 'backup'),
             BooleanProperty::create('servers_advanced_support', 'support'),
 
             StringProperty::create('servers_status', 'status'),
+
             StringProperty::create('servers_ecloud_type', 'environment'),
+            IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
         ];
 
         return $array;
@@ -393,6 +394,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'servers_license'
         )->select(
             'server_license_id',
+            'server_license_name',
             'server_license_friendly_name'
         );
     }
@@ -470,7 +472,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * @var array
      */
     protected $appends = [
-        'server_license_friendly_name',
+        'template',
         'ip_internal',
         'ip_external',
     ];
@@ -846,5 +848,17 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $this->server_subtype_name == 'Webcelerator' ||
             $this->servers_role == 'Webcelerator Appliance'
         );
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTemplateAttribute()
+    {
+        if (!empty($this->servers_ecloud_custom_template)) {
+            return $this->servers_ecloud_custom_template;
+        }
+
+        return $this->server_license_friendly_name;
     }
 }

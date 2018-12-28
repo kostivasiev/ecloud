@@ -70,13 +70,13 @@ class VirtualMachineResource extends CustomResource
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param \Illuminate\Http\Request $request
+     * @param array $visible
      * @return array
      */
     public function toArray($request, $visible = [])
     {
         $data = [
             'id' => $this->resource->servers_id,
-            'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
 
             'name' => $this->resource->servers_friendly_name,
             'hostname' => $this->resource->servers_hostname,
@@ -91,8 +91,8 @@ class VirtualMachineResource extends CustomResource
             'ip_internal' => $this->resource->ip_internal, //Derived
             'ip_external' => $this->resource->ip_external, //Derived
 
+            'template' => $this->resource->template,
             'platform' => $this->resource->servers_platform,
-            'operating_system' => $this->resource->server_license_friendly_name, //Relation
 
             'backup' => $this->resource->servers_backup,
             'support' => $this->resource->servers_advanced_support,
@@ -102,6 +102,7 @@ class VirtualMachineResource extends CustomResource
             'tools_status' => $this->vmwareToolsStatus(),
 
             'environment' => $this->resource->servers_ecloud_type,
+            'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
         ];
 
         return $this->filterProperties($request, $data);
