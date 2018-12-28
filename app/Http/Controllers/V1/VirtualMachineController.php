@@ -85,6 +85,7 @@ class VirtualMachineController extends BaseController
      * @throws InsufficientResourceException
      * @throws IntapiServiceException
      * @throws ServiceResponseException
+     * @throws ServiceUnavailableException
      * @throws SolutionNotFoundException
      * @throws \App\Exceptions\V1\TemplateNotFoundException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
@@ -463,6 +464,8 @@ class VirtualMachineController extends BaseController
         //Load the vm to clone
         $virtualMachine = $this->getVirtualMachine($vmId);
 
+        // todo check/prevent cloning on Public/Burst VMs
+
         //Load the default datastore and check there's enough space
         //For Hybrid the default is the available datastore with the most free space
         $datastore = Datastore::getDefault($virtualMachine->servers_ecloud_ucs_reseller_id, $virtualMachine->type());
@@ -581,7 +584,6 @@ class VirtualMachineController extends BaseController
 
         switch ($virtualMachine->type()) {
             case 'Hybrid':
-            case 'Burst':
             case 'Private':
                 $maxRam = intval($virtualMachine->servers_memory)
                     + min(VirtualMachine::MAX_RAM, $virtualMachine->solution->ramAvailable());
@@ -592,6 +594,7 @@ class VirtualMachineController extends BaseController
                 //TODO: Is this still right? should this be VirtualMachine::MIN_HDD
 //                $minHdd = $virtualMachine->servers_hdd;
                 break;
+
             case 'Public':
                 if ($virtualMachine->isContract()) {
                     //Determine contract specific limits
@@ -604,6 +607,8 @@ class VirtualMachineController extends BaseController
                     $minHdd = $this->extractTriggerNumeric($contractHddTrigger);
                 }
                 break;
+
+            case 'Burst':
             default:
         }
 

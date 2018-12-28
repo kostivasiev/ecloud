@@ -525,7 +525,13 @@ class TemplateController extends BaseController
         // load pod templates
         $templates = $TemplateController->getResellerPodTemplates(true)[$pod->getKey()];
         if (is_array($templates) and count($templates) > 0) {
-            $template = $TemplateController->findTemplateByName($name, $templates);
+            $template = $TemplateController->findTemplateBy('name', $name, $templates);
+            if ($template) {
+                return $template;
+            }
+
+            // base templates use friendly names
+            $template = $TemplateController->findTemplateBy('operating_system', $name, $templates);
             if ($template) {
                 return $template;
             }
@@ -543,13 +549,18 @@ class TemplateController extends BaseController
      */
     protected function findTemplateByName($name, $objects)
     {
+        return $this->findTemplateBy('name', $name, $objects);
+    }
+
+    protected function findTemplateBy($property, $value, $objects)
+    {
         foreach ($objects as $object) {
-            if ($object->name == $name) {
+            if ($object->$property == $value) {
                 return $object;
             }
         }
 
-        return false;
+        return null;
     }
 
 

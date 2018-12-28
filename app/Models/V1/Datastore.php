@@ -294,55 +294,62 @@ class Datastore extends Model implements Filterable, Sortable
      * @param bool $backupRequired
      * @param null $solutionSiteId
      * @return mixed|bool
+     * @throws \Exception
      */
     public static function getDefault($solutionId, $ecloudType, $backupRequired = false, $solutionSiteId = null)
     {
         switch ($ecloudType) {
             case 'Hybrid':
             case 'Private':
-            case 'Burst':
                 $datastores = static::getForSolution($solutionId, $solutionSiteId);
-                if (!empty($datastores)) {
-                    $defaultDatastore = $datastores[0];
-                    if (count($datastores) > 1) {
-                        //default on dedicated is the one with the most space
-                        foreach ($datastores as &$datastore) {
-                            try {
-                                //get the usage from vmware
-                                $datastore->getUsage();
-                            } catch (\Exception $exception) {
-                                continue;
-                            }
+                if (empty($datastores)) {
+                    throw new \Exception('failed to load solution datastores');
+                }
 
-                            if ($datastore->available > $defaultDatastore->available) {
-                                $defaultDatastore = $datastore;
-                            }
+                $defaultDatastore = $datastores[0];
+                if (count($datastores) > 1) {
+                    //default on dedicated is the one with the most space
+                    foreach ($datastores as &$datastore) {
+                        try {
+                            //get the usage from vmware
+                            $datastore->getUsage();
+                        } catch (\Exception $exception) {
+                            continue;
+                        }
+
+                        if ($datastore->available > $defaultDatastore->available) {
+                            $defaultDatastore = $datastore;
                         }
                     }
                 }
 
-                // If we cant locate the users LUN try the default.
-                if (!isset($defaultDatastore)) {
-                    $defaultDatastore = static::find(5);
-                }
+                return $defaultDatastore;
 
+            case 'Burst':
+                $defaultDatastore = static::find(5);
                 break;
+
             case 'Public':
                 if (!$backupRequired) {
                     $defaultDatastore = static::find(3);
                 } else {
                     $defaultDatastore = static::find(4);
                 }
-                $defaultDatastore->usage->available = $defaultDatastore->reseller_lun_size_gb;
                 break;
+
             default:
-                return false;
+                throw new \Exception('failed to load default datastore');
         }
 
         //allow default datastores to over provision
-        if (!isset($defaultDatastore->usage->available) and $defaultDatastore->reseller_lun_reseller_id == 308) {
-            $defaultDatastore->usage->available = $defaultDatastore->reseller_lun_size_gb;
-        }
+        $defaultDatastore->usage = (object)[
+            'capacity' => $defaultDatastore->reseller_lun_size_gb,
+            'freeSpace' => $defaultDatastore->reseller_lun_size_gb,
+            'uncommitted' => 0,
+            'provisioned' => 0,
+            'available' => $defaultDatastore->reseller_lun_size_gb,
+            'used' => 0,
+        ];
 
         return $defaultDatastore;
     }
