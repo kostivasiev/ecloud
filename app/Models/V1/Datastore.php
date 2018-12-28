@@ -240,7 +240,7 @@ class Datastore extends Model implements Filterable, Sortable
         $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
 
         if (!empty($resellerId)) {
-            $query->where('reseller_lun_ucs_reseller_id', $resellerId);
+            $query->where('reseller_lun_reseller_id', $resellerId);
         }
 
         return $query;
