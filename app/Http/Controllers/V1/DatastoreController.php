@@ -70,7 +70,7 @@ class DatastoreController extends BaseController
      */
     public static function getDatastoreQuery(Request $request)
     {
-        $query = Datastore::query()
+        $query = Datastore::withReseller($request->user->resellerId)
             ->where('reseller_lun_status', '!=', 'Deleted')
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'reseller_lun_ucs_reseller_id');
 
