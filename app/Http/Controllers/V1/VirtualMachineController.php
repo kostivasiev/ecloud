@@ -94,6 +94,13 @@ class VirtualMachineController extends BaseController
      */
     public function create(Request $request, IntapiService $intapiService)
     {
+        // todo remove when public VMs supported
+        if ($request->input('environment') == 'Public') {
+            throw new Exceptions\ForbiddenException(
+                'Public VM creation is temporarily disabled'
+            );
+        }
+
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
