@@ -115,7 +115,7 @@ class SolutionController extends BaseController
         if (!$request->user->isAdmin) {
             $solutionQuery->where('ucs_reseller_active', 'Yes');
             $solutionQuery->where('ucs_reseller_status', '!=', 'Cancelled');
-            $solutionQuery->whereDate('ucs_reseller_start_date', '<=', date('Y-m-d'));
+            $solutionQuery->where('ucs_reseller_start_date', '<=', date('Y-m-d H:i:s'));
         }
 
         return $solutionQuery;

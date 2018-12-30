@@ -27,6 +27,7 @@ class CreateInitialTables extends Migration
             $table->string('ucs_reseller_solution_name');
             $table->string('ucs_reseller_active');
             $table->string('ucs_reseller_status');
+            $table->dateTime('ucs_reseller_start_date')->default('0000-00-00 00:00:00');
         });
 
 
