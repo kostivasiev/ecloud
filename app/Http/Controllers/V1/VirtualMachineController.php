@@ -82,6 +82,7 @@ class VirtualMachineController extends BaseController
      * @param IntapiService $intapiService
      * @return \Illuminate\Http\Response
      * @throws Exceptions\BadRequestException
+     * @throws Exceptions\ForbiddenException
      * @throws InsufficientResourceException
      * @throws IntapiServiceException
      * @throws ServiceResponseException
@@ -94,10 +95,12 @@ class VirtualMachineController extends BaseController
      */
     public function create(Request $request, IntapiService $intapiService)
     {
-        // todo remove when public VMs supported
-        if ($request->input('environment') == 'Public') {
+        // todo remove when public/burst VMs supported
+        // - template validation issue on public
+        // - need `add_billing` step on create_vm automation
+        if (in_array($request->input('environment'), ['Public', 'Burst'])) {
             throw new Exceptions\ForbiddenException(
-                'Public VM creation is temporarily disabled'
+                $request->input('environment') . ' VM creation is temporarily disabled'
             );
         }
 
@@ -576,7 +579,14 @@ class VirtualMachineController extends BaseController
         $virtualMachine = $this->getVirtualMachine($vmId);
 
         if ($virtualMachine->isManaged()) {
-            throw new Exceptions\UnauthorisedException('Cannot modify virtual machine, it is a UKFast managed device');
+            throw new Exceptions\ForbiddenException('Access to modify UKFast managed devices is restricted');
+        }
+
+        // todo remove when public/burst VMs supported, missing billing step on automation
+        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+            throw new Exceptions\ForbiddenException(
+                $virtualMachine->type() . ' VM updates are temporarily disabled'
+            );
         }
 
         $this->validate($request, $rules);
