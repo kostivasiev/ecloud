@@ -105,6 +105,7 @@ class SolutionController extends BaseController
     }
 
     /**
+     * create initial filtered query builder
      * @param Request $request
      * @return mixed
      */
@@ -113,6 +114,8 @@ class SolutionController extends BaseController
         $solutionQuery = Solution::withReseller($request->user->resellerId);
         if (!$request->user->isAdmin) {
             $solutionQuery->where('ucs_reseller_active', 'Yes');
+            $solutionQuery->where('ucs_reseller_status', '!=', 'Cancelled');
+            $solutionQuery->whereDate('ucs_reseller_start_date', '<=', date('Y-m-d'));
         }
 
         return $solutionQuery;
