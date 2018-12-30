@@ -387,7 +387,7 @@ class Solution extends Model implements Filterable, Sortable
                 //Load the datastore record
                 $datastoreQuery = Datastore::query()
                     ->withName($datastore->name)
-                    ->withReseller($this->attributes['ucs_reseller_id']);
+                    ->withSolution($this->attributes['ucs_reseller_id']);
 
                 if (!empty($UCSSiteId)) {
                     $datastoreQuery->where('reseller_lun_ucs_site_id', '=', $UCSSiteId);
