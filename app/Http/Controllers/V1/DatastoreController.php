@@ -52,7 +52,6 @@ class DatastoreController extends BaseController
     public function show(Request $request, $datastoreId)
     {
         $datastore = static::getDatastoreById($request, $datastoreId);
-        $datastore->getUsage();
 
         return $this->respondItem(
             $request,

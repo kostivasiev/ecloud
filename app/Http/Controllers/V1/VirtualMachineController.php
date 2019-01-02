@@ -113,6 +113,10 @@ class VirtualMachineController extends BaseController
             'ram' => ['required', 'integer'],
             'hdd' => ['required', 'integer'],
 
+            'datastore_id' => ['nullable', 'integer'],
+            'network_id' => ['nullable', 'integer'],
+            'site_id' => ['nullable', 'integer'],
+
             'tags' => ['nullable', 'array'],
         ];
 

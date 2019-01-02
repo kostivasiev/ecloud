@@ -205,7 +205,7 @@ class Datastore extends Model implements Filterable, Sortable
     /**
      * get VMware usage stats
      */
-    public function getUsage()
+    public function getVmwareUsage()
     {
         try {
             $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [
@@ -220,7 +220,7 @@ class Datastore extends Model implements Filterable, Sortable
             throw $exception;
         }
 
-        return $this->usage = (object)[
+        return $this->vmwareUsage = (object)[
             'capacity' => $vmwareDatastore->capacity,
             'freeSpace' => $vmwareDatastore->freeSpace,
             'uncommitted' => $vmwareDatastore->uncommitted,
@@ -228,6 +228,19 @@ class Datastore extends Model implements Filterable, Sortable
             'available' => $vmwareDatastore->available,
             'used' => $vmwareDatastore->used,
         ];
+    }
+
+    /**
+     * Return Usage
+     * @throws \Exception
+     */
+    public function getUsageAttribute()
+    {
+        if (!is_object($this->vmwareUsage)) {
+            $this->getVmwareUsage();
+        }
+
+        return $this->vmwareUsage;
     }
 
     /**
@@ -313,7 +326,7 @@ class Datastore extends Model implements Filterable, Sortable
                     foreach ($datastores as &$datastore) {
                         try {
                             //get the usage from vmware
-                            $datastore->getUsage();
+                            $datastore->getVmwareUsage();
                         } catch (\Exception $exception) {
                             continue;
                         }
