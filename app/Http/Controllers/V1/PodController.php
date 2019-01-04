@@ -30,11 +30,11 @@ class PodController extends BaseController
             ->config(Pod::class)
             ->transform($collectionQuery);
 
-        $solutions = $collectionQuery->paginate($this->perPage);
+        $pods = $collectionQuery->paginate($this->perPage);
 
         return $this->respondCollection(
             $request,
-            $solutions
+            $pods
         );
     }
 
@@ -63,12 +63,12 @@ class PodController extends BaseController
      */
     public static function getPodById(Request $request, $podId)
     {
-        $solution = static::getPodQuery($request)->find($podId);
-        if (is_null($solution)) {
+        $pod = static::getPodQuery($request)->find($podId);
+        if (is_null($pod)) {
             throw new PodNotFoundException('Pod ID #' . $podId . ' not found');
         }
 
-        return $solution;
+        return $pod;
     }
 
     /**
@@ -80,8 +80,9 @@ class PodController extends BaseController
         $podQuery = Pod::query();
         if (!$request->user->isAdmin) {
             $podQuery->where('ucs_datacentre_active', 'Yes');
-        }
 
+            $podQuery->whereIn('ucs_datacentre_reseller_id', [0, $request->user->resellerId]);
+        }
         return $podQuery;
     }
 }

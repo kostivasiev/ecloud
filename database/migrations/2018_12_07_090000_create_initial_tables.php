@@ -15,6 +15,7 @@ class CreateInitialTables extends Migration
     {
         Schema::create('ucs_datacentre', function (Blueprint $table) {
             $table->increments('ucs_datacentre_id');
+            $table->integer('ucs_datacentre_reseller_id')->default('0');
             $table->string('ucs_datacentre_public_name');
             $table->string('ucs_datacentre_active');
         });
