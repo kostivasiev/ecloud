@@ -85,6 +85,25 @@ class TemplateController extends BaseController
     }
 
     /**
+     * Get templates for a Pod
+     * @param Request $request
+     * @param $podId
+     * @return \Illuminate\Http\Response
+     * @throws \App\Exceptions\V1\PodNotFoundException
+     */
+    public function podTemplates(Request $request, $podId)
+    {
+        $pod = PodController::getPodById($request, $podId);
+
+        $templates = $this->getPodTemplates($pod);
+
+        return $this->respondCollection(
+            $request,
+            $this->paginateTemplateData($templates)
+        );
+    }
+
+    /**
      * Rename / move a template
      * @param Request $request
      * @param IntapiService $intapiService
