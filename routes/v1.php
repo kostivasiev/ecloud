@@ -50,11 +50,11 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('templates', 'TemplateController@index');
 
     $router->get('templates/{template_name}', 'TemplateController@show');
-    $router->put('templates/{template_name}', 'TemplateController@renameTemplate');
     $router->delete('templates/{template_name}', 'TemplateController@deleteTemplate');
-
     $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
+    $router->post('templates/{template_name}/move', 'TemplateController@renameTemplate');
 });
+
 
 
 // Solution's
