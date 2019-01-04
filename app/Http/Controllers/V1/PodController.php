@@ -81,10 +81,7 @@ class PodController extends BaseController
         if (!$request->user->isAdmin) {
             $podQuery->where('ucs_datacentre_active', 'Yes');
 
-            $podQuery->where(function ($query) use ($request) {
-                $query->where('ucs_datacentre_reseller_id', '=', '0')
-                    ->orWhere('ucs_datacentre_reseller_id', '=', $request->user->resellerId);
-            });
+            $podQuery->whereIn('ucs_datacentre_reseller_id', [0, $request->user->resellerId]);
         }
         return $podQuery;
     }
