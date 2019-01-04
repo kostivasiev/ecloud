@@ -531,7 +531,6 @@ class TemplateController extends BaseController
                     $podTemplates[] = $this->convertToPublicTemplate($template, $serverLicense);
                 }
             }
-
         }
 
         return $podTemplates;
