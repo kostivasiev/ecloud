@@ -459,6 +459,7 @@ class VirtualMachineController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws DatastoreInsufficientSpaceException
      * @throws DatastoreNotFoundException
+     * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
@@ -469,7 +470,7 @@ class VirtualMachineController extends BaseController
     {
         //Validation
         $rules = [
-            'name' => ['required', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/']
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/']
         ];
 
         $this->validateVirtualMachineId($request, $vmId);
@@ -478,7 +479,12 @@ class VirtualMachineController extends BaseController
         //Load the vm to clone
         $virtualMachine = $this->getVirtualMachine($vmId);
 
-        // todo check/prevent cloning on Public/Burst VMs
+        // VM cloning isn't available to Public/Burst VMs
+        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+            throw new Exceptions\ForbiddenException(
+                $virtualMachine->type() . ' VM cloning is currently disabled'
+            );
+        }
 
         //Load the default datastore and check there's enough space
         //For Hybrid the default is the available datastore with the most free space
