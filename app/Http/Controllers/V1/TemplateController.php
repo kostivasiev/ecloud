@@ -347,7 +347,6 @@ class TemplateController extends BaseController
      * Formats the Solution and Pod templates
      * @param $template
      * @param null $serverLicense
-     * @param bool $retainInternalLame
      * @return \stdClass
      */
     protected function convertToPublicTemplate($template, $serverLicense = null)
@@ -360,6 +359,8 @@ class TemplateController extends BaseController
         $tmp_template->ram = $template->ram;
         $tmp_template->hdd = $template->size_gb;
 
+        $tmp_template->license = 'Unknown';
+
         foreach ($template->hard_drives as $hard_drive) {
             $tmp_template->hdd_disks[] = (object)array(
                 'name' => $hard_drive->name,
@@ -369,6 +370,8 @@ class TemplateController extends BaseController
 
         if (!empty($serverLicense)) {
             $tmp_template->platform = $serverLicense->category;
+            $tmp_template->license = $serverLicense->name;
+
             // For UKFast managed Pod templates return the server license friendly name as the template name
             if ($template->type == 'Base' || $this->isUKFastBaseTemplate($template)) {
                 $tmp_template->name = $serverLicense->friendly_name;
