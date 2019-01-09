@@ -26,9 +26,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->delete('vms/{vmId}', 'VirtualMachineController@destroy');
 
     $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
-
     // todo create template
-
     $router->put('vms/{vmId}/power-on', 'VirtualMachineController@powerOn');
     $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
     $router->put('vms/{vmId}/power-shutdown', 'VirtualMachineController@shutdown');
@@ -51,9 +49,8 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->get('templates/{template_name}', 'TemplateController@show');
     $router->delete('templates/{template_name}', 'TemplateController@deleteTemplate');
-    $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
+
     $router->post('templates/{template_name}/move', 'TemplateController@renameTemplate');
-    $router->get('pods/{pod_id}/templates', 'TemplateController@podTemplates');
 });
 
 
@@ -68,6 +65,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}/vms', 'VirtualMachineController@getSolutionVMs');
     $router->get('solutions/{solution_id}/hosts', 'HostController@indexSolution');
     $router->get('solutions/{solution_id}/datastores', 'DatastoreController@indexSolution');
+    $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
     $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
@@ -120,8 +118,6 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->get('pods/{pod_id}', 'PodController@show');
 
-    // todo templates
+    $router->get('pods/{pod_id}/templates', 'TemplateController@podTemplates');
     // todo datastores
 });
-
-// todo prices
