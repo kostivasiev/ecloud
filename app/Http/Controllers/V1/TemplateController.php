@@ -29,21 +29,15 @@ use UKFast\Api\Exceptions\UnauthorisedException;
 class TemplateController extends BaseController
 {
     /**
-     * List all Solution and Pod Templates
+     * List all Solution Templates
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        $solutionTemplates = $this->getResellerSolutionTemplates();
-
-        // List all Pod templates
-        $podTemplates = $this->getResellerPodTemplates();
-
-        $allTemplates = array_merge($solutionTemplates, $podTemplates);
+        $allTemplates = $this->filterAdminProperties($request, $this->getResellerSolutionTemplates());
 
         $paginator = $this->paginateTemplateData($allTemplates);
-
         $paginator->setPath($request->root() . '/' . $request->path());
 
         return $this->respondCollection(
@@ -80,7 +74,7 @@ class TemplateController extends BaseController
 
         return $this->respondItem(
             $request,
-            $template
+            $this->filterAdminProperties($request, $template)
         );
     }
 
@@ -95,7 +89,7 @@ class TemplateController extends BaseController
     {
         $pod = PodController::getPodById($request, $podId);
 
-        $templates = $this->getPodTemplates($pod);
+        $templates = $this->filterAdminProperties($request, $this->getPodTemplates($pod));
 
         return $this->respondCollection(
             $request,
@@ -223,7 +217,10 @@ class TemplateController extends BaseController
             throw new SolutionNotFoundException('Solution ID #' . $solutionId . ' not found', 'solution_id');
         }
 
-        $templates = $this->getSolutionTemplates($solution, false);
+        $templates = $this->filterAdminProperties(
+            $request,
+            $this->getSolutionTemplates($solution, false)
+        );
 
         return $this->respondCollection(
             $request,
@@ -644,5 +641,31 @@ class TemplateController extends BaseController
         }
 
         return false;
+    }
+
+    /**
+     * Filter admin properties, no model defined?
+     * @param Request $request
+     * @param $templates
+     * @return array
+     */
+    protected function filterAdminProperties(Request $request, $templates)
+    {
+        if ($request->user->isAdmin) {
+            return $templates;
+        }
+
+        if (!is_array($templates)) {
+            $templates = [$templates];
+        }
+
+        foreach ($templates as $key => $template) {
+            unset($template->type);
+            unset($template->license);
+
+            $templates[$key] = $template;
+        }
+
+        return $templates;
     }
 }
