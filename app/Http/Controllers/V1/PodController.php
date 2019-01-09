@@ -80,6 +80,7 @@ class PodController extends BaseController
         $podQuery = Pod::query();
         if (!$request->user->isAdmin) {
             $podQuery->where('ucs_datacentre_active', 'Yes');
+            $podQuery->where('ucs_datacentre_api_enabled', 'Yes');
 
             $podQuery->whereIn('ucs_datacentre_reseller_id', [0, $request->user->resellerId]);
         }
