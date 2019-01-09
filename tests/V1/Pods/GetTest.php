@@ -14,10 +14,6 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-//        $this->artisan('db:seed');
-
-        //create 2 pods
-        factory(Pod::class, 2)->create();
     }
 
     /**
@@ -26,12 +22,17 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
+        $total = rand(1, 2);
+        factory(Pod::class, $total)->create();
+
         $this->get('/v1/pods', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
 
-        $this->assertResponseStatus(200);
+        $this->assertResponseStatus(200) && $this->seeJson([
+            'total' => $total,
+        ]);
     }
 
     /**
@@ -40,7 +41,11 @@ class GetTest extends TestCase
      */
     public function testValidItem()
     {
-        $this->get('/v1/pods/1', [
+        factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+        ]);
+
+        $this->get('/v1/pods/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
@@ -61,4 +66,44 @@ class GetTest extends TestCase
 
         $this->assertResponseStatus(404);
     }
+
+    /**
+     * Test pod with api disabled is hidden
+     * @return void
+     */
+    public function testHiddenApiDisabled()
+    {
+        factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_api_enabled' => 'No',
+        ]);
+
+        $this->get('/v1/pods/123', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(404);
+    }
+
+    /**
+     * Test customer pod hidden from other users
+     * @return void
+     */
+    public function testHiddenClientPod()
+    {
+        factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_reseller_id' => 999,
+        ]);
+
+        $this->get('/v1/pods/123', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(404);
+    }
+
+
 }

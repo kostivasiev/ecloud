@@ -18,6 +18,7 @@ class CreateInitialTables extends Migration
             $table->integer('ucs_datacentre_reseller_id')->default('0');
             $table->string('ucs_datacentre_public_name');
             $table->string('ucs_datacentre_active');
+            $table->string('ucs_datacentre_api_enabled');
         });
 
 
@@ -179,10 +180,11 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('ucs_specification');
         Schema::dropIfExists('ucs_node');
         Schema::dropIfExists('reseller_lun');
-        Schema::dropIfExists('servers');
+        Schema::dropIfExists('ucs_reseller');
         Schema::dropIfExists('servers');
         Schema::dropIfExists('server_license');
         Schema::dropIfExists('server_ip_address');
         Schema::dropIfExists('server_subtype');
+        Schema::dropIfExists('metadata');
     }
 }
