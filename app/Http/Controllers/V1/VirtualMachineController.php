@@ -571,7 +571,6 @@ class VirtualMachineController extends BaseController
      * @throws Exceptions\DatabaseException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
-     * @throws Exceptions\UnauthorisedException
      * @throws ServiceUnavailableException
      */
     public function update(Request $request, IntapiService $intapiService, $vmId)
@@ -708,6 +707,18 @@ class VirtualMachineController extends BaseController
                     //capacity can be an integer or the string 'deleted'
                     //Add disks marked as deleted to automation data
                     if ($capacity == 'deleted') {
+                        if ($name == 'Hard disk 1') {
+                            // Don't allow deletion of the primary hard disk
+                            $message = 'Primary hard disk (Hard disk 1) can not be deleted';
+                            throw new Exceptions\ForbiddenException($message);
+                        }
+
+                        // Don't allow deletion of Hard disk 2 on VM's with legacy LVM
+                        if ($name == 'Hard disk 2' && $virtualMachine->hasLegacyLVM()) {
+                            $message = 'Unable to delete Hard Disk 2 on VMs with legacy LVM';
+                            throw new Exceptions\ForbiddenException($message);
+                        }
+
                         $automationData['hdd'][$name] = $diskData;
                         continue;
                     }
@@ -715,6 +726,14 @@ class VirtualMachineController extends BaseController
                     if ($capacity < $existingDisks[$name]->capacity) {
                         $message = 'We are currently unable to shrink HDD capacity, ';
                         $message .= "hdd '$name' value must be larger than {$existingDisks[$name]->capacity}GB";
+                        throw new Exceptions\ForbiddenException($message);
+                    }
+
+                    // Prevent expand of Hard disk 1 for VM's with legacy LVM
+                    if ($virtualMachine->hasLegacyLVM()
+                        && $name == 'Hard disk 1'
+                        && $capacity > $existingDisks[$name]->capacity) {
+                        $message = 'Unable to expand Disk 1 on VMs with legacy LVM';
                         throw new Exceptions\ForbiddenException($message);
                     }
 
