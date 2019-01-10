@@ -89,7 +89,6 @@ class TagController extends BaseController
         if (!$tag->save()) {
             // todo log and error
         }
-        //exit('test');
 
         return $this->respondSave(
             $request,
