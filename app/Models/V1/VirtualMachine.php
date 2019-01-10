@@ -861,4 +861,20 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
         return $this->server_license_friendly_name;
     }
+
+    /**
+     * Check if the VM has a legacy LVM (Logical Volume Manager)
+     * Legacy LVM's require 'Hard disk 1' & 'Hard disk 2' to be undeletable.
+     */
+    public function hasLegacyLVM()
+    {
+        if ($this->servers_platform != 'Linux') {
+            return false;
+        }
+
+        $v2GoLiveDate = new \DateTime('2017-11-16 07:30:00');
+        $installationDate = new \DateTime($this->servers_installation_date);
+
+        return ($installationDate < $v2GoLiveDate);
+    }
 }
