@@ -83,6 +83,7 @@ class VirtualMachineController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\UnauthorisedException
      * @throws InsufficientResourceException
      * @throws IntapiServiceException
      * @throws ServiceResponseException
@@ -118,6 +119,10 @@ class VirtualMachineController extends BaseController
             'site_id' => ['nullable', 'integer'],
 
             'tags' => ['nullable', 'array'],
+
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+
+            'ssh_keys' => ['nullable', 'array']
         ];
 
         if ($request->input('environment') == 'Public') {
@@ -125,12 +130,6 @@ class VirtualMachineController extends BaseController
             // todo public iops
         } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
-        }
-
-        if ($request->has('name')) {
-            $rules['name'] = [
-                'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'
-            ];
         }
 
         if ($request->has('tags')) {
@@ -148,7 +147,6 @@ class VirtualMachineController extends BaseController
         }
 
         $this->validate($request, $rules);
-
 
         // environment specific validation
         $minCpu = VirtualMachine::MIN_CPU;
@@ -243,9 +241,16 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
-        // set initial _post data
+        //If admin reseller scope is 0, we won't know the reseller id for Public VM's
+        if (empty($solution) && empty($request->user->resellerId)) {
+            if ($request->user->isAdmin) {
+                throw new Exceptions\BadRequestException('Missing Reseller scope');
+            }
+            throw new Exceptions\UnauthorisedException('Unable to determine reseller id');
+        }
+
         $post_data = array(
-            'reseller_id' => $request->user->resellerId,
+            'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user->resellerId,
             'ecloud_type' => $request->input('environment'),
             'ucs_reseller_id' => $request->input('solution_id'),
             'server_active' => true,
@@ -258,6 +263,12 @@ class VirtualMachineController extends BaseController
             'launched_by' => '-5',
         );
 
+        if ($request->has('ssh_keys')) {
+            if ($template->platform != 'Linux') {
+                throw new Exceptions\BadRequestException("ssh_keys only supported for Linux VM's at this time");
+            }
+            $post_data['ssh_keys'] = $request->input('ssh_keys');
+        }
 
         // set template
         $post_data['platform'] = $template->platform;
@@ -274,7 +285,6 @@ class VirtualMachineController extends BaseController
         if ($request->has('template_password')) {
             $post_data['template_password'] = $request->input('template_password');
         }
-
 
         // set compute
         $post_data['cpus'] = $request->input('cpu');
