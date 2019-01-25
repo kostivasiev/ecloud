@@ -83,6 +83,7 @@ class VirtualMachineController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\UnauthorisedException
      * @throws InsufficientResourceException
      * @throws IntapiServiceException
      * @throws ServiceResponseException
@@ -266,8 +267,7 @@ class VirtualMachineController extends BaseController
             if ($template->platform != 'Linux') {
                 throw new Exceptions\BadRequestException("ssh_keys only supported for Linux VM's at this time");
             }
-
-           $post_data['ssh_keys'] = $request->input('ssh_keys');
+            $post_data['ssh_keys'] = $request->input('ssh_keys');
         }
 
         // set template
