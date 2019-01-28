@@ -18,6 +18,7 @@ stages:
 - Build
 - Standards
 - Tests
+- Deploy
 
 check_syntax:
   stage: Build
@@ -33,17 +34,18 @@ check_syntax:
     - ls -lha vendor
     - '! find . -path ./vendor -prune -o -type f -name "*.php" -exec php -l "{}" \; | grep -iv "No syntax errors detected";'
 
-unit_tests:
-  stage: Tests
+debugging_check:
+  stage: Standards
   tags:
-  - rnd
-  - php
+    - rnd
+    - php
   artifacts:
     expire_in: 10 mins
     paths:
     - vendor/
   script:
-  - vendor/bin/phpunit --coverage-text --colors=never
+  - export PHP_FILES=$(git diff --diff-filter=d --name-only master | grep '.php')
+  - 'if [ -n "$PHP_FILES" ]; then ! echo "$PHP_FILES" | xargs grep -irnP "\bprint_r\s*\((?!.*,.*).*\)|\b(?:var_dump|dd)\s*\(.*\)"; fi'
 
 php_cs:
   stage: Standards
@@ -70,15 +72,35 @@ php_md:
   script:
   - vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml
 
-debugging_check:
-  stage: Standards
+unit_tests:
+  stage: Tests
   tags:
-    - rnd
-    - php
+  - rnd
+  - php
   artifacts:
     expire_in: 10 mins
     paths:
     - vendor/
   script:
-  - export PHP_FILES=$(git diff --diff-filter=d --name-only master | grep '.php')
-  - 'if [ -n "$PHP_FILES" ]; then ! echo "$PHP_FILES" | xargs grep -irnP "\bprint_r\s*\((?!.*,.*).*\)|\b(?:var_dump|dd)\s*\(.*\)"; fi'
+  - vendor/bin/phpunit --coverage-text --colors=never
+
+deploy_production:
+  stage: Deploy
+  tags:
+  - rnd
+  - php
+  cache: {}
+  dependencies: []
+  before_script: []
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - curl -sLf -XPOST -d "site_id=$CVS_SITE_ID&golive_hash=${CI_COMMIT_SHA}" https://$INTAPI_USER:$INTAPI_PASS@intapi.ukfast.co.uk/repository/schedule-deployment
+  environment:
+    name: production
+    url: https://api.ukfast.io/${CI_PROJECT_NAME}
+  only:
+    - tags
+  except:
+    - branches
+
