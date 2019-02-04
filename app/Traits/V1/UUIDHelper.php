@@ -40,8 +40,10 @@ trait UUIDHelper
     public function scopeWithUuid($query, $uuid)
     {
         $uuidColumnName = $this->getUuidColumnName();
-
+// @codingStandardsIgnoreStart
         $query->where($uuidColumnName, '=', $uuid);
+// @codingStandardsIgnoreEnd
+        exit(print_r($query->toSql()));
 
         return $query;
     }
