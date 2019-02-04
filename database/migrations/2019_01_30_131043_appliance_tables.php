@@ -41,7 +41,6 @@ class ApplianceTables extends Migration
         Schema::create('appliance_script_parameters', function (Blueprint $table) {
             $table->increments('appliance_script_parameter_id');
             $table->string('appliance_script_parameter_uuid');
-            $table->integer('appliance_script_parameter_appliance_id');
             $table->integer('appliance_script_parameter_appliance_version_id');
             $table->enum('appliance_Script_parameter_type', ['String','Numeric','Boolean','Array','Password','Date','DateTime'])->default('String');
             $table->enum('appliance_script_parameter_required', ['Yes', 'No'])->default('Yes');

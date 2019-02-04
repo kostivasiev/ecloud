@@ -121,3 +121,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('pods/{pod_id}/templates', 'TemplateController@podTemplates');
     // todo datastores
 });
+
+
+// Appliances
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->get('appliances', 'ApplianceController@index');
+    $router->get('appliances/{appliance_uuid}', 'ApplianceController@show');
+});
