@@ -98,5 +98,4 @@ class ApplianceController extends BaseController
 
         return $applianceQuery;
     }
-
 }

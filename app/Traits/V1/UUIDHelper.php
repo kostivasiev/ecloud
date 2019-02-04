@@ -18,7 +18,8 @@ trait UUIDHelper
      * @return bool
      * @throws \Exception
      */
-    public function save(array $options = []) {
+    public function save(array $options = [])
+    {
 
         $uuidColumn = $this->getUuidColumnName();
 
@@ -38,9 +39,7 @@ trait UUIDHelper
      */
     public function scopeWithUuid($query, $uuid)
     {
-        if (!empty($uuid)) {
-            $query->where($this->getUuidColumnName(), $uuid);
-        }
+        $query->where($this->getUuidColumnName(),  '=',  $uuid);
 
         return $query;
     }
@@ -55,5 +54,4 @@ trait UUIDHelper
     {
         return (isset($this->uuidColumn) ? $this->uuidColumn :  "{$this->table}_uuid");
     }
-
 }

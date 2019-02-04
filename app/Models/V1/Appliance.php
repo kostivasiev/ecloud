@@ -2,7 +2,7 @@
 
 namespace App\Models\V1;
 
-use App\Traits\V1\ColumnPrefix;
+use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Filter;
 class Appliance extends Model implements Filterable, Sortable
 {
     // Table columns have table name prefixes
-    use ColumnPrefix;
+    use ColumnPrefixHelper;
 
     // Table uses UUID's
     use UUIDHelper;

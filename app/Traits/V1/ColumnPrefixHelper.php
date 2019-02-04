@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
  * Works for both accessing and setting model attributes.
  *
  */
-trait ColumnPrefix
+trait ColumnPrefixHelper
 {
     /**
      * @var bool
