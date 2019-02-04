@@ -116,6 +116,34 @@ class Appliance extends Model implements Filterable, Sortable
 
 
     /**
+     * The attributes included in the model's JSON form.
+     * Admin scope / everything
+     *
+     * @var array
+     */
+    protected $visible = [
+        'appliance_uuid',
+        'appliance_name',
+        'appliance_logo_uri',
+        'appliance_description',
+        'appliance_documentation_uri',
+        'appliance_publisher',
+        'appliance_active'
+    ];
+
+    /**
+     * Restrict visibility for non-admin
+     */
+    const VISIBLE_SCOPE_RESELLER = [
+        'appliance_uuid',
+        'appliance_name',
+        'appliance_logo_uri',
+        'appliance_description',
+        'appliance_documentation_uri',
+        'appliance_publisher'
+    ];
+
+    /**
      * Resource package
      * Map request property to database field
      *
@@ -130,19 +158,7 @@ class Appliance extends Model implements Filterable, Sortable
             StringProperty::create('appliance_description', 'description'),
             StringProperty::create('appliance_documentation_uri', 'documentation_uri'),
             StringProperty::create('appliance_publisher', 'publisher'),
-            BooleanProperty::create('appliance_active', 'active')
+            BooleanProperty::create('appliance_active', 'active', null, 'Yes', 'No')
         ];
     }
-
-
-    /**
-     * Mutate the appliance_active property to a boolean
-     * @param $value
-     * @return bool
-     */
-    public function getApplianceActiveAttribute($value)
-    {
-        return ($value != 'No');
-    }
-
 }

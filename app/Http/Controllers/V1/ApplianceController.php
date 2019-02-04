@@ -25,7 +25,7 @@ class ApplianceController extends BaseController
      */
     public function index(Request $request)
     {
-        $collectionQuery = static::getApplianceQuery();
+        $collectionQuery = static::getApplianceQuery($request);
 
         (new QueryTransformer($request))
             ->config(Appliance::class)
@@ -35,7 +35,11 @@ class ApplianceController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $appliances
+            $appliances,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : Appliance::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -51,19 +55,24 @@ class ApplianceController extends BaseController
     {
         return $this->respondItem(
             $request,
-            static::getApplianceByUuid($applianceUuid)
+            static::getApplianceByUuid($request, $applianceUuid),
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : Appliance::VISIBLE_SCOPE_RESELLER
         );
     }
 
     /**
      * Load an appliance by UUID
+     * @param Request $request
      * @param $uuid
      * @return mixed
      * @throws ApplianceNotFoundException
      */
-    public static function getApplianceByUuid($uuid)
+    public static function getApplianceByUuid(Request $request, $uuid)
     {
-        $appliance = static::getApplianceQuery()->withUuid($uuid)->first();
+        $appliance = static::getApplianceQuery($request)->withUuid($uuid)->first();
 
         if (is_null($appliance)) {
             throw new ApplianceNotFoundException("Appliance with ID '$uuid' was not found", 'id');
@@ -71,14 +80,20 @@ class ApplianceController extends BaseController
 
         return $appliance;
     }
+
     /**
      * Get appliances query builder
+     * @param $request
      * @return mixed
      */
-    public static function getApplianceQuery()
+    public static function getApplianceQuery($request)
     {
         $applianceQuery = Appliance::query();
-        $applianceQuery->where('appliance_active', 'Yes');
+
+        if ($request->user->resellerId != 0) {
+            $applianceQuery->where('appliance_active', 'Yes');
+        }
+
         $applianceQuery->whereNull('appliance_deleted_at');
 
         return $applianceQuery;
