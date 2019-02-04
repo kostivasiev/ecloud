@@ -36,14 +36,13 @@ trait UUIDHelper
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string $uuid
      * @return \Illuminate\Database\Eloquent\Builder $query
+     * // @codingStandardsIgnoreEnd
      */
     public function scopeWithUuid($query, $uuid)
     {
         $uuidColumnName = $this->getUuidColumnName();
-// @codingStandardsIgnoreStart
+
         $query->where($uuidColumnName, '=', $uuid);
-// @codingStandardsIgnoreEnd
-        exit(print_r($query->toSql()));
 
         return $query;
     }
