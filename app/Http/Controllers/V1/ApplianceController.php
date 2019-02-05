@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
+use UKFast\Api\Exceptions\DatabaseException;
+use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -62,6 +64,51 @@ class ApplianceController extends BaseController
             ($this->isAdmin) ? null : Appliance::VISIBLE_SCOPE_RESELLER
         );
     }
+
+
+    /**
+     * Create appliance resource
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     */
+    public function create(Request $request)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException('Only UKFast can publish appliances at this time.');
+        }
+
+        $this->validate($request, [
+            'name' => ['required', 'string', 'max:255'],
+            'logo_uri' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'documentation_uri' => ['nullable', 'string'],
+            'publisher' => ['nullable', 'string', 'max:255'],
+            'active' => ['nullable', 'boolean']
+        ]);
+
+        // Save the record
+        $appliance = $this->receiveItem($request, Appliance::class);
+
+        if (!$appliance->save()) {
+            throw new DatabaseException('Failed to save appliance record.');
+        }
+
+        return $this->respondSave(
+            $request,
+            $appliance,
+            201,
+            null,
+            [],
+            [],
+            $request->path() . '/' . $appliance->getUuid()
+        );
+    }
+
 
     /**
      * Load an appliance by UUID

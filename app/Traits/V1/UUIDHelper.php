@@ -20,11 +20,10 @@ trait UUIDHelper
      */
     public function save(array $options = [])
     {
+        $uuidColumnName = $this->getUuidColumnName();
 
-        $uuidColumn = $this->getUuidColumnName();
-
-        if (empty($this->{$uuidColumn})) {
-            $this->{$uuidColumn} = Uuid::uuid4()->toString();
+        if (empty($this->{$uuidColumnName})) {
+            $this->{$uuidColumnName} = Uuid::uuid4()->toString();
         }
 
         return parent::save($options);
@@ -36,11 +35,12 @@ trait UUIDHelper
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string $uuid
      * @return \Illuminate\Database\Eloquent\Builder $query
-     * // @codingStandardsIgnoreEnd
+     *
      */
     public function scopeWithUuid($query, $uuid)
     {
         $uuidColumnName = $this->getUuidColumnName();
+        // Suppress codesniffer warning as we're using using PDO prepared statements in the background anyway
         //@codingStandardsIgnoreStart
         $query->where($uuidColumnName, '=', $uuid);
         //@codingStandardsIgnoreEnd
@@ -56,5 +56,14 @@ trait UUIDHelper
     protected function getUuidColumnName()
     {
         return (isset($this->uuidColumn) ? $this->uuidColumn :  $this->table . "_uuid");
+    }
+
+    /**
+     * Get the value of the UUID column
+     */
+    public function getUuid()
+    {
+        $uuidColumnName = $this->getUuidColumnName();
+        return $this->{$uuidColumnName};
     }
 }

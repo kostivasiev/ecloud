@@ -127,4 +127,6 @@ $router->group($baseRouteParameters, function () use ($router) {
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliances', 'ApplianceController@index');
     $router->get('appliances/{appliance_uuid}', 'ApplianceController@show');
+
+    $router->post('appliances', 'ApplianceController@create');
 });
