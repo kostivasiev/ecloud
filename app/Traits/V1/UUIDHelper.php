@@ -43,7 +43,7 @@ trait UUIDHelper
         $uuidColumnName = $this->getUuidColumnName();
         //@codingStandardsIgnoreStart
         $query->where($uuidColumnName, '=', $uuid);
-        //@codingStandardsIgnoreStart
+        //@codingStandardsIgnoreEnd
         return $query;
     }
 
