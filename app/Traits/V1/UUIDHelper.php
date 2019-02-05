@@ -55,6 +55,6 @@ trait UUIDHelper
      */
     protected function getUuidColumnName()
     {
-        return (isset($this->uuidColumn) ? $this->uuidColumn :  "{$this->table}_uuid");
+        return (isset($this->uuidColumn) ? $this->uuidColumn :  $this->table . "_uuid");
     }
 }
