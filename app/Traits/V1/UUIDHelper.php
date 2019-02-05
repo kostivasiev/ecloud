@@ -41,9 +41,9 @@ trait UUIDHelper
     public function scopeWithUuid($query, $uuid)
     {
         $uuidColumnName = $this->getUuidColumnName();
-
+        //@codingStandardsIgnoreStart
         $query->where($uuidColumnName, '=', $uuid);
-
+        //@codingStandardsIgnoreStart
         return $query;
     }
 
@@ -53,7 +53,7 @@ trait UUIDHelper
      * Note: Assumes table_name.table_name_uuid unless told otherwise
      * @return string
      */
-    public function getUuidColumnName()
+    protected function getUuidColumnName()
     {
         return (isset($this->uuidColumn) ? $this->uuidColumn :  "{$this->table}_uuid");
     }
