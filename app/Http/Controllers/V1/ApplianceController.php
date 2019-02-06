@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
+use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -49,15 +50,17 @@ class ApplianceController extends BaseController
      * Get a singe Appliance resource
      *
      * @param Request $request
-     * @param $applianceUuid
+     * @param $applianceId
      * @return \Illuminate\Http\Response
      * @throws ApplianceNotFoundException
      */
-    public function show(Request $request, $applianceUuid)
+    public function show(Request $request, $applianceId)
     {
+        $this->validateUuid($request, $applianceId);
+
         return $this->respondItem(
             $request,
-            static::getApplianceByUuid($request, $applianceUuid),
+            static::getApplianceById($request, $applianceId),
             200,
             null,
             [],
@@ -82,18 +85,17 @@ class ApplianceController extends BaseController
             throw new ForbiddenException('Only UKFast can publish appliances at this time.');
         }
 
-        $this->validate($request, [
-            'name' => ['required', 'string', 'max:255'],
-            'logo_uri' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'documentation_uri' => ['nullable', 'string'],
-            'publisher' => ['nullable', 'string', 'max:255'],
-            'active' => ['nullable', 'boolean']
-        ]);
+        $this->validate($request, Appliance::$rules);
 
-        // Save the record
+        //Receive the user data
         $appliance = $this->receiveItem($request, Appliance::class);
 
+        // Default the publisher to UKFast
+        if (!$request->has('publisher')) {
+            $appliance->resource->publisher = 'UKFast';
+        }
+
+        // Save the record
         if (!$appliance->save()) {
             throw new DatabaseException('Failed to save appliance record.');
         }
@@ -101,28 +103,71 @@ class ApplianceController extends BaseController
         return $this->respondSave(
             $request,
             $appliance,
-            201,
-            null,
-            [],
-            [],
-            $request->path() . '/' . $appliance->getUuid()
+            201
         );
+    }
+
+    /**
+     * Update an application resource
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
+    public function update(Request $request, $applianceId)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException('Only UKFast can update appliances at this time.');
+        }
+
+        $rules = Appliance::$rules;
+        $rules = array_merge(
+            $rules,
+            [
+                'name' => ['nullable', 'max:255'],
+                'id' => [new IsValidUuid()]
+            ]
+        );
+
+        $request['id'] = $applianceId;
+        $this->validate($request, $rules);
+
+        $appliance = $this->receiveItem($request, Appliance::class);
+
+        if (!$appliance->resource->save()) {
+            throw new DatabaseException('Could not update appliance');
+        }
+
+        return $this->respondEmpty();
+    }
+
+
+    /**
+     * Validate the appliance UUID
+     * @param $request
+     * @param $uuid
+     */
+    public function validateUuid($request, $uuid)
+    {
+        $request['id'] = $uuid;
+        $this->validate($request, ['appliance_id' => [new IsValidUuid()]]);
     }
 
 
     /**
      * Load an appliance by UUID
      * @param Request $request
-     * @param $uuid
+     * @param $applianceId
      * @return mixed
      * @throws ApplianceNotFoundException
      */
-    public static function getApplianceByUuid(Request $request, $uuid)
+    public static function getApplianceById(Request $request, $applianceId)
     {
-        $appliance = static::getApplianceQuery($request)->withUuid($uuid)->first();
+        $appliance = static::getApplianceQuery($request)->find($applianceId);
 
         if (is_null($appliance)) {
-            throw new ApplianceNotFoundException("Appliance with ID '$uuid' was not found", 'id');
+            throw new ApplianceNotFoundException("Appliance with ID '$applianceId' was not found", 'id');
         }
 
         return $appliance;

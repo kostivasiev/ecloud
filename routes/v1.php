@@ -126,7 +126,8 @@ $router->group($baseRouteParameters, function () use ($router) {
 // Appliances
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliances', 'ApplianceController@index');
-    $router->get('appliances/{appliance_uuid}', 'ApplianceController@show');
+    $router->get('appliances/{appliance_id}', 'ApplianceController@show');
 
     $router->post('appliances', 'ApplianceController@create');
+    $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
 });

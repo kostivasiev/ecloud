@@ -9,7 +9,7 @@
     "ext-json": "*",
     "laravel/lumen-framework": "5.5.*",
     "vlucas/phpdotenv": "~2.2",
-    "ukfast/api-resources": "^3.1.4",
+    "ukfast/api-resources": "^4.0.3",
     "ukfast/api-exceptions": "^2.2",
     "ukfast/api-helper-datetime": "^2.0.1",
     "ukfast/api-auth": "^2.1",
@@ -89,10 +89,6 @@
     {
       "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/validation.git"
-    },
-    {
-      "type": "vcs",
-      "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/helpers/encryption-helper.git"
     }
   ]
 }

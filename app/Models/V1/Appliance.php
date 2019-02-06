@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\StringProperty;
+use UKFast\Api\Resource\Property\IdProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -28,7 +29,10 @@ class Appliance extends Model implements Filterable, Sortable
 
     protected $table = 'appliance';
 
-    protected $primaryKey = 'appliance_id';
+    // Use UUID as primary key
+    protected $primaryKey = 'appliance_uuid';
+    // Don't increment the primary key for UUID's
+    public $incrementing = false;
 
     // Automatically manage our timestamps
     public $timestamps = true;
@@ -36,6 +40,16 @@ class Appliance extends Model implements Filterable, Sortable
     const CREATED_AT = 'appliance_created_at';
 
     const UPDATED_AT = 'appliance_updated_at';
+
+    // Validation Rules
+    public static $rules = [
+        'name' => ['required',  'max:255'],
+        'logo_uri' => ['nullable', 'max:255'],
+        'description' => ['nullable'],
+        'documentation_uri' => ['nullable'],
+        'publisher' => ['nullable', 'max:255'],
+        'active' => ['nullable', 'boolean']
+    ];
 
 
     /**
@@ -50,9 +64,9 @@ class Appliance extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id' => 'appliance_uuid', //UUIDHelper, not internal id
+            'id' => 'appliance_uuid', //UUID, not internal id
             'name' => 'appliance_name',
-            'logo_uri' => 'appliance_logo_url',
+            'logo_uri' => 'appliance_logo_uri',
             'description' => 'appliance_description',
             'documentation_uri' => 'appliance_documentation_uri',
             'publisher' => 'appliance_publisher',
@@ -148,11 +162,12 @@ class Appliance extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {
         return [
-            StringProperty::create('appliance_uuid', 'id'),
+            IdProperty::create('appliance_uuid', 'id', null, 'uuid'),
             StringProperty::create('appliance_name', 'name'),
             StringProperty::create('appliance_logo_uri', 'logo_uri'),
             StringProperty::create('appliance_description', 'description'),
