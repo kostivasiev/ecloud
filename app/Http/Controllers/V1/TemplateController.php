@@ -586,7 +586,7 @@ class TemplateController extends BaseController
             }
 
             // base templates use friendly names
-            $template = $TemplateController->findTemplateBy('operating_system', $name, $templates);
+            $template = $TemplateController->findTemplateBy('name', $name, $templates);
             if ($template) {
                 return $template;
             }
