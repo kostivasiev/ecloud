@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 
 use App\Services\IntapiService;
 use App\Exceptions\V1\IntapiServiceException;
+use App\Exceptions\V1\ServiceUnavailableException;
 
 use App\Models\V1\Firewall;
 use App\Exceptions\V1\FirewallNotFoundException;
@@ -89,6 +90,7 @@ class FirewallController extends BaseController
      * @param $firewallId
      * @return Response
      * @throws FirewallNotFoundException
+     * @throws ServiceUnavailableException
      */
     public function getFirewallConfig(Request $request, IntapiService $intapiService, $firewallId)
     {
@@ -97,9 +99,8 @@ class FirewallController extends BaseController
         try {
             $firewallConfig = $intapiService->getFirewallConfig($firewallId);
         } catch (IntapiServiceException $exception) {
-            throw new FirewallNotFoundException(
-                'Firewall ID #' . $firewallId . ' not found',
-                'firewall_id'
+            throw new ServiceUnavailableException(
+                'Firewall ID #' . $firewallId . ' config temporarily unavailable'
             );
         }
 

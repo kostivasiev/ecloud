@@ -169,7 +169,7 @@ class IntapiService
         }
 
         if (!$this->responseData->result) {
-            throw new IntapiServiceException(end($this->responseData->result));
+            throw new IntapiServiceException(end($this->responseData->errorset));
         }
 
         return $this->responseData->config;
