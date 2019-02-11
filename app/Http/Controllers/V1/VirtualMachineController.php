@@ -32,6 +32,7 @@ use App\Exceptions\V1\ServiceTimeoutException;
 use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Exceptions\V1\InsufficientResourceException;
+use Log;
 
 class VirtualMachineController extends BaseController
 {
@@ -585,6 +586,13 @@ class VirtualMachineController extends BaseController
      */
     public function update(Request $request, IntapiService $intapiService, $vmId)
     {
+        /**
+         * This endpoint should be using HTTP PATCH, log if we detect any PUT requests.
+         */
+        if ($request->method() == 'PUT') {
+            Log::notice('Call to update VM endpoint using PUT detected. Request should be using PATCH');
+        }
+
         $rules = [
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'cpu' => ['nullable', 'integer'],

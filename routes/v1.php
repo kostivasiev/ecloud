@@ -22,7 +22,15 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('vms', 'VirtualMachineController@create');
 
     $router->get('vms/{vmId}', 'VirtualMachineController@show');
+
+    /**
+     * @deprecated
+     * We are replacing the PUT /vms/{vmId} endpoint with PATCH as it's a partial resource update.
+     * The PUT endpoint is to be removed once we are happy nobody is using it. Have added some logging to monitor usage.
+     */
     $router->put('vms/{vmId}', 'VirtualMachineController@update');
+    $router->patch('vms/{vmId}', 'VirtualMachineController@update');
+
     $router->delete('vms/{vmId}', 'VirtualMachineController@destroy');
 
     $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
