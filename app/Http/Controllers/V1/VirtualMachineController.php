@@ -698,7 +698,7 @@ class VirtualMachineController extends BaseController
         $existingDisks = [];
         if ($disks !== false) {
             foreach ($disks as $disk) {
-                $existingDisks[$disk->name] = $disk;
+                $existingDisks[$disk->uuid] = $disk;
             }
         }
 
@@ -707,91 +707,105 @@ class VirtualMachineController extends BaseController
         $totalCapacity = 0;
 
         if ($request->has('hdd')) {
-            foreach ($request->input('hdd') as $name => $capacity) {
-                if (!is_numeric($capacity) && $capacity != 'deleted') {
-                    throw new Exceptions\BadRequestException("Unexpected hdd_value for '$name'");
+            $newDisksCount = 0;
+            foreach ($request->input('hdd') as $hdd) {
+                $hdd = (object) $hdd;
+
+                $isExistingDisk = false;
+                if (isset($hdd->uuid)) {
+                    // existing disks
+                    $isExistingDisk = array_key_exists($hdd->uuid, $existingDisks);
+                    if (!$isExistingDisk) {
+                        throw new Exceptions\BadRequestException("HDD with UUID '$hdd->uuid' was not found");
+                    }
                 }
 
-                $diskData = new \stdClass();
-                $diskData->name = $name;
-                $diskData->capacity = $capacity;
-
-                // existing disks
-                $isExistingDisk = array_key_exists($name, $existingDisks);
                 if ($isExistingDisk) {
-                    // For existing disks add the disk UUID
-                    $diskData->uuid = $existingDisks[$name]->uuid;
+                    $hdd->name = $existingDisks[$hdd->uuid]->name;
 
-                    //capacity can be an integer or the string 'deleted'
-                    //Add disks marked as deleted to automation data
-                    if ($capacity == 'deleted') {
-                        if ($name == 'Hard disk 1') {
+                    //Add disks marked as deleted (state = 'absent') to automation data
+                    if (isset($hdd->state) && $hdd->state == 'absent') {
+                        if ($hdd->name == 'Hard disk 1' || ($hdd->uuid == $disks[0]->uuid)) {
                             // Don't allow deletion of the primary hard disk
                             $message = 'Primary hard disk (Hard disk 1) can not be deleted';
                             throw new Exceptions\ForbiddenException($message);
                         }
 
                         // Don't allow deletion of Hard disk 2 on VM's with legacy LVM
-                        if ($name == 'Hard disk 2' && $virtualMachine->hasLegacyLVM()) {
+                        if ($hdd->name == 'Hard disk 2' && $virtualMachine->hasLegacyLVM()) {
                             $message = 'Unable to delete Hard Disk 2 on VMs with legacy LVM';
                             throw new Exceptions\ForbiddenException($message);
                         }
 
-                        $automationData['hdd'][$name] = $diskData;
+                        $hdd->capacity = 'deleted';
+                        $automationData['hdd'][$hdd->name] = $hdd;
                         continue;
                     }
 
-                    if ($capacity < $existingDisks[$name]->capacity) {
+                    //Non-deleted disks
+                    if (!is_numeric($hdd->capacity)) {
+                        throw new Exceptions\BadRequestException("Invalid capacity for HDD '$hdd->uuid'");
+                    }
+
+                    if ($hdd->capacity < $existingDisks[$hdd->uuid]->capacity) {
                         $message = 'We are currently unable to shrink HDD capacity, ';
-                        $message .= "hdd '$name' value must be larger than {$existingDisks[$name]->capacity}GB";
+                        $message .= "HDD '$hdd->uuid' value must be larger than {$existingDisks[$hdd->uuid]->capacity}GB";
                         throw new Exceptions\ForbiddenException($message);
                     }
 
                     // Prevent expand of Hard disk 1 for VM's with legacy LVM
                     if ($virtualMachine->hasLegacyLVM()
-                        && $name == 'Hard disk 1'
-                        && $capacity > $existingDisks[$name]->capacity) {
-                        $message = 'Unable to expand Disk 1 on VMs with legacy LVM';
+                        && $hdd->name == 'Hard disk 1'
+                        && $hdd->capacity > $existingDisks[$hdd->uuid]->capacity) {
+                        $message = 'Unable to expand Hard Disk 1 on VMs with legacy LVM';
                         throw new Exceptions\ForbiddenException($message);
                     }
 
                     //disk isn't changed
-                    if ($capacity == $existingDisks[$name]->capacity) {
-                        $totalCapacity += $capacity;
-                        $automationData['hdd'][$name] = $diskData;
+                    if ($hdd->capacity == $existingDisks[$hdd->uuid]->capacity) {
+                        $totalCapacity += $hdd->capacity;
+                        $hdd->state = 'present'; // For when we update the automation
+                        $automationData['hdd'][$hdd->name] = $hdd;
                         continue;
                     }
                 }
 
                 // New disks must be prefixed with 'New '
-                if (!$isExistingDisk && strpos($name, 'New ') === false) {
-                    //TODO: Potentially we don't need this check as existing disks will have a UUID
-                    throw new Exceptions\ForbiddenException("Non-existent disks names must be prefixed with 'New '");
+                if (!$isExistingDisk) {
+                    // For now, we still need hdd in the automation data  to be prefixed with 'New '
+                    // The number does not indicate future designation for the disk & is just used
+                    // for logging in the automation process.
+                    $hdd->name = 'New disk ' . ++$newDisksCount;
                 }
 
-                if ($capacity < $minHdd) {
-                    throw new Exceptions\ForbiddenException("hdd '$name' value must be {$minHdd}GB or larger");
+                if ($hdd->capacity < $minHdd) {
+                    throw new Exceptions\ForbiddenException("HDD '$hdd->uuid' value must be {$minHdd}GB or larger");
                 }
 
-                if ($capacity > $maxHdd) {
-                    throw new Exceptions\ForbiddenException("hdd '$name' value must be {$maxHdd}GB or smaller");
+                if ($hdd->capacity > $maxHdd) {
+                    throw new Exceptions\ForbiddenException("HDD '$hdd->uuid' value must be {$maxHdd}GB or smaller");
                 }
 
-                $totalCapacity += $capacity;
+                $totalCapacity += $hdd->capacity;
 
-                $automationData['hdd'][$name] = $diskData;
+                $hdd->state = 'present'; // For when we update the automation
+                $automationData['hdd'][$hdd->name] = $hdd;
             }
         }
 
-        // Add any unspecified disks to our automation data as we want to send the complete required Storage state
-        $unchangedDisks = array_diff_key($existingDisks, $automationData['hdd']);
+        $unchangedDisks = $existingDisks;
+        if (!empty($automationData['hdd'])) {
+            // Add any unspecified disks to our automation data as we want to send the complete required Storage state
+            $unchangedDisks = array_diff_key($existingDisks, array_flip(array_column($automationData['hdd'], 'uuid')));
+        }
 
-        foreach ($unchangedDisks as $diskName => $disk) {
+        foreach ($unchangedDisks as $disk) {
             $diskData = new \stdClass();
             $diskData->name = $disk->name;
             $diskData->capacity = $disk->capacity;
             $diskData->uuid = $disk->uuid;
-            $automationData['hdd'][$diskName] = $diskData;
+            $diskData->state = 'present';
+            $automationData['hdd'][$disk->name] = $diskData;
             $totalCapacity += $diskData->capacity;
         }
 
