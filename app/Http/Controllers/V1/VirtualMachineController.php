@@ -716,7 +716,7 @@ class VirtualMachineController extends BaseController
                     // existing disks
                     $isExistingDisk = array_key_exists($hdd->uuid, $existingDisks);
                     if (!$isExistingDisk) {
-                        throw new Exceptions\BadRequestException("HDD with UUID '$hdd->uuid' was not found");
+                        throw new Exceptions\BadRequestException("HDD with UUID '" . $hdd->uuid . "' was not found");
                     }
                 }
 
@@ -744,12 +744,13 @@ class VirtualMachineController extends BaseController
 
                     //Non-deleted disks
                     if (!is_numeric($hdd->capacity)) {
-                        throw new Exceptions\BadRequestException("Invalid capacity for HDD '$hdd->uuid'");
+                        throw new Exceptions\BadRequestException("Invalid capacity for HDD '" . $hdd->uuid . "'");
                     }
 
                     if ($hdd->capacity < $existingDisks[$hdd->uuid]->capacity) {
                         $message = 'We are currently unable to shrink HDD capacity, ';
-                        $message .= "HDD '$hdd->uuid' value must be larger than {$existingDisks[$hdd->uuid]->capacity}GB";
+                        $message .= "HDD '" . $hdd->uuid . "' value must be larger than";
+                        $message .= $existingDisks[$hdd->uuid]->capacity . "GB";
                         throw new Exceptions\ForbiddenException($message);
                     }
 
@@ -779,11 +780,15 @@ class VirtualMachineController extends BaseController
                 }
 
                 if ($hdd->capacity < $minHdd) {
-                    throw new Exceptions\ForbiddenException("HDD '$hdd->uuid' value must be {$minHdd}GB or larger");
+                    throw new Exceptions\ForbiddenException(
+                        "HDD '" . $hdd->uuid . "' value must be {$minHdd}GB or larger"
+                    );
                 }
 
                 if ($hdd->capacity > $maxHdd) {
-                    throw new Exceptions\ForbiddenException("HDD '$hdd->uuid' value must be {$maxHdd}GB or smaller");
+                    throw new Exceptions\ForbiddenException(
+                        "HDD '" . $hdd->uuid . "' value must be {$maxHdd}GB or smaller"
+                    );
                 }
 
                 $totalCapacity += $hdd->capacity;
