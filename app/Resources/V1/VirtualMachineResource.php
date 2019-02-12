@@ -56,6 +56,7 @@ class VirtualMachineResource extends CustomResource
             foreach ($disks as $disk) {
                 $hdd = new \StdClass();
                 $hdd->name = $disk->name;
+                $hdd->uuid = $disk->uuid;
                 $hdd->capacity = $disk->capacity;
                 $hdds[] = $hdd;
             }
