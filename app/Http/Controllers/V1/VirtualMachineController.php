@@ -597,7 +597,7 @@ class VirtualMachineController extends BaseController
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'cpu' => ['nullable', 'integer'],
             'ram' => ['nullable', 'integer'],
-            'hdd' => ['nullable', 'array'],
+            'hdd_disks' => ['nullable', 'array'],
         ];
 
         $this->validateVirtualMachineId($request, $vmId);
