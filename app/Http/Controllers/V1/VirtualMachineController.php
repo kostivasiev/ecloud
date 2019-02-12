@@ -706,9 +706,9 @@ class VirtualMachineController extends BaseController
         $automationData['hdd'] = [];
         $totalCapacity = 0;
 
-        if ($request->has('hdd')) {
+        if ($request->has('hdd_disks')) {
             $newDisksCount = 0;
-            foreach ($request->input('hdd') as $hdd) {
+            foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object) $hdd;
 
                 $isExistingDisk = false;
