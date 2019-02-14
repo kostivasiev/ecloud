@@ -36,6 +36,8 @@ class ApplianceController extends BaseController
 
         $appliances = $collectionQuery->paginate($this->perPage);
 
+        //TODO: We should add the appliance version (latest active version ) to the data
+
         return $this->respondCollection(
             $request,
             $appliances,
@@ -56,7 +58,8 @@ class ApplianceController extends BaseController
      */
     public function show(Request $request, $applianceId)
     {
-        $this->validateUuid($request, $applianceId);
+        $request['id'] = $applianceId;
+        $this->validate($request, ['id' => [new IsValidUuid()]]);
 
         return $this->respondItem(
             $request,
@@ -140,18 +143,6 @@ class ApplianceController extends BaseController
         }
 
         return $this->respondEmpty();
-    }
-
-
-    /**
-     * Validate the appliance UUID
-     * @param $request
-     * @param $uuid
-     */
-    public function validateUuid($request, $uuid)
-    {
-        $request['id'] = $uuid;
-        $this->validate($request, ['appliance_id' => [new IsValidUuid()]]);
     }
 
 

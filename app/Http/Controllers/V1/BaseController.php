@@ -45,4 +45,22 @@ class BaseController extends Controller
 
         $this->resellerId = $request->user->resellerId;
     }
+
+
+    /**
+     * Returns the database connection
+     * @param $database
+     * @return mixed
+     */
+    public function getDatabaseConnection($database)
+    {
+        switch($database) {
+            case 'ecloud':
+                return app('db')->connection(env('DB_DATABASE_ECLOUD'));
+                break;
+            default:
+                // Default database is reseller
+                return app('db')->connection();
+        }
+    }
 }

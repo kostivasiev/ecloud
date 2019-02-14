@@ -139,3 +139,16 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('appliances', 'ApplianceController@create');
     $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
 });
+
+//Appliance Versions
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->get('appliance-versions', 'ApplianceVersionController@index');
+    $router->get('appliance-versions/{appliance_version_id}', 'ApplianceVersionController@show');
+    $router->post('appliance-versions', 'ApplianceVersionController@create');
+});
+
+//Appliance Parameters
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->get('appliance-parameters', 'ApplianceParametersController@index');
+    $router->get('appliance-parameters/{parameter_id}', 'ApplianceParametersController@show');
+});
