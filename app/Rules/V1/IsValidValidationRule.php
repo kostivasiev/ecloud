@@ -4,7 +4,6 @@ namespace App\Rules\V1;
 
 use Illuminate\Contracts\Validation\Rule;
 
-
 /**
  * Class IsValidValidationRule
  *

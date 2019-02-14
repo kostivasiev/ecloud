@@ -54,7 +54,7 @@ class BaseController extends Controller
      */
     public function getDatabaseConnection($database)
     {
-        switch($database) {
+        switch ($database) {
             case 'ecloud':
                 return app('db')->connection(env('DB_DATABASE_ECLOUD'));
                 break;
