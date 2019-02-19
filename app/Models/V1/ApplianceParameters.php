@@ -52,18 +52,35 @@ class ApplianceParameters extends Model implements Filterable, Sortable
     public static $rules = [
         'name' => ['required', 'max:255'],
         'type' => ['required', 'in:String,Numeric,Boolean,Array,Password,Date,DateTime'],
-        'required' => ['nullable'], ['boolean']
+        'description' => ['nullable', 'max:255'],
+        'required' => ['nullable', 'boolean']
     ];
 
     /**
-     * Return model validation rules
+     * Return model (Create) validation rules
      * @return array
      */
     public static function getRules()
     {
         $rules = static::$rules;
+        $rules['version_id'] = ['required', new IsValidUuid()];
         $rules['validation_rule'] = ['filled', new IsValidValidationRule()];
         return $rules;
+    }
+
+    /**
+     * Return model (Update) validation rules
+     */
+    public static function getUpdateRules()
+    {
+        return [
+            'name' => ['nullable', 'max:255'],
+            'type' => ['nullable', 'in:String,Numeric,Boolean,Array,Password,Date,DateTime'],
+            'description' => ['nullable', ''],
+            'required' => ['nullable', 'boolean'],
+            'version_id' => ['nullable', new IsValidUuid()],
+            'validation_rule' => ['nullable', new IsValidValidationRule()]
+        ];
     }
 
     /**
@@ -77,6 +94,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         'appliance_version_uuid',
         'appliance_script_parameters_name',
         'appliance_script_parameters_type',
+        'appliance_script_parameters_description',
         'appliance_script_parameters_required',
         'appliance_script_parameters_validation_rule',
         'appliance_script_parameters_created_at',
@@ -135,6 +153,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
             'version_id' => 'appliance_version_uuid',
             'name' => 'appliance_script_parameters_name',
             'type' => 'appliance_script_parameters_type',
+            'description' => 'appliance_script_parameters_description',
             'required' => 'appliance_script_parameters_required',
             'validation_rule' => 'appliance_script_parameters_validation_rule',
             'created_at' => 'appliance_script_parameters_created_at',
@@ -152,6 +171,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         return [
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('type', Filter::$stringDefaults),
+            $factory->create('description', Filter::$stringDefaults),
             $factory->create('version_id', Filter::$stringDefaults),
             $factory->create('required', Filter::$enumDefaults),
             $factory->create('validation_rule', Filter::$stringDefaults),
@@ -172,6 +192,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         return [
             $factory->create('name'),
             $factory->create('type'),
+            $factory->create('description'),
             $factory->create('version_id'),
             $factory->create('required'),
             $factory->create('created_at'),
@@ -217,22 +238,13 @@ class ApplianceParameters extends Model implements Filterable, Sortable
             StringProperty::create('appliance_version_uuid', 'version_id'),
             StringProperty::create('appliance_script_parameters_name', 'name'),
             StringProperty::create('appliance_script_parameters_type', 'type'),
+            StringProperty::create('appliance_script_parameters_description', 'description'),
             BooleanProperty::create('appliance_script_parameters_required', 'required', null, 'Yes', 'No'),
             StringProperty::create('appliance_script_parameters_validation_rule', 'validation_rule'),
             DateTimeProperty::create('appliance_script_parameters_created_at', 'created_at'),
             DateTimeProperty::create('appliance_script_parameters_updated_at', 'updated_at')
         ];
     }
-
-    /**
-     * Save the required parameter as yes/no
-     * @param $value
-     */
-    public function setApplianceScriptParametersRequiredAttribute($value)
-    {
-        $this->attributes['appliance_script_parameters_required'] = ($value) ? 'Yes' : 'No';
-    }
-
 
 
     /**
@@ -245,6 +257,6 @@ class ApplianceParameters extends Model implements Filterable, Sortable
             'App\Models\V1\ApplianceVersion',
             'appliance_version_id',
             'appliance_script_parameters_appliance_version_id'
-        )->first();
+        );
     }
 }

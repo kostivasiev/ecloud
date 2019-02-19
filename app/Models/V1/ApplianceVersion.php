@@ -195,6 +195,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
      * Convenience mutator:
      * When we try and set our non-database appliance_uuid column, it saves the internal id to the
      * appliance_version_appliance_id database column
+     * @param $value
      */
     public function setApplianceVersionApplianceUuidAttribute($value)
     {
@@ -214,8 +215,8 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     {
         return $this->hasOne(
             'App\Models\V1\Appliance',
-            'appliance_version_appliance_id',
-            'appliance_uuid'
+            'appliance_id',
+            'appliance_version_appliance_id'
         );
     }
 }

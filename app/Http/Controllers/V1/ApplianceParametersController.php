@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\ParameterNotFoundException;
 use App\Models\V1\ApplianceParameters;
 use App\Rules\V1\IsValidUuid;
+use UKFast\Api\Exceptions\BadRequestException;
+use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -56,6 +58,89 @@ class ApplianceParametersController extends BaseController
             $request,
             static::getApplianceParameterById($request, $parameterId)
         );
+    }
+
+
+    /**
+     * Create an appliance script parameter
+     *
+     * @param Request $request
+     * - version_id - requiredm UUID
+     * - name - string, nullable
+     * - type - enum, required
+     * - required, optional, default true
+     * - validation_rule, optional
+     *
+     * @return \Illuminate\Http\Response
+     * @throws DatabaseException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     */
+    public function create(Request $request)
+    {
+        $rules = ApplianceParameters::getRules();
+        $this->validate($request, $rules);
+
+        //Validate the appliance exists
+        ApplianceVersionController::getApplianceVersionById($request, $request->input('version_id'));
+
+        $applianceParameter = $this->receiveItem($request, ApplianceParameters::class);
+        if (!$applianceParameter->resource->save()) {
+            throw new DatabaseException('Unable to save Appliance parameter.');
+        }
+
+        return $this->respondSave(
+            $request,
+            $applianceParameter,
+            201
+        );
+    }
+
+    /**
+     * Update an appliance script parameter
+     * @param Request $request
+     * @param $applianceParameterId
+     * @return \Illuminate\Http\Response
+     * @throws BadRequestException
+     * @throws DatabaseException
+     * @throws ParameterNotFoundException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
+     */
+    public function update(Request $request, $applianceParameterId)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException('Only UKFast can update appliance parameters at this time.');
+        }
+
+        $rules = ApplianceParameters::getUpdateRules();
+
+        $request['id'] = $applianceParameterId;
+        $this->validate($request, $rules);
+
+        //Do we want to change the Appliance Version the parameter is associated with?
+        if ($request->has('version_id')) {
+            $applianceParameter = ApplianceParametersController::getApplianceParameterById($request, $applianceParameterId);
+            //Validate the appliance version exists
+            $newApplianceVersion = ApplianceVersionController::getApplianceVersionById($request, $request->input('version_id'));
+
+            // Only allow a parameter to be moved between different versions of the same Application
+            if ($newApplianceVersion->appliance->id != $applianceParameter->applianceVersion->appliance->id) {
+               throw new BadRequestException('Parameters can not be moved between different Appliances.');
+            }
+        }
+
+        // Update the resource
+        $applianceParameter = $this->receiveItem($request, ApplianceParameters::class);
+
+        try {
+            $applianceParameter->resource->save();
+        } catch (\Illuminate\Database\QueryException $exception) {
+            throw new DatabaseException('Unable to update Appliance parameter.');
+        }
+
+        return $this->respondEmpty();
     }
 
 
