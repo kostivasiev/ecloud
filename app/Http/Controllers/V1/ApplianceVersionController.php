@@ -87,7 +87,7 @@ class ApplianceVersionController extends BaseController
         // Validate the appliance version
         $rules = ApplianceVersion::$rules;
         $rules['appliance_id'] = [new IsValidUuid()];
-        // TODO: Add some Liquid template validation here, (validate number of parameters matches the script etc)
+        // TODO: Add some template validation here, (validate number of parameters matches the script etc)
         $this->validate($request, $rules);
 
         //Validate the appliance exists
