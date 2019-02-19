@@ -46,10 +46,42 @@ class ApplianceVersion extends Model implements Filterable, Sortable
 
     // Validation Rules
     public static $rules = [
-        'version' => ['required', 'max:25'],
+        'version' => ['required', 'integer'],
         'script_template' => ['required'],
         'active' => ['nullable']
     ];
+
+    /**
+     * Return Create resource validation rules
+     * @return array
+     */
+    public static function getRules()
+    {
+        $rules = static::$rules;
+        $rules['appliance_id'] = ['required', new IsValidUuid()];
+        return $rules;
+    }
+
+    /**
+     * Return Update resource validation rules
+     * @return array
+     */
+    public static function getUpdateRules()
+    {
+        $rules = static::$rules;
+        // Modify our appliance version validation rules for an update
+        $rules = array_merge(
+            $rules,
+            [
+                'version' => ['nullable', 'integer'],
+                'script_template' => ['nullable'],
+                'id' => [new IsValidUuid()],
+                'appliance_id' => ['nullable', new IsValidUuid()]
+            ]
+        );
+
+        return $rules;
+    }
 
 
     /**
@@ -169,7 +201,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             IdProperty::create('appliance_version_uuid', 'id', null, 'uuid'),
             //Return the appliance UUID, not internal ID
             StringProperty::create('appliance_uuid', 'appliance_id'),
-            StringProperty::create('appliance_version_version', 'version'),
+            IntProperty::create('appliance_version_version', 'version'),
             StringProperty::create('appliance_version_script_template', 'script_template'),
             BooleanProperty::create('appliance_version_active', 'active', null, 'Yes', 'No'),
             DateTimeProperty::create('appliance_version_created_at', 'created_at'),

@@ -85,8 +85,7 @@ class ApplianceVersionController extends BaseController
         }
 
         // Validate the appliance version
-        $rules = ApplianceVersion::$rules;
-        $rules['appliance_id'] = [new IsValidUuid()];
+        $rules = ApplianceVersion::getRules();
         // TODO: Add some template validation here, (validate number of parameters matches the script etc)
         $this->validate($request, $rules);
 
@@ -122,7 +121,8 @@ class ApplianceVersionController extends BaseController
         } catch (\Illuminate\Database\QueryException $exception) {
             // 23000 Error code (Integrity Constraint Violation: version already exists for this application)
             if ($exception->getCode() == 23000) {
-                $errorMessage .= ' Version designation \'' .$request->input('version') . '\' already exists.';
+                $errorMessage .= ' Version designation \'' .$request->input('version');
+                $errorMessage .= '\' already exists for this appliance.';
                 throw new UnprocessableEntityException($errorMessage);
             }
 
@@ -193,18 +193,7 @@ class ApplianceVersionController extends BaseController
             throw new ForbiddenException('Only UKFast can update appliance versions at this time.');
         }
 
-        $rules = ApplianceVersion::$rules;
-        // Modify our appliance version validation rules for an update
-        $rules = array_merge(
-            $rules,
-            [
-                'version' => ['nullable', 'max:25'],
-                'script_template' => ['nullable'],
-                'id' => [new IsValidUuid()],
-                'appliance_id' => ['nullable', new IsValidUuid()]
-            ]
-        );
-
+        $rules = ApplianceVersion::getUpdateRules();
         $request['id'] = $applianceVersionId;
         $this->validate($request, $rules);
 
@@ -223,7 +212,8 @@ class ApplianceVersionController extends BaseController
         } catch (\Illuminate\Database\QueryException $exception) {
             // 23000 Error code (Integrity Constraint Violation: version already exists for this application)
             if ($exception->getCode() == 23000) {
-                $errorMessage .= ' Version designation \'' .$request->input('version') . '\' already exists.';
+                $errorMessage .= ' Version designation \'' .$request->input('version');
+                $errorMessage .= '\' already exists for this appliance.';
                 throw new UnprocessableEntityException($errorMessage);
             }
 
