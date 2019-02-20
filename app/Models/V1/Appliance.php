@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
 
@@ -214,17 +215,34 @@ class Appliance extends Model implements Filterable, Sortable
     }
 
     /**
+     * Get the latest version of the appliance.
+     * @return Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
+     * @throws ApplianceVersionNotFoundException
+     */
+    public function getLatestVersion()
+    {
+        $version = $this->versions()->orderBy('appliance_version_version', 'DESC')->limit(1);
+
+        if ($version->get()->count() > 0) {
+            return $version->first();
+        }
+
+        throw new ApplianceVersionNotFoundException(
+            'Unable to load latest version of the appliance. No versions were found.'
+        );
+    }
+
+    /**
      * Get designation of the latest version of he application
      * @return string
      */
     public function getVersionAttribute()
     {
-        $versions = $this->versions()->orderBy('appliance_version_version', 'DESC')->limit(1);
-
-        if ($versions->get()->count() > 0) {
-            return $this->versions()->orderBy('appliance_version_version', 'DESC')->limit(1)->first()->version;
+        try {
+            $version = $this->getLatestVersion();
+            return $version->version;
+        } catch (ApplianceVersionNotFoundException $exception) {
+            return 0;
         }
-
-        return null;
     }
 }

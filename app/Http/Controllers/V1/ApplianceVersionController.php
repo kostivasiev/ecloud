@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
+use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceParameters;
 use App\Models\V1\ApplianceVersion;
@@ -22,7 +23,7 @@ class ApplianceVersionController extends BaseController
     use ResponseHelper, RequestHelper;
 
     /**
-     * List all Appliances Versions collection
+     * List all Appliance Versions collection
      *
      * @param Request $request
      * @return \Illuminate\Http\Response
@@ -50,7 +51,7 @@ class ApplianceVersionController extends BaseController
      * @param Request $request
      * @param $applianceVersionId
      * @return \Illuminate\Http\Response
-     * @throws ApplianceNotFoundException
+     * @throws ApplianceVersionNotFoundException
      */
     public function show(Request $request, $applianceVersionId)
     {
@@ -104,6 +105,7 @@ class ApplianceVersionController extends BaseController
                     'parameters' => ['array'],
                     'parameters.*.name' => $rules['name'],
                     'parameters.*.type' => $rules['type'],
+                    'parameters.*.key' => $rules['key'],
                     'parameters.*.description' => $rules['description'],
                     'parameters.*.required' => $rules['required'],
                     'parameters.*.validation_rule' => $rules['validation_rule'],
@@ -121,7 +123,7 @@ class ApplianceVersionController extends BaseController
         } catch (\Illuminate\Database\QueryException $exception) {
             // 23000 Error code (Integrity Constraint Violation: version already exists for this application)
             if ($exception->getCode() == 23000) {
-                $errorMessage .= ' Version designation \'' .$request->input('version');
+                $errorMessage .= ' Version \'' .$request->input('version');
                 $errorMessage .= '\' already exists for this appliance.';
                 throw new UnprocessableEntityException($errorMessage);
             }
@@ -141,13 +143,14 @@ class ApplianceVersionController extends BaseController
             $applianceParameter->appliance_version_id = $applianceVersion->id;
             $applianceParameter->name = $parameter['name'];
             $applianceParameter->type = $parameter['type'];
+            $applianceParameter->key = $parameter['key'];
 
             if (isset($parameter['description'])) {
                 $applianceParameter->description = $parameter['description'];
             }
 
             if (isset($parameter['required'])) {
-                $applianceParameter->required = $parameter['required'];
+                $applianceParameter->required = ($parameter['required']) ? 'Yes' : 'No';
             }
 
             if (isset($parameter['validation_rule'])) {
@@ -183,8 +186,9 @@ class ApplianceVersionController extends BaseController
      * @param $applianceVersionId
      * @return \Illuminate\Http\Response
      * @throws ApplianceNotFoundException
-     * @throws ForbiddenException
+     * @throws ApplianceVersionNotFoundException
      * @throws DatabaseException
+     * @throws ForbiddenException
      * @throws UnprocessableEntityException
      */
     public function update(Request $request, $applianceVersionId)
@@ -192,6 +196,9 @@ class ApplianceVersionController extends BaseController
         if (!$this->isAdmin) {
             throw new ForbiddenException('Only UKFast can update appliance versions at this time.');
         }
+
+        // Validate the appliance version exists
+        static::getApplianceVersionById($request, $applianceVersionId);
 
         $rules = ApplianceVersion::getUpdateRules();
         $request['id'] = $applianceVersionId;
@@ -212,7 +219,7 @@ class ApplianceVersionController extends BaseController
         } catch (\Illuminate\Database\QueryException $exception) {
             // 23000 Error code (Integrity Constraint Violation: version already exists for this application)
             if ($exception->getCode() == 23000) {
-                $errorMessage .= ' Version designation \'' .$request->input('version');
+                $errorMessage .= ' Version \'' .$request->input('version');
                 $errorMessage .= '\' already exists for this appliance.';
                 throw new UnprocessableEntityException($errorMessage);
             }
@@ -224,11 +231,38 @@ class ApplianceVersionController extends BaseController
     }
 
     /**
+     * Return a collection of parameters for an appliance version
+     * @param Request $request
+     * @param $applianceVersionId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceVersionNotFoundException
+     */
+    public function versionParameters(Request $request, $applianceVersionId)
+    {
+        $applianceVersion = static::getApplianceVersionById($request, $applianceVersionId);
+
+        $parametersQry = ApplianceParametersController::getApplianceParametersQuery($request);
+        $parametersQry->where('appliance_version_id', '=', $applianceVersion->id);
+
+        (new QueryTransformer($request))
+            ->config(ApplianceParameters::class)
+            ->transform($parametersQry);
+
+        $applianceParameters = $parametersQry->paginate($this->perPage);
+
+        return $this->respondCollection(
+            $request,
+            $applianceParameters
+        );
+    }
+
+
+    /**
      * Load an appliance version by UUID
      * @param Request $request
      * @param $applianceVersionId
      * @return mixed
-     * @throws ApplianceNotFoundException
+     * @throws ApplianceVersionNotFoundException
      */
     public static function getApplianceVersionById(Request $request, $applianceVersionId)
     {
@@ -238,7 +272,7 @@ class ApplianceVersionController extends BaseController
             return $applianceVersion;
         }
 
-        throw new ApplianceNotFoundException("Appliance version with ID '$applianceVersionId' was not found", 'id');
+        throw new ApplianceVersionNotFoundException("Appliance version with ID '$applianceVersionId' was not found", 'id');
     }
 
     /**
@@ -251,7 +285,7 @@ class ApplianceVersionController extends BaseController
         $applianceQuery = ApplianceVersion::query();
 
         if ($request->user->resellerId != 0) {
-            $applianceQuery->where('appliance_version_active', 'Yes');
+            $applianceQuery->where('active', 'Yes');
         }
 
         $applianceQuery->whereNull('appliance_version_deleted_at');

@@ -52,6 +52,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
     public static $rules = [
         'name' => ['required', 'max:255'],
         'type' => ['required', 'in:String,Numeric,Boolean,Array,Password,Date,DateTime'],
+        'key' => ['required', 'regex:/^\w*$/'],
         'description' => ['nullable', 'max:255'],
         'required' => ['nullable', 'boolean']
     ];
@@ -76,6 +77,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         return [
             'name' => ['nullable', 'max:255'],
             'type' => ['nullable', 'in:String,Numeric,Boolean,Array,Password,Date,DateTime'],
+            'key' => ['filled', 'regex:/^\w*$/'], //If it's passed in we need a value.
             'description' => ['nullable', ''],
             'required' => ['nullable', 'boolean'],
             'version_id' => ['nullable', new IsValidUuid()],
@@ -93,6 +95,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         'appliance_script_parameters_uuid',
         'appliance_version_uuid',
         'appliance_script_parameters_name',
+        'appliance_script_parameters_key', // hide from non-admin?
         'appliance_script_parameters_type',
         'appliance_script_parameters_description',
         'appliance_script_parameters_required',
@@ -152,6 +155,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
             'id' => 'appliance_script_parameters_uuid', //UUID, not internal id
             'version_id' => 'appliance_version_uuid',
             'name' => 'appliance_script_parameters_name',
+            'key' => 'appliance_script_parameters_key',
             'type' => 'appliance_script_parameters_type',
             'description' => 'appliance_script_parameters_description',
             'required' => 'appliance_script_parameters_required',
@@ -170,6 +174,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('key', Filter::$stringDefaults),
             $factory->create('type', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
             $factory->create('version_id', Filter::$stringDefaults),
@@ -191,6 +196,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('name'),
+            $factory->create('key'),
             $factory->create('type'),
             $factory->create('description'),
             $factory->create('version_id'),
@@ -237,6 +243,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
             // Return the parameter UUID, not internal ID
             StringProperty::create('appliance_version_uuid', 'version_id'),
             StringProperty::create('appliance_script_parameters_name', 'name'),
+            StringProperty::create('appliance_script_parameters_key', 'key'),
             StringProperty::create('appliance_script_parameters_type', 'type'),
             StringProperty::create('appliance_script_parameters_description', 'description'),
             BooleanProperty::create('appliance_script_parameters_required', 'required', null, 'Yes', 'No'),
