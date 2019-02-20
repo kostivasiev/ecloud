@@ -128,6 +128,9 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->get('pods/{pod_id}/templates', 'TemplateController@podTemplates');
     // todo datastores
+
+    $router->get('pods/{pod_id}/appliances', 'ApplianceController@podAvailability');
+    $router->post('pods/{pod_id}/appliances', 'ApplianceController@addToPod');
 });
 
 
@@ -135,6 +138,8 @@ $router->group($baseRouteParameters, function () use ($router) {
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliances', 'ApplianceController@index');
     $router->get('appliances/{appliance_id}', 'ApplianceController@show');
+    $router->get('appliances/{appliance_id}/versions', 'ApplianceController@versions');
+    $router->get('appliances/{appliance_id}/parameters', 'ApplianceController@latestVersionParameters');
 
     $router->post('appliances', 'ApplianceController@create');
     $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
@@ -146,6 +151,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliance-versions/{appliance_version_id}', 'ApplianceVersionController@show');
     $router->post('appliance-versions', 'ApplianceVersionController@create');
     $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
+    $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
 });
 
 //Appliance Parameters

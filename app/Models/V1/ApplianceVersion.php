@@ -46,10 +46,44 @@ class ApplianceVersion extends Model implements Filterable, Sortable
 
     // Validation Rules
     public static $rules = [
-        'version' => ['required', 'max:25'],
+        'version' => ['required', 'integer'],
         'script_template' => ['required'],
+        'vm_template' => ['required'],
         'active' => ['nullable']
     ];
+
+    /**
+     * Return Create resource validation rules
+     * @return array
+     */
+    public static function getRules()
+    {
+        $rules = static::$rules;
+        $rules['appliance_id'] = ['required', new IsValidUuid()];
+        return $rules;
+    }
+
+    /**
+     * Return Update resource validation rules
+     * @return array
+     */
+    public static function getUpdateRules()
+    {
+        $rules = static::$rules;
+        // Modify our appliance version validation rules for an update
+        $rules = array_merge(
+            $rules,
+            [
+                'version' => ['nullable', 'integer'],
+                'script_template' => ['nullable'],
+                'vm_template' => ['filled'], //If it's present, we need a value.
+                'id' => [new IsValidUuid()],
+                'appliance_id' => ['nullable', new IsValidUuid()]
+            ]
+        );
+
+        return $rules;
+    }
 
 
     /**
@@ -63,6 +97,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         'appliance_uuid',
         'appliance_version_version',
         'appliance_version_script_template',
+        'appliance_version_vm_template',
         'appliance_version_active',
         'appliance_version_created_at',
         'appliance_version_updated_at'
@@ -93,6 +128,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             'appliance_id' => 'appliance_uuid',
             'version' => 'appliance_version_version',
             'script_template' => 'appliance_version_script_template',
+            'vm_template' => 'appliance_version_vm_template',
             'active' => 'appliance_version_active',
             'created_at' => 'appliance_version_created_at',
             'updated_at' => 'appliance_version_updated_at'
@@ -109,6 +145,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         return [
             $factory->create('version', Filter::$stringDefaults),
             $factory->create('script_template', Filter::$stringDefaults),
+            $factory->create('vm_template', Filter::$stringDefaults),
             $factory->create('active', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
@@ -127,6 +164,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         return [
             $factory->create('version'),
             $factory->create('active'),
+            $factory->create('vm_template'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -169,8 +207,9 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             IdProperty::create('appliance_version_uuid', 'id', null, 'uuid'),
             //Return the appliance UUID, not internal ID
             StringProperty::create('appliance_uuid', 'appliance_id'),
-            StringProperty::create('appliance_version_version', 'version'),
+            IntProperty::create('appliance_version_version', 'version'),
             StringProperty::create('appliance_version_script_template', 'script_template'),
+            StringProperty::create('appliance_version_vm_template', 'vm_template'),
             BooleanProperty::create('appliance_version_active', 'active', null, 'Yes', 'No'),
             DateTimeProperty::create('appliance_version_created_at', 'created_at'),
             DateTimeProperty::create('appliance_version_updated_at', 'updated_at')
@@ -185,16 +224,21 @@ class ApplianceVersion extends Model implements Filterable, Sortable
      */
     public function getApplianceUuidAttribute()
     {
-        return Appliance::select('appliance_uuid')
-            ->where('appliance_id', '=', $this->attributes['appliance_version_appliance_id'])
-            ->first()
-            ->uuid;
+        $appliance =  Appliance::select('appliance_uuid')
+            ->where('appliance_id', '=', $this->attributes['appliance_version_appliance_id']);
+
+        if ($appliance->count() > 0) {
+            return $appliance->first()->uuid;
+        }
+
+        // Appliance with that id was not found
+        return null;
     }
 
     /**
      * Convenience mutator:
      * When we try and set our non-database appliance_uuid column, it saves the internal id to the
-     * appliance_version_appliance_id database column
+     * appliance_version_appliance_id database foreign key column
      * @param $value
      */
     public function setApplianceVersionApplianceUuidAttribute($value)

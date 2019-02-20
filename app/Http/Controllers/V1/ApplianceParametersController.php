@@ -33,11 +33,11 @@ class ApplianceParametersController extends BaseController
             ->config(ApplianceParameters::class)
             ->transform($collectionQuery);
 
-        $applianceVersions = $collectionQuery->paginate($this->perPage);
+        $applianceParameters = $collectionQuery->paginate($this->perPage);
 
         return $this->respondCollection(
             $request,
-            $applianceVersions
+            $applianceParameters
         );
     }
 
@@ -73,10 +73,10 @@ class ApplianceParametersController extends BaseController
      *
      * @return \Illuminate\Http\Response
      * @throws DatabaseException
-     * @throws \App\Exceptions\V1\ApplianceNotFoundException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      */
     public function create(Request $request)
     {
@@ -106,7 +106,7 @@ class ApplianceParametersController extends BaseController
      * @throws BadRequestException
      * @throws DatabaseException
      * @throws ParameterNotFoundException
-     * @throws \App\Exceptions\V1\ApplianceNotFoundException
+     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      */
     public function update(Request $request, $applianceParameterId)
     {
@@ -179,11 +179,13 @@ class ApplianceParametersController extends BaseController
             ->join(
                 'appliance_version',
                 'appliance_script_parameters_appliance_version_id',
+                '=',
                 'appliance_version_id'
             )
             ->join(
                 'appliance',
                 'appliance_id',
+                '=',
                 'appliance_version_appliance_id'
             )
             ->whereNull('appliance_version_deleted_at');
