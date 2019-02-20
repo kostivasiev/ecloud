@@ -113,7 +113,8 @@ class VirtualMachineController extends BaseController
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
-            'hdd' => ['required', 'integer'],
+            'hdd' => ['required_without:hdd_disks', 'integer'],
+            'hdd_disks' => ['required_without:hdd', 'array'],
 
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
@@ -169,7 +170,7 @@ class VirtualMachineController extends BaseController
                 $maxRam = min($maxRam, $solution->ramAvailable());
                 if ($maxRam < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'host has insufficient ram, ' . $maxRam . ' remaining'
+                        'host has insufficient ram, ' . $maxRam . 'GB remaining'
                     ));
                 }
 
@@ -180,10 +181,14 @@ class VirtualMachineController extends BaseController
                     $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
                 }
 
-                $maxHdd = $datastore->usage->available;
+                $maxHdd = min(
+                    $datastore->usage->available,
+                    VirtualMachine::MAX_HDD
+                );
+
                 if ($maxHdd < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'datastore has insufficient space, ' . $maxRam . ' remaining'
+                        'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
                 }
             }
@@ -197,6 +202,7 @@ class VirtualMachineController extends BaseController
             }
         }
 
+
         $rules['cpu'] = array_merge($rules['cpu'], [
             'min:' . $minCpu, 'max:' . $maxCpu
         ]);
@@ -205,19 +211,35 @@ class VirtualMachineController extends BaseController
             'min:' . $minRam, 'max:' . $maxRam
         ]);
 
-        $rules['hdd'] = array_merge($rules['hdd'], [
-            'min:' . $minHdd, 'max:' . $maxHdd
-        ]);
+        // single disk vm requested
+        if ($request->has('hdd')) {
+            $rules['hdd'] = array_merge($rules['hdd'], [
+                'min:' . $minHdd, 'max:' . $maxHdd
+            ]);
+        }
 
-//        if ($request->has('hdd_disks')) {
-//            // todo add support for multiple disks
-//
-//            $hdd_disks = $request->input('hdd');
-//        } else {
-//            $hdd_disks = [
-//                'Hard disk 1' => $request->input('hdd')
-//            ];
-//        }
+        // multi-disk vm requested
+        if ($request->has('hdd_disks')) {
+            // validate disk names
+            $rules['hdd_disks.*.name'] = [
+                'required', 'regex:/' . VirtualMachine::HDD_NAME_FORMAT_REGEX . '/'
+            ];
+
+            // todo check numbers are sequential?
+
+
+            // validate disk capacity
+            $rules['hdd_disks.*.capacity'] = [
+                'required', 'integer', 'min:' . $minHdd, 'max:' . $maxHdd
+            ];
+
+            $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
+            if ($capacityRequested > $datastore->usage->available) {
+                throw new InsufficientResourceException($intapiService->getFriendlyError(
+                    'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining'
+                ));
+            }
+        }
 
         $this->validate($request, $rules);
 
@@ -293,10 +315,20 @@ class VirtualMachineController extends BaseController
 
 
         // set storage
-        $post_data['hdd_gb'] = $request->input('hdd');
+        if ($request->has('hdd')) {
+            $post_data['hdd_gb'] = $request->input('hdd');
+        } elseif ($request->has('hdd_disks')) {
+            $post_data['hdd_gb'] = [];
+
+            foreach ($request->input('hdd_disks') as $disk) {
+                $post_data['hdd_gb'][$disk['name']] = $disk['capacity'];
+            }
+        }
+
         if ($request->has('datastore_id')) {
             $post_data['reseller_lun_id'] = $request->input('datastore_id');
         }
+
 
         // todo check template disks not larger than request
 
