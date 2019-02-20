@@ -143,7 +143,11 @@ class IntapiService
 
                 return $error_msg;
 
+            case (preg_match('/^invalid tag key:/i', $error) == true):
+                return $error;
+
             default:
+//                return $error;
                 return 'Please try again in a few moments or contact our support team if the fault persists.';
         }
     }
