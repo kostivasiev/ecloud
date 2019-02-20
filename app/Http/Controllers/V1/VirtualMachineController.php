@@ -199,6 +199,13 @@ class VirtualMachineController extends BaseController
 
             if ($solution->isMultiNetwork()) {
                 $rules['network_id'] = ['required', 'integer'];
+
+                if (!$solution->hasMultipleNetworks()) {
+                    unset($rules['network_id']);
+
+                    $network = SolutionNetwork::withSolution($solution->getKey())->first();
+                    $request->request->add(['network_id' => $network->getKey()]);
+                }
             }
         }
 
@@ -334,14 +341,16 @@ class VirtualMachineController extends BaseController
 
         // set networking
         if ($request->has('network_id')) {
-            $network = SolutionNetwork::withSolution($request->input('solution_id'))
-                ->find($request->input('network_id'));
-
             if (is_null($network)) {
-                throw new Exceptions\BadRequestException(
-                    "A network matching the requested ID was not found",
-                    'network_id'
-                );
+                $network = SolutionNetwork::withSolution($request->input('solution_id'))
+                    ->find($request->input('network_id'));
+
+                if (is_null($network)) {
+                    throw new Exceptions\BadRequestException(
+                        "A network matching the requested ID was not found",
+                        'network_id'
+                    );
+                }
             }
 
             $post_data['internal_vlan'] = $network->vlan_number;
