@@ -273,7 +273,8 @@ class ApplianceVersionController extends BaseController
         }
 
         throw new ApplianceVersionNotFoundException(
-            "Appliance version with ID '$applianceVersionId' was not found", 'id'
+            "Appliance version with ID '$applianceVersionId' was not found",
+            'id'
         );
     }
 
