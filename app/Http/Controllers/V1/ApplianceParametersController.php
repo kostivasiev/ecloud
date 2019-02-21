@@ -86,6 +86,7 @@ class ApplianceParametersController extends BaseController
         //Validate the appliance exists
         ApplianceVersionController::getApplianceVersionById($request, $request->input('version_id'));
 
+        //TODO: If the parameter is required, validate that the parameter key is present in the script template
         $applianceParameter = $this->receiveItem($request, ApplianceParameters::class);
         if (!$applianceParameter->resource->save()) {
             throw new DatabaseException('Unable to save Appliance parameter.');

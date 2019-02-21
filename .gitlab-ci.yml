@@ -61,7 +61,7 @@ php_cs:
     paths:
     - vendor/
   script:
-  - vendor/bin/phpcs --standard=vendor/ukfast/rulesets/CodeSniffer/UKFDefault.xml app
+  - vendor/bin/phpcs --runtime-set ignore_warnings_on_exit 1 --standard=vendor/ukfast/rulesets/CodeSniffer/UKFDefault.xml app
   except:
     - tags
 
