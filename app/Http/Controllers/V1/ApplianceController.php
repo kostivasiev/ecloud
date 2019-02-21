@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
+use App\Exceptions\V1\TemplateNotFoundException;
 use App\Models\V1\AppliancePodAvailability;
 use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\DatabaseException;
@@ -217,7 +218,15 @@ class ApplianceController extends BaseController
             'appliance.appliance_id',
             'appliance_pod_availability.appliance_pod_availability_appliance_id'
         )
-        ->where('appliance_pod_availability_ucs_datacentre_id', '=', $podId);
+            ->where('appliance_pod_availability_ucs_datacentre_id', '=', $podId);
+
+        if (!$this->isAdmin) {
+            $applianceQuery->join(
+                'reseller.ucs_datacentre',
+                'appliance_pod_availability_ucs_datacentre_id',
+                'ucs_datacentre.ucs_datacentre_id'
+            )->where('ucs_datacentre_oneclick_enabled', '=', 'Yes');
+        }
 
         (new QueryTransformer($request))
             ->config(Appliance::class)
@@ -244,6 +253,7 @@ class ApplianceController extends BaseController
      * @throws ApplianceNotFoundException
      * @throws DatabaseException
      * @throws ForbiddenException
+     * @throws TemplateNotFoundException
      * @throws \App\Exceptions\V1\PodNotFoundException
      */
     public function addToPod(Request $request, $podId)
@@ -255,9 +265,20 @@ class ApplianceController extends BaseController
         $this->validate($request, ['appliance_id' => ['required', new IsValidUuid()]]);
 
         // Validate the Pod
-        PodController::getPodById($request, $podId);
+        $pod = PodController::getPodById($request, $podId);
 
         $appliance = static::getApplianceById($request, $request->input('appliance_id'));
+
+        // Validate that the VM template associated with the Appliance is on the Pod
+        $latestVersion = $appliance->getLatestVersion();
+        try {
+            $template = TemplateController::getTemplateByName($latestVersion->vm_template, $pod);
+        } catch (TemplateNotFoundException $exception) {
+            throw new TemplateNotFoundException(
+                'The VM template \'' . $latestVersion->vm_template
+                . '\' associated with this Application\'s latest version was not found on this Pod'
+            );
+        }
 
         $row = new AppliancePodAvailability();
         $row->appliance_id = $appliance->id;
@@ -265,7 +286,11 @@ class ApplianceController extends BaseController
         try {
             $row->save();
         } catch (\Exception $exception) {
-            throw new DatabaseException('Unable to add Appliance to pod');
+            $message = 'Unable to add Appliance to pod';
+            if ($exception->getCode() == 23000) {
+                $message .= ': The Appliance is already in this Pod.';
+            }
+            throw new DatabaseException($message);
         }
 
         return $this->respondEmpty();
