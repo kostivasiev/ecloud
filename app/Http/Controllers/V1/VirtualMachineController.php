@@ -98,6 +98,7 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
