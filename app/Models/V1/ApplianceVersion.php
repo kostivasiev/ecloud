@@ -264,6 +264,10 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         );
     }
 
+    /**
+     * Return the parameters for the appliance version
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function parameters()
     {
         return $this->hasMany(
@@ -316,6 +320,4 @@ class ApplianceVersion extends Model implements Filterable, Sortable
 
         return $params;
     }
-
-
 }

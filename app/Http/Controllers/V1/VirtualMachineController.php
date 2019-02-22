@@ -287,14 +287,15 @@ class VirtualMachineController extends BaseController
 
             // For each of the script parameters build some validation rules
             foreach ($parameters as $parameterKey => $parameter) {
-                $scriptRules['appliance_param_' . $parameterKey][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
+                $key = 'appliance_param_' . $parameterKey;
+                $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
                 //validation rules regex
                 if (!empty($parameters[$parameterKey]->validation_rule)) {
-                    $scriptRules['appliance_param_' . $parameterKey][] = 'regex:' . $parameters[$parameterKey]->validation_rule;
+                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->validation_rule;
                 }
 
                 // For data types String,Numeric,Boolean we can use Laravel validation
-                $scriptRules['appliance_param_' . $parameterKey][] = strtolower($parameters[$parameterKey]->type);
+                $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
             }
 
             $this->validate($request, $scriptRules);
