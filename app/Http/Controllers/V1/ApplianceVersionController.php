@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
 use App\Exceptions\V1\ApplianceVersionNotFoundException;
+use App\Exceptions\V1\InvalidJsonException;
 use App\Models\V1\ApplianceParameters;
 use App\Models\V1\ApplianceVersion;
 use App\Rules\V1\IsValidUuid;
@@ -77,6 +78,7 @@ class ApplianceVersionController extends BaseController
      * @throws BadRequestException
      * @throws DatabaseException
      * @throws ForbiddenException
+     * @throws InvalidJsonException
      * @throws UnprocessableEntityException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
@@ -86,6 +88,11 @@ class ApplianceVersionController extends BaseController
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException('Only UKFast can publish appliances at this time.');
+        }
+        
+        // Validates request has correct JSON format
+        if (empty($request->json()->all()) || empty($request->request->all())) {
+            throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
         }
 
         // Validate the appliance version
