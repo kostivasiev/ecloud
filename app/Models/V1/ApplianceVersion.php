@@ -263,4 +263,59 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             'appliance_version_appliance_id'
         );
     }
+
+    public function parameters()
+    {
+        return $this->hasMany(
+            'App\Models\V1\ApplianceParameters',
+            'appliance_script_parameters_appliance_version_id',
+            'appliance_version_id'
+        );
+    }
+
+    /**
+     * Return the VM Template associated with the Appliance version
+     * @return mixed
+     */
+    public function getTemplateName()
+    {
+        return $this->vm_template;
+    }
+
+
+    /**
+     * Return the script parameters for the Appliance version
+     * @return array
+     */
+    public function getParameters()
+    {
+        $params = [];
+        $parameters = $this->parameters()->get();
+        foreach ($parameters as $parameter) {
+            $params[$parameter->key] = $parameter;
+        }
+
+        return $params;
+    }
+
+    /**
+     * Return a list of required parameters
+     * @param bool $requiredOnly
+     * @return array
+     */
+    public function getParameterList($requiredOnly = false)
+    {
+        $params = [];
+        $parameters = $this->parameters()->get();
+        foreach ($parameters as $parameter) {
+            if ($requiredOnly && $parameter->required == 'No') {
+                continue;
+            }
+            $params[] = $parameter->key;
+        }
+
+        return $params;
+    }
+
+
 }
