@@ -649,7 +649,7 @@ class VirtualMachineController extends BaseController
         }
 
         // todo remove when public/burst VMs supported, missing billing step on automation
-        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+        if (($virtualMachine->type() == 'Public' && !$this->isAdmin) || $virtualMachine->type() == 'Burst') {
             throw new Exceptions\ForbiddenException(
                 $virtualMachine->type() . ' VM updates are temporarily disabled'
             );
