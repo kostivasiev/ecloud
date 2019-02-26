@@ -359,9 +359,17 @@ class Solution extends Model implements Filterable, Sortable
     public function isMultiNetwork()
     {
         return SolutionNetwork::withSolution($this->getKey())
-            ->limit(2)
-            ->count() > 1
+            ->limit(1)
+            ->count() > 0
         ;
+    }
+
+    public function hasMultipleNetworks()
+    {
+        return SolutionNetwork::withSolution($this->getKey())
+                ->limit(2)
+                ->count() > 1
+            ;
     }
 
 

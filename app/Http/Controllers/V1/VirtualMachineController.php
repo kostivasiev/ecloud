@@ -212,6 +212,13 @@ class VirtualMachineController extends BaseController
 
             if ($solution->isMultiNetwork()) {
                 $rules['network_id'] = ['required', 'integer'];
+
+                if (!$solution->hasMultipleNetworks()) {
+                    unset($rules['network_id']);
+
+                    $defaultNetwork = SolutionNetwork::withSolution($solution->getKey())->first();
+                    $request->request->add(['network_id' => $defaultNetwork->getKey()]);
+                }
             }
         }
 
@@ -716,7 +723,7 @@ class VirtualMachineController extends BaseController
         }
 
         // todo remove when public/burst VMs supported, missing billing step on automation
-        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+        if (($virtualMachine->type() == 'Public' && !$this->isAdmin) || $virtualMachine->type() == 'Burst') {
             throw new Exceptions\ForbiddenException(
                 $virtualMachine->type() . ' VM updates are temporarily disabled'
             );
