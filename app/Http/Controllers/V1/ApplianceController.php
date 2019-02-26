@@ -203,6 +203,27 @@ class ApplianceController extends BaseController
         return $applianceVersionController->versionParameters($request, $applianceVersion->uuid);
     }
 
+
+    /**
+     * Return the latest appliance version
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
+     */
+    public function latestVersion(Request $request, $applianceId)
+    {
+        $appliance = static::getApplianceById($request, $applianceId);
+
+        $applianceVersion = $appliance->getLatestVersion();
+
+        $applianceVersionController = new ApplianceVersionController($request);
+
+        return $applianceVersionController->show($request, $applianceVersion->uuid);
+    }
+
+
     /**
      * List the appliances available in a pod
      * @param Request $request

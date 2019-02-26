@@ -139,6 +139,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliances', 'ApplianceController@index');
     $router->get('appliances/{appliance_id}', 'ApplianceController@show');
     $router->get('appliances/{appliance_id}/versions', 'ApplianceController@versions');
+    $router->get('appliances/{appliance_id}/version', 'ApplianceController@latestVersion');
     $router->get('appliances/{appliance_id}/parameters', 'ApplianceController@latestVersionParameters');
 
     $router->post('appliances', 'ApplianceController@create');
