@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\TemplateNotFoundException;
+use App\Rules\V1\IsValidUuid;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -33,6 +35,8 @@ use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Exceptions\V1\InsufficientResourceException;
 use Log;
+
+use Mustache_Engine;
 
 class VirtualMachineController extends BaseController
 {
@@ -94,6 +98,7 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -109,7 +114,9 @@ class VirtualMachineController extends BaseController
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
-            'template' => ['required'],
+             // User must either specify a vm template or an appliance_id
+            'template' => ['required_without:appliance_id'],
+            'appliance_id' => ['required_without:template', new IsValidUuid()],
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
@@ -126,6 +133,12 @@ class VirtualMachineController extends BaseController
 
             'ssh_keys' => ['nullable', 'array']
         ];
+
+        if ($request->has('template') && $request->has('appliance_id')) {
+            throw new Exceptions\BadRequestException(
+                'The appliance_id and template parameters are mutually exclusive.'
+            );
+        }
 
         if ($request->input('environment') == 'Public') {
             $rules['hdd_iops'] = ['nullable', 'integer'];
@@ -250,9 +263,65 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
+        /**
+         * Launch VM from Appliance
+         */
+        if ($request->has('appliance_id')) {
+            $scriptRules = [];
+
+            //Validate the appliance exists
+            $appliance = ApplianceController::getApplianceById($request, $request->input('appliance_id'));
+
+            $applianceVersion = $appliance->getLatestVersion();
+
+            // Load the VM template from the appliance version specification
+            if (empty($applianceVersion->vm_template)) {
+                throw new TemplateNotFoundException('Invalid Virtual Machine Template for Appliance');
+            }
+            $templateName = $applianceVersion->getTemplateName();
+
+            // Sort the Appliance params from the Request (user input) into key => value and add back
+            // onto our Request for easy validation
+            $requestApplianceParams = [];
+            foreach ($request->parameters as $requestParam) {
+                $requestApplianceParams[trim($requestParam['key'])] = $requestParam['value'];
+                //Add prefixed param to request (to avoid conflicts)
+                $request['appliance_param_'.trim($requestParam['key'])] = $requestParam['value'];
+            }
+
+            // Get the script parameters that we need from the latest version of teh appliance
+            $parameters = $applianceVersion->getParameters();
+
+            // For each of the script parameters build some validation rules
+            foreach ($parameters as $parameterKey => $parameter) {
+                $key = 'appliance_param_' . $parameterKey;
+                $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
+                //validation rules regex
+                if (!empty($parameters[$parameterKey]->validation_rule)) {
+                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->validation_rule;
+                }
+
+                // For data types String,Numeric,Boolean we can use Laravel validation
+                $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
+            }
+
+            $this->validate($request, $scriptRules);
+
+            // Attempt to build the script
+            $Mustache_Engine = new Mustache_Engine;
+
+            $template = $Mustache_Engine->loadTemplate($applianceVersion->script_template);
+
+            $applianceScript = $template->render($requestApplianceParams);
+        }
+
+        if ($request->has('template')) {
+            $templateName = $request->input('template');
+        }
+
         // check template is valid
         $template = TemplateController::getTemplateByName(
-            $request->input('template'),
+            $templateName,
             $pod,
             $solution
         );
@@ -305,7 +374,7 @@ class VirtualMachineController extends BaseController
         $post_data['license'] = $template->license;
 
         if ($template->type != 'Base') {
-            $post_data['template'] = $request->input('template');
+            $post_data['template'] = $templateName;
 
             if ($template->type != 'Solution') {
                 $post_data['template_type'] = 'System';
@@ -391,6 +460,11 @@ class VirtualMachineController extends BaseController
         //set tags
         if ($request->has('tags')) {
             $post_data['tags'] = $request->input('tags');
+        }
+
+        // Do we have an appliance script?
+        if (!empty($applianceScript)) {
+            $post_data['bootstrap_script'] = json_encode($applianceScript);
         }
 
         // todo remove debugging when ready to retest

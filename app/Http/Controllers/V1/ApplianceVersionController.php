@@ -4,10 +4,11 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
 use App\Exceptions\V1\ApplianceVersionNotFoundException;
-use App\Models\V1\Appliance;
+use App\Exceptions\V1\InvalidJsonException;
 use App\Models\V1\ApplianceParameters;
 use App\Models\V1\ApplianceVersion;
 use App\Rules\V1\IsValidUuid;
+use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
@@ -17,6 +18,8 @@ use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
 
 use Illuminate\Http\Request;
+
+use Mustache_Engine;
 
 class ApplianceVersionController extends BaseController
 {
@@ -71,24 +74,53 @@ class ApplianceVersionController extends BaseController
      *
      * @param Request $request
      * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws BadRequestException
      * @throws DatabaseException
      * @throws ForbiddenException
+     * @throws InvalidJsonException
      * @throws UnprocessableEntityException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
-     * @throws ApplianceNotFoundException
      */
     public function create(Request $request)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException('Only UKFast can publish appliances at this time.');
         }
+        
+        // Validates request has correct JSON format
+        if (empty($request->json()->all()) || empty($request->request->all())) {
+            throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
+        }
 
         // Validate the appliance version
         $rules = ApplianceVersion::getRules();
-        // TODO: Add some template validation here, (validate number of parameters matches the script etc)
         $this->validate($request, $rules);
+
+        /**
+         * Validate the script template
+         *
+         * Scan and tokenize template source.
+         *
+         * Throws Mustache_Exception_SyntaxException when mismatched section tags are encountered
+         */
+        $Mustache_Engine = new Mustache_Engine;
+
+        $Mustache_Tokenizer = $Mustache_Engine->getTokenizer();
+
+        try {
+            $tokens = $Mustache_Tokenizer->scan($request->input('script_template'));
+        } catch (\Mustache_Exception_SyntaxException $exception) {
+            throw new BadRequestException('Invalid script template.');
+        }
+
+        $variableTokens = array_filter($tokens, function ($var) {
+            return ($var['type'] == '_v');
+        });
+
+        $scriptVariables = array_unique(array_column($variableTokens, 'name'));
 
         //Validate the appliance exists
         ApplianceController::getApplianceById($request, $request->input('appliance_id'));
@@ -149,8 +181,21 @@ class ApplianceVersionController extends BaseController
                 $applianceParameter->description = $parameter['description'];
             }
 
-            if (isset($parameter['required'])) {
-                $applianceParameter->required = ($parameter['required']) ? 'Yes' : 'No';
+            // Default parameter to required unless stated otherwise
+            $isRequired = true;
+            if (isset($parameter['required']) && $parameter['required'] === false) {
+                $isRequired = false;
+            }
+
+            $applianceParameter->required = ($isRequired) ? 'Yes' : 'No';
+
+            // If the parameter is required and is not found in the script template, error.
+            if ($isRequired && !in_array($parameter['key'], $scriptVariables)) {
+                $database->rollBack();
+                throw new BadRequestException(
+                    'Required parameter \'' . $parameter['name'] . '\' with key \''
+                    . $parameter['key'] . '\' was not found in script template'
+                );
             }
 
             if (isset($parameter['validation_rule'])) {
