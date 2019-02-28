@@ -133,7 +133,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * @param FilterFactory $factory
      * @return array
      */
-    public function filterableColumns($factory)
+    public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
@@ -155,7 +155,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function sortableColumns($factory)
+    public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('id', 'asc'),
@@ -177,7 +177,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * @return mixed
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function defaultSort($factory)
+    public function defaultSort(SortFactory $factory)
     {
         return $factory->create('id', 'asc');
     }

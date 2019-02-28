@@ -79,7 +79,7 @@ class Appliance extends Model implements Filterable, Sortable
      * @param FilterFactory $factory
      * @return array
      */
-    public function filterableColumns($factory)
+    public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('name', Filter::$stringDefaults),
@@ -96,7 +96,7 @@ class Appliance extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function sortableColumns($factory)
+    public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('name'),
@@ -111,7 +111,7 @@ class Appliance extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function defaultSort($sortFactory)
+    public function defaultSort(SortFactory $sortFactory)
     {
         return [
             $sortFactory->create('name', 'asc'),
