@@ -37,7 +37,11 @@ class ApplianceParametersController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $applianceParameters
+            $applianceParameters,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceParameters::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -56,7 +60,11 @@ class ApplianceParametersController extends BaseController
 
         return $this->respondItem(
             $request,
-            static::getApplianceParameterById($request, $parameterId)
+            static::getApplianceParameterById($request, $parameterId),  
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceParameters::VISIBLE_SCOPE_RESELLER
         );
     }
 
