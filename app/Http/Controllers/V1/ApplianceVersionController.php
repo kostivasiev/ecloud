@@ -297,7 +297,11 @@ class ApplianceVersionController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $applianceParameters
+            $applianceParameters,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceParameters::VISIBLE_SCOPE_RESELLER
         );
     }
 
