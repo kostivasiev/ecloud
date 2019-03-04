@@ -60,7 +60,7 @@ class ApplianceParametersController extends BaseController
 
         return $this->respondItem(
             $request,
-            static::getApplianceParameterById($request, $parameterId),  
+            static::getApplianceParameterById($request, $parameterId),
             200,
             null,
             [],
