@@ -109,7 +109,6 @@ class ApplianceParameters extends Model implements Filterable, Sortable
      */
     const VISIBLE_SCOPE_RESELLER = [
         'appliance_script_parameters_uuid',
-        'appliance_version_uuid',
         'appliance_script_parameters_name',
         'appliance_script_parameters_key',
         'appliance_script_parameters_type',
