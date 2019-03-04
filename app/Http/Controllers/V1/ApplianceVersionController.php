@@ -330,14 +330,14 @@ class ApplianceVersionController extends BaseController
      */
     public static function getApplianceVersionQuery($request)
     {
-        $applianceQuery = ApplianceVersion::query();
+        $applianceVersionQuery = ApplianceVersion::query();
 
         if ($request->user->resellerId != 0) {
-            $applianceQuery->where('active', 'Yes');
+            $applianceVersionQuery->where('appliance_version_active', '=', 'Yes');
         }
 
-        $applianceQuery->whereNull('appliance_version_deleted_at');
+        $applianceVersionQuery->whereNull('appliance_version_deleted_at');
 
-        return $applianceQuery;
+        return $applianceVersionQuery;
     }
 }
