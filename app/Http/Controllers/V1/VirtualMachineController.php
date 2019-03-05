@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 use App\Exceptions\V1\TemplateNotFoundException;
 use App\Rules\V1\IsValidUuid;
 use Illuminate\Http\Request;
@@ -134,9 +135,10 @@ class VirtualMachineController extends BaseController
             'ssh_keys' => ['nullable', 'array']
         ];
 
-        if ($request->has('template') && $request->has('appliance_id')) {
+        // Check we either have template or appliance_id but not both
+        if (!($request->has('template') xor $request->has('appliance_id'))) {
             throw new Exceptions\BadRequestException(
-                'The appliance_id and template parameters are mutually exclusive.'
+                'Virtual machines must be launched with either the appliance_id or template parameter'
             );
         }
 
@@ -278,7 +280,7 @@ class VirtualMachineController extends BaseController
             if (empty($applianceVersion->vm_template)) {
                 throw new TemplateNotFoundException('Invalid Virtual Machine Template for Appliance');
             }
-            $template = $applianceVersion->getTemplateName();
+            $templateName = $applianceVersion->getTemplateName();
 
             // Sort the Appliance params from the Request (user input) into key => value and add back
             // onto our Request for easy validation
@@ -313,6 +315,28 @@ class VirtualMachineController extends BaseController
             $mustacheTemplate = $Mustache_Engine->loadTemplate($applianceVersion->script_template);
 
             $applianceScript = $mustacheTemplate->render($requestApplianceParams);
+
+            // Try to load the server license associated with th appliance version
+            try {
+                $serverLicense = $applianceVersion->getLicense();
+            } catch (ApplianceServerLicenseNotFoundException $exception) {
+                if ($this->isAdmin) {
+                    throw new ApplianceServerLicenseNotFoundException(
+                        $exception->getMessage()
+                    );
+                }
+
+                Log::critical(
+                    "Unable to launch VM using Appliance '" . $appliance->getKey() . "'': Appliance version '"
+                    . $applianceVersion->getKey() . "' has no server license."
+                );
+                throw new ServiceUnavailableException(
+                    "Unable to launch Appliance '" . $appliance->getKey() . "' at this time."
+                );
+            }
+
+            $platform = $serverLicense->server_license_category;
+            $license = $serverLicense->server_license_name;
         }
 
         if ($request->has('template')) {
@@ -323,14 +347,17 @@ class VirtualMachineController extends BaseController
                 $pod,
                 $solution
             );
+
+            $platform = $template->platform;
+            $license = $template->license;
         }
         
         if ($request->has('computername')) {
-            if ($template->platform == 'Linux') {
+            if ($platform == 'Linux') {
                 $rules['computername'] = [
                     'regex:/' . VirtualMachine::HOSTNAME_FORMAT_REGEX . '/'
                 ];
-            } elseif ($template->platform == 'Windows') {
+            } elseif ($platform == 'Windows') {
                 $rules['computername'] = [
                     'regex:/' . VirtualMachine::NETBIOS_FORMAT_REGEX . '/'
                 ];
@@ -362,21 +389,28 @@ class VirtualMachineController extends BaseController
         );
 
         if ($request->has('ssh_keys')) {
-            if ($template->platform != 'Linux') {
+            if ($platform != 'Linux') {
                 throw new Exceptions\BadRequestException("ssh_keys only supported for Linux VM's at this time");
             }
             $post_data['ssh_keys'] = $request->input('ssh_keys');
         }
 
         // set template
-        $post_data['platform'] = $template->platform;
-        $post_data['license'] = $template->license;
+        $post_data['platform'] = $platform;
+        $post_data['license'] = $license;
 
-        if ($template->type != 'Base') {
+        if ($request->has('appliance_id')) {
             $post_data['template'] = $templateName;
+            $post_data['template_type'] = 'system';
+        }
 
-            if ($template->type != 'Solution') {
-                $post_data['template_type'] = 'System';
+        if ($request->has('template')) {
+            if ($template->type != 'Base') {
+                $post_data['template'] = $templateName;
+
+                if ($template->type != 'Solution') {
+                    $post_data['template_type'] = 'system';
+                }
             }
         }
 
