@@ -278,7 +278,7 @@ class VirtualMachineController extends BaseController
             if (empty($applianceVersion->vm_template)) {
                 throw new TemplateNotFoundException('Invalid Virtual Machine Template for Appliance');
             }
-            $templateName = $applianceVersion->getTemplateName();
+            $template = $applianceVersion->getTemplateName();
 
             // Sort the Appliance params from the Request (user input) into key => value and add back
             // onto our Request for easy validation
@@ -310,22 +310,21 @@ class VirtualMachineController extends BaseController
             // Attempt to build the script
             $Mustache_Engine = new Mustache_Engine;
 
-            $template = $Mustache_Engine->loadTemplate($applianceVersion->script_template);
+            $mustacheTemplate = $Mustache_Engine->loadTemplate($applianceVersion->script_template);
 
-            $applianceScript = $template->render($requestApplianceParams);
+            $applianceScript = $mustacheTemplate->render($requestApplianceParams);
         }
 
         if ($request->has('template')) {
             $templateName = $request->input('template');
+            // check template is valid
+            $template = TemplateController::getTemplateByName(
+                $templateName,
+                $pod,
+                $solution
+            );
         }
-
-        // check template is valid
-        $template = TemplateController::getTemplateByName(
-            $templateName,
-            $pod,
-            $solution
-        );
-
+        
         if ($request->has('computername')) {
             if ($template->platform == 'Linux') {
                 $rules['computername'] = [

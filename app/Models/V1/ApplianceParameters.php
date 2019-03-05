@@ -95,13 +95,26 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         'appliance_script_parameters_uuid',
         'appliance_version_uuid',
         'appliance_script_parameters_name',
-        'appliance_script_parameters_key', // hide from non-admin?
+        'appliance_script_parameters_key',
         'appliance_script_parameters_type',
         'appliance_script_parameters_description',
         'appliance_script_parameters_required',
         'appliance_script_parameters_validation_rule',
         'appliance_script_parameters_created_at',
         'appliance_script_parameters_updated_at',
+    ];
+
+    /**
+     * Restrict visibility for non-admin
+     */
+    const VISIBLE_SCOPE_RESELLER = [
+        'appliance_script_parameters_uuid',
+        'appliance_script_parameters_name',
+        'appliance_script_parameters_key',
+        'appliance_script_parameters_type',
+        'appliance_script_parameters_description',
+        'appliance_script_parameters_required',
+        'appliance_script_parameters_validation_rule'
     ];
 
     /**
