@@ -34,6 +34,9 @@ class ApplianceVersionController extends BaseController
      */
     public function index(Request $request)
     {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException('Only UKFast can view version information at this time.');
+        }
         $collectionQuery = static::getApplianceVersionQuery($request);
 
         (new QueryTransformer($request))
@@ -55,9 +58,13 @@ class ApplianceVersionController extends BaseController
      * @param $applianceVersionId
      * @return \Illuminate\Http\Response
      * @throws ApplianceVersionNotFoundException
+     * @throws ForbiddenException
      */
     public function show(Request $request, $applianceVersionId)
     {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException('Only UKFast can view version information at this time.');
+        }
         $request['id'] = $applianceVersionId;
         $this->validate($request, ['id' => [new IsValidUuid()]]);
 
