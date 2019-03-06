@@ -64,7 +64,8 @@ class SolutionNetwork extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
-            $factory->create('number', Filter::$numericDefaults),
+            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('vlan', Filter::$numericDefaults),
         ];
     }
 
@@ -80,6 +81,7 @@ class SolutionNetwork extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('vlan'),
         ];
     }
 
