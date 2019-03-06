@@ -8,6 +8,8 @@ use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
+
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -319,5 +321,25 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         }
 
         return $params;
+    }
+
+    /**
+     * Returns the server license associated with the appliance version
+     * @return ServerLicense | null
+     * @throws ApplianceServerLicenseNotFoundException
+     */
+    public function getLicense()
+    {
+        if (!empty($this->server_license_id)) {
+            $serverLicense = ServerLicense::find($this->server_license_id);
+
+            if (!empty($serverLicense)) {
+                return $serverLicense;
+            }
+        }
+
+        throw new ApplianceServerLicenseNotFoundException(
+            "No Server license found for Appliance version '" . $this->getKey() . "'"
+        );
     }
 }
