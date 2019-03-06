@@ -163,7 +163,7 @@ class ApplianceController extends BaseController
     public function versions(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliances at this time.');
+            throw new ForbiddenException('Only UKFast can view appliance versioning information at this time.');
         }
 
         $appliance = static::getApplianceById($request, $applianceId);
@@ -211,6 +211,7 @@ class ApplianceController extends BaseController
      * @param $applianceId
      * @return \Illuminate\Http\Response
      * @throws ApplianceNotFoundException
+     * @throws ForbiddenException
      * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      */
     public function latestVersion(Request $request, $applianceId)
