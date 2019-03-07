@@ -82,8 +82,8 @@ class Solution extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
             $factory->create('pod_id', Filter::$numericDefaults),
+            $factory->create('environment', Filter::$stringDefaults),
         ];
     }
 
@@ -99,8 +99,8 @@ class Solution extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('type'),
             $factory->create('pod_id'),
+            $factory->create('environment'),
         ];
     }
 
@@ -139,8 +139,8 @@ class Solution extends Model implements Filterable, Sortable
         return [
             IdProperty::create('ucs_reseller_id', 'id'),
             StringProperty::create('ucs_reseller_solution_name', 'name'),
-            StringProperty::create('ucs_reseller_type', 'type'),
             IntProperty::create('ucs_reseller_datacentre_id', 'pod_id'),
+            StringProperty::create('ucs_reseller_type', 'environment'),
         ];
     }
 
