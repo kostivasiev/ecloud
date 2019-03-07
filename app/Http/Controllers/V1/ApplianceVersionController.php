@@ -128,7 +128,8 @@ class ApplianceVersionController extends BaseController
         $variableTokens = array_filter(
             $tokens,
             function ($var) {
-                return in_array($var['type'],
+                return in_array(
+                    $var['type'],
                     [
                         Mustache_Tokenizer::T_ESCAPED,
                         Mustache_Tokenizer::T_UNESCAPED,
