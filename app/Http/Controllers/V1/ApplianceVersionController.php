@@ -20,6 +20,7 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 use Illuminate\Http\Request;
 
 use Mustache_Engine;
+use Mustache_Tokenizer;
 
 class ApplianceVersionController extends BaseController
 {
@@ -123,9 +124,20 @@ class ApplianceVersionController extends BaseController
             throw new BadRequestException('Invalid script template.');
         }
 
-        $variableTokens = array_filter($tokens, function ($var) {
-            return ($var['type'] == '_v');
-        });
+        // Extract script variable tokens
+        $variableTokens = array_filter(
+            $tokens,
+            function ($var) {
+                return in_array(
+                    $var['type'],
+                    [
+                        Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::T_UNESCAPED,
+                        Mustache_Tokenizer::T_UNESCAPED_2
+                    ]
+                );
+            }
+        );
 
         $scriptVariables = array_unique(array_column($variableTokens, 'name'));
 
