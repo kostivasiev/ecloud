@@ -14,7 +14,7 @@
     "ukfast/api-helper-datetime": "^2.0.1",
     "ukfast/api-auth": "^2.1",
     "ukfast/api-paginator": "^2.0",
-    "ukfast/ditto": "4.1.*",
+    "ukfast/ditto": "4.3.*",
     "ukfast/api-validation": "~1.0",
     "ukfast/log-provider": "~1.0",
     "guzzlehttp/guzzle": "^6.3.3",
