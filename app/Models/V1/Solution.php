@@ -7,6 +7,7 @@ use App\Exceptions\V1\SolutionNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -67,6 +68,7 @@ class Solution extends Model implements Filterable, Sortable
             'id' => 'ucs_reseller_id',
             'name' => 'ucs_reseller_solution_name',
             'type' => 'ucs_reseller_type',
+            'pod_id' => 'ucs_reseller_datacentre_id',
         ];
     }
 
@@ -81,6 +83,7 @@ class Solution extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('type', Filter::$stringDefaults),
+            $factory->create('pod_id', Filter::$numericDefaults),
         ];
     }
 
@@ -97,6 +100,7 @@ class Solution extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('type'),
+            $factory->create('pod_id'),
         ];
     }
 
@@ -136,6 +140,7 @@ class Solution extends Model implements Filterable, Sortable
             IdProperty::create('ucs_reseller_id', 'id'),
             StringProperty::create('ucs_reseller_solution_name', 'name'),
             StringProperty::create('ucs_reseller_type', 'type'),
+            IntProperty::create('ucs_reseller_datacentre_id', 'pod_id'),
         ];
     }
 
