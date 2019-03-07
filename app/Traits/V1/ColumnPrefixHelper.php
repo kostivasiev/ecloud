@@ -31,8 +31,7 @@ trait ColumnPrefixHelper
     {
         if (!Str::startsWith($key, $this->table) && $this->prefixOnGet) {
             $prefixed = "{$this->table}_$key";
-            if (array_key_exists($prefixed, $this->attributes) ||
-                $this->hasGetMutator($prefixed)) {
+            if (array_key_exists($prefixed, $this->attributes) || $this->hasGetMutator($prefixed)) {
                 return $this->getAttributeValue($prefixed);
             }
         }

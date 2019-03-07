@@ -56,8 +56,11 @@ class Datastore extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
-            $factory->create('name', Filter::$stringDefaults),
+//            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('status', Filter::$stringDefaults),
+            $factory->create('capacity', Filter::$numericDefaults),
             $factory->create('solution_id', Filter::$numericDefaults),
+            $factory->create('site_id', Filter::$numericDefaults),
         ];
     }
 
@@ -72,7 +75,11 @@ class Datastore extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('name'),
+//            $factory->create('name'),
+            $factory->create('status'),
+            $factory->create('capacity'),
+            $factory->create('solution_id'),
+            $factory->create('site_id'),
         ];
     }
 

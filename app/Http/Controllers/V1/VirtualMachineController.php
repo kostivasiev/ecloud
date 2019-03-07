@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
+use App\Exceptions\V1\TemplateNotFoundException;
+use App\Rules\V1\IsValidUuid;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -33,6 +36,8 @@ use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Exceptions\V1\InsufficientResourceException;
 use Log;
+
+use Mustache_Engine;
 
 class VirtualMachineController extends BaseController
 {
@@ -94,6 +99,7 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -109,11 +115,14 @@ class VirtualMachineController extends BaseController
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
-            'template' => ['required'],
+             // User must either specify a vm template or an appliance_id
+            'template' => ['required_without:appliance_id'],
+            'appliance_id' => ['required_without:template', new IsValidUuid()],
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
-            'hdd' => ['required', 'integer'],
+            'hdd' => ['required_without:hdd_disks', 'integer'],
+            'hdd_disks' => ['required_without:hdd', 'array'],
 
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
@@ -125,6 +134,13 @@ class VirtualMachineController extends BaseController
 
             'ssh_keys' => ['nullable', 'array']
         ];
+
+        // Check we either have template or appliance_id but not both
+        if (!($request->has('template') xor $request->has('appliance_id'))) {
+            throw new Exceptions\BadRequestException(
+                'Virtual machines must be launched with either the appliance_id or template parameter'
+            );
+        }
 
         if ($request->input('environment') == 'Public') {
             $rules['hdd_iops'] = ['nullable', 'integer'];
@@ -169,7 +185,7 @@ class VirtualMachineController extends BaseController
                 $maxRam = min($maxRam, $solution->ramAvailable());
                 if ($maxRam < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'host has insufficient ram, ' . $maxRam . ' remaining'
+                        'host has insufficient ram, ' . $maxRam . 'GB remaining'
                     ));
                 }
 
@@ -180,10 +196,14 @@ class VirtualMachineController extends BaseController
                     $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
                 }
 
-                $maxHdd = $datastore->usage->available;
+                $maxHdd = min(
+                    $datastore->usage->available,
+                    VirtualMachine::MAX_HDD
+                );
+
                 if ($maxHdd < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'datastore has insufficient space, ' . $maxRam . ' remaining'
+                        'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
                 }
             }
@@ -194,8 +214,16 @@ class VirtualMachineController extends BaseController
 
             if ($solution->isMultiNetwork()) {
                 $rules['network_id'] = ['required', 'integer'];
+
+                if (!$solution->hasMultipleNetworks()) {
+                    unset($rules['network_id']);
+
+                    $defaultNetwork = SolutionNetwork::withSolution($solution->getKey())->first();
+                    $request->request->add(['network_id' => $defaultNetwork->getKey()]);
+                }
             }
         }
+
 
         $rules['cpu'] = array_merge($rules['cpu'], [
             'min:' . $minCpu, 'max:' . $maxCpu
@@ -205,35 +233,131 @@ class VirtualMachineController extends BaseController
             'min:' . $minRam, 'max:' . $maxRam
         ]);
 
-        $rules['hdd'] = array_merge($rules['hdd'], [
-            'min:' . $minHdd, 'max:' . $maxHdd
-        ]);
+        // single disk vm requested
+        if ($request->has('hdd')) {
+            $rules['hdd'] = array_merge($rules['hdd'], [
+                'min:' . $minHdd, 'max:' . $maxHdd
+            ]);
+        }
 
-//        if ($request->has('hdd_disks')) {
-//            // todo add support for multiple disks
-//
-//            $hdd_disks = $request->input('hdd');
-//        } else {
-//            $hdd_disks = [
-//                'Hard disk 1' => $request->input('hdd')
-//            ];
-//        }
+        // multi-disk vm requested
+        if ($request->has('hdd_disks')) {
+            // validate disk names
+            $rules['hdd_disks.*.name'] = [
+                'required', 'regex:/' . VirtualMachine::HDD_NAME_FORMAT_REGEX . '/'
+            ];
+
+            // todo check numbers are sequential?
+
+
+            // validate disk capacity
+            $rules['hdd_disks.*.capacity'] = [
+                'required', 'integer', 'min:' . $minHdd, 'max:' . $maxHdd
+            ];
+
+            $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
+            if ($capacityRequested > $datastore->usage->available) {
+                throw new InsufficientResourceException($intapiService->getFriendlyError(
+                    'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining'
+                ));
+            }
+        }
 
         $this->validate($request, $rules);
 
-        // check template is valid
-        $template = TemplateController::getTemplateByName(
-            $request->input('template'),
-            $pod,
-            $solution
-        );
+        /**
+         * Launch VM from Appliance
+         */
+        if ($request->has('appliance_id')) {
+            $scriptRules = [];
 
+            //Validate the appliance exists
+            $appliance = ApplianceController::getApplianceById($request, $request->input('appliance_id'));
+
+            $applianceVersion = $appliance->getLatestVersion();
+
+            // Load the VM template from the appliance version specification
+            if (empty($applianceVersion->vm_template)) {
+                throw new TemplateNotFoundException('Invalid Virtual Machine Template for Appliance');
+            }
+            $templateName = $applianceVersion->getTemplateName();
+
+            // Sort the Appliance params from the Request (user input) into key => value and add back
+            // onto our Request for easy validation
+            $requestApplianceParams = [];
+            foreach ($request->parameters as $requestParam) {
+                $requestApplianceParams[trim($requestParam['key'])] = $requestParam['value'];
+                //Add prefixed param to request (to avoid conflicts)
+                $request['appliance_param_'.trim($requestParam['key'])] = $requestParam['value'];
+            }
+
+            // Get the script parameters that we need from the latest version of teh appliance
+            $parameters = $applianceVersion->getParameters();
+
+            // For each of the script parameters build some validation rules
+            foreach ($parameters as $parameterKey => $parameter) {
+                $key = 'appliance_param_' . $parameterKey;
+                $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
+                //validation rules regex
+                if (!empty($parameters[$parameterKey]->validation_rule)) {
+                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->validation_rule;
+                }
+
+                // For data types String,Numeric,Boolean we can use Laravel validation
+                $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
+            }
+
+            $this->validate($request, $scriptRules);
+
+            // Attempt to build the script
+            $Mustache_Engine = new Mustache_Engine;
+
+            $mustacheTemplate = $Mustache_Engine->loadTemplate($applianceVersion->script_template);
+
+            $applianceScript = $mustacheTemplate->render($requestApplianceParams);
+
+            // Try to load the server license associated with th appliance version
+            try {
+                $serverLicense = $applianceVersion->getLicense();
+            } catch (ApplianceServerLicenseNotFoundException $exception) {
+                if ($this->isAdmin) {
+                    throw new ApplianceServerLicenseNotFoundException(
+                        $exception->getMessage()
+                    );
+                }
+
+                Log::critical(
+                    "Unable to launch VM using Appliance '" . $appliance->getKey() . "'': Appliance version '"
+                    . $applianceVersion->getKey() . "' has no server license."
+                );
+                throw new ServiceUnavailableException(
+                    "Unable to launch Appliance '" . $appliance->getKey() . "' at this time."
+                );
+            }
+
+            $platform = $serverLicense->server_license_category;
+            $license = $serverLicense->server_license_name;
+        }
+
+        if ($request->has('template')) {
+            $templateName = $request->input('template');
+            // check template is valid
+            $template = TemplateController::getTemplateByName(
+                $templateName,
+                $pod,
+                $solution
+            );
+
+            $platform = $template->platform;
+            $license = $template->license;
+        }
+        
         if ($request->has('computername')) {
-            if ($template->platform == 'Linux') {
+            if ($platform == 'Linux') {
                 $rules['computername'] = [
                     'regex:/' . VirtualMachine::HOSTNAME_FORMAT_REGEX . '/'
                 ];
-            } elseif ($template->platform == 'Windows') {
+            } elseif ($platform == 'Windows') {
                 $rules['computername'] = [
                     'regex:/' . VirtualMachine::NETBIOS_FORMAT_REGEX . '/'
                 ];
@@ -265,21 +389,28 @@ class VirtualMachineController extends BaseController
         );
 
         if ($request->has('ssh_keys')) {
-            if ($template->platform != 'Linux') {
+            if ($platform != 'Linux') {
                 throw new Exceptions\BadRequestException("ssh_keys only supported for Linux VM's at this time");
             }
             $post_data['ssh_keys'] = $request->input('ssh_keys');
         }
 
         // set template
-        $post_data['platform'] = $template->platform;
-        $post_data['license'] = $template->license;
+        $post_data['platform'] = $platform;
+        $post_data['license'] = $license;
 
-        if ($template->type != 'Base') {
-            $post_data['template'] = $request->input('template');
+        if ($request->has('appliance_id')) {
+            $post_data['template'] = $templateName;
+            $post_data['template_type'] = 'system';
+        }
 
-            if ($template->type != 'Solution') {
-                $post_data['template_type'] = 'System';
+        if ($request->has('template')) {
+            if ($template->type != 'Base') {
+                $post_data['template'] = $templateName;
+
+                if ($template->type != 'Solution') {
+                    $post_data['template_type'] = 'system';
+                }
             }
         }
 
@@ -293,10 +424,20 @@ class VirtualMachineController extends BaseController
 
 
         // set storage
-        $post_data['hdd_gb'] = $request->input('hdd');
+        if ($request->has('hdd')) {
+            $post_data['hdd_gb'] = $request->input('hdd');
+        } elseif ($request->has('hdd_disks')) {
+            $post_data['hdd_gb'] = [];
+
+            foreach ($request->input('hdd_disks') as $disk) {
+                $post_data['hdd_gb'][$disk['name']] = $disk['capacity'];
+            }
+        }
+
         if ($request->has('datastore_id')) {
             $post_data['reseller_lun_id'] = $request->input('datastore_id');
         }
+
 
         // todo check template disks not larger than request
 
@@ -352,6 +493,12 @@ class VirtualMachineController extends BaseController
         //set tags
         if ($request->has('tags')) {
             $post_data['tags'] = $request->input('tags');
+        }
+
+        // Do we have an appliance script?
+        if (!empty($applianceScript)) {
+            $post_data['bootstrap_script'] = json_encode($applianceScript);
+            $post_data['is_appliance'] = true;
         }
 
         // todo remove debugging when ready to retest
@@ -610,7 +757,7 @@ class VirtualMachineController extends BaseController
         }
 
         // todo remove when public/burst VMs supported, missing billing step on automation
-        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+        if (($virtualMachine->type() == 'Public' && !$this->isAdmin) || $virtualMachine->type() == 'Burst') {
             throw new Exceptions\ForbiddenException(
                 $virtualMachine->type() . ' VM updates are temporarily disabled'
             );

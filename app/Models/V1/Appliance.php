@@ -2,12 +2,15 @@
 
 namespace App\Models\V1;
 
+use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\BooleanProperty;
+use UKFast\Api\Resource\Property\DateTimeProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 
@@ -41,6 +44,15 @@ class Appliance extends Model implements Filterable, Sortable
 
     const UPDATED_AT = 'appliance_updated_at';
 
+    /**
+     * Non-database attributes
+     * @var array
+     */
+    protected $appends = [
+        // Return the latest version of the appliance
+        'version'
+    ];
+
     // Validation Rules
     public static $rules = [
         'name' => ['required',  'max:255'],
@@ -51,6 +63,37 @@ class Appliance extends Model implements Filterable, Sortable
         'active' => ['nullable', 'boolean']
     ];
 
+    /**
+     * The attributes included in the model's JSON form.
+     * Admin scope / everything
+     *
+     * @var array
+     */
+    protected $visible = [
+        'appliance_uuid',
+        'appliance_name',
+        'version',
+        'appliance_logo_uri',
+        'appliance_description',
+        'appliance_documentation_uri',
+        'appliance_publisher',
+        'appliance_active',
+        'appliance_created_at',
+        'appliance_updated_at',
+    ];
+
+    /**
+     * Restrict visibility for non-admin
+     */
+    const VISIBLE_SCOPE_RESELLER = [
+        'appliance_uuid',
+        'appliance_name',
+        'appliance_logo_uri',
+        'appliance_description',
+        'appliance_documentation_uri',
+        'appliance_publisher',
+        'appliance_created_at'
+    ];
 
     /**
      * Ditto configuration
@@ -66,11 +109,14 @@ class Appliance extends Model implements Filterable, Sortable
         return [
             'id' => 'appliance_uuid', //UUID, not internal id
             'name' => 'appliance_name',
+            'version' => 'version', //Non-database attribute
             'logo_uri' => 'appliance_logo_uri',
             'description' => 'appliance_description',
             'documentation_uri' => 'appliance_documentation_uri',
             'publisher' => 'appliance_publisher',
-            'active' => 'appliance_active' // Yes / No
+            'active' => 'appliance_active', // Yes / No
+            'created_at' => 'appliance_created_at',
+            'updated_at' => 'appliance_updated_at',
         ];
     }
 
@@ -83,12 +129,14 @@ class Appliance extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('version', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
             $factory->create('publisher', Filter::$stringDefaults),
-            $factory->create('active', Filter::$stringDefaults)
+            $factory->create('active', Filter::$stringDefaults),
+            $factory->create('created_at', Filter::$dateDefaults),
+            $factory->create('updated_at', Filter::$dateDefaults)
         ];
     }
-
 
     /**
      * Ditto sorting configuration
@@ -100,8 +148,11 @@ class Appliance extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('name'),
+            $factory->create('version'),
             $factory->create('publisher'),
-            $factory->create('active')
+            $factory->create('active'),
+            $factory->create('created_at'),
+            $factory->create('updated_at')
         ];
     }
 
@@ -118,7 +169,6 @@ class Appliance extends Model implements Filterable, Sortable
         ];
     }
 
-
     /**
      * Ditto Selectable persistent Properties
      * @return array
@@ -127,35 +177,6 @@ class Appliance extends Model implements Filterable, Sortable
     {
         return ['id'];
     }
-
-
-    /**
-     * The attributes included in the model's JSON form.
-     * Admin scope / everything
-     *
-     * @var array
-     */
-    protected $visible = [
-        'appliance_uuid',
-        'appliance_name',
-        'appliance_logo_uri',
-        'appliance_description',
-        'appliance_documentation_uri',
-        'appliance_publisher',
-        'appliance_active'
-    ];
-
-    /**
-     * Restrict visibility for non-admin
-     */
-    const VISIBLE_SCOPE_RESELLER = [
-        'appliance_uuid',
-        'appliance_name',
-        'appliance_logo_uri',
-        'appliance_description',
-        'appliance_documentation_uri',
-        'appliance_publisher'
-    ];
 
     /**
      * Resource package
@@ -169,11 +190,59 @@ class Appliance extends Model implements Filterable, Sortable
         return [
             IdProperty::create('appliance_uuid', 'id', null, 'uuid'),
             StringProperty::create('appliance_name', 'name'),
+            IntProperty::create('version', 'version'),
             StringProperty::create('appliance_logo_uri', 'logo_uri'),
             StringProperty::create('appliance_description', 'description'),
             StringProperty::create('appliance_documentation_uri', 'documentation_uri'),
             StringProperty::create('appliance_publisher', 'publisher'),
-            BooleanProperty::create('appliance_active', 'active', null, 'Yes', 'No')
+            BooleanProperty::create('appliance_active', 'active', null, 'Yes', 'No'),
+            DateTimeProperty::create('appliance_created_at', 'created_at'),
+            DateTimeProperty::create('appliance_updated_at', 'updated_at')
         ];
+    }
+
+    /**
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function versions()
+    {
+        return $this->hasMany(
+            'App\Models\V1\ApplianceVersion',
+            'appliance_version_appliance_id',
+            'appliance_id'
+        );
+    }
+
+    /**
+     * Get the latest version of the appliance.
+     * @return Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
+     * @throws ApplianceVersionNotFoundException
+     */
+    public function getLatestVersion()
+    {
+        $version = $this->versions()->orderBy('appliance_version_version', 'DESC')->limit(1);
+
+        if ($version->get()->count() > 0) {
+            return $version->first();
+        }
+
+        throw new ApplianceVersionNotFoundException(
+            'Unable to load latest version of the appliance. No versions were found.'
+        );
+    }
+
+    /**
+     * Get designation of the latest version of he application
+     * @return string
+     */
+    public function getVersionAttribute()
+    {
+        try {
+            $version = $this->getLatestVersion();
+            return $version->version;
+        } catch (ApplianceVersionNotFoundException $exception) {
+            return 0;
+        }
     }
 }

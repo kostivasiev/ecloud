@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
+use App\Exceptions\V1\TemplateNotFoundException;
+use App\Models\V1\AppliancePodAvailability;
 use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
@@ -14,6 +16,8 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 use Illuminate\Http\Request;
 
 use App\Models\V1\Appliance;
+
+use App\Models\V1\ApplianceVersion;
 
 class ApplianceController extends BaseController
 {
@@ -56,7 +60,8 @@ class ApplianceController extends BaseController
      */
     public function show(Request $request, $applianceId)
     {
-        $this->validateUuid($request, $applianceId);
+        $request['id'] = $applianceId;
+        $this->validate($request, ['id' => [new IsValidUuid()]]);
 
         return $this->respondItem(
             $request,
@@ -114,12 +119,16 @@ class ApplianceController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws DatabaseException
      * @throws ForbiddenException
+     * @throws ApplianceNotFoundException
      */
     public function update(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException('Only UKFast can update appliances at this time.');
         }
+
+        // Validate the the appliance exists:
+        static::getApplianceById($request, $applianceId);
 
         $rules = Appliance::$rules;
         $rules = array_merge(
@@ -144,14 +153,169 @@ class ApplianceController extends BaseController
 
 
     /**
-     * Validate the appliance UUID
-     * @param $request
-     * @param $uuid
+     * Return a list of versions for the appliance
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws ForbiddenException
      */
-    public function validateUuid($request, $uuid)
+    public function versions(Request $request, $applianceId)
     {
-        $request['id'] = $uuid;
-        $this->validate($request, ['appliance_id' => [new IsValidUuid()]]);
+        if (!$this->isAdmin) {
+            throw new ForbiddenException('Only UKFast can view appliance versioning information at this time.');
+        }
+
+        $appliance = static::getApplianceById($request, $applianceId);
+
+        $collectionQuery = ApplianceVersionController::getApplianceVersionQuery($request);
+        $collectionQuery->where('appliance_version_appliance_id', '=', $appliance->id);
+        $collectionQuery->orderBy('appliance_version_version', 'DESC');
+
+        (new QueryTransformer($request))
+            ->config(ApplianceVersion::class)
+            ->transform($collectionQuery);
+
+        $applianceVersions = $collectionQuery->paginate($this->perPage);
+
+        return $this->respondCollection(
+            $request,
+            $applianceVersions
+        );
+    }
+
+
+    /**
+     * Return the parameters for the latest version of the appliance
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
+     */
+    public function latestVersionParameters(Request $request, $applianceId)
+    {
+        $appliance = static::getApplianceById($request, $applianceId);
+
+        $applianceVersion = $appliance->getLatestVersion();
+
+        $applianceVersionController = new ApplianceVersionController($request);
+
+        return $applianceVersionController->versionParameters($request, $applianceVersion->uuid);
+    }
+
+
+    /**
+     * Return the latest appliance version
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws ForbiddenException
+     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
+     */
+    public function latestVersion(Request $request, $applianceId)
+    {
+        $appliance = static::getApplianceById($request, $applianceId);
+
+        $applianceVersion = $appliance->getLatestVersion();
+
+        $applianceVersionController = new ApplianceVersionController($request);
+
+        return $applianceVersionController->show($request, $applianceVersion->uuid);
+    }
+
+
+    /**
+     * List the appliances available in a pod
+     * @param Request $request
+     * @param $podId
+     * @return \Illuminate\Http\Response
+     */
+    public function podAvailability(Request $request, $podId)
+    {
+        $applianceQuery = static::getApplianceQuery($request);
+        $applianceQuery->join(
+            'appliance_pod_availability',
+            'appliance.appliance_id',
+            'appliance_pod_availability.appliance_pod_availability_appliance_id'
+        )
+            ->where('appliance_pod_availability_ucs_datacentre_id', '=', $podId);
+
+        if (!$this->isAdmin) {
+            $applianceQuery->join(
+                'reseller.ucs_datacentre',
+                'appliance_pod_availability_ucs_datacentre_id',
+                'ucs_datacentre.ucs_datacentre_id'
+            )->where('ucs_datacentre_oneclick_enabled', '=', 'Yes');
+        }
+
+        (new QueryTransformer($request))
+            ->config(Appliance::class)
+            ->transform($applianceQuery);
+
+        $appliances = $applianceQuery->paginate($this->perPage);
+
+        return $this->respondCollection(
+            $request,
+            $appliances,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : Appliance::VISIBLE_SCOPE_RESELLER
+        );
+    }
+
+
+    /**
+     * Add an appliance to a pod
+     * @param Request $request
+     * @param $podId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     * @throws TemplateNotFoundException
+     * @throws \App\Exceptions\V1\PodNotFoundException
+     */
+    public function addToPod(Request $request, $podId)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException('Only UKFast can update appliances at this time.');
+        }
+
+        $this->validate($request, ['appliance_id' => ['required', new IsValidUuid()]]);
+
+        // Validate the Pod
+        $pod = PodController::getPodById($request, $podId);
+
+        $appliance = static::getApplianceById($request, $request->input('appliance_id'));
+
+        // Validate that the VM template associated with the Appliance is on the Pod
+        $latestVersion = $appliance->getLatestVersion();
+        try {
+            $template = TemplateController::getTemplateByName($latestVersion->vm_template, $pod);
+        } catch (TemplateNotFoundException $exception) {
+            throw new TemplateNotFoundException(
+                'The VM template \'' . $latestVersion->vm_template
+                . '\' associated with this Application\'s latest version was not found on this Pod'
+            );
+        }
+
+        $row = new AppliancePodAvailability();
+        $row->appliance_id = $appliance->id;
+        $row->ucs_datacentre_id = $podId;
+        try {
+            $row->save();
+        } catch (\Exception $exception) {
+            $message = 'Unable to add Appliance to pod';
+            if ($exception->getCode() == 23000) {
+                $message .= ': The Appliance is already in this Pod.';
+            }
+            throw new DatabaseException($message);
+        }
+
+        return $this->respondEmpty();
     }
 
 
