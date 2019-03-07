@@ -125,15 +125,18 @@ class ApplianceVersionController extends BaseController
         }
 
         // Extract script variable tokens
-        $variableTokens = array_filter($tokens, function ($var) {
-            return in_array($var['type'],
-                [
-                    Mustache_Tokenizer::T_ESCAPED,
-                    Mustache_Tokenizer::T_UNESCAPED,
-                    Mustache_Tokenizer::T_UNESCAPED_2
-                ]
-            );
-        });
+        $variableTokens = array_filter(
+            $tokens,
+            function ($var) {
+                return in_array($var['type'],
+                    [
+                        Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::T_UNESCAPED,
+                        Mustache_Tokenizer::T_UNESCAPED_2
+                    ]
+                );
+            }
+        );
 
         $scriptVariables = array_unique(array_column($variableTokens, 'name'));
 
