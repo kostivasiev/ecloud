@@ -36,7 +36,7 @@ class ApplianceVersionController extends BaseController
     public function index(Request $request)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can view version information at this time.');
+            throw new ForbiddenException();
         }
         $collectionQuery = static::getApplianceVersionQuery($request);
 
@@ -64,7 +64,7 @@ class ApplianceVersionController extends BaseController
     public function show(Request $request, $applianceVersionId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can view version information at this time.');
+            throw new ForbiddenException();
         }
         $request['id'] = $applianceVersionId;
         $this->validate($request, ['id' => [new IsValidUuid()]]);
@@ -95,7 +95,7 @@ class ApplianceVersionController extends BaseController
     public function create(Request $request)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can publish appliances at this time.');
+            throw new ForbiddenException();
         }
         
         // Validates request has correct JSON format
@@ -258,7 +258,7 @@ class ApplianceVersionController extends BaseController
     public function update(Request $request, $applianceVersionId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliance versions at this time.');
+            throw new ForbiddenException();
         }
 
         // Validate the appliance version exists

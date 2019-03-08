@@ -87,7 +87,7 @@ class ApplianceController extends BaseController
     public function create(Request $request)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can publish appliances at this time.');
+            throw new ForbiddenException();
         }
 
         $this->validate($request, Appliance::$rules);
@@ -124,7 +124,7 @@ class ApplianceController extends BaseController
     public function update(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliances at this time.');
+            throw new ForbiddenException();
         }
 
         // Validate the the appliance exists:
@@ -163,7 +163,7 @@ class ApplianceController extends BaseController
     public function versions(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can view appliance versioning information at this time.');
+            throw new ForbiddenException();
         }
 
         $appliance = static::getApplianceById($request, $applianceId);
@@ -281,7 +281,7 @@ class ApplianceController extends BaseController
     public function addToPod(Request $request, $podId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliances at this time.');
+            throw new ForbiddenException();
         }
 
         $this->validate($request, ['appliance_id' => ['required', new IsValidUuid()]]);

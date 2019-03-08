@@ -120,7 +120,7 @@ class ApplianceParametersController extends BaseController
     public function update(Request $request, $applianceParameterId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliance parameters at this time.');
+            throw new ForbiddenException();
         }
 
         $rules = ApplianceParameters::getUpdateRules();
