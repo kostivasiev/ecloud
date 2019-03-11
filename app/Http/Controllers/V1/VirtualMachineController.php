@@ -550,12 +550,16 @@ class VirtualMachineController extends BaseController
      * @param $vmId
      * @return \Illuminate\Http\Response
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
      */
     public function destroy(Request $request, IntapiService $intapiService, $vmId)
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
+        if (!$virtualMachine) {
+            throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
+        }
 
         //cant delete vm if its doing something that requires it to exist
         if (!$virtualMachine->canBeDeleted()) {
