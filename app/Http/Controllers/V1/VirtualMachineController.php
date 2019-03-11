@@ -558,7 +558,7 @@ class VirtualMachineController extends BaseController
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
         if (!$virtualMachine) {
-            throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
+            throw new Exceptions\NotFoundException("Virtual Machine with ID '$vmId' not found");
         }
 
         //cant delete vm if its doing something that requires it to exist
