@@ -1079,10 +1079,9 @@ class VirtualMachineController extends BaseController
 
             $solutionTemplates = $TemplateController->getSolutionTemplates($virtualMachine->solution, false);
             if (is_array($solutionTemplates) and count($solutionTemplates) > 0) {
-                $existingTemplate = array_filter($solutionTemplates, function($template) use ($request) {
+                 $existingTemplate = array_filter($solutionTemplates, function ($template) use ($request) {
                     return ($template->name == $request->input('template_name'));
                 });
-
             }
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
