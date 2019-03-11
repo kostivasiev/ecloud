@@ -7,6 +7,7 @@ use App\Exceptions\V1\SolutionNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -67,6 +68,7 @@ class Solution extends Model implements Filterable, Sortable
             'id' => 'ucs_reseller_id',
             'name' => 'ucs_reseller_solution_name',
             'type' => 'ucs_reseller_type',
+            'pod_id' => 'ucs_reseller_datacentre_id',
         ];
     }
 
@@ -75,12 +77,13 @@ class Solution extends Model implements Filterable, Sortable
      * @param FilterFactory $factory
      * @return array
      */
-    public function filterableColumns($factory)
+    public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
+            $factory->create('pod_id', Filter::$numericDefaults),
+            $factory->create('environment', Filter::$stringDefaults),
         ];
     }
 
@@ -91,12 +94,13 @@ class Solution extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function sortableColumns($factory)
+    public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('type'),
+            $factory->create('pod_id'),
+            $factory->create('environment'),
         ];
     }
 
@@ -106,7 +110,7 @@ class Solution extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function defaultSort($sortFactory)
+    public function defaultSort(SortFactory $sortFactory)
     {
         return [
             $sortFactory->create('id', 'asc'),
@@ -135,7 +139,8 @@ class Solution extends Model implements Filterable, Sortable
         return [
             IdProperty::create('ucs_reseller_id', 'id'),
             StringProperty::create('ucs_reseller_solution_name', 'name'),
-            StringProperty::create('ucs_reseller_type', 'type'),
+            IntProperty::create('ucs_reseller_datacentre_id', 'pod_id'),
+            StringProperty::create('ucs_reseller_type', 'environment'),
         ];
     }
 
@@ -359,9 +364,17 @@ class Solution extends Model implements Filterable, Sortable
     public function isMultiNetwork()
     {
         return SolutionNetwork::withSolution($this->getKey())
-            ->limit(2)
-            ->count() > 1
+            ->limit(1)
+            ->count() > 0
         ;
+    }
+
+    public function hasMultipleNetworks()
+    {
+        return SolutionNetwork::withSolution($this->getKey())
+                ->limit(2)
+                ->count() > 1
+            ;
     }
 
 

@@ -43,6 +43,15 @@ return [
             'password'  => env('DB_PASSWORD')
         ],
 
+        'ecloud' => [
+            'driver'    => 'mysql',
+            'host'      => env('DB_HOST'),
+            'port'      => env('DB_PORT'),
+            'database'  => env('DB_DATABASE_ECLOUD'),
+            'username'  => env('DB_USERNAME'),
+            'password'  => env('DB_PASSWORD')
+        ],
+
         'sqlite' => [
             'driver' => 'sqlite',
             'database' => env('DB_DATABASE', database_path('database.sqlite')),

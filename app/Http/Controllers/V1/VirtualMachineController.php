@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
+use App\Exceptions\V1\TemplateNotFoundException;
+use App\Rules\V1\IsValidUuid;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -32,6 +35,9 @@ use App\Exceptions\V1\ServiceTimeoutException;
 use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Exceptions\V1\InsufficientResourceException;
+use Log;
+
+use Mustache_Engine;
 
 class VirtualMachineController extends BaseController
 {
@@ -83,6 +89,7 @@ class VirtualMachineController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\UnauthorisedException
      * @throws InsufficientResourceException
      * @throws IntapiServiceException
      * @throws ServiceResponseException
@@ -92,6 +99,7 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -107,30 +115,38 @@ class VirtualMachineController extends BaseController
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
-            'template' => ['required'],
+             // User must either specify a vm template or an appliance_id
+            'template' => ['required_without:appliance_id'],
+            'appliance_id' => ['required_without:template', new IsValidUuid()],
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
-            'hdd' => ['required', 'integer'],
+            'hdd' => ['required_without:hdd_disks', 'integer'],
+            'hdd_disks' => ['required_without:hdd', 'array'],
 
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
             'site_id' => ['nullable', 'integer'],
 
             'tags' => ['nullable', 'array'],
+
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+
+            'ssh_keys' => ['nullable', 'array']
         ];
+
+        // Check we either have template or appliance_id but not both
+        if (!($request->has('template') xor $request->has('appliance_id'))) {
+            throw new Exceptions\BadRequestException(
+                'Virtual machines must be launched with either the appliance_id or template parameter'
+            );
+        }
 
         if ($request->input('environment') == 'Public') {
             $rules['hdd_iops'] = ['nullable', 'integer'];
             // todo public iops
         } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
-        }
-
-        if ($request->has('name')) {
-            $rules['name'] = [
-                'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'
-            ];
         }
 
         if ($request->has('tags')) {
@@ -148,7 +164,6 @@ class VirtualMachineController extends BaseController
         }
 
         $this->validate($request, $rules);
-
 
         // environment specific validation
         $minCpu = VirtualMachine::MIN_CPU;
@@ -170,7 +185,7 @@ class VirtualMachineController extends BaseController
                 $maxRam = min($maxRam, $solution->ramAvailable());
                 if ($maxRam < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'host has insufficient ram, ' . $maxRam . ' remaining'
+                        'host has insufficient ram, ' . $maxRam . 'GB remaining'
                     ));
                 }
 
@@ -181,10 +196,14 @@ class VirtualMachineController extends BaseController
                     $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
                 }
 
-                $maxHdd = $datastore->usage->available;
+                $maxHdd = min(
+                    $datastore->usage->available,
+                    VirtualMachine::MAX_HDD
+                );
+
                 if ($maxHdd < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
-                        'datastore has insufficient space, ' . $maxRam . ' remaining'
+                        'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
                 }
             }
@@ -195,8 +214,16 @@ class VirtualMachineController extends BaseController
 
             if ($solution->isMultiNetwork()) {
                 $rules['network_id'] = ['required', 'integer'];
+
+                if (!$solution->hasMultipleNetworks()) {
+                    unset($rules['network_id']);
+
+                    $defaultNetwork = SolutionNetwork::withSolution($solution->getKey())->first();
+                    $request->request->add(['network_id' => $defaultNetwork->getKey()]);
+                }
             }
         }
+
 
         $rules['cpu'] = array_merge($rules['cpu'], [
             'min:' . $minCpu, 'max:' . $maxCpu
@@ -206,35 +233,131 @@ class VirtualMachineController extends BaseController
             'min:' . $minRam, 'max:' . $maxRam
         ]);
 
-        $rules['hdd'] = array_merge($rules['hdd'], [
-            'min:' . $minHdd, 'max:' . $maxHdd
-        ]);
+        // single disk vm requested
+        if ($request->has('hdd')) {
+            $rules['hdd'] = array_merge($rules['hdd'], [
+                'min:' . $minHdd, 'max:' . $maxHdd
+            ]);
+        }
 
-//        if ($request->has('hdd_disks')) {
-//            // todo add support for multiple disks
-//
-//            $hdd_disks = $request->input('hdd');
-//        } else {
-//            $hdd_disks = [
-//                'Hard disk 1' => $request->input('hdd')
-//            ];
-//        }
+        // multi-disk vm requested
+        if ($request->has('hdd_disks')) {
+            // validate disk names
+            $rules['hdd_disks.*.name'] = [
+                'required', 'regex:/' . VirtualMachine::HDD_NAME_FORMAT_REGEX . '/'
+            ];
+
+            // todo check numbers are sequential?
+
+
+            // validate disk capacity
+            $rules['hdd_disks.*.capacity'] = [
+                'required', 'integer', 'min:' . $minHdd, 'max:' . $maxHdd
+            ];
+
+            $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
+            if ($capacityRequested > $datastore->usage->available) {
+                throw new InsufficientResourceException($intapiService->getFriendlyError(
+                    'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining'
+                ));
+            }
+        }
 
         $this->validate($request, $rules);
 
-        // check template is valid
-        $template = TemplateController::getTemplateByName(
-            $request->input('template'),
-            $pod,
-            $solution
-        );
+        /**
+         * Launch VM from Appliance
+         */
+        if ($request->has('appliance_id')) {
+            $scriptRules = [];
 
+            //Validate the appliance exists
+            $appliance = ApplianceController::getApplianceById($request, $request->input('appliance_id'));
+
+            $applianceVersion = $appliance->getLatestVersion();
+
+            // Load the VM template from the appliance version specification
+            if (empty($applianceVersion->vm_template)) {
+                throw new TemplateNotFoundException('Invalid Virtual Machine Template for Appliance');
+            }
+            $templateName = $applianceVersion->getTemplateName();
+
+            // Sort the Appliance params from the Request (user input) into key => value and add back
+            // onto our Request for easy validation
+            $requestApplianceParams = [];
+            foreach ($request->parameters as $requestParam) {
+                $requestApplianceParams[trim($requestParam['key'])] = $requestParam['value'];
+                //Add prefixed param to request (to avoid conflicts)
+                $request['appliance_param_'.trim($requestParam['key'])] = $requestParam['value'];
+            }
+
+            // Get the script parameters that we need from the latest version of teh appliance
+            $parameters = $applianceVersion->getParameters();
+
+            // For each of the script parameters build some validation rules
+            foreach ($parameters as $parameterKey => $parameter) {
+                $key = 'appliance_param_' . $parameterKey;
+                $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
+                //validation rules regex
+                if (!empty($parameters[$parameterKey]->validation_rule)) {
+                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->validation_rule;
+                }
+
+                // For data types String,Numeric,Boolean we can use Laravel validation
+                $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
+            }
+
+            $this->validate($request, $scriptRules);
+
+            // Attempt to build the script
+            $Mustache_Engine = new Mustache_Engine;
+
+            $mustacheTemplate = $Mustache_Engine->loadTemplate($applianceVersion->script_template);
+
+            $applianceScript = $mustacheTemplate->render($requestApplianceParams);
+
+            // Try to load the server license associated with th appliance version
+            try {
+                $serverLicense = $applianceVersion->getLicense();
+            } catch (ApplianceServerLicenseNotFoundException $exception) {
+                if ($this->isAdmin) {
+                    throw new ApplianceServerLicenseNotFoundException(
+                        $exception->getMessage()
+                    );
+                }
+
+                Log::critical(
+                    "Unable to launch VM using Appliance '" . $appliance->getKey() . "'': Appliance version '"
+                    . $applianceVersion->getKey() . "' has no server license."
+                );
+                throw new ServiceUnavailableException(
+                    "Unable to launch Appliance '" . $appliance->getKey() . "' at this time."
+                );
+            }
+
+            $platform = $serverLicense->server_license_category;
+            $license = $serverLicense->server_license_name;
+        }
+
+        if ($request->has('template')) {
+            $templateName = $request->input('template');
+            // check template is valid
+            $template = TemplateController::getTemplateByName(
+                $templateName,
+                $pod,
+                $solution
+            );
+
+            $platform = $template->platform;
+            $license = $template->license;
+        }
+        
         if ($request->has('computername')) {
-            if ($template->platform == 'Linux') {
+            if ($platform == 'Linux') {
                 $rules['computername'] = [
                     'regex:/' . VirtualMachine::HOSTNAME_FORMAT_REGEX . '/'
                 ];
-            } elseif ($template->platform == 'Windows') {
+            } elseif ($platform == 'Windows') {
                 $rules['computername'] = [
                     'regex:/' . VirtualMachine::NETBIOS_FORMAT_REGEX . '/'
                 ];
@@ -243,9 +366,16 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
-        // set initial _post data
+        //If admin reseller scope is 0, we won't know the reseller id for Public VM's
+        if (empty($solution) && empty($request->user->resellerId)) {
+            if ($request->user->isAdmin) {
+                throw new Exceptions\BadRequestException('Missing Reseller scope');
+            }
+            throw new Exceptions\UnauthorisedException('Unable to determine reseller id');
+        }
+
         $post_data = array(
-            'reseller_id' => $request->user->resellerId,
+            'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user->resellerId,
             'ecloud_type' => $request->input('environment'),
             'ucs_reseller_id' => $request->input('solution_id'),
             'server_active' => true,
@@ -258,16 +388,29 @@ class VirtualMachineController extends BaseController
             'launched_by' => '-5',
         );
 
+        if ($request->has('ssh_keys')) {
+            if ($platform != 'Linux') {
+                throw new Exceptions\BadRequestException("ssh_keys only supported for Linux VM's at this time");
+            }
+            $post_data['ssh_keys'] = $request->input('ssh_keys');
+        }
 
         // set template
-        $post_data['platform'] = $template->platform;
-        $post_data['license'] = $template->license;
+        $post_data['platform'] = $platform;
+        $post_data['license'] = $license;
 
-        if ($template->type != 'Base') {
-            $post_data['template'] = $request->input('template');
+        if ($request->has('appliance_id')) {
+            $post_data['template'] = $templateName;
+            $post_data['template_type'] = 'system';
+        }
 
-            if ($template->type != 'Solution') {
-                $post_data['template_type'] = 'System';
+        if ($request->has('template')) {
+            if ($template->type != 'Base') {
+                $post_data['template'] = $templateName;
+
+                if ($template->type != 'Solution') {
+                    $post_data['template_type'] = 'system';
+                }
             }
         }
 
@@ -275,17 +418,26 @@ class VirtualMachineController extends BaseController
             $post_data['template_password'] = $request->input('template_password');
         }
 
-
         // set compute
         $post_data['cpus'] = $request->input('cpu');
         $post_data['ram_gb'] = $request->input('ram');
 
 
         // set storage
-        $post_data['hdd_gb'] = $request->input('hdd');
+        if ($request->has('hdd')) {
+            $post_data['hdd_gb'] = $request->input('hdd');
+        } elseif ($request->has('hdd_disks')) {
+            $post_data['hdd_gb'] = [];
+
+            foreach ($request->input('hdd_disks') as $disk) {
+                $post_data['hdd_gb'][$disk['name']] = $disk['capacity'];
+            }
+        }
+
         if ($request->has('datastore_id')) {
             $post_data['reseller_lun_id'] = $request->input('datastore_id');
         }
+
 
         // todo check template disks not larger than request
 
@@ -343,6 +495,12 @@ class VirtualMachineController extends BaseController
             $post_data['tags'] = $request->input('tags');
         }
 
+        // Do we have an appliance script?
+        if (!empty($applianceScript)) {
+            $post_data['bootstrap_script'] = json_encode($applianceScript);
+            $post_data['is_appliance'] = true;
+        }
+
         // todo remove debugging when ready to retest
 //        print_r($post_data);
 //        exit;
@@ -392,12 +550,16 @@ class VirtualMachineController extends BaseController
      * @param $vmId
      * @return \Illuminate\Http\Response
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
      */
     public function destroy(Request $request, IntapiService $intapiService, $vmId)
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
+        if (!$virtualMachine) {
+            throw new Exceptions\NotFoundException("Virtual Machine with ID '$vmId' not found");
+        }
 
         //cant delete vm if its doing something that requires it to exist
         if (!$virtualMachine->canBeDeleted()) {
@@ -575,11 +737,18 @@ class VirtualMachineController extends BaseController
      */
     public function update(Request $request, IntapiService $intapiService, $vmId)
     {
+        /**
+         * This endpoint should be using HTTP PATCH, log if we detect any PUT requests.
+         */
+        if ($request->method() == 'PUT') {
+            Log::notice('Call to update VM endpoint using PUT detected. Request should be using PATCH');
+        }
+
         $rules = [
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'cpu' => ['nullable', 'integer'],
             'ram' => ['nullable', 'integer'],
-            'hdd' => ['nullable', 'array'],
+            'hdd_disks' => ['nullable', 'array'],
         ];
 
         $this->validateVirtualMachineId($request, $vmId);
@@ -592,7 +761,7 @@ class VirtualMachineController extends BaseController
         }
 
         // todo remove when public/burst VMs supported, missing billing step on automation
-        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+        if (($virtualMachine->type() == 'Public' && !$this->isAdmin) || $virtualMachine->type() == 'Burst') {
             throw new Exceptions\ForbiddenException(
                 $virtualMachine->type() . ' VM updates are temporarily disabled'
             );
@@ -680,7 +849,7 @@ class VirtualMachineController extends BaseController
         $existingDisks = [];
         if ($disks !== false) {
             foreach ($disks as $disk) {
-                $existingDisks[$disk->name] = $disk;
+                $existingDisks[$disk->uuid] = $disk;
             }
         }
 
@@ -688,92 +857,111 @@ class VirtualMachineController extends BaseController
         $automationData['hdd'] = [];
         $totalCapacity = 0;
 
-        if ($request->has('hdd')) {
-            foreach ($request->input('hdd') as $name => $capacity) {
-                if (!is_numeric($capacity) && $capacity != 'deleted') {
-                    throw new Exceptions\BadRequestException("Unexpected hdd_value for '$name'");
+        if ($request->has('hdd_disks')) {
+            $newDisksCount = 0;
+            foreach ($request->input('hdd_disks') as $hdd) {
+                $hdd = (object) $hdd;
+
+                $isExistingDisk = false;
+                if (isset($hdd->uuid)) {
+                    // existing disks
+                    $isExistingDisk = array_key_exists($hdd->uuid, $existingDisks);
+                    if (!$isExistingDisk) {
+                        throw new Exceptions\BadRequestException("HDD with UUID '" . $hdd->uuid . "' was not found");
+                    }
                 }
 
-                $diskData = new \stdClass();
-                $diskData->name = $name;
-                $diskData->capacity = $capacity;
-
-                // existing disks
-                $isExistingDisk = array_key_exists($name, $existingDisks);
                 if ($isExistingDisk) {
-                    // For existing disks add the disk UUID
-                    $diskData->uuid = $existingDisks[$name]->uuid;
+                    $hdd->name = $existingDisks[$hdd->uuid]->name;
 
-                    //capacity can be an integer or the string 'deleted'
-                    //Add disks marked as deleted to automation data
-                    if ($capacity == 'deleted') {
-                        if ($name == 'Hard disk 1') {
+                    //Add disks marked as deleted (state = 'absent') to automation data
+                    if (isset($hdd->state) && $hdd->state == 'absent') {
+                        if ($hdd->name == 'Hard disk 1' || ($hdd->uuid == $disks[0]->uuid)) {
                             // Don't allow deletion of the primary hard disk
                             $message = 'Primary hard disk (Hard disk 1) can not be deleted';
                             throw new Exceptions\ForbiddenException($message);
                         }
 
                         // Don't allow deletion of Hard disk 2 on VM's with legacy LVM
-                        if ($name == 'Hard disk 2' && $virtualMachine->hasLegacyLVM()) {
+                        if ($hdd->name == 'Hard disk 2' && $virtualMachine->hasLegacyLVM()) {
                             $message = 'Unable to delete Hard Disk 2 on VMs with legacy LVM';
                             throw new Exceptions\ForbiddenException($message);
                         }
 
-                        $automationData['hdd'][$name] = $diskData;
+                        $hdd->capacity = 'deleted';
+                        $automationData['hdd'][$hdd->name] = $hdd;
                         continue;
                     }
 
-                    if ($capacity < $existingDisks[$name]->capacity) {
+                    //Non-deleted disks
+                    if (!is_numeric($hdd->capacity)) {
+                        throw new Exceptions\BadRequestException("Invalid capacity for HDD '" . $hdd->uuid . "'");
+                    }
+
+                    if ($hdd->capacity < $existingDisks[$hdd->uuid]->capacity) {
                         $message = 'We are currently unable to shrink HDD capacity, ';
-                        $message .= "hdd '$name' value must be larger than {$existingDisks[$name]->capacity}GB";
+                        $message .= "HDD '" . $hdd->uuid . "' value must be larger than";
+                        $message .= $existingDisks[$hdd->uuid]->capacity . "GB";
                         throw new Exceptions\ForbiddenException($message);
                     }
 
                     // Prevent expand of Hard disk 1 for VM's with legacy LVM
                     if ($virtualMachine->hasLegacyLVM()
-                        && $name == 'Hard disk 1'
-                        && $capacity > $existingDisks[$name]->capacity) {
-                        $message = 'Unable to expand Disk 1 on VMs with legacy LVM';
+                        && $hdd->name == 'Hard disk 1'
+                        && $hdd->capacity > $existingDisks[$hdd->uuid]->capacity) {
+                        $message = 'Unable to expand Hard Disk 1 on VMs with legacy LVM';
                         throw new Exceptions\ForbiddenException($message);
                     }
 
                     //disk isn't changed
-                    if ($capacity == $existingDisks[$name]->capacity) {
-                        $totalCapacity += $capacity;
-                        $automationData['hdd'][$name] = $diskData;
+                    if ($hdd->capacity == $existingDisks[$hdd->uuid]->capacity) {
+                        $totalCapacity += $hdd->capacity;
+                        $hdd->state = 'present'; // For when we update the automation
+                        $automationData['hdd'][$hdd->name] = $hdd;
                         continue;
                     }
                 }
 
                 // New disks must be prefixed with 'New '
-                if (!$isExistingDisk && strpos($name, 'New ') === false) {
-                    //TODO: Potentially we don't need this check as existing disks will have a UUID
-                    throw new Exceptions\ForbiddenException("Non-existent disks names must be prefixed with 'New '");
+                if (!$isExistingDisk) {
+                    // For now, we still need hdd in the automation data  to be prefixed with 'New '
+                    // The number does not indicate future designation for the disk & is just used
+                    // for logging in the automation process.
+                    $hdd->name = 'New disk ' . ++$newDisksCount;
                 }
 
-                if ($capacity < $minHdd) {
-                    throw new Exceptions\ForbiddenException("hdd '$name' value must be {$minHdd}GB or larger");
+                if ($hdd->capacity < $minHdd) {
+                    throw new Exceptions\ForbiddenException(
+                        "HDD '" . $hdd->uuid . "' value must be {$minHdd}GB or larger"
+                    );
                 }
 
-                if ($capacity > $maxHdd) {
-                    throw new Exceptions\ForbiddenException("hdd '$name' value must be {$maxHdd}GB or smaller");
+                if ($hdd->capacity > $maxHdd) {
+                    throw new Exceptions\ForbiddenException(
+                        "HDD '" . $hdd->uuid . "' value must be {$maxHdd}GB or smaller"
+                    );
                 }
 
-                $totalCapacity += $capacity;
+                $totalCapacity += $hdd->capacity;
 
-                $automationData['hdd'][$name] = $diskData;
+                $hdd->state = 'present'; // For when we update the automation
+                $automationData['hdd'][$hdd->name] = $hdd;
             }
         }
 
-        // Add any unspecified disks to our automation data as we want to send the complete required Storage state
-        $unchangedDisks = array_diff_key($existingDisks, $automationData['hdd']);
+        $unchangedDisks = $existingDisks;
+        if (!empty($automationData['hdd'])) {
+            // Add any unspecified disks to our automation data as we want to send the complete required Storage state
+            $unchangedDisks = array_diff_key($existingDisks, array_flip(array_column($automationData['hdd'], 'uuid')));
+        }
 
-        foreach ($unchangedDisks as $diskName => $disk) {
+        foreach ($unchangedDisks as $disk) {
             $diskData = new \stdClass();
             $diskData->name = $disk->name;
             $diskData->capacity = $disk->capacity;
             $diskData->uuid = $disk->uuid;
-            $automationData['hdd'][$diskName] = $diskData;
+            $diskData->state = 'present';
+            $automationData['hdd'][$disk->name] = $diskData;
             $totalCapacity += $diskData->capacity;
         }
 

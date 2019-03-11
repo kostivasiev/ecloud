@@ -52,12 +52,15 @@ class Datastore extends Model implements Filterable, Sortable
      * @param FilterFactory $factory
      * @return array
      */
-    public function filterableColumns($factory)
+    public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
-            $factory->create('name', Filter::$stringDefaults),
+//            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('status', Filter::$stringDefaults),
+            $factory->create('capacity', Filter::$numericDefaults),
             $factory->create('solution_id', Filter::$numericDefaults),
+            $factory->create('site_id', Filter::$numericDefaults),
         ];
     }
 
@@ -68,11 +71,15 @@ class Datastore extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function sortableColumns($factory)
+    public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('id'),
-            $factory->create('name'),
+//            $factory->create('name'),
+            $factory->create('status'),
+            $factory->create('capacity'),
+            $factory->create('solution_id'),
+            $factory->create('site_id'),
         ];
     }
 
@@ -82,7 +89,7 @@ class Datastore extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function defaultSort($sortFactory)
+    public function defaultSort(SortFactory $sortFactory)
     {
         return [
             $sortFactory->create('id', 'asc'),

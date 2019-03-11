@@ -36,6 +36,9 @@ class VirtualMachine extends Model implements Filterable, Sortable
     const NETBIOS_FORMAT_DESC = 'alphanumeric (start/end) and hyphens, upto 15 characters';
     const NETBIOS_FORMAT_REGEX = '^(?!-)[a-zA-Z0-9-]{1,15}(?<!-)$';
 
+    const HDD_NAME_FORMAT_DESC = 'start with \'Hard disk\', followed by a space then a digit';
+    const HDD_NAME_FORMAT_REGEX = '^Hard disk \d$';
+
     // For Linux we want the min CPU's to be 1, but 2 for windows.
     const MIN_CPU = 1;
     const MAX_CPU = 10;
@@ -133,7 +136,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * @param FilterFactory $factory
      * @return array
      */
-    public function filterableColumns($factory)
+    public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
@@ -155,7 +158,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * @return array
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function sortableColumns($factory)
+    public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('id', 'asc'),
@@ -177,7 +180,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * @return mixed
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
-    public function defaultSort($factory)
+    public function defaultSort(SortFactory $factory)
     {
         return $factory->create('id', 'asc');
     }

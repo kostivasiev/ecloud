@@ -352,9 +352,9 @@ class TemplateController extends BaseController
         $tmp_template->type = $template->type;
         $tmp_template->name = $template->name;
 
-        $tmp_template->cpu = $template->cpu;
-        $tmp_template->ram = $template->ram;
-        $tmp_template->hdd = $template->size_gb;
+        $tmp_template->cpu = (int) $template->cpu;
+        $tmp_template->ram = (int) $template->ram;
+        $tmp_template->hdd = (int) $template->size_gb;
 
         $tmp_template->license = 'Unknown';
 
@@ -586,7 +586,7 @@ class TemplateController extends BaseController
             }
 
             // base templates use friendly names
-            $template = $TemplateController->findTemplateBy('operating_system', $name, $templates);
+            $template = $TemplateController->findTemplateBy('name', $name, $templates);
             if ($template) {
                 return $template;
             }
