@@ -28,6 +28,7 @@ use UKFast\Api\Exceptions\UnauthorisedException;
  */
 class TemplateController extends BaseController
 {
+    const TEMPLATE_NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ ]+$';
     /**
      * List all Solution Templates
      * @param Request $request
@@ -470,7 +471,7 @@ class TemplateController extends BaseController
      * @param bool $appendSolutionId
      * @return array|bool
      */
-    protected function getSolutionTemplates(Solution $solution, $appendSolutionId = true)
+    public function getSolutionTemplates(Solution $solution, $appendSolutionId = true)
     {
         $templates = [];
         try {
@@ -594,7 +595,6 @@ class TemplateController extends BaseController
 
         throw new TemplateNotFoundException("A template matching the requested name was not found");
     }
-
 
     /**
      * Find a template by it's name

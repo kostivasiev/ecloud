@@ -1003,8 +1003,8 @@ class VirtualMachineController extends BaseController
     public function cloneToTemplate(Request $request, IntapiService $intapiService, $vmId)
     {
         $rules = [
-            'template_name' => ['required', 'string'],
-            'template_type' => ['nullable', 'string'], // 'pod' | 'solution'
+            'template_name' => ['required', 'regex:/' . TemplateController::TEMPLATE_NAME_FORMAT_REGEX . '/'],
+            'template_type' => ['nullable', 'string'], // 'pod' | 'solution' | null (solution)
         ];
 
         $this->validate($request, $rules);
@@ -1014,69 +1014,125 @@ class VirtualMachineController extends BaseController
         //Load the VM
         $virtualMachine = $this->getVirtualMachine($vmId);
 
-        exit(print_r($virtualMachine));
-
-        //exit(print_r($virtuaolMachine->solution->datastores()));
-
-        // exit(print_r($virtualMachine->pod));
-
-
-        if ($request->has('template_type') && $request->input('template_type') == 'pod') {
-            $solution = $virtualMachine->solution; //ucs_reseller_id
-            $pod = $virtualMachine->pod; //datacentre
-
-            $templateDatastore = $virtualMachine->pod->ucs_datacentre_template_datastore;
-            if (!empty($templateDatastore)) {
-                $datastore = DatastoreController::getDatastoreQuery($request)->where('reseller_lun_name', '=', $templateDatastore);
-
-                exit(print_r($datastore));
-            }
-
-            //exit(print_r($virtualMachine->pod));
-
-
-        } else {
-
-
-
+        if ($virtualMachine->servers_status != 'Complete') {
+            throw new Exceptions\UnprocessableEntityException(
+                'Unable to clone vm while status is: '. $virtualMachine->servers_status
+            );
         }
 
+        // Clone to Pod template
+        if ($request->has('template_type') && $request->input('template_type') == 'pod') {
+            if (!$this->isAdmin) {
+                throw new Exceptions\ForbiddenException();
+            }
 
-        // If template_type is set and == 'pod' (admin only)
+            try {
+                $templateDatastore = $virtualMachine->pod->ucs_datacentre_template_datastore;
+                if (empty($templateDatastore)) {
+                    throw new \Exception('Unable to load VM template datastore: No template datastore defined');
+                }
+            } catch (\Exception $exception) {
+                throw new DatastoreNotFoundException('Unable to load VM template datastore');
+            }
 
-//                // Check Pod templates first
-//        $templates = $this->getResellerPodTemplates(true);
-//        foreach ($templates as $podId => $podTemplates) {
-//            $template = $this->findTemplateByName($templateName, $podTemplates);
-//            if (!empty($template)) {
-//                $template->pod_id = $podId;
-//                break;
-//            }
-//        }
-//
-//        // Not found in Pod templates, check Solution templates
-//        if (empty($template)) {
-//            $templates = $this->getResellerSolutionTemplates($request->input('solution_id', null));
-//            $template = $this->findTemplateByName($templateName, $templates);
-//        }
-//
-//        if (empty($template)) {
-//            throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
-//        }
+            $datastore = DatastoreController::getDatastoreQuery($request)
+                ->where('reseller_lun_name', '=', $templateDatastore)  //MCS_PX_VV_999999_DATA_03
+                ->first();
 
-        // else template_type = 'solution'
+            if (!$datastore) {
+                throw new DatastoreNotFoundException('Unable to load VM template datastore from the database.');
+            }
 
+            // Check if the template name is already in use
+            try {
+                $existingTemplate = TemplateController::getTemplateByName(
+                    $request->input('template_name'),
+                    $virtualMachine->pod
+                );
+            } catch (TemplateNotFoundException $exception) {
+                // Do nothing, the template name is available
+            }
 
-       $automationData = [
-           'template_name' => '',
-           'template_type' => '',
-           'datastore_name' => ''
-       ];
-        //template_name
-        //template_type
-        //datastore_name (can be null?)
+            if (!empty($existingTemplate)) {
+                throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
+            }
 
+            try {
+                $datastoreUsage = $datastore->getVmwareUsage();
+            } catch (\Exception $exception) {
+                throw new ServiceUnavailableException('Unable to determine available datastore space');
+            }
 
+            // Check available space
+            if ($datastoreUsage->available < $virtualMachine->servers_hdd) {
+                throw new DatastoreInsufficientSpaceException(
+                    'Datastore has insufficient space, only ' . $datastoreUsage->available . 'GB remaining'
+                );
+            }
+
+            $templateType = 'system';
+        } else {
+            // Clone to Solution template
+
+            // Check if the template name is already in use on the Solution
+            $TemplateController = new TemplateController($request);
+
+            $solutionTemplates = $TemplateController->getSolutionTemplates($virtualMachine->solution, false);
+            if (is_array($solutionTemplates) and count($solutionTemplates) > 0) {
+                $existingTemplate = array_filter($solutionTemplates, function($template) use ($request) {
+                    return ($template->name == $request->input('template_name'));
+                });
+
+            }
+            if (!empty($existingTemplate)) {
+                throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
+            }
+
+            // Load the datastores for the Solution
+            $solutionDatastores = $virtualMachine->solution->datastores();
+
+            if (empty($solutionDatastores)) {
+                throw new Exceptions\NotFoundException('Unable to load datastores for solution');
+            }
+
+            // Filter datastores to ones with enough free space
+            $datastores = array_filter(
+                $solutionDatastores,
+                function ($datastore) use ($virtualMachine) {
+                    try {
+                        $datastoreUsage = $datastore->getVmwareUsage();
+                    } catch (\Exception $exception) {
+                        throw new ServiceUnavailableException('Unable to determine available datastore space');
+                    }
+
+                    return (
+                        $datastore->reseller_lun_status == 'Completed'
+                        &&
+                        $datastore->reseller_lun_lun_type == 'DATA'
+                        &&
+                        $datastoreUsage->available > $virtualMachine->servers_hdd
+                    );
+                }
+            );
+
+            if (empty($datastores)) {
+                throw new DatastoreInsufficientSpaceException('No datastore available with required space');
+            }
+
+            if (count($datastores) > 1) {
+                shuffle($datastores);
+            }
+
+            $datastore = $datastores[0];
+
+            $templateType = 'solution';
+        }
+
+        $automationData = [
+            'template_name' => $request->input('template_name'),
+            'template_type' => $templateType,
+            'datastore_name' => $datastore->reseller_lun_name
+        ];
 
 
         // Fire off automation request
