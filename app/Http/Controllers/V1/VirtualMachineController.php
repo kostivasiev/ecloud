@@ -801,6 +801,114 @@ class VirtualMachineController extends BaseController
     }
 
 
+
+    /**
+     * Clone VM to template
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
+     * @throws ServiceUnavailableException
+     */
+    public function cloneToTemplate(Request $request, IntapiService $intapiService, $vmId)
+    {
+        $rules = [
+            'template_name' => ['required', 'string'],
+            'template_type' => ['nullable', 'string'], // 'pod' | 'solution'
+        ];
+
+        $this->validate($request, $rules);
+
+        $this->validateVirtualMachineId($request, $vmId);
+
+        //Load the VM
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        exit(print_r($virtualMachine));
+
+        //exit(print_r($virtuaolMachine->solution->datastores()));
+
+        // exit(print_r($virtualMachine->pod));
+
+
+        if ($request->has('template_type') && $request->input('template_type') == 'pod') {
+            $solution = $virtualMachine->solution; //ucs_reseller_id
+            $pod = $virtualMachine->pod; //datacentre
+
+            $templateDatastore = $virtualMachine->pod->ucs_datacentre_template_datastore;
+            if (!empty($templateDatastore)) {
+                $datastore = DatastoreController::getDatastoreQuery($request)->where('reseller_lun_name', '=', $templateDatastore);
+
+                exit(print_r($datastore));
+            }
+
+            //exit(print_r($virtualMachine->pod));
+
+
+        } else {
+
+
+
+        }
+
+
+        // If template_type is set and == 'pod' (admin only)
+
+//                // Check Pod templates first
+//        $templates = $this->getResellerPodTemplates(true);
+//        foreach ($templates as $podId => $podTemplates) {
+//            $template = $this->findTemplateByName($templateName, $podTemplates);
+//            if (!empty($template)) {
+//                $template->pod_id = $podId;
+//                break;
+//            }
+//        }
+//
+//        // Not found in Pod templates, check Solution templates
+//        if (empty($template)) {
+//            $templates = $this->getResellerSolutionTemplates($request->input('solution_id', null));
+//            $template = $this->findTemplateByName($templateName, $templates);
+//        }
+//
+//        if (empty($template)) {
+//            throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
+//        }
+
+        // else template_type = 'solution'
+
+
+       $automationData = [
+           'template_name' => '',
+           'template_type' => '',
+           'datastore_name' => ''
+       ];
+        //template_name
+        //template_type
+        //datastore_name (can be null?)
+
+
+
+
+        // Fire off automation request
+        try {
+            $intapiService->automationRequest(
+                'create_template_from_vm',
+                'server',
+                $virtualMachine->getKey(),
+                $automationData,
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                $request->user->applicationId
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        }
+
+        return $this->respondEmpty(202);
+    }
+
+
     /**
      * Extract the numeric value from a trigger description
      * @param $trigger

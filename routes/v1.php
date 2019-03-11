@@ -26,7 +26,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->delete('vms/{vmId}', 'VirtualMachineController@destroy');
 
     $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
-    // todo create template
+
+    $router->post('vms/{vmId}/clone-to-template', 'VirtualMachineController@cloneToTemplate');
+
     $router->put('vms/{vmId}/power-on', 'VirtualMachineController@powerOn');
     $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
     $router->put('vms/{vmId}/power-shutdown', 'VirtualMachineController@shutdown');
