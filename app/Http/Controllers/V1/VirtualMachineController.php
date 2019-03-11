@@ -1081,7 +1081,7 @@ class VirtualMachineController extends BaseController
             if (is_array($solutionTemplates) and count($solutionTemplates) > 0) {
                  $existingTemplate = array_filter($solutionTemplates, function ($template) use ($request) {
                     return ($template->name == $request->input('template_name'));
-                });
+                 });
             }
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
