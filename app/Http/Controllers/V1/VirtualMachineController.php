@@ -1040,7 +1040,7 @@ class VirtualMachineController extends BaseController
                 ->first();
 
             if (!$datastore) {
-                throw new DatastoreNotFoundException('Unable to load VM template datastore from the database.');
+                throw new DatastoreNotFoundException('Unable to load VM template datastore record.');
             }
 
             // Check if the template name is already in use
