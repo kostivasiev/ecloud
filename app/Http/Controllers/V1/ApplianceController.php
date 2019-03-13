@@ -251,7 +251,7 @@ class ApplianceController extends BaseController
 
         if (!$this->isAdmin) {
             // Limit to one-click enabled pods
-            $applianceQuery->whereIn('appliance_pod_availability_ucs_datacentre_id',$oneClickPods);
+            $applianceQuery->whereIn('appliance_pod_availability_ucs_datacentre_id', $oneClickPods);
         }
 
         (new QueryTransformer($request))

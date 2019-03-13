@@ -93,7 +93,10 @@ class ApplianceParametersController extends BaseController
         $this->validate($request, $rules);
 
         //Validate the appliance exists
-        $applianceVersion = ApplianceVersionController::getApplianceVersionById($request, $request->input('version_id'));
+        $applianceVersion = ApplianceVersionController::getApplianceVersionById(
+            $request,
+            $request->input('version_id')
+        );
 
         $scriptVariables = applianceVersionController::getScriptVariables($applianceVersion->script_template);
 
