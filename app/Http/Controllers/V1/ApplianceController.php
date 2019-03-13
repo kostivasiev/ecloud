@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\ApplianceNotFoundException;
 use App\Exceptions\V1\TemplateNotFoundException;
 use App\Models\V1\AppliancePodAvailability;
+use App\Models\V1\Pod;
 use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
@@ -87,7 +88,7 @@ class ApplianceController extends BaseController
     public function create(Request $request)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can publish appliances at this time.');
+            throw new ForbiddenException();
         }
 
         $this->validate($request, Appliance::$rules);
@@ -124,7 +125,7 @@ class ApplianceController extends BaseController
     public function update(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliances at this time.');
+            throw new ForbiddenException();
         }
 
         // Validate the the appliance exists:
@@ -163,7 +164,7 @@ class ApplianceController extends BaseController
     public function versions(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can view appliance versioning information at this time.');
+            throw new ForbiddenException();
         }
 
         $appliance = static::getApplianceById($request, $applianceId);
@@ -234,6 +235,12 @@ class ApplianceController extends BaseController
      */
     public function podAvailability(Request $request, $podId)
     {
+        // Get the one-click enabled pods this way to avoid cross database query
+        $oneClickPods = Pod::select('ucs_datacentre_id')
+            ->where('ucs_datacentre_oneclick_enabled', '=', 'Yes')
+            ->pluck('ucs_datacentre_id')
+            ->toArray();
+
         $applianceQuery = static::getApplianceQuery($request);
         $applianceQuery->join(
             'appliance_pod_availability',
@@ -243,11 +250,8 @@ class ApplianceController extends BaseController
             ->where('appliance_pod_availability_ucs_datacentre_id', '=', $podId);
 
         if (!$this->isAdmin) {
-            $applianceQuery->join(
-                'reseller.ucs_datacentre',
-                'appliance_pod_availability_ucs_datacentre_id',
-                'ucs_datacentre.ucs_datacentre_id'
-            )->where('ucs_datacentre_oneclick_enabled', '=', 'Yes');
+            // Limit to one-click enabled pods
+            $applianceQuery->whereIn('appliance_pod_availability_ucs_datacentre_id', $oneClickPods);
         }
 
         (new QueryTransformer($request))
@@ -281,7 +285,7 @@ class ApplianceController extends BaseController
     public function addToPod(Request $request, $podId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliances at this time.');
+            throw new ForbiddenException();
         }
 
         $this->validate($request, ['appliance_id' => ['required', new IsValidUuid()]]);

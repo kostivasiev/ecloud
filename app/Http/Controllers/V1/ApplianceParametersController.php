@@ -73,18 +73,19 @@ class ApplianceParametersController extends BaseController
      * Create an appliance script parameter
      *
      * @param Request $request
-     * - version_id - requiredm UUID
+     * - version_id - required UUID
      * - name - string, nullable
      * - type - enum, required
      * - required, optional, default true
      * - validation_rule, optional
      *
      * @return \Illuminate\Http\Response
+     * @throws BadRequestException
      * @throws DatabaseException
+     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
-     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      */
     public function create(Request $request)
     {
@@ -92,9 +93,28 @@ class ApplianceParametersController extends BaseController
         $this->validate($request, $rules);
 
         //Validate the appliance exists
-        ApplianceVersionController::getApplianceVersionById($request, $request->input('version_id'));
+        $applianceVersion = ApplianceVersionController::getApplianceVersionById(
+            $request,
+            $request->input('version_id')
+        );
 
-        //TODO: If the parameter is required, validate that the parameter key is present in the script template
+        $scriptVariables = applianceVersionController::getScriptVariables($applianceVersion->script_template);
+
+        //If the parameter is required, validate that the parameter key is present in the script template
+        $isRequired = true;
+        if ($request->has('required') && $request->input('required') === false) {
+            $isRequired = false;
+        }
+
+        // If the parameter is required and is not found in the script template, error.
+        if ($isRequired && !in_array($request->input('key'), $scriptVariables)) {
+            throw new BadRequestException(
+                'Required parameter \'' . $request->input('name') . '\' with key \''
+                . $request->input('key') . '\' was not found in script template. Please update the script template'
+                . ' if you wish to add a new required parameter, or consider creating a new version.'
+            );
+        }
+
         $applianceParameter = $this->receiveItem($request, ApplianceParameters::class);
         if (!$applianceParameter->resource->save()) {
             throw new DatabaseException('Unable to save Appliance parameter.');
@@ -120,7 +140,7 @@ class ApplianceParametersController extends BaseController
     public function update(Request $request, $applianceParameterId)
     {
         if (!$this->isAdmin) {
-            throw new ForbiddenException('Only UKFast can update appliance parameters at this time.');
+            throw new ForbiddenException();
         }
 
         $rules = ApplianceParameters::getUpdateRules();

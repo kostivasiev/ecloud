@@ -285,7 +285,7 @@ class VirtualMachineController extends BaseController
             // Sort the Appliance params from the Request (user input) into key => value and add back
             // onto our Request for easy validation
             $requestApplianceParams = [];
-            foreach ($request->parameters as $requestParam) {
+            foreach ($request->input('parameters', []) as $requestParam) {
                 $requestApplianceParams[trim($requestParam['key'])] = $requestParam['value'];
                 //Add prefixed param to request (to avoid conflicts)
                 $request['appliance_param_'.trim($requestParam['key'])] = $requestParam['value'];
@@ -547,12 +547,16 @@ class VirtualMachineController extends BaseController
      * @param $vmId
      * @return \Illuminate\Http\Response
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
      */
     public function destroy(Request $request, IntapiService $intapiService, $vmId)
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
+        if (!$virtualMachine) {
+            throw new Exceptions\NotFoundException("Virtual Machine with ID '$vmId' not found");
+        }
 
         //cant delete vm if its doing something that requires it to exist
         if (!$virtualMachine->canBeDeleted()) {

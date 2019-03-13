@@ -47,7 +47,7 @@ mv .env-testing .env
 
 ### Deployment
 
-Current Live Deployment is via CVS Manager + GitOverHere
+Production: auto deployment via Gitlab + gitoverhere, triggered on Tag from master
 - https://api.ukfast.io/ecloud/ (public facing)
 
 

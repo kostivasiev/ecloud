@@ -70,6 +70,7 @@ class Appliance extends Model implements Filterable, Sortable
      * @var array
      */
     protected $visible = [
+        //'appliance_id',
         'appliance_uuid',
         'appliance_name',
         'version',
