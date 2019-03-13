@@ -5,7 +5,9 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
+use UKFast\Api\Resource\Property\BooleanProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -16,31 +18,14 @@ use UKFast\DB\Ditto\Filter;
 class Pod extends Model implements Filterable, Sortable
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
+     * Eloquent configuration
+     * ----------------------
      */
     protected $table = 'ucs_datacentre';
-
-    /**
-     * The primary key associated with the model.
-     *
-     * @var string
-     */
     protected $primaryKey = 'ucs_datacentre_id';
 
-    /**
-     * Indicates if the model should be timestamped
-     *
-     * @var bool
-     */
     public $timestamps = false;
 
-    /**
-     * The attributes that should be cast to native types
-     *
-     * @var array
-     */
     protected $casts = [
         'ucs_datacentre_id' => 'integer',
     ];
@@ -121,12 +106,29 @@ class Pod extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {
-        return [
+        $properties = [
             IdProperty::create('ucs_datacentre_id', 'id'),
             StringProperty::create('ucs_datacentre_public_name', 'name'),
+
+            'services' => [
+                BooleanProperty::create('ucs_datacentre_public_enabled', 'public', null, 'Yes', 'No'),
+                BooleanProperty::create('ucs_datacentre_burst_enabled', 'burst', null, 'Yes', 'No'),
+                BooleanProperty::create('ucs_datacentre_oneclick_enabled', 'appliances', null, 'Yes', 'No'),
+            ],
         ];
+
+        $request = app('request');
+        if (!$request->user->isAdmin) {
+            return $properties;
+        }
+
+        // admin only properties
+        return array_merge($properties, [
+            IntProperty::create('ucs_datacentre_datacentre_id', 'datacentre_id'),
+        ]);
     }
 }
