@@ -116,11 +116,10 @@ class IntapiService
     public function getFriendlyError($error)
     {
         switch ($error) {
-            case (preg_match('/no available.*ip addresses/', $error) == true):
-                $ip_type = 'external';
-                if (strpos($error, 'internal') !== false) {
-                    $ip_type = 'internal';
-                }
+            case (preg_match('/^.*: no available \'(.*)\' ip addresses(?: for \((.*)\))$/', $error, $matches) == true):
+                $ip_type = $matches[1];
+                //$vlan = $matches[1];
+
                 return 'No ' . $ip_type . ' IP addresses available';
 
             case (preg_match('/datastore has insufficient space/', $error) == true):

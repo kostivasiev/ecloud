@@ -520,14 +520,11 @@ class VirtualMachineController extends BaseController
         }
 
         if (!$intapiData->result) {
-            $error_msg = end($intapiData->errorset);
+            $error_msg = $intapiService->getFriendlyError(
+                end($intapiData->errorset)
+            );
 
-            if (!$request->user->isAdmin) {
-                $error_msg = $intapiService->getFriendlyError($error_msg);
-                throw new ServiceResponseException($error_msg);
-            }
-
-            throw new IntapiServiceException($error_msg);
+            throw new ServiceResponseException($error_msg);
         }
 
         $virtualMachine = new VirtualMachine();
