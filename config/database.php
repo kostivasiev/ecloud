@@ -35,28 +35,28 @@ return [
 
         // Default database connection
         'reseller' => [
-            'driver'    => 'mysql',
-            'host'      => env('DB_HOST'),
-            'port'      => env('DB_PORT'),
-            'database'  => env('DB_DATABASE'),
-            'username'  => env('DB_USERNAME'),
-            'password'  => env('DB_PASSWORD')
+            'driver'    => env('DB_RESELLER_DRIVER', 'mysql'),
+            'host'      => env('DB_RESELLER_HOST'),
+            'port'      => env('DB_RESELLER_PORT', 3306),
+            'database'  => env('DB_RESELLER_DATABASE', 'reseller'),
+            'username'  => env('DB_RESELLER_USERNAME'),
+            'password'  => env('DB_RESELLER_PASSWORD')
         ],
 
         'ecloud' => [
-            'driver'    => 'mysql',
-            'host'      => env('DB_HOST'),
-            'port'      => env('DB_PORT'),
-            'database'  => env('DB_DATABASE_ECLOUD'),
-            'username'  => env('DB_USERNAME'),
-            'password'  => env('DB_PASSWORD')
+            'driver'    => env('DB_ECLOUD_DRIVER', 'mysql'),
+            'host'      => env('DB_ECLOUD_HOST'),
+            'port'      => env('DB_ECLOUD_PORT', 3306),
+            'database'  => env('DB_ECLOUD_DATABASE', 'ecloud'),
+            'username'  => env('DB_ECLOUD_USERNAME'),
+            'password'  => env('DB_ECLOUD_PASSWORD')
         ],
 
-        'sqlite' => [
-            'driver' => 'sqlite',
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
-        ]
+//        'sqlite' => [
+//            'driver' => 'sqlite',
+//            'database' => ':memory:',
+//            'prefix' => '',
+//        ]
     ],
 
     /*

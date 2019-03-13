@@ -1,0 +1,88 @@
+<?php
+
+namespace Tests\Appliances\ApplianceParameters;
+
+use App\Models\V1\ApplianceParameters;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+
+use Tests\ApplianceTestCase;
+
+class PatchTest extends ApplianceTestCase
+{
+    use DatabaseMigrations;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    /**
+     * Test updating an Appliance parameter
+     * @return void
+     */
+    public function testUpdateApplianceParameter()
+    {
+        // Generate a test parameter
+        $newParameter = factory(ApplianceParameters::class, 1)->make()->first();
+
+        // Get an existing parameter
+        $param = ApplianceParameters::query()->first();
+
+
+        $this->missingFromDatabase(
+            'appliance_script_parameters',
+            [
+                'appliance_script_parameters_name' => $newParameter->name,
+                'appliance_script_parameters_key' => $newParameter->key,
+                'appliance_script_parameters_type' => $newParameter->type,
+                'appliance_script_parameters_description' => $newParameter->description,
+                'appliance_script_parameters_required' => ($newParameter->required == 'Yes'),
+
+            ],
+            env('DB_ECLOUD_CONNECTION')
+        );
+
+        $this->json('PATCH', '/v1/appliance-parameters/' . $param->uuid, [
+            'name' => $newParameter->name,
+            'key' => $newParameter->key,
+            'type' => $newParameter->type,
+            'description' => $newParameter->description,
+            'required' => false,
+            'validation_rule' => '/\w+/'
+        ], $this->validWriteHeaders);
+
+        $this->assertResponseStatus(204);
+
+        $this->seeInDatabase('appliance_script_parameters',
+            [
+                'appliance_script_parameters_uuid' => $param->uuid,
+                'appliance_script_parameters_name' => $newParameter->name,
+                'appliance_script_parameters_key' => $newParameter->key,
+                'appliance_script_parameters_type' => $newParameter->type,
+                'appliance_script_parameters_description' => $newParameter->description,
+                'appliance_script_parameters_required' => 'No',
+                'appliance_script_parameters_validation_rule' => '/\w+/'
+            ],
+            env('DB_ECLOUD_CONNECTION')
+        );
+
+    }
+
+    /**
+     * Test update an appliance version (non-admin)
+     */
+    public function testUpdateApplianceParameterNotAdmin()
+    {
+        // Generate a test parameter
+        $newParameter = factory(ApplianceParameters::class, 1)->make()->first();
+
+        // Get an existing parameter
+        $param = ApplianceParameters::query()->first();
+
+        $this->json('PATCH', '/v1/appliance-parameters/' . $param->uuid, [
+            'name' => $newParameter->name
+        ], $this->validReadHeaders);
+
+        $this->assertResponseStatus(403);
+    }
+}

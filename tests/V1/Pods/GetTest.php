@@ -104,6 +104,4 @@ class GetTest extends TestCase
 
         $this->assertResponseStatus(404);
     }
-
-
 }
