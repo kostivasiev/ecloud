@@ -6,6 +6,9 @@ use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceVersion;
 use App\Models\V1\ApplianceParameters;
 
+use App\Models\V1\Pod;
+use App\Models\V1\AppliancePodAvailability;
+
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class ApplianceTestCase extends TestCase
@@ -100,5 +103,33 @@ class ApplianceTestCase extends TestCase
             }
 
         });
+    }
+
+    /**
+     * Create some Pods and add some appliances to them
+     */
+    public function setUpAppliancePodTestData()
+    {
+        // Create a pod with one-click enabled
+        factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 1,
+            'ucs_datacentre_oneclick_enabled' => 'Yes'
+        ]);
+        // Add an appliance to the pod
+        $availability = new AppliancePodAvailability();
+        $availability->appliance_id = $this->appliances[0]->id;
+        $availability->ucs_datacentre_id = 1;
+        $availability->save();
+
+        // Create a Pod with one-click disabled
+        factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 2,
+            'ucs_datacentre_oneclick_enabled' => 'No'
+        ]);
+        // Add an appliance to the pod
+        $availability = new AppliancePodAvailability();
+        $availability->appliance_id = $this->appliances[0]->id;
+        $availability->ucs_datacentre_id = 2;
+        $availability->save();
     }
 }

@@ -19,6 +19,7 @@ class CreateInitialTables extends Migration
             $table->string('ucs_datacentre_public_name');
             $table->string('ucs_datacentre_active');
             $table->string('ucs_datacentre_api_enabled');
+            $table->string('ucs_datacentre_oneclick_enabled')->default('No');
         });
 
 

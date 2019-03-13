@@ -103,8 +103,6 @@ class GetTest extends ApplianceTestCase
                 'vm_template' => $version->vm_template,
                 'active' => ($version->active == 'Yes')
             ]);
-
-        $this->assertResponseStatus(200);
     }
 
 
@@ -126,8 +124,6 @@ class GetTest extends ApplianceTestCase
                 'vm_template' => $version->vm_template,
                 'active' => ($version->active == 'Yes')
             ]);
-
-        $this->assertResponseStatus(200);
     }
 
 

@@ -34,7 +34,7 @@ class CreateApplianceTables extends Migration
             $table->integer('appliance_version_version');
             $table->text('appliance_version_script_template');
             $table->text('appliance_version_vm_template');
-            $table->integer('appliance_version_server_license_id');
+            $table->integer('appliance_version_server_license_id')->nullable();
             $table->enum('appliance_version_active', ['Yes', 'No'])->default('Yes');
             $table->timestamp('appliance_version_created_at');
             $table->timestamp('appliance_version_updated_at');
@@ -55,14 +55,14 @@ class CreateApplianceTables extends Migration
             $table->timestamp('appliance_script_parameters_updated_at');
         });
 
-        Schema::connection('ecloud')->create('appliance_release_notes', function (Blueprint $table) {
-            $table->increments('appliance_release_notes_id');
-            $table->string('appliance_release_notes_uuid');
-            $table->integer('appliance_release_notes_version_id');
-            $table->text('appliance_release_notes');
-            $table->timestamp('appliance_release_notes_created_at');
-            $table->timestamp('appliance_release_notes_updated_at');
-        });
+//        Schema::connection('ecloud')->create('appliance_release_notes', function (Blueprint $table) {
+//            $table->increments('appliance_release_notes_id');
+//            $table->string('appliance_release_notes_uuid');
+//            $table->integer('appliance_release_notes_version_id');
+//            $table->text('appliance_release_notes');
+//            $table->timestamp('appliance_release_notes_created_at');
+//            $table->timestamp('appliance_release_notes_updated_at');
+//        });
 
         Schema::connection('ecloud')->create('appliance_pod_availability', function (Blueprint $table) {
             $table->increments('appliance_pod_availability_id');
@@ -81,7 +81,7 @@ class CreateApplianceTables extends Migration
         Schema::connection('ecloud')->dropIfExists('appliance');
         Schema::connection('ecloud')->dropIfExists('appliance_version');
         Schema::connection('ecloud')->dropIfExists('appliance_script_parameters');
-        Schema::connection('ecloud')->dropIfExists('appliance_release_notes');
+//        Schema::connection('ecloud')->dropIfExists('appliance_release_notes');
         Schema::connection('ecloud')->dropIfExists('appliance_pod_availability');
     }
 }

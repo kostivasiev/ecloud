@@ -76,6 +76,47 @@ class ApplianceVersionController extends BaseController
     }
 
     /**
+     * Parse the variables from a script template.
+     *
+     * Validate the script template, scan and tokenize template source.
+     * Throws Mustache_Exception_SyntaxException when mismatched section tags are encountered
+     *
+     * @param $script
+     * @return array
+     * @throws BadRequestException
+     */
+    public static function getScriptVariables($script)
+    {
+        $Mustache_Engine = new Mustache_Engine;
+
+        $Mustache_Tokenizer = $Mustache_Engine->getTokenizer();
+
+        try {
+            $tokens = $Mustache_Tokenizer->scan($script);
+        } catch (\Mustache_Exception_SyntaxException $exception) {
+            throw new BadRequestException('Invalid script template.');
+        }
+
+        // Extract script variable tokens
+        $variableTokens = array_filter(
+            $tokens,
+            function ($var) {
+                return in_array(
+                    $var['type'],
+                    [
+                        Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::T_UNESCAPED,
+                        Mustache_Tokenizer::T_UNESCAPED_2
+                    ]
+                );
+            }
+        );
+
+        $scriptVariables = array_unique(array_column($variableTokens, 'name'));
+        return $scriptVariables;
+    }
+
+    /**
      * Create an appliance version.
      *
      * Stores an appliance version record and also stores any associated
@@ -107,39 +148,7 @@ class ApplianceVersionController extends BaseController
         $rules = ApplianceVersion::getRules();
         $this->validate($request, $rules);
 
-        /**
-         * Validate the script template
-         *
-         * Scan and tokenize template source.
-         *
-         * Throws Mustache_Exception_SyntaxException when mismatched section tags are encountered
-         */
-        $Mustache_Engine = new Mustache_Engine;
-
-        $Mustache_Tokenizer = $Mustache_Engine->getTokenizer();
-
-        try {
-            $tokens = $Mustache_Tokenizer->scan($request->input('script_template'));
-        } catch (\Mustache_Exception_SyntaxException $exception) {
-            throw new BadRequestException('Invalid script template.');
-        }
-
-        // Extract script variable tokens
-        $variableTokens = array_filter(
-            $tokens,
-            function ($var) {
-                return in_array(
-                    $var['type'],
-                    [
-                        Mustache_Tokenizer::T_ESCAPED,
-                        Mustache_Tokenizer::T_UNESCAPED,
-                        Mustache_Tokenizer::T_UNESCAPED_2
-                    ]
-                );
-            }
-        );
-
-        $scriptVariables = array_unique(array_column($variableTokens, 'name'));
+        $scriptVariables = self::getScriptVariables($request->input('script_template'));
 
         //Validate the appliance exists
         ApplianceController::getApplianceById($request, $request->input('appliance_id'));
@@ -189,7 +198,7 @@ class ApplianceVersionController extends BaseController
          * Loop through and save any version parameters, we've already validated the data but if any errors occur
          * whilst saving, roll back the entire transaction to remove ALL version parameters AND THE VERSION RECORD.
          */
-        foreach ($request->input('parameters') as $parameter) {
+        foreach ($request->input('parameters', []) as $parameter) {
             $applianceParameter = new ApplianceParameters();
             $applianceParameter->appliance_version_id = $applianceVersion->id;
             $applianceParameter->name = $parameter['name'];
