@@ -304,7 +304,15 @@ class VirtualMachineController extends BaseController
                 }
 
                 // For data types String,Numeric,Boolean we can use Laravel validation
-                $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
+                switch ($parameters[$parameterKey]->type) {
+                    case 'String':
+                    case 'Numeric':
+                    case 'Boolean':
+                        $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
+                    break;
+                    case 'Password' :
+                        $scriptRules[$key][] = 'string';
+                }
             }
 
             $this->validate($request, $scriptRules);
