@@ -4,9 +4,6 @@ namespace Tests\Appliances\ApplianceParameters;
 
 use App\Models\V1\ApplianceParameter;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
-use Ramsey\Uuid\Uuid;
-
 use Tests\ApplianceTestCase;
 
 class GetTest extends ApplianceTestCase

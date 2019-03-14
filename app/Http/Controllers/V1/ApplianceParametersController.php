@@ -8,6 +8,7 @@ use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\DB\Ditto\QueryTransformer;
+use UKFast\Api\Exceptions\ForbiddenException;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
