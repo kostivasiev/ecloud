@@ -8,6 +8,7 @@ use App\Traits\V1\UUIDHelper;
 use App\Rules\V1\IsValidValidationRule;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -20,13 +21,18 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class ApplianceParameters extends Model implements Filterable, Sortable
+// Events
+use App\Events\V1\ApplianceParameterDeletedEvent;
+
+class ApplianceParameter extends Model implements Filterable, Sortable
 {
     // Table columns have table name prefixes
     use ColumnPrefixHelper;
 
     // Table uses UUID's
     use UUIDHelper;
+
+    use SoftDeletes;
 
     protected $connection = 'ecloud';
 
@@ -44,6 +50,13 @@ class ApplianceParameters extends Model implements Filterable, Sortable
 
     const UPDATED_AT = 'appliance_script_parameters_updated_at';
 
+    const DELETED_AT = 'appliance_script_parameters_deleted_at';
+
+    // Events triggered by actions on the model
+    protected $dispatchesEvents = [
+        'deleted' => ApplianceParameterDeletedEvent::class,
+    ];
+
     /**
      * Validation rules
      * @see function rules()
@@ -51,7 +64,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
      */
     public static $rules = [
         'name' => ['required', 'max:255'],
-        'type' => ['required', 'in:String,Numeric,Boolean,Password'], // todo: Array (limit easy data types for now)
+        'type' => ['required', 'in:String,Numeric,Boolean'], // todo: Array (limit easy data types for now)
         'key' => ['required', 'regex:/^\w*$/'],
         'description' => ['nullable', 'max:255'],
         'required' => ['nullable', 'boolean']
@@ -76,7 +89,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
     {
         return [
             'name' => ['nullable', 'max:255'],
-            'type' => ['nullable', 'in:String,Numeric,Boolean,Password'], // todo: Array (limit easy data types for now)
+            'type' => ['nullable', 'in:String,Numeric,Boolean'], // todo: Array (limit easy data types for now)
             'key' => ['filled', 'regex:/^\w*$/'], //If it's passed in we need a value.
             'description' => ['nullable', ''],
             'required' => ['nullable', 'boolean'],
@@ -138,7 +151,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         if ($applianceVersion->count() > 0) {
             return $applianceVersion->first()->uuid;
         }
-        return;
+        return null;
     }
 
     /**

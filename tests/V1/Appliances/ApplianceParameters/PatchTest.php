@@ -2,7 +2,7 @@
 
 namespace Tests\Appliances\ApplianceParameters;
 
-use App\Models\V1\ApplianceParameters;
+use App\Models\V1\ApplianceParameter;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use Tests\ApplianceTestCase;
@@ -23,10 +23,10 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameter()
     {
         // Generate a test parameter
-        $newParameter = factory(ApplianceParameters::class, 1)->make()->first();
+        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
 
         // Get an existing parameter
-        $param = ApplianceParameters::query()->first();
+        $param = ApplianceParameter::query()->first();
 
 
         $this->missingFromDatabase(
@@ -74,10 +74,10 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameterNotAdmin()
     {
         // Generate a test parameter
-        $newParameter = factory(ApplianceParameters::class, 1)->make()->first();
+        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
 
         // Get an existing parameter
-        $param = ApplianceParameters::query()->first();
+        $param = ApplianceParameter::query()->first();
 
         $this->json('PATCH', '/v1/appliance-parameters/' . $param->uuid, [
             'name' => $newParameter->name

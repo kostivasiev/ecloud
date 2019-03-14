@@ -185,6 +185,32 @@ class ApplianceController extends BaseController
         );
     }
 
+    /**
+     * Delete an appliance.
+     *
+     * Soft deletes the appliance, and cascades to delete any appliance versions and parameters.
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
+    public function delete(Request $request, $applianceId)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException();
+        }
+
+        $appliance = static::getApplianceById($request, $applianceId);
+        try {
+            $appliance->delete();
+        } catch (\Exception $exception) {
+            throw new DatabaseException('Failed to delete the appliance');
+        }
+
+        return $this->respondEmpty();
+    }
 
     /**
      * Return the parameters for the latest version of the appliance
@@ -353,8 +379,6 @@ class ApplianceController extends BaseController
         if ($request->user->resellerId != 0) {
             $applianceQuery->where('appliance_active', 'Yes');
         }
-
-        $applianceQuery->whereNull('appliance_deleted_at');
 
         return $applianceQuery;
     }

@@ -2,7 +2,7 @@
 
 namespace Tests\Appliances\ApplianceParameters;
 
-use App\Models\V1\ApplianceParameters;
+use App\Models\V1\ApplianceParameter;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use Ramsey\Uuid\Uuid;
@@ -26,7 +26,7 @@ class GetTest extends ApplianceTestCase
         $this->get('/v1/appliance-parameters', $this->validReadHeaders);
 
         $this->assertResponseStatus(200) && $this->seeJson([
-            'total' => ApplianceParameters::query()->count()
+            'total' => ApplianceParameter::query()->count()
         ]);
     }
 

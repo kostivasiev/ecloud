@@ -94,6 +94,8 @@ $app->register(App\Providers\NetworkingServiceProvider::class);
 // intAPI
 $app->register(App\Providers\IntapiServiceProvider::class);
 
+// Event Service provider
+$app->register(App\Providers\EventServiceProvider::class);
 
 
 /*

@@ -53,6 +53,7 @@ class CreateApplianceTables extends Migration
             $table->string('appliance_script_parameters_validation_rule')->default('');
             $table->timestamp('appliance_script_parameters_created_at');
             $table->timestamp('appliance_script_parameters_updated_at');
+            $table->timestamp('appliance_script_parameters_deleted_at')->nullable();
         });
 
 //        Schema::connection('ecloud')->create('appliance_release_notes', function (Blueprint $table) {

@@ -144,6 +144,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->post('appliances', 'ApplianceController@create');
     $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
+    $router->delete('appliances/{appliance_id}', 'ApplianceController@delete');
 });
 
 //Appliance Versions
@@ -153,6 +154,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('appliance-versions', 'ApplianceVersionController@create');
     $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
     $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
+    $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
 });
 
 //Appliance Parameters
@@ -161,4 +163,5 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@show');
     $router->post('appliance-parameters', 'ApplianceParametersController@create');
     $router->patch('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@update');
+    $router->delete('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@delete');
 });

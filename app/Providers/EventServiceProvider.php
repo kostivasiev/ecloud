@@ -15,5 +15,14 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\ExampleEvent' => [
             'App\Listeners\ExampleListener',
         ],
+        'App\Events\V1\ApplianceParameterDeletedEvent' => [
+            'App\Listeners\V1\ApplianceParameterDeletedListener',
+        ],
+        'App\Events\V1\ApplianceVersionDeletedEvent' => [
+            'App\Listeners\V1\ApplianceVersionDeletedListener',
+        ],
+        'App\Events\V1\ApplianceDeletedEvent' => [
+            'App\Listeners\V1\ApplianceDeletedListener',
+        ]
     ];
 }

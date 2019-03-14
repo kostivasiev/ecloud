@@ -7,6 +7,8 @@ use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Events\V1\ApplianceVersionDeletedEvent;
 
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 
@@ -30,6 +32,8 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     // Table uses UUID's
     use UUIDHelper;
 
+    use SoftDeletes;
+
     protected $connection = 'ecloud';
 
     protected $table = 'appliance_version';
@@ -45,6 +49,13 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     const CREATED_AT = 'appliance_version_created_at';
 
     const UPDATED_AT = 'appliance_version_updated_at';
+
+    const DELETED_AT = 'appliance_version_deleted_at';
+
+    // Events triggered by actions on the model
+    protected $dispatchesEvents = [
+        'deleting' => ApplianceVersionDeletedEvent::class, //Trigger on deleting (not deleted, as we need the version record to cascade the soft-deletes to the parameters)
+    ];
 
     // Validation Rules
     public static $rules = [
@@ -273,7 +284,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     public function parameters()
     {
         return $this->hasMany(
-            'App\Models\V1\ApplianceParameters',
+            'App\Models\V1\ApplianceParameter',
             'appliance_script_parameters_appliance_version_id',
             'appliance_version_id'
         );
