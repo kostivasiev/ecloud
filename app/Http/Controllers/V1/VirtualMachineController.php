@@ -309,8 +309,8 @@ class VirtualMachineController extends BaseController
                     case 'Numeric':
                     case 'Boolean':
                         $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
-                    break;
-                    case 'Password' :
+                        break;
+                    case 'Password':
                         $scriptRules[$key][] = 'string';
                 }
             }
