@@ -177,9 +177,10 @@ class ServerLicense extends Model
                 $similarText[$availableLicence->id] = $percent;
             }
         }
+
         if (!empty($similarText)) {
             $mostLikelyLicence = array_keys($similarText, max($similarText));
-            $serverLicense = new server_licence($mostLikelyLicence[0]);
+            $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
             if ($serverLicense->count() > 0) {
                 return $serverLicense->first();
             }
