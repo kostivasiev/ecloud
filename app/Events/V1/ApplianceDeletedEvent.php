@@ -14,7 +14,7 @@ use App\Models\V1\Appliance;
  */
 class ApplianceDeletedEvent extends Event
 {
-    public $applianceVersion;
+    public $appliance;
 
     /**
      * ApplianceDeletedEvent constructor.

@@ -43,9 +43,9 @@ class ApplianceDeletedListener
         );
 
         // Cascade soft delete to appliance versions (which will cascade to appliance parameters)
-        foreach ($event->appliance->versions as $applanceVersion) {
+        foreach ($event->appliance->versions as $applianceVersion) {
             try {
-                $applanceVersion->delete();
+                $applianceVersion->delete();
             } catch (\Exception $exception) {
                 throw new DatabaseException('Failed to delete the appliance versions');
             }
