@@ -51,7 +51,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
      */
     public static $rules = [
         'name' => ['required', 'max:255'],
-        'type' => ['required', 'in:String,Numeric,Boolean'], // todo: Array (limit easy data types for now)
+        'type' => ['required', 'in:String,Numeric,Boolean,Password'], // todo: Array (limit easy data types for now)
         'key' => ['required', 'regex:/^\w*$/'],
         'description' => ['nullable', 'max:255'],
         'required' => ['nullable', 'boolean']
@@ -76,7 +76,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
     {
         return [
             'name' => ['nullable', 'max:255'],
-            'type' => ['nullable', 'in:String,Numeric,Boolean'], // todo: Array (limit easy data types for now)
+            'type' => ['nullable', 'in:String,Numeric,Boolean,Password'], // todo: Array (limit easy data types for now)
             'key' => ['filled', 'regex:/^\w*$/'], //If it's passed in we need a value.
             'description' => ['nullable', ''],
             'required' => ['nullable', 'boolean'],
