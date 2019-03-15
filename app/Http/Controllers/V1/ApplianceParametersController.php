@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ParameterNotFoundException;
-use App\Models\V1\ApplianceParameters;
+use App\Models\V1\ApplianceParameter;
 use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\DB\Ditto\QueryTransformer;
+use UKFast\Api\Exceptions\ForbiddenException;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
@@ -30,7 +31,7 @@ class ApplianceParametersController extends BaseController
         $collectionQuery = static::getApplianceParametersQuery($request);
 
         (new QueryTransformer($request))
-            ->config(ApplianceParameters::class)
+            ->config(ApplianceParameter::class)
             ->transform($collectionQuery);
 
         $applianceParameters = $collectionQuery->paginate($this->perPage);
@@ -41,7 +42,7 @@ class ApplianceParametersController extends BaseController
             200,
             null,
             [],
-            ($this->isAdmin) ? null : ApplianceParameters::VISIBLE_SCOPE_RESELLER
+            ($this->isAdmin) ? null : ApplianceParameter::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -64,7 +65,7 @@ class ApplianceParametersController extends BaseController
             200,
             null,
             [],
-            ($this->isAdmin) ? null : ApplianceParameters::VISIBLE_SCOPE_RESELLER
+            ($this->isAdmin) ? null : ApplianceParameter::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -89,7 +90,7 @@ class ApplianceParametersController extends BaseController
      */
     public function create(Request $request)
     {
-        $rules = ApplianceParameters::getRules();
+        $rules = ApplianceParameter::getRules();
         $this->validate($request, $rules);
 
         //Validate the appliance exists
@@ -115,7 +116,7 @@ class ApplianceParametersController extends BaseController
             );
         }
 
-        $applianceParameter = $this->receiveItem($request, ApplianceParameters::class);
+        $applianceParameter = $this->receiveItem($request, ApplianceParameter::class);
         if (!$applianceParameter->resource->save()) {
             throw new DatabaseException('Unable to save Appliance parameter.');
         }
@@ -143,7 +144,7 @@ class ApplianceParametersController extends BaseController
             throw new ForbiddenException();
         }
 
-        $rules = ApplianceParameters::getUpdateRules();
+        $rules = ApplianceParameter::getUpdateRules();
 
         $request['id'] = $applianceParameterId;
         $this->validate($request, $rules);
@@ -167,7 +168,7 @@ class ApplianceParametersController extends BaseController
         }
 
         // Update the resource
-        $applianceParameter = $this->receiveItem($request, ApplianceParameters::class);
+        $applianceParameter = $this->receiveItem($request, ApplianceParameter::class);
 
         try {
             $applianceParameter->resource->save();
@@ -178,6 +179,33 @@ class ApplianceParametersController extends BaseController
         return $this->respondEmpty();
     }
 
+
+    /**
+     * Delete an appliance script parameter
+     * @param Request $request
+     * @param $applianceParameterId
+     * @return \Illuminate\Http\Response
+     * @throws DatabaseException
+     * @throws ParameterNotFoundException
+     */
+    public function delete(Request $request, $applianceParameterId)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException();
+        }
+        $request['id'] = $applianceParameterId;
+        $this->validate($request, ['id' => [new IsValidUuid()]]);
+
+        $parameter = static::getApplianceParameterById($request, $applianceParameterId);
+
+        try {
+            $parameter->delete();
+        } catch (\Exception $exception) {
+            throw new DatabaseException('Failed to delete the parameter record');
+        }
+
+        return $this->respondEmpty();
+    }
 
     /**
      * Load an appliance parameter (by UUID)
@@ -204,7 +232,7 @@ class ApplianceParametersController extends BaseController
      */
     public static function getApplianceParametersQuery($request)
     {
-        $applianceParametersQuery = ApplianceParameters::query()
+        $applianceParametersQuery = ApplianceParameter::query()
             ->join(
                 'appliance_version',
                 'appliance_script_parameters_appliance_version_id',
@@ -216,8 +244,7 @@ class ApplianceParametersController extends BaseController
                 'appliance_id',
                 '=',
                 'appliance_version_appliance_id'
-            )
-            ->whereNull('appliance_version_deleted_at');
+            );
 
         if ($request->user->resellerId != 0) {
             $applianceParametersQuery->where('appliance_version_active', 'Yes');
