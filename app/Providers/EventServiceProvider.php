@@ -23,6 +23,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\V1\ApplianceDeletedEvent' => [
             'App\Listeners\V1\ApplianceDeletedListener',
+        ],
+        'App\Events\V1\AppliancePodAvailabilityDeletedEvent' => [
+            'App\Listeners\V1\AppliancePodAvailabilityDeletedListener',
         ]
     ];
 }

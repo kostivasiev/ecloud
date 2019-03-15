@@ -131,6 +131,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->get('pods/{pod_id}/appliances', 'ApplianceController@podAvailability');
     $router->post('pods/{pod_id}/appliances', 'ApplianceController@addToPod');
+    $router->delete('pods/{pod_id}/appliances/{appliance_id}', 'ApplianceController@removeFromPod');
 });
 
 
