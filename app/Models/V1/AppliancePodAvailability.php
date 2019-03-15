@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Traits\V1\ColumnPrefixHelper;
+use App\Events\V1\AppliancePodAvailabilityDeletedEvent;
 
 class AppliancePodAvailability extends Model
 {
@@ -17,4 +18,9 @@ class AppliancePodAvailability extends Model
     protected $primaryKey = 'appliance_pod_availability_id';
 
     public $timestamps = false;
+
+    // Events triggered by actions on the model
+    protected $dispatchesEvents = [
+        'deleting' => AppliancePodAvailabilityDeletedEvent::class
+    ];
 }

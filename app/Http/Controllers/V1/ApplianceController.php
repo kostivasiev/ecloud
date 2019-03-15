@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Models\V1\Appliance;
 
 use App\Models\V1\ApplianceVersion;
+use Log;
 
 class ApplianceController extends BaseController
 {
@@ -345,6 +346,43 @@ class ApplianceController extends BaseController
             throw new DatabaseException($message);
         }
 
+        return $this->respondEmpty();
+    }
+
+    /**
+     * @param Request $request
+     * @param $podId
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
+    public function removeFromPod(Request $request, $podId, $applianceId)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException();
+        }
+
+        $request['appliance_id'] = $applianceId;
+        $this->validate($request, ['appliance_id' => ['required', new IsValidUuid()]]);
+
+        $appliance = static::getApplianceById($request, $applianceId);
+
+        $podQry = AppliancePodAvailability::query();
+        $podQry->where('appliance_pod_availability_appliance_id', '=', $appliance->id);
+        $podQry->where('appliance_pod_availability_ucs_datacentre_id', '=', $podId);
+
+        if ($podQry->count() < 1) {
+            throw new ApplianceNotFoundException('The appliance was not found in the Pod');
+        }
+
+        try {
+            AppliancePodAvailability::destroy($podQry->first()->id);
+        } catch (\Exception $exception) {
+            throw new DatabaseException('Unable to remove the appliance from the pod');
+        }
+        
         return $this->respondEmpty();
     }
 
