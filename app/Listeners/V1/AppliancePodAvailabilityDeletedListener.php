@@ -6,7 +6,6 @@ use App\Events\V1\AppliancePodAvailabilityDeletedEvent;
 use Illuminate\Http\Request;
 use Log;
 
-
 class AppliancePodAvailabilityDeletedListener
 {
     public $request;

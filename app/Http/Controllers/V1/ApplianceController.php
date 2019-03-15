@@ -382,7 +382,7 @@ class ApplianceController extends BaseController
         } catch (\Exception $exception) {
             throw new DatabaseException('Unable to remove the appliance from the pod');
         }
-        
+
         return $this->respondEmpty();
     }
 
