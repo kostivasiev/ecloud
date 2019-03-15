@@ -99,7 +99,7 @@ class PostTest extends ApplianceTestCase
             'version' => 4,
             'script_template' => $applianceVersion->script_template,
             'vm_template' => $applianceVersion->vm_template,
-            'os_license_id' => 132,
+            'os_license_id' => 123,
             'active' => true,
             'parameters'=> [
                 [
