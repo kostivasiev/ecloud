@@ -48,7 +48,11 @@ class ApplianceVersionController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $applianceVersions
+            $applianceVersions,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceVersion::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -71,7 +75,11 @@ class ApplianceVersionController extends BaseController
 
         return $this->respondItem(
             $request,
-            static::getApplianceVersionById($request, $applianceVersionId)
+            static::getApplianceVersionById($request, $applianceVersionId),
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceVersion::VISIBLE_SCOPE_RESELLER
         );
     }
 
