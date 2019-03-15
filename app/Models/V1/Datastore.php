@@ -25,6 +25,7 @@ class Datastore extends Model implements Filterable, Sortable
     protected $primaryKey = 'reseller_lun_id';
     public $timestamps = false;
 
+    public $isSystemStorage = false;
 
     /**
      * Ditto configuration
@@ -214,13 +215,25 @@ class Datastore extends Model implements Filterable, Sortable
      */
     public function getVmwareUsage()
     {
+        //allow system datastores to over provision
+        if ($this->isSystemStorage) {
+            return $this->vmwareUsage = (object)[
+                'capacity' => $this->reseller_lun_size_gb,
+                'freeSpace' => $this->reseller_lun_size_gb,
+                'uncommitted' => 0,
+                'provisioned' => 0,
+                'available' => $this->reseller_lun_size_gb,
+                'used' => 0,
+            ];
+        }
+
         try {
             $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [
                 $this->pod
             ]);
 
             $vmwareDatastore = $kingpin->getDatastore(
-                $this->solution->ucs_reseller_id,
+                $this->reseller_lun_ucs_reseller_id,
                 $this->reseller_lun_name
             );
         } catch (\Exception $exception) {
@@ -362,16 +375,7 @@ class Datastore extends Model implements Filterable, Sortable
                 throw new \Exception('failed to load default datastore');
         }
 
-        //allow default datastores to over provision
-        $defaultDatastore->usage = (object)[
-            'capacity' => $defaultDatastore->reseller_lun_size_gb,
-            'freeSpace' => $defaultDatastore->reseller_lun_size_gb,
-            'uncommitted' => 0,
-            'provisioned' => 0,
-            'available' => $defaultDatastore->reseller_lun_size_gb,
-            'used' => 0,
-        ];
-
+        $defaultDatastore->isSystemStorage = true;
         return $defaultDatastore;
     }
 }

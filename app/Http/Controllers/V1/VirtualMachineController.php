@@ -106,7 +106,7 @@ class VirtualMachineController extends BaseController
         // todo remove when public/burst VMs supported
         // - template validation issue on public
         // - need `add_billing` step on create_vm automation
-        if (in_array($request->input('environment'), ['Public', 'Burst'])) {
+        if (!$this->isAdmin && in_array($request->input('environment'), ['Public', 'Burst'])) {
             throw new Exceptions\ForbiddenException(
                 $request->input('environment') . ' VM creation is temporarily disabled'
             );
@@ -142,9 +142,9 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        if ($request->input('environment') == 'Public') {
+        if (in_array($request->input('environment'), ['Public', 'Burst'])) {
             $rules['hdd_iops'] = ['nullable', 'integer'];
-            // todo public iops
+            // todo check iops in allowed range
         } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
         }
@@ -180,6 +180,13 @@ class VirtualMachineController extends BaseController
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
 
+            // get datastore
+            if ($request->has('datastore_id')) {
+                $datastore = Datastore::find($request->input('datastore_id'));
+            } else {
+                $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
+            }
+
             if ($request->input('environment') != 'Burst') {
                 // get available compute
                 $maxRam = min($maxRam, $solution->ramAvailable());
@@ -187,13 +194,6 @@ class VirtualMachineController extends BaseController
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
                         'host has insufficient ram, ' . $maxRam . 'GB remaining'
                     ));
-                }
-
-                // get available storage
-                if ($request->has('datastore_id')) {
-                    $datastore = Datastore::find($request->input('datastore_id'));
-                } else {
-                    $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
                 }
 
                 $maxHdd = min(
@@ -206,10 +206,10 @@ class VirtualMachineController extends BaseController
                         'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
                 }
-            }
 
-            if ($solution->isMultiSite()) {
-                $rules['site_id'] = ['required', 'integer'];
+                if ($solution->isMultiSite()) {
+                    $rules['site_id'] = ['required', 'integer'];
+                }
             }
 
             if ($solution->isMultiNetwork()) {
@@ -446,6 +446,10 @@ class VirtualMachineController extends BaseController
             $post_data['reseller_lun_id'] = $request->input('datastore_id');
         }
 
+        if ($request->has('hdd_iops') && in_array($request->input('environment'), ['Public', 'Burst'])) {
+            $post_data['hdd_iops'] = $request->input('hdd_iops');
+        }
+
 
         // todo check template disks not larger than request
 
@@ -509,9 +513,10 @@ class VirtualMachineController extends BaseController
             $post_data['is_appliance'] = true;
         }
 
-        // todo remove debugging when ready to retest
+        // remove debugging when ready to retest
 //        print_r($post_data);
 //        exit;
+        // ---
 
         // schedule automation
         try {
