@@ -8,6 +8,7 @@ use App\Traits\V1\UUIDHelper;
 use App\Rules\V1\IsValidValidationRule;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -20,13 +21,18 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-class ApplianceParameters extends Model implements Filterable, Sortable
+// Events
+use App\Events\V1\ApplianceParameterDeletedEvent;
+
+class ApplianceParameter extends Model implements Filterable, Sortable
 {
     // Table columns have table name prefixes
     use ColumnPrefixHelper;
 
     // Table uses UUID's
     use UUIDHelper;
+
+    use SoftDeletes;
 
     protected $connection = 'ecloud';
 
@@ -43,6 +49,13 @@ class ApplianceParameters extends Model implements Filterable, Sortable
     const CREATED_AT = 'appliance_script_parameters_created_at';
 
     const UPDATED_AT = 'appliance_script_parameters_updated_at';
+
+    const DELETED_AT = 'appliance_script_parameters_deleted_at';
+
+    // Events triggered by actions on the model
+    protected $dispatchesEvents = [
+        'deleted' => ApplianceParameterDeletedEvent::class,
+    ];
 
     /**
      * Validation rules
@@ -138,7 +151,7 @@ class ApplianceParameters extends Model implements Filterable, Sortable
         if ($applianceVersion->count() > 0) {
             return $applianceVersion->first()->uuid;
         }
-        return;
+        return null;
     }
 
     /**

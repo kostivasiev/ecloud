@@ -7,6 +7,9 @@ use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+use App\Events\V1\ApplianceDeletedEvent;
 
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
@@ -28,6 +31,8 @@ class Appliance extends Model implements Filterable, Sortable
     // Table uses UUID's
     use UUIDHelper;
 
+    use SoftDeletes;
+
     protected $connection = 'ecloud';
 
     protected $table = 'appliance';
@@ -43,6 +48,13 @@ class Appliance extends Model implements Filterable, Sortable
     const CREATED_AT = 'appliance_created_at';
 
     const UPDATED_AT = 'appliance_updated_at';
+
+    const DELETED_AT = 'appliance_deleted_at';
+
+    // Events triggered by actions on the model
+    protected $dispatchesEvents = [
+        'deleting' => ApplianceDeletedEvent::class, //Trigger on deleting an appliance to cascade the delete to
+    ];
 
     /**
      * Non-database attributes

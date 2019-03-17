@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\ApplianceNotFoundException;
 use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Exceptions\V1\InvalidJsonException;
-use App\Models\V1\ApplianceParameters;
+use App\Models\V1\ApplianceParameter;
 use App\Models\V1\ApplianceVersion;
 use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\BadRequestException;
@@ -48,7 +48,11 @@ class ApplianceVersionController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $applianceVersions
+            $applianceVersions,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceVersion::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -71,7 +75,11 @@ class ApplianceVersionController extends BaseController
 
         return $this->respondItem(
             $request,
-            static::getApplianceVersionById($request, $applianceVersionId)
+            static::getApplianceVersionById($request, $applianceVersionId),
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceVersion::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -158,7 +166,7 @@ class ApplianceVersionController extends BaseController
 
         // Validate appliance version parameters
         if ($request->has('parameters')) {
-            $rules = ApplianceParameters::getRules();
+            $rules = ApplianceParameter::getRules();
             $this->validate(
                 $request,
                 [
@@ -199,7 +207,7 @@ class ApplianceVersionController extends BaseController
          * whilst saving, roll back the entire transaction to remove ALL version parameters AND THE VERSION RECORD.
          */
         foreach ($request->input('parameters', []) as $parameter) {
-            $applianceParameter = new ApplianceParameters();
+            $applianceParameter = new ApplianceParameter();
             $applianceParameter->appliance_version_id = $applianceVersion->id;
             $applianceParameter->name = $parameter['name'];
             $applianceParameter->type = $parameter['type'];
@@ -304,6 +312,36 @@ class ApplianceVersionController extends BaseController
     }
 
     /**
+     * Delete an appliance version
+     * @param Request $request
+     * @param $applianceVersionId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceVersionNotFoundException
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
+    public function delete(Request $request, $applianceVersionId)
+    {
+        if (!$this->isAdmin) {
+            throw new ForbiddenException();
+        }
+
+        $rules['appliance_version_id'] = ['required', new IsValidUuid()];
+        $request['appliance_version_id'] = $applianceVersionId;
+        $this->validate($request, $rules);
+
+        $applianceVersion = static::getApplianceVersionById($request, $applianceVersionId);
+
+        try {
+            $applianceVersion->delete();
+        } catch (\Exception $exception) {
+            throw new DatabaseException('Failed to delete appliance version record');
+        }
+
+        return $this->respondEmpty();
+    }
+
+    /**
      * Return a collection of parameters for an appliance version
      * @param Request $request
      * @param $applianceVersionId
@@ -318,7 +356,7 @@ class ApplianceVersionController extends BaseController
         $parametersQry->where('appliance_version_id', '=', $applianceVersion->id);
 
         (new QueryTransformer($request))
-            ->config(ApplianceParameters::class)
+            ->config(ApplianceParameter::class)
             ->transform($parametersQry);
 
         $applianceParameters = $parametersQry->paginate($this->perPage);
@@ -329,7 +367,7 @@ class ApplianceVersionController extends BaseController
             200,
             null,
             [],
-            ($this->isAdmin) ? null : ApplianceParameters::VISIBLE_SCOPE_RESELLER
+            ($this->isAdmin) ? null : ApplianceParameter::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -367,8 +405,6 @@ class ApplianceVersionController extends BaseController
         if ($request->user->resellerId != 0) {
             $applianceVersionQuery->where('appliance_version_active', '=', 'Yes');
         }
-
-        $applianceVersionQuery->whereNull('appliance_version_deleted_at');
 
         return $applianceVersionQuery;
     }

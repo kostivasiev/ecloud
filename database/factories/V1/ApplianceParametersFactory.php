@@ -6,7 +6,7 @@
 
 use Ramsey\Uuid\Uuid;
 
-$factory->define(App\Models\V1\ApplianceParameters::class, function (Faker\Generator $faker) {
+$factory->define(App\Models\V1\ApplianceParameter::class, function (Faker\Generator $faker) {
 
     $data = [
         'appliance_script_parameters_uuid' => Uuid::uuid4()->toString(),

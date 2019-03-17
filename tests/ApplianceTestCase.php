@@ -4,7 +4,7 @@ namespace Tests;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceVersion;
-use App\Models\V1\ApplianceParameters;
+use App\Models\V1\ApplianceParameter;
 
 use App\Models\V1\Pod;
 use App\Models\V1\AppliancePodAvailability;
@@ -93,7 +93,7 @@ class ApplianceTestCase extends TestCase
                     }
 
                     $applianceVersion->parameters()->save(
-                        factory(ApplianceParameters::class)->make($applianceParameterConfig)
+                        factory(ApplianceParameter::class)->make($applianceParameterConfig)
                     );
                 }
             }

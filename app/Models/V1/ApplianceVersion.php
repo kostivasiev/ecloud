@@ -7,6 +7,8 @@ use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Events\V1\ApplianceVersionDeletedEvent;
 
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 
@@ -30,6 +32,8 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     // Table uses UUID's
     use UUIDHelper;
 
+    use SoftDeletes;
+
     protected $connection = 'ecloud';
 
     protected $table = 'appliance_version';
@@ -46,11 +50,19 @@ class ApplianceVersion extends Model implements Filterable, Sortable
 
     const UPDATED_AT = 'appliance_version_updated_at';
 
+    const DELETED_AT = 'appliance_version_deleted_at';
+
+    // Events triggered by actions on the model
+    protected $dispatchesEvents = [
+        'deleting' => ApplianceVersionDeletedEvent::class, //Trigger on deleting (not deleted, as we need the version record to cascade the soft-deletes to the parameters)
+    ];
+
     // Validation Rules
     public static $rules = [
         'version' => ['required', 'integer'],
         'script_template' => ['required'],
         'vm_template' => ['required'],
+        'os_license_id' => ['required', 'integer'],
         'active' => ['nullable']
     ];
 
@@ -79,6 +91,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
                 'version' => ['nullable', 'integer'],
                 'script_template' => ['nullable'],
                 'vm_template' => ['filled'], //If it's present, we need a value.
+                'os_license_id' => ['nullable', 'integer'],
                 'id' => [new IsValidUuid()],
                 'appliance_id' => ['nullable', new IsValidUuid()]
             ]
@@ -95,6 +108,21 @@ class ApplianceVersion extends Model implements Filterable, Sortable
      * @var array
      */
     protected $visible = [
+        'appliance_version_uuid',
+        'appliance_uuid',
+        'appliance_version_version',
+        'appliance_version_script_template',
+        'appliance_version_vm_template',
+        'appliance_version_server_license_id',
+        'appliance_version_active',
+        'appliance_version_created_at',
+        'appliance_version_updated_at'
+    ];
+
+    /**
+     * Restrict visibility for non-admin
+     */
+    const VISIBLE_SCOPE_RESELLER = [
         'appliance_version_uuid',
         'appliance_uuid',
         'appliance_version_version',
@@ -131,6 +159,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             'version' => 'appliance_version_version',
             'script_template' => 'appliance_version_script_template',
             'vm_template' => 'appliance_version_vm_template',
+            'os_license_id' => 'appliance_version_server_license_id',
             'active' => 'appliance_version_active',
             'created_at' => 'appliance_version_created_at',
             'updated_at' => 'appliance_version_updated_at'
@@ -148,6 +177,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             $factory->create('version', Filter::$stringDefaults),
             $factory->create('script_template', Filter::$stringDefaults),
             $factory->create('vm_template', Filter::$stringDefaults),
+            $factory->create('os_license_id', Filter::$numericDefaults),
             $factory->create('active', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
@@ -167,6 +197,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             $factory->create('version'),
             $factory->create('active'),
             $factory->create('vm_template'),
+            $factory->create('os_license_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -212,6 +243,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             IntProperty::create('appliance_version_version', 'version'),
             StringProperty::create('appliance_version_script_template', 'script_template'),
             StringProperty::create('appliance_version_vm_template', 'vm_template'),
+            IntProperty::create('appliance_version_server_license_id', 'os_license_id'),
             BooleanProperty::create('appliance_version_active', 'active', null, 'Yes', 'No'),
             DateTimeProperty::create('appliance_version_created_at', 'created_at'),
             DateTimeProperty::create('appliance_version_updated_at', 'updated_at')
@@ -273,7 +305,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     public function parameters()
     {
         return $this->hasMany(
-            'App\Models\V1\ApplianceParameters',
+            'App\Models\V1\ApplianceParameter',
             'appliance_script_parameters_appliance_version_id',
             'appliance_version_id'
         );
