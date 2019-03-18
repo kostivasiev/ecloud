@@ -999,7 +999,6 @@ class VirtualMachineController extends BaseController
     }
 
 
-
     /**
      * Clone VM to template
      * @param Request $request
@@ -1009,6 +1008,7 @@ class VirtualMachineController extends BaseController
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
+     * @throws Exceptions\UnprocessableEntityException
      */
     public function cloneToTemplate(Request $request, IntapiService $intapiService, $vmId)
     {
@@ -1098,10 +1098,14 @@ class VirtualMachineController extends BaseController
             }
 
             // Load the datastores for the Solution
-            $solutionDatastores = $virtualMachine->solution->datastores();
+            try {
+                $solutionDatastores = $virtualMachine->solution->datastores();
+            } catch (\Exception $exception) {
+                throw new ServiceUnavailableException('Failed to load solution datastores');
+            }
 
             if (empty($solutionDatastores)) {
-                throw new Exceptions\NotFoundException('Unable to load datastores for solution');
+                throw new Exceptions\NotFoundException('No datastores were found for this solution');
             }
 
             // Filter datastores to ones with enough free space
@@ -1118,6 +1122,8 @@ class VirtualMachineController extends BaseController
                         $datastore->reseller_lun_status == 'Completed'
                         &&
                         $datastore->reseller_lun_lun_type == 'DATA'
+                        &&
+                        $datastore->reseller_lun_type == $virtualMachine->type()
                         &&
                         $datastoreUsage->available > $virtualMachine->servers_hdd
                     );

@@ -391,8 +391,8 @@ class Solution extends Model implements Filterable, Sortable
             $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$this->pod]);
             //Load the solution datastores from VMWare
             $datastores = $kingpin->getDatastores($this->getKey());
-        } catch (\Exception $exception) {
-            throw $exception;
+        } catch (KingpinException $exception) {
+            throw new \Exception('Failed to load solution datastores.');
         }
 
         if (!empty($datastores)) {

@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Exceptions\V1\KingpinException;
 use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\IdProperty;
@@ -212,6 +213,7 @@ class Datastore extends Model implements Filterable, Sortable
 
     /**
      * get VMware usage stats
+     * @throws \Exception
      */
     public function getVmwareUsage()
     {
@@ -236,8 +238,8 @@ class Datastore extends Model implements Filterable, Sortable
                 $this->reseller_lun_ucs_reseller_id,
                 $this->reseller_lun_name
             );
-        } catch (\Exception $exception) {
-            throw $exception;
+        } catch (KingpinException $exception) {
+            throw new \Exception('Unable to load datastore usage from VMWare');
         }
 
         return $this->vmwareUsage = (object)[
