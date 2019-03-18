@@ -999,6 +999,169 @@ class VirtualMachineController extends BaseController
     }
 
 
+
+    /**
+     * Clone VM to template
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
+     * @throws ServiceUnavailableException
+     */
+    public function cloneToTemplate(Request $request, IntapiService $intapiService, $vmId)
+    {
+        $rules = [
+            'template_name' => ['required', 'regex:/' . TemplateController::TEMPLATE_NAME_FORMAT_REGEX . '/'],
+            'template_type' => ['nullable', 'string'], // 'pod' | 'solution' | null (solution)
+        ];
+
+        $this->validate($request, $rules);
+
+        $this->validateVirtualMachineId($request, $vmId);
+
+        //Load the VM
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        if ($virtualMachine->servers_status != 'Complete') {
+            throw new Exceptions\UnprocessableEntityException(
+                'Unable to clone vm while status is: '. $virtualMachine->servers_status
+            );
+        }
+
+        // Clone to Pod template
+        if ($request->has('template_type') && $request->input('template_type') == 'pod') {
+            if (!$this->isAdmin) {
+                throw new Exceptions\ForbiddenException();
+            }
+
+            try {
+                $templateDatastore = $virtualMachine->pod->ucs_datacentre_template_datastore;
+                if (empty($templateDatastore)) {
+                    throw new \Exception('Unable to load VM template datastore: No template datastore defined');
+                }
+            } catch (\Exception $exception) {
+                throw new DatastoreNotFoundException('Unable to load VM template datastore');
+            }
+
+            $datastore = DatastoreController::getDatastoreQuery($request)
+                ->where('reseller_lun_name', '=', $templateDatastore)  //MCS_PX_VV_999999_DATA_03
+                ->first();
+
+            if (!$datastore) {
+                throw new DatastoreNotFoundException('Unable to load VM template datastore record.');
+            }
+
+            // Check if the template name is already in use
+            try {
+                $existingTemplate = TemplateController::getTemplateByName(
+                    $request->input('template_name'),
+                    $virtualMachine->pod
+                );
+            } catch (TemplateNotFoundException $exception) {
+                // Do nothing, the template name is available
+            }
+
+            if (!empty($existingTemplate)) {
+                throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
+            }
+
+            try {
+                $datastoreUsage = $datastore->getVmwareUsage();
+            } catch (\Exception $exception) {
+                throw new ServiceUnavailableException('Unable to determine available datastore space');
+            }
+
+            // Check available space
+            if ($datastoreUsage->available < $virtualMachine->servers_hdd) {
+                throw new DatastoreInsufficientSpaceException(
+                    'Datastore has insufficient space, only ' . $datastoreUsage->available . 'GB remaining'
+                );
+            }
+
+            $templateType = 'system';
+        } else {
+            // Clone to Solution template
+
+            // Check if the template name is already in use on the Solution
+            $TemplateController = new TemplateController($request);
+
+            $solutionTemplates = $TemplateController->getSolutionTemplates($virtualMachine->solution, false);
+            if (is_array($solutionTemplates) and count($solutionTemplates) > 0) {
+                 $existingTemplate = array_filter($solutionTemplates, function ($template) use ($request) {
+                    return ($template->name == $request->input('template_name'));
+                 });
+            }
+            if (!empty($existingTemplate)) {
+                throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
+            }
+
+            // Load the datastores for the Solution
+            $solutionDatastores = $virtualMachine->solution->datastores();
+
+            if (empty($solutionDatastores)) {
+                throw new Exceptions\NotFoundException('Unable to load datastores for solution');
+            }
+
+            // Filter datastores to ones with enough free space
+            $datastores = array_filter(
+                $solutionDatastores,
+                function ($datastore) use ($virtualMachine) {
+                    try {
+                        $datastoreUsage = $datastore->getVmwareUsage();
+                    } catch (\Exception $exception) {
+                        throw new ServiceUnavailableException('Unable to determine available datastore space');
+                    }
+
+                    return (
+                        $datastore->reseller_lun_status == 'Completed'
+                        &&
+                        $datastore->reseller_lun_lun_type == 'DATA'
+                        &&
+                        $datastoreUsage->available > $virtualMachine->servers_hdd
+                    );
+                }
+            );
+
+            if (empty($datastores)) {
+                throw new DatastoreInsufficientSpaceException('No datastore available with required space');
+            }
+
+            if (count($datastores) > 1) {
+                shuffle($datastores);
+            }
+
+            $datastore = $datastores[0];
+
+            $templateType = 'solution';
+        }
+
+        $automationData = [
+            'template_name' => $request->input('template_name'),
+            'template_type' => $templateType,
+            'datastore_name' => $datastore->reseller_lun_name
+        ];
+
+
+        // Fire off automation request
+        try {
+            $intapiService->automationRequest(
+                'create_template_from_vm',
+                'server',
+                $virtualMachine->getKey(),
+                $automationData,
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                $request->user->applicationId
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        }
+
+        return $this->respondEmpty(202);
+    }
+
+
     /**
      * Extract the numeric value from a trigger description
      * @param $trigger
