@@ -910,7 +910,7 @@ class VirtualMachineController extends BaseController
 
                     if ($hdd->capacity < $existingDisks[$hdd->uuid]->capacity) {
                         $message = 'We are currently unable to shrink HDD capacity, ';
-                        $message .= "HDD '" . $hdd->uuid . "' value must be larger than";
+                        $message .= "HDD '" . $hdd->uuid . "' value must be larger than ";
                         $message .= $existingDisks[$hdd->uuid]->capacity . "GB";
                         throw new Exceptions\ForbiddenException($message);
                     }
