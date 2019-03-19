@@ -1112,21 +1112,21 @@ class VirtualMachineController extends BaseController
             $datastores = array_filter(
                 $solutionDatastores,
                 function ($datastore) use ($virtualMachine) {
-                    try {
-                        $datastoreUsage = $datastore->getVmwareUsage();
-                    } catch (\Exception $exception) {
-                        throw new ServiceUnavailableException('Unable to determine available datastore space');
-                    }
+                    if ($datastore->reseller_lun_type == $virtualMachine->type()) {
+                        try {
+                            $datastoreUsage = $datastore->getVmwareUsage();
+                        } catch (\Exception $exception) {
+                            throw new ServiceUnavailableException('Unable to determine available datastore space');
+                        }
 
-                    return (
-                        $datastore->reseller_lun_status == 'Completed'
-                        &&
-                        $datastore->reseller_lun_lun_type == 'DATA'
-                        &&
-                        $datastore->reseller_lun_type == $virtualMachine->type()
-                        &&
-                        $datastoreUsage->available > $virtualMachine->servers_hdd
-                    );
+                        return (
+                            $datastore->reseller_lun_status == 'Completed'
+                            &&
+                            $datastore->reseller_lun_lun_type == 'DATA'
+                            &&
+                            $datastoreUsage->available > $virtualMachine->servers_hdd
+                        );
+                    }
                 }
             );
 
