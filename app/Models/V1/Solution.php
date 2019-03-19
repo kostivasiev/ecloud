@@ -386,9 +386,14 @@ class Solution extends Model implements Filterable, Sortable
      */
     public function datastores($UCSSiteId = null)
     {
-        $solutionDatastores = [];
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$this->pod]);
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService',
+                [
+                    $this->pod,
+                    $this->ucs_reseller_type
+                ]
+            );
+
             //Load the solution datastores from VMWare
             $datastores = $kingpin->getDatastores($this->getKey());
         } catch (KingpinException $exception) {
