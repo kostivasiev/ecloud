@@ -387,7 +387,8 @@ class Solution extends Model implements Filterable, Sortable
     public function datastores($UCSSiteId = null)
     {
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService',
+            $kingpin = app()->makeWith(
+                'App\Kingpin\V1\KingpinService',
                 [
                     $this->pod,
                     $this->ucs_reseller_type
