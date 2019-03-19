@@ -231,7 +231,8 @@ class Datastore extends Model implements Filterable, Sortable
 
         try {
             $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [
-                $this->pod
+                $this->pod,
+                $this->reseller_lun_type
             ]);
 
             $vmwareDatastore = $kingpin->getDatastore(
