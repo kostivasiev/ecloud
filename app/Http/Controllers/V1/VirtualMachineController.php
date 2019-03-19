@@ -747,6 +747,7 @@ class VirtualMachineController extends BaseController
      */
     public function update(Request $request, IntapiService $intapiService, $vmId)
     {
+        $resizeRequired = false;
         /**
          * This endpoint should be using HTTP PATCH, log if we detect any PUT requests.
          */
@@ -829,7 +830,6 @@ class VirtualMachineController extends BaseController
             }
         }
 
-
         // CPU
         if ($request->has('cpu')) {
             if ($request->input('cpu') < $minCpu) {
@@ -839,6 +839,7 @@ class VirtualMachineController extends BaseController
             if ($request->input('cpu') > $maxCpu) {
                 throw new Exceptions\ForbiddenException('cpu value must be ' . $maxCpu . ' or smaller');
             }
+            $resizeRequired = ($request->input('cpu') != $virtualMachine->servers_cpu);
         }
         $automationData['cpu'] = $request->input('cpu', $virtualMachine->servers_cpu);
 
@@ -851,6 +852,7 @@ class VirtualMachineController extends BaseController
             if ($request->input('ram') > $maxRam) {
                 throw new Exceptions\ForbiddenException('ram value must be ' . $maxRam . ' or smaller');
             }
+            $resizeRequired = (($request->input('ram') != $virtualMachine->servers_memory) || $resizeRequired);
         }
         $automationData['ram'] = $request->input('ram', $virtualMachine->servers_memory);
 
@@ -898,6 +900,7 @@ class VirtualMachineController extends BaseController
                             throw new Exceptions\ForbiddenException($message);
                         }
 
+                        $resizeRequired = true;
                         $hdd->capacity = 'deleted';
                         $automationData['hdd'][$hdd->name] = $hdd;
                         continue;
@@ -938,24 +941,32 @@ class VirtualMachineController extends BaseController
                     // The number does not indicate future designation for the disk & is just used
                     // for logging in the automation process.
                     $hdd->name = 'New disk ' . ++$newDisksCount;
+                    $resizeRequired = true;
                 }
 
                 if ($hdd->capacity < $minHdd) {
-                    throw new Exceptions\ForbiddenException(
-                        "HDD '" . $hdd->uuid . "' value must be {$minHdd}GB or larger"
-                    );
+                    $message = "HDD";
+                    if (!empty($hdd->uuid)) {
+                        $message .= " '" . $hdd->uuid . "'";
+                    }
+                    $message .= " value must be {$minHdd}GB or larger";
+                    throw new Exceptions\ForbiddenException($message);
                 }
 
                 if ($hdd->capacity > $maxHdd) {
-                    throw new Exceptions\ForbiddenException(
-                        "HDD '" . $hdd->uuid . "' value must be {$maxHdd}GB or smaller"
-                    );
+                    $message = "HDD";
+                    if (!empty($hdd->uuid)) {
+                        $message .= " '" . $hdd->uuid . "'";
+                    }
+                    $message .= " value must be {$maxHdd}GB or smaller";
+                    throw new Exceptions\ForbiddenException($message);
                 }
 
                 $totalCapacity += $hdd->capacity;
 
                 $hdd->state = 'present'; // For when we update the automation
                 $automationData['hdd'][$hdd->name] = $hdd;
+                $resizeRequired = true;
             }
         }
 
@@ -981,21 +992,24 @@ class VirtualMachineController extends BaseController
                 . $virtualMachine->servers_hdd . "GB or greater (proposed:{$totalCapacity}GB)"
             );
         }
+
         // Fire off automation request
-        try {
-            $intapiService->automationRequest(
-                'resize_vm',
-                'server',
-                $virtualMachine->getKey(),
-                $automationData,
-                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
-            );
-        } catch (IntapiServiceException $exception) {
-            throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        if ($resizeRequired) {
+            try {
+                $intapiService->automationRequest(
+                    'resize_vm',
+                    'server',
+                    $virtualMachine->getKey(),
+                    $automationData,
+                    !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                    $request->user->applicationId
+                );
+            } catch (IntapiServiceException $exception) {
+                throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+            }
         }
 
-        return $this->respondEmpty(202);
+        return $this->respondEmpty(($resizeRequired) ? 202 : 200);
     }
 
 
