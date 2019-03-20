@@ -51,7 +51,7 @@ return [
             'username'  => env('DB_ECLOUD_USERNAME'),
             'password'  => env('DB_ECLOUD_PASSWORD'),
             'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci'
+            'collation' => 'utf8_general_ci'
         ],
 
 //        'sqlite' => [
