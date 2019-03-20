@@ -37,6 +37,7 @@ use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Exceptions\V1\InsufficientResourceException;
 use Log;
+use App\VM\ResizeCheck;
 
 use Mustache_Engine;
 
@@ -872,7 +873,7 @@ class VirtualMachineController extends BaseController
         $automationData['hdd'] = [];
         $totalCapacity = 0;
 
-        if ($request->has('hdd_disks')) {
+        if ($request->filled('hdd_disks')) {
             $newDisksCount = 0;
             foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object) $hdd;
@@ -997,6 +998,8 @@ class VirtualMachineController extends BaseController
 
         // Fire off automation request
         if ($resizeRequired) {
+            (new ResizeCheck($virtualMachine))->validate();
+
             try {
                 $intapiService->automationRequest(
                     'resize_vm',
