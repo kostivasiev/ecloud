@@ -145,7 +145,7 @@ class Appliance extends Model implements Filterable, Sortable
             $factory->create('version', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
             $factory->create('publisher', Filter::$stringDefaults),
-            $factory->create('active', Filter::$stringDefaults),
+            $factory->boolean()->create('active', 'Yes', 'No'),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];

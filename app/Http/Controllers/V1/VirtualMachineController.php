@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 use App\Exceptions\V1\TemplateNotFoundException;
+use App\Rules\V1\IsValidSSHPublicKey;
 use App\Rules\V1\IsValidUuid;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -100,6 +101,7 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
      * @throws \App\Exceptions\V1\ApplianceNotFoundException
+     * @throws ApplianceServerLicenseNotFoundException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -132,7 +134,8 @@ class VirtualMachineController extends BaseController
 
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
 
-            'ssh_keys' => ['nullable', 'array']
+            'ssh_keys' => ['nullable', 'array'],
+            'ssh_keys.*' => [new IsValidSSHPublicKey()]
         ];
 
         // Check we either have template or appliance_id but not both
@@ -164,7 +167,7 @@ class VirtualMachineController extends BaseController
         }
 
         $this->validate($request, $rules);
-
+        
         // environment specific validation
         $minCpu = VirtualMachine::MIN_CPU;
         $maxCpu = VirtualMachine::MAX_CPU;

@@ -178,7 +178,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             $factory->create('script_template', Filter::$stringDefaults),
             $factory->create('vm_template', Filter::$stringDefaults),
             $factory->create('os_license_id', Filter::$numericDefaults),
-            $factory->create('active', Filter::$enumDefaults),
+            $factory->boolean()->create('active', 'Yes', 'No'),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
