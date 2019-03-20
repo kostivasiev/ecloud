@@ -116,7 +116,7 @@ class PostTest extends TestCase
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'The ssh_keys.0 is not a valid SSH Public key',
+                    'detail' => 'ssh_keys.0 is not a valid SSH Public key',
                     'status' => 422
                 ]
             );

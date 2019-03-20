@@ -23,6 +23,6 @@ class IsValidSSHPublicKey implements Rule
      */
     public function message()
     {
-        return 'The :attribute is not a valid SSH Public key';
+        return ':attribute is not a valid SSH Public key';
     }
 }
