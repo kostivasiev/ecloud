@@ -167,7 +167,7 @@ class VirtualMachineController extends BaseController
         }
 
         $this->validate($request, $rules);
-        
+
         // environment specific validation
         $minCpu = VirtualMachine::MIN_CPU;
         $maxCpu = VirtualMachine::MAX_CPU;
