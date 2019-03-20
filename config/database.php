@@ -49,7 +49,9 @@ return [
             'port'      => env('DB_ECLOUD_PORT', 3306),
             'database'  => env('DB_ECLOUD_DATABASE', 'ecloud'),
             'username'  => env('DB_ECLOUD_USERNAME'),
-            'password'  => env('DB_ECLOUD_PASSWORD')
+            'password'  => env('DB_ECLOUD_PASSWORD'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_general_ci'
         ],
 
 //        'sqlite' => [
