@@ -941,7 +941,6 @@ class VirtualMachineController extends BaseController
                     // The number does not indicate future designation for the disk & is just used
                     // for logging in the automation process.
                     $hdd->name = 'New disk ' . ++$newDisksCount;
-                    $resizeRequired = true;
                 }
 
                 if ($hdd->capacity < $minHdd) {
