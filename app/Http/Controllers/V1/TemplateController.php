@@ -141,7 +141,7 @@ class TemplateController extends BaseController
      * @throws TemplateUpdateException
      * @throws \App\Exceptions\V1\PodNotFoundException
      */
-    public function renamePodTemplate(Request $request, IntapiService $intapiService, $podId,  $templateName)
+    public function renamePodTemplate(Request $request, IntapiService $intapiService, $podId, $templateName)
     {
         $templateName = urldecode($templateName);
 
