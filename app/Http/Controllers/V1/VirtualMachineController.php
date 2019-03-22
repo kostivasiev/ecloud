@@ -512,9 +512,11 @@ class VirtualMachineController extends BaseController
         }
 
         // Do we have an appliance script?
-        if (!empty($applianceScript)) {
-            $post_data['bootstrap_script'] = json_encode($applianceScript);
+        if ($request->has('appliance_id')) {
             $post_data['is_appliance'] = true;
+            if (!empty($applianceScript)) {
+                $post_data['bootstrap_script'] = json_encode($applianceScript);
+            }
         }
 
         // remove debugging when ready to retest
