@@ -59,6 +59,34 @@ class TemplateController extends BaseController
     }
 
     /**
+     * Returns a Pod template item
+     *
+     * @param Request $request
+     * @param $podId
+     * @param $templateName
+     * @return \Illuminate\Http\Response
+     * @throws TemplateNotFoundException
+     * @throws \App\Exceptions\V1\PodNotFoundException
+     */
+    public function showPodTemplate(Request $request, $podId, $templateName)
+    {
+        $templateName = urldecode($templateName);
+
+        $pod = PodController::getPodById($request, $podId);
+
+        $template = static::getPodTemplateByName($pod, $templateName);
+
+        if (!$template) {
+            throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
+        }
+
+        return $this->respondItem(
+            $request,
+            $this->filterAdminProperties($request, $template)
+        );
+    }
+
+    /**
      * Get templates for a Pod
      *
      * @param Request $request

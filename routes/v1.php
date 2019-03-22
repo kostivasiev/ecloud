@@ -121,6 +121,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('pods/{pod_id}', 'PodController@show');
 
     $router->get('pods/{pod_id}/templates', 'TemplateController@podTemplates');
+    $router->get('pods/{pod_id}/templates/{template_name}', 'TemplateController@showPodTemplate');
     $router->post('pods/{pod_id}/templates/{template_name}/move', 'TemplateController@renamePodTemplate');
     // todo datastores
 
