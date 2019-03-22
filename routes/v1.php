@@ -53,18 +53,6 @@ $router->group($baseRouteParameters, function () use ($router) {
 });
 
 
-// Templates
-$router->group($baseRouteParameters, function () use ($router) {
-    $router->get('templates', 'TemplateController@index');
-
-    $router->get('templates/{template_name}', 'TemplateController@show');
-    $router->delete('templates/{template_name}', 'TemplateController@deleteTemplate');
-
-    $router->post('templates/{template_name}/move', 'TemplateController@renameTemplate');
-});
-
-
-
 // Solution's
 $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions', 'SolutionController@index');
@@ -75,10 +63,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}/vms', 'VirtualMachineController@getSolutionVMs');
     $router->get('solutions/{solution_id}/hosts', 'HostController@indexSolution');
     $router->get('solutions/{solution_id}/datastores', 'DatastoreController@indexSolution');
-    $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
     $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
+
+    $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
+    $router->get('solutions/{solution_id}/templates/{template_name}', 'TemplateController@show');
+    $router->post('solutions/{solution_id}/templates/{template_name}/move', 'TemplateController@renameSolutionTemplate');
+    $router->delete('solutions/{solution_id}/templates/{template_name}', 'TemplateController@deleteSolutionTemplate');
 
     $router->get('solutions/{solution_id}/tags', 'TagController@indexSolutionTags');
     $router->post('solutions/{solution_id}/tags', 'TagController@createSolutionTag');
@@ -129,11 +121,13 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('pods/{pod_id}', 'PodController@show');
 
     $router->get('pods/{pod_id}/templates', 'TemplateController@podTemplates');
+    $router->post('pods/{pod_id}/templates/{template_name}/move', 'TemplateController@renamePodTemplate');
     // todo datastores
 
     $router->get('pods/{pod_id}/appliances', 'ApplianceController@podAvailability');
     $router->post('pods/{pod_id}/appliances', 'ApplianceController@addToPod');
     $router->delete('pods/{pod_id}/appliances/{appliance_id}', 'ApplianceController@removeFromPod');
+    $router->delete('pods/{pod_id}/templates/{template_name}', 'TemplateController@deletePodTemplate');
 });
 
 
