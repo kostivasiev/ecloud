@@ -29,45 +29,24 @@ use UKFast\Api\Exceptions\UnauthorisedException;
 class TemplateController extends BaseController
 {
     const TEMPLATE_NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ ]+$';
-    /**
-     * List all Solution Templates
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Request $request)
-    {
-        $allTemplates = $this->filterAdminProperties($request, $this->getResellerSolutionTemplates());
-
-        $paginator = $this->paginateTemplateData($allTemplates);
-        $paginator->setPath($request->root() . '/' . $request->path());
-
-        return $this->respondCollection(
-            $request,
-            $paginator
-        );
-    }
 
     /**
-     * Returns a template Item
+     * Returns a Solution template Item
+     *
      * @param Request $request
+     * @param $solutionId
      * @param $templateName
      * @return \Illuminate\Http\Response
      * @throws TemplateNotFoundException
      */
-    public function show(Request $request, $templateName)
+
+    public function show(Request $request, $solutionId, $templateName)
     {
         $templateName = urldecode($templateName);
 
-        // Check Solution Templates First
-        $templates = $this->getResellerSolutionTemplates();
+        $templates = $this->getResellerSolutionTemplates($solutionId);
 
         $template = $this->findTemplateByName($templateName, $templates);
-
-        if (!$template) {
-            // Not found in Solution templates, check Pod templates
-            $templates = $this->getResellerPodTemplates();
-            $template = $this->findTemplateByName($templateName, $templates);
-        }
 
         if (!$template) {
             throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
@@ -81,6 +60,7 @@ class TemplateController extends BaseController
 
     /**
      * Get templates for a Pod
+     *
      * @param Request $request
      * @param $podId
      * @return \Illuminate\Http\Response
@@ -99,87 +79,91 @@ class TemplateController extends BaseController
     }
 
     /**
-     * Rename / move a template
+     * Rename / move a Solution template
+     *
      * @param Request $request
      * @param IntapiService $intapiService
+     * @param $solutionId
      * @param $templateName
      * @return \Illuminate\Http\Response
      * @throws SolutionNotFoundException
      * @throws TemplateNotFoundException
-     * @throws ForbiddenException
      * @throws TemplateUpdateException
      */
-    public function renameTemplate(Request $request, IntapiService $intapiService, $templateName)
+    public function renameSolutionTemplate(Request $request, IntapiService $intapiService, $solutionId, $templateName)
     {
         $templateName = urldecode($templateName);
 
-        $this->validate($request, [
-            'destination' => [
-                'required',
-                'regex:/[A-Za-z0-9-_\ ]+/'
-            ],
-            'solution_id' => 'nullable|integer'
-        ]);
+        $this->validate($request, ['destination' => ['required', 'regex:/[A-Za-z0-9-_\ ]+/']]);
 
         $newTemplateName = $request->input('destination');
 
-        // Check Pod templates first
-        $templates = $this->getResellerPodTemplates(true);
-        foreach ($templates as $podId => $podTemplates) {
-            $template = $this->findTemplateByName($templateName, $podTemplates);
-            if (!empty($template)) {
-                $template->pod_id = $podId;
-                break;
-            }
-        }
+        $templates = $this->getResellerSolutionTemplates($solutionId);
 
-        // Not found in Pod templates, check Solution templates
-        if (empty($template)) {
-            $templates = $this->getResellerSolutionTemplates($request->input('solution_id', null));
-            $template = $this->findTemplateByName($templateName, $templates);
-        }
+        $template = $this->findTemplateByName($templateName, $templates);
 
         if (empty($template)) {
             throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
         }
 
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+
+        try {
+            $intapiService->automationRequest(
+                'rename_template',
+                'ucs_reseller',
+                $template->solution_id,
+                [
+                    'template_type' => 'solution',
+                    'template_name' => $template->name,
+                    'new_template_name' => $newTemplateName
+                ],
+                'ecloud_ucs_' . $solution->pod->getKey()
+            );
+
+            return $this->respondEmpty(202);
+        } catch (IntapiServiceException $exception) {
+            throw new TemplateUpdateException('Failed to schedule template rename');
+        }
+    }
+
+
+    /**
+     * Rename / move a Pod template
+     *
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $podId
+     * @param $templateName
+     * @return \Illuminate\Http\Response
+     * @throws ForbiddenException
+     * @throws TemplateNotFoundException
+     * @throws TemplateUpdateException
+     * @throws \App\Exceptions\V1\PodNotFoundException
+     */
+    public function renamePodTemplate(Request $request, IntapiService $intapiService, $podId, $templateName)
+    {
+        $templateName = urldecode($templateName);
+
+        $this->validate($request, ['destination' => ['required', 'regex:/[A-Za-z0-9-_\ ]+/']]);
+
+        $newTemplateName = $request->input('destination');
+
+        $pod = PodController::getPodById($request, $podId);
+
+        $templates = $this->getPodTemplates($pod);
+
+        $template = $this->findTemplateByName($templateName, $templates);
+
+        if (empty($template)) {
+            throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
+        }
 
         // Dont allow renaming of UKFast managed base templates
         if ($template->type == 'Base' || $this->isUKFastBaseTemplate($template)) {
             throw new ForbiddenException('UKFast Base templates can not be edited');
         }
 
-        /**
-         * Rename a Solution template
-         */
-        if ($template->type == 'Solution') {
-            $solution = Solution::find($template->solution_id);
-            if (!$solution) {
-                throw new SolutionNotFoundException('Failed to load Solution information for template');
-            }
-
-            try {
-                $intapiService->automationRequest(
-                    'rename_template',
-                    'ucs_reseller',
-                    $template->solution_id,
-                    [
-                        'template_type' => 'solution',
-                        'template_name' => $template->name,
-                        'new_template_name' => $newTemplateName
-                    ],
-                    'ecloud_ucs_' . $solution->pod->getKey()
-                );
-
-                return $this->respondEmpty(202);
-            } catch (IntapiServiceException $exception) {
-                throw new TemplateUpdateException('Failed to schedule template rename');
-            }
-        }
-
-        /**
-         * Rename a Pod template
-         */
         try {
             $intapiService->automationRequest(
                 'rename_template',
@@ -189,7 +173,7 @@ class TemplateController extends BaseController
                     'template_type' => 'system',
                     'template_name' => $template->name,
                     'new_template_name' => $newTemplateName,
-                    'datacentre_id' => $template->pod_id
+                    'datacentre_id' => $podId
                 ]
             );
 
@@ -201,6 +185,7 @@ class TemplateController extends BaseController
 
     /**
      * Returns the templates for a Solution
+     *
      * @param Request $request
      * @param $solutionId
      * @return \Illuminate\Http\Response
@@ -230,35 +215,71 @@ class TemplateController extends BaseController
     }
 
     /**
-     * Delete a template
+     * Delete a Solution template
+     *
      * @param Request $request
      * @param IntapiService $intapiService
+     * @param $solutionId
      * @param $templateName
      * @return \Illuminate\Http\Response
-     * @throws ForbiddenException
      * @throws SolutionNotFoundException
      * @throws TemplateNotFoundException
      * @throws TemplateUpdateException
      */
-    public function deleteTemplate(IntapiService $intapiService, $templateName)
+    public function deleteSolutionTemplate(Request $request, IntapiService $intapiService, $solutionId, $templateName)
     {
         $templateName = urldecode($templateName);
 
-        // Check Pod templates first
-        $templates = $this->getResellerPodTemplates(true);
-        foreach ($templates as $podId => $podTemplates) {
-            $template = $this->findTemplateByName($templateName, $podTemplates);
-            if (!empty($template)) {
-                $template->pod_id = $podId;
-                break;
-            }
+        $templates = $this->getResellerSolutionTemplates($solutionId);
+
+        $template = $this->findTemplateByName($templateName, $templates);
+
+        if (empty($template)) {
+            throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
         }
 
-        // Not found in Pod templates, check Solution templates
-        if (empty($template)) {
-            $templates = $this->getResellerSolutionTemplates();
-            $template = $this->findTemplateByName($templateName, $templates);
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+
+        try {
+            $intapiService->automationRequest(
+                'delete_template',
+                'ucs_reseller',
+                $template->solution_id,
+                [
+                    'template_type' => 'solution',
+                    'template_name' => $templateName,
+                ],
+                'ecloud_ucs_' . $solution->pod->getKey()
+            );
+
+            return $this->respondEmpty(202);
+        } catch (IntapiServiceException $exception) {
+            throw new TemplateUpdateException('Failed to schedule template deletion');
         }
+    }
+
+    /**
+     * Delete Pod Template
+     *
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $podId
+     * @param $templateName
+     * @return \Illuminate\Http\Response
+     * @throws ForbiddenException
+     * @throws TemplateNotFoundException
+     * @throws TemplateUpdateException
+     * @throws \App\Exceptions\V1\PodNotFoundException
+     */
+    public function deletePodTemplate(Request $request, IntapiService $intapiService, $podId, $templateName)
+    {
+        $templateName = urldecode($templateName);
+
+        $pod = PodController::getPodById($request, $podId);
+
+        $templates = $this->getPodTemplates($pod);
+
+        $template = $this->findTemplateByName($templateName, $templates);
 
         if (empty($template)) {
             throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
@@ -269,36 +290,6 @@ class TemplateController extends BaseController
             throw new ForbiddenException('UKFast Base templates can not be deleted');
         }
 
-        /**
-         * Delete Solution Template
-         */
-        if ($template->type == 'Solution') {
-            $solution = Solution::find($template->solution_id);
-            if (!$solution) {
-                throw new SolutionNotFoundException('Failed to load Solution information for template');
-            }
-            //delete the solution template
-            try {
-                $intapiService->automationRequest(
-                    'delete_template',
-                    'ucs_reseller',
-                    $template->solution_id,
-                    [
-                        'template_type' => 'solution',
-                        'template_name' => $templateName,
-                    ],
-                    'ecloud_ucs_' . $solution->pod->getKey()
-                );
-
-                return $this->respondEmpty(202);
-            } catch (IntapiServiceException $exception) {
-                throw new TemplateUpdateException('Failed to schedule template deletion');
-            }
-        }
-
-        /**
-         * Delete Pod Template
-         */
         try {
             $intapiService->automationRequest(
                 'delete_template',
@@ -307,7 +298,7 @@ class TemplateController extends BaseController
                 [
                     'template_type' => 'system',
                     'template_name' => $template->name,
-                    'datacentre_id' => $template->pod_id
+                    'datacentre_id' => $podId
                 ]
             );
 
@@ -316,8 +307,6 @@ class TemplateController extends BaseController
             throw new TemplateUpdateException('Failed to schedule template deletion');
         }
     }
-
-
     //-------------------------------------------------
 
     /**
@@ -467,6 +456,7 @@ class TemplateController extends BaseController
 
     /**
      * Get the templates for a specific Solution
+     *
      * @param Solution $solution
      * @param bool $appendSolutionId
      * @return array|bool
@@ -557,6 +547,7 @@ class TemplateController extends BaseController
     }
 
     /**
+     * Attempt to load a template by name using Solution or Pod
      * @param string $name
      * @param Pod $pod
      * @param Solution|null $solution
@@ -565,35 +556,66 @@ class TemplateController extends BaseController
      */
     public static function getTemplateByName(string $name, Pod $pod, Solution $solution = null)
     {
-        $request = app('request');
-        $TemplateController = new static($request);
-
         if (!is_null($solution)) {
-            $templates = $TemplateController->getSolutionTemplates($solution, false);
-            if (is_array($templates) and count($templates) > 0) {
-                $template = $TemplateController->findTemplateByName($name, $templates);
-                if ($template) {
-                    return $template;
-                }
+            $template = static::getSolutionTemplateByName($solution, $name);
+            if (!empty($template)) {
+                return $template;
             }
         }
 
-        // load pod templates
+        $template = static::getPodTemplateByName($pod, $name);
+        if (!empty($template)) {
+            return $template;
+        }
+
+        throw new TemplateNotFoundException("A template matching the requested name was not found");
+    }
+
+
+    /**
+     * Retrieve a Pod (Pod/Base) template from a Pod by name
+     * @param Pod $pod
+     * @param $templateName
+     * @return bool|null
+     */
+    public static function getPodTemplateByName(Pod $pod, $templateName)
+    {
+        $request = app('request');
+        $TemplateController = new static($request);
         $templates = $TemplateController->getResellerPodTemplates(true)[$pod->getKey()];
         if (is_array($templates) and count($templates) > 0) {
-            $template = $TemplateController->findTemplateBy('name', $name, $templates);
+            $template = $TemplateController->findTemplateBy('name', $templateName, $templates);
             if ($template) {
                 return $template;
             }
 
             // base templates use friendly names
-            $template = $TemplateController->findTemplateBy('name', $name, $templates);
+            $template = $TemplateController->findTemplateBy('name', $templateName, $templates);
             if ($template) {
                 return $template;
             }
         }
+        return false;
+    }
 
-        throw new TemplateNotFoundException("A template matching the requested name was not found");
+    /**
+     * Retrieve a Solution template from a Solution by name
+     * @param Solution $solution
+     * @param $templateName
+     * @return bool|null
+     */
+    public static function getSolutionTemplateByName(Solution $solution, $templateName)
+    {
+        $request = app('request');
+        $TemplateController = new static($request);
+        $templates = $TemplateController->getSolutionTemplates($solution, false);
+        if (is_array($templates) and count($templates) > 0) {
+            $template = $TemplateController->findTemplateByName($templateName, $templates);
+            if ($template) {
+                return $template;
+            }
+        }
+        return false;
     }
 
     /**

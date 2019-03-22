@@ -1075,14 +1075,10 @@ class VirtualMachineController extends BaseController
             }
 
             // Check if the template name is already in use
-            try {
-                $existingTemplate = TemplateController::getTemplateByName(
-                    $request->input('template_name'),
-                    $virtualMachine->pod
-                );
-            } catch (TemplateNotFoundException $exception) {
-                // Do nothing, the template name is available
-            }
+            $existingTemplate = TemplateController::getPodTemplateByName(
+                $virtualMachine->pod,
+                $request->input('template_name')
+            );
 
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
@@ -1105,15 +1101,12 @@ class VirtualMachineController extends BaseController
         } else {
             // Clone to Solution template
 
-            // Check if the template name is already in use on the Solution
-            $TemplateController = new TemplateController($request);
+            // Check whether the template name is already in use on this Solution.
+            $existingTemplate = TemplateController::getSolutionTemplateByName(
+                $virtualMachine->solution,
+                $request->input('template_name')
+            );
 
-            $solutionTemplates = $TemplateController->getSolutionTemplates($virtualMachine->solution, false);
-            if (is_array($solutionTemplates) and count($solutionTemplates) > 0) {
-                 $existingTemplate = array_filter($solutionTemplates, function ($template) use ($request) {
-                    return ($template->name == $request->input('template_name'));
-                 });
-            }
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
             }
