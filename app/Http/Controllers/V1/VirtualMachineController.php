@@ -444,6 +444,7 @@ class VirtualMachineController extends BaseController
             foreach ($request->input('hdd_disks') as $disk) {
                 $post_data['hdd_gb'][$disk['name']] = $disk['capacity'];
             }
+            $post_data['hdd_gb'] = serialize($post_data['hdd_gb']);
         }
 
         if ($request->has('datastore_id')) {
