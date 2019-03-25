@@ -146,6 +146,13 @@ class VirtualMachineController extends BaseController
             );
         }
 
+        // Check we either have template or appliance_id but not both
+        if (!($request->has('hdd') xor $request->has('hdd_disks'))) {
+            throw new Exceptions\BadRequestException(
+                'Virtual machines must be launched with either the hdd or hdd_disks parameter'
+            );
+        }
+
         if (in_array($request->input('environment'), ['Public', 'Burst'])) {
             $rules['hdd_iops'] = ['nullable', 'integer'];
             // todo check iops in allowed range
