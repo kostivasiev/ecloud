@@ -716,6 +716,6 @@ class TemplateController extends BaseController
             $templates[$key] = $template;
         }
 
-        return $templates;
+        return (count($templates) > 1) ? $templates : $templates[0];
     }
 }
