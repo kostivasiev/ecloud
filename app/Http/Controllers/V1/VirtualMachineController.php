@@ -847,6 +847,7 @@ class VirtualMachineController extends BaseController
             case 'Burst':
                 // Check if the solution can modify resources
                 (new CanModifyResource($virtualMachine->solution))->validate();
+                break;
             default:
         }
 
@@ -1246,6 +1247,11 @@ class VirtualMachineController extends BaseController
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
+        // Check if the solution can modify resources
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
+
         $result = $this->powerOnVirtualMachine($virtualMachine);
         if (!$result) {
             throw new KingpinException('Failed to power on virtual machine');
@@ -1266,6 +1272,10 @@ class VirtualMachineController extends BaseController
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $result = $this->powerOffVirtualMachine($virtualMachine);
         if (!$result) {
@@ -1289,6 +1299,10 @@ class VirtualMachineController extends BaseController
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
+
         $result = $this->shutDownVirtualMachine($virtualMachine);
         if (!$result) {
             throw new KingpinException('Failed to shut down virtual machine');
@@ -1311,6 +1325,9 @@ class VirtualMachineController extends BaseController
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
         //Shut down
         $shutDownResult = $this->shutDownVirtualMachine($virtualMachine);
         if (!$shutDownResult) {
@@ -1338,6 +1355,9 @@ class VirtualMachineController extends BaseController
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         //Hard power-off
         $powerOffResult = $this->powerOffVirtualMachine($virtualMachine);
@@ -1371,6 +1391,9 @@ class VirtualMachineController extends BaseController
 
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $result = $this->suspendVirtualMachine($virtualMachine);
         if (!$result) {

@@ -9,7 +9,7 @@ class InvalidSolutionStateException extends ApiException
     /**
      * {@inheritdoc}
      */
-    public $message = 'VM is in an invalid state for that action';
+    public $message = 'Solution is in an invalid state for that action';
 
     /**
      * {@inheritdoc}
@@ -24,7 +24,7 @@ class InvalidSolutionStateException extends ApiException
     public function __construct($state)
     {
         $this->state = $state;
-        $this->title = 'Invalid Solution state';
+        $this->title = 'Invalid solution state';
     }
 
     /**
