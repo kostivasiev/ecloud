@@ -270,7 +270,10 @@ class TagController extends BaseController
 
     public function updateVMTag(Request $request, $vmId, $tagKey)
     {
-        VirtualMachineController::getVirtualMachineById($request, $vmId);
+        $virtualMachine = VirtualMachineController::getVirtualMachineById($request, $vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $tag = Tag::withReseller($request->user->resellerId)
             ->withServer($vmId)
@@ -298,8 +301,11 @@ class TagController extends BaseController
 
     public function destroyVMTag(Request $request, $vmId, $tagKey)
     {
-        VirtualMachineController::getVirtualMachineById($request, $vmId);
-
+        $virtualMachine = VirtualMachineController::getVirtualMachineById($request, $vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
+        
         $tag = Tag::withReseller($request->user->resellerId)
             ->withServer($vmId)
             ->withKey($tagKey)
