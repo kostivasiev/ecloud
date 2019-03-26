@@ -305,7 +305,7 @@ class TagController extends BaseController
         if ($virtualMachine->type() != 'Public') {
             (new CanModifyResource($virtualMachine->solution))->validate();
         }
-        
+
         $tag = Tag::withReseller($request->user->resellerId)
             ->withServer($vmId)
             ->withKey($tagKey)

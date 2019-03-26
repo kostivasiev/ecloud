@@ -4,6 +4,7 @@ namespace App\Solution;
 
 use App\Solution\Exceptions\InvalidSolutionStateException;
 use App\Models\V1\Solution;
+use \Illuminate\Http\Request;
 
 class CanModifyResource
 {
@@ -21,10 +22,10 @@ class CanModifyResource
     ];
 
 
-    public function __construct(Solution $solution)
+    public function __construct(Solution $solution, Request $request = null)
     {
         $this->solution = $solution;
-        $this->request = app('request');
+        $this->request = empty($request) ? app('request') : $request;
     }
 
     public function validate()
