@@ -9,6 +9,7 @@ use App\Models\V1\ServerLicense;
 use App\Models\V1\Solution;
 use App\Models\V1\Pod;
 
+use App\Solution\CanModifyResource;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -117,9 +118,14 @@ class TemplateController extends BaseController
      * @throws SolutionNotFoundException
      * @throws TemplateNotFoundException
      * @throws TemplateUpdateException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
     public function renameSolutionTemplate(Request $request, IntapiService $intapiService, $solutionId, $templateName)
     {
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+
+        (new CanModifyResource($solution))->validate();
+
         $templateName = urldecode($templateName);
 
         $this->validate($request, ['destination' => ['required', 'regex:/[A-Za-z0-9-_\ ]+/']]);
@@ -133,8 +139,6 @@ class TemplateController extends BaseController
         if (empty($template)) {
             throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
         }
-
-        $solution = SolutionController::getSolutionById($request, $solutionId);
 
         try {
             $intapiService->automationRequest(
@@ -253,9 +257,14 @@ class TemplateController extends BaseController
      * @throws SolutionNotFoundException
      * @throws TemplateNotFoundException
      * @throws TemplateUpdateException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
     public function deleteSolutionTemplate(Request $request, IntapiService $intapiService, $solutionId, $templateName)
     {
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+
+        (new CanModifyResource($solution))->validate();
+
         $templateName = urldecode($templateName);
 
         $templates = $this->getResellerSolutionTemplates($solutionId);
@@ -266,7 +275,6 @@ class TemplateController extends BaseController
             throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
         }
 
-        $solution = SolutionController::getSolutionById($request, $solutionId);
 
         try {
             $intapiService->automationRequest(
