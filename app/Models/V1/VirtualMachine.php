@@ -651,6 +651,30 @@ class VirtualMachine extends Model implements Filterable, Sortable
         return $response;
     }
 
+    /**
+     * Get the VM's datastore
+     */
+    public function getDatastore()
+    {
+        $config = [
+            $this->getPod(),
+            $this->type()
+        ];
+
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+        } catch (\Exception $exception) {
+            return false;
+        }
+
+        $response = $kingpin->getVMDatastore(
+            $this->getKey(),
+            $this->solutionId()
+        );
+
+        return $response;
+    }
+
 
     /**
      * Return the VM solutionId
