@@ -6,6 +6,7 @@ use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 use App\Exceptions\V1\TemplateNotFoundException;
 use App\Rules\V1\IsValidSSHPublicKey;
 use App\Rules\V1\IsValidUuid;
+use App\Solution\CanModifyResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -190,6 +191,9 @@ class VirtualMachineController extends BaseController
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
+
+            // Check if the solution can modify resources
+            (new CanModifyResource($solution))->validate();
 
             // get datastore
             if ($request->has('datastore_id')) {
@@ -591,6 +595,11 @@ class VirtualMachineController extends BaseController
             );
         }
 
+        // Check if the solution can modify resources
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
+
         //server is in contract
         if (!$request->user->isAdmin && $virtualMachine->inContract()) {
             throw new Exceptions\ForbiddenException(
@@ -605,7 +614,6 @@ class VirtualMachineController extends BaseController
                 'VM cannot be deleted, device is managed by UKFast'
             );
         }
-
         //schedule automation
         try {
             $automationRequestId = $intapiService->automationRequest(
@@ -670,6 +678,9 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->type() . ' VM cloning is currently disabled'
             );
         }
+
+        // Check if the solution can modify resources
+        (new CanModifyResource($virtualMachine->solution))->validate();
 
         //Load the default datastore and check there's enough space
         //For Hybrid the default is the available datastore with the most free space
@@ -757,6 +768,7 @@ class VirtualMachineController extends BaseController
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \App\VM\Exceptions\InvalidVmStateException
      */
     public function update(Request $request, IntapiService $intapiService, $vmId)
@@ -805,6 +817,9 @@ class VirtualMachineController extends BaseController
         switch ($virtualMachine->type()) {
             case 'Hybrid':
             case 'Private':
+                // Check if the solution can modify resources
+                (new CanModifyResource($virtualMachine->solution))->validate();
+
                 $maxRam = intval($virtualMachine->servers_memory)
                     + min(VirtualMachine::MAX_RAM, $virtualMachine->solution->ramAvailable());
 
@@ -847,6 +862,9 @@ class VirtualMachineController extends BaseController
                 break;
 
             case 'Burst':
+                // Check if the solution can modify resources
+                (new CanModifyResource($virtualMachine->solution))->validate();
+                break;
             default:
         }
 
@@ -1071,6 +1089,11 @@ class VirtualMachineController extends BaseController
         //Load the VM
         $virtualMachine = $this->getVirtualMachine($vmId);
 
+        if ($virtualMachine->type() != 'Public') {
+            // Check if the solution can modify resources
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
+
         if ($virtualMachine->servers_status != 'Complete') {
             throw new Exceptions\UnprocessableEntityException(
                 'Unable to clone vm while status is: '. $virtualMachine->servers_status
@@ -1241,6 +1264,11 @@ class VirtualMachineController extends BaseController
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
+        // Check if the solution can modify resources
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
+
         $result = $this->powerOnVirtualMachine($virtualMachine);
         if (!$result) {
             throw new KingpinException('Failed to power on virtual machine');
@@ -1261,6 +1289,10 @@ class VirtualMachineController extends BaseController
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $result = $this->powerOffVirtualMachine($virtualMachine);
         if (!$result) {
@@ -1284,6 +1316,10 @@ class VirtualMachineController extends BaseController
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
+
         $result = $this->shutDownVirtualMachine($virtualMachine);
         if (!$result) {
             throw new KingpinException('Failed to shut down virtual machine');
@@ -1306,6 +1342,9 @@ class VirtualMachineController extends BaseController
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
         //Shut down
         $shutDownResult = $this->shutDownVirtualMachine($virtualMachine);
         if (!$shutDownResult) {
@@ -1333,6 +1372,9 @@ class VirtualMachineController extends BaseController
     {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         //Hard power-off
         $powerOffResult = $this->powerOffVirtualMachine($virtualMachine);
@@ -1366,6 +1408,9 @@ class VirtualMachineController extends BaseController
 
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $result = $this->suspendVirtualMachine($virtualMachine);
         if (!$result) {

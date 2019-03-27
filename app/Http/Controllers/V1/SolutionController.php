@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Solution\CanModifyResource;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -61,6 +62,7 @@ class SolutionController extends BaseController
      * @param $solutionId
      * @return \Illuminate\Http\Response
      * @throws SolutionNotFoundException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -71,6 +73,8 @@ class SolutionController extends BaseController
         if (is_null($solution)) {
             throw new SolutionNotFoundException('Solution ID #' . $solutionId . ' not found');
         }
+
+        (new CanModifyResource($solution))->validate();
 
         // replace request data with json payload
         $request->request->replace($request->json()->all());

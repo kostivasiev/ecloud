@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Solution\CanModifyResource;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -59,9 +60,22 @@ class TagController extends BaseController
         );
     }
 
+    /**
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\Http\Response
+     * @throws BadRequestException
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     */
     public function createSolutionTag(Request $request, $solutionId)
     {
         $solution = SolutionController::getSolutionById($request, $solutionId);
+        // Check if the solution can modify resources
+        (new CanModifyResource($solution))->validate();
 
         $this->validate($request, [
             'key' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
@@ -101,9 +115,22 @@ class TagController extends BaseController
         );
     }
 
+    /**
+     * @param Request $request
+     * @param $solutionId
+     * @param $tagKey
+     * @return \Illuminate\Http\Response
+     * @throws TagNotFoundException
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     */
     public function updateSolutionTag(Request $request, $solutionId, $tagKey)
     {
-        SolutionController::getSolutionById($request, $solutionId);
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+        (new CanModifyResource($solution))->validate();
 
         $tag = Tag::withReseller($request->user->resellerId)
             ->withSolution($solutionId)
@@ -136,10 +163,12 @@ class TagController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws TagNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
     public function destroySolutionTag(Request $request, $solutionId, $tagKey)
     {
-        SolutionController::getSolutionById($request, $solutionId);
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+        (new CanModifyResource($solution))->validate();
 
         $tag = Tag::withReseller($request->user->resellerId)
             ->withSolution($solutionId)
@@ -195,7 +224,11 @@ class TagController extends BaseController
 
     public function createVMTag(Request $request, $vmId)
     {
-        $server = VirtualMachineController::getVirtualMachineById($request, $vmId);
+        $virtualMachine = VirtualMachineController::getVirtualMachineById($request, $vmId);
+        // Check if the solution can modify resources
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $this->validate($request, [
             'key' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
@@ -211,11 +244,11 @@ class TagController extends BaseController
         }
 
         $tag = new Tag;
-        $tag->metadata_reseller_id = $server->servers_reseller_id;
+        $tag->metadata_reseller_id = $virtualMachine->servers_reseller_id;
         $tag->metadata_key = $request->input('key');
         $tag->metadata_value = $request->input('value');
         $tag->metadata_resource = 'server';
-        $tag->metadata_resource_id = $server->getKey();
+        $tag->metadata_resource_id = $virtualMachine->getKey();
         $tag->metadata_created = date('Y-m-d H:i:s');
         $tag->metadata_createdby = 'API Client';
         $tag->metadata_createdby_id = $request->user->applicationId;
@@ -237,7 +270,10 @@ class TagController extends BaseController
 
     public function updateVMTag(Request $request, $vmId, $tagKey)
     {
-        VirtualMachineController::getVirtualMachineById($request, $vmId);
+        $virtualMachine = VirtualMachineController::getVirtualMachineById($request, $vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $tag = Tag::withReseller($request->user->resellerId)
             ->withServer($vmId)
@@ -265,7 +301,10 @@ class TagController extends BaseController
 
     public function destroyVMTag(Request $request, $vmId, $tagKey)
     {
-        VirtualMachineController::getVirtualMachineById($request, $vmId);
+        $virtualMachine = VirtualMachineController::getVirtualMachineById($request, $vmId);
+        if ($virtualMachine->type() != 'Public') {
+            (new CanModifyResource($virtualMachine->solution))->validate();
+        }
 
         $tag = Tag::withReseller($request->user->resellerId)
             ->withServer($vmId)
