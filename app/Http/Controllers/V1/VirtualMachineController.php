@@ -441,7 +441,6 @@ class VirtualMachineController extends BaseController
         $post_data['cpus'] = $request->input('cpu');
         $post_data['ram_gb'] = $request->input('ram');
 
-
         // set storage
         if ($request->has('hdd')) {
             $post_data['hdd_gb'] = $request->input('hdd');
@@ -758,6 +757,7 @@ class VirtualMachineController extends BaseController
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
+     * @throws \App\VM\Exceptions\InvalidVmStateException
      */
     public function update(Request $request, IntapiService $intapiService, $vmId)
     {
@@ -825,8 +825,6 @@ class VirtualMachineController extends BaseController
 
                 $datastore = $datastoreQuery->first();
                 $datastore->getVmwareUsage();
-
-                //exit(print_r($datastore->vmwareUsage));
 
                 // Max HDD size is the available datastore space + the current HDD size
                 $maxHdd = ($datastore->vmwareUsage->available + $virtualMachine->servers_hdd);
