@@ -445,7 +445,6 @@ class VirtualMachineController extends BaseController
         $post_data['cpus'] = $request->input('cpu');
         $post_data['ram_gb'] = $request->input('ram');
 
-
         // set storage
         if ($request->has('hdd')) {
             $post_data['hdd_gb'] = $request->input('hdd');
@@ -824,9 +823,27 @@ class VirtualMachineController extends BaseController
                 $maxRam = intval($virtualMachine->servers_memory)
                     + min(VirtualMachine::MAX_RAM, $virtualMachine->solution->ramAvailable());
 
-                $datastore = Datastore::getDefault($virtualMachine->solution->getKey(), $virtualMachine->type());
+                // Get the vm's datastore
+                $vmDatastore = $virtualMachine->getDatastore();
+                if (!$vmDatastore) {
+                    Log::error('Failed to retrieve datastore information from VMWare for VM #' . $virtualMachine->id);
+                    throw new DatastoreNotFoundException('Unable to load datastore for virtual machine');
+                }
 
-                $maxHdd = $datastore->usage->available;
+                // Load the datastore object and get the vmware usage (so we take into account over provisioning)
+                $datastoreQuery = Datastore::query()->withName($vmDatastore->name);
+
+                if ($datastoreQuery->count() < 1) {
+                    Log::error('Failed to retrieve datastore record \'' . $vmDatastore->name . '\'  from the database');
+                    throw new DatastoreNotFoundException('Unable to load datastore for virtual machine');
+                }
+
+                $datastore = $datastoreQuery->first();
+                $datastore->getVmwareUsage();
+
+                // Max HDD size is the available datastore space + the current HDD size
+                $maxHdd = ($datastore->vmwareUsage->available + $virtualMachine->servers_hdd);
+
                 //TODO: Is this still right? should this be VirtualMachine::MIN_HDD
 //                $minHdd = $virtualMachine->servers_hdd;
                 break;
@@ -985,15 +1002,6 @@ class VirtualMachineController extends BaseController
                     throw new Exceptions\ForbiddenException($message);
                 }
 
-                if ($hdd->capacity > $maxHdd) {
-                    $message = "HDD";
-                    if (!empty($hdd->uuid)) {
-                        $message .= " '" . $hdd->uuid . "'";
-                    }
-                    $message .= " value must be {$maxHdd}GB or smaller";
-                    throw new Exceptions\ForbiddenException($message);
-                }
-
                 $totalCapacity += $hdd->capacity;
 
                 $hdd->state = 'present'; // For when we update the automation
@@ -1019,9 +1027,18 @@ class VirtualMachineController extends BaseController
         }
 
         if ($totalCapacity < $virtualMachine->servers_hdd) {
+            $underprovision = ($virtualMachine->servers_hdd - $totalCapacity);
             throw new Exceptions\ForbiddenException(
-                'HDD capacity for virtual machine must be '
-                . $virtualMachine->servers_hdd . "GB or greater (proposed:{$totalCapacity}GB)"
+                'HDD capacity for virtual machine under-provisioned by '. $underprovision .'GB.'
+                .' Total HDD capacity must be ' . $virtualMachine->servers_hdd . 'GB or greater.'
+            );
+        }
+
+        if ($totalCapacity > $maxHdd) {
+            $overprovision = ($totalCapacity - $maxHdd);
+            throw new Exceptions\ForbiddenException(
+                'HDD capacity for virtual machine over-provisioned by ' . $overprovision . 'GB.'
+                . ' Total HDD capacity must be ' . $maxHdd . 'GB or less.'
             );
         }
 
