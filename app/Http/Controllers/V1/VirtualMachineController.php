@@ -808,9 +808,26 @@ class VirtualMachineController extends BaseController
                 $maxRam = intval($virtualMachine->servers_memory)
                     + min(VirtualMachine::MAX_RAM, $virtualMachine->solution->ramAvailable());
 
-                $datastore = Datastore::getDefault($virtualMachine->solution->getKey(), $virtualMachine->type());
+                // Get the vm's datastore
+                $vmDatastore = $virtualMachine->getDatastore();
+                if (!$vmDatastore) {
+                    Log::error('Failed to retrieve datastore information from VMWare for VM #' . $virtualMachine->id);
+                    throw new DatastoreNotFoundException('Unable to load datastore for virtual machine');
+                }
 
-                $maxHdd = $datastore->usage->available;
+                // Load the datastore object and get the vmware usage (so we take into account over provisioning)
+                $datastoreQuery = Datastore::query()->withName($vmDatastore->name);
+
+                if ($datastoreQuery->count() < 1) {
+                    Log::error('Failed to retrieve datastore record \'' . $vmDatastore->name . '\'  from the database');
+                    throw new DatastoreNotFoundException('Unable to load datastore for virtual machine');
+                }
+
+                $datastore = $datastoreQuery->first();
+                $datastore->getVmwareUsage();
+                // Max HDD size is the available datastore space + the current HDD size
+                $maxHdd = ($datastore->vmwareUsage->available + $virtualMachine->servers_hdd);
+
                 //TODO: Is this still right? should this be VirtualMachine::MIN_HDD
 //                $minHdd = $virtualMachine->servers_hdd;
                 break;

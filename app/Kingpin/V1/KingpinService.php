@@ -274,6 +274,34 @@ class KingpinService
         return $hdds;
     }
 
+    /**
+     * Get a VM's datastore
+     * @param $vmId
+     * @param null $solutionId
+     * @return bool|object
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getVMDatastore($vmId, $solutionId = null)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'vm/' . $vmId;
+
+        $model = [
+            'detailNetwork' => 'false',
+            'detailDatastore' => 'true',
+            'detailHost' => 'false',
+        ];
+
+        try {
+            $this->makeRequest('GET', $url, $model);
+
+            return $this->formatDatastore($this->responseData->datastore);
+
+        } catch (TransferException $exception) {
+            return false;
+        }
+    }
+
 
     /**
      * @param $vmId
@@ -723,6 +751,14 @@ class KingpinService
         if (empty($this->requestData) === false) {
             $requestOptions['json'] = $this->requestData;
         }
+
+        // If we pass $data with a GET request add it to the query string i.e. ?key=val
+        if ($method === 'GET') {
+            if (!empty($data)) {
+                $requestOptions['query'] = $data;
+            }
+        }
+
         try {
             $this->response = $this->requestClient->request($method, $this->requestUrl, $requestOptions);
             // check if there is a response body
