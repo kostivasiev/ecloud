@@ -1022,7 +1022,7 @@ class VirtualMachineController extends BaseController
                 . $virtualMachine->servers_hdd . "GB or greater (proposed:{$totalCapacity}GB)"
             );
         }
-
+exit(print_r($automationData));
         // Fire off automation request
         if ($resizeRequired) {
             (new ResizeCheck($virtualMachine))->validate();

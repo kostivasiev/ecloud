@@ -296,7 +296,6 @@ class KingpinService
             $this->makeRequest('GET', $url, $model);
 
             return $this->formatDatastore($this->responseData->datastore);
-
         } catch (TransferException $exception) {
             return false;
         }
