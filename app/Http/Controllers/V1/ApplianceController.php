@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
+use App\Exceptions\V1\InvalidJsonException;
 use App\Exceptions\V1\TemplateNotFoundException;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\Pod;
@@ -85,11 +86,16 @@ class ApplianceController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws InvalidJsonException
      */
     public function create(Request $request)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException();
+        }
+
+        if (empty($request->json()->all()) || empty($request->request->all())) {
+            throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
         }
 
         $this->validate($request, Appliance::$rules);
@@ -122,11 +128,16 @@ class ApplianceController extends BaseController
      * @throws DatabaseException
      * @throws ForbiddenException
      * @throws ApplianceNotFoundException
+     * @throws InvalidJsonException
      */
     public function update(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException();
+        }
+
+        if (empty($request->json()->all()) || empty($request->request->all())) {
+            throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
         }
 
         // Validate the the appliance exists:
