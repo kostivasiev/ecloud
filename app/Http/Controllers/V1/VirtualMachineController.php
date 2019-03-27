@@ -825,6 +825,9 @@ class VirtualMachineController extends BaseController
 
                 $datastore = $datastoreQuery->first();
                 $datastore->getVmwareUsage();
+
+                //exit(print_r($datastore->vmwareUsage));
+
                 // Max HDD size is the available datastore space + the current HDD size
                 $maxHdd = ($datastore->vmwareUsage->available + $virtualMachine->servers_hdd);
 
@@ -983,15 +986,6 @@ class VirtualMachineController extends BaseController
                     throw new Exceptions\ForbiddenException($message);
                 }
 
-                if ($hdd->capacity > $maxHdd) {
-                    $message = "HDD";
-                    if (!empty($hdd->uuid)) {
-                        $message .= " '" . $hdd->uuid . "'";
-                    }
-                    $message .= " value must be {$maxHdd}GB or smaller";
-                    throw new Exceptions\ForbiddenException($message);
-                }
-
                 $totalCapacity += $hdd->capacity;
 
                 $hdd->state = 'present'; // For when we update the automation
@@ -1017,9 +1011,18 @@ class VirtualMachineController extends BaseController
         }
 
         if ($totalCapacity < $virtualMachine->servers_hdd) {
+            $underprovision = ($virtualMachine->servers_hdd - $totalCapacity);
             throw new Exceptions\ForbiddenException(
-                'HDD capacity for virtual machine must be '
-                . $virtualMachine->servers_hdd . "GB or greater (proposed:{$totalCapacity}GB)"
+                'HDD capacity for virtual machine under-provisioned by '. $underprovision .'GB.'
+                .' Total HDD capacity must be ' . $virtualMachine->servers_hdd . 'GB or greater.'
+            );
+        }
+
+        if ($totalCapacity > $maxHdd) {
+            $overprovision = ($totalCapacity - $maxHdd);
+            throw new Exceptions\ForbiddenException(
+                'HDD capacity for virtual machine over-provisioned by ' . $overprovision . 'GB.'
+                . ' Total HDD capacity must be ' . $maxHdd . 'GB or less.'
             );
         }
 
