@@ -250,8 +250,6 @@ class ApplianceController extends BaseController
      * @param $applianceId
      * @return \Illuminate\Http\Response
      * @throws ApplianceNotFoundException
-     * @throws ForbiddenException
-     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      */
     public function latestVersion(Request $request, $applianceId)
     {
@@ -259,9 +257,14 @@ class ApplianceController extends BaseController
 
         $applianceVersion = $appliance->getLatestVersion();
 
-        $applianceVersionController = new ApplianceVersionController($request);
-
-        return $applianceVersionController->show($request, $applianceVersion->uuid);
+        return $this->respondItem(
+            $request,
+            $applianceVersion,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceVersion::VISIBLE_SCOPE_RESELLER
+        );
     }
 
 

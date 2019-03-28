@@ -57,7 +57,7 @@ class ApplianceVersionController extends BaseController
     }
 
     /**
-     * Get a singe ApplianceVersion resource
+     * Get a single ApplianceVersion resource
      *
      * @param Request $request
      * @param $applianceVersionId

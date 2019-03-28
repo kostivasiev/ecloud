@@ -70,7 +70,6 @@ class Appliance extends Model implements Filterable, Sortable
         'name' => ['required',  'max:255'],
         'logo_uri' => ['nullable', 'max:255'],
         'description' => ['nullable'],
-        'detailed_description' => ['nullable'],
         'documentation_uri' => ['nullable'],
         'publisher' => ['nullable', 'max:255'],
         'active' => ['nullable', 'boolean']
@@ -83,13 +82,11 @@ class Appliance extends Model implements Filterable, Sortable
      * @var array
      */
     protected $visible = [
-        //'appliance_id',
         'appliance_uuid',
         'appliance_name',
         'version',
         'appliance_logo_uri',
         'appliance_description',
-        'appliance_detailed_description',
         'appliance_documentation_uri',
         'appliance_publisher',
         'appliance_active',
@@ -105,7 +102,6 @@ class Appliance extends Model implements Filterable, Sortable
         'appliance_name',
         'appliance_logo_uri',
         'appliance_description',
-        'appliance_detailed_description',
         'appliance_documentation_uri',
         'appliance_publisher',
         'appliance_created_at'
@@ -128,7 +124,6 @@ class Appliance extends Model implements Filterable, Sortable
             'version' => 'version', //Non-database attribute
             'logo_uri' => 'appliance_logo_uri',
             'description' => 'appliance_description',
-            'detailed_description' => 'appliance_detailed_description',
             'documentation_uri' => 'appliance_documentation_uri',
             'publisher' => 'appliance_publisher',
             'active' => 'appliance_active', // Yes / No
@@ -148,7 +143,6 @@ class Appliance extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('version', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
-            $factory->create('detailed_description', Filter::$stringDefaults),
             $factory->create('publisher', Filter::$stringDefaults),
             $factory->boolean()->create('active', 'Yes', 'No'),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -211,7 +205,6 @@ class Appliance extends Model implements Filterable, Sortable
             IntProperty::create('version', 'version'),
             StringProperty::create('appliance_logo_uri', 'logo_uri'),
             StringProperty::create('appliance_description', 'description'),
-            StringProperty::create('appliance_detailed_description', 'detailed_description'),
             StringProperty::create('appliance_documentation_uri', 'documentation_uri'),
             StringProperty::create('appliance_publisher', 'publisher'),
             BooleanProperty::create('appliance_active', 'active', null, 'Yes', 'No'),
