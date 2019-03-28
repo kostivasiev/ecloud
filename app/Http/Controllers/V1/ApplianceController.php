@@ -86,16 +86,11 @@ class ApplianceController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
-     * @throws InvalidJsonException
      */
     public function create(Request $request)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException();
-        }
-
-        if (empty($request->json()->all()) || empty($request->request->all())) {
-            throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
         }
 
         $this->validate($request, Appliance::$rules);
@@ -128,16 +123,11 @@ class ApplianceController extends BaseController
      * @throws DatabaseException
      * @throws ForbiddenException
      * @throws ApplianceNotFoundException
-     * @throws InvalidJsonException
      */
     public function update(Request $request, $applianceId)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException();
-        }
-
-        if (empty($request->json()->all()) || empty($request->request->all())) {
-            throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
         }
 
         // Validate the the appliance exists:
@@ -250,8 +240,6 @@ class ApplianceController extends BaseController
      * @param $applianceId
      * @return \Illuminate\Http\Response
      * @throws ApplianceNotFoundException
-     * @throws ForbiddenException
-     * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      */
     public function latestVersion(Request $request, $applianceId)
     {
@@ -259,9 +247,14 @@ class ApplianceController extends BaseController
 
         $applianceVersion = $appliance->getLatestVersion();
 
-        $applianceVersionController = new ApplianceVersionController($request);
-
-        return $applianceVersionController->show($request, $applianceVersion->uuid);
+        return $this->respondItem(
+            $request,
+            $applianceVersion,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : ApplianceVersion::VISIBLE_SCOPE_RESELLER
+        );
     }
 
 

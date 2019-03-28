@@ -62,6 +62,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         'version' => ['required', 'integer'],
         'script_template' => ['required'],
         'vm_template' => ['required'],
+        'description' => ['nullable'],
         'os_license_id' => ['required', 'integer'],
         'active' => ['nullable']
     ];
@@ -111,6 +112,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         'appliance_version_uuid',
         'appliance_uuid',
         'appliance_version_version',
+        'appliance_version_description',
         'appliance_version_script_template',
         'appliance_version_vm_template',
         'appliance_version_server_license_id',
@@ -125,10 +127,8 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     const VISIBLE_SCOPE_RESELLER = [
         'appliance_version_uuid',
         'appliance_uuid',
-        'appliance_version_version',
         'appliance_version_script_template',
-        'appliance_version_vm_template',
-        'appliance_version_active',
+        'appliance_version_description',
         'appliance_version_created_at',
         'appliance_version_updated_at'
     ];
@@ -157,6 +157,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             'id' => 'appliance_version_uuid', //UUID, not internal id
             'appliance_id' => 'appliance_uuid',
             'version' => 'appliance_version_version',
+            'description' => 'appliance_version_description',
             'script_template' => 'appliance_version_script_template',
             'vm_template' => 'appliance_version_vm_template',
             'os_license_id' => 'appliance_version_server_license_id',
@@ -241,6 +242,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             //Return the appliance UUID, not internal ID
             StringProperty::create('appliance_uuid', 'appliance_id'),
             IntProperty::create('appliance_version_version', 'version'),
+            StringProperty::create('appliance_version_description', 'description'),
             StringProperty::create('appliance_version_script_template', 'script_template'),
             StringProperty::create('appliance_version_vm_template', 'vm_template'),
             IntProperty::create('appliance_version_server_license_id', 'os_license_id'),
