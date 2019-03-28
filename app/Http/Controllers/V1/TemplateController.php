@@ -352,6 +352,9 @@ class TemplateController extends BaseController
      */
     protected function paginateTemplateData($templates)
     {
+        if (!is_array($templates)) {
+            $templates = [$templates];
+        }
         $collection = new Collection($templates);
 
         $paginator = new LengthAwarePaginator(
@@ -713,15 +716,17 @@ class TemplateController extends BaseController
             return $templates;
         }
 
+        if (empty($templates)) {
+            return $templates;
+        }
+
         if (!is_array($templates)) {
             $templates = [$templates];
         }
 
-        foreach ($templates as $key => $template) {
+        foreach ($templates as &$template) {
             unset($template->type);
             unset($template->license);
-
-            $templates[$key] = $template;
         }
 
         return (count($templates) > 1) ? $templates : $templates[0];
