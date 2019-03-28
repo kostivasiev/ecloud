@@ -270,12 +270,17 @@ class ApplianceVersionController extends BaseController
      * @throws ApplianceVersionNotFoundException
      * @throws DatabaseException
      * @throws ForbiddenException
+     * @throws InvalidJsonException
      * @throws UnprocessableEntityException
      */
     public function update(Request $request, $applianceVersionId)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException();
+        }
+
+        if (empty($request->json()->all()) || empty($request->request->all())) {
+            throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
         }
 
         // Validate the appliance version exists
