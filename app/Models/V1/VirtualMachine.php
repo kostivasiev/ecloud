@@ -208,6 +208,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {

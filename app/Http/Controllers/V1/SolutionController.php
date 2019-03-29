@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Events\V1\EncryptionEnabledOnSolutionEvent;
 use App\Solution\CanModifyResource;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -15,6 +16,7 @@ use App\Exceptions\V1\SolutionNotFoundException;
 use UKFast\Api\Exceptions\DatabaseException;
 
 use App\Traits\V1\SanitiseRequestData;
+use Illuminate\Support\Facades\Event;
 
 class SolutionController extends BaseController
 {
@@ -103,6 +105,11 @@ class SolutionController extends BaseController
 
         $request['id'] = $solutionId;
         $this->validate($request, $rules);
+
+        if ($request->has('encryption_enabled') && $request->input('encryption_enabled') === true) {
+            Event::fire(new EncryptionEnabledOnSolutionEvent($solution));
+        }
+
 
         $appliance = $this->receiveItem($request, Solution::class);
 
