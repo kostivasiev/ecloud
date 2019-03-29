@@ -239,6 +239,11 @@ class VirtualMachineController extends BaseController
                     $request->request->add(['network_id' => $defaultNetwork->getKey()]);
                 }
             }
+
+            // Check if encryption is enabled on the solution
+            if ($solution->encryptionEnabled()) {
+                $encrypt_vm = $request->input('encrypt', ($solution->ucs_reseller_encryption_default == 'Yes'));
+            }
         }
 
 
@@ -418,6 +423,10 @@ class VirtualMachineController extends BaseController
                 throw new Exceptions\BadRequestException("ssh_keys only supported for Linux VM's at this time");
             }
             $post_data['ssh_keys'] = $request->input('ssh_keys');
+        }
+
+        if (isset($encrypt_vm)) {
+            $post_data['encrypt_vm'] = $encrypt_vm;
         }
 
         // set template

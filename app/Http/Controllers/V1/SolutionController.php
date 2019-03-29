@@ -106,14 +106,14 @@ class SolutionController extends BaseController
         $request['id'] = $solutionId;
         $this->validate($request, $rules);
 
-        if ($request->has('encryption_enabled') && $request->input('encryption_enabled') === true) {
-            Event::fire(new EncryptionEnabledOnSolutionEvent($solution));
-        }
-
         $appliance = $this->receiveItem($request, Solution::class);
 
         if (!$appliance->resource->save()) {
-            throw new DatabaseException('Could not update appliance');
+            throw new DatabaseException('Could not update solution');
+        }
+
+        if ($request->has('encryption_enabled') && $request->input('encryption_enabled') === true) {
+            Event::fire(new EncryptionEnabledOnSolutionEvent($solution));
         }
 
         return $this->respondEmpty();
