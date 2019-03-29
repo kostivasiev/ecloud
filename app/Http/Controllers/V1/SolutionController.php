@@ -110,7 +110,6 @@ class SolutionController extends BaseController
             Event::fire(new EncryptionEnabledOnSolutionEvent($solution));
         }
 
-
         $appliance = $this->receiveItem($request, Solution::class);
 
         if (!$appliance->resource->save()) {

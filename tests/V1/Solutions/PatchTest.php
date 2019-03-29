@@ -44,7 +44,7 @@ class PatchTest extends TestCase
         ]);
 
 
-        $this->assertResponseStatus(200) && $this->seeInDatabase('ucs_reseller', [
+        $this->assertResponseStatus(204) && $this->seeInDatabase('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_solution_name' => $testString,
         ]);
