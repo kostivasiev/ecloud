@@ -521,4 +521,13 @@ class Solution extends Model implements Filterable, Sortable
 
         return $solutionDatastores;
     }
+
+    /**
+     * Return whether encryption is enabled on the solution
+     * @return bool
+     */
+    public function encryptionEnabled()
+    {
+        return ($this->ucs_reseller_encryption_enabled == 'Yes');
+    }
 }
