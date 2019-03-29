@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Events\V1\EncryptionEnabledOnSolutionEvent;
 use App\Solution\CanModifyResource;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -12,10 +13,14 @@ use Illuminate\Http\Request;
 
 use App\Models\V1\Solution;
 use App\Exceptions\V1\SolutionNotFoundException;
+use UKFast\Api\Exceptions\DatabaseException;
+
+use App\Traits\V1\SanitiseRequestData;
+use Illuminate\Support\Facades\Event;
 
 class SolutionController extends BaseController
 {
-    use ResponseHelper, RequestHelper;
+    use ResponseHelper, RequestHelper, SanitiseRequestData;
 
     /**
      * List all solutions
@@ -35,7 +40,11 @@ class SolutionController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $solutions
+            $solutions,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : Solution::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -51,7 +60,11 @@ class SolutionController extends BaseController
     {
         return $this->respondItem(
             $request,
-            static::getSolutionById($request, $solutionId)
+            static::getSolutionById($request, $solutionId),
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : Solution::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -61,11 +74,9 @@ class SolutionController extends BaseController
      * @param Request $request
      * @param $solutionId
      * @return \Illuminate\Http\Response
+     * @throws DatabaseException
      * @throws SolutionNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
      */
     public function update(Request $request, $solutionId)
     {
@@ -76,19 +87,36 @@ class SolutionController extends BaseController
 
         (new CanModifyResource($solution))->validate();
 
-        // replace request data with json payload
-        $request->request->replace($request->json()->all());
+        $rules = Solution::$rules;
+        $rules = array_merge(
+            $rules,
+            [
+                'environment' => ['nullable', 'in:Hybrid,Private'],
+                'pod_id' => ['nullable', 'numeric'],
+                'reseller_id' => ['nullable', 'numeric'],
+                'status' => ['nullable']
+            ]
+        );
 
-        $this->validate($request, [
-            'name' => 'regex:/'.Solution::NAME_FORMAT_REGEX.'/',
-        ]);
-
-        $solution->ucs_reseller_solution_name = $request->input('name');
-        if (!$solution->save()) {
-            //
+        if (!$this->isAdmin) {
+            // Set whitelist of request params to pass to receiveItem()
+            $this->sanitiseRequestData($request, ['name', 'encryption_default']);
         }
 
-        return $this->respondSave($request, $solution);
+        $request['id'] = $solutionId;
+        $this->validate($request, $rules);
+
+        if ($request->has('encryption_enabled') && $request->input('encryption_enabled') === true) {
+            Event::fire(new EncryptionEnabledOnSolutionEvent($solution));
+        }
+
+        $appliance = $this->receiveItem($request, Solution::class);
+
+        if (!$appliance->resource->save()) {
+            throw new DatabaseException('Could not update appliance');
+        }
+
+        return $this->respondEmpty();
     }
 
     /**

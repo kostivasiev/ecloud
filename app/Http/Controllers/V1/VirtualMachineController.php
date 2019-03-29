@@ -137,7 +137,9 @@ class VirtualMachineController extends BaseController
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
 
             'ssh_keys' => ['nullable', 'array'],
-            'ssh_keys.*' => [new IsValidSSHPublicKey()]
+            'ssh_keys.*' => [new IsValidSSHPublicKey()],
+
+            'encrypt' => ['sometimes', 'boolean']
         ];
 
         // Check we either have template or appliance_id but not both

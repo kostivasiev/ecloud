@@ -26,6 +26,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\V1\AppliancePodAvailabilityDeletedEvent' => [
             'App\Listeners\V1\AppliancePodAvailabilityDeletedListener',
+        ],
+        'App\Events\V1\EncryptionEnabledOnSolutionEvent' => [
+            'App\Listeners\V1\EncryptionEnabledOnSolutionListener',
         ]
     ];
 }

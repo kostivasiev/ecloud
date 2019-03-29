@@ -6,9 +6,12 @@ use App\Exceptions\V1\KingpinException;
 use App\Exceptions\V1\SolutionNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 
+use UKFast\Api\Resource\Property\DateProperty;
+use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
+use UKFast\Api\Resource\Property\BooleanProperty;
 
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -51,6 +54,40 @@ class Solution extends Model implements Filterable, Sortable
         'ucs_reseller_id' => 'integer',
     ];
 
+    /**
+     * Model properties to surface to customers
+     */
+    const VISIBLE_SCOPE_RESELLER = [
+        'ucs_reseller_id',
+        'ucs_reseller_solution_name',
+        'ucs_reseller_datacentre_id',
+        'ucs_reseller_type',
+        'ucs_reseller_encryption_enabled',
+        'ucs_reseller_encryption_default'
+    ];
+
+    // Validation Rules
+    public static $rules = [
+        'name' => ['nullable'],
+        'environment' => ['required', 'in:Hybrid,Private'],
+        'pod_id' => ['required'],
+        'reseller_id' => ['required', 'numeric'],
+        'active' => ['nullable', 'boolean'],
+        'status' => ['required'],
+        'windows_licence' => ['nullable'],
+        'redundant_firewall' => ['nullable'],
+        'nplusone_active' => ['nullable'],
+        'nplus_redundancy' => ['nullable'],
+        'nplus_overprovision' => ['nullable'],
+        'min_term' => ['nullable'],
+        'start_date' => ['sometimes', 'date_format:"Y-m-d H:i:s'],
+        'source' => ['nullable'],
+        'can_move_between_luns' => ['nullable', 'boolean'],
+        'saleorder_id' => ['nullable', 'numeric'],
+        'encryption_enabled' => ['nullable', 'boolean'],
+        'encryption_default' => ['nullable', 'boolean'],
+    ];
+
 
     /**
      * Ditto configuration
@@ -67,8 +104,23 @@ class Solution extends Model implements Filterable, Sortable
         return [
             'id' => 'ucs_reseller_id',
             'name' => 'ucs_reseller_solution_name',
-            'type' => 'ucs_reseller_type',
+            'environment' => 'ucs_reseller_type',
             'pod_id' => 'ucs_reseller_datacentre_id',
+            'reseller_id' => 'ucs_reseller_reseller_id',
+            'active' => 'ucs_reseller_active',
+            'status' => 'ucs_reseller_status',
+            'windows_licence' => 'ucs_reseller_windows_licence',
+            'redundant_firewall' => 'ucs_reseller_redundant_firewall',
+            'nplusone_active' => 'ucs_reseller_nplusone_active',
+            'nplus_redundancy' => 'ucs_reseller_nplus_redundancy',
+            'nplus_overprovision' => 'ucs_reseller_nplus_overprovision',
+            'min_term' => 'ucs_reseller_min_term',
+            'start_date' => 'ucs_reseller_start_date',
+            'source' => 'ucs_reseller_source',
+            'can_move_between_luns' => 'ucs_reseller_can_move_between_luns',
+            'saleorder_id' => 'ucs_reseller_saleorder_id',
+            'encryption_enabled' => 'ucs_reseller_encryption_enabled',
+            'encryption_default' => 'ucs_reseller_encryption_default'
         ];
     }
 
@@ -84,6 +136,21 @@ class Solution extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('pod_id', Filter::$numericDefaults),
             $factory->create('environment', Filter::$stringDefaults),
+            $factory->create('reseller_id', Filter::$numericDefaults),
+            $factory->boolean()->create('active', 'Yes', 'No'),
+            $factory->create('status', Filter::$stringDefaults),
+            $factory->boolean()->create('windows_licence', 'Yes', 'No'),
+            $factory->boolean()->create('redundant_firewall', 'Yes', 'No'),
+            $factory->boolean()->create('nplusone_active', 'Yes', 'No'),
+            $factory->enum()->create('nplus_redundancy', ['None', 'N+1', 'N+N']),
+            $factory->boolean()->create('nplus_overprovision', 'Yes', 'No'),
+            $factory->create('min_term', Filter::$numericDefaults),
+            $factory->create('start_date', Filter::$dateDefaults),
+            $factory->create('source', Filter::$stringDefaults),
+            $factory->boolean()->create('can_move_between_luns', 'Yes', 'No'),
+            $factory->create('saleorder_id', Filter::$numericDefaults),
+            $factory->boolean()->create('encryption_enabled', 'Yes', 'No'),
+            $factory->boolean()->create('encryption_default', 'Yes', 'No'),
         ];
     }
 
@@ -101,6 +168,21 @@ class Solution extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('pod_id'),
             $factory->create('environment'),
+            $factory->create('reseller_id'),
+            $factory->create('active'),
+            $factory->create('status'),
+            $factory->create('windows_licence'),
+            $factory->create('redundant_firewall'),
+            $factory->create('nplusone_active'),
+            $factory->create('nplus_redundancy'),
+            $factory->create('nplus_overprovision'),
+            $factory->create('min_term'),
+            $factory->create('start_date'),
+            $factory->create('source'),
+            $factory->create('can_move_between_luns'),
+            $factory->create('saleorder_id'),
+            $factory->create('encryption_enabled'),
+            $factory->create('encryption_default')
         ];
     }
 
@@ -133,6 +215,7 @@ class Solution extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {
@@ -141,6 +224,22 @@ class Solution extends Model implements Filterable, Sortable
             StringProperty::create('ucs_reseller_solution_name', 'name'),
             IntProperty::create('ucs_reseller_datacentre_id', 'pod_id'),
             StringProperty::create('ucs_reseller_type', 'environment'),
+            IntProperty::create('ucs_reseller_reseller_id', 'reseller_id'),
+            BooleanProperty::create('ucs_reseller_active', 'active', null, 'Yes', 'No'),
+            StringProperty::create('ucs_reseller_status', 'status'),
+            BooleanProperty::create('ucs_reseller_windows_licence', 'windows_licence', null, 'Yes', 'No'),
+            BooleanProperty::create('ucs_reseller_redundant_firewall', 'redundant_firewall', null, 'Yes', 'No'),
+            BooleanProperty::create('ucs_reseller_nplusone_active', 'nplusone_active', null, 'Yes', 'No'),
+            StringProperty::create('ucs_reseller_nplus_redundancy', 'nplus_redundancy'),
+            StringProperty::create('ucs_reseller_nplus_overprovision', 'nplus_overprovision'),
+            StringProperty::create('ucs_reseller_min_term', 'min_term'),
+            DateTimeProperty::create('ucs_reseller_start_date', 'start_date'),
+            StringProperty::create('ucs_reseller_source', 'source'),
+            BooleanProperty::create('ucs_reseller_can_move_between_luns', 'can_move_between_luns', null, 'Yes', 'No'),
+            IntProperty::create('ucs_reseller_saleorder_id', 'saleorder_id'),
+            BooleanProperty::create('ucs_reseller_encryption_enabled', 'encryption_enabled', null, 'Yes', 'No'),
+            BooleanProperty::create('ucs_reseller_can_move_between_luns', 'can_move_between_luns', null, 'Yes', 'No'),
+            BooleanProperty::create('ucs_reseller_encryption_default', 'encryption_default', null, 'Yes', 'No'),
         ];
     }
 
