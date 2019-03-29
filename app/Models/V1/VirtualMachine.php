@@ -127,7 +127,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'backup' => 'servers_backup',
             'support' => 'servers_advanced_support',
             'status' => 'servers_status',
-            'environment' => 'servers_ecloud_type'
+            'environment' => 'servers_ecloud_type',
+            'encrypted' => 'servers_encrypted'
         ];
     }
 
@@ -149,6 +150,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('support', Filter::$stringDefaults),
             $factory->create('status', Filter::$stringDefaults),
             $factory->create('environment', Filter::$stringDefaults),
+            $factory->boolean()->create('encrypted', 'Yes', 'No')
         ];
     }
 
@@ -171,6 +173,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('support', 'asc'),
             $factory->create('status', 'asc'),
             $factory->create('environment', 'asc'),
+            $factory->create('encrypted', 'asc'),
         ];
     }
 
@@ -232,6 +235,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
             StringProperty::create('servers_ecloud_type', 'environment'),
             IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
+
+            BooleanProperty::create('servers_encrypted', 'encrypted'),
         ];
 
         return $array;

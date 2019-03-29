@@ -104,6 +104,8 @@ class VirtualMachineResource extends CustomResource
 
             'environment' => $this->resource->servers_ecloud_type,
             'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
+
+            'encrypted' => ($this->resource->servers_encrypted == 'Yes')
         ];
 
         return $this->filterProperties($request, $data);
