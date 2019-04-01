@@ -7,6 +7,9 @@ use Illuminate\Contracts\Validation\Rule;
 /**
  * Class IsValidSSHPublicKey
  * Validates the given value is a valid SSH public key
+ * SSHkey formats supported:
+ * ssh-rsa
+ * ssh-ed25519
  * @package App\Rules\V1
  */
 class IsValidSSHPublicKey implements Rule
