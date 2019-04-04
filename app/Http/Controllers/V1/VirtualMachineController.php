@@ -7,6 +7,7 @@ use App\Exceptions\V1\TemplateNotFoundException;
 use App\Rules\V1\IsValidSSHPublicKey;
 use App\Rules\V1\IsValidUuid;
 use App\Solution\CanModifyResource;
+use App\VM\Status;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -1068,6 +1069,11 @@ class VirtualMachineController extends BaseController
                 );
             } catch (IntapiServiceException $exception) {
                 throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+            }
+
+            $virtualMachine->status = Status::RESIZING;
+            if (!$virtualMachine->save()) {
+                throw new Exceptions\DatabaseException('Failed to update virtual machine status');
             }
         }
 
