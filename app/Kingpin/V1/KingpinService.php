@@ -631,6 +631,7 @@ class KingpinService
             $temp_template->actual_os = trim((string)$template->actualOS);
             $temp_template->cpu = intval($template->numCPU);
             $temp_template->ram = intval($template->ramGB);
+            $temp_template->encrypted = $template->encrypted;
 
             $hard_drives = array();
             foreach ($template->disks as $hard_drive) {
