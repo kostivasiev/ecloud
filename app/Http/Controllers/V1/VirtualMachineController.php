@@ -307,7 +307,7 @@ class VirtualMachineController extends BaseController
             // Encrypting a VM requires twice the space on the datastore
             if (!empty($encrypt_vm)) {
                 $capacityRequested *= 2;
-                $insufficientSpaceMessage .= '. Encrypted VM\'s require requested storage space';
+                $insufficientSpaceMessage .= '. Encrypted VM\'s require double requested storage space';
             }
 
             if ($capacityRequested > $datastore->usage->available) {
