@@ -737,7 +737,7 @@ class VirtualMachineController extends BaseController
         $requiredSpace = $virtualMachine->servers_hdd;
 
         if ($request->has('encrypt')) {
-            if (in_array($virtualMachine->type(),['Public', 'Burst'])) {
+            if ($virtualMachine->type() == 'Public') {
                 throw new EncryptionServiceNotEnabledException(
                     'Encryption service is not currently available for ' . $virtualMachine->type() . ' VM\'s'
                 );
