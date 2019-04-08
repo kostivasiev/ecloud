@@ -693,9 +693,11 @@ class VirtualMachineController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws DatastoreInsufficientSpaceException
      * @throws DatastoreNotFoundException
+     * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -704,7 +706,8 @@ class VirtualMachineController extends BaseController
     {
         //Validation
         $rules = [
-            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/']
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'encrypt' => ['sometimes', 'boolean']
         ];
 
         $this->validateVirtualMachineId($request, $vmId);
@@ -731,15 +734,35 @@ class VirtualMachineController extends BaseController
             throw new DatastoreNotFoundException('Unable to load datastore');
         }
 
-        if ($datastore->usage->available < $virtualMachine->servers_hdd) {
+        $requiredSpace = $virtualMachine->servers_hdd;
+
+        if ($request->has('encrypt')) {
+            if (in_array($virtualMachine->type(),['Public', 'Burst'])) {
+                throw new EncryptionServiceNotEnabledException(
+                    'Encryption service is not currently available for ' . $virtualMachine->type() . ' VM\'s'
+                );
+            }
+            if (!$virtualMachine->solution->encryptionEnabled()) {
+                throw new EncryptionServiceNotEnabledException(
+                    'Encryption service is not enabled on this solution.'
+                );
+            }
+            $postData['encrypt_vm'] = $request->input('encrypt');
+
+            // If encryption change is required, we need twice the storage space on the datastore to perform the action
+            if ($request->input('encrypt') != ($virtualMachine->servers_encrypted == 'Yes')) {
+                $requiredSpace *= 2;
+            }
+        }
+
+        if ($datastore->usage->available < $requiredSpace) {
             $message = 'Insufficient free space on selected datastore.' .
-                ' Request required ' . $virtualMachine->servers_hdd . 'GB, datastore has '
+                ' Request required ' . $requiredSpace . 'GB, datastore has '
                 . $datastore->usage->available . 'GB remaining';
             throw new DatastoreInsufficientSpaceException($message);
         }
 
         //OK, start the clone process ==
-
         //create new server record
         $postData['reseller_id'] = $virtualMachine->servers_reseller_id;
         $postData['reseller_lun_id'] = $datastore->getKey();
