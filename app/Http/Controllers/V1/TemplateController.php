@@ -386,6 +386,7 @@ class TemplateController extends BaseController
         $tmp_template->hdd = (int) $template->size_gb;
 
         $tmp_template->license = 'Unknown';
+        $tmp_template->encrypted = $template->encrypted;
 
         foreach ($template->hard_drives as $hard_drive) {
             $tmp_template->hdd_disks[] = (object)array(
