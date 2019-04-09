@@ -579,7 +579,7 @@ class VirtualMachineController extends BaseController
 //        exit;
         // ---
 
-//         schedule automation
+        // schedule automation
         try {
             $intapiService->request('/automation/create_ucs_vmware_vm', [
                 'form_params' => $post_data,
