@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\V1;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 use App\Exceptions\V1\EncryptionServiceNotEnabledException;
 use App\Exceptions\V1\TemplateNotFoundException;
@@ -607,6 +609,10 @@ class VirtualMachineController extends BaseController
             $headers = [
                 'X-AutomationRequestId' => $intapiData->data->automation_request_id
             ];
+        }
+
+        if (isset($appliance)) {
+            Event::fire(new ApplianceLaunchedEvent($appliance));
         }
 
         return $this->respondSave($request, $virtualMachine, 202, null, $headers);
