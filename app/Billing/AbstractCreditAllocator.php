@@ -9,7 +9,6 @@ use App\Exceptions\V1\InsufficientCreditsException;
 use App\Exceptions\V1\CannotRefundProductCreditException;
 use Illuminate\Support\Facades\Log;
 
-
 abstract class AbstractCreditAllocator
 {
     /**
