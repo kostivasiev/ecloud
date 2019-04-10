@@ -198,7 +198,7 @@ class VirtualMachineController extends BaseController
             }
 
             if ($request->has('controlpanel_id') && !$this->isAdmin) {
-                throw new EncryptionServiceNotEnabledException(
+                throw new Exceptions\BadRequestException(
                     'Legacy Control Panel installation is not available at this time.'
                 );
             }
