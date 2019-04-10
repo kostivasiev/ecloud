@@ -27,7 +27,7 @@ class DatastoreResource extends CustomResource
         // return additional admin properties if required
         // Auth::user()->isAdmin()
         // $request->user()
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $visible = array_merge(
                 $visible,
                 Datastore::$adminProperties

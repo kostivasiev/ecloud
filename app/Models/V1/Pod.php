@@ -122,7 +122,7 @@ class Pod extends Model implements Filterable, Sortable
         ];
 
         $request = app('request');
-        if (!$request->user->isAdmin) {
+        if (!$request->user->isAdministrator) {
             return $properties;
         }
 

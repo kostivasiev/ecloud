@@ -431,7 +431,7 @@ class VirtualMachineController extends BaseController
 
         //If admin reseller scope is 0, we won't know the reseller id for Public VM's
         if (empty($solution) && empty($request->user->resellerId)) {
-            if ($request->user->isAdmin) {
+            if ($request->user->isAdministrator) {
                 throw new Exceptions\BadRequestException('Missing Reseller scope');
             }
             throw new Exceptions\UnauthorisedException('Unable to determine reseller id');
@@ -605,7 +605,7 @@ class VirtualMachineController extends BaseController
         $virtualMachine->servers_status = $intapiData->data->server_status;
 
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = [
                 'X-AutomationRequestId' => $intapiData->data->automation_request_id
             ];
@@ -648,7 +648,7 @@ class VirtualMachineController extends BaseController
         }
 
         //server is in contract
-        if (!$request->user->isAdmin && $virtualMachine->inContract()) {
+        if (!$request->user->isAdministrator && $virtualMachine->inContract()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, in contract until ' .
                 date('d/m/Y', strtotime($virtualMachine->servers_contract_end_date))
@@ -656,7 +656,7 @@ class VirtualMachineController extends BaseController
         }
 
         //server is a managed device
-        if (!$request->user->isAdmin && $virtualMachine->isManaged()) {
+        if (!$request->user->isAdministrator && $virtualMachine->isManaged()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, device is managed by UKFast'
             );
@@ -681,7 +681,7 @@ class VirtualMachineController extends BaseController
         }
 
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = [
                 'X-AutomationRequestId' => $automationRequestId
             ];
@@ -801,7 +801,7 @@ class VirtualMachineController extends BaseController
 
         // Respond with the new machine id
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = ['X-AutomationRequestId' => $automationRequestId];
         }
 
