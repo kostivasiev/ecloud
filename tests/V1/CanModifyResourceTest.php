@@ -39,7 +39,7 @@ class CanModifyResourceTest extends TestCase
     {
         $request = new Request;
         $user = new \StdClass();
-        $user->isAdmin = false;
+        $user->isAdministrator = false;
         $request->merge(['user' => $user]);
 
         $solution = (factory(Solution::class, 1)->create())->first();
@@ -59,7 +59,7 @@ class CanModifyResourceTest extends TestCase
     {
         $request = new Request;
         $user = new \StdClass();
-        $user->isAdmin = false;
+        $user->isAdministrator = false;
         $request->merge(['user' => $user]);
 
         $solution = (factory(Solution::class, 1)->create())->first();

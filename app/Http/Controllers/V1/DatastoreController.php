@@ -73,7 +73,7 @@ class DatastoreController extends BaseController
             ->where('reseller_lun_status', '!=', 'Deleted')
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'reseller_lun_ucs_reseller_id');
 
-        if (!$request->user->isAdmin) {
+        if (!$request->user->isAdministrator) {
             $query->where('ucs_reseller_active', 'Yes');
         }
 

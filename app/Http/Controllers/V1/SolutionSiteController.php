@@ -25,7 +25,7 @@ class SolutionSiteController extends BaseController
     public function index(Request $request)
     {
         $collectionQuery = static::getSiteQuery($request);
-        if (!$request->user->isAdmin) {
+        if (!$request->user->isAdministrator) {
             $collectionQuery->where('ucs_reseller_active', 'Yes');
         };
 
@@ -101,7 +101,7 @@ class SolutionSiteController extends BaseController
     public static function getSiteQuery(Request $request)
     {
         $solutionQuery = SolutionSite::withReseller($request->user->resellerId);
-        if (!$request->user->isAdmin) {
+        if (!$request->user->isAdministrator) {
             $solutionQuery->where('ucs_reseller_active', 'Yes');
         }
 
