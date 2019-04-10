@@ -18,6 +18,9 @@ use UKFast\Api\Exceptions\DatabaseException;
 use App\Traits\V1\SanitiseRequestData;
 use Illuminate\Support\Facades\Event;
 
+use App\Billing\VmEncryptionCreditAllocator;
+use App\Exceptions\V1\InsufficientCreditsException;
+
 class SolutionController extends BaseController
 {
     use ResponseHelper, RequestHelper, SanitiseRequestData;
@@ -47,6 +50,44 @@ class SolutionController extends BaseController
             ($this->isAdmin) ? null : Solution::VISIBLE_SCOPE_RESELLER
         );
     }
+
+
+    /**
+     * Returns the ecloud_vm_encrytion credits available to the solution
+     * @param Request $request
+     * @param VmEncryptionCreditAllocator $creditAllocator
+     * @return \Illuminate\Http\Response
+     */
+    public function credits(Request $request, VmEncryptionCreditAllocator $creditAllocator)
+    {
+        // Get the resellers solutions and check whether any have encryption enabled as PAYG
+        $solutionQuery = $this->getSolutionQuery($request);
+
+        foreach ($solutionQuery->get() as $solution) {
+            if ($solution->encryptionEnabled()) {
+                exit('found solution with encryption');
+            }
+        }
+
+        exit('here');
+        $item = new \StdClass();
+        $item->type = 'ecloud_vm_encryption';
+
+        try {
+            $encryption_credits = $creditAllocator->getRemainingCredits($request->user->resellerId);
+            $item->available = $encryption_credits;
+        } catch (InsufficientCreditsException $exception) {
+            $item->available = 0;
+        }
+
+        $credits = collect([$item]);
+
+        return $this->respondCollection(
+            $request,
+            $credits
+        );
+    }
+
 
     /**
      * Show specific solution
