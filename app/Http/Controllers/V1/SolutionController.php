@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
 use App\Solution\CanModifyResource;
 use App\Solution\EncryptionBillingType;
+use Illuminate\Support\Collection;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -65,7 +66,7 @@ class SolutionController extends BaseController
     {
         $solution = $this->getSolutionById($request, $solutionId);
 
-        $credits = [];
+        $credits = new Collection();
 
         // Load ecloud_vm_encryption credits available to the solution's reseller
         if ($solution->encryptionEnabled() && $solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
