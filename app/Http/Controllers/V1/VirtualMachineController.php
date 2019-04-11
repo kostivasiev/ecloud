@@ -775,8 +775,8 @@ class VirtualMachineController extends BaseController
         Request $request,
         IntapiService $intapiService,
         EncryptionCreditAllocator $creditAllocator,
-        $vmId)
-    {
+        $vmId
+    ) {
         //Validation
         $rules = [
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
