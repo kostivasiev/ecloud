@@ -72,7 +72,7 @@ class HostController extends BaseController
             ->where('ucs_specification_active', '=', 'Yes')
         ;
 
-        if (!$request->user->isAdmin) {
+        if (!$request->user->isAdministrator) {
             $query->where('ucs_reseller_active', 'Yes');
         }
 

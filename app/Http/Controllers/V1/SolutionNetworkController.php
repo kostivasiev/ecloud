@@ -22,7 +22,7 @@ class SolutionNetworkController extends BaseController
         $collection = SolutionNetwork::withReseller($request->user->resellerId)
             ->withSolution($solutionId);
 
-        if (!$request->user->isAdmin) {
+        if (!$request->user->isAdministrator) {
             $collection->where('ucs_reseller_active', 'Yes');
         }
 

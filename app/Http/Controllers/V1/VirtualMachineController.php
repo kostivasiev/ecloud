@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\V1;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
+use App\Exceptions\V1\EncryptionServiceNotEnabledException;
 use App\Exceptions\V1\TemplateNotFoundException;
 use App\Rules\V1\IsValidSSHPublicKey;
 use App\Rules\V1\IsValidUuid;
@@ -95,7 +98,6 @@ class VirtualMachineController extends BaseController
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\UnauthorisedException
      * @throws InsufficientResourceException
-     * @throws IntapiServiceException
      * @throws ServiceResponseException
      * @throws ServiceUnavailableException
      * @throws SolutionNotFoundException
@@ -105,6 +107,7 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
      * @throws \App\Exceptions\V1\ApplianceNotFoundException
      * @throws ApplianceServerLicenseNotFoundException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -189,8 +192,25 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         if ($request->input('environment') == 'Public') {
+            if ($request->has('encrypt')) {
+                throw new EncryptionServiceNotEnabledException(
+                    'Encryption service is not available for eCloud Public at this time.'
+                );
+            }
+
+            if ($request->has('controlpanel_id') && !$this->isAdmin) {
+                throw new Exceptions\BadRequestException(
+                    'Legacy Control Panel installation is not available at this time.'
+                );
+            }
+
             $solution = null;
             $pod = Pod::find(14);
+            $datastore = Datastore::getDefault(
+                null,
+                'Public',
+                ($request->input('backup') == true)
+            );
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
@@ -241,12 +261,20 @@ class VirtualMachineController extends BaseController
                 }
             }
 
-            // Check if encryption is enabled on the solution
-            if ($solution->encryptionEnabled()) {
-                $encrypt_vm = $request->input('encrypt', ($solution->ucs_reseller_encryption_default == 'Yes'));
+            // Encrypt the VM
+            if ($solution->encryptionEnabled() && !$request->has('encrypt')) {
+                $encrypt_vm = ($solution->ucs_reseller_encryption_default == 'Yes');
+            }
+
+            if ($request->has('encrypt')) {
+                if (!$solution->encryptionEnabled()) {
+                    throw new EncryptionServiceNotEnabledException(
+                        'Encryption service is not enabled on this solution.'
+                    );
+                }
+                $encrypt_vm = $request->input('encrypt');
             }
         }
-
 
         $rules['cpu'] = array_merge($rules['cpu'], [
             'min:' . $minCpu, 'max:' . $maxCpu
@@ -256,11 +284,25 @@ class VirtualMachineController extends BaseController
             'min:' . $minRam, 'max:' . $maxRam
         ]);
 
+        $insufficientSpaceMessage =
+            'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining'
+        ;
+
         // single disk vm requested
         if ($request->has('hdd')) {
             $rules['hdd'] = array_merge($rules['hdd'], [
                 'min:' . $minHdd, 'max:' . $maxHdd
             ]);
+
+            // Encrypting a VM requires twice the space on the datastore
+            if (!empty($encrypt_vm)) {
+                $insufficientSpaceMessage .= '. Encrypted VM\'s require double requested storage space';
+                if (($request->input('hdd') * 2) > $datastore->usage->available) {
+                    throw new InsufficientResourceException(
+                        $intapiService->getFriendlyError($insufficientSpaceMessage)
+                    );
+                }
+            }
         }
 
         // multi-disk vm requested
@@ -272,21 +314,26 @@ class VirtualMachineController extends BaseController
 
             // todo check numbers are sequential?
 
-
             // validate disk capacity
             $rules['hdd_disks.*.capacity'] = [
                 'required', 'integer', 'min:' . $minHdd, 'max:' . $maxHdd
             ];
 
             $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
+
+            // Encrypting a VM requires twice the space on the datastore
+            if (!empty($encrypt_vm)) {
+                $capacityRequested *= 2;
+                $insufficientSpaceMessage .= '. Encrypted VM\'s require double requested storage space';
+            }
+
             if ($capacityRequested > $datastore->usage->available) {
-                throw new InsufficientResourceException($intapiService->getFriendlyError(
-                    'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining'
-                ));
+                throw new InsufficientResourceException($intapiService->getFriendlyError($insufficientSpaceMessage));
             }
         }
 
         $this->validate($request, $rules);
+
 
         /**
          * Launch VM from Appliance
@@ -382,7 +429,7 @@ class VirtualMachineController extends BaseController
             $platform = $template->platform;
             $license = $template->license;
         }
-        
+
         if ($request->has('computername')) {
             if ($platform == 'Linux') {
                 $rules['computername'] = [
@@ -399,7 +446,7 @@ class VirtualMachineController extends BaseController
 
         //If admin reseller scope is 0, we won't know the reseller id for Public VM's
         if (empty($solution) && empty($request->user->resellerId)) {
-            if ($request->user->isAdmin) {
+            if ($request->user->isAdministrator) {
                 throw new Exceptions\BadRequestException('Missing Reseller scope');
             }
             throw new Exceptions\UnauthorisedException('Unable to determine reseller id');
@@ -542,6 +589,12 @@ class VirtualMachineController extends BaseController
             }
         }
 
+        if ($request->input('environment') == 'Public') {
+            if ($request->has('controlpanel_id')) {
+                $post_data['control_panel_id'] = $request->input('controlpanel_id');
+            }
+        }
+
         // remove debugging when ready to retest
 //        print_r($post_data);
 //        exit;
@@ -565,7 +618,6 @@ class VirtualMachineController extends BaseController
             $error_msg = $intapiService->getFriendlyError(
                 end($intapiData->errorset)
             );
-
             throw new ServiceResponseException($error_msg);
         }
 
@@ -574,10 +626,14 @@ class VirtualMachineController extends BaseController
         $virtualMachine->servers_status = $intapiData->data->server_status;
 
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = [
                 'X-AutomationRequestId' => $intapiData->data->automation_request_id
             ];
+        }
+
+        if (isset($appliance)) {
+            Event::fire(new ApplianceLaunchedEvent($appliance));
         }
 
         return $this->respondSave($request, $virtualMachine, 202, null, $headers);
@@ -613,7 +669,7 @@ class VirtualMachineController extends BaseController
         }
 
         //server is in contract
-        if (!$request->user->isAdmin && $virtualMachine->inContract()) {
+        if (!$request->user->isAdministrator && $virtualMachine->inContract()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, in contract until ' .
                 date('d/m/Y', strtotime($virtualMachine->servers_contract_end_date))
@@ -621,7 +677,7 @@ class VirtualMachineController extends BaseController
         }
 
         //server is a managed device
-        if (!$request->user->isAdmin && $virtualMachine->isManaged()) {
+        if (!$request->user->isAdministrator && $virtualMachine->isManaged()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, device is managed by UKFast'
             );
@@ -646,7 +702,7 @@ class VirtualMachineController extends BaseController
         }
 
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = [
                 'X-AutomationRequestId' => $automationRequestId
             ];
@@ -664,9 +720,11 @@ class VirtualMachineController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws DatastoreInsufficientSpaceException
      * @throws DatastoreNotFoundException
+     * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -675,7 +733,8 @@ class VirtualMachineController extends BaseController
     {
         //Validation
         $rules = [
-            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/']
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'encrypt' => ['sometimes', 'boolean']
         ];
 
         $this->validateVirtualMachineId($request, $vmId);
@@ -702,15 +761,35 @@ class VirtualMachineController extends BaseController
             throw new DatastoreNotFoundException('Unable to load datastore');
         }
 
-        if ($datastore->usage->available < $virtualMachine->servers_hdd) {
+        $requiredSpace = $virtualMachine->servers_hdd;
+
+        if ($request->has('encrypt')) {
+            if ($virtualMachine->type() == 'Public') {
+                throw new EncryptionServiceNotEnabledException(
+                    'Encryption service is not currently available for ' . $virtualMachine->type() . ' VM\'s'
+                );
+            }
+            if (!$virtualMachine->solution->encryptionEnabled()) {
+                throw new EncryptionServiceNotEnabledException(
+                    'Encryption service is not enabled on this solution.'
+                );
+            }
+            $postData['encrypt_vm'] = $request->input('encrypt');
+
+            // If encryption change is required, we need twice the storage space on the datastore to perform the action
+            if ($request->input('encrypt') != ($virtualMachine->servers_encrypted == 'Yes')) {
+                $requiredSpace *= 2;
+            }
+        }
+
+        if ($datastore->usage->available < $requiredSpace) {
             $message = 'Insufficient free space on selected datastore.' .
-                ' Request required ' . $virtualMachine->servers_hdd . 'GB, datastore has '
+                ' Request required ' . $requiredSpace . 'GB, datastore has '
                 . $datastore->usage->available . 'GB remaining';
             throw new DatastoreInsufficientSpaceException($message);
         }
 
         //OK, start the clone process ==
-
         //create new server record
         $postData['reseller_id'] = $virtualMachine->servers_reseller_id;
         $postData['reseller_lun_id'] = $datastore->getKey();
@@ -743,7 +822,7 @@ class VirtualMachineController extends BaseController
 
         // Respond with the new machine id
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = ['X-AutomationRequestId' => $automationRequestId];
         }
 
@@ -1242,6 +1321,11 @@ class VirtualMachineController extends BaseController
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        }
+
+        $virtualMachine->status = Status::CLONING_TO_TEMPLATE;
+        if (!$virtualMachine->save()) {
+            throw new Exceptions\DatabaseException('Failed to update virtual machine status');
         }
 
         return $this->respondEmpty(202);

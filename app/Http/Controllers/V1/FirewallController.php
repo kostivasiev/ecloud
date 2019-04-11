@@ -140,7 +140,7 @@ class FirewallController extends BaseController
             ->join('server_subtype', 'server_subtype_id', '=', 'servers_subtype_id')
             ->where('server_subtype_name', 'eCloud Dedicated');
 
-        if (!$request->user->isAdmin) {
+        if (!$request->user->isAdministrator) {
             $firewallQuery->where('servers_active', 'y');
         }
 

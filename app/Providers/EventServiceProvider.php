@@ -29,6 +29,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\V1\EncryptionEnabledOnSolutionEvent' => [
             'App\Listeners\V1\EncryptionEnabledOnSolutionListener',
+        ],
+        'App\Events\V1\ApplianceLaunchedEvent' => [
+            'App\Listeners\V1\ApplianceLaunchedListener',
         ]
     ];
 }
