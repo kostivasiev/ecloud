@@ -2,7 +2,7 @@
 
 namespace App\Billing;
 
-class VmEncryptionCreditAllocator extends AbstractCreditAllocator implements CreditAllocatorInterface
+class EncryptionCreditAllocator extends AbstractCreditAllocator implements CreditAllocatorInterface
 {
     /** Shortcut for getting VM Encryption credits
      * @param int $resellerId
@@ -17,24 +17,24 @@ class VmEncryptionCreditAllocator extends AbstractCreditAllocator implements Cre
     /**
      * Shortcut to assign VM Encryption credit
      * @param int $resellerId
-     * @param int $domainId
+     * @param int $serverId
      * @return bool
      * @throws \App\Exceptions\V1\InsufficientCreditsException
      */
-    public function assignCredit(int $resellerId, int $domainId): bool
+    public function assignCredit(int $resellerId, int $serverId): bool
     {
-        return parent::assignProductCreditByReference($resellerId, "ecloud_vm_encryption", $domainId, 1);
+        return parent::assignProductCreditByReference($resellerId, "ecloud_vm_encryption", $serverId, 1);
     }
 
     /**
      * Shortcut to refund VM Encryption credit
      * @param int $resellerId
-     * @param int $domainId
+     * @param int $serverId
      * @return bool
      * @throws \App\Exceptions\V1\CannotRefundProductCreditException
      */
-    public function refundCredit(int $resellerId, int $domainId): bool
+    public function refundCredit(int $resellerId, int $serverId): bool
     {
-        return parent::refundProductCreditByReference($resellerId, "ecloud_vm_encryption", $domainId, 1);
+        return parent::refundProductCreditByReference($resellerId, "ecloud_vm_encryption", $serverId, 1);
     }
 }

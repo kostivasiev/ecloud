@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Billing\EncryptionCreditAllocator;
+use App\Exceptions\V1\CannotRefundProductCreditException;
+use App\Exceptions\V1\InsufficientCreditsException;
+use App\Solution\EncryptionBillingType;
 use Illuminate\Support\Facades\Event;
 use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
@@ -92,7 +96,10 @@ class VirtualMachineController extends BaseController
     /**
      * @param Request $request
      * @param IntapiService $intapiService
+     * @param EncryptionCreditAllocator $creditAllocator
      * @return \Illuminate\Http\Response
+     * @throws ApplianceServerLicenseNotFoundException
+     * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\UnauthorisedException
@@ -100,15 +107,15 @@ class VirtualMachineController extends BaseController
      * @throws ServiceResponseException
      * @throws ServiceUnavailableException
      * @throws SolutionNotFoundException
-     * @throws \App\Exceptions\V1\TemplateNotFoundException
+     * @throws TemplateNotFoundException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
+     * @throws \App\Exceptions\V1\InsufficientCreditsException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
-     * @throws \App\Exceptions\V1\ApplianceNotFoundException
-     * @throws ApplianceServerLicenseNotFoundException
-     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
-    public function create(Request $request, IntapiService $intapiService)
+    public function create(Request $request, IntapiService $intapiService, EncryptionCreditAllocator $creditAllocator)
     {
         // todo remove when public/burst VMs supported
         // - template validation issue on public
@@ -248,7 +255,7 @@ class VirtualMachineController extends BaseController
                 }
             }
 
-            // Encrypt the VM
+            // If encryption is enabled but no flag passed in, set to the solution default
             if ($solution->encryptionEnabled() && !$request->has('encrypt')) {
                 $encrypt_vm = ($solution->ucs_reseller_encryption_default == 'Yes');
             }
@@ -261,7 +268,15 @@ class VirtualMachineController extends BaseController
                 }
                 $encrypt_vm = $request->input('encrypt');
             }
+
+            // If PAYG encryption, check there are sufficient credits
+            if (!empty($encrypt_vm)) {
+                if ($solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
+                    $creditAllocator->getRemainingCredits($solution->resellerId());
+                }
+            }
         }
+
 
         $rules['cpu'] = array_merge($rules['cpu'], [
             'min:' . $minCpu, 'max:' . $maxCpu
@@ -272,6 +287,7 @@ class VirtualMachineController extends BaseController
         ]);
 
         $insufficientSpaceMessage = 'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining';
+        $encryptionDatastoreSpaceMessage = '';
 
         // single disk vm requested
         if ($request->has('hdd')) {
@@ -281,10 +297,11 @@ class VirtualMachineController extends BaseController
 
             // Encrypting a VM requires twice the space on the datastore
             if (!empty($encrypt_vm)) {
-                $insufficientSpaceMessage .= '. Encrypted VM\'s require double requested storage space';
+                $encryptionDatastoreSpaceMessage = '. Encrypted VM\'s require double requested storage space.';
                 if (($request->input('hdd') * 2) > $datastore->usage->available) {
                     throw new InsufficientResourceException(
                         $intapiService->getFriendlyError($insufficientSpaceMessage)
+                        . $encryptionDatastoreSpaceMessage
                     );
                 }
             }
@@ -306,19 +323,22 @@ class VirtualMachineController extends BaseController
 
             $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
 
+
             // Encrypting a VM requires twice the space on the datastore
             if (!empty($encrypt_vm)) {
                 $capacityRequested *= 2;
-                $insufficientSpaceMessage .= '. Encrypted VM\'s require double requested storage space';
+                $encryptionDatastoreSpaceMessage = '. Encrypted VM\'s require double requested storage space.';
             }
 
             if ($capacityRequested > $datastore->usage->available) {
-                throw new InsufficientResourceException($intapiService->getFriendlyError($insufficientSpaceMessage));
+                throw new InsufficientResourceException(
+                    $intapiService->getFriendlyError($insufficientSpaceMessage)
+                    . $encryptionDatastoreSpaceMessage
+                );
             }
         }
 
         $this->validate($request, $rules);
-
 
         /**
          * Launch VM from Appliance
@@ -615,20 +635,49 @@ class VirtualMachineController extends BaseController
             Event::fire(new ApplianceLaunchedEvent($appliance));
         }
 
+        // If PAYG encryption, assign credit. We need to do after the intapi call so we have the server id
+        if (!empty($encrypt_vm)) {
+            if ($solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
+                $logData = [
+                    'id' => $virtualMachine->getKey(),
+                    'reseller_id' => $virtualMachine->servers_reseller_id
+                ];
+
+                try {
+                    $result = $creditAllocator->assignCredit($solution->resellerId(), $virtualMachine->getKey());
+                    if (!$result) {
+                        Log::critical(
+                            'Failed to create encryption credit record when cloning Virtual Machine',
+                            $logData
+                        );
+                    }
+                } catch (InsufficientCreditsException $exception) {
+                    Log::error(
+                        'Failed to assign credit when launching encrypted Virtual Machine. Insufficient credits',
+                        $logData
+                    );
+                }
+            }
+        }
+
         return $this->respondSave($request, $virtualMachine, 202, null, $headers);
     }
 
     /**
      * @param Request $request
      * @param IntapiService $intapiService
+     * @param EncryptionCreditAllocator $creditAllocator
      * @param $vmId
      * @return \Illuminate\Http\Response
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
+     * @throws \App\Exceptions\V1\CannotRefundProductCreditException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
-    public function destroy(Request $request, IntapiService $intapiService, $vmId)
+    public function destroy(Request $request, IntapiService $intapiService, EncryptionCreditAllocator $creditAllocator, $vmId)
     {
+        $refundCredit = false;
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
         if (!$virtualMachine) {
@@ -645,6 +694,11 @@ class VirtualMachineController extends BaseController
         // Check if the solution can modify resources
         if ($virtualMachine->type() != 'Public') {
             (new CanModifyResource($virtualMachine->solution))->validate();
+
+            $refundCredit = (
+                $virtualMachine->servers_encrypted == 'Yes'
+                && $virtualMachine->solution->encryptionBillingType() == EncryptionBillingType::PAYG
+            );
         }
 
         //server is in contract
@@ -661,6 +715,7 @@ class VirtualMachineController extends BaseController
                 'VM cannot be deleted, device is managed by UKFast'
             );
         }
+
         //schedule automation
         try {
             $automationRequestId = $intapiService->automationRequest(
@@ -680,6 +735,28 @@ class VirtualMachineController extends BaseController
             //Log::critical('');
         }
 
+        if ($refundCredit) {
+            $logData = [
+                'id' => $virtualMachine->getKey(),
+                'reseller_id' => $virtualMachine->servers_reseller_id
+            ];
+
+            try {
+                $result = $creditAllocator->refundCredit($virtualMachine->servers_reseller_id, $virtualMachine->getKey());
+                if (!$result) {
+                    Log::critical(
+                        'Failed to update assigned encryption credit record when destroying Virtual Machine',
+                        $logData
+                    );
+                }
+            } catch (CannotRefundProductCreditException $exception) {
+                Log::critical(
+                    'Failed to refund encryption credit when destroying Virtual Machine',
+                    $logData
+                );
+            }
+        }
+
         $headers = [];
         if ($request->user->isAdmin) {
             $headers = [
@@ -695,6 +772,7 @@ class VirtualMachineController extends BaseController
      * Clone a VM
      * @param Request $request
      * @param IntapiService $intapiService
+     * @param EncryptionCreditAllocator $creditAllocator
      * @param $vmId
      * @return \Illuminate\Http\Response
      * @throws DatastoreInsufficientSpaceException
@@ -703,12 +781,18 @@ class VirtualMachineController extends BaseController
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
+     * @throws \App\Exceptions\V1\InsufficientCreditsException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
      */
-    public function clone(Request $request, IntapiService $intapiService, $vmId)
+    public function clone(
+        Request $request,
+        IntapiService $intapiService,
+        EncryptionCreditAllocator $creditAllocator,
+        $vmId
+    )
     {
         //Validation
         $rules = [
@@ -742,6 +826,8 @@ class VirtualMachineController extends BaseController
 
         $requiredSpace = $virtualMachine->servers_hdd;
 
+        $assignEncryptionCredit = ($virtualMachine->servers_encrypted == 'Yes');
+
         if ($request->has('encrypt')) {
             if ($virtualMachine->type() == 'Public') {
                 throw new EncryptionServiceNotEnabledException(
@@ -753,7 +839,7 @@ class VirtualMachineController extends BaseController
                     'Encryption service is not enabled on this solution.'
                 );
             }
-            $postData['encrypt_vm'] = $request->input('encrypt');
+            $postData['encrypt_vm'] = $assignEncryptionCredit = $request->input('encrypt');
 
             // If encryption change is required, we need twice the storage space on the datastore to perform the action
             if ($request->input('encrypt') != ($virtualMachine->servers_encrypted == 'Yes')) {
@@ -766,6 +852,16 @@ class VirtualMachineController extends BaseController
                 ' Request required ' . $requiredSpace . 'GB, datastore has '
                 . $datastore->usage->available . 'GB remaining';
             throw new DatastoreInsufficientSpaceException($message);
+        }
+
+        // We only need to deduct the encryption credit if the billing type is PAYG
+        $assignEncryptionCredit = (
+            $assignEncryptionCredit && ($virtualMachine->solution->encryptionBillingType() == EncryptionBillingType::PAYG)
+        );
+
+        // If we need to use encryption, check there are remaining credits before proceeding
+        if ($assignEncryptionCredit) {
+            $creditAllocator->getRemainingCredits($virtualMachine->solution->resellerId());
         }
 
         //OK, start the clone process ==
@@ -794,6 +890,35 @@ class VirtualMachineController extends BaseController
             $clonedVirtualMacine = $this->getVirtualMachine($clonedVirtualMacineId);
         } catch (Exceptions\NotFoundException $exception) {
             throw new ServiceUnavailableException('Cloned virtual machine failed to initialise');
+        }
+
+        // Assign encryption credit
+        if ($assignEncryptionCredit) {
+            if ($clonedVirtualMacine->solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
+                $logData = [
+                    'original_vm_id' => $virtualMachine->getKey(),
+                    'new_vm_id' => $clonedVirtualMacine->getKey(),
+                    'reseller_id' => $clonedVirtualMacine->servers_reseller_id
+                ];
+
+                try {
+                    $result = $creditAllocator->assignCredit(
+                        $clonedVirtualMacine->solution->resellerId(),
+                        $clonedVirtualMacine->getKey()
+                    );
+                    if (!$result) {
+                        Log::critical(
+                            'Failed to add product credit product record when cloning Virtual Machine',
+                            $logData
+                        );
+                    }
+                } catch (InsufficientCreditsException $exception) {
+                    Log::error(
+                        'Failed to assign credit when launching encrypted Virtual Machine. Insufficient credits',
+                        $logData
+                    );
+                }
+            }
         }
 
         $responseData = $intapiService->getResponseData();
@@ -1140,10 +1265,13 @@ class VirtualMachineController extends BaseController
      * @param IntapiService $intapiService
      * @param $vmId
      * @return \Illuminate\Http\Response
+     * @throws DatastoreInsufficientSpaceException
+     * @throws DatastoreNotFoundException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
-     * @throws ServiceUnavailableException
      * @throws Exceptions\UnprocessableEntityException
+     * @throws ServiceUnavailableException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
     public function cloneToTemplate(Request $request, IntapiService $intapiService, $vmId)
     {

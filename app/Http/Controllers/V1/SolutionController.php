@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
 use App\Solution\CanModifyResource;
+use App\Solution\EncryptionBillingType;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -18,7 +19,7 @@ use UKFast\Api\Exceptions\DatabaseException;
 use App\Traits\V1\SanitiseRequestData;
 use Illuminate\Support\Facades\Event;
 
-use App\Billing\VmEncryptionCreditAllocator;
+use App\Billing\EncryptionCreditAllocator;
 use App\Exceptions\V1\InsufficientCreditsException;
 
 class SolutionController extends BaseController
@@ -55,32 +56,32 @@ class SolutionController extends BaseController
     /**
      * Returns the ecloud_vm_encrytion credits available to the solution
      * @param Request $request
-     * @param VmEncryptionCreditAllocator $creditAllocator
+     * @param EncryptionCreditAllocator $creditAllocator
+     * @param $solutionId
      * @return \Illuminate\Http\Response
+     * @throws SolutionNotFoundException
      */
-    public function credits(Request $request, VmEncryptionCreditAllocator $creditAllocator)
+    public function credits(Request $request, EncryptionCreditAllocator $creditAllocator, $solutionId)
     {
-        // Get the resellers solutions and check whether any have encryption enabled as PAYG
-        $solutionQuery = $this->getSolutionQuery($request);
+        $solution = $this->getSolutionById($request, $solutionId);
 
-        foreach ($solutionQuery->get() as $solution) {
-            if ($solution->encryptionEnabled()) {
-                exit('found solution with encryption');
+        $credits = [];
+
+        // Load ecloud_vm_encryption credits available to the solution's reseller
+        if ($solution->encryptionEnabled() && $solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
+            $item = new \StdClass();
+            $item->type = 'ecloud_vm_encryption';
+
+            try {
+                $encryption_credits = $creditAllocator->getRemainingCredits($solution->ucs_reseller_reseller_id);
+                $item->available = $encryption_credits;
+            } catch (InsufficientCreditsException $exception) {
+                $item->available = 0;
             }
+
+            $credits = collect([$item]);
         }
 
-        exit('here');
-        $item = new \StdClass();
-        $item->type = 'ecloud_vm_encryption';
-
-        try {
-            $encryption_credits = $creditAllocator->getRemainingCredits($request->user->resellerId);
-            $item->available = $encryption_credits;
-        } catch (InsufficientCreditsException $exception) {
-            $item->available = 0;
-        }
-
-        $credits = collect([$item]);
 
         return $this->respondCollection(
             $request,

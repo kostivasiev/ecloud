@@ -14,18 +14,18 @@ interface CreditAllocatorInterface
     /**
      * Assign a credit
      * @param int $resellerId
-     * @param int $domainId
+     * @param int $serverId
      * @return bool
      * @throws \App\Exceptions\V1\InsufficientCreditsException
      */
-    public function assignCredit(int $resellerId, int $domainId): bool;
+    public function assignCredit(int $resellerId, int $serverId): bool;
 
     /**
      * Refund a credit
      * @param int $resellerId
-     * @param int $domainId
+     * @param int $serverId
      * @return bool
      * @throws \App\Exceptions\V1\CannotRefundProductCreditException
      */
-    public function refundCredit(int $resellerId, int $domainId): bool;
+    public function refundCredit(int $resellerId, int $serverId): bool;
 }
