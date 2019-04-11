@@ -1151,9 +1151,7 @@ class VirtualMachineController extends BaseController
             }
 
             $virtualMachine->status = Status::RESIZING;
-            if (!$virtualMachine->save()) {
-                throw new Exceptions\DatabaseException('Failed to update virtual machine status');
-            }
+            $virtualMachine->save();
         }
 
         return $this->respondEmpty(($resizeRequired) ? 202 : 200);
