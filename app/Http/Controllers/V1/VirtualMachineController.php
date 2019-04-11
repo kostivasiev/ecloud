@@ -638,23 +638,15 @@ class VirtualMachineController extends BaseController
         // If PAYG encryption, assign credit. We need to do after the intapi call so we have the server id
         if (!empty($encrypt_vm)) {
             if ($solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
-                $logData = [
-                    'id' => $virtualMachine->getKey(),
-                    'reseller_id' => $virtualMachine->servers_reseller_id
-                ];
-
                 try {
-                    $result = $creditAllocator->assignCredit($solution->resellerId(), $virtualMachine->getKey());
-                    if (!$result) {
-                        Log::critical(
-                            'Failed to create encryption credit record when cloning Virtual Machine',
-                            $logData
-                        );
-                    }
-                } catch (InsufficientCreditsException $exception) {
-                    Log::error(
-                        'Failed to assign credit when launching encrypted Virtual Machine. Insufficient credits',
-                        $logData
+                    $creditAllocator->assignCredit($solution->resellerId(), $virtualMachine->getKey());
+                } catch (\Exception $exception) {
+                    Log::critical(
+                        'Failed to assign credit when launching encrypted Virtual Machine.',
+                        [
+                            'id' => $virtualMachine->getKey(),
+                            'reseller_id' => $virtualMachine->servers_reseller_id
+                        ]
                     );
                 }
             }
@@ -736,23 +728,15 @@ class VirtualMachineController extends BaseController
         }
 
         if ($refundCredit) {
-            $logData = [
-                'id' => $virtualMachine->getKey(),
-                'reseller_id' => $virtualMachine->servers_reseller_id
-            ];
-
             try {
-                $result = $creditAllocator->refundCredit($virtualMachine->servers_reseller_id, $virtualMachine->getKey());
-                if (!$result) {
-                    Log::critical(
-                        'Failed to update assigned encryption credit record when destroying Virtual Machine',
-                        $logData
-                    );
-                }
-            } catch (CannotRefundProductCreditException $exception) {
+                $creditAllocator->refundCredit($virtualMachine->servers_reseller_id, $virtualMachine->getKey());
+            } catch (\Exception $exception) {
                 Log::critical(
                     'Failed to refund encryption credit when destroying Virtual Machine',
-                    $logData
+                    [
+                        'id' => $virtualMachine->getKey(),
+                        'reseller_id' => $virtualMachine->servers_reseller_id
+                    ]
                 );
             }
         }
@@ -895,27 +879,19 @@ class VirtualMachineController extends BaseController
         // Assign encryption credit
         if ($assignEncryptionCredit) {
             if ($clonedVirtualMacine->solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
-                $logData = [
-                    'original_vm_id' => $virtualMachine->getKey(),
-                    'new_vm_id' => $clonedVirtualMacine->getKey(),
-                    'reseller_id' => $clonedVirtualMacine->servers_reseller_id
-                ];
-
                 try {
-                    $result = $creditAllocator->assignCredit(
+                    $creditAllocator->assignCredit(
                         $clonedVirtualMacine->solution->resellerId(),
                         $clonedVirtualMacine->getKey()
                     );
-                    if (!$result) {
-                        Log::critical(
-                            'Failed to add product credit product record when cloning Virtual Machine',
-                            $logData
-                        );
-                    }
-                } catch (InsufficientCreditsException $exception) {
-                    Log::error(
-                        'Failed to assign credit when launching encrypted Virtual Machine. Insufficient credits',
-                        $logData
+                } catch (\Exception $exception) {
+                    Log::critical(
+                        'Failed to assign credit when launching encrypted Virtual Machine.',
+                        [
+                            'original_vm_id' => $virtualMachine->getKey(),
+                            'new_vm_id' => $clonedVirtualMacine->getKey(),
+                            'reseller_id' => $clonedVirtualMacine->servers_reseller_id
+                        ]
                     );
                 }
             }
