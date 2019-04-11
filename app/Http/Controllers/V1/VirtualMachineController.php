@@ -196,8 +196,20 @@ class VirtualMachineController extends BaseController
                     'Encryption service is not available for eCloud Public at this time.'
                 );
             }
+
+            if ($request->has('controlpanel_id') && !$this->isAdmin) {
+                throw new Exceptions\BadRequestException(
+                    'Legacy Control Panel installation is not available at this time.'
+                );
+            }
+
             $solution = null;
             $pod = Pod::find(14);
+            $datastore = Datastore::getDefault(
+                null,
+                'Public',
+                ($request->input('backup') == true)
+            );
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
@@ -271,7 +283,9 @@ class VirtualMachineController extends BaseController
             'min:' . $minRam, 'max:' . $maxRam
         ]);
 
-        $insufficientSpaceMessage = 'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining';
+        $insufficientSpaceMessage =
+            'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining'
+        ;
 
         // single disk vm requested
         if ($request->has('hdd')) {
@@ -571,6 +585,12 @@ class VirtualMachineController extends BaseController
             $post_data['is_appliance'] = true;
             if (!empty($applianceScript)) {
                 $post_data['bootstrap_script'] = json_encode($applianceScript);
+            }
+        }
+
+        if ($request->input('environment') == 'Public') {
+            if ($request->has('controlpanel_id')) {
+                $post_data['control_panel_id'] = $request->input('controlpanel_id');
             }
         }
 
