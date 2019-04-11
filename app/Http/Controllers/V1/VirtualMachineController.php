@@ -162,6 +162,8 @@ class VirtualMachineController extends BaseController
         if (in_array($request->input('environment'), ['Public', 'Burst'])) {
             $rules['hdd_iops'] = ['nullable', 'integer'];
             // todo check iops in allowed range
+
+            $rules['backup'] = ['nullable', 'boolean'];
         } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
         }
@@ -191,6 +193,11 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         if ($request->input('environment') == 'Public') {
+            // if admin reseller scope is 0, we won't know the owner for the new VM
+            if (empty($request->user->resellerId)) {
+                throw new Exceptions\UnauthorisedException('Unable to determine account id');
+            }
+
             if ($request->has('encrypt')) {
                 throw new EncryptionServiceNotEnabledException(
                     'Encryption service is not available for eCloud Public at this time.'
@@ -443,13 +450,6 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
-        //If admin reseller scope is 0, we won't know the reseller id for Public VM's
-        if (empty($solution) && empty($request->user->resellerId)) {
-            if ($request->user->isAdministrator) {
-                throw new Exceptions\BadRequestException('Missing Reseller scope');
-            }
-            throw new Exceptions\UnauthorisedException('Unable to determine reseller id');
-        }
 
         $post_data = array(
             'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user->resellerId,
@@ -589,6 +589,10 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->input('environment') == 'Public') {
+            if ($request->input('backup') === true) {
+                $post_data['backup_enabled'] = true;
+            }
+
             if ($request->has('controlpanel_id')) {
                 $post_data['control_panel_id'] = $request->input('controlpanel_id');
             }
