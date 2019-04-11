@@ -619,8 +619,11 @@ class VirtualMachineController extends BaseController
 
         if (!$intapiData->result) {
             $error_msg = $intapiService->getFriendlyError(
-                end($intapiData->errorset)
+                is_array($intapiData->errorset->error) ?
+                    end($intapiData->errorset->error) :
+                    $intapiData->errorset->error
             );
+
             throw new ServiceResponseException($error_msg);
         }
 
