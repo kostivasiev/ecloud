@@ -1317,6 +1317,11 @@ class VirtualMachineController extends BaseController
             throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
         }
 
+        $virtualMachine->status = Status::CLONING_TO_TEMPLATE;
+        if (!$virtualMachine->save()) {
+            throw new Exceptions\DatabaseException('Failed to update virtual machine status');
+        }
+
         return $this->respondEmpty(202);
     }
 
