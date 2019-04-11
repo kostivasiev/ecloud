@@ -877,22 +877,20 @@ class VirtualMachineController extends BaseController
 
         // Assign encryption credit
         if ($assignEncryptionCredit) {
-            if ($clonedVirtualMacine->solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
-                try {
-                    $creditAllocator->assignCredit(
-                        $clonedVirtualMacine->solution->resellerId(),
-                        $clonedVirtualMacine->getKey()
-                    );
-                } catch (\Exception $exception) {
-                    Log::critical(
-                        'Failed to assign credit when launching encrypted Virtual Machine.',
-                        [
-                            'original_vm_id' => $virtualMachine->getKey(),
-                            'new_vm_id' => $clonedVirtualMacine->getKey(),
-                            'reseller_id' => $clonedVirtualMacine->servers_reseller_id
-                        ]
-                    );
-                }
+            try {
+                $creditAllocator->assignCredit(
+                    $clonedVirtualMacine->solution->resellerId(),
+                    $clonedVirtualMacine->getKey()
+                );
+            } catch (\Exception $exception) {
+                Log::critical(
+                    'Failed to assign credit when launching encrypted Virtual Machine.',
+                    [
+                        'original_vm_id' => $virtualMachine->getKey(),
+                        'new_vm_id' => $clonedVirtualMacine->getKey(),
+                        'reseller_id' => $clonedVirtualMacine->servers_reseller_id
+                    ]
+                );
             }
         }
 
