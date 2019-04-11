@@ -169,6 +169,8 @@ class VirtualMachineController extends BaseController
         if (in_array($request->input('environment'), ['Public', 'Burst'])) {
             $rules['hdd_iops'] = ['nullable', 'integer'];
             // todo check iops in allowed range
+
+            $rules['backup'] = ['nullable', 'boolean'];
         } else {
             $rules['solution_id'] = ['required', 'integer', 'min:1'];
         }
@@ -198,13 +200,30 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         if ($request->input('environment') == 'Public') {
+            // if admin reseller scope is 0, we won't know the owner for the new VM
+            if (empty($request->user->resellerId)) {
+                throw new Exceptions\UnauthorisedException('Unable to determine account id');
+            }
+
             if ($request->has('encrypt')) {
                 throw new EncryptionServiceNotEnabledException(
                     'Encryption service is not available for eCloud Public at this time.'
                 );
             }
+
+            if ($request->has('controlpanel_id') && !$this->isAdmin) {
+                throw new Exceptions\BadRequestException(
+                    'Legacy Control Panel installation is not available at this time.'
+                );
+            }
+
             $solution = null;
             $pod = Pod::find(14);
+            $datastore = Datastore::getDefault(
+                null,
+                'Public',
+                ($request->input('backup') == true)
+            );
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
@@ -449,13 +468,6 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
-        //If admin reseller scope is 0, we won't know the reseller id for Public VM's
-        if (empty($solution) && empty($request->user->resellerId)) {
-            if ($request->user->isAdmin) {
-                throw new Exceptions\BadRequestException('Missing Reseller scope');
-            }
-            throw new Exceptions\UnauthorisedException('Unable to determine reseller id');
-        }
 
         $post_data = array(
             'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user->resellerId,
@@ -594,6 +606,16 @@ class VirtualMachineController extends BaseController
             }
         }
 
+        if ($request->input('environment') == 'Public') {
+            if ($request->input('backup') === true) {
+                $post_data['backup_enabled'] = true;
+            }
+
+            if ($request->has('controlpanel_id')) {
+                $post_data['control_panel_id'] = $request->input('controlpanel_id');
+            }
+        }
+
         // remove debugging when ready to retest
 //        print_r($post_data);
 //        exit;
@@ -615,8 +637,11 @@ class VirtualMachineController extends BaseController
 
         if (!$intapiData->result) {
             $error_msg = $intapiService->getFriendlyError(
-                end($intapiData->errorset)
+                is_array($intapiData->errorset->error) ?
+                    end($intapiData->errorset->error) :
+                    $intapiData->errorset->error
             );
+
             throw new ServiceResponseException($error_msg);
         }
 
@@ -625,7 +650,7 @@ class VirtualMachineController extends BaseController
         $virtualMachine->servers_status = $intapiData->data->server_status;
 
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = [
                 'X-AutomationRequestId' => $intapiData->data->automation_request_id
             ];
@@ -694,7 +719,7 @@ class VirtualMachineController extends BaseController
         }
 
         //server is in contract
-        if (!$request->user->isAdmin && $virtualMachine->inContract()) {
+        if (!$request->user->isAdministrator && $virtualMachine->inContract()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, in contract until ' .
                 date('d/m/Y', strtotime($virtualMachine->servers_contract_end_date))
@@ -702,7 +727,7 @@ class VirtualMachineController extends BaseController
         }
 
         //server is a managed device
-        if (!$request->user->isAdmin && $virtualMachine->isManaged()) {
+        if (!$request->user->isAdministrator && $virtualMachine->isManaged()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, device is managed by UKFast'
             );
@@ -742,7 +767,7 @@ class VirtualMachineController extends BaseController
         }
 
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = [
                 'X-AutomationRequestId' => $automationRequestId
             ];
@@ -899,7 +924,7 @@ class VirtualMachineController extends BaseController
 
         // Respond with the new machine id
         $headers = [];
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             $headers = ['X-AutomationRequestId' => $automationRequestId];
         }
 
@@ -1396,6 +1421,11 @@ class VirtualMachineController extends BaseController
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        }
+
+        $virtualMachine->status = Status::CLONING_TO_TEMPLATE;
+        if (!$virtualMachine->save()) {
+            throw new Exceptions\DatabaseException('Failed to update virtual machine status');
         }
 
         return $this->respondEmpty(202);

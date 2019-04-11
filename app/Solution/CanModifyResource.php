@@ -30,7 +30,7 @@ class CanModifyResource
 
     public function validate()
     {
-        if ($this->request->user->isAdmin) {
+        if ($this->request->user->isAdministrator) {
             return true;
         }
 
@@ -39,7 +39,9 @@ class CanModifyResource
         }
 
         $exception = new InvalidSolutionStateException($this->solution->ucs_reseller_status);
-        $exception->detail = 'Cannot modify resources whilst solution state is: ' . $this->solution->ucs_reseller_status;
+        $exception->detail =
+            'Cannot modify resources whilst solution state is: ' . $this->solution->ucs_reseller_status
+        ;
 
         throw $exception;
     }

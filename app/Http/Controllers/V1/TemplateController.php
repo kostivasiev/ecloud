@@ -622,7 +622,8 @@ class TemplateController extends BaseController
     {
         $request = app('request');
         $TemplateController = new static($request);
-        $templates = $TemplateController->getResellerPodTemplates(true)[$pod->getKey()];
+
+        $templates = $TemplateController->getPodTemplates($pod);
         if (is_array($templates) and count($templates) > 0) {
             $template = $TemplateController->findTemplateBy('name', $templateName, $templates);
             if ($template) {
@@ -713,7 +714,7 @@ class TemplateController extends BaseController
      */
     protected function filterAdminProperties(Request $request, $templates)
     {
-        if ($request->user->isAdmin) {
+        if ($request->user->isAdministrator) {
             return $templates;
         }
 

@@ -118,4 +118,9 @@ class Status
      *
      */
     const MISSING_VLAN = 'Missing VLAN';
+
+    /**
+     *
+     */
+    const CLONING_TO_TEMPLATE = 'Cloning To Template';
 }
