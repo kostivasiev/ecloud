@@ -123,4 +123,9 @@ class Status
      *
      */
     const CLONING_TO_TEMPLATE = 'Cloning To Template';
+
+    /**
+     *
+     */
+    const RESIZING = 'Resizing';
 }
