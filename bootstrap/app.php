@@ -90,13 +90,13 @@ $app->register(App\Providers\KingpinServiceProvider::class);
 
 // APIo service providers
 $app->register(App\Providers\NetworkingServiceProvider::class);
+$app->register(App\Providers\AccountsServiceProvider::class);
 
 // intAPI
 $app->register(App\Providers\IntapiServiceProvider::class);
 
 // Event Service provider
 $app->register(App\Providers\EventServiceProvider::class);
-
 
 /*
 |--------------------------------------------------------------------------
