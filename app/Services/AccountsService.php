@@ -4,7 +4,10 @@ namespace App\Services;
 
 use GuzzleHttp\Exception\TransferException;
 
-
+/**
+ * Class AccountsService
+ * @package App\Services
+ */
 class AccountsService extends AbstractApioService
 {
     /**
@@ -12,7 +15,6 @@ class AccountsService extends AbstractApioService
      * @var string
      */
     protected $api_version = "v1";
-
 
     /**
      * Get VM encryption credit info
@@ -33,7 +35,6 @@ class AccountsService extends AbstractApioService
             return false;
         }
     }
-
 
     /**
      * Assign VM encryption credit

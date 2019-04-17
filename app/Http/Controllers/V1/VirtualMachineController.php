@@ -308,7 +308,8 @@ class VirtualMachineController extends BaseController
             'min:' . $minRam, 'max:' . $maxRam
         ]);
 
-        $insufficientSpaceMessage = 'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining';
+        $insufficientSpaceMessage =
+            'datastore has insufficient space, ' . $datastore->usage->available . 'GB remaining';
         $encryptionDatastoreSpaceMessage = '';
 
         // single disk vm requested
@@ -872,7 +873,8 @@ class VirtualMachineController extends BaseController
 
         // We only need to deduct the encryption credit if the billing type is PAYG
         $assignEncryptionCredit = (
-            $assignEncryptionCredit && ($virtualMachine->solution->encryptionBillingType() == EncryptionBillingType::PAYG)
+            $assignEncryptionCredit
+            && ($virtualMachine->solution->encryptionBillingType() == EncryptionBillingType::PAYG)
         );
 
         // If we need to use encryption, check there are remaining credits before proceeding
