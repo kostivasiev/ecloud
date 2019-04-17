@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Billing\EncryptionCreditAllocator;
-use App\Exceptions\V1\CannotRefundProductCreditException;
 use App\Exceptions\V1\InsufficientCreditsException;
+use App\Services\AccountsService;
 use App\Solution\EncryptionBillingType;
 use Illuminate\Support\Facades\Event;
 use App\Events\V1\ApplianceLaunchedEvent;
@@ -96,26 +95,27 @@ class VirtualMachineController extends BaseController
     /**
      * @param Request $request
      * @param IntapiService $intapiService
-     * @param EncryptionCreditAllocator $creditAllocator
+     * @param AccountsService $accountsService
      * @return \Illuminate\Http\Response
      * @throws ApplianceServerLicenseNotFoundException
      * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\UnauthorisedException
+     * @throws InsufficientCreditsException
      * @throws InsufficientResourceException
      * @throws ServiceResponseException
      * @throws ServiceUnavailableException
      * @throws SolutionNotFoundException
      * @throws TemplateNotFoundException
      * @throws \App\Exceptions\V1\ApplianceNotFoundException
-     * @throws \App\Exceptions\V1\InsufficientCreditsException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
      */
-    public function create(Request $request, IntapiService $intapiService, EncryptionCreditAllocator $creditAllocator)
+    public function create(Request $request, IntapiService $intapiService, AccountsService $accountsService)
     {
         // todo remove when public/burst VMs supported
         // - template validation issue on public
@@ -289,13 +289,16 @@ class VirtualMachineController extends BaseController
             }
 
             // If PAYG encryption, check there are sufficient credits
-            if (!empty($encrypt_vm)) {
-                if ($solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
-                    $creditAllocator->getRemainingCredits($solution->resellerId());
+            if (!empty($encrypt_vm) && ($solution->encryptionBillingType() == EncryptionBillingType::PAYG)) {
+                $credits = $accountsService->scopeResellerId($solution->resellerId())->getVmEncryptionCredits();
+                if (!$credits) {
+                    throw new ServiceUnavailableException('Unable to load product credits.');
+                }
+                if ($credits->remaining < 1) {
+                    throw new InsufficientCreditsException();
                 }
             }
         }
-
 
         $rules['cpu'] = array_merge($rules['cpu'], [
             'min:' . $minCpu, 'max:' . $maxCpu
@@ -663,9 +666,11 @@ class VirtualMachineController extends BaseController
         // If PAYG encryption, assign credit. We need to do after the intapi call so we have the server id
         if (!empty($encrypt_vm)) {
             if ($solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
-                try {
-                    $creditAllocator->assignCredit($solution->resellerId(), $virtualMachine->getKey());
-                } catch (\Exception $exception) {
+                $result = $accountsService
+                        ->scopeResellerId($solution->resellerId())
+                        ->assignVmEncryptionCredit($virtualMachine->getKey());
+
+                if (!$result) {
                     Log::critical(
                         'Failed to assign credit when launching encrypted Virtual Machine.',
                         [
@@ -683,16 +688,16 @@ class VirtualMachineController extends BaseController
     /**
      * @param Request $request
      * @param IntapiService $intapiService
-     * @param EncryptionCreditAllocator $creditAllocator
+     * @param AccountsService $accountsService
      * @param $vmId
      * @return \Illuminate\Http\Response
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
      * @throws ServiceUnavailableException
-     * @throws \App\Exceptions\V1\CannotRefundProductCreditException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function destroy(Request $request, IntapiService $intapiService, EncryptionCreditAllocator $creditAllocator, $vmId)
+    public function destroy(Request $request, IntapiService $intapiService, AccountsService $accountsService, $vmId)
     {
         $refundCredit = false;
         $this->validateVirtualMachineId($request, $vmId);
@@ -753,9 +758,11 @@ class VirtualMachineController extends BaseController
         }
 
         if ($refundCredit) {
-            try {
-                $creditAllocator->refundCredit($virtualMachine->servers_reseller_id, $virtualMachine->getKey());
-            } catch (\Exception $exception) {
+            $result = $accountsService
+                ->scopeResellerId($virtualMachine->servers_reseller_id)
+                ->refundVmEncryptionCredit($virtualMachine->getKey());
+
+            if (!$result) {
                 Log::critical(
                     'Failed to refund encryption credit when destroying Virtual Machine',
                     [
@@ -781,7 +788,7 @@ class VirtualMachineController extends BaseController
      * Clone a VM
      * @param Request $request
      * @param IntapiService $intapiService
-     * @param EncryptionCreditAllocator $creditAllocator
+     * @param AccountsService $accountsService
      * @param $vmId
      * @return \Illuminate\Http\Response
      * @throws DatastoreInsufficientSpaceException
@@ -789,9 +796,10 @@ class VirtualMachineController extends BaseController
      * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\NotFoundException
+     * @throws InsufficientCreditsException
      * @throws ServiceUnavailableException
-     * @throws \App\Exceptions\V1\InsufficientCreditsException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -799,7 +807,7 @@ class VirtualMachineController extends BaseController
     public function clone(
         Request $request,
         IntapiService $intapiService,
-        EncryptionCreditAllocator $creditAllocator,
+        AccountsService $accountsService,
         $vmId
     ) {
         //Validation
@@ -869,7 +877,15 @@ class VirtualMachineController extends BaseController
 
         // If we need to use encryption, check there are remaining credits before proceeding
         if ($assignEncryptionCredit) {
-            $creditAllocator->getRemainingCredits($virtualMachine->solution->resellerId());
+            $credits = $accountsService
+                ->scopeResellerId($virtualMachine->solution->resellerId())
+                ->getVmEncryptionCredits();
+            if (!$credits) {
+                throw new ServiceUnavailableException('Unable to load product credits.');
+            }
+            if ($credits->remaining < 1) {
+                throw new InsufficientCreditsException();
+            }
         }
 
         //OK, start the clone process ==
@@ -902,14 +918,13 @@ class VirtualMachineController extends BaseController
 
         // Assign encryption credit
         if ($assignEncryptionCredit) {
-            try {
-                $creditAllocator->assignCredit(
-                    $clonedVirtualMacine->solution->resellerId(),
-                    $clonedVirtualMacine->getKey()
-                );
-            } catch (\Exception $exception) {
+            $result = $accountsService
+                ->scopeResellerId($clonedVirtualMacine->solution->resellerId())
+                ->assignVmEncryptionCredit($clonedVirtualMacine->getKey());
+
+            if (!$result) {
                 Log::critical(
-                    'Failed to assign credit when launching encrypted Virtual Machine.',
+                    'Failed to assign credit when cloning encrypted Virtual Machine.',
                     [
                         'original_vm_id' => $virtualMachine->getKey(),
                         'new_vm_id' => $clonedVirtualMacine->getKey(),

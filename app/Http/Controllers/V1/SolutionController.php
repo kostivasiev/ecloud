@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
+use App\Exceptions\V1\ServiceUnavailableException;
+use App\Services\AccountsService;
 use App\Solution\CanModifyResource;
-use App\Solution\EncryptionBillingType;
-use Illuminate\Support\Collection;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -19,9 +19,6 @@ use UKFast\Api\Exceptions\DatabaseException;
 
 use App\Traits\V1\SanitiseRequestData;
 use Illuminate\Support\Facades\Event;
-
-use App\Billing\EncryptionCreditAllocator;
-use App\Exceptions\V1\InsufficientCreditsException;
 
 class SolutionController extends BaseController
 {
@@ -53,43 +50,33 @@ class SolutionController extends BaseController
         );
     }
 
-
     /**
      * Returns the ecloud_vm_encrytion credits available to the solution
      * @param Request $request
-     * @param EncryptionCreditAllocator $creditAllocator
+     * @param AccountsService $accountsService
      * @param $solutionId
      * @return \Illuminate\Http\Response
+     * @throws ServiceUnavailableException
      * @throws SolutionNotFoundException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function credits(Request $request, EncryptionCreditAllocator $creditAllocator, $solutionId)
+    public function credits(Request $request, AccountsService $accountsService, $solutionId)
     {
         $solution = $this->getSolutionById($request, $solutionId);
 
-        $credits = new Collection();
+        $credits = $accountsService->scopeResellerId($solution->resellerId())->getVmEncryptionCredits();
 
-        // Load ecloud_vm_encryption credits available to the solution's reseller
-        if ($solution->encryptionEnabled() && $solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
-            $item = new \StdClass();
-            $item->type = 'ecloud_vm_encryption';
-
-            try {
-                $encryption_credits = $creditAllocator->getRemainingCredits($solution->ucs_reseller_reseller_id);
-                $item->available = $encryption_credits;
-            } catch (InsufficientCreditsException $exception) {
-                $item->available = 0;
-            }
-
-            $credits = collect([$item]);
+        if (!$credits) {
+            throw new ServiceUnavailableException('Unable to load product credits.');
         }
 
+        $credits = collect([$credits]);
 
         return $this->respondCollection(
             $request,
             $credits
         );
     }
-
 
     /**
      * Show specific solution
