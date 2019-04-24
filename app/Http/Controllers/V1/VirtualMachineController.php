@@ -1706,9 +1706,12 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param $solutionId
      * @return \Illuminate\Http\Response
+     * @throws SolutionNotFoundException
      */
     public function getSolutionVMs(Request $request, $solutionId)
     {
+        SolutionController::getSolutionById($request, $solutionId);
+
         $collection = VirtualMachine::withResellerId($request->user->resellerId)->withSolutionId($solutionId);
 
         if (!$this->isAdmin) {
