@@ -51,7 +51,7 @@ class SolutionController extends BaseController
     }
 
     /**
-     * Returns the ecloud_vm_encrytion credits available to the solution
+     * Returns the ecloud_vm_encryption credits available to the solution
      * @param Request $request
      * @param AccountsService $accountsService
      * @param $solutionId
