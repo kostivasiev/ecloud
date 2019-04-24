@@ -93,6 +93,7 @@ class VirtualMachineController extends BaseController
     }
 
     /**
+     * Creates a Virtual Machine
      * @param Request $request
      * @param IntapiService $intapiService
      * @param AccountsService $accountsService
