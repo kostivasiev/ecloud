@@ -10,7 +10,6 @@ use UKFast\Api\Resource\Traits\RequestHelper;
 
 use Illuminate\Http\Request;
 
-
 class CreditsController extends BaseController
 {
     use ResponseHelper, RequestHelper;
