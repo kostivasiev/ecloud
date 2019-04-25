@@ -94,6 +94,8 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @return \Illuminate\Http\Response
+     * @throws ApplianceServerLicenseNotFoundException
+     * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
      * @throws Exceptions\UnauthorisedException
@@ -101,13 +103,12 @@ class VirtualMachineController extends BaseController
      * @throws ServiceResponseException
      * @throws ServiceUnavailableException
      * @throws SolutionNotFoundException
-     * @throws \App\Exceptions\V1\TemplateNotFoundException
+     * @throws TemplateNotFoundException
+     * @throws \App\Exceptions\V1\ApplianceNotFoundException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
-     * @throws \App\Exceptions\V1\ApplianceNotFoundException
-     * @throws ApplianceServerLicenseNotFoundException
-     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -123,6 +124,7 @@ class VirtualMachineController extends BaseController
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
+
              // User must either specify a vm template or an appliance_id
             'template' => ['required_without:appliance_id'],
             'appliance_id' => ['required_without:template', new IsValidUuid()],
@@ -130,7 +132,7 @@ class VirtualMachineController extends BaseController
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
             'hdd' => ['required_without:hdd_disks', 'integer'],
-            'hdd_disks' => ['required_without:hdd', 'array'],
+            'hdd_disks' => ['required_without:hdd', 'array', "max:".VirtualMachine::MAX_HDD_COUNT.""],
 
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
@@ -241,11 +243,7 @@ class VirtualMachineController extends BaseController
                     ));
                 }
 
-                $maxHdd = min(
-                    $datastore->usage->available,
-                    VirtualMachine::MAX_HDD
-                );
-
+                $maxHdd = $datastore->usage->available;
                 if ($maxHdd < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
                         'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
@@ -328,13 +326,18 @@ class VirtualMachineController extends BaseController
 
             $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
 
+            $capacityAllowed = $datastore->usage->available;
+            if (in_array($request->input('environment'), ['Public', 'Burst'])) {
+                $capacityAllowed = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
+            }
+
             // Encrypting a VM requires twice the space on the datastore
             if (!empty($encrypt_vm)) {
                 $capacityRequested *= 2;
                 $insufficientSpaceMessage .= '. Encrypted VM\'s require double requested storage space';
             }
 
-            if ($capacityRequested > $datastore->usage->available) {
+            if ($capacityRequested > $capacityAllowed) {
                 throw new InsufficientResourceException($intapiService->getFriendlyError($insufficientSpaceMessage));
             }
         }
@@ -1100,6 +1103,15 @@ class VirtualMachineController extends BaseController
                     throw new Exceptions\ForbiddenException($message);
                 }
 
+                if ($virtualMachine->inSharedEnvironment() && $hdd->capacity > VirtualMachine::MAX_HDD) {
+                    $message = 'HDD';
+                    if (!empty($hdd->uuid)) {
+                        $message .= " '" . $hdd->uuid . "'";
+                    }
+                    $message .= ' value must be '.VirtualMachine::MAX_HDD.'GB or smaller';
+                    throw new Exceptions\ForbiddenException($message);
+                }
+
                 $totalCapacity += $hdd->capacity;
 
                 $hdd->state = 'present'; // For when we update the automation
@@ -1132,13 +1144,20 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        if ($totalCapacity > $maxHdd) {
-            $overprovision = ($totalCapacity - $maxHdd);
+        $maxCapacity = $maxHdd;
+        if ($virtualMachine->inSharedEnvironment()) {
+            $maxCapacity = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
+        }
+
+        if ($totalCapacity > $maxCapacity) {
+            $overprovision = ($totalCapacity - $maxCapacity);
             throw new Exceptions\ForbiddenException(
                 'HDD capacity for virtual machine over-provisioned by ' . $overprovision . 'GB.'
-                . ' Total HDD capacity must be ' . $maxHdd . 'GB or less.'
+                . ' Total HDD capacity must be ' . $maxCapacity . 'GB or less.'
             );
         }
+
+        // todo add MAX_HDD_COUNT check?
 
         // Fire off automation request
         if ($resizeRequired) {
