@@ -79,6 +79,7 @@ class SolutionController extends BaseController
      * @throws DatabaseException
      * @throws SolutionNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \ReflectionException
      */
     public function update(Request $request, $solutionId)
     {
@@ -89,7 +90,7 @@ class SolutionController extends BaseController
 
         (new CanModifyResource($solution))->validate();
 
-        $rules = Solution::$rules;
+        $rules = Solution::getRules();
         $rules = array_merge(
             $rules,
             [

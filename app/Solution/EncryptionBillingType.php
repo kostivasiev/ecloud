@@ -2,6 +2,8 @@
 
 namespace App\Solution;
 
+use ReflectionClass;
+
 /**
  * Class EncryptionBillingType
  *
@@ -22,4 +24,13 @@ class EncryptionBillingType
      * The solution has VM encryption enabled using a pay-as-you-go Credit model
      */
     const PAYG = 'PAYG';
+
+    /**
+     * Return class constants
+     * @return array
+     * @throws \ReflectionException
+     */
+    static function all() {
+        return (new ReflectionClass(static::class))->getConstants();
+    }
 }

@@ -88,4 +88,163 @@ class PatchTest extends TestCase
             'metadata_value' => $testString,
         ]);
     }
+
+    public function testEnableEncryption()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_enabled' => 'No'
+        ]);
+
+        $this->missingFromDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_enabled' => 'Yes',
+        ]);
+
+
+        $this->json('PATCH', '/v1/solutions/123', [
+            'encryption_enabled' => true,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(204);
+
+        $this->seeInDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_enabled' => 'Yes'
+        ]);
+    }
+
+    public function testEnableEncryptionUnauthorised()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123
+        ]);
+
+        $this->missingFromDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_enabled' => 'Yes',
+        ]);
+
+
+        $this->json('PATCH', '/v1/solutions/123', [
+            'encryption_billing_type' => 'Contract',
+        ], [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(204);
+
+        /**
+         * Should not have been updated due to whitelist
+         */
+        $this->missingFromDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_enabled' => 'Yes',
+        ]);
+    }
+
+    public function testSetEncryptionDefault()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_default' => 'No'
+        ]);
+
+        $this->missingFromDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_default' => 'Yes',
+        ]);
+
+
+        $this->json('PATCH', '/v1/solutions/123', [
+            'encryption_default' => true,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(204);
+
+        $this->seeInDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_default' => 'Yes'
+        ]);
+    }
+
+    public function testSetEncryptionBillingType()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123
+        ]);
+
+        $this->missingFromDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_default' => 'Contract',
+        ]);
+
+
+        $this->json('PATCH', '/v1/solutions/123', [
+            'encryption_billing_type' => 'Contract',
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(204);
+
+        $this->seeInDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_billing_type' => 'Contract'
+        ]);
+    }
+
+    public function testSetEncryptionBillingTypeUnauthorised()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123
+        ]);
+
+        $this->missingFromDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_default' => 'Contract',
+        ]);
+
+
+        $this->json('PATCH', '/v1/solutions/123', [
+            'encryption_billing_type' => 'Contract',
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(204);
+
+        /**
+         * Should not have been updated due to whitelist
+         */
+        $this->missingFromDatabase('ucs_reseller', [
+            'ucs_reseller_id' => 123,
+            'ucs_reseller_encryption_default' => 'Contract',
+        ]);
+    }
+
+    public function testSetEncryptionBillingTypeUnknown()
+    {
+        factory(Solution::class, 1)->create([
+            'ucs_reseller_id' => 123
+        ]);
+
+        $this->json('PATCH', '/v1/solutions/123', [
+            'encryption_billing_type' => 'RANDOM STRING',
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(422);
+    }
 }

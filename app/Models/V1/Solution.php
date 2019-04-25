@@ -7,6 +7,7 @@ use App\Exceptions\V1\SolutionNotFoundException;
 use App\Solution\EncryptionBillingType;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Validation\Rule;
 use UKFast\Api\Resource\Property\DateProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
@@ -87,12 +88,19 @@ class Solution extends Model implements Filterable, Sortable
         'saleorder_id' => ['nullable', 'numeric'],
         'encryption_enabled' => ['nullable', 'boolean'],
         'encryption_default' => ['nullable', 'boolean'],
-        'encryption_billing_type' =>
-            [
-                'sometimes',
-                'in:'.EncryptionBillingType::PAYG . ',' . EncryptionBillingType::CONTRACT
-            ],
     ];
+
+    /**
+     * Return model (Create) validation rules
+     * @return array
+     * @throws \ReflectionException
+     */
+    public static function getRules()
+    {
+        $rules = static::$rules;
+        $rules['encryption_billing_type'] = ['sometimes', Rule::in(EncryptionBillingType::all())];
+        return $rules;
+    }
 
 
     /**
