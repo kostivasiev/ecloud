@@ -20,10 +20,22 @@ class PostTest extends TestCase
         parent::setUp();
     }
 
-    public function testPublicCreateDisabled()
+    public function testPublicDeployDisabled()
     {
-        $this->json('POST', '/v1/vms/', [
+        $this->json('POST', '/v1/vms', [
             'environment' => 'Public',
+        ], [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(403);
+    }
+
+    public function testBurstDeployDisabled()
+    {
+        $this->json('POST', '/v1/vms', [
+            'environment' => 'Burst',
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
@@ -60,6 +72,8 @@ class PostTest extends TestCase
 //        $this->assertResponseStatus(403);
 //    }
 
+
+
     public function testPublicCloneDisabled()
     {
         factory(VirtualMachine::class, 1)->create([
@@ -95,33 +109,6 @@ class PostTest extends TestCase
     }
 
 
-    public function testInvalidSSHPublicKey()
-    {
-        factory(Solution::class, 1)->create();
-        $solution = Solution::query()->first();
-        $data = [
-            'environment' => 'Hybrid',
-	        'cpu' => 2,
-	        'ram' => 2,
-	        'hdd' => 20,
-	        'solution_id' => $solution->getKey(),
-	        "template"  => 'CentOS 7 64-bit',
-	        'ssh_keys' => [
-                'THIS IS AN INVALID SSH PUBLIC KEY'
-            ]
-        ];
-
-        $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
-            ->seeStatusCode(422)
-            ->seeJson(
-                [
-                    'title' => 'Validation Error',
-                    'detail' => 'ssh_keys.0 is not a valid SSH Public key',
-                    'status' => 422
-                ]
-            );
-    }
-
     public function testValidSSHPublicKey()
     {
         $data = [
@@ -136,5 +123,32 @@ class PostTest extends TestCase
         ]);
 
         $this->assertTrue($validator->passes());
+    }
+
+    public function testInvalidSSHPublicKey()
+    {
+        factory(Solution::class, 1)->create();
+        $solution = Solution::query()->first();
+        $data = [
+            'environment' => 'Hybrid',
+            'cpu' => 2,
+            'ram' => 2,
+            'hdd' => 20,
+            'solution_id' => $solution->getKey(),
+            "template"  => 'CentOS 7 64-bit',
+            'ssh_keys' => [
+                'THIS IS AN INVALID SSH PUBLIC KEY'
+            ]
+        ];
+
+        $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
+            ->seeStatusCode(422)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'ssh_keys.0 is not a valid SSH Public key',
+                    'status' => 422
+                ]
+            );
     }
 }
