@@ -830,6 +830,19 @@ class VirtualMachine extends Model implements Filterable, Sortable
     }
 
     /**
+     * Is the VM on a shared cluster
+     * @return bool
+     */
+    public function inSharedEnvironment()
+    {
+        if (in_array($this->type(), ['Public', 'Burst'])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Is the vm a managed device
      *
      * @return boolean
