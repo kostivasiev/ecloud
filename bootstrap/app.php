@@ -67,7 +67,9 @@ $app->singleton(
 
 $app->routeMiddleware([
     'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
-    'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class
+    'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
+    'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
+    'is-administrator' => \App\Http\Middleware\IsAdministrator::class
 ]);
 
 /*

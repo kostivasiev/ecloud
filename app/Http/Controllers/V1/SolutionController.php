@@ -51,34 +51,6 @@ class SolutionController extends BaseController
     }
 
     /**
-     * Returns the ecloud_vm_encryption credits available to the solution
-     * @param Request $request
-     * @param AccountsService $accountsService
-     * @param $solutionId
-     * @return \Illuminate\Http\Response
-     * @throws ServiceUnavailableException
-     * @throws SolutionNotFoundException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function credits(Request $request, AccountsService $accountsService, $solutionId)
-    {
-        $solution = $this->getSolutionById($request, $solutionId);
-
-        $credits = $accountsService->scopeResellerId($solution->resellerId())->getVmEncryptionCredits();
-
-        if (!$credits) {
-            throw new ServiceUnavailableException('Unable to load product credits.');
-        }
-
-        $credits = collect([$credits]);
-
-        return $this->respondCollection(
-            $request,
-            $credits
-        );
-    }
-
-    /**
      * Show specific solution
      *
      * @param Request $request
