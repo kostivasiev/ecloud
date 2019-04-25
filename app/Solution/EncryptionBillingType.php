@@ -30,7 +30,8 @@ class EncryptionBillingType
      * @return array
      * @throws \ReflectionException
      */
-    static function all() {
+    public static function all()
+    {
         return (new ReflectionClass(static::class))->getConstants();
     }
 }
