@@ -44,35 +44,56 @@ class PostTest extends TestCase
         $this->assertResponseStatus(403);
     }
 
-//    todo need to mock kingpin/intapi services
-//    public function testHybridCreate()
+//    /**
+//     * @runTestsInSeparateProcesses
+//     */
+//    public function testHybridDeploy()
 //    {
-//        $this->missingFromDatabase('servers', [
-//            'servers_id' => 123,
-//        ]);
-//
 //        factory(Solution::class, 1)->create([
 //            'ucs_reseller_id' => 12345,
 //        ]);
 //
+//
+//        //lets get mockery...
+//
+//        $mockDatastore = (object) [
+//            'uuid' => 'Datastore-datastore-01',
+//            'name' => 'MCS_PX_VV_12345_DATA_01',
+//            'type' => 'VMFS',
+//            'capacity' => 1024,
+//            'freeSpace' => 1024,
+//            'uncommitted' => 0,
+//            'provisioned' => 0,
+//            'available' => 1024,
+//            'used' => 0,
+//        ];
+//
+//
+//        \Mockery::mock('overload:KingpinService')
+//            ->shouldReceive('getDatastores')->andReturn([
+//                $mockDatastore
+//            ]);
+//
+//        \Mockery::mock('overload:KingpinService')
+//            ->shouldReceive('getDatastore')->andReturn($mockDatastore);
+//
+//
+//
+//        // test the api
 //        $this->json('POST', '/v1/vms/', [
 //            'environment' => 'Hybrid',
 //            'template' => 'CentOS 7 64-bit',
 //            'solution_id' => '12345',
 //            'cpu' => 1,
 //            'ram' => 2,
-//            'hdd' => 30,
+//            'hdd' => 20,
 //        ], [
 //            'X-consumer-custom-id' => '1-1',
 //            'X-consumer-groups' => 'ecloud.write',
 //        ]);
 //
-//        dd($this->response->getContent());
-//
-//        $this->assertResponseStatus(403);
+//        $this->assertResponseStatus(201);
 //    }
-
-
 
     public function testPublicCloneDisabled()
     {
