@@ -1470,8 +1470,8 @@ class VirtualMachineController extends BaseController
         Request $request,
         IntapiService $intapiService,
         AccountsService $accountsService,
-        $vmId)
-    {
+        $vmId
+    ) {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
@@ -1588,8 +1588,8 @@ class VirtualMachineController extends BaseController
         Request $request,
         IntapiService $intapiService,
         AccountsService $accountsService,
-        $vmId)
-    {
+        $vmId
+    ) {
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 

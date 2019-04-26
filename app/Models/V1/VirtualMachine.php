@@ -931,5 +931,4 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
         return $this;
     }
-
 }

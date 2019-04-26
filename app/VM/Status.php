@@ -145,6 +145,4 @@ class Status
     {
         return (new ReflectionClass(static::class))->getConstants();
     }
-
-
 }
