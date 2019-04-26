@@ -51,6 +51,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('vms/{vmId}/tags/{key}', 'TagController@showVMTag');
     $router->patch('vms/{vmId}/tags/{key}', 'TagController@updateVMTag');
     $router->delete('vms/{vmId}/tags/{key}', 'TagController@destroyVMTag');
+    $router->post('vms/{vmId}/encrypt', 'VirtualMachineController@encrypt');
+    $router->post('vms/{vmId}/decrypt', 'VirtualMachineController@decrypt');
+
 
 
     // Solution's

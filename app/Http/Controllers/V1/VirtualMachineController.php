@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\InsufficientCreditsException;
 use App\Services\AccountsService;
 use App\Solution\EncryptionBillingType;
+use App\VM\Status;
 use Illuminate\Support\Facades\Event;
 use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
@@ -1447,6 +1448,231 @@ class VirtualMachineController extends BaseController
         }
 
         return $this->respondEmpty(202);
+    }
+
+    /**
+     * Encrypt an existing virtual machine
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param AccountsService $accountsService
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws EncryptionServiceNotEnabledException
+     * @throws Exceptions\BadRequestException
+     * @throws Exceptions\NotFoundException
+     * @throws InsufficientCreditsException
+     * @throws ServiceResponseException
+     * @throws ServiceUnavailableException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function encrypt(
+        Request $request,
+        IntapiService $intapiService,
+        AccountsService $accountsService,
+        $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        if ($virtualMachine->type() == 'Public') {
+            throw new EncryptionServiceNotEnabledException(
+                'Encryption service is not available for eCloud Public at this time.'
+            );
+        }
+
+        (new CanModifyResource($virtualMachine->solution))->validate();
+
+        // Check of the vm is already encrypted
+        if ($virtualMachine->servers_encrypted == 'Yes') {
+            throw new Exceptions\BadRequestException('The virtual machine is already encrypted.');
+        }
+
+        // Check encryption is enabled on the solution
+        if (!$virtualMachine->solution->encryptionEnabled()) {
+            throw new EncryptionServiceNotEnabledException(
+                'Encryption service is not enabled on this solution.'
+            );
+        }
+
+        $allocateEncryptionCredit = false;
+
+        // PAYG or contract?
+        if ($virtualMachine->solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
+            // Check there are encryption credits available
+            $credits = $accountsService
+                ->scopeResellerId($virtualMachine->servers_reseller_id)
+                ->getVmEncryptionCredits();
+            if (!$credits) {
+                throw new ServiceUnavailableException('Unable to load product credits.');
+            }
+            if ($credits->remaining < 1) {
+                throw new InsufficientCreditsException();
+            }
+
+            $allocateEncryptionCredit = true;
+        }
+
+        // Update the status of the VM
+        $virtualMachine->setStatus(Status::ENCRYPTING);
+
+        // Fire off automation request
+        try {
+            $intapiService->automationRequest(
+                'encrypt_vm', //todo: automation needs creating
+                'server',
+                $virtualMachine->getKey(),
+                [],
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                $request->user->applicationId
+            );
+
+            $intapiData = $intapiService->getResponseData();
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        }
+
+        if (!$intapiData->result) {
+            $error_msg = $intapiService->getFriendlyError(
+                is_array($intapiData->errorset->error) ?
+                    end($intapiData->errorset->error) :
+                    $intapiData->errorset->error
+            );
+
+            throw new ServiceResponseException($error_msg);
+        }
+        $headers = [];
+        if ($request->user->isAdministrator) {
+            $headers = [
+                'X-AutomationRequestId' => $intapiData->automation_request->id
+            ];
+        }
+
+        // Allocate the credit
+        if ($allocateEncryptionCredit) {
+            $result = $accountsService
+                ->scopeResellerId($virtualMachine->servers_reseller_id)
+                ->assignVmEncryptionCredit($virtualMachine->getKey());
+
+            if (!$result) {
+                Log::critical(
+                    'Failed to assign credit when encrypting Virtual Machine.',
+                    [
+                        'id' => $virtualMachine->getKey(),
+                        'reseller_id' => $virtualMachine->servers_reseller_id,
+                        'credits_available' => $credits->remaining
+                    ]
+                );
+            }
+        }
+
+        return $this->respondEmpty(202, $headers);
+    }
+
+    /**
+     * Decrypt an existing virtual machine
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param AccountsService $accountsService
+     * @param $vmId
+     * @return \Illuminate\Http\Response
+     * @throws EncryptionServiceNotEnabledException
+     * @throws Exceptions\BadRequestException
+     * @throws Exceptions\NotFoundException
+     * @throws ServiceUnavailableException
+     * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws ServiceResponseException
+     */
+    public function decrypt(
+        Request $request,
+        IntapiService $intapiService,
+        AccountsService $accountsService,
+        $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        if ($virtualMachine->type() == 'Public') {
+            throw new EncryptionServiceNotEnabledException(
+                'Encryption service is not available for eCloud Public at this time.'
+            );
+        }
+
+        (new CanModifyResource($virtualMachine->solution))->validate();
+
+        // Check of the vm is already encrypted
+        if ($virtualMachine->servers_encrypted == 'No') {
+            throw new Exceptions\BadRequestException('The virtual machine is already encrypted.');
+        }
+
+        // Check encryption is enabled on the solution
+        if (!$virtualMachine->solution->encryptionEnabled()) {
+            throw new EncryptionServiceNotEnabledException(
+                'Encryption service is not enabled on this solution.'
+            );
+        }
+
+        $deallocateEncryptionCredit = false;
+
+        // PAYG or contract?
+        if ($virtualMachine->solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
+            $deallocateEncryptionCredit = true;
+        }
+
+        // Update the status of the VM
+        $virtualMachine->setStatus(Status::DECRYPTING);
+
+        // Fire off automation request
+        try {
+            $intapiService->automationRequest(
+                'decrypt_vm', //todo: automation needs creating
+                'server',
+                $virtualMachine->getKey(),
+                [],
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                $request->user->applicationId
+            );
+
+            $intapiData = $intapiService->getResponseData();
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
+        }
+
+        if (!$intapiData->result) {
+            $error_msg = $intapiService->getFriendlyError(
+                is_array($intapiData->errorset->error) ?
+                    end($intapiData->errorset->error) :
+                    $intapiData->errorset->error
+            );
+
+            throw new ServiceResponseException($error_msg);
+        }
+        $headers = [];
+        if ($request->user->isAdministrator) {
+            $headers = [
+                'X-AutomationRequestId' => $intapiData->automation_request->id
+            ];
+        }
+
+        // Deallocate encryption credit
+        if ($deallocateEncryptionCredit) {
+            $result = $accountsService
+                ->scopeResellerId($virtualMachine->servers_reseller_id)
+                ->refundVmEncryptionCredit($virtualMachine->getKey());
+
+            if (!$result) {
+                Log::critical(
+                    'Failed to refund encryption credit when decrypting virtual machine',
+                    [
+                        'id' => $virtualMachine->getKey(),
+                        'reseller_id' => $virtualMachine->servers_reseller_id
+                    ]
+                );
+            }
+        }
+
+        return $this->respondEmpty(202, $headers);
     }
 
 
