@@ -20,9 +20,9 @@ class PostTest extends TestCase
         parent::setUp();
     }
 
-    public function testPublicCreateDisabled()
+    public function testPublicDeployDisabled()
     {
-        $this->json('POST', '/v1/vms/', [
+        $this->json('POST', '/v1/vms', [
             'environment' => 'Public',
         ], [
             'X-consumer-custom-id' => '1-1',
@@ -32,32 +32,67 @@ class PostTest extends TestCase
         $this->assertResponseStatus(403);
     }
 
-//    todo need to mock kingpin/intapi services
-//    public function testHybridCreate()
+    public function testBurstDeployDisabled()
+    {
+        $this->json('POST', '/v1/vms', [
+            'environment' => 'Burst',
+        ], [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(403);
+    }
+
+//    /**
+//     * @runTestsInSeparateProcesses
+//     */
+//    public function testHybridDeploy()
 //    {
-//        $this->missingFromDatabase('servers', [
-//            'servers_id' => 123,
-//        ]);
-//
 //        factory(Solution::class, 1)->create([
 //            'ucs_reseller_id' => 12345,
 //        ]);
 //
+//
+//        //lets get mockery...
+//
+//        $mockDatastore = (object) [
+//            'uuid' => 'Datastore-datastore-01',
+//            'name' => 'MCS_PX_VV_12345_DATA_01',
+//            'type' => 'VMFS',
+//            'capacity' => 1024,
+//            'freeSpace' => 1024,
+//            'uncommitted' => 0,
+//            'provisioned' => 0,
+//            'available' => 1024,
+//            'used' => 0,
+//        ];
+//
+//
+//        \Mockery::mock('overload:KingpinService')
+//            ->shouldReceive('getDatastores')->andReturn([
+//                $mockDatastore
+//            ]);
+//
+//        \Mockery::mock('overload:KingpinService')
+//            ->shouldReceive('getDatastore')->andReturn($mockDatastore);
+//
+//
+//
+//        // test the api
 //        $this->json('POST', '/v1/vms/', [
 //            'environment' => 'Hybrid',
 //            'template' => 'CentOS 7 64-bit',
 //            'solution_id' => '12345',
 //            'cpu' => 1,
 //            'ram' => 2,
-//            'hdd' => 30,
+//            'hdd' => 20,
 //        ], [
 //            'X-consumer-custom-id' => '1-1',
 //            'X-consumer-groups' => 'ecloud.write',
 //        ]);
 //
-//        dd($this->response->getContent());
-//
-//        $this->assertResponseStatus(403);
+//        $this->assertResponseStatus(201);
 //    }
 
     public function testPublicCloneDisabled()
@@ -95,33 +130,6 @@ class PostTest extends TestCase
     }
 
 
-    public function testInvalidSSHPublicKey()
-    {
-        factory(Solution::class, 1)->create();
-        $solution = Solution::query()->first();
-        $data = [
-            'environment' => 'Hybrid',
-	        'cpu' => 2,
-	        'ram' => 2,
-	        'hdd' => 20,
-	        'solution_id' => $solution->getKey(),
-	        "template"  => 'CentOS 7 64-bit',
-	        'ssh_keys' => [
-                'THIS IS AN INVALID SSH PUBLIC KEY'
-            ]
-        ];
-
-        $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
-            ->seeStatusCode(422)
-            ->seeJson(
-                [
-                    'title' => 'Validation Error',
-                    'detail' => 'ssh_keys.0 is not a valid SSH Public key',
-                    'status' => 422
-                ]
-            );
-    }
-
     public function testValidSSHPublicKey()
     {
         $data = [
@@ -136,5 +144,32 @@ class PostTest extends TestCase
         ]);
 
         $this->assertTrue($validator->passes());
+    }
+
+    public function testInvalidSSHPublicKey()
+    {
+        factory(Solution::class, 1)->create();
+        $solution = Solution::query()->first();
+        $data = [
+            'environment' => 'Hybrid',
+            'cpu' => 2,
+            'ram' => 2,
+            'hdd' => 20,
+            'solution_id' => $solution->getKey(),
+            "template"  => 'CentOS 7 64-bit',
+            'ssh_keys' => [
+                'THIS IS AN INVALID SSH PUBLIC KEY'
+            ]
+        ];
+
+        $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
+            ->seeStatusCode(422)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'ssh_keys.0 is not a valid SSH Public key',
+                    'status' => 422
+                ]
+            );
     }
 }

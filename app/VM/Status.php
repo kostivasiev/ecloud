@@ -137,6 +137,11 @@ class Status
     const DECRYPTING = 'Decrypting';
 
     /**
+     *
+     */
+    const RESIZING = 'Resizing';
+
+    /**
      * Return class constants
      * @return array
      * @throws \ReflectionException
