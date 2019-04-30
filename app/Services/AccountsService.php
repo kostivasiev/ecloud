@@ -14,7 +14,7 @@ class AccountsService extends AbstractApioService
      * Service Name
      * @var string
      */
-    protected $serviceName = 'account';
+    protected $serviceName = 'accounts';
 
     /**
      * Get VM encryption credit info
