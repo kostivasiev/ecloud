@@ -40,10 +40,15 @@ abstract class AbstractApioService
     /**
      * AbstractApioService constructor.
      * @param $client
+     * @throws \Exception
      */
     public function __construct(Client $client)
     {
         $this->client = $client;
+
+        if (empty($this->serviceName)) {
+            throw new \Exception('Service Not Defined');
+        }
 
         $this->headers = [
             'User-Agent'           => 'service-' . env('APP_NAME') . '/1.0',
