@@ -11,12 +11,6 @@ use GuzzleHttp\Exception\TransferException;
 class AccountsService extends AbstractApioService
 {
     /**
-     * API version
-     * @var string
-     */
-    protected $api_version = "v1";
-
-    /**
      * Get VM encryption credit info
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -24,7 +18,7 @@ class AccountsService extends AbstractApioService
     public function getVmEncryptionCredits()
     {
         try {
-            $response = $this->makeRequest('GET', 'credits/ecloud_vm_encryption');
+            $response = $this->makeRequest('GET', 'v1/credits/ecloud_vm_encryption');
 
             if ($response->getStatusCode() !== 200) {
                 return false;
@@ -47,7 +41,7 @@ class AccountsService extends AbstractApioService
         try {
             $data = ['resource_id' => $serverId];
 
-            $response = $this->makeRequest('POST', 'credits/ecloud_vm_encryption', $data);
+            $response = $this->makeRequest('POST', 'v1/credits/ecloud_vm_encryption', $data);
 
             return ($response->getStatusCode() == 204);
         } catch (TransferException $exception) {
@@ -64,7 +58,7 @@ class AccountsService extends AbstractApioService
     public function refundVmEncryptionCredit(Int $serverId): bool
     {
         try {
-            $response = $this->makeRequest('DELETE', 'credits/ecloud_vm_encryption/' . $serverId);
+            $response = $this->makeRequest('DELETE', 'v1/credits/ecloud_vm_encryption/' . $serverId);
 
             return ($response->getStatusCode() == 204);
         } catch (TransferException $exception) {

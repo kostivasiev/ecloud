@@ -10,12 +10,6 @@ use GuzzleHttp\Exception\TransferException;
 abstract class AbstractApioService
 {
     /**
-     * Default API version
-     * @var string
-     */
-    protected $api_version = "v1";
-
-    /**
      * @var Client
      */
     protected $client;
@@ -94,7 +88,7 @@ abstract class AbstractApioService
         try {
             return $this->response = $this->client->request(
                 $method,
-                '/' . $this->api_version . '/' . $endpoint,
+                $endpoint,
                 array_merge_recursive([
                     'debug'   => false,
                     'headers' => $this->headers
