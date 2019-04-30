@@ -33,6 +33,11 @@ abstract class AbstractApioService
     protected $lastError = null;
 
     /**
+     * @var string
+     */
+    protected $serviceName = '';
+
+    /**
      * AbstractApioService constructor.
      * @param $client
      */
@@ -43,7 +48,8 @@ abstract class AbstractApioService
         $this->headers = [
             'User-Agent'           => 'service-' . env('APP_NAME') . '/1.0',
             'Accept'               => 'application/json',
-            'X-consumer-custom-id' => '0-0'
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => $this->serviceName . '.write'
         ];
     }
 
