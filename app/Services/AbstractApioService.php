@@ -33,17 +33,28 @@ abstract class AbstractApioService
     protected $lastError = null;
 
     /**
+     * @var string
+     */
+    protected $serviceName = '';
+
+    /**
      * AbstractApioService constructor.
      * @param $client
+     * @throws \Exception
      */
     public function __construct(Client $client)
     {
         $this->client = $client;
 
+        if (empty($this->serviceName)) {
+            throw new \Exception('Service Not Defined');
+        }
+
         $this->headers = [
             'User-Agent'           => 'service-' . env('APP_NAME') . '/1.0',
             'Accept'               => 'application/json',
-            'X-consumer-custom-id' => '0-0'
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => $this->serviceName . '.write'
         ];
     }
 

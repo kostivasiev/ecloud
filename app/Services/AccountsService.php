@@ -11,6 +11,12 @@ use GuzzleHttp\Exception\TransferException;
 class AccountsService extends AbstractApioService
 {
     /**
+     * Service Name
+     * @var string
+     */
+    protected $serviceName = 'account';
+
+    /**
      * Get VM encryption credit info
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
