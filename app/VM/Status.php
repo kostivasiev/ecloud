@@ -2,6 +2,8 @@
 
 namespace App\VM;
 
+use ReflectionClass;
+
 class Status
 {
     /**
@@ -125,7 +127,27 @@ class Status
     const CLONING_TO_TEMPLATE = 'Cloning To Template';
 
     /**
+     * The VM is currently being encrypted
+     */
+    const ENCRYPTING = 'Encrypting';
+
+    /**
+     * The VM is currently being decrypted
+     */
+    const DECRYPTING = 'Decrypting';
+
+    /**
      *
      */
     const RESIZING = 'Resizing';
+
+    /**
+     * Return class constants
+     * @return array
+     * @throws \ReflectionException
+     */
+    public static function all()
+    {
+        return (new ReflectionClass(static::class))->getConstants();
+    }
 }

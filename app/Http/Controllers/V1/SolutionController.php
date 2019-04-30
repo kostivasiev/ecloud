@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
+use App\Exceptions\V1\ServiceUnavailableException;
+use App\Services\AccountsService;
 use App\Solution\CanModifyResource;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -77,6 +79,7 @@ class SolutionController extends BaseController
      * @throws DatabaseException
      * @throws SolutionNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \ReflectionException
      */
     public function update(Request $request, $solutionId)
     {
@@ -87,7 +90,7 @@ class SolutionController extends BaseController
 
         (new CanModifyResource($solution))->validate();
 
-        $rules = Solution::$rules;
+        $rules = Solution::getRules();
         $rules = array_merge(
             $rules,
             [

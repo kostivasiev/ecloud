@@ -67,7 +67,9 @@ $app->singleton(
 
 $app->routeMiddleware([
     'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
-    'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class
+    'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
+    'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
+    'is-administrator' => \App\Http\Middleware\IsAdministrator::class
 ]);
 
 /*
@@ -90,13 +92,13 @@ $app->register(App\Providers\KingpinServiceProvider::class);
 
 // APIo service providers
 $app->register(App\Providers\NetworkingServiceProvider::class);
+$app->register(App\Providers\AccountsServiceProvider::class);
 
 // intAPI
 $app->register(App\Providers\IntapiServiceProvider::class);
 
 // Event Service provider
 $app->register(App\Providers\EventServiceProvider::class);
-
 
 /*
 |--------------------------------------------------------------------------
