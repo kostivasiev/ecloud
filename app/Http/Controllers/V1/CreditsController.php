@@ -22,7 +22,6 @@ class CreditsController extends BaseController
      * @param Request $request
      * @param AccountsService $accountsService
      * @return \Illuminate\Http\Response
-     * @throws ServiceUnavailableException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function index(Request $request, AccountsService $accountsService)
@@ -31,7 +30,7 @@ class CreditsController extends BaseController
         $credits = $accountsService->scopeResellerId($this->resellerId)->getVmEncryptionCredits();
 
         if (!$credits) {
-            throw new ServiceUnavailableException('Unable to load product credits.');
+            $credits = [];
         }
 
         $credits = collect([$credits]);
