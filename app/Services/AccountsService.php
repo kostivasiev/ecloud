@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Exception\TransferException;
+use Liquid\Exception\NotFoundException;
 
 /**
  * Class AccountsService
