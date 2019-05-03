@@ -326,16 +326,7 @@ class ApplianceController extends BaseController
 
         $appliance = static::getApplianceById($request, $request->input('appliance_id'));
 
-        // Validate that the VM template associated with the Appliance is on the Pod
         $latestVersion = $appliance->getLatestVersion();
-        try {
-            $template = TemplateController::getTemplateByName($latestVersion->vm_template, $pod);
-        } catch (TemplateNotFoundException $exception) {
-            throw new TemplateNotFoundException(
-                'The VM template \'' . $latestVersion->vm_template
-                . '\' associated with this Application\'s latest version was not found on this Pod'
-            );
-        }
 
         $row = new AppliancePodAvailability();
         $row->appliance_id = $appliance->id;
