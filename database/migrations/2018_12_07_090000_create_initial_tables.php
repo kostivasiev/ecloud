@@ -26,10 +26,13 @@ class CreateInitialTables extends Migration
         Schema::create('ucs_reseller', function (Blueprint $table) {
             $table->increments('ucs_reseller_id');
             $table->integer('ucs_reseller_reseller_id');
-            $table->integer('ucs_reseller_datacentre_id');
-            $table->string('ucs_reseller_solution_name');
             $table->string('ucs_reseller_active');
+            $table->string('ucs_reseller_solution_name');
             $table->string('ucs_reseller_status');
+            $table->integer('ucs_reseller_datacentre_id');
+            $table->string('ucs_reseller_encryption_enabled')->default('No');
+            $table->string('ucs_reseller_encryption_default')->default('No');
+            $table->string('ucs_reseller_encryption_billing_type')->default('PAYG');
             $table->dateTime('ucs_reseller_start_date')->default('0000-00-00 00:00:00');
         });
 

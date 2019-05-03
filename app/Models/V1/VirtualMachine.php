@@ -3,6 +3,8 @@
 namespace App\Models\V1;
 
 use App\Exceptions\V1\KingpinException;
+use App\VM\Exceptions\UnrecognisedVmStateException;
+use App\VM\Status;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Scopes\ECloudVmServersScope;
@@ -830,6 +832,19 @@ class VirtualMachine extends Model implements Filterable, Sortable
     }
 
     /**
+     * Is the VM on a shared cluster
+     * @return bool
+     */
+    public function inSharedEnvironment()
+    {
+        if (in_array($this->type(), ['Public', 'Burst'])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Is the vm a managed device
      *
      * @return boolean
@@ -909,5 +924,24 @@ class VirtualMachine extends Model implements Filterable, Sortable
         $installationDate = new \DateTime($this->servers_installation_date);
 
         return ($installationDate < $v2GoLiveDate);
+    }
+
+    /**
+     * Set the VM's current status
+     * @param string $status
+     * @return VirtualMachine
+     * @throws UnrecognisedVmStateException
+     * @throws \ReflectionException
+     */
+    public function setStatus(string $status)
+    {
+        if (!in_array($status, Status::all())) {
+            throw new UnrecognisedVmStateException($status);
+        }
+
+        $this->servers_status = $status;
+        $this->save();
+
+        return $this;
     }
 }

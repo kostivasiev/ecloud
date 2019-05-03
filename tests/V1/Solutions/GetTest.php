@@ -4,13 +4,14 @@ namespace Tests\Solutions;
 
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Laravel\Lumen\Testing\DatabaseTransactions;
 
 use App\Models\V1\Solution;
 use App\Models\V1\Tag;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, DatabaseTransactions;
 
     public function setUp(): void
     {
@@ -49,6 +50,16 @@ class GetTest extends TestCase
     public function testInvalidItem()
     {
         $this->get('/v1/solutions/abc', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(404);
+    }
+
+    public function testInvalidSolutionVmCollection()
+    {
+        $this->get('/v1/solutions/12345/vms', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);

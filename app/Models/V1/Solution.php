@@ -4,8 +4,10 @@ namespace App\Models\V1;
 
 use App\Exceptions\V1\KingpinException;
 use App\Exceptions\V1\SolutionNotFoundException;
+use App\Solution\EncryptionBillingType;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Validation\Rule;
 use UKFast\Api\Resource\Property\DateProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
@@ -88,6 +90,18 @@ class Solution extends Model implements Filterable, Sortable
         'encryption_default' => ['nullable', 'boolean'],
     ];
 
+    /**
+     * Return model (Create) validation rules
+     * @return array
+     * @throws \ReflectionException
+     */
+    public static function getRules()
+    {
+        $rules = static::$rules;
+        $rules['encryption_billing_type'] = ['sometimes', Rule::in(EncryptionBillingType::all())];
+        return $rules;
+    }
+
 
     /**
      * Ditto configuration
@@ -120,7 +134,8 @@ class Solution extends Model implements Filterable, Sortable
             'can_move_between_luns' => 'ucs_reseller_can_move_between_luns',
             'saleorder_id' => 'ucs_reseller_saleorder_id',
             'encryption_enabled' => 'ucs_reseller_encryption_enabled',
-            'encryption_default' => 'ucs_reseller_encryption_default'
+            'encryption_default' => 'ucs_reseller_encryption_default',
+            'encryption_billing_type' => 'ucs_reseller_encryption_billing_type'
         ];
     }
 
@@ -151,6 +166,7 @@ class Solution extends Model implements Filterable, Sortable
             $factory->create('saleorder_id', Filter::$numericDefaults),
             $factory->boolean()->create('encryption_enabled', 'Yes', 'No'),
             $factory->boolean()->create('encryption_default', 'Yes', 'No'),
+            $factory->create('encryption_billing_type', Filter::$stringDefaults),
         ];
     }
 
@@ -182,7 +198,8 @@ class Solution extends Model implements Filterable, Sortable
             $factory->create('can_move_between_luns'),
             $factory->create('saleorder_id'),
             $factory->create('encryption_enabled'),
-            $factory->create('encryption_default')
+            $factory->create('encryption_default'),
+            $factory->create('encryption_billing_type')
         ];
     }
 
@@ -240,6 +257,7 @@ class Solution extends Model implements Filterable, Sortable
             BooleanProperty::create('ucs_reseller_encryption_enabled', 'encryption_enabled', null, 'Yes', 'No'),
             BooleanProperty::create('ucs_reseller_can_move_between_luns', 'can_move_between_luns', null, 'Yes', 'No'),
             BooleanProperty::create('ucs_reseller_encryption_default', 'encryption_default', null, 'Yes', 'No'),
+            StringProperty::create('ucs_reseller_encryption_billing_type', 'encryption_billing_type'),
         ];
     }
 
@@ -529,5 +547,23 @@ class Solution extends Model implements Filterable, Sortable
     public function encryptionEnabled()
     {
         return ($this->ucs_reseller_encryption_enabled == 'Yes');
+    }
+
+    /**
+     * Determines the billing type for encryption on the solution
+     * @return mixed
+     */
+    public function encryptionBillingType()
+    {
+        return $this->ucs_reseller_encryption_billing_type;
+    }
+
+    /**
+     * Return the reseller id from the solution
+     * @return mixed
+     */
+    public function resellerId()
+    {
+        return $this->ucs_reseller_reseller_id;
     }
 }
