@@ -3,8 +3,12 @@
 namespace App\Listeners\V1;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
+use App\Exceptions\V1\ServiceResponseException;
+use App\Exceptions\V1\ServiceUnavailableException;
 use Illuminate\Http\Request;
 use Log;
+use App\Services\IntapiService;
+use App\Exceptions\V1\IntapiServiceException;
 
 /**
  * Class EncryptionEnabledOnSolutionListener
@@ -14,37 +18,62 @@ class EncryptionEnabledOnSolutionListener
 {
     public $request;
 
+    public $intapiService;
+
     /**
      * Create the event listener.
      *
      * @param Request $request
+     * @param IntapiService $intapiService
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, IntapiService $intapiService)
     {
         $this->request = $request;
+        $this->intapiService = $intapiService;
     }
 
     public function handle(EncryptionEnabledOnSolutionEvent $event)
     {
-        // Log the appliance deletion
+        // Fire off automation request
+        try {
+            $this->intapiService->automationRequest(
+                'solution_encryption_enable',
+                'ucs_reseller',
+                $event->solution->getKey(),
+                [],
+                'ecloud_ucs_' . $event->solution->pod->getKey(),
+                $this->request->user->applicationId
+            );
+
+            $intapiData = $this->intapiService->getResponseData();
+        } catch (IntapiServiceException $exception) {
+            $this->resetSolutionEncryptionFlag($event->solution);
+
+            throw new ServiceUnavailableException('Unable to schedule solution changes');
+        }
+
+        if (!$intapiData->result) {
+            $errorMessage = is_array($intapiData->errorset->error) ?
+                end($intapiData->errorset->error) :
+                $intapiData->errorset->error;
+
+            $this->resetSolutionEncryptionFlag($event->solution);
+
+            throw new ServiceResponseException($errorMessage);
+        }
+
         Log::info(
-            'Virtual machine encryption was enabled on solution',
+            'Virtual machine encryption was enabled on Solution',
             [
                 'id' => $event->solution->getKey(),
                 'reseller_id' => $this->request->user->resellerId
             ]
         );
+    }
 
-
-//        //  Send email to the backup team to let them know, as backup changes are required
-//
-//        $to = "paul.mcnally@ukfast.co.uk";
-//        $subject = 'Virtual machine encryption enabled on eCloud solution';
-//
-//        $content = 'Virtual machine encryption enabled on eCloud solution # ' . $event->solution->getKey();
-//
-//        $headers = "From: alerts@ukfast.co.uk.co.uk" . "\r\n";
-//
-//        mail($to,$subject,$content,$headers);
+    private function resetSolutionEncryptionFlag($solution)
+    {
+        $solution->ucs_reseller_encryption_enabled = 'No';
+        $solution->save();
     }
 }
