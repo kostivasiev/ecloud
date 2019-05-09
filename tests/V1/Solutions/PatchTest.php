@@ -2,6 +2,8 @@
 
 namespace Tests\Solutions;
 
+use App\Events\V1\EncryptionEnabledOnSolutionEvent;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -91,7 +93,8 @@ class PatchTest extends TestCase
 
     public function testEnableEncryption()
     {
-        factory(Solution::class, 1)->create([
+        Event::fake();
+        $solution = factory(Solution::class, 1)->create([
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_enabled' => 'No'
         ]);
@@ -102,12 +105,17 @@ class PatchTest extends TestCase
         ]);
 
 
-        $this->json('PATCH', '/v1/solutions/123', [
+        $res = $this->json('PATCH', '/v1/solutions/123', [
             'encryption_enabled' => true,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ]);
+
+
+        Event::assertDispatched(EncryptionEnabledOnSolutionEvent::class, function ($e) use ($solution) {
+            return $e->solution->ucs_reseller_id === $solution->first()->ucs_reseller_id;
+        });
 
         $this->assertResponseStatus(204);
 
