@@ -109,11 +109,16 @@ class SolutionController extends BaseController
         $request['id'] = $solutionId;
         $this->validate($request, $rules);
 
+        $encryptionStatus = $solution->ucs_reseller_encryption_enabled;
+
         $solution = $this->receiveItem($request, Solution::class);
 
         $solution->resource->save();
 
-        if ($request->has('encryption_enabled') && $request->input('encryption_enabled') === true) {
+        if ($request->has('encryption_enabled')
+            && $request->input('encryption_enabled') === true
+            && ($encryptionStatus == 'No') // Only fire off the automation if the encryption was not already enabled.
+        ) {
             Event::fire(new EncryptionEnabledOnSolutionEvent($solution->resource));
         }
 
