@@ -118,6 +118,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliances/{appliance_id}/versions', 'ApplianceController@versions');
     $router->get('appliances/{appliance_id}/version', 'ApplianceController@latestVersion');
     $router->get('appliances/{appliance_id}/parameters', 'ApplianceController@latestVersionParameters');
+    $router->get('appliances/{appliance_id}/pods', 'ApplianceController@pods');
     $router->post('appliances', 'ApplianceController@create');
     $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
     $router->delete('appliances/{appliance_id}', 'ApplianceController@delete');
