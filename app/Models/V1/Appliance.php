@@ -140,6 +140,7 @@ class Appliance extends Model implements Filterable, Sortable
     public function filterableColumns(FilterFactory $factory)
     {
         return [
+            $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('version', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),

@@ -301,6 +301,42 @@ class ApplianceController extends BaseController
         );
     }
 
+    /**
+     * List the Pods that an appliance is available on
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     */
+    public function pods(Request $request, $applianceId)
+    {
+        $appliance = static::getApplianceById($request, $applianceId);
+
+        $podIds = AppliancePodAvailability::select('appliance_pod_availability_ucs_datacentre_id')->where(
+            'appliance_pod_availability_appliance_id',
+            '=',
+            $appliance->appliance_id
+        )->get()->toArray();
+
+        // Get the one-click enabled pods this way to avoid cross database query
+        $podsQuery = Pod::query()->whereIn('ucs_datacentre_id', $podIds);
+
+        if (!$this->isAdmin) {
+            // Limit to one-click enabled pods
+            $podsQuery->where('ucs_datacentre_oneclick_enabled', '=', 'Yes');
+        }
+
+        (new QueryTransformer($request))
+            ->config(Pod::class)
+            ->transform($podsQuery);
+
+        $pods = $podsQuery->paginate($this->perPage);
+
+        return $this->respondCollection(
+            $request,
+            $pods
+        );
+    }
 
     /**
      * Add an appliance to a pod
