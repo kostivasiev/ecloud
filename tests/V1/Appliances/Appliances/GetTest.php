@@ -2,6 +2,8 @@
 
 namespace Tests\Appliances\Appliances;
 
+use App\Models\V1\AppliancePodAvailability;
+use App\Models\V1\Pod;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use Ramsey\Uuid\Uuid;
@@ -123,6 +125,27 @@ class GetTest extends ApplianceTestCase
                 'script_template' => $version->script_template,
                 'vm_template' => $version->vm_template,
                 'active' => ($version->active == 'Yes')
+            ]);
+    }
+
+    /**
+     * Test listing pods that an appliance is on
+     */
+    public function testPodsApplianceIsOn()
+    {
+        $appliance = $this->appliances[0];
+
+        $pod = factory(Pod::class, 1)->create();
+
+        $appliancePodAvailability = new AppliancePodAvailability();
+        $appliancePodAvailability->appliance_id = $appliance->appliance_id;
+        $appliancePodAvailability->ucs_datacentre_id = 1;
+        $appliancePodAvailability->save();
+
+        $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/pods', [], $this->validWriteHeaders)
+            ->seeStatusCode(200)
+            ->seeJson([
+                'id' => $pod[0]->getKey()
             ]);
     }
 
