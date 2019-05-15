@@ -1247,14 +1247,6 @@ class VirtualMachineController extends BaseController
             $totalCapacity += $diskData->capacity;
         }
 
-        if ($totalCapacity < $virtualMachine->servers_hdd) {
-            $underprovision = ($virtualMachine->servers_hdd - $totalCapacity);
-            throw new Exceptions\ForbiddenException(
-                'HDD capacity for virtual machine under-provisioned by '. $underprovision .'GB.'
-                .' Total HDD capacity must be ' . $virtualMachine->servers_hdd . 'GB or greater.'
-            );
-        }
-
         $maxCapacity = $maxHdd;
         if ($virtualMachine->inSharedEnvironment()) {
             $maxCapacity = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
