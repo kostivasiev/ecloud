@@ -259,11 +259,20 @@ class KingpinService
             if (!empty($this->responseData->disks)) {
                 foreach ($this->responseData->disks as $disk) {
                     $hdd = new \StdClass();
+
+                    if (isset($disk->scsiCanonicalName)) {
+                        $hdd->uuid   = $disk->scsiCanonicalName;
+                    } else {
+                        $hdd->uuid   = $disk->uuid;
+                    }
+
                     $hdd->name = $disk->name;
-                    $hdd->capacity = $disk->capacityGB;
+
                     $hdd->type = $disk->type;
-                    $hdd->uuid = $disk->uuid;
                     $hdd->key = $disk->key;
+
+                    $hdd->capacity = $disk->capacityGB;
+
                     $hdds[] = $hdd;
                 }
             }
