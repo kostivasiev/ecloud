@@ -55,6 +55,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
     const MAX_HDD = 300;
     const MAX_HDD_COUNT = 20;
 
+    const MAX_MBR_PARTITION = 2000;
+
     protected $attributes = array(
         'servers_use_ip_management' => 'Yes',
     );
