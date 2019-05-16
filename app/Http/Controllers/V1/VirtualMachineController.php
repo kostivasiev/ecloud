@@ -1162,6 +1162,12 @@ class VirtualMachineController extends BaseController
                             throw new Exceptions\ForbiddenException($message);
                         }
 
+                        // Don't allow deletion of RDM disks
+                        if ($existingDisks[$hdd->uuid]->type != 'Flat') {
+                            $message = 'Unable to delete cluster disk ('.$hdd->name.')';
+                            throw new Exceptions\ForbiddenException($message);
+                        }
+
                         $resizeRequired = true;
                         $hdd->capacity = 'deleted';
                         $automationData['hdd'][$hdd->name] = $hdd;
@@ -1185,6 +1191,15 @@ class VirtualMachineController extends BaseController
                         && $hdd->name == 'Hard disk 1'
                         && $hdd->capacity > $existingDisks[$hdd->uuid]->capacity) {
                         $message = 'Unable to expand Hard Disk 1 on VMs with legacy LVM';
+                        throw new Exceptions\ForbiddenException($message);
+                    }
+
+                    // Prevent expand of RDM disks
+                    if ($existingDisks[$hdd->uuid]->type != 'Flat'
+                        && $hdd->capacity > $existingDisks[$hdd->uuid]->capacity) {
+                        $message = 'We are currently unable to expand cluster disks , ';
+                        $message .= "HDD '" . $hdd->uuid . "' value must be set to ";
+                        $message .= $existingDisks[$hdd->uuid]->capacity . "GB";
                         throw new Exceptions\ForbiddenException($message);
                     }
 

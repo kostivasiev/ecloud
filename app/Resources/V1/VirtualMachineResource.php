@@ -55,9 +55,15 @@ class VirtualMachineResource extends CustomResource
         if ($disks !== false && count($disks) > 0) {
             foreach ($disks as $disk) {
                 $hdd = new \StdClass();
-                $hdd->name = $disk->name;
                 $hdd->uuid = $disk->uuid;
+                $hdd->name = $disk->name;
+
+                // rename disk type to customer friendly wording
+                $hdd->type = ($disk->type=='Flat'?'Standard':'Cluster');
+                $hdd->key = $disk->key;
+
                 $hdd->capacity = $disk->capacity;
+
                 $hdds[] = $hdd;
             }
         }
