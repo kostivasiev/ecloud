@@ -24,15 +24,20 @@ class PatchTest extends ApplianceTestCase
         /**
          * Loop over each property and try and update it
          */
-        $testString = 'phpUnit test string';
+        $scriptTemplate = 'phpUnit test string';
+
+        $applianceVersion = $this->appliances[0]->getLatestVersion();
+
+        // Add teh required params to the script template
+        foreach ($applianceVersion->getParameterList(true) as $requiredParam) {
+            $scriptTemplate .= "{{{ $requiredParam }}} ";
+        }
 
         $stringProperty = [
             'version' => 9,
-            'script_template' => $testString,
-            'vm_template' => $testString
+            'script_template' => $scriptTemplate,
+            'vm_template' => 'sometemplate'
         ];
-
-        $applianceVersion = $this->appliances[0]->getLatestVersion();
 
         foreach ($stringProperty as $property => $newValue) {
             $this->missingFromDatabase(
