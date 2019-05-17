@@ -272,6 +272,7 @@ class ApplianceVersionController extends BaseController
      * @throws ForbiddenException
      * @throws InvalidJsonException
      * @throws UnprocessableEntityException
+     * @throws BadRequestException
      */
     public function update(Request $request, $applianceVersionId)
     {
@@ -284,11 +285,29 @@ class ApplianceVersionController extends BaseController
         }
 
         // Validate the appliance version exists
-        static::getApplianceVersionById($request, $applianceVersionId);
+        $applianceVersion = static::getApplianceVersionById($request, $applianceVersionId);
 
         $rules = ApplianceVersion::getUpdateRules();
         $request['id'] = $applianceVersionId;
         $this->validate($request, $rules);
+
+        if ($request->has('script_template')) {
+            $scriptVariables = self::getScriptVariables($request->input('script_template'));
+
+            // Load the required parameters and check that we have placeholders for them all in the script
+            $requiredParameters = $applianceVersion->getParameterList(true);
+
+            $missingRequiredParameters = array_diff($requiredParameters, $scriptVariables);
+
+            if (!empty($missingRequiredParameters)) {
+                $error_message = 'The following required parameters are missing from the script template: \''
+                    . implode("','", $missingRequiredParameters) . '\'';
+
+                throw new BadRequestException(
+                    $error_message
+                );
+            }
+        }
 
         //Do we want to change the Appliance the version is associated with?
         if ($request->has('appliance_id')) {

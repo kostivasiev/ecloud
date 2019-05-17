@@ -345,16 +345,14 @@ class ApplianceVersion extends Model implements Filterable, Sortable
      */
     public function getParameterList($requiredOnly = false)
     {
-        $params = [];
-        $parameters = $this->parameters()->get();
-        foreach ($parameters as $parameter) {
-            if ($requiredOnly && $parameter->required == 'No') {
-                continue;
-            }
-            $params[] = $parameter->key;
+        $parameters = $this->parameters();
+
+        if ($requiredOnly) {
+            $parameters->where('appliance_script_parameters_required', '=', 'Yes');
         }
 
-        return $params;
+        return $parameters->pluck('appliance_script_parameters_key')
+            ->toArray();
     }
 
     /**
