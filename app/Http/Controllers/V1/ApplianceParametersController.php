@@ -7,6 +7,7 @@ use App\Models\V1\ApplianceParameter;
 use App\Rules\V1\IsValidUuid;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\DatabaseException;
+use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
 use UKFast\Api\Exceptions\ForbiddenException;
 
@@ -87,6 +88,7 @@ class ApplianceParametersController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws UnprocessableEntityException
      */
     public function create(Request $request)
     {
@@ -94,30 +96,23 @@ class ApplianceParametersController extends BaseController
         $this->validate($request, $rules);
 
         //Validate the appliance exists
-        $applianceVersion = ApplianceVersionController::getApplianceVersionById(
+        ApplianceVersionController::getApplianceVersionById(
             $request,
             $request->input('version_id')
         );
 
-        $scriptVariables = applianceVersionController::getScriptVariables($applianceVersion->script_template);
-
-        //If the parameter is required, validate that the parameter key is present in the script template
-        $isRequired = true;
-        if ($request->has('required') && $request->input('required') === false) {
-            $isRequired = false;
-        }
-
-        // If the parameter is required and is not found in the script template, error.
-        if ($isRequired && !in_array($request->input('key'), $scriptVariables)) {
-            throw new BadRequestException(
-                'Required parameter \'' . $request->input('name') . '\' with key \''
-                . $request->input('key') . '\' was not found in script template. Please update the script template'
-                . ' if you wish to add a new required parameter, or consider creating a new version.'
-            );
-        }
-
         $applianceParameter = $this->receiveItem($request, ApplianceParameter::class);
-        if (!$applianceParameter->resource->save()) {
+
+        try {
+            $applianceParameter->resource->save();
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // 23000 Error code (Integrity Constraint Violation: parameter key already exists)
+            if ($exception->getCode() == 23000) {
+                throw new UnprocessableEntityException(
+                    'A parameter with that key already exists for this appliance version'
+                );
+            }
+
             throw new DatabaseException('Unable to save Appliance parameter.');
         }
 

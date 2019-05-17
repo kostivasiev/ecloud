@@ -78,7 +78,7 @@ class ApplianceParameter extends Model implements Filterable, Sortable
     {
         $rules = static::$rules;
         $rules['version_id'] = ['required', new IsValidUuid()];
-        $rules['validation_rule'] = ['filled', new IsValidValidationRule()];
+        $rules['validation_rule'] = ['nullable', new IsValidValidationRule()];
         return $rules;
     }
 
