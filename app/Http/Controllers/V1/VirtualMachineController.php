@@ -271,7 +271,6 @@ class VirtualMachineController extends BaseController
                     $request->request->add(['network_id' => $defaultNetwork->getKey()]);
                 }
             }
-
             // If encryption is enabled but no flag passed in, set to the solution default
             if ($solution->encryptionEnabled() && !$request->has('encrypt')) {
                 $encrypt_vm = ($solution->ucs_reseller_encryption_default == 'Yes');
@@ -497,9 +496,8 @@ class VirtualMachineController extends BaseController
         }
 
         if (isset($encrypt_vm)) {
-            $post_data['encrypt_vm'] = $encrypt_vm;
+            $post_data['encrypt_vm'] = ($encrypt_vm) ? 'true' : 'false';
         }
-
         // set template
         $post_data['platform'] = $platform;
         $post_data['license'] = $license;
