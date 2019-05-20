@@ -621,8 +621,8 @@ class VirtualMachineController extends BaseController
         }
 
         // remove debugging when ready to retest
-        print_r($post_data);
-        exit;
+//        print_r($post_data);
+//        exit;
         // ---
 
         // schedule automation
