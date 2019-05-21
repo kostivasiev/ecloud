@@ -115,6 +115,7 @@ class IntapiService
 
     public function getFriendlyError($error)
     {
+        Log::error('IntAPI error: ' . $error);
         switch ($error) {
             case (preg_match('/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/', $error, $matches) == true):
                 $ip_type = $matches[1];
