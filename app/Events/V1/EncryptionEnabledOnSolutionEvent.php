@@ -14,7 +14,7 @@ use App\Models\V1\Solution;
  */
 class EncryptionEnabledOnSolutionEvent extends Event
 {
-    public $appliance;
+    public $solution;
 
     /**
      * EncryptionEnabledOnSolutionEvent constructor.
