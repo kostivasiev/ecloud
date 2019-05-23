@@ -683,7 +683,15 @@ class VirtualMachineController extends BaseController
             }
         }
 
-        return $this->respondSave($request, $virtualMachine, 202, null, $headers);
+        // Add the VM credentials to the response
+        $credentials = $intapiData->data->credentials;
+        $response =  $this->respondSave($request, $virtualMachine, 202, null, $headers);
+        $content = $response->getOriginalContent();
+        $content['data']['credentials'] = is_array($credentials) ? $credentials : [$credentials];
+
+        $response->setContent($content);
+
+        return $response;
     }
 
     /**
