@@ -103,9 +103,11 @@ class DatastoreController extends BaseController
      * @param Request $request
      * @param $solutionId
      * @return \Illuminate\Http\Response
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
      */
     public function indexSolution(Request $request, $solutionId)
     {
+        SolutionController::getSolutionById($request, $solutionId);
         $collectionQuery = static::getDatastoreQuery($request)
             ->withSolution($solutionId);
 

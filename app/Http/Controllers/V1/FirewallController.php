@@ -63,9 +63,11 @@ class FirewallController extends BaseController
      * @param Request $request
      * @param $solutionId
      * @return mixed
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
      */
     public function getSolutionFirewalls(Request $request, $solutionId)
     {
+        SolutionController::getSolutionById($request, $solutionId);
         //$firewalls = $this->networkingService->getSolutionFirewalls($request, $solutionId);
 
         $collectionQuery = static::getFirewallQuery($request)
