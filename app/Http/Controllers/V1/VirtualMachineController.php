@@ -684,14 +684,10 @@ class VirtualMachineController extends BaseController
         }
 
         // Add the VM credentials to the response
+        $credentials = $intapiData->data->credentials;
         $response =  $this->respondSave($request, $virtualMachine, 202, null, $headers);
         $content = $response->getOriginalContent();
-        $content['data']['credentials'] = [
-            [
-            'username' => $intapiData->data->username,
-            'password' => $intapiData->data->password
-            ]
-        ];
+        $content['data']['credentials'] = is_array($credentials) ? $credentials : [$credentials];
 
         $response->setContent($content);
 
