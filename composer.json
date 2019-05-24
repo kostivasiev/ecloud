@@ -50,7 +50,7 @@
     ],
     "test": [
       "vendor/bin/phpunit",
-      "vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml",
+      "vendor/bin/phpmd --ignore-violations-on-exit app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml",
       "vendor/bin/phpcs --standard=vendor/ukfast/rulesets/CodeSniffer/UKFDefault.xml app"
     ]
   },
