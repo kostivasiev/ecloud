@@ -419,6 +419,26 @@ class KingpinService
         return $templates;
     }
 
+    /**
+     * Get a single solution template
+     * @param $solutionId
+     * @param $templateName
+     * @return array|bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getSolutionTemplate($solutionId, $templateName)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'template/' . $templateName;
+
+        try {
+            $this->makeRequest('GET', $url);
+            return !empty($this->responseData) ? $this->processTemplateData([$this->responseData])[0] : false;
+        } catch (TransferException $exception) {
+            return false;
+        }
+    }
+
 
     /**
      * Get the Virtual Machine 'System Templates' for a datacentre/pod
