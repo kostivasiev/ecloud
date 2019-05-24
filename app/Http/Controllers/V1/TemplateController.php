@@ -386,7 +386,7 @@ class TemplateController extends BaseController
         $tmp_template->hdd = (int) $template->size_gb;
 
         $tmp_template->license = 'Unknown';
-        $tmp_template->encrypted = $template->encrypted;
+        $tmp_template->encrypted = $template->encrypted ?? false;
 
         foreach ($template->hard_drives as $hard_drive) {
             $tmp_template->hdd_disks[] = (object)array(
@@ -533,7 +533,6 @@ class TemplateController extends BaseController
         return $templates;
     }
 
-
     /**
      * Get the Pod templates templates for this pod/datacentre
      *
@@ -643,21 +642,33 @@ class TemplateController extends BaseController
      * Retrieve a Solution template from a Solution by name
      * @param Solution $solution
      * @param $templateName
-     * @return bool|null
+     * @return bool|object
      */
     public static function getSolutionTemplateByName(Solution $solution, $templateName)
     {
+        try {
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->pod]);
+        } catch (\Exception $exception) {
+            //Failed to connect to Kingpin
+            return false;
+        }
+
+        $template = $kingpin->getSolutionTemplate($solution->getKey(), $templateName);
+
+        if (empty($template)) {
+            return false;
+        }
+
+        // Convert to public format
+        $template->type = 'Solution';
+        // Check the template license
+        $serverLicense = ServerLicense::checkTemplateLicense($solution->pod->getKey(), $template);
         $request = app('request');
         $TemplateController = new static($request);
-        $templates = $TemplateController->getSolutionTemplates($solution, false);
-        if (is_array($templates) and count($templates) > 0) {
-            $template = $TemplateController->findTemplateByName($templateName, $templates);
-            if ($template) {
-                return $template;
-            }
-        }
-        return false;
+
+        return $TemplateController->convertToPublicTemplate($template, $serverLicense);
     }
+
 
     /**
      * Find a template by it's name
