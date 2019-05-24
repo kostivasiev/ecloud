@@ -51,8 +51,9 @@
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
     "test": [
-      "phpunit",
-      "phpcs --standard=PSR2 app/"
+      "vendor/bin/phpunit",
+      "vendor/bin/phpmd app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml",
+      "vendor/bin/phpcs --standard=vendor/ukfast/rulesets/CodeSniffer/UKFDefault.xml app"
     ]
   },
   "config": {
