@@ -82,7 +82,6 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
 */
-$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 $app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\PaginationServiceProvider::class);
