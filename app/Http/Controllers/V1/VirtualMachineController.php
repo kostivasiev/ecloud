@@ -1321,6 +1321,7 @@ class VirtualMachineController extends BaseController
      * @throws Exceptions\UnprocessableEntityException
      * @throws ServiceUnavailableException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws Exceptions\DatabaseException
      */
     public function cloneToTemplate(Request $request, IntapiService $intapiService, $vmId)
     {
@@ -1396,11 +1397,11 @@ class VirtualMachineController extends BaseController
             $templateType = 'system';
         } else {
             // Clone to Solution template
-
+            $templateName = urldecode($request->input('template_name'));
             // Check whether the template name is already in use on this Solution.
             $existingTemplate = TemplateController::getSolutionTemplateByName(
                 $virtualMachine->solution,
-                $request->input('template_name')
+                $templateName
             );
 
             if (!empty($existingTemplate)) {
@@ -1452,7 +1453,7 @@ class VirtualMachineController extends BaseController
         }
 
         $automationData = [
-            'template_name' => $request->input('template_name'),
+            'template_name' => $templateName,
             'template_type' => $templateType,
             'datastore_name' => $datastore->reseller_lun_name
         ];
