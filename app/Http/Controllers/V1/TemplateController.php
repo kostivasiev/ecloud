@@ -21,6 +21,7 @@ use UKFast\Api\Exceptions\ForbiddenException;
 use App\Exceptions\V1\TemplateUpdateException;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnauthorisedException;
+use Log;
 
 /**
  * Class TemplateController
