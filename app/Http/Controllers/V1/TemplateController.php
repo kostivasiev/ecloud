@@ -508,7 +508,13 @@ class TemplateController extends BaseController
     {
         $templates = [];
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->pod]);
+            $kingpin = app()->makeWith(
+                'App\Kingpin\V1\KingpinService',
+                [
+                    $solution->pod,
+                    $solution->ucs_reseller_type
+                ]
+            );
         } catch (\Exception $exception) {
             //Failed to connect to Kingpin
             return $templates;
