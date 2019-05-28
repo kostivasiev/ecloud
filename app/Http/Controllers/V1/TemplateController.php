@@ -650,7 +650,12 @@ class TemplateController extends BaseController
     public static function getSolutionTemplateByName(Solution $solution, $templateName)
     {
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->pod]);
+            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService',
+                [
+                    $solution->pod,
+                    $solution->ucs_reseller_type
+                ]
+            );
         } catch (\Exception $exception) {
             //Failed to connect to Kingpin
             Log::error(
