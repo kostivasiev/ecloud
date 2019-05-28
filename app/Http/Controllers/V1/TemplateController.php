@@ -46,7 +46,7 @@ class TemplateController extends BaseController
         $solution =  SolutionController::getSolutionById($request, $solutionId);
 
         $templateName = urldecode($templateName);
-        $template = TemplateController::getSolutionTemplateByName(
+        $template = static::getSolutionTemplateByName(
             $solution,
             $templateName
         );
