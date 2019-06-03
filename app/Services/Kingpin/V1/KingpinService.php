@@ -462,7 +462,6 @@ class KingpinService
             $solutionTemplate = new SolutionTemplate($this->responseData, $this->pod, $solution);
 
             return $solutionTemplate;
-
         } catch (TransferException $exception) {
             Log::info(
                 'Failed to load solution template from Kingpin by name',
@@ -683,57 +682,7 @@ class KingpinService
             'used' => $vmwareObject->usedGB,
         ];
     }
-
-    /**
-     * Process and format template data from getSystemTemplates() & getSolutionTemplates()
-     * @param $templates
-     * @return array
-     */
-    protected function processTemplateData($templates)
-    {
-        $forattedTemplates = [];
-        foreach ($templates as $template) {
-
-            $Template = new Template($template, $this->pod);
-
-
-            $forattedTemplates[] = $Template;
-        }
-
-        return $forattedTemplates;
-    }
-
-
-//    protected function processTemplateData($templates)
-//    {
-//        $forattedTemplates = [];
-//        foreach ($templates as $template) {
-//            $temp_template = new \stdClass();
-//            $temp_template->name = (string)$template->name;
-//            $temp_template->size_gb = (string)$template->capacityGB;
-//            $temp_template->guest_os = (string)$template->guestOS;
-//            $temp_template->actual_os = trim((string)$template->actualOS);
-//            $temp_template->cpu = intval($template->numCPU);
-//            $temp_template->ram = intval($template->ramGB);
-//            $temp_template->encrypted = $template->encrypted ?? false;
-//
-//            $hard_drives = array();
-//            foreach ($template->disks as $hard_drive) {
-//                $hdd = new \stdClass();
-//                $hdd->name = (string)$hard_drive->name;
-//                $hdd->capacitygb = intval($hard_drive->capacityGB);
-//                $hard_drives[] = $hdd;
-//            }
-//
-//            $temp_template->hard_drives = $hard_drives;
-//
-//            $forattedTemplates[] = $temp_template;
-//        }
-//
-//        return $forattedTemplates;
-//    }
-
-
+    
     /**
      * Generates the base URL
      * @param null $solutionId

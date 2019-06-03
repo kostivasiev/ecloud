@@ -59,7 +59,7 @@ abstract class AbstractTemplate
 
         $templateName = $this->name;
         if ($this->isGpuTemplate()) {
-            $templateName = substr($this->name,0,strpos($this->name, '-gpu-'));
+            $templateName = substr($this->name, 0, strpos($this->name, '-gpu-'));
         }
 
         $ecloudLicenses = ServerLicense::availableToInstall('ecloud vm', true, 'OS', $this->pod->getKey());
@@ -210,5 +210,4 @@ abstract class AbstractTemplate
     {
         return $this->serverLicense->category;
     }
-
 }
