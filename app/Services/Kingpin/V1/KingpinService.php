@@ -682,7 +682,7 @@ class KingpinService
             'used' => $vmwareObject->usedGB,
         ];
     }
-    
+
     /**
      * Generates the base URL
      * @param null $solutionId

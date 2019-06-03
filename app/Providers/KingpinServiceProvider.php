@@ -50,7 +50,8 @@ class KingpinServiceProvider extends ServiceProvider
 
             /**
              * Or
-             * Load using $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [$datacentre, $environment]);
+             * Load using
+             * $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [$datacentre, $environment]);
              */
 
             if (count($parameters) > 0) {
