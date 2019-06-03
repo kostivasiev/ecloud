@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Kingpin\V1\KingpinService;
+use App\Services\Kingpin\V1\KingpinService;
 
 use GuzzleHttp\Client;
 use Log;
@@ -22,7 +22,7 @@ class KingpinServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('App\Kingpin\V1\KingpinService', function ($app, $parameters) {
+        $this->app->bind('App\Services\Kingpin\V1\KingpinService', function ($app, $parameters) {
 
             $environment = null;
 
@@ -50,7 +50,7 @@ class KingpinServiceProvider extends ServiceProvider
 
             /**
              * Or
-             * Load using $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$datacentre, $environment]);
+             * Load using $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [$datacentre, $environment]);
              */
 
             if (count($parameters) > 0) {
@@ -81,6 +81,7 @@ class KingpinServiceProvider extends ServiceProvider
 
             return new KingpinService(
                 new Client(['base_uri' => $serviceBaseUri]),
+                $pod,
                 $environment
             );
         });

@@ -589,7 +589,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return 'Unknown';
         }
@@ -623,7 +623,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return false;
         }
@@ -648,7 +648,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return false;
         }
@@ -672,7 +672,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return false;
         }

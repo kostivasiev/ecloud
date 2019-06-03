@@ -33,7 +33,6 @@ use App\Models\V1\Datastore;
 use App\Exceptions\V1\DatastoreNotFoundException;
 use App\Exceptions\V1\DatastoreInsufficientSpaceException;
 
-use App\Kingpin\V1\KingpinService as Kingpin;
 use App\Exceptions\V1\KingpinException;
 
 use App\Services\IntapiService;
@@ -112,6 +111,7 @@ class VirtualMachineController extends BaseController
      * @throws TemplateNotFoundException
      * @throws \App\Exceptions\V1\ApplianceNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -455,8 +455,8 @@ class VirtualMachineController extends BaseController
                 $solution
             );
 
-            $platform = $template->platform;
-            $license = $template->license;
+            $platform = $template->platform();
+            $license = $template->license();
         }
 
         if ($request->has('computername')) {
@@ -472,7 +472,6 @@ class VirtualMachineController extends BaseController
         }
 
         $this->validate($request, $rules);
-
 
         $post_data = array(
             'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user->resellerId,
@@ -508,7 +507,7 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->has('template')) {
-            if ($template->type != 'Base') {
+            if ($template->subType != 'Base') {
                 $post_data['template'] = $templateName;
 
                 if ($template->type != 'Solution') {
@@ -2004,7 +2003,7 @@ class VirtualMachineController extends BaseController
     {
         try {
             $kingpin = app()->makeWith(
-                'App\Kingpin\V1\KingpinService',
+                'App\Services\Kingpin\V1\KingpinService',
                 [$virtualMachine->getPod(), $virtualMachine->type()]
             );
         } catch (\Exception $exception) {

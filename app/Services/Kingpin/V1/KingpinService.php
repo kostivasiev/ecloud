@@ -1,8 +1,13 @@
 <?php
 
-namespace App\Kingpin\V1;
+namespace App\Services\Kingpin\V1;
 
 use App\Exceptions\V1\KingpinException;
+use App\Models\V1\ServerLicense;
+use App\Models\V1\Solution;
+use App\Template\PodTemplate;
+use App\Template\SolutionTemplate;
+use App\Template\Template;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TransferException;
 use Log;
@@ -75,14 +80,19 @@ class KingpinService
         'Private'
     ];
 
+    protected $pod;
+
     /**
      * KingpinService constructor.
      * @param $requestClient
+     * @param $pod
      * @param null $environment Set an environment for the service, see $environmentOptions
      */
-    public function __construct($requestClient, $environment = null)
+    public function __construct($requestClient, $pod, $environment = null)
     {
         $this->requestClient = $requestClient;
+
+        $this->pod = $pod;
 
         if (!empty($environment)) {
             return $this->setEnvironment($environment);
@@ -397,20 +407,23 @@ class KingpinService
 
     /**
      * Retrieve Virtual Machine Solution Specific Templates
-     * @param $solutionId
+     * @param Solution $solution
      * @return array|bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getSolutionTemplates($solutionId)
+    public function getSolutionTemplates(Solution $solution)
     {
-        $url = $this->generateV1URL($solutionId);
+        $url = $this->generateV1URL($solution->getKey());
         $url .= 'template';
 
         $templates = [];
         try {
             $this->makeRequest('GET', $url);
             if (!empty($this->responseData) && is_array($this->responseData)) {
-                $templates = $this->processTemplateData($this->responseData);
+                foreach ($this->responseData as $template) {
+                    $solutionTemplate = new SolutionTemplate($template, $this->pod, $solution);
+                    $templates[] = $solutionTemplate;
+                }
             }
         } catch (TransferException $exception) {
             return false;
@@ -421,14 +434,14 @@ class KingpinService
 
     /**
      * Get a single solution template
-     * @param $solutionId
+     * @param Solution $solution
      * @param $templateName
-     * @return array|bool
+     * @return SolutionTemplate|array|bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getSolutionTemplate($solutionId, $templateName)
+    public function getSolutionTemplate(Solution $solution, $templateName)
     {
-        $url = $this->generateV1URL($solutionId);
+        $url = $this->generateV1URL($solution->getKey());
         $url .= 'template/' . $templateName;
 
         try {
@@ -438,7 +451,7 @@ class KingpinService
                 Log::info(
                     'Failed to load solution template from Kingpin by name: no response data from Kingpin',
                     [
-                        'solution_id'             => $solutionId,
+                        'solution_id'             => $solution->getKey(),
                         'requested_template_name' => $templateName,
                         'url'                     => $url,
                     ]
@@ -446,12 +459,15 @@ class KingpinService
                 return false;
             }
 
-            return $this->processTemplateData([$this->responseData])[0];
+            $solutionTemplate = new SolutionTemplate($this->responseData, $this->pod, $solution);
+
+            return $solutionTemplate;
+
         } catch (TransferException $exception) {
             Log::info(
                 'Failed to load solution template from Kingpin by name',
                 [
-                    'solution_id'             => $solutionId,
+                    'solution_id'             => $solution->getKey(),
                     'requested_template_name' => $templateName,
                     'url'                     => $url,
                 ]
@@ -476,7 +492,10 @@ class KingpinService
             $this->makeRequest('GET', $url);
 
             if (!empty($this->responseData) && is_array($this->responseData)) {
-                $templates = $this->processTemplateData($this->responseData);
+                foreach ($this->responseData as $template) {
+                    $Template = new PodTemplate($template, $this->pod);
+                    $templates[] = $Template;
+                }
             }
         } catch (TransferException $exception) {
             return false;
@@ -674,30 +693,45 @@ class KingpinService
     {
         $forattedTemplates = [];
         foreach ($templates as $template) {
-            $temp_template = new \stdClass();
-            $temp_template->name = (string)$template->name;
-            $temp_template->size_gb = (string)$template->capacityGB;
-            $temp_template->guest_os = (string)$template->guestOS;
-            $temp_template->actual_os = trim((string)$template->actualOS);
-            $temp_template->cpu = intval($template->numCPU);
-            $temp_template->ram = intval($template->ramGB);
-            $temp_template->encrypted = $template->encrypted ?? false;
 
-            $hard_drives = array();
-            foreach ($template->disks as $hard_drive) {
-                $hdd = new \stdClass();
-                $hdd->name = (string)$hard_drive->name;
-                $hdd->capacitygb = intval($hard_drive->capacityGB);
-                $hard_drives[] = $hdd;
-            }
+            $Template = new Template($template, $this->pod);
 
-            $temp_template->hard_drives = $hard_drives;
 
-            $forattedTemplates[] = $temp_template;
+            $forattedTemplates[] = $Template;
         }
 
         return $forattedTemplates;
     }
+
+
+//    protected function processTemplateData($templates)
+//    {
+//        $forattedTemplates = [];
+//        foreach ($templates as $template) {
+//            $temp_template = new \stdClass();
+//            $temp_template->name = (string)$template->name;
+//            $temp_template->size_gb = (string)$template->capacityGB;
+//            $temp_template->guest_os = (string)$template->guestOS;
+//            $temp_template->actual_os = trim((string)$template->actualOS);
+//            $temp_template->cpu = intval($template->numCPU);
+//            $temp_template->ram = intval($template->ramGB);
+//            $temp_template->encrypted = $template->encrypted ?? false;
+//
+//            $hard_drives = array();
+//            foreach ($template->disks as $hard_drive) {
+//                $hdd = new \stdClass();
+//                $hdd->name = (string)$hard_drive->name;
+//                $hdd->capacitygb = intval($hard_drive->capacityGB);
+//                $hard_drives[] = $hdd;
+//            }
+//
+//            $temp_template->hard_drives = $hard_drives;
+//
+//            $forattedTemplates[] = $temp_template;
+//        }
+//
+//        return $forattedTemplates;
+//    }
 
 
     /**
