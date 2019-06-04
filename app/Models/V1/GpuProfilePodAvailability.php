@@ -4,7 +4,6 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class GpuProfilePodAvailability extends Model
 {
     protected $connection = 'ecloud';

@@ -35,7 +35,8 @@ class PodTemplate
 
         // Show non-managed pod templates?
         $showNonManagedPodTemplates = false;
-        if ($pod->ucs_datacentre_reseller_id != 0 && $pod->ucs_datacentre_reseller_id == app()->request->user->resellerId) {
+        if ($pod->ucs_datacentre_reseller_id != 0
+            && $pod->ucs_datacentre_reseller_id == app()->request->user->resellerId) {
             $showNonManagedPodTemplates = true;
         }
 

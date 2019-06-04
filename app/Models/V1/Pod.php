@@ -144,8 +144,8 @@ class Pod extends Model implements Filterable, Sortable
     {
         /**
          * select * from `gpu_profile`
-         * inner join `gpu_profile_pod_availability` on `gpu_profile_pod_availability`.`gpu_profile_id` = `gpu_profile`.`id`
-         * where `gpu_profile_pod_availability`.`ucs_datacentre_id` = ?
+         * inner join `gpu_profile_pod_availability` on `gpu_profile_pod_availability`.`gpu_profile_id` =
+         * `gpu_profile`.`id`  where `gpu_profile_pod_availability`.`ucs_datacentre_id` = ?
          * and `gpu_profile`.`deleted_at` is null
          */
         return $this->hasManyThrough(

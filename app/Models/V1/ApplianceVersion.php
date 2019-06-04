@@ -54,7 +54,8 @@ class ApplianceVersion extends Model implements Filterable, Sortable
 
     // Events triggered by actions on the model
     protected $dispatchesEvents = [
-        'deleting' => ApplianceVersionDeletedEvent::class, //Trigger on deleting (not deleted, as we need the version record to cascade the soft-deletes to the parameters)
+        //Trigger on deleting (not deleted, as we need the version record to cascade the soft-deletes to the parameters)
+        'deleting' => ApplianceVersionDeletedEvent::class,
     ];
 
     // Validation Rules
