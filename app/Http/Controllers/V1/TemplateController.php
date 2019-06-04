@@ -55,10 +55,7 @@ class TemplateController extends BaseController
 
         $templates = [];
         foreach ($solutionTemplates as $template) {
-            // Don't display GPU templates
-            if (!$template->isGpuTemplate()) {
-                $templates[] = $template->convertToPublicTemplate();
-            }
+            $templates[] = $template->convertToPublicTemplate();
         }
 
         $templates = $this->filterAdminProperties(
@@ -111,6 +108,7 @@ class TemplateController extends BaseController
         $podTemplates = PodTemplate::withPod($pod);
 
         $templates = [];
+
         foreach ($podTemplates as $template) {
             // Don't display GPU templates
             if (!$template->isGpuTemplate()) {

@@ -131,4 +131,30 @@ class Pod extends Model implements Filterable, Sortable
             IntProperty::create('ucs_datacentre_datacentre_id', 'datacentre_id'),
         ]);
     }
+
+    /**
+     *
+     * Return GPU profiles available to the Pod
+     *
+     * Has-many relationship through gpu_profile_pod_availability mapping table using ucs_datacentre_id
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function gpuProfiles()
+    {
+        /**
+         * select * from `gpu_profile`
+         * inner join `gpu_profile_pod_availability` on `gpu_profile_pod_availability`.`gpu_profile_id` = `gpu_profile`.`id`
+         * where `gpu_profile_pod_availability`.`ucs_datacentre_id` = ?
+         * and `gpu_profile`.`deleted_at` is null
+         */
+        return $this->hasManyThrough(
+            'App\Models\V1\GpuProfile',
+            'App\Models\V1\GpuProfilePodAvailability', // Map table
+            'ucs_datacentre_id', // Foreign key on gpu_profile_pod_availability table.
+            'id', // Foreign key on gpu_profile table.
+            'ucs_datacentre_id', // Local key on gpu_profile_pod_availability table.
+            'gpu_profile_id'  // Local key on gpu_profile_pod_availability table.
+        );
+    }
 }
