@@ -51,6 +51,7 @@ abstract class AbstractApioService
         }
 
         $this->headers = [
+            'Request-ID'           => app('request')->header('Request-ID'),
             'User-Agent'           => 'service-' . env('APP_NAME') . '/1.0',
             'Accept'               => 'application/json',
             'X-consumer-custom-id' => '0-0',
