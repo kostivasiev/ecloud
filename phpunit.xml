@@ -7,7 +7,9 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         executionOrder="random"
+         resolveDependencies="true">
     <testsuites>
         <testsuite name="Application Test Suite">
             <directory suffix="Test.php">./tests</directory>
@@ -19,9 +21,11 @@
         </whitelist>
     </filter>
     <php>
+        <env name="APP_NAME" value="ecloud"/>
         <env name="APP_ENV" value="testing"/>
+
         <env name="CACHE_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="QUEUE_DRIVER" value="array"/>
 
         <env name="DB_RESELLER_CONNECTION" value="reseller"/>
         <env name="DB_RESELLER_DRIVER" value="sqlite"/>
