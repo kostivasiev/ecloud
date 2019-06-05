@@ -873,7 +873,7 @@ class VirtualMachineController extends BaseController
         $virtualMachine = $this->getVirtualMachine($vmId);
 
         // VM cloning isn't available to Public/Burst VMs
-        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+        if (in_array($virtualMachine->type(), ['Public', 'Burst', 'GPU'])) {
             throw new Exceptions\ForbiddenException(
                 $virtualMachine->type() . ' VM cloning is currently disabled'
             );
@@ -1377,6 +1377,12 @@ class VirtualMachineController extends BaseController
 
         //Load the VM
         $virtualMachine = $this->getVirtualMachine($vmId);
+
+        if ($virtualMachine->type() == 'GPU') {
+            throw new Exceptions\ForbiddenException(
+                $virtualMachine->type() . ' VM cloning is currently disabled'
+            );
+        }
 
         if ($virtualMachine->type() != 'Public') {
             // Check if the solution can modify resources
