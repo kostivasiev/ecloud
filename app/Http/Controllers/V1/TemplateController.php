@@ -140,7 +140,7 @@ class TemplateController extends BaseController
 
         $pod = PodController::getPodById($request, $podId);
 
-        $template = PodTemplate::withName($pod, $templateName);
+        $template = PodTemplate::withFriendlyName($pod, $templateName);
 
         return $this->respondItem(
             $request,
@@ -218,7 +218,7 @@ class TemplateController extends BaseController
 
         $pod = PodController::getPodById($request, $podId);
 
-        $template = PodTemplate::withName($pod, $templateName);
+        $template = PodTemplate::withFriendlyName($pod, $templateName);
 
         // Dont allow renaming of UKFast managed base templates
         if ($template->isUKFastBaseTemplate($template)) {
@@ -304,7 +304,7 @@ class TemplateController extends BaseController
 
         $pod = PodController::getPodById($request, $podId);
 
-        $template = PodTemplate::withName($pod, $templateName);
+        $template = PodTemplate::withFriendlyName($pod, $templateName);
 
         // Dont allow deletion of UKFast managed base templates
         if ($template->isUKFastBaseTemplate($template)) {
@@ -368,11 +368,11 @@ class TemplateController extends BaseController
             try {
                 return SolutionTemplate::withName($solution, $name);
             } catch (TemplateNotFoundException $exception) {
-                return PodTemplate::withName($pod, $name);
+                return PodTemplate::withFriendlyName($pod, $name);
             }
         }
 
-        return PodTemplate::withName($pod, $name);
+        return PodTemplate::withFriendlyName($pod, $name);
     }
 
     /**

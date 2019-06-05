@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\InsufficientCreditsException;
+use App\Models\V1\PodTemplate;
 use App\Services\AccountsService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
@@ -23,7 +24,6 @@ use App\Resources\V1\VirtualMachineResource;
 use App\Models\V1\Pod;
 use App\Models\V1\Tag;
 
-use App\Models\V1\Solution;
 use App\Exceptions\V1\SolutionNotFoundException;
 
 use App\Models\V1\SolutionNetwork;
@@ -115,6 +115,7 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws Exceptions\NotFoundException
      */
     public function create(Request $request, IntapiService $intapiService, AccountsService $accountsService)
     {
@@ -129,7 +130,7 @@ class VirtualMachineController extends BaseController
 
         // default validation
         $rules = [
-            'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
+            'environment' => ['required', 'in:Public,Hybrid,Private,Burst,GPU'],
 
              // User must either specify a vm template or an appliance_id
             'template' => ['required_without:appliance_id'],
@@ -151,7 +152,9 @@ class VirtualMachineController extends BaseController
             'ssh_keys' => ['nullable', 'array'],
             'ssh_keys.*' => [new IsValidSSHPublicKey()],
 
-            'encrypt' => ['sometimes', 'boolean']
+            'encrypt' => ['sometimes', 'boolean'],
+
+            'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()]
         ];
 
         // Check we either have template or appliance_id but not both
@@ -165,6 +168,12 @@ class VirtualMachineController extends BaseController
         if (!($request->has('hdd') xor $request->has('hdd_disks'))) {
             throw new Exceptions\BadRequestException(
                 'Virtual machines must be launched with either the hdd or hdd_disks parameter'
+            );
+        }
+
+        if ($request->has('gpu_profile') && $request->input('environment') != 'GPU') {
+            throw new Exceptions\ForbiddenException(
+                'gpu_profile can only be set when environment is GPU'
             );
         }
 
@@ -368,6 +377,12 @@ class VirtualMachineController extends BaseController
          * Launch VM from Appliance
          */
         if ($request->has('appliance_id')) {
+            if ($request->input('environment') == 'GPU') {
+                throw new Exceptions\ForbiddenException(
+                    'Launching of Appliances is not available using the GPU environment at this time.'
+                );
+            }
+
             $scriptRules = [];
 
             //Validate the appliance exists
@@ -423,7 +438,7 @@ class VirtualMachineController extends BaseController
 
             $applianceScript = $mustacheTemplate->render($requestApplianceParams);
 
-            // Try to load the server license associated with th appliance version
+            // Try to load the server license associated with the appliance version
             try {
                 $serverLicense = $applianceVersion->getLicense();
             } catch (ApplianceServerLicenseNotFoundException $exception) {
@@ -448,12 +463,35 @@ class VirtualMachineController extends BaseController
 
         if ($request->has('template')) {
             $templateName = $request->input('template');
-            // check template is valid
-            $template = TemplateController::getTemplateByName(
-                $templateName,
-                $pod,
-                $solution
-            );
+
+            if ($request->input('environment') == 'GPU') {
+                // We Determine the GPU template based on the base template name and the profile
+                $gpuProfile = $pod->gpuProfiles()->find($request->input('gpu_profile'));
+
+                if (empty($gpuProfile)) {
+                    throw new Exceptions\NotFoundException('gpu_profile \'' . $request->input('gpu_profile') . '\' was not found');
+                }
+
+                $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);
+
+                try {
+                    $template = $podTemplate->getGpuVersion($gpuProfile);
+                } catch (TemplateNotFoundException $exception) {
+                    throw new TemplateNotFoundException('No GPU template found matching requested template and gpu_profile');
+                } catch (\Exception $exception) {
+                    throw new ServiceUnavailableException($exception->getMessage());
+                }
+
+                // Update the template name to the GPU version of this template
+                $templateName = $template->name;
+            } else {
+                // Validate the template exists: Try to load from both Solution & Pod templates
+                $template = TemplateController::getTemplateByName(
+                    $templateName,
+                    $pod,
+                    $solution
+                );
+            }
 
             $platform = $template->platform();
             $license = $template->license();
@@ -487,6 +525,10 @@ class VirtualMachineController extends BaseController
             'launched_by' => '-5',
         );
 
+        if (isset($gpuProfile)) {
+            $post_data['gpu_profile'] = $gpuProfile->profile_name;
+        }
+
         if ($request->has('ssh_keys')) {
             if ($platform != 'Linux') {
                 throw new Exceptions\BadRequestException("ssh_keys only supported for Linux VM's at this time");
@@ -507,7 +549,7 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->has('template')) {
-            if ($template->subType != 'Base') {
+            if ($template->subType != 'Base' || $request->input('environment') == 'GPU') {
                 $post_data['template'] = $templateName;
 
                 if ($template->type != 'Solution') {

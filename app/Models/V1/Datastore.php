@@ -363,6 +363,7 @@ class Datastore extends Model implements Filterable, Sortable
                 return $defaultDatastore;
 
             case 'Burst':
+            case 'GPU': // TODO: To be confirmed
                 $defaultDatastore = static::find(5);
                 break;
 

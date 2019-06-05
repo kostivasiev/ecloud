@@ -50,10 +50,37 @@ class PodTemplate
     }
 
     /**
-     * Retrieve a Pod (Pod/Base) template from a Pod by name
+     * Retrieve a Pod (Pod/Base) template from a Pod by FRIENDLY name.
+     * Note: This will not return GPU templates, as we don't want to display these to customers.
      * @param Pod $pod
      * @param $templateName
      * @return bool|null
+     * @throws TemplateNotFoundException
+     */
+    public static function withFriendlyName(Pod $pod, $templateName)
+    {
+        $templates = PodTemplate::withPod($pod);
+
+        if (is_array($templates) and count($templates) > 0) {
+            foreach ($templates as $template) {
+                if ($template->isGpuTemplate()) {
+                    continue;
+                }
+                if ($template->getFriendlyName() == $templateName) {
+                    return $template;
+                }
+            }
+        }
+
+        throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
+    }
+
+    /**
+     * Retrieve a Pod (Pod/Base) template from a Pod by name.
+     * note: This will include GPU templates also
+     * @param Pod $pod
+     * @param $templateName
+     * @return mixed
      * @throws TemplateNotFoundException
      */
     public static function withName(Pod $pod, $templateName)
@@ -62,7 +89,7 @@ class PodTemplate
 
         if (is_array($templates) and count($templates) > 0) {
             foreach ($templates as $template) {
-                if ($template->getFriendlyName() == $templateName) {
+                if ($template->name == $templateName) {
                     return $template;
                 }
             }
