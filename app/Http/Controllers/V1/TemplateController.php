@@ -21,6 +21,7 @@ use UKFast\Api\Exceptions\ForbiddenException;
 use App\Exceptions\V1\TemplateUpdateException;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnauthorisedException;
+use Log;
 
 /**
  * Class TemplateController
@@ -38,16 +39,18 @@ class TemplateController extends BaseController
      * @param $solutionId
      * @param $templateName
      * @return \Illuminate\Http\Response
+     * @throws SolutionNotFoundException
      * @throws TemplateNotFoundException
      */
-
     public function show(Request $request, $solutionId, $templateName)
     {
+        $solution =  SolutionController::getSolutionById($request, $solutionId);
+
         $templateName = urldecode($templateName);
-
-        $templates = $this->getResellerSolutionTemplates($solutionId);
-
-        $template = $this->findTemplateByName($templateName, $templates);
+        $template = static::getSolutionTemplateByName(
+            $solution,
+            $templateName
+        );
 
         if (!$template) {
             throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
@@ -505,7 +508,13 @@ class TemplateController extends BaseController
     {
         $templates = [];
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->pod]);
+            $kingpin = app()->makeWith(
+                'App\Kingpin\V1\KingpinService',
+                [
+                    $solution->pod,
+                    $solution->ucs_reseller_type
+                ]
+            );
         } catch (\Exception $exception) {
             //Failed to connect to Kingpin
             return $templates;
@@ -647,15 +656,37 @@ class TemplateController extends BaseController
     public static function getSolutionTemplateByName(Solution $solution, $templateName)
     {
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$solution->pod]);
+            $kingpin = app()->makeWith(
+                'App\Kingpin\V1\KingpinService',
+                [
+                    $solution->pod,
+                    $solution->ucs_reseller_type
+                ]
+            );
         } catch (\Exception $exception) {
             //Failed to connect to Kingpin
+            Log::error(
+                'Searching for solution template by name - Failed to connect to Kingpin: ' . $exception->getMessage(),
+                [
+                    'solution_id'   => $solution->getKey(),
+                    'template_name' => $templateName,
+                    'pod'           => $solution->pod
+                ]
+            );
             return false;
         }
 
         $template = $kingpin->getSolutionTemplate($solution->getKey(), $templateName);
 
         if (empty($template)) {
+            Log::info(
+                'Search for solution template by name did not return any results.',
+                [
+                    'solution_id'   => $solution->getKey(),
+                    'template_name' => $templateName,
+                    'pod'           => $solution->pod
+                ]
+            );
             return false;
         }
 

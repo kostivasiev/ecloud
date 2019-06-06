@@ -39,6 +39,7 @@ class IntapiService
         $this->response = $this->client->request('POST', $endpoint, array_replace_recursive([
             'debug' => false,
             'headers' => [
+                'Request-ID' => app('request')->header('Request-ID'),
                 'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/x-www-form-urlencoded',

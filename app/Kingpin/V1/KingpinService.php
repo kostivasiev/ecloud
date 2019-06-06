@@ -433,8 +433,29 @@ class KingpinService
 
         try {
             $this->makeRequest('GET', $url);
-            return !empty($this->responseData) ? $this->processTemplateData([$this->responseData])[0] : false;
+
+            if (empty($this->responseData)) {
+                Log::info(
+                    'Failed to load solution template from Kingpin by name: no response data from Kingpin',
+                    [
+                        'solution_id'             => $solutionId,
+                        'requested_template_name' => $templateName,
+                        'url'                     => $url,
+                    ]
+                );
+                return false;
+            }
+
+            return $this->processTemplateData([$this->responseData])[0];
         } catch (TransferException $exception) {
+            Log::info(
+                'Failed to load solution template from Kingpin by name',
+                [
+                    'solution_id'             => $solutionId,
+                    'requested_template_name' => $templateName,
+                    'url'                     => $url,
+                ]
+            );
             return false;
         }
     }
