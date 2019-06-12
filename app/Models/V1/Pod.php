@@ -118,6 +118,7 @@ class Pod extends Model implements Filterable, Sortable
                 BooleanProperty::create('ucs_datacentre_public_enabled', 'public', null, 'Yes', 'No'),
                 BooleanProperty::create('ucs_datacentre_burst_enabled', 'burst', null, 'Yes', 'No'),
                 BooleanProperty::create('ucs_datacentre_oneclick_enabled', 'appliances', null, 'Yes', 'No'),
+                BooleanProperty::create('ucs_datacentre_gpu_enabled', 'gpu', null, 'Yes', 'No'),
             ],
         ];
 
