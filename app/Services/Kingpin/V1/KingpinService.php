@@ -77,7 +77,8 @@ class KingpinService
         'Public',
         'Hybrid',
         'Burst',
-        'Private'
+        'Private',
+        'GPU'
     ];
 
     protected $pod;
@@ -701,6 +702,9 @@ class KingpinService
                 break;
             case 'Burst':
                 return 'api/v1/burst/solution/' . $solutionId . '/';
+                break;
+            case 'GPU':
+                return '/api/v1/burstgpu/solution/' . $solutionId . '/';
                 break;
             case 'Hybrid':
             default:
