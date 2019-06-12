@@ -122,7 +122,7 @@ class VirtualMachineController extends BaseController
         // todo remove when public/burst VMs supported
         // - template validation issue on public
         // - need `add_billing` step on create_vm automation
-        if (!$this->isAdmin && in_array($request->input('environment'), ['Public', 'Burst'])) {
+        if (!$this->isAdmin && in_array($request->input('environment'), ['Public', 'Burst', 'GPU'])) {
             throw new Exceptions\ForbiddenException(
                 $request->input('environment') . ' VM creation is temporarily disabled'
             );
