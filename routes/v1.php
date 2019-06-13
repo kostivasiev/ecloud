@@ -141,6 +141,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->patch('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@update');
     $router->delete('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@delete');
 
+    //GPU Profiles
+    $router->get('gpu-profiles', 'GpuProfileController@index');
+    $router->get('gpu-profiles/{profile_id}', 'GpuProfileController@show');
+
 
     /**
      * Base middleware + reseller ID scope
