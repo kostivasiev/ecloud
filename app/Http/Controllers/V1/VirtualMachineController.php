@@ -526,7 +526,7 @@ class VirtualMachineController extends BaseController
         );
 
         if (isset($gpuProfile)) {
-            $post_data['gpu_profile_id'] = $gpuProfile->id;
+            $post_data['gpu_profile_uuid'] = $gpuProfile->getKey();
         }
 
         if ($request->has('ssh_keys')) {
