@@ -1,4 +1,4 @@
 include:
-  - project: 'peter.boulderstone/ci-cd-templates'
+  - project: 'ukfast/infrastructure/ci-cd-templates'
     ref: master
     file: '/templates/main.yml'
