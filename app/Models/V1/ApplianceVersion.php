@@ -61,7 +61,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     // Validation Rules
     public static $rules = [
         'version' => ['required', 'integer'],
-        'script_template' => ['required'],
+        'script_template' => ['nullable'],
         'vm_template' => ['required'],
         'description' => ['nullable'],
         'os_license_id' => ['required', 'integer'],

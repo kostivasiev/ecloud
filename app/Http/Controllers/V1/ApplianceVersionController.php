@@ -156,7 +156,7 @@ class ApplianceVersionController extends BaseController
         $rules = ApplianceVersion::getRules();
         $this->validate($request, $rules);
 
-        $scriptVariables = self::getScriptVariables($request->input('script_template'));
+        $scriptVariables = self::getScriptVariables($request->input('script_template', ''));
 
         //Validate the appliance exists
         ApplianceController::getApplianceById($request, $request->input('appliance_id'));
