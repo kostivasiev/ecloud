@@ -8,7 +8,7 @@ envSecrets:
       - "APP_NAME"
       - "APP_URL"
       - "APP_VERSION"
-      - "APP_LOG_PATH"
+#      - "APP_LOG_PATH"
       - "CACHE_DRIVER"
       - "QUEUE_DRIVER"
       - "PAGINATION_LIMIT"
