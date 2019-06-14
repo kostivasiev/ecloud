@@ -649,6 +649,17 @@ class VirtualMachineController extends BaseController
             throw new ServiceResponseException($error_msg);
         }
 
+        Log::info(
+            'VirtualMachine Launched',
+            [
+                'id' => $intapiData->data->server_id,
+                'type' => $post_data['ecloud_type'],
+
+                'kong_request_id' => $request->header('Request-ID'),
+                'kong_consumer_custom_id' => $request->header('X-consumer-custom-id'),
+            ]
+        );
+
         $virtualMachine = new VirtualMachine();
         $virtualMachine->servers_id = $intapiData->data->server_id;
         $virtualMachine->servers_status = $intapiData->data->server_status;
@@ -765,6 +776,17 @@ class VirtualMachineController extends BaseController
         if (!$virtualMachine->save()) {
             //Log::critical('');
         }
+
+        Log::info(
+            'VirtualMachine Deleted',
+            [
+                'id' => $virtualMachine->getKey(),
+                'type' => $virtualMachine->type(),
+
+                'kong_request_id' => $request->header('Request-ID'),
+                'kong_consumer_custom_id' => $request->header('X-consumer-custom-id'),
+            ]
+        );
 
         if ($refundCredit) {
             $result = $accountsService
@@ -1302,6 +1324,17 @@ class VirtualMachineController extends BaseController
 
             $virtualMachine->servers_status = Status::RESIZING;
             $virtualMachine->save();
+
+            Log::info(
+                'VirtualMachine Resized',
+                [
+                    'id' => $virtualMachine->getKey(),
+                    'type' => $virtualMachine->type(),
+
+                    'kong_request_id' => $request->header('Request-ID'),
+                    'kong_consumer_custom_id' => $request->header('X-consumer-custom-id'),
+                ]
+            );
         }
 
         return $this->respondEmpty(($resizeRequired) ? 202 : 200);
