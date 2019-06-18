@@ -49,8 +49,8 @@
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
     "test": [
-      "vendor/bin/phpunit",
-      "vendor/bin/phpcs --runtime-set ignore_warnings_on_exit 1 --standard=PSR2 --ignore=/tests/*,/vendor/* ."
+      "vendor/bin/phpcs --runtime-set ignore_warnings_on_exit 1 --standard=PSR2 --ignore=/tests/*,/vendor/*,/database/*,/.* .",
+      "vendor/bin/phpunit -c phpunit.xml --bootstrap bootstrap/app.php"
     ]
   },
   "config": {
