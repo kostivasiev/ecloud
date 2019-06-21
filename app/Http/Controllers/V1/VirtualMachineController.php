@@ -1422,7 +1422,7 @@ class VirtualMachineController extends BaseController
             try {
                 $existingTemplate = PodTemplate::withFriendlyName($virtualMachine->pod, $request->input('template_name'));
             } catch (TemplateNotFoundException $exception) {
-
+                // Do nothing
             }
 
             if (!empty($existingTemplate)) {
@@ -1450,7 +1450,7 @@ class VirtualMachineController extends BaseController
             try {
                 $existingTemplate = SolutionTemplate::withName($virtualMachine->solution, $templateName);
             } catch (TemplateNotFoundException $exception) {
-
+                // Do nothing
             }
 
             if (!empty($existingTemplate)) {
