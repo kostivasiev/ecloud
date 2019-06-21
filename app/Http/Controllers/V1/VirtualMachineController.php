@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\InsufficientCreditsException;
 use App\Models\V1\PodTemplate;
+use App\Models\V1\SolutionTemplate;
 use App\Services\AccountsService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
@@ -1451,11 +1452,11 @@ class VirtualMachineController extends BaseController
                 throw new DatastoreNotFoundException('Unable to load VM template datastore record.');
             }
 
-            // Check if the template name is already in use
-            $existingTemplate = TemplateController::getPodTemplateByName(
-                $virtualMachine->pod,
-                $request->input('template_name')
-            );
+            try {
+                $existingTemplate = PodTemplate::withFriendlyName($virtualMachine->pod, $request->input('template_name'));
+            } catch (TemplateNotFoundException $exception) {
+                // Do nothing
+            }
 
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
@@ -1478,11 +1479,12 @@ class VirtualMachineController extends BaseController
         } else {
             // Clone to Solution template
             $templateName = urldecode($request->input('template_name'));
-            // Check whether the template name is already in use on this Solution.
-            $existingTemplate = TemplateController::getSolutionTemplateByName(
-                $virtualMachine->solution,
-                $templateName
-            );
+
+            try {
+                $existingTemplate = SolutionTemplate::withName($virtualMachine->solution, $templateName);
+            } catch (TemplateNotFoundException $exception) {
+                // Do nothing
+            }
 
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
