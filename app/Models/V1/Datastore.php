@@ -230,7 +230,7 @@ class Datastore extends Model implements Filterable, Sortable
         }
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
                 $this->pod,
                 $this->reseller_lun_type
             ]);
@@ -363,6 +363,7 @@ class Datastore extends Model implements Filterable, Sortable
                 return $defaultDatastore;
 
             case 'Burst':
+            case 'GPU': // TODO: To be confirmed
                 $defaultDatastore = static::find(5);
                 break;
 

@@ -114,6 +114,10 @@ class VirtualMachineResource extends CustomResource
             'encrypted' => ($this->resource->servers_encrypted == 'Yes')
         ];
 
+        if ($this->resource->servers_ecloud_type == 'GPU') {
+            $data['gpu_profile'] = $this->resource->servers_gpu_profile_uuid;
+        }
+
         return $this->filterProperties($request, $data);
     }
 }
