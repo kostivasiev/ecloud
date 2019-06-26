@@ -1157,7 +1157,7 @@ class VirtualMachineController extends BaseController
         $automationData = [];
 
         // Name
-        // We can change the server name in realtime but Compute and Storage changes via automation.
+        // We can change the server name/role in realtime but Compute and Storage changes via automation.
         // If we are making other changes return 202 otherwise return 200
         if ($request->has('name')) {
             $virtualMachine->servers_friendly_name = $request->input('name');
@@ -1166,7 +1166,6 @@ class VirtualMachineController extends BaseController
         if ($request->has('role')) {
             $virtualMachine->servers_role = $request->input('role');
         }
-
 
         if (!$virtualMachine->save()) {
             throw new Exceptions\DatabaseException('Failed to update virtual machine record');
