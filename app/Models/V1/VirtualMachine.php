@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Scopes\ECloudVmServersScope;
 
+use Illuminate\Support\Facades\DB;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\IntProperty;
@@ -28,6 +29,8 @@ use UKFast\DB\Ditto\Filter;
  */
 class VirtualMachine extends Model implements Filterable, Sortable
 {
+    use EnumHelper;
+
     const NAME_FORMAT_DESC = 'alphanumeric, spaces, hyphens and underscores';
     const NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ \.]+$';
 
@@ -111,6 +114,24 @@ class VirtualMachine extends Model implements Filterable, Sortable
     }
 
     /**
+     * Assignable roles for VM
+     * @param bool $isAdmin
+     * @return array
+     */
+    public static function getRoles($isAdmin = false)
+    {
+        return ($isAdmin) ?
+            static::getEnumValues('servers_role') :
+            [
+                'Web Server',
+                'Database Server',
+                'Mail Server',
+                'Application Server',
+                'Development Server'
+            ];
+    }
+
+    /**
      * Ditto configuration
      * ----------------------
      */
@@ -132,7 +153,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'support' => 'servers_advanced_support',
             'status' => 'servers_status',
             'environment' => 'servers_ecloud_type',
-            'encrypted' => 'servers_encrypted'
+            'encrypted' => 'servers_encrypted',
+            'role' => 'servers_role'
         ];
     }
 
@@ -154,7 +176,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('support', Filter::$stringDefaults),
             $factory->create('status', Filter::$stringDefaults),
             $factory->create('environment', Filter::$stringDefaults),
-            $factory->boolean()->create('encrypted', 'Yes', 'No')
+            $factory->boolean()->create('encrypted', 'Yes', 'No'),
+            $factory->create('role', Filter::$stringDefaults)
         ];
     }
 
@@ -178,6 +201,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('status', 'asc'),
             $factory->create('environment', 'asc'),
             $factory->create('encrypted', 'asc'),
+            $factory->create('role', 'asc'),
         ];
     }
 
@@ -242,6 +266,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
 
             BooleanProperty::create('servers_encrypted', 'encrypted'),
+
+            StringProperty::create('servers_role', 'role'),
         ];
 
         return $array;
