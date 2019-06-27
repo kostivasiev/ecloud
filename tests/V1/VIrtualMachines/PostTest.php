@@ -147,24 +147,8 @@ class PostTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    protected function getMockVirtualMachine()
-    {
-        $mock = Mockery::mock(VirtualMachine::class);
-        $this->app->instance(VirtualMachine::class, $mock);
-        return $mock;
-   }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
     public function testInvalidSSHPublicKey()
     {
-        $mock = Mockery::mock('overload:'.VirtualMachine::class)->makePartial();
-        $mock->shouldReceive('getRoles')->andReturn(['N/A', 'Web Server', 'Mail Server', 'SQL Server']);
-        $this->app->instance(VirtualMachine::class, $mock);
-
-
         factory(Solution::class, 1)->create();
         $solution = Solution::query()->first();
         $data = [
@@ -173,13 +157,14 @@ class PostTest extends TestCase
             'ram' => 2,
             'hdd' => 20,
             'solution_id' => $solution->getKey(),
-            "template"  => 'CentOS 7 64-bit',
+            "template" => 'CentOS 7 64-bit',
             'ssh_keys' => [
                 'THIS IS AN INVALID SSH PUBLIC KEY'
             ]
         ];
 
-        $res = $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)->seeStatusCode(422)
+        $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
+            ->seeStatusCode(422)
             ->seeJson(
                 [
                     'title' => 'Validation Error',

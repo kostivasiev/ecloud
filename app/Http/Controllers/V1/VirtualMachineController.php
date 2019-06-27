@@ -155,10 +155,13 @@ class VirtualMachineController extends BaseController
 
             'encrypt' => ['sometimes', 'boolean'],
 
-            'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()],
-
-            'role' => ['nullable', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))]
+            'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()]
         ];
+
+        // Validate role is allowed
+        if ($request->has('role')) {
+            $rules['role'] = ['nullable', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+        }
 
         // Check we either have template or appliance_id but not both
         if (!($request->has('template') xor $request->has('appliance_id'))) {
