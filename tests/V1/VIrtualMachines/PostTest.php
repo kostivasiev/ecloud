@@ -4,6 +4,7 @@ namespace Tests\VirtualMachines;
 
 use App\Models\V1\Solution;
 use App\Rules\V1\IsValidSSHPublicKey;
+use Mockery;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -146,8 +147,24 @@ class PostTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
+    protected function getMockVirtualMachine()
+    {
+        $mock = Mockery::mock(VirtualMachine::class);
+        $this->app->instance(VirtualMachine::class, $mock);
+        return $mock;
+   }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testInvalidSSHPublicKey()
     {
+        $mock = Mockery::mock('overload:'.VirtualMachine::class)->makePartial();
+        $mock->shouldReceive('getRoles')->andReturn(['N/A', 'Web Server', 'Mail Server', 'SQL Server']);
+        $this->app->instance(VirtualMachine::class, $mock);
+
+
         factory(Solution::class, 1)->create();
         $solution = Solution::query()->first();
         $data = [
@@ -162,8 +179,7 @@ class PostTest extends TestCase
             ]
         ];
 
-        $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
-            ->seeStatusCode(422)
+        $res = $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)->seeStatusCode(422)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
