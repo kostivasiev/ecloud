@@ -158,6 +158,11 @@ class VirtualMachineController extends BaseController
             'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()]
         ];
 
+        // Validate role is allowed
+        if ($request->has('role')) {
+            $rules['role'] = ['nullable', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+        }
+
         // Check we either have template or appliance_id but not both
         if (!($request->has('template') xor $request->has('appliance_id'))) {
             throw new Exceptions\BadRequestException(
@@ -519,6 +524,7 @@ class VirtualMachineController extends BaseController
             'server_active' => true,
 
             'name' => $request->input('name'),
+            'role' => $request->input('role'),
             'netbios' => $request->input('computername'),
 
             'submitted_by_type' => 'API Client',
@@ -1068,6 +1074,7 @@ class VirtualMachineController extends BaseController
             'cpu' => ['nullable', 'integer'],
             'ram' => ['nullable', 'integer'],
             'hdd_disks' => ['nullable', 'array'],
+            'role' => ['nullable', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))]
         ];
 
         $this->validateVirtualMachineId($request, $vmId);
@@ -1153,13 +1160,18 @@ class VirtualMachineController extends BaseController
         $automationData = [];
 
         // Name
-        // We can change the server name in realtime but Compute and Storage changes via automation.
+        // We can change the server name/role in realtime but Compute and Storage changes via automation.
         // If we are making other changes return 202 otherwise return 200
         if ($request->has('name')) {
             $virtualMachine->servers_friendly_name = $request->input('name');
-            if (!$virtualMachine->save()) {
-                throw new Exceptions\DatabaseException('Failed to update virtual machine: name');
-            }
+        }
+
+        if ($request->has('role')) {
+            $virtualMachine->servers_role = $request->input('role');
+        }
+
+        if (!$virtualMachine->save()) {
+            throw new Exceptions\DatabaseException('Failed to update virtual machine record');
         }
 
         // CPU
@@ -1316,39 +1328,40 @@ class VirtualMachineController extends BaseController
             }
         }
 
-        $unchangedDisks = $existingDisks;
-        if (!empty($automationData['hdd'])) {
-            // Add any unspecified disks to our automation data as we want to send the complete required Storage state
-            $unchangedDisks = array_diff_key($existingDisks, array_flip(array_column($automationData['hdd'], 'uuid')));
-        }
-
-        foreach ($unchangedDisks as $disk) {
-            $diskData = new \stdClass();
-            $diskData->name = $disk->name;
-            $diskData->capacity = $disk->capacity;
-            $diskData->uuid = $disk->uuid;
-            $diskData->state = 'present';
-            $automationData['hdd'][$disk->name] = $diskData;
-            $totalCapacity += $diskData->capacity;
-        }
-
-        $maxCapacity = $maxHdd;
-        if ($virtualMachine->inSharedEnvironment()) {
-            $maxCapacity = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
-        }
-
-        if ($totalCapacity > $maxCapacity) {
-            $overprovision = ($totalCapacity - $maxCapacity);
-            throw new Exceptions\ForbiddenException(
-                'HDD capacity for virtual machine over-provisioned by ' . $overprovision . 'GB.'
-                . ' Total HDD capacity must be ' . $maxCapacity . 'GB or less.'
-            );
-        }
-
         // todo add MAX_HDD_COUNT check?
 
         // Fire off automation request
         if ($resizeRequired) {
+            $unchangedDisks = $existingDisks;
+            if (!empty($automationData['hdd'])) {
+                // Add any unspecified disks to our automation data as we want to send the complete required Storage state
+                $unchangedDisks = array_diff_key($existingDisks, array_flip(array_column($automationData['hdd'], 'uuid')));
+            }
+
+            foreach ($unchangedDisks as $disk) {
+                $diskData = new \stdClass();
+                $diskData->name = $disk->name;
+                $diskData->capacity = $disk->capacity;
+                $diskData->uuid = $disk->uuid;
+                $diskData->state = 'present';
+                $automationData['hdd'][$disk->name] = $diskData;
+                $totalCapacity += $diskData->capacity;
+            }
+
+            $maxCapacity = $maxHdd;
+            if ($virtualMachine->inSharedEnvironment()) {
+                $maxCapacity = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
+            }
+
+
+            if ($totalCapacity > $maxCapacity) {
+                $overprovision = ($totalCapacity - $maxCapacity);
+                throw new Exceptions\ForbiddenException(
+                    'HDD capacity for virtual machine over-provisioned by ' . $overprovision . 'GB.'
+                    . ' Total HDD capacity must be ' . $maxCapacity . 'GB or less.'
+                );
+            }
+
             (new ResizeCheck($virtualMachine))->validate();
 
             try {
