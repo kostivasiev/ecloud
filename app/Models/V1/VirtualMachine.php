@@ -123,6 +123,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         return ($isAdmin) ?
             static::getEnumValues('servers_role') :
             [
+                'N/A',
                 'Web Server',
                 'Database Server',
                 'Mail Server',
