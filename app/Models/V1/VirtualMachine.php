@@ -130,7 +130,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'DPM Server', 'Backup server', 'CommVault Server', 'Magento Server', 'Primary Active Directory Server',
             'Secondary Active Directory Server', 'VMware Management Server', 'HyperV Management Server', 'Streaming Server',
             'API Server', 'Web Apllication Firewall', 'NAS', 'Webcelerator Appliance', 'Web Application Firewall',
-                'MSSQL Cluster', 'MySQL Cluster', 'File Cluster', 'UKFast Backup Server'
+                'MSSQL Cluster', 'MySQL Cluster', 'File Cluster', 'Zabbix Proxy','Magento 2 Server','UKFast Backup Server'
             ];
 
         return ($isAdmin) ?
