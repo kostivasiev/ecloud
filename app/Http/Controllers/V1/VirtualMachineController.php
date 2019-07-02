@@ -1075,9 +1075,12 @@ class VirtualMachineController extends BaseController
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'cpu' => ['nullable', 'integer'],
             'ram' => ['nullable', 'integer'],
-            'hdd_disks' => ['nullable', 'array'],
-            'role' => ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))]
+            'hdd_disks' => ['nullable', 'array']
         ];
+
+        if ($request->has('role')) {
+            $rules['role'] = ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+        }
 
         $this->validateVirtualMachineId($request, $vmId);
 
