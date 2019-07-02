@@ -120,7 +120,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      */
     public static function getRoles($isAdmin = false)
     {
-        // Fallback if we can't load admin roles from database column enum
+        // Fallback if we can't load admin roles from database enum column
         $adminRoles =
             [
                 'N/A', 'Web Server', 'MySQL Server', 'MSSQL Server', 'Web + DB Server', 'Deployment Server',
