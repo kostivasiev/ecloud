@@ -206,7 +206,9 @@ class VirtualMachineController extends BaseController
             $rules['monitoring-contacts.*'] = ['integer'];
         }
 
-        $this->validate($request, $rules);
+        $this->validate($request, $rules, [
+            'role.required' => 'The selected role is invalid',
+        ]);
 
         // environment specific validation
         $minCpu = VirtualMachine::MIN_CPU;
@@ -1093,7 +1095,7 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        $this->validate($request, $rules, $messages = [
+        $this->validate($request, $rules, [
             'role.required' => 'The selected role is invalid',
         ]);
 
