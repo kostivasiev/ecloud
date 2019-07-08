@@ -120,9 +120,23 @@ class VirtualMachine extends Model implements Filterable, Sortable
      */
     public static function getRoles($isAdmin = false)
     {
-        return ($isAdmin) ?
-            static::getEnumValues('servers_role') :
+        // Fallback if we can't load admin roles from database enum column
+        $adminRoles =
             [
+                'N/A', 'Web Server', 'MySQL Server', 'MSSQL Server', 'Web + DB Server', 'Deployment Server',
+            'Application Server', 'Mail Server', 'Development Server', 'Exchange server', 'Mail Relay', 'Test Server',
+            'Hardware Node', 'Network Logging Server', 'Storage Server', 'File Server', 'Active Directory Server',
+            'Gaming Server', 'Intranet Server', 'FTP Server', 'Oracle Server', 'Database Server', 'PostgreSQL Server',
+            'DPM Server', 'Backup server', 'CommVault Server', 'Magento Server', 'Primary Active Directory Server',
+            'Secondary Active Directory Server', 'VMware Management Server', 'HyperV Management Server', 'Streaming Server',
+            'API Server', 'Web Apllication Firewall', 'NAS', 'Webcelerator Appliance', 'Web Application Firewall',
+                'MSSQL Cluster', 'MySQL Cluster', 'File Cluster', 'Zabbix Proxy','Magento 2 Server','UKFast Backup Server'
+            ];
+
+        return ($isAdmin) ?
+            static::getEnumValues('servers_role') ?: $adminRoles :
+            [
+                'N/A',
                 'Web Server',
                 'Database Server',
                 'Mail Server',

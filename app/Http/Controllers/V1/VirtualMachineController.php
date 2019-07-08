@@ -160,7 +160,7 @@ class VirtualMachineController extends BaseController
 
         // Validate role is allowed
         if ($request->has('role')) {
-            $rules['role'] = ['nullable', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+            $rules['role'] = ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
         }
 
         // Check we either have template or appliance_id but not both
@@ -206,7 +206,9 @@ class VirtualMachineController extends BaseController
             $rules['monitoring-contacts.*'] = ['integer'];
         }
 
-        $this->validate($request, $rules);
+        $this->validate($request, $rules, [
+            'role.required' => 'The selected role is invalid',
+        ]);
 
         // environment specific validation
         $minCpu = VirtualMachine::MIN_CPU;
@@ -1073,9 +1075,12 @@ class VirtualMachineController extends BaseController
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'cpu' => ['nullable', 'integer'],
             'ram' => ['nullable', 'integer'],
-            'hdd_disks' => ['nullable', 'array'],
-            'role' => ['nullable', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))]
+            'hdd_disks' => ['nullable', 'array']
         ];
+
+        if ($request->has('role')) {
+            $rules['role'] = ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+        }
 
         $this->validateVirtualMachineId($request, $vmId);
 
@@ -1093,7 +1098,9 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        $this->validate($request, $rules);
+        $this->validate($request, $rules, [
+            'role.required' => 'The selected role is invalid',
+        ]);
 
         //Define the min/max default sizes
         $minCpu = VirtualMachine::MIN_CPU;
