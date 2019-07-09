@@ -34,7 +34,7 @@ trait EnumHelper
             return false;
         }
 
-        if (preg_match('/^(?:enum|set)\((.*)\)$/', $type, $matches) === 1) {
+        if (preg_match('/^enum\((.*)\)$/', $type, $matches) === 1) {
             $enum = [];
             foreach (explode(',', $matches[1]) as $value) {
                 $v = trim($value, "'");
