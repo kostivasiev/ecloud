@@ -72,8 +72,7 @@ class Appliance extends Model implements Filterable, Sortable
         'description' => ['nullable'],
         'documentation_uri' => ['nullable'],
         'publisher' => ['nullable', 'max:255'],
-        'active' => ['nullable', 'boolean'],
-        'public' => ['nullable', 'boolean']
+        'active' => ['nullable', 'boolean']
     ];
 
     /**
@@ -91,7 +90,6 @@ class Appliance extends Model implements Filterable, Sortable
         'appliance_documentation_uri',
         'appliance_publisher',
         'appliance_active',
-        'appliance_is_public',
         'appliance_created_at',
         'appliance_updated_at',
     ];
@@ -129,7 +127,6 @@ class Appliance extends Model implements Filterable, Sortable
             'documentation_uri' => 'appliance_documentation_uri',
             'publisher' => 'appliance_publisher',
             'active' => 'appliance_active', // Yes / No
-            'public' => 'appliance_is_public', // Yes / No
             'created_at' => 'appliance_created_at',
             'updated_at' => 'appliance_updated_at',
         ];
@@ -149,7 +146,6 @@ class Appliance extends Model implements Filterable, Sortable
             $factory->create('description', Filter::$stringDefaults),
             $factory->create('publisher', Filter::$stringDefaults),
             $factory->boolean()->create('active', 'Yes', 'No'),
-            $factory->boolean()->create('public', 'Yes', 'No'),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -168,7 +164,6 @@ class Appliance extends Model implements Filterable, Sortable
             $factory->create('version'),
             $factory->create('publisher'),
             $factory->create('active'),
-            $factory->create('public'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -214,7 +209,6 @@ class Appliance extends Model implements Filterable, Sortable
             StringProperty::create('appliance_documentation_uri', 'documentation_uri'),
             StringProperty::create('appliance_publisher', 'publisher'),
             BooleanProperty::create('appliance_active', 'active', null, 'Yes', 'No'),
-            BooleanProperty::create('appliance_is_public', 'public', null, 'Yes', 'No'),
             DateTimeProperty::create('appliance_created_at', 'created_at'),
             DateTimeProperty::create('appliance_updated_at', 'updated_at')
         ];
