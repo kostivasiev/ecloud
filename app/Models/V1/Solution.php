@@ -350,7 +350,7 @@ class Solution extends Model implements Filterable, Sortable
         // Load hosts for Solution from VMWare
         try {
             $kingpin = app()->makeWith(
-                'App\Kingpin\V1\KingpinService',
+                'App\Services\Kingpin\V1\KingpinService',
                 [
                     $this->pod()->first(),
                     'Hybrid'
@@ -505,7 +505,7 @@ class Solution extends Model implements Filterable, Sortable
     {
         try {
             $kingpin = app()->makeWith(
-                'App\Kingpin\V1\KingpinService',
+                'App\Services\Kingpin\V1\KingpinService',
                 [
                     $this->pod,
                     $this->ucs_reseller_type

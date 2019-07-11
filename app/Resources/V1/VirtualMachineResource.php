@@ -111,8 +111,14 @@ class VirtualMachineResource extends CustomResource
             'environment' => $this->resource->servers_ecloud_type,
             'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
 
-            'encrypted' => ($this->resource->servers_encrypted == 'Yes')
+            'encrypted' => ($this->resource->servers_encrypted == 'Yes'),
+
+            'role' => $this->resource->servers_role,
         ];
+
+        if ($this->resource->servers_ecloud_type == 'GPU') {
+            $data['gpu_profile'] = $this->resource->servers_gpu_profile_uuid;
+        }
 
         return $this->filterProperties($request, $data);
     }

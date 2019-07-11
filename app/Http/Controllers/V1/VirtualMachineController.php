@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\InsufficientCreditsException;
+use App\Models\V1\PodTemplate;
+use App\Models\V1\SolutionTemplate;
 use App\Services\AccountsService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
@@ -23,7 +25,6 @@ use App\Resources\V1\VirtualMachineResource;
 use App\Models\V1\Pod;
 use App\Models\V1\Tag;
 
-use App\Models\V1\Solution;
 use App\Exceptions\V1\SolutionNotFoundException;
 
 use App\Models\V1\SolutionNetwork;
@@ -33,7 +34,6 @@ use App\Models\V1\Datastore;
 use App\Exceptions\V1\DatastoreNotFoundException;
 use App\Exceptions\V1\DatastoreInsufficientSpaceException;
 
-use App\Kingpin\V1\KingpinService as Kingpin;
 use App\Exceptions\V1\KingpinException;
 
 use App\Services\IntapiService;
@@ -112,16 +112,18 @@ class VirtualMachineController extends BaseController
      * @throws TemplateNotFoundException
      * @throws \App\Exceptions\V1\ApplianceNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws Exceptions\NotFoundException
      */
     public function create(Request $request, IntapiService $intapiService, AccountsService $accountsService)
     {
         // todo remove when public/burst VMs supported
         // - template validation issue on public
         // - need `add_billing` step on create_vm automation
-        if (!$this->isAdmin && in_array($request->input('environment'), ['Public', 'Burst'])) {
+        if (!$this->isAdmin && in_array($request->input('environment'), ['Public', 'Burst', 'GPU'])) {
             throw new Exceptions\ForbiddenException(
                 $request->input('environment') . ' VM creation is temporarily disabled'
             );
@@ -129,7 +131,7 @@ class VirtualMachineController extends BaseController
 
         // default validation
         $rules = [
-            'environment' => ['required', 'in:Public,Hybrid,Private,Burst'],
+            'environment' => ['required', 'in:Public,Hybrid,Private,Burst,GPU'],
 
              // User must either specify a vm template or an appliance_id
             'template' => ['required_without:appliance_id'],
@@ -151,8 +153,15 @@ class VirtualMachineController extends BaseController
             'ssh_keys' => ['nullable', 'array'],
             'ssh_keys.*' => [new IsValidSSHPublicKey()],
 
-            'encrypt' => ['sometimes', 'boolean']
+            'encrypt' => ['sometimes', 'boolean'],
+
+            'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()]
         ];
+
+        // Validate role is allowed
+        if ($request->has('role')) {
+            $rules['role'] = ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+        }
 
         // Check we either have template or appliance_id but not both
         if (!($request->has('template') xor $request->has('appliance_id'))) {
@@ -165,6 +174,12 @@ class VirtualMachineController extends BaseController
         if (!($request->has('hdd') xor $request->has('hdd_disks'))) {
             throw new Exceptions\BadRequestException(
                 'Virtual machines must be launched with either the hdd or hdd_disks parameter'
+            );
+        }
+
+        if ($request->has('gpu_profile') && $request->input('environment') != 'GPU') {
+            throw new Exceptions\ForbiddenException(
+                'gpu_profile can only be set when environment is GPU'
             );
         }
 
@@ -191,7 +206,9 @@ class VirtualMachineController extends BaseController
             $rules['monitoring-contacts.*'] = ['integer'];
         }
 
-        $this->validate($request, $rules);
+        $this->validate($request, $rules, [
+            'role.required' => 'The selected role is invalid',
+        ]);
 
         // environment specific validation
         $minCpu = VirtualMachine::MIN_CPU;
@@ -311,9 +328,10 @@ class VirtualMachineController extends BaseController
 
         // single disk vm requested
         if ($request->has('hdd')) {
-            $rules['hdd'] = array_merge($rules['hdd'], [
-                'min:' . $minHdd, 'max:' . $maxHdd
-            ]);
+            $rules['hdd'][] = 'max:' . $maxHdd;
+            if (!$this->isAdmin) {
+                $rules['hdd'][] = 'min:' . $minHdd;
+            }
 
             // Encrypting a VM requires twice the space on the datastore
             if (!empty($encrypt_vm)) {
@@ -338,8 +356,14 @@ class VirtualMachineController extends BaseController
 
             // validate disk capacity
             $rules['hdd_disks.*.capacity'] = [
-                'required', 'integer', 'min:' . $minHdd, 'max:' . $maxHdd
+                'required',
+                'integer',
+                'max:' . $maxHdd
             ];
+
+            if (!$this->isAdmin) {
+                $rules['hdd_disks.*.capacity'][] = 'min:' . $minHdd;
+            }
 
             $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
 
@@ -368,6 +392,12 @@ class VirtualMachineController extends BaseController
          * Launch VM from Appliance
          */
         if ($request->has('appliance_id')) {
+            if ($request->input('environment') == 'GPU') {
+                throw new Exceptions\ForbiddenException(
+                    'Launching of Appliances is not available using the GPU environment at this time.'
+                );
+            }
+
             $scriptRules = [];
 
             //Validate the appliance exists
@@ -423,9 +453,13 @@ class VirtualMachineController extends BaseController
 
             $applianceScript = $mustacheTemplate->render($requestApplianceParams);
 
-            // Try to load the server license associated with th appliance version
+            // Load the appliance template - we can use this later for validating hdd size
+            $template = PodTemplate::applianceTemplate($pod, $templateName);
+
+            // Try to load the server license associated with the appliance version
             try {
                 $serverLicense = $applianceVersion->getLicense();
+                $template->serverLicense = $serverLicense;
             } catch (ApplianceServerLicenseNotFoundException $exception) {
                 if ($this->isAdmin) {
                     throw new ApplianceServerLicenseNotFoundException(
@@ -442,21 +476,44 @@ class VirtualMachineController extends BaseController
                 );
             }
 
-            $platform = $serverLicense->server_license_category;
-            $license = $serverLicense->server_license_name;
+            $platform = $template->platform();
+            $license = $template->license();
         }
 
         if ($request->has('template')) {
             $templateName = $request->input('template');
-            // check template is valid
-            $template = TemplateController::getTemplateByName(
-                $templateName,
-                $pod,
-                $solution
-            );
 
-            $platform = $template->platform;
-            $license = $template->license;
+            if ($request->input('environment') == 'GPU') {
+                // We Determine the GPU template based on the base template name and the profile
+                $gpuProfile = $pod->gpuProfiles()->find($request->input('gpu_profile'));
+
+                if (empty($gpuProfile)) {
+                    throw new Exceptions\NotFoundException('gpu_profile \'' . $request->input('gpu_profile') . '\' was not found');
+                }
+
+                $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);
+
+                try {
+                    $template = $podTemplate->getGpuVersion($gpuProfile);
+                } catch (TemplateNotFoundException $exception) {
+                    throw new TemplateNotFoundException('No GPU template found matching requested template and gpu_profile');
+                } catch (\Exception $exception) {
+                    throw new ServiceUnavailableException($exception->getMessage());
+                }
+
+                // Update the template name to the GPU version of this template
+                $templateName = $template->name;
+            } else {
+                // Validate the template exists: Try to load from both Solution & Pod templates
+                $template = TemplateController::getTemplateByName(
+                    $templateName,
+                    $pod,
+                    $solution
+                );
+            }
+
+            $platform = $template->platform();
+            $license = $template->license();
         }
 
         if ($request->has('computername')) {
@@ -473,7 +530,6 @@ class VirtualMachineController extends BaseController
 
         $this->validate($request, $rules);
 
-
         $post_data = array(
             'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user->resellerId,
             'ecloud_type' => $request->input('environment'),
@@ -481,12 +537,17 @@ class VirtualMachineController extends BaseController
             'server_active' => true,
 
             'name' => $request->input('name'),
+            'role' => $request->input('role'),
             'netbios' => $request->input('computername'),
 
             'submitted_by_type' => 'API Client',
             'submitted_by_id' => $request->user->applicationId,
             'launched_by' => '-5',
         );
+
+        if (isset($gpuProfile)) {
+            $post_data['gpu_profile_uuid'] = $gpuProfile->getKey();
+        }
 
         if ($request->has('ssh_keys')) {
             if ($platform != 'Linux') {
@@ -508,7 +569,7 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->has('template')) {
-            if ($template->type != 'Base') {
+            if ($template->subType != 'Base' || $request->input('environment') == 'GPU') {
                 $post_data['template'] = $templateName;
 
                 if ($template->type != 'Solution') {
@@ -545,8 +606,44 @@ class VirtualMachineController extends BaseController
             $post_data['hdd_iops'] = $request->input('hdd_iops');
         }
 
+        // Check hdd capacity is >= template hdd
+        $templateHDDs = collect($template->hard_drives);
 
-        // todo check template disks not larger than request
+        if ($request->has('hdd')) {
+            $templatePrimaryHdd = (object) $templateHDDs->firstWhere('name', 'Hard disk 1');
+
+            if (!$templatePrimaryHdd) {
+                throw new ServiceResponseException('Unable to determine minimum size requirements for Hard disk 1');
+            }
+
+            if ($request->input('hdd') < $templatePrimaryHdd->capacitygb) {
+                throw new Exceptions\BadRequestException(
+                    'Insufficient hdd capacity requested. Please specify ' . $templatePrimaryHdd->capacitygb . ' or more.'
+                );
+            }
+        }
+
+        if ($request->has('hdd_disks')) {
+            $requestHDDs = collect($request->input('hdd_disks'));
+
+            // Loop over the template HDD's and match to the request HDD's. Check the requested capacity is >= the template capacity.
+            $templateHDDs->each(function ($templateHdd) use ($requestHDDs) {
+                $requestHdd = (object) $requestHDDs->firstWhere('name', $templateHdd->name);
+
+                if (!$requestHdd) {
+                    throw new Exceptions\BadRequestException(
+                        'hdd_disks template requirements not met. Missing ' . $templateHdd->name
+                    );
+                }
+
+                if ($requestHdd->capacity < $templateHdd->capacitygb) {
+                    throw new Exceptions\BadRequestException(
+                        'Insufficient capacity requested for ' . $requestHdd->name . '. Please specify ' . $templateHdd->capacitygb . ' or more.'
+                    );
+                }
+            });
+        }
+
 
         // set networking
         if ($request->has('network_id')) {
@@ -648,6 +745,17 @@ class VirtualMachineController extends BaseController
 
             throw new ServiceResponseException($error_msg);
         }
+
+        Log::info(
+            'VirtualMachine Launched',
+            [
+                'id' => $intapiData->data->server_id,
+                'type' => $post_data['ecloud_type'],
+
+                'kong_request_id' => $request->header('Request-ID'),
+                'kong_consumer_custom_id' => $request->header('X-consumer-custom-id'),
+            ]
+        );
 
         $virtualMachine = new VirtualMachine();
         $virtualMachine->servers_id = $intapiData->data->server_id;
@@ -766,6 +874,17 @@ class VirtualMachineController extends BaseController
             //Log::critical('');
         }
 
+        Log::info(
+            'VirtualMachine Deleted',
+            [
+                'id' => $virtualMachine->getKey(),
+                'type' => $virtualMachine->type(),
+
+                'kong_request_id' => $request->header('Request-ID'),
+                'kong_consumer_custom_id' => $request->header('X-consumer-custom-id'),
+            ]
+        );
+
         if ($refundCredit) {
             $result = $accountsService
                 ->scopeResellerId($virtualMachine->servers_reseller_id)
@@ -832,7 +951,7 @@ class VirtualMachineController extends BaseController
         $virtualMachine = $this->getVirtualMachine($vmId);
 
         // VM cloning isn't available to Public/Burst VMs
-        if (in_array($virtualMachine->type(), ['Public', 'Burst'])) {
+        if (in_array($virtualMachine->type(), ['Public', 'Burst', 'GPU'])) {
             throw new Exceptions\ForbiddenException(
                 $virtualMachine->type() . ' VM cloning is currently disabled'
             );
@@ -1003,8 +1122,12 @@ class VirtualMachineController extends BaseController
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'cpu' => ['nullable', 'integer'],
             'ram' => ['nullable', 'integer'],
-            'hdd_disks' => ['nullable', 'array'],
+            'hdd_disks' => ['nullable', 'array']
         ];
+
+        if ($request->has('role')) {
+            $rules['role'] = ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+        }
 
         $this->validateVirtualMachineId($request, $vmId);
 
@@ -1022,7 +1145,9 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        $this->validate($request, $rules);
+        $this->validate($request, $rules, [
+            'role.required' => 'The selected role is invalid',
+        ]);
 
         //Define the min/max default sizes
         $minCpu = VirtualMachine::MIN_CPU;
@@ -1089,13 +1214,18 @@ class VirtualMachineController extends BaseController
         $automationData = [];
 
         // Name
-        // We can change the server name in realtime but Compute and Storage changes via automation.
+        // We can change the server name/role in realtime but Compute and Storage changes via automation.
         // If we are making other changes return 202 otherwise return 200
         if ($request->has('name')) {
             $virtualMachine->servers_friendly_name = $request->input('name');
-            if (!$virtualMachine->save()) {
-                throw new Exceptions\DatabaseException('Failed to update virtual machine: name');
-            }
+        }
+
+        if ($request->has('role')) {
+            $virtualMachine->servers_role = $request->input('role');
+        }
+
+        if (!$virtualMachine->save()) {
+            throw new Exceptions\DatabaseException('Failed to update virtual machine record');
         }
 
         // CPU
@@ -1252,39 +1382,40 @@ class VirtualMachineController extends BaseController
             }
         }
 
-        $unchangedDisks = $existingDisks;
-        if (!empty($automationData['hdd'])) {
-            // Add any unspecified disks to our automation data as we want to send the complete required Storage state
-            $unchangedDisks = array_diff_key($existingDisks, array_flip(array_column($automationData['hdd'], 'uuid')));
-        }
-
-        foreach ($unchangedDisks as $disk) {
-            $diskData = new \stdClass();
-            $diskData->name = $disk->name;
-            $diskData->capacity = $disk->capacity;
-            $diskData->uuid = $disk->uuid;
-            $diskData->state = 'present';
-            $automationData['hdd'][$disk->name] = $diskData;
-            $totalCapacity += $diskData->capacity;
-        }
-
-        $maxCapacity = $maxHdd;
-        if ($virtualMachine->inSharedEnvironment()) {
-            $maxCapacity = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
-        }
-
-        if ($totalCapacity > $maxCapacity) {
-            $overprovision = ($totalCapacity - $maxCapacity);
-            throw new Exceptions\ForbiddenException(
-                'HDD capacity for virtual machine over-provisioned by ' . $overprovision . 'GB.'
-                . ' Total HDD capacity must be ' . $maxCapacity . 'GB or less.'
-            );
-        }
-
         // todo add MAX_HDD_COUNT check?
 
         // Fire off automation request
         if ($resizeRequired) {
+            $unchangedDisks = $existingDisks;
+            if (!empty($automationData['hdd'])) {
+                // Add any unspecified disks to our automation data as we want to send the complete required Storage state
+                $unchangedDisks = array_diff_key($existingDisks, array_flip(array_column($automationData['hdd'], 'uuid')));
+            }
+
+            foreach ($unchangedDisks as $disk) {
+                $diskData = new \stdClass();
+                $diskData->name = $disk->name;
+                $diskData->capacity = $disk->capacity;
+                $diskData->uuid = $disk->uuid;
+                $diskData->state = 'present';
+                $automationData['hdd'][$disk->name] = $diskData;
+                $totalCapacity += $diskData->capacity;
+            }
+
+            $maxCapacity = $maxHdd;
+            if ($virtualMachine->inSharedEnvironment()) {
+                $maxCapacity = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
+            }
+
+
+            if ($totalCapacity > $maxCapacity) {
+                $overprovision = ($totalCapacity - $maxCapacity);
+                throw new Exceptions\ForbiddenException(
+                    'HDD capacity for virtual machine over-provisioned by ' . $overprovision . 'GB.'
+                    . ' Total HDD capacity must be ' . $maxCapacity . 'GB or less.'
+                );
+            }
+
             (new ResizeCheck($virtualMachine))->validate();
 
             try {
@@ -1302,6 +1433,17 @@ class VirtualMachineController extends BaseController
 
             $virtualMachine->servers_status = Status::RESIZING;
             $virtualMachine->save();
+
+            Log::info(
+                'VirtualMachine Resized',
+                [
+                    'id' => $virtualMachine->getKey(),
+                    'type' => $virtualMachine->type(),
+
+                    'kong_request_id' => $request->header('Request-ID'),
+                    'kong_consumer_custom_id' => $request->header('X-consumer-custom-id'),
+                ]
+            );
         }
 
         return $this->respondEmpty(($resizeRequired) ? 202 : 200);
@@ -1337,6 +1479,12 @@ class VirtualMachineController extends BaseController
         //Load the VM
         $virtualMachine = $this->getVirtualMachine($vmId);
 
+        if ($virtualMachine->type() == 'GPU') {
+            throw new Exceptions\ForbiddenException(
+                $virtualMachine->type() . ' VM cloning is currently disabled'
+            );
+        }
+
         if ($virtualMachine->type() != 'Public') {
             // Check if the solution can modify resources
             (new CanModifyResource($virtualMachine->solution))->validate();
@@ -1371,11 +1519,11 @@ class VirtualMachineController extends BaseController
                 throw new DatastoreNotFoundException('Unable to load VM template datastore record.');
             }
 
-            // Check if the template name is already in use
-            $existingTemplate = TemplateController::getPodTemplateByName(
-                $virtualMachine->pod,
-                $request->input('template_name')
-            );
+            try {
+                $existingTemplate = PodTemplate::withFriendlyName($virtualMachine->pod, $request->input('template_name'));
+            } catch (TemplateNotFoundException $exception) {
+                // Do nothing
+            }
 
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
@@ -1398,11 +1546,12 @@ class VirtualMachineController extends BaseController
         } else {
             // Clone to Solution template
             $templateName = urldecode($request->input('template_name'));
-            // Check whether the template name is already in use on this Solution.
-            $existingTemplate = TemplateController::getSolutionTemplateByName(
-                $virtualMachine->solution,
-                $templateName
-            );
+
+            try {
+                $existingTemplate = SolutionTemplate::withName($virtualMachine->solution, $templateName);
+            } catch (TemplateNotFoundException $exception) {
+                // Do nothing
+            }
 
             if (!empty($existingTemplate)) {
                 throw new Exceptions\UnprocessableEntityException('A template with that name already exists');
@@ -2004,7 +2153,7 @@ class VirtualMachineController extends BaseController
     {
         try {
             $kingpin = app()->makeWith(
-                'App\Kingpin\V1\KingpinService',
+                'App\Services\Kingpin\V1\KingpinService',
                 [$virtualMachine->getPod(), $virtualMachine->type()]
             );
         } catch (\Exception $exception) {

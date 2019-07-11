@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Scopes\ECloudVmServersScope;
 
+use Illuminate\Support\Facades\DB;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\IntProperty;
@@ -28,6 +29,8 @@ use UKFast\DB\Ditto\Filter;
  */
 class VirtualMachine extends Model implements Filterable, Sortable
 {
+    use EnumHelper;
+
     const NAME_FORMAT_DESC = 'alphanumeric, spaces, hyphens and underscores';
     const NAME_FORMAT_REGEX = '^[A-Za-z0-9-_\ \.]+$';
 
@@ -111,6 +114,38 @@ class VirtualMachine extends Model implements Filterable, Sortable
     }
 
     /**
+     * Assignable roles for VM
+     * @param bool $isAdmin
+     * @return array
+     */
+    public static function getRoles($isAdmin = false)
+    {
+        // Fallback if we can't load admin roles from database enum column
+        $adminRoles =
+            [
+                'N/A', 'Web Server', 'MySQL Server', 'MSSQL Server', 'Web + DB Server', 'Deployment Server',
+            'Application Server', 'Mail Server', 'Development Server', 'Exchange server', 'Mail Relay', 'Test Server',
+            'Hardware Node', 'Network Logging Server', 'Storage Server', 'File Server', 'Active Directory Server',
+            'Gaming Server', 'Intranet Server', 'FTP Server', 'Oracle Server', 'Database Server', 'PostgreSQL Server',
+            'DPM Server', 'Backup server', 'CommVault Server', 'Magento Server', 'Primary Active Directory Server',
+            'Secondary Active Directory Server', 'VMware Management Server', 'HyperV Management Server', 'Streaming Server',
+            'API Server', 'Web Apllication Firewall', 'NAS', 'Webcelerator Appliance', 'Web Application Firewall',
+                'MSSQL Cluster', 'MySQL Cluster', 'File Cluster', 'Zabbix Proxy','Magento 2 Server','UKFast Backup Server'
+            ];
+
+        return ($isAdmin) ?
+            static::getEnumValues('servers_role') ?: $adminRoles :
+            [
+                'N/A',
+                'Web Server',
+                'Database Server',
+                'Mail Server',
+                'Application Server',
+                'Development Server'
+            ];
+    }
+
+    /**
      * Ditto configuration
      * ----------------------
      */
@@ -132,7 +167,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'support' => 'servers_advanced_support',
             'status' => 'servers_status',
             'environment' => 'servers_ecloud_type',
-            'encrypted' => 'servers_encrypted'
+            'encrypted' => 'servers_encrypted',
+            'role' => 'servers_role'
         ];
     }
 
@@ -154,7 +190,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('support', Filter::$stringDefaults),
             $factory->create('status', Filter::$stringDefaults),
             $factory->create('environment', Filter::$stringDefaults),
-            $factory->boolean()->create('encrypted', 'Yes', 'No')
+            $factory->boolean()->create('encrypted', 'Yes', 'No'),
+            $factory->create('role', Filter::$stringDefaults)
         ];
     }
 
@@ -178,6 +215,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('status', 'asc'),
             $factory->create('environment', 'asc'),
             $factory->create('encrypted', 'asc'),
+            $factory->create('role', 'asc'),
         ];
     }
 
@@ -242,6 +280,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
 
             BooleanProperty::create('servers_encrypted', 'encrypted'),
+
+            StringProperty::create('servers_role', 'role'),
         ];
 
         return $array;
@@ -589,7 +629,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return 'Unknown';
         }
@@ -623,7 +663,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return false;
         }
@@ -648,7 +688,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return false;
         }
@@ -672,7 +712,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', $config);
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', $config);
         } catch (\Exception $exception) {
             return false;
         }
