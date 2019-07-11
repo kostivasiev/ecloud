@@ -328,9 +328,10 @@ class VirtualMachineController extends BaseController
 
         // single disk vm requested
         if ($request->has('hdd')) {
-            $rules['hdd'] = array_merge($rules['hdd'], [
-                'min:' . $minHdd, 'max:' . $maxHdd
-            ]);
+            $rules['hdd'][] = 'max:' . $maxHdd;
+            if (!$this->isAdmin) {
+                $rules['hdd'][] = 'min:' . $minHdd;
+            }
 
             // Encrypting a VM requires twice the space on the datastore
             if (!empty($encrypt_vm)) {
@@ -355,8 +356,14 @@ class VirtualMachineController extends BaseController
 
             // validate disk capacity
             $rules['hdd_disks.*.capacity'] = [
-                'required', 'integer', 'min:' . $minHdd, 'max:' . $maxHdd
+                'required',
+                'integer',
+                'max:' . $maxHdd
             ];
+
+            if (!$this->isAdmin) {
+                $rules['hdd_disks.*.capacity'][] = 'min:' . $minHdd;
+            }
 
             $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
 
@@ -446,9 +453,13 @@ class VirtualMachineController extends BaseController
 
             $applianceScript = $mustacheTemplate->render($requestApplianceParams);
 
+            // Load the appliance template - we can use this later for validating hdd size
+            $template = PodTemplate::applianceTemplate($pod, $templateName);
+
             // Try to load the server license associated with the appliance version
             try {
                 $serverLicense = $applianceVersion->getLicense();
+                $template->serverLicense = $serverLicense;
             } catch (ApplianceServerLicenseNotFoundException $exception) {
                 if ($this->isAdmin) {
                     throw new ApplianceServerLicenseNotFoundException(
@@ -465,8 +476,8 @@ class VirtualMachineController extends BaseController
                 );
             }
 
-            $platform = $serverLicense->server_license_category;
-            $license = $serverLicense->server_license_name;
+            $platform = $template->platform();
+            $license = $template->license();
         }
 
         if ($request->has('template')) {
@@ -595,8 +606,44 @@ class VirtualMachineController extends BaseController
             $post_data['hdd_iops'] = $request->input('hdd_iops');
         }
 
+        // Check hdd capacity is >= template hdd
+        $templateHDDs = collect($template->hard_drives);
 
-        // todo check template disks not larger than request
+        if ($request->has('hdd')) {
+            $templatePrimaryHdd = (object) $templateHDDs->firstWhere('name', 'Hard disk 1');
+
+            if (!$templatePrimaryHdd) {
+                throw new ServiceResponseException('Unable to determine minimum size requirements for Hard disk 1');
+            }
+
+            if ($request->input('hdd') < $templatePrimaryHdd->capacitygb) {
+                throw new Exceptions\BadRequestException(
+                    'Insufficient hdd capacity requested. Please specify ' . $templatePrimaryHdd->capacitygb . ' or more.'
+                );
+            }
+        }
+
+        if ($request->has('hdd_disks')) {
+            $requestHDDs = collect($request->input('hdd_disks'));
+
+            // Loop over the template HDD's and match to the request HDD's. Check the requested capacity is >= the template capacity.
+            $templateHDDs->each(function ($templateHdd) use ($requestHDDs) {
+                $requestHdd = (object) $requestHDDs->firstWhere('name', $templateHdd->name);
+
+                if (!$requestHdd) {
+                    throw new Exceptions\BadRequestException(
+                        'hdd_disks template requirements not met. Missing ' . $templateHdd->name
+                    );
+                }
+
+                if ($requestHdd->capacity < $templateHdd->capacitygb) {
+                    throw new Exceptions\BadRequestException(
+                        'Insufficient capacity requested for ' . $requestHdd->name . '. Please specify ' . $templateHdd->capacitygb . ' or more.'
+                    );
+                }
+            });
+        }
+
 
         // set networking
         if ($request->has('network_id')) {
