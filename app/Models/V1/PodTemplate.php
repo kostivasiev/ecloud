@@ -15,9 +15,10 @@ class PodTemplate
      * templates in these pods.
      *
      * @param Pod $pod
+     * @param bool $forceNonManagedPodTemplates
      * @return array
      */
-    public static function withPod(Pod $pod)
+    public static function withPod(Pod $pod, $forceNonManagedPodTemplates = false)
     {
         $templates = [];
         try {
@@ -41,7 +42,7 @@ class PodTemplate
         }
 
         foreach ($result as $template) {
-            if ($template->isUKFastBaseTemplate() || $showNonManagedPodTemplates) {
+            if ($template->isUKFastBaseTemplate() || $showNonManagedPodTemplates || $forceNonManagedPodTemplates) {
                 $templates[] = $template;
             }
         }
@@ -60,7 +61,6 @@ class PodTemplate
     public static function withFriendlyName(Pod $pod, $templateName)
     {
         $templates = PodTemplate::withPod($pod);
-
         if (is_array($templates) and count($templates) > 0) {
             foreach ($templates as $template) {
                 if ($template->isGpuTemplate()) {
@@ -90,6 +90,24 @@ class PodTemplate
         if (is_array($templates) and count($templates) > 0) {
             foreach ($templates as $template) {
                 if ($template->name == $templateName) {
+                    return $template;
+                }
+            }
+        }
+
+        throw new TemplateNotFoundException("A template matching the requested name '$templateName' was not found");
+    }
+
+    // Load an appliance template
+    public static function applianceTemplate(Pod $pod, $templateName)
+    {
+        $templates = PodTemplate::withPod($pod, true);
+
+        if (is_array($templates) and count($templates) > 0) {
+            foreach ($templates as $template) {
+                if ($template->name == $templateName) {
+                    // Unset the server license as we work this out from the appliance version
+                    unset($template->serverLicense);
                     return $template;
                 }
             }
