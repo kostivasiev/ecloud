@@ -447,6 +447,7 @@ class ApplianceController extends BaseController
 
         if ($request->user->resellerId != 0) {
             $applianceQuery->where('appliance_active', 'Yes');
+            $applianceQuery->where('appliance_is_public', 'Yes');
         }
 
         return $applianceQuery;

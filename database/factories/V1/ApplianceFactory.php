@@ -15,6 +15,7 @@ $factory->define(App\Models\V1\Appliance::class, function (Faker\Generator $fake
         'appliance_documentation_uri' => "https://en-gb.wordpress.org/",
         'appliance_publisher' => 'UKFast',
         'appliance_active' => 'Yes',
+        'appliance_is_public' => 'Yes',
     ];
 
     return $data;
