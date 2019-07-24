@@ -131,7 +131,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('appliance-versions', 'ApplianceVersionController@create');
     $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
     $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
-    $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
 
 
     //Appliance Parameters
@@ -166,7 +165,8 @@ $router->group($baseRouteParameters, function () use ($router) {
      * Base middleware + is-administrator
      */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        //
+        //Appliance Versions
+        $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
     });
 });
 

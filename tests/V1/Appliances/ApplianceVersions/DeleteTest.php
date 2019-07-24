@@ -2,6 +2,9 @@
 
 namespace Tests\Appliances\AppplianceVersions;
 
+use App\Models\V1\Appliance;
+use App\Models\V1\AppliancePodAvailability;
+use App\Models\V1\ApplianceVersion;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\ApplianceTestCase;
 
@@ -50,6 +53,47 @@ class DeleteTest extends ApplianceTestCase
         $applianceVersion = $this->appliances[0]->getLatestVersion();
 
         $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid , [], $this->validReadHeaders);
+
+        $this->assertResponseStatus(403);
+    }
+
+    /**
+     * Test to make sure that we can't delete the last active version of an appliance if the appliance is
+     * active in any Pods
+     */
+    public function testDeleteLastActiveApplianceVersion()
+    {
+        // Create an appliance with a single active version and add it to a Pod
+        $appliance = factory(Appliance::class, 1)->create()->each(function ($appliance) {
+            $appliance->save();
+            $appliance->refresh();
+
+            // Create a single appliance version
+            $applianceFactoryConfig = [
+                'appliance_version_appliance_id' => $appliance->id,
+                'appliance_version_version' => 1,
+            ];
+
+            $applianceVersion = factory(ApplianceVersion::class)->make($applianceFactoryConfig);
+            $applianceVersion->save();
+            $applianceVersion->refresh();
+
+            // Add an appliance to a pod
+            $availability = new AppliancePodAvailability(); //
+            $availability->appliance_id = $appliance->id;
+            $availability->ucs_datacentre_id = 1;
+            $availability->save();
+        })->first();
+
+        $versions = $appliance->versions->where('appliance_version_active', '=', 'Yes');
+        $this->assertEquals(1, $versions->count());
+
+        $this->json(
+            'DELETE',
+            '/v1/appliance-versions/' . $versions->first()->appliance_version_uuid,
+            [],
+            $this->validReadHeaders
+        );
 
         $this->assertResponseStatus(403);
     }

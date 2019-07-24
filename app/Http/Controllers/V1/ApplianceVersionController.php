@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\ApplianceActiveException;
 use App\Exceptions\V1\ApplianceNotFoundException;
 use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Exceptions\V1\InvalidJsonException;
@@ -340,21 +341,23 @@ class ApplianceVersionController extends BaseController
      * @param Request $request
      * @param $applianceVersionId
      * @return \Illuminate\Http\Response
+     * @throws ApplianceActiveException
      * @throws ApplianceVersionNotFoundException
      * @throws DatabaseException
-     * @throws ForbiddenException
      */
     public function delete(Request $request, $applianceVersionId)
     {
-        if (!$this->isAdmin) {
-            throw new ForbiddenException();
-        }
-
         $rules['appliance_version_id'] = ['required', new IsValidUuid()];
         $request['appliance_version_id'] = $applianceVersionId;
         $this->validate($request, $rules);
 
         $applianceVersion = static::getApplianceVersionById($request, $applianceVersionId);
+
+        // Don't allow an appliance version to be deleted if it's the laste active version and the appliance active in any pods.
+        if ($applianceVersion->appliance->versions->where('appliance_version_active', '=', 'Yes')->count() == 1
+            && $applianceVersion->appliance->pods->count() > 0) {
+            throw new ApplianceActiveException();
+        }
 
         try {
             $applianceVersion->delete();
