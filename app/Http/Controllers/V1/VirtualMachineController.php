@@ -703,13 +703,13 @@ class VirtualMachineController extends BaseController
         if ($request->has('appliance_id')) {
             $post_data['is_appliance'] = true;
             if (!empty($applianceScript)) {
-                $post_data['appliance_bootstrap_script'] = json_encode($applianceScript);
+                $post_data['appliance_bootstrap_script'] = base64_encode($applianceScript);
             }
         }
 
         //set bootstrap script
         if ($request->has('bootstrap_script')) {
-            $post_data['bootstrap_script'] = json_encode($request->input('bootstrap_script'));
+            $post_data['bootstrap_script'] = base64_encode($request->input('bootstrap_script'));
         }
 
         if ($request->input('environment') == 'Public') {
