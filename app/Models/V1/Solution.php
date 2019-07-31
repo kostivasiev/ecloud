@@ -7,6 +7,7 @@ use App\Exceptions\V1\SolutionNotFoundException;
 use App\Solution\EncryptionBillingType;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use UKFast\Api\Resource\Property\DateProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
@@ -357,7 +358,9 @@ class Solution extends Model implements Filterable, Sortable
                 ]
             );
         } catch (\Exception $exception) {
-            throw new KingpinException('Unable to load hosts');
+            $error = 'Unable to load hosts';
+            Log::error($error . ': ' . $exception->getMessage());
+            throw new KingpinException($error);
         }
 
         try {
