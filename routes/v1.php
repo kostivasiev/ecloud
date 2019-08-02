@@ -90,6 +90,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Datastores
     $router->get('datastores', 'DatastoreController@index');
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
+    $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand');
 
 
     // Firewalls

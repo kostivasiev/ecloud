@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Services\Artisan\V1\ArtisanService;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -52,6 +53,33 @@ class DatastoreController extends BaseController
     public function show(Request $request, $datastoreId)
     {
         $datastore = static::getDatastoreById($request, $datastoreId);
+
+        return $this->respondItem(
+            $request,
+            $datastore,
+            200,
+            DatastoreResource::class,
+            [],
+            Datastore::$itemProperties
+        );
+    }
+
+    /**
+     * Expand a datastore
+     *
+     * Schedules automation to expand a datastore
+     * @param Request $request
+     * @param ArtisanService $artisanService
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws DatastoreNotFoundException
+     */
+    public function expand(Request $request, ArtisanService $artisanService, $datastoreId)
+    {
+        exit(print_r('expand'));
+        $datastore = static::getDatastoreById($request, $datastoreId);
+
+
 
         return $this->respondItem(
             $request,

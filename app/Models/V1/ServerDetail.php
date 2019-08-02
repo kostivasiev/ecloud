@@ -137,4 +137,9 @@ class ServerDetail extends Model
 
         return $this->attributes['server_detail_pass'];
     }
+
+    public function password()
+    {
+        return $this->server_detail_pass;
+    }
 }

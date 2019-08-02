@@ -182,6 +182,19 @@ class Datastore extends Model implements Filterable, Sortable
     }
 
     /**
+     * Return Solution
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function storage()
+    {
+        return $this->hasOne(
+            'App\Models\V1\Storage',
+            'id',
+            'reseller_lun_ucs_storage_id'
+        );
+    }
+
+    /**
      * Return Pod
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
@@ -234,7 +247,6 @@ class Datastore extends Model implements Filterable, Sortable
                 $this->pod,
                 $this->reseller_lun_type
             ]);
-
             $vmwareDatastore = $kingpin->getDatastore(
                 $this->reseller_lun_ucs_reseller_id,
                 $this->reseller_lun_name
@@ -260,7 +272,11 @@ class Datastore extends Model implements Filterable, Sortable
     public function getUsageAttribute()
     {
         if (!is_object($this->vmwareUsage)) {
-            $this->getVmwareUsage();
+            try {
+                $this->getVmwareUsage();
+            } catch (\Exception $exception) {
+                throw new KingpinException('Unable to load datastore usage');
+            }
         }
 
         return $this->vmwareUsage;

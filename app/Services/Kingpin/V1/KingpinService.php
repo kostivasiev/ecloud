@@ -656,6 +656,8 @@ class KingpinService
             );
         } catch (TransferException $exception) {
             throw new KingpinException($exception->getMessage());
+        } catch (\Exception $exception) {
+            exit('bbb');
         }
 
         $datastores = [];
@@ -748,7 +750,6 @@ class KingpinService
         }
 
         Log::critical($logMessage, $exceptionData);
-
         if (is_null($response)) {
             Log::debug('No response body from Kingpin request, service may be unavailable.');
             return true;

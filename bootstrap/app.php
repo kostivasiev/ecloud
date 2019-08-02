@@ -100,6 +100,9 @@ $app->register(App\Providers\IntapiServiceProvider::class);
 // Event Service provider
 $app->register(App\Providers\EventServiceProvider::class);
 
+// Artisan service provider
+$app->register(App\Providers\ArtisanServiceProvider::class);
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

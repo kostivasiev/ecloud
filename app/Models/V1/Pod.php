@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
 use Illuminate\Database\Eloquent\Model;
 
@@ -163,10 +164,11 @@ class Pod extends Model implements Filterable, Sortable
 
 
     /**
-     * Load VCE server details
+     * Load VCE server details/credentials by username
+     * @param string $username
      * @return array|bool
      */
-    public function vceServerDetails()
+    public function vceServerDetails($username)
     {
         if (empty($this->ucs_datacentre_vce_server_id)) {
             Log::error('Invalid or missing VCE server ID for Pod ' . $this->getKey());
@@ -175,7 +177,7 @@ class Pod extends Model implements Filterable, Sortable
 
         $serverDetail = ServerDetail::withParent($this->ucs_datacentre_vce_server_id)
             ->where('server_detail_type', '=', 'API')
-            ->where('server_detail_user', '=', KingpinService::KINGPIN_USER)
+            ->where('server_detail_user', '=', $username)
             ->first();
 
         if (!$serverDetail) {
@@ -184,5 +186,51 @@ class Pod extends Model implements Filterable, Sortable
         }
 
         return $serverDetail;
+    }
+
+    /**
+     * Return the storage api URL
+     * @return mixed
+     */
+    public function storageApiUrl()
+    {
+        return $this->ucs_datacentre_storage_api_url;
+    }
+
+    /**
+     * Return the storage API password
+     * @return mixed
+     */
+    public function storageApiPassword()
+    {
+        $serverDetail = $this->vceServerDetails(ArtisanService::ARTISAN_API_USER);
+        if (!$serverDetail) {
+            return $serverDetail->password();
+        }
+        return false;
+    }
+
+    /**
+     * Return the VMWare API URL
+     * @return mixed
+     * TODO: Implement this in the kingpin service provider
+     */
+    public function vmwareApiUrl()
+    {
+        return $this->ucs_datacentre_vmware_api_url;
+    }
+
+    /**
+     * Return the kingpin passowrd
+     * @return bool
+     * TODO: implement this isn the kingpin service provider
+     */
+    public function vmwareApiPassword()
+    {
+        $serverDetail = $this->vceServerDetails(KingpinService::KINGPIN_USER);
+        if (!$serverDetail) {
+            return $serverDetail->password();
+        }
+        return false;
     }
 }
