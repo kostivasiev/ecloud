@@ -151,7 +151,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('gpu-profiles/{profile_id}', 'GpuProfileController@show');
 
     // Active Directory Domains
-    $router->get('domains', 'ActiveDirectoryDomainController@index');
+    $router->get('ad-domains', 'ActiveDirectoryDomainController@index');
 
 
     /**

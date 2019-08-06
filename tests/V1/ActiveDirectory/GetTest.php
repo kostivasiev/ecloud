@@ -25,7 +25,7 @@ class GetTest extends TestCase
         $total = rand(1, 2);
         factory(ActiveDirectoryDomain::class, $total)->create();
 
-        $this->get('/v1/domains', [
+        $this->get('/v1/ad-domains', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
