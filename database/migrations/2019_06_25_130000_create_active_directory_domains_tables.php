@@ -27,6 +27,6 @@ class CreateActiveDirectoryDomainsTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ad_domains');
+        Schema::dropIfExists('ad_domain');
     }
 }

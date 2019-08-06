@@ -34,19 +34,4 @@ class ActiveDirectoryDomainController extends BaseController
             $collectionQuery->paginate($this->perPage)
         );
     }
-
-    /**
-     * @param Request $request
-     * @return mixed
-     */
-    public static function getDomainQuery(Request $request)
-    {
-        $podQuery = ActiveDirectoryDomain::query();
-        if (!empty($request->user->resellerId)) {
-            $podQuery->where('ad_domain_reseller_id', $request->user->resellerId);
-        }
-
-        return $podQuery;
-    }
-
 }
