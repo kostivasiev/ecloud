@@ -131,12 +131,6 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        //replace renamed variables
-        if ($request->has('ad_domain_id')) {
-            $request->merge(['domain_id' => $request->input('ad_domain_id')]);
-        }
-
-
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst,GPU'],
@@ -156,7 +150,7 @@ class VirtualMachineController extends BaseController
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
             'site_id' => ['nullable', 'integer'],
-            'domain_id' => ['nullable', 'integer'],
+            'ad_domain_id' => ['nullable', 'integer'],
 
             'ssh_keys' => ['nullable', 'array'],
             'ssh_keys.*' => [new IsValidSSHPublicKey()],
@@ -653,18 +647,18 @@ class VirtualMachineController extends BaseController
         }
 
         // set active directory domain
-        if ($request->has('domain_id')) {
+        if ($request->has('ad_domain_id')) {
             $domain = ActiveDirectoryDomain::withReseller($request->user->resellerId)
-                ->find($request->input('domain_id'));
+                ->find($request->input('ad_domain_id'));
 
             if (is_null($domain)) {
                 throw new Exceptions\BadRequestException(
-                    "A domain matching the requested ID was not found",
-                    'domain_id'
+                    "An Active Directory domain matching the requested ID was not found",
+                    'ad_domain_id'
                 );
             }
 
-            $post_data['ad_domain_id'] = $request->input('domain_id');
+            $post_data['ad_domain_id'] = $request->input('ad_domain_id');
         }
 
         // set networking
