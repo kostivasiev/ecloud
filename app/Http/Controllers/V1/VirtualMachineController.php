@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Models\V1\ActiveDirectoryDomain;
 use App\Exceptions\V1\InsufficientCreditsException;
 use App\Models\V1\PodTemplate;
 use App\Models\V1\SolutionTemplate;
@@ -130,9 +131,18 @@ class VirtualMachineController extends BaseController
             );
         }
 
+        //replace renamed variables
+        if ($request->has('ad_domain_id')) {
+            $request->merge(['domain_id' => $request->input('ad_domain_id')]);
+        }
+
+
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst,GPU'],
+
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'tags' => ['nullable', 'array'],
 
              // User must either specify a vm template or an appliance_id
             'template' => ['required_without:appliance_id'],
@@ -146,10 +156,7 @@ class VirtualMachineController extends BaseController
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
             'site_id' => ['nullable', 'integer'],
-
-            'tags' => ['nullable', 'array'],
-
-            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'domain_id' => ['nullable', 'integer'],
 
             'ssh_keys' => ['nullable', 'array'],
             'ssh_keys.*' => [new IsValidSSHPublicKey()],
@@ -645,6 +652,20 @@ class VirtualMachineController extends BaseController
             });
         }
 
+        // set active directory domain
+        if ($request->has('domain_id')) {
+            $domain = ActiveDirectoryDomain::withReseller($request->user->resellerId)
+                ->find($request->input('domain_id'));
+
+            if (is_null($domain)) {
+                throw new Exceptions\BadRequestException(
+                    "A domain matching the requested ID was not found",
+                    'domain_id'
+                );
+            }
+
+            $post_data['ad_domain_id'] = $request->input('domain_id');
+        }
 
         // set networking
         if ($request->has('network_id')) {
@@ -2282,4 +2303,73 @@ class VirtualMachineController extends BaseController
 
         return $VirtualMachine;
     }
+
+//
+//    public function joinActiveDirectoryDomain(Request $request, $vmId)
+//    {
+//        $this->validateVirtualMachineId($request, $vmId);
+//        $virtualMachine = $this->getVirtualMachine($vmId);
+//
+//        $rules = [
+//            'domain_fqdn' => ['string'],
+//            'domain_user' => ['string'],
+//            'domain_pass' => ['string'],
+//
+//            'vm_user' => ['string'],
+//            'vm_pass' => ['string'],
+//        ];
+//
+//        $this->validate($request, $rules);
+//
+//        $adDomain = new ActiveDirectoryDomain;
+//        $adDomain->fqdn = $request->input('domain_fqdn');
+//
+//        $adDomain->credentials = (object) [
+//            'username' => $request->input('domain_user'),
+//            'password' => $request->input('domain_pass'),
+//        ];
+//
+//
+//        $virtualMachine->credentials = [
+//            (object) [
+//                'username' => $request->input('vm_user'),
+//                'password' => $request->input('vm_pass'),
+//            ]
+//        ];
+//
+//        try {
+//            $kingpin = $this->loadKingpinService($virtualMachine);
+//            $response = $kingpin->joinVmToActiveDirectoryDomain(
+//                $adDomain,
+//                $virtualMachine
+//            );
+//        } catch (TransferException $exception) {
+//            throw new ServiceUnavailableException('Failed to join domain');
+//        }
+//
+//        return $this->respondEmpty();
+//    }
+//
+//    /**
+//     * Join a VM to an Active Directory Domain
+//     * @param ActiveDirectoryDomain $adDomain
+//     * @param VirtualMachine $virtualMachine
+//     * @return bool
+//     * @throws KingpinException
+//     */
+//    protected function activeDirectoryJoinVmToDomain(ActiveDirectoryDomain $adDomain, VirtualMachine $virtualMachine)
+//    {
+//        $kingpin = $this->loadKingpinService($virtualMachine);
+//
+//        $powerOnResult = $kingpin->joinVmToActiveDirectoryDomain(
+//            $adDomain,
+//            $virtualMachine
+//        );
+//
+//        if (!$powerOnResult) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 }
