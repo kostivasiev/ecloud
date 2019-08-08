@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use UKFast\Api\Exceptions\NotFoundException;
 use App\Models\V1\ActiveDirectoryDomain;
 use UKFast\DB\Ditto\QueryTransformer;
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -32,6 +33,29 @@ class ActiveDirectoryDomainController extends BaseController
         return $this->respondCollection(
             $request,
             $collectionQuery->paginate($this->perPage)
+        );
+    }
+
+    /**
+     * Show specific solution
+     *
+     * @param Request $request
+     * @param $domainId
+     * @return \Illuminate\http\Response
+     * @throws NotFoundException
+     */
+    public function show(Request $request, $domainId)
+    {
+        $domain = ActiveDirectoryDomain::withReseller($request->user->resellerId)->find($domainId);
+        if (is_null($domain)) {
+            throw new NotFoundException(
+                "An Active Directory domain matching the requested ID was not found"
+            );
+        }
+
+        return $this->respondItem(
+            $request,
+            $domain
         );
     }
 }
