@@ -74,14 +74,32 @@ class KingpinServiceProvider extends ServiceProvider
                 throw new \Exception($log_message);
             }
 
-            $serviceBaseUri = $pod->ucs_datacentre_vmware_api_url;
+            // Load the VCE server details / credentials for the Pod
+            $serverDetail = $pod->vceServerDetails();
 
-            if (!empty(env('VMWARE_API_PORT'))) {
-                $serviceBaseUri .= ':' . env('VMWARE_API_PORT');
+            if (!$serverDetail) {
+                throw new \Exception('Unable to create KingpinService: Unable to load VCE server details');
             }
 
+            if (empty($serverDetail->server_detail_pass)) {
+                throw new \Exception('Unable to create KingpinService: Unable to load service credentials');
+            }
+
+            $serviceBaseUri = $pod->ucs_datacentre_vmware_api_url;
+
+            if (!empty($serverDetail->server_detail_login_port)) {
+                $serviceBaseUri .= ':' . $serverDetail->server_detail_login_port;
+            }
+
+            $requestClient = new Client([
+                'base_uri' => $serviceBaseUri,
+                'defaults' => [
+                    'auth' => [KingpinService::KINGPIN_USER, $serverDetail->server_detail_pass ?? null]
+                ]
+            ]);
+
             return new KingpinService(
-                new Client(['base_uri' => $serviceBaseUri]),
+                $requestClient,
                 $pod,
                 $environment
             );

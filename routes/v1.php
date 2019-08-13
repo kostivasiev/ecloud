@@ -38,22 +38,27 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->put('vms/{vmId}', 'VirtualMachineController@update');
     $router->patch('vms/{vmId}', 'VirtualMachineController@update');
     $router->delete('vms/{vmId}', 'VirtualMachineController@destroy');
+
     $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
     $router->post('vms/{vmId}/clone-to-template', 'VirtualMachineController@cloneToTemplate');
+
     $router->put('vms/{vmId}/power-on', 'VirtualMachineController@powerOn');
     $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
     $router->put('vms/{vmId}/power-shutdown', 'VirtualMachineController@shutdown');
     $router->put('vms/{vmId}/power-restart', 'VirtualMachineController@restart');
     $router->put('vms/{vmId}/power-reset', 'VirtualMachineController@reset');
     $router->put('vms/{vmId}/power-suspend', 'VirtualMachineController@suspend');
+
     $router->get('vms/{vmId}/tags', 'TagController@indexVMTags');
     $router->post('vms/{vmId}/tags', 'TagController@createVMTag');
     $router->get('vms/{vmId}/tags/{key}', 'TagController@showVMTag');
     $router->patch('vms/{vmId}/tags/{key}', 'TagController@updateVMTag');
     $router->delete('vms/{vmId}/tags/{key}', 'TagController@destroyVMTag');
+
     $router->post('vms/{vmId}/encrypt', 'VirtualMachineController@encrypt');
     $router->post('vms/{vmId}/decrypt', 'VirtualMachineController@decrypt');
 
+    $router->post('vms/{vmId}/join-ad-domain', 'VirtualMachineController@joinActiveDirectoryDomain');
 
 
     // Solution's
@@ -144,6 +149,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     //GPU Profiles
     $router->get('gpu-profiles', 'GpuProfileController@index');
     $router->get('gpu-profiles/{profile_id}', 'GpuProfileController@show');
+
+    // Active Directory Domains
+    $router->get('active-directory/domains', 'ActiveDirectoryDomainController@index');
+    $router->get('active-directory/domains/{domain_id}', 'ActiveDirectoryDomainController@show');
 
 
     /**

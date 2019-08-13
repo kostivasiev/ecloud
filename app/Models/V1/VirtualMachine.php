@@ -258,6 +258,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
             IdProperty::create('servers_id', 'id'),
 
             StringProperty::create('servers_friendly_name', 'name'),
+            StringProperty::create('servers_role', 'role'),
+
             StringProperty::create('servers_hostname', 'hostname'),
             StringProperty::create('servers_netnios_name', 'computername'),
 
@@ -281,7 +283,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
 
             BooleanProperty::create('servers_encrypted', 'encrypted'),
 
-            StringProperty::create('servers_role', 'role'),
+            IntProperty::create('servers_ad_domain_id', 'ad_domain_id'),
         ];
 
         return $array;
@@ -505,7 +507,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function trigger($category = null)
     {
         $hasMany = $this->hasMany(
-            'App\Models\V1\Triggers',
+            'App\Models\V1\Trigger',
             'trigger_reference_id',
             'servers_id'
         )
@@ -985,5 +987,32 @@ class VirtualMachine extends Model implements Filterable, Sortable
         $this->save();
 
         return $this;
+    }
+
+    /**
+     * Mutate the servers_ad_domain_id property
+     * @param $value
+     * @return bool
+     */
+    public function getServersAdDomainIdAttribute($value)
+    {
+        return empty($value) ? null : $value;
+    }
+    public function setServersAdDomainIdAttribute($value)
+    {
+        return empty($value) ? 0 : $value;
+    }
+
+    /**
+     * Return ActiveDirectoryDomain
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function activeDirectoryDomain()
+    {
+        return $this->hasOne(
+            'App\Models\V1\ActiveDirectoryDomain',
+            'ad_domain_id',
+            'servers_ad_domain_id'
+        );
     }
 }

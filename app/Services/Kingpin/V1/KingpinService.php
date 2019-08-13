@@ -83,6 +83,8 @@ class KingpinService
 
     protected $pod;
 
+    public const KINGPIN_USER = 'kingpinapi';
+
     /**
      * KingpinService constructor.
      * @param $requestClient
@@ -755,7 +757,7 @@ class KingpinService
         if ($response->getStatusCode() == 401) {
             Log::debug(
                 'Connection attempt to Kingpin returned an Unauthorized response,'
-                . ' check datacentre and VMWare API URL for VM are correct.'
+                . ' check datacentre and VMWare API URL for VM are correct and VCE server details for the Pod are valid.'
             );
         }
 
@@ -779,11 +781,6 @@ class KingpinService
         $this->response = null;
         $this->responseData = null;
 
-        // Authentication options
-        $requestOptions = [
-            'auth' => [env('VMWARE_API_USER'), env('VMWARE_API_PASS')]
-        ];
-
         // Only set JSON if we're sending data in the request
         if (empty($this->requestData) === false) {
             $requestOptions['json'] = $this->requestData;
@@ -797,7 +794,12 @@ class KingpinService
         }
 
         try {
-            $this->response = $this->requestClient->request($method, $this->requestUrl, $requestOptions);
+            $this->response = $this->requestClient->request(
+                $method,
+                $this->requestUrl,
+                array_merge($this->requestClient->getConfig('defaults'), $requestOptions ?? [])
+            );
+
             // check if there is a response body
             $this->responseData = json_decode($this->response->getBody()->getContents());
         } catch (TransferException $exception) {
