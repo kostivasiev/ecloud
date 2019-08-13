@@ -38,22 +38,27 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->put('vms/{vmId}', 'VirtualMachineController@update');
     $router->patch('vms/{vmId}', 'VirtualMachineController@update');
     $router->delete('vms/{vmId}', 'VirtualMachineController@destroy');
+
     $router->post('vms/{vmId}/clone', 'VirtualMachineController@clone');
     $router->post('vms/{vmId}/clone-to-template', 'VirtualMachineController@cloneToTemplate');
+
     $router->put('vms/{vmId}/power-on', 'VirtualMachineController@powerOn');
     $router->put('vms/{vmId}/power-off', 'VirtualMachineController@powerOff');
     $router->put('vms/{vmId}/power-shutdown', 'VirtualMachineController@shutdown');
     $router->put('vms/{vmId}/power-restart', 'VirtualMachineController@restart');
     $router->put('vms/{vmId}/power-reset', 'VirtualMachineController@reset');
     $router->put('vms/{vmId}/power-suspend', 'VirtualMachineController@suspend');
+
     $router->get('vms/{vmId}/tags', 'TagController@indexVMTags');
     $router->post('vms/{vmId}/tags', 'TagController@createVMTag');
     $router->get('vms/{vmId}/tags/{key}', 'TagController@showVMTag');
     $router->patch('vms/{vmId}/tags/{key}', 'TagController@updateVMTag');
     $router->delete('vms/{vmId}/tags/{key}', 'TagController@destroyVMTag');
+
     $router->post('vms/{vmId}/encrypt', 'VirtualMachineController@encrypt');
     $router->post('vms/{vmId}/decrypt', 'VirtualMachineController@decrypt');
 
+    $router->post('vms/{vmId}/join-ad-domain', 'VirtualMachineController@joinActiveDirectoryDomain');
 
 
     // Solution's
@@ -66,8 +71,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
     $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
-    $router->get('solutions/{solution_id}/templates', 'TemplateController@solutionTemplates');
-    $router->get('solutions/{solution_id}/templates/{template_name}', 'TemplateController@show');
+    $router->get('solutions/{solution_id}/templates', 'TemplateController@indexSolutionTemplate');
+    $router->get('solutions/{solution_id}/templates/{template_name}', 'TemplateController@showSolutionTemplate');
     $router->post('solutions/{solution_id}/templates/{template_name}/move', 'TemplateController@renameSolutionTemplate');
     $router->delete('solutions/{solution_id}/templates/{template_name}', 'TemplateController@deleteSolutionTemplate');
     $router->get('solutions/{solution_id}/tags', 'TagController@indexSolutionTags');
@@ -101,9 +106,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Pods
     $router->get('pods', 'PodController@index');
     $router->get('pods/{pod_id}', 'PodController@show');
-    $router->get('pods/{pod_id}/templates', 'TemplateController@podTemplates');
+    $router->get('pods/{pod_id}/templates', 'TemplateController@indexPodTemplate');
     $router->get('pods/{pod_id}/templates/{template_name}', 'TemplateController@showPodTemplate');
     $router->post('pods/{pod_id}/templates/{template_name}/move', 'TemplateController@renamePodTemplate');
+    $router->get('pods/{pod_id}/gpu-profiles', 'PodController@gpuProfiles');
     // todo datastores
 
     $router->get('pods/{pod_id}/appliances', 'ApplianceController@podAvailability');
@@ -139,6 +145,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('appliance-parameters', 'ApplianceParametersController@create');
     $router->patch('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@update');
     $router->delete('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@delete');
+
+    //GPU Profiles
+    $router->get('gpu-profiles', 'GpuProfileController@index');
+    $router->get('gpu-profiles/{profile_id}', 'GpuProfileController@show');
+
+    // Active Directory Domains
+    $router->get('active-directory/domains', 'ActiveDirectoryDomainController@index');
+    $router->get('active-directory/domains/{domain_id}', 'ActiveDirectoryDomainController@show');
 
 
     /**

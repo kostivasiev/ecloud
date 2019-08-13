@@ -214,7 +214,7 @@ class Host extends Model implements Filterable, Sortable
         }
 
         try {
-            $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
                 $this->pod
             ]);
 

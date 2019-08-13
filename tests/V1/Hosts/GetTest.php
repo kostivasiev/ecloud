@@ -49,7 +49,7 @@ class GetTest extends TestCase
 //    public function testValidItem()
 //    {
 //        // mock services
-//        $service = Mockery::mock('App\Kingpin\V1\KingpinService');
+//        $service = Mockery::mock('App\Services\Kingpin\V1\KingpinService');
 //        $service->shouldReceive('getHostByMac')->once()->andReturn((object) [
 //            'uuid' => 'HostSystem-host-01',
 //            'name' => '172.1.1.2',
@@ -59,7 +59,7 @@ class GetTest extends TestCase
 //            'vms' => [],
 //            'stats' => null,
 //        ]);
-//        $this->app->instance('App\Kingpin\V1\KingpinService', $service);
+//        $this->app->instance('App\Services\Kingpin\V1\KingpinService', $service);
 //
 //
 //        // populate db

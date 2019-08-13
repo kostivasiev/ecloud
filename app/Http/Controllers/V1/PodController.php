@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Models\V1\GpuProfile;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -85,5 +86,34 @@ class PodController extends BaseController
             $podQuery->whereIn('ucs_datacentre_reseller_id', [0, $request->user->resellerId]);
         }
         return $podQuery;
+    }
+
+    /**
+     * List available GPU Profiles
+     * @param Request $request
+     * @param $podId
+     * @return \Illuminate\Http\Response
+     * @throws PodNotFoundException
+     */
+    public function gpuProfiles(Request $request, $podId)
+    {
+        $pod = static::getPodById($request, $podId);
+
+        $profiles = $pod->gpuProfiles()->getQuery();
+
+        (new QueryTransformer($request))
+            ->config(GpuProfile::class)
+            ->transform($profiles);
+
+        $profiles = $profiles->paginate($this->perPage);
+
+        return $this->respondCollection(
+            $request,
+            $profiles,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : GpuProfile::VISIBLE_SCOPE_RESELLER
+        );
     }
 }

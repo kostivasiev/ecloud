@@ -86,6 +86,8 @@ class VirtualMachineResource extends CustomResource
             'id' => $this->resource->servers_id,
 
             'name' => $this->resource->servers_friendly_name,
+            'role' => $this->resource->servers_role,
+
             'hostname' => $this->resource->servers_hostname,
             'computername' => $this->resource->servers_netnios_name,
 
@@ -103,6 +105,7 @@ class VirtualMachineResource extends CustomResource
 
             'backup' => $this->resource->servers_backup,
             'support' => $this->resource->servers_advanced_support,
+            'encrypted' => ($this->resource->servers_encrypted == 'Yes'),
 
             'status' => $this->resource->servers_status,
             'power_status' => $this->resource->stateCheck(),
@@ -111,8 +114,12 @@ class VirtualMachineResource extends CustomResource
             'environment' => $this->resource->servers_ecloud_type,
             'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
 
-            'encrypted' => ($this->resource->servers_encrypted == 'Yes')
+            'ad_domain_id' => $this->resource->servers_ad_domain_id,
         ];
+
+        if ($this->resource->servers_ecloud_type == 'GPU') {
+            $data['gpu_profile'] = $this->resource->servers_ecloud_gpu_profile_uuid;
+        }
 
         return $this->filterProperties($request, $data);
     }

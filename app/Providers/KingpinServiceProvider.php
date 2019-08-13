@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Kingpin\V1\KingpinService;
+use App\Services\Kingpin\V1\KingpinService;
 
 use GuzzleHttp\Client;
 use Log;
@@ -22,7 +22,7 @@ class KingpinServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('App\Kingpin\V1\KingpinService', function ($app, $parameters) {
+        $this->app->bind('App\Services\Kingpin\V1\KingpinService', function ($app, $parameters) {
 
             $environment = null;
 
@@ -50,7 +50,8 @@ class KingpinServiceProvider extends ServiceProvider
 
             /**
              * Or
-             * Load using $kingpin = app()->makeWith('App\Kingpin\V1\KingpinService', [$datacentre, $environment]);
+             * Load using
+             * $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [$datacentre, $environment]);
              */
 
             if (count($parameters) > 0) {
@@ -73,14 +74,33 @@ class KingpinServiceProvider extends ServiceProvider
                 throw new \Exception($log_message);
             }
 
-            $serviceBaseUri = $pod->ucs_datacentre_vmware_api_url;
+            // Load the VCE server details / credentials for the Pod
+            $serverDetail = $pod->vceServerDetails();
 
-            if (!empty(env('VMWARE_API_PORT'))) {
-                $serviceBaseUri .= ':' . env('VMWARE_API_PORT');
+            if (!$serverDetail) {
+                throw new \Exception('Unable to create KingpinService: Unable to load VCE server details');
             }
 
+            if (empty($serverDetail->server_detail_pass)) {
+                throw new \Exception('Unable to create KingpinService: Unable to load service credentials');
+            }
+
+            $serviceBaseUri = $pod->ucs_datacentre_vmware_api_url;
+
+            if (!empty($serverDetail->server_detail_login_port)) {
+                $serviceBaseUri .= ':' . $serverDetail->server_detail_login_port;
+            }
+
+            $requestClient = new Client([
+                'base_uri' => $serviceBaseUri,
+                'defaults' => [
+                    'auth' => [KingpinService::KINGPIN_USER, $serverDetail->server_detail_pass ?? null]
+                ]
+            ]);
+
             return new KingpinService(
-                new Client(['base_uri' => $serviceBaseUri]),
+                $requestClient,
+                $pod,
                 $environment
             );
         });

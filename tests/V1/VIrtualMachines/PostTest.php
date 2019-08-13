@@ -4,6 +4,7 @@ namespace Tests\VirtualMachines;
 
 use App\Models\V1\Solution;
 use App\Rules\V1\IsValidSSHPublicKey;
+use Mockery;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -156,7 +157,7 @@ class PostTest extends TestCase
             'ram' => 2,
             'hdd' => 20,
             'solution_id' => $solution->getKey(),
-            "template"  => 'CentOS 7 64-bit',
+            "template" => 'CentOS 7 64-bit',
             'ssh_keys' => [
                 'THIS IS AN INVALID SSH PUBLIC KEY'
             ]
