@@ -62,6 +62,20 @@ class GpuProfile extends Model implements Filterable, Sortable
     ];
 
     /**
+     * Profile names to half and full GPU cards mapping
+     */
+    const CARD_PROFILES = [
+            'grid_v100d-16q' => 0.5,
+            'grid_v100d-32q' => 1
+        ];
+
+    /**
+     * This is the amount of GPU cards that we have available for customer use.
+     * We will need to update this as we purchase more GPU cards.
+     */
+    const CARDS_AVAILABLE = 6;
+
+    /**
      * Ditto configuration
      * ----------------------
      */

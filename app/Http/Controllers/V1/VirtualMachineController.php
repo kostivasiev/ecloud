@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Models\V1\ActiveDirectoryDomain;
 use App\Exceptions\V1\InsufficientCreditsException;
+use App\Models\V1\GpuProfile;
 use App\Models\V1\PodTemplate;
 use App\Models\V1\SolutionTemplate;
 use App\Models\V1\Trigger;
@@ -491,6 +492,17 @@ class VirtualMachineController extends BaseController
 
                 if (empty($gpuProfile)) {
                     throw new Exceptions\NotFoundException('gpu_profile \'' . $request->input('gpu_profile') . '\' was not found');
+                }
+
+                // Check we have enough GPU resources available to launch the VM
+                $availableGpuPool = GpuProfileController::gpuResourcePoolAvailability();
+
+                $requiredUsage = GpuProfile::CARD_PROFILES[$gpuProfile->profile_name];
+
+                if ($requiredUsage > $availableGpuPool) {
+                    throw new InsufficientResourceException(
+                        'Insufficient GPU resources available to launch Virtual Machine at this time'
+                    );
                 }
 
                 $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);

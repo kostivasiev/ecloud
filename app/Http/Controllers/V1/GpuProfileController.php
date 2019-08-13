@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Models\V1\GpuProfile;
-use UKFast\Api\Exceptions\NotFoundException;
+use App\Models\V1\VirtualMachine;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -45,7 +45,6 @@ class GpuProfileController extends BaseController
      * @param Request $request
      * @param $id
      * @return \Illuminate\http\Response
-     * @throws NotFoundException
      */
     public function show(Request $request, $id)
     {
@@ -53,18 +52,14 @@ class GpuProfileController extends BaseController
     }
 
     /**
-     * get item by ID
+     * Get item by ID
      * @param Request $request
      * @param $id
      * @return mixed
-     * @throws NotFoundException
      */
     public static function getById(Request $request, $id)
     {
-        $object = static::getQuery($request)->find($id);
-        if (is_null($object)) {
-            throw new NotFoundException('Resource \'' . $id . '\' not found');
-        }
+        $object = static::getQuery($request)->findOrFail($id);
 
         return $object;
     }
@@ -76,5 +71,38 @@ class GpuProfileController extends BaseController
     public static function getQuery()
     {
         return self::$model::query();
+    }
+
+    /**
+     * Calculates available GPU resources in pool for assigning to VM's
+     * @return int
+     */
+    public static function gpuResourcePoolAvailability()
+    {
+        $available = GpuProfile::CARDS_AVAILABLE;
+
+        $profiles = GpuProfile::select('uuid', 'profile_name')->get()->pluck('uuid', 'profile_name');
+        $profiles = $profiles->flip();
+
+        // Get a list of active VM's with a GPU profile assigned
+        $vms = VirtualMachine::query()
+            ->where('servers_ecloud_gpu_profile_uuid', '!=', '0')
+            ->where('servers_active', '=', 'y')
+            ->whereNotNull('servers_ecloud_gpu_profile_uuid')
+            ->pluck('servers_ecloud_gpu_profile_uuid', 'servers_id')
+        ->toArray();
+
+        foreach ($vms as $vmId => $profileUuid) {
+            if (!in_array($profiles[$profileUuid], array_keys(GpuProfile::CARD_PROFILES))) {
+                Log::error(
+                    'Unrecognised GPU profile \'' . $profileUuid . '\' found on Virtual Machine # ' . $vmId .' when calculating GPU pool availability'
+                );
+                continue;
+            }
+
+            $available -= GpuProfile::CARD_PROFILES[$profiles[$profileUuid]];
+        }
+
+        return $available;
     }
 }
