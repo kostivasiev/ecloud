@@ -2,11 +2,9 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-try {
-    (new Dotenv\Dotenv(__DIR__.'/../'))->load();
-} catch (Dotenv\Exception\InvalidPathException $e) {
-    //
-}
+(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
+    dirname(__DIR__)
+))->bootstrap();
 
 /*
 |--------------------------------------------------------------------------
@@ -85,7 +83,6 @@ $app->routeMiddleware([
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 $app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\PaginationServiceProvider::class);
-$app->register(UKFast\Providers\LogServiceProvider::class);
 
 //VMWare service provider (Kingpin)
 $app->register(App\Providers\KingpinServiceProvider::class);
