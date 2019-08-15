@@ -493,17 +493,16 @@ class VirtualMachineController extends BaseController
                     throw new Exceptions\NotFoundException('gpu_profile \'' . $request->input('gpu_profile') . '\' was not found');
                 }
 
-                $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);
+                $template = PodTemplate::withFriendlyName($pod, $templateName);
 
                 try {
-                    $template = $podTemplate->getGpuVersion($gpuProfile);
+                    $gpuTemplate = $template->getGpuVersion($gpuProfile);
                 } catch (TemplateNotFoundException $exception) {
                     throw new TemplateNotFoundException('No GPU template found matching requested template and gpu_profile');
                 } catch (\Exception $exception) {
                     throw new ServiceUnavailableException($exception->getMessage());
                 }
 
-                // Update the template name to the GPU version of this template
                 $templateName = $template->name;
             } else {
                 // Validate the template exists: Try to load from both Solution & Pod templates
@@ -571,7 +570,7 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->has('template')) {
-            if ($template->subType != 'Base' || $request->input('environment') == 'GPU') {
+            if ($template->subType != 'Base') {
                 $post_data['template'] = $templateName;
 
                 if ($template->type != 'Solution') {
