@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Models\V1\San;
 use App\Services\Artisan\V1\ArtisanService;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -76,8 +77,19 @@ class DatastoreController extends BaseController
      */
     public function expand(Request $request, ArtisanService $artisanService, $datastoreId)
     {
-        exit(print_r('expand'));
-        $datastore = static::getDatastoreById($request, $datastoreId);
+        //dd($artisanService);
+        $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
+        //dd($datastore->reseller_lun_name);
+        $artisanService->expandVolume($datastore->reseller_lun_name, 3000);
+        dd($artisanService->getLastError());
+
+
+//        $datastore = static::getDatastoreById($request, $datastoreId);
+//
+//        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $datastore]]);
+//        dd($artisan);
+
+
 
 
 

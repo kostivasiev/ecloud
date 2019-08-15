@@ -204,8 +204,17 @@ class Pod extends Model implements Filterable, Sortable
     public function storageApiPassword()
     {
         $serverDetail = $this->vceServerDetails(ArtisanService::ARTISAN_API_USER);
-        if (!$serverDetail) {
+        if ($serverDetail) {
             return $serverDetail->password();
+        }
+        return false;
+    }
+
+    public function storageApiPort()
+    {
+        $serverDetail = $this->vceServerDetails(ArtisanService::ARTISAN_API_USER);
+        if ($serverDetail) {
+            return $serverDetail->server_detail_login_port;
         }
         return false;
     }

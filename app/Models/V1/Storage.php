@@ -2,9 +2,13 @@
 
 namespace App\Models\V1;
 
-use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Storage
+ * Model for Storage table and accessing SAN credentials
+ * @package App\Models\V1
+ */
 class Storage extends Model
 {
     protected $table = 'ucs_storage';
@@ -13,32 +17,29 @@ class Storage extends Model
 
     public $timestamps = false;
 
-    public function password()
+    /**
+     * Return the storage API Pod
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function pod()
     {
-        //todo: check we have a record returned
-        return $this->hasMany(
-            'App\Models\V1\ServerDetail',
-            'server_detail_server_id',
-            'server_id'
-        )
-            ->where('server_detail_type', '=', 'API')
-            ->where('server_detail_user', '=', ArtisanService::ARTISAN_API_USER)->firstOrFail()->password();
+        return $this->hasOne(
+            'App\Models\V1\Pod',
+            'ucs_datacentre_id',
+            'ucs_datacentre_id'
+        );
     }
 
-    public function port()
+    /**
+     * Return the SAN
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function san()
     {
-        return $this->hasMany(
-            'App\Models\V1\ServerDetail',
-            'server_detail_server_id',
+        return $this->hasOne(
+            'App\Models\V1\San',
+            'servers_id',
             'server_id'
-        )
-            ->where('server_detail_type', '=', 'API')
-            ->where('server_detail_user', '=', ArtisanService::ARTISAN_API_USER)->firstOrFail()->server_detail_login_port;
-    }
-
-
-    public function datacentreId()
-    {
-        return $this->ucs_datacentre_id;
+        );
     }
 }

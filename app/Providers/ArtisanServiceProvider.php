@@ -5,16 +5,29 @@ namespace App\Providers;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Http\Controllers\V1\DatastoreController;
 use App\Models\V1\Datastore;
+use App\Models\V1\Pod;
+use App\Models\V1\San;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\ServiceProvider;
 use App\Services\Artisan\V1\ArtisanService;
 
-
 use GuzzleHttp\Client;
 use Log;
-use App\Models\V1\VirtualMachine;
 
 /**
+ * Load the Artisan service
+ *
+ * - Via dependency injection when an endpoint has datastore_id in the path
+ *
+ * - or by specifying a datastore object
+ * $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $datastore]]);
+ *
+ * - or Load from Solution + San (using Solution's Pod)
+ * $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['solution'=>$solution, 'san' => $san]);
+ *
+ * or load using Solution + Pod + San
+ * $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['solution'=>$solution, 'san' => $san, 'pod' => $solution->pod]]);
+ *
  * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 class ArtisanServiceProvider extends ServiceProvider
@@ -29,28 +42,13 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->bind('App\Services\Artisan\V1\ArtisanService', function ($app, $parameters) {
 
-            $environment = null;
-
-            //san name
-            //solution_id
-            //server_detail_user
-            //server_Detail_pass
-
-
-
             /**
              * Load via dependency injection in a controller which has datastore_id in the route
-             * Loads a ArtisanService configured for that VM
              */
-
             $routeParams = $this->app['request']->route()[2];
 
             // Do we have a datastore to get the config from in a route? (i.e does the route have datastore_id?
             if (in_array('datastore_id', array_keys($routeParams))) {
-
-
-                // From the datastore load reseller_lun_ucs_storage_id ->
-
                 $datastore = DatastoreController::getDatastoreById($this->app['request'], $routeParams['datastore_id']);
 
                 if (!is_object($datastore) || !is_a($datastore, 'App\Models\V1\Datastore')) {
@@ -59,124 +57,164 @@ class ArtisanServiceProvider extends ServiceProvider
                     throw new \Exception($log_message);
                 }
 
+                $config = $this->loadConfigFromDatastore($datastore);
+                $config['solution_id'] = $datastore->reseller_lun_ucs_reseller_id;
 
-                /**
-                 * Load the artisan API URL and credentials from the Pod
-                 */
-
-                $apiUrl = $datastore->pod->storageApiUrl();
-                if (empty($apiUrl)) {
-                    Log::error('Failed to load storage API URL');
-                    throw new ServiceUnavailableException('Failed to load storage for datastore.');
-                }
-
-                $apiPassword = $datastore->pod->storageApiPassword();
-                if (empty($apiPassword)) {
-                    Log::error('Failed to load storage API password');
-                    throw new ServiceUnavailableException('Failed to load storage for datastore.');
-                }
-
-                /**
-                 * Load the Storage / SAN credentials
-                 */
-                try {
-                    $sanPassword = $datastore->storage->password();
-                } catch (ModelNotFoundException $exception) {
-                    Log::error('Failed to load SAN password.');
-                    throw new ServiceUnavailableException('Failed to load storage for datastore.');
-                }
-
-
-
-                //exit(print_r($datastore->storage->port()));
-
-
-                //exit(print_r($datastore->storage->serverDetail()));
-
-
-                // Use ucs_storage.datacentre_id to load the pod to get the storage api url and the API credentials from the vce server details for the Pod/datacentre API user 'artisanapi'
-
-                //--
-
-                // Use ucs_storage.server_id (SAN id) to load the server details password for the SAN
-                //
-                // Use ucs_storage.server_id to load the server netbios for the san name
-
-
-
-
-
-
-
-
-
+                return $this->launchArtisanService($config);
             }
 
-            /**
-             * Or
-             * Load using
-             * $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', []);
-             */
 
             if (count($parameters) > 0) {
-                // First parameter is a datacentre object
-                $pod = $parameters[0];
+                /**
+                 * Load using a datastore object
+                 */
+                if (!empty($parameters[0]['datastore'])) {
+                    $datastore = $parameters[0]['datastore'];
+                    $config = $this->loadConfigFromDatastore($datastore);
 
-                // Kingpin environment, e.g. Public/Hybrid etc
-                if (isset($parameters[1])) {
-                    $environment = $parameters[1];
+                    return $this->launchArtisanService($config);
+                }
+
+                /**
+                 * Load from Solution + San (using Solution's Pod) or Solution + Pod + San
+                 */
+                if (!empty($parameters[0]['solution']) && !empty($parameters[0]['san'])) {
+                    $solution = $parameters[0]['solution'];
+                    $san = $parameters[0]['san'];
+
+                    if (!is_object($solution) || !is_a($solution, 'App\Models\V1\Solution')) {
+                        $log_message = 'Unable to create ArtisanService: Invalid Solution Object';
+                        Log::error($log_message);
+                        throw new \Exception($log_message);
+                    }
+
+                    $pod = $parameters[0]['pod'] ?? $solution->pod;
+
+                    if (!is_object($san) || !is_a($san, 'App\Models\V1\San')) {
+                        $log_message = 'Unable to create ArtisanService: Invalid San Object';
+                        Log::error($log_message);
+                        throw new \Exception($log_message);
+                    }
+
+                    $config = $this->loadConfig($pod, $san);
+                    $config['solution_id'] = $solution->getKey();
+
+                    return $this->launchArtisanService($config);
                 }
             }
-
-            /**
-             * Load the service
-             */
-
-            if (!is_object($pod) || !is_a($pod, 'App\Models\V1\Pod')) {
-                $log_message = 'Unable to create KingpinService: Invalid Pod Object';
-                Log::error($log_message);
-                throw new \Exception($log_message);
-            }
-
-            $serviceBaseUri = $pod->ucs_datacentre_storage_api_url;
-
-//            if (!empty(env('VMWARE_API_PORT'))) {
-//                $serviceBaseUri .= ':' . env('VMWARE_API_PORT');
-//            }
-
-
-            //
-            //         $this->requestClient = $requestClient;
-            //        $this->sanName = $sanName;
-            //        $this->solutionId = $solutionId;
-            //
-
-
-            $artisanService = new ArtisanService(
-                new Client(['base_uri' => $serviceBaseUri]),
-                $sanName,
-                $solutionId
-            );
-
-            $artisanService->setAPICredentials(
-                env('ARTISAN_API_USER'),
-                env('ARTISAN_API_PASS')
-            );
-
-            // Load API credentials
-            $sanCredentials = $this->getSANCredentials($solution->solution_san_id);
-
-            $artisanService->setSANCredentials(
-                $sanCredentials->server_detail_user,
-                $sanCredentials->server_detail_pass
-            );
-
-
-            return new ArtisanService(
-                new Client(['base_uri' => $serviceBaseUri]),
-                $pod,
-                $environment
-            );
         });
+    }
+
+    /**
+     * Load the artisan API URL and credentials from the datastore
+     * @param Datastore $datastore
+     * @return array
+     * @throws ServiceUnavailableException
+     */
+    private function loadConfigFromDatastore(Datastore $datastore) : array
+    {
+        if ($datastore->storage->count() < 1) {
+            throw new ServiceUnavailableException('No storage is configured for this datastore.');
+        }
+
+        return $this->loadConfig(
+            $datastore->storage->pod,
+            $datastore->storage->san
+        );
+    }
+
+    /**
+     * Load the config for the Pod and SAN
+     * @param Pod $pod
+     * @param San $san
+     * @return array
+     * @throws ServiceUnavailableException
+     */
+    private function loadConfig(Pod $pod, San $san) : array
+    {
+        $storageApiUrl = $pod->storageApiUrl();
+        if (empty($storageApiUrl)) {
+            Log::error(
+                'Failed to load storage API URL for Pod.',
+                [
+                    'pod_id' => $pod->getKey()
+                ]
+            );
+            throw new ServiceUnavailableException('Failed to load storage for datastore.');
+        }
+
+        $storageApiPassword = $pod->storageApiPassword();
+        if (empty($storageApiPassword)) {
+            Log::error(
+                'Failed to load storage API password for Pod.',
+                [
+                    'pod_id'       => $pod->getKey(),
+                    'vce_server_id'=> $pod->ucs_datacentre_vce_server_id
+                ]
+            );
+            throw new ServiceUnavailableException('Failed to load storage for datastore.');
+        }
+
+        //We might not always have/need this
+        $storageApiPort = $pod->storageApiPort();
+
+        // SAN credentials
+        if (empty($san->name())) {
+            Log::error(
+                'Failed to load SAN name from server record.',
+                [
+                    'server_id' => $san->getKey()
+                ]
+            );
+            throw new ServiceUnavailableException('Failed to load storage for datastore');
+        }
+
+        try {
+            $sanPassword = $san->password();
+        } catch (ModelNotFoundException $exception) {
+            Log::error(
+                'Failed to load SAN password.',
+                [
+                    'server_id' => $san->getKey()
+                ]
+            );
+            throw new ServiceUnavailableException('Failed to load storage for datastore');
+        }
+
+        return [
+            'api_url'      => $storageApiUrl,
+            'api_password' => $storageApiPassword,
+            'api_port'     => $storageApiPort,
+            'san_name'     => $san->name(),
+            'san_password' => $sanPassword
+        ];
+    }
+
+    /**
+     * Load the artisan service using the supplied config
+     * @param $config
+     * @return ArtisanService
+     */
+    private function launchArtisanService($config)
+    {
+        $serviceBaseUri = $config['api_url'];
+
+        if (!empty($config['api_port'])) {
+            $serviceBaseUri .= ':' . $config['api_port'];
+        }
+
+        return (new ArtisanService(
+            new Client(['base_uri' => $serviceBaseUri]),
+            $config['san_name'],
+            $config['solution_id']
+        ))
+            ->setAPICredentials(
+                ArtisanService::ARTISAN_API_USER,
+                $config['api_password']
+            )
+            ->setSANCredentials(
+                San::SAN_USERNAME,
+                $config['san_password']
+        );
     }
 }
