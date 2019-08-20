@@ -56,4 +56,3 @@ class San extends Model
             ->where('server_detail_user', '=', static::SAN_USERNAME)->firstOrFail()->password();
     }
 }
-

@@ -215,6 +215,6 @@ class ArtisanServiceProvider extends ServiceProvider
             ->setSANCredentials(
                 San::SAN_USERNAME,
                 $config['san_password']
-        );
+            );
     }
 }

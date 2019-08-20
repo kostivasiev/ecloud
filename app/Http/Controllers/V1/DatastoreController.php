@@ -107,7 +107,6 @@ class DatastoreController extends BaseController
                 'ecloud_ucs_' . $datastore->storage->pod->getKey(),
                 $request->user->applicationId
             );
-
         } catch (IntapiServiceException $exception) {
             throw new ArtisanException('Failed to expand datastore: ' . $exception->getMessage());
         }
