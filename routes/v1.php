@@ -95,7 +95,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Datastores
     $router->get('datastores', 'DatastoreController@index');
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
-    $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand');
 
 
     // Firewalls
@@ -176,7 +175,9 @@ $router->group($baseRouteParameters, function () use ($router) {
      * Base middleware + is-administrator
      */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        //
+        // Datastores
+        $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand'); //Fire off automation
+        $router->post('datastores/{datastore_id}/expand-datastore', 'DatastoreController@expandDatastore'); //Expand the datastore (used by automation)
     });
 });
 

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\ArtisanException;
+use App\Exceptions\V1\IntapiServiceException;
 use App\Models\V1\San;
 use App\Services\Artisan\V1\ArtisanService;
+use App\Services\IntapiService;
+use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -66,41 +70,56 @@ class DatastoreController extends BaseController
     }
 
     /**
-     * Expand a datastore
+     * Expand a datastore - Initiate automation to expand a datastore
      *
      * Schedules automation to expand a datastore
      * @param Request $request
-     * @param ArtisanService $artisanService
+     * @param IntapiService $intapiService
      * @param $datastoreId
      * @return \Illuminate\Http\Response
+     * @throws ArtisanException
      * @throws DatastoreNotFoundException
+     * @throws ForbiddenException
      */
-    public function expand(Request $request, ArtisanService $artisanService, $datastoreId)
+    public function expand(Request $request, IntapiService $intapiService, $datastoreId)
     {
-        //dd($artisanService);
+        $this->validate($request, ['size_gb' => 'required|integer|min:2']);
+
         $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
-        //dd($datastore->reseller_lun_name);
-        $artisanService->expandVolume($datastore->reseller_lun_name, 3000);
-        dd($artisanService->getLastError());
 
+        // check the new size is larger than the current size
+        $newSizeGB = $request->input('size_gb');
+        if ($newSizeGB <= $datastore->reseller_lun_size_gb) {
+            throw new ForbiddenException('New datastore size must be greater than the current size');
+        }
 
-//        $datastore = static::getDatastoreById($request, $datastoreId);
-//
-//        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $datastore]]);
-//        dd($artisan);
+        $datastore->reseller_lun_status = 'Expanding';
+        $datastore->save();
 
+        try {
+            $automationRequestId = $intapiService->automationRequest(
+                'expand_lun',
+                'reseller_lun',
+                $datastore->getKey(),
+                [
+                    'size_gb' => $newSizeGB
+                ],
+                'ecloud_ucs_' . $datastore->storage->pod->getKey(),
+                $request->user->applicationId
+            );
 
+        } catch (IntapiServiceException $exception) {
+            throw new ArtisanException('Failed to expand datastore: ' . $exception->getMessage());
+        }
 
+        $headers = [];
+        if ($request->user->isAdministrator) {
+            $headers = [
+                'X-AutomationRequestId' => $automationRequestId
+            ];
+        }
 
-
-        return $this->respondItem(
-            $request,
-            $datastore,
-            200,
-            DatastoreResource::class,
-            [],
-            Datastore::$itemProperties
-        );
+        return $this->respondEmpty(202, $headers);
     }
 
     /**
@@ -132,7 +151,7 @@ class DatastoreController extends BaseController
         $datastore = static::getDatastoreQuery($request)->find($datastoreId);
 
         if (is_null($datastore)) {
-            throw new DatastoreNotFoundException('Pod ID #' . $datastoreId . ' not found');
+            throw new DatastoreNotFoundException('Datastore ID #' . $datastoreId . ' not found');
         }
 
         return $datastore;
@@ -163,5 +182,36 @@ class DatastoreController extends BaseController
             [],
             Datastore::$collectionProperties
         );
+    }
+
+    /**
+     * Expand the datastore on the SAN - admin only functionality to be performed by automation
+     * @param Request $request
+     * @param ArtisanService $artisanService
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws ArtisanException
+     * @throws DatastoreNotFoundException
+     * @throws ForbiddenException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function expandDatastore(Request $request, ArtisanService $artisanService, $datastoreId)
+    {
+        $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
+
+        // check the new size is larger than the current size
+        $newSizeGB = $request->input('size_gb');
+        if ($newSizeGB <= $datastore->reseller_lun_size_gb) {
+            throw new ForbiddenException('New datastore size must be greater than the current size');
+        }
+
+        // Convert GB to Mib
+        $newSizeMiB = $newSizeGB * 1024;
+
+        if (!$artisanService->expandVolume($datastore->reseller_lun_name, $newSizeMiB)) {
+            throw new ArtisanException('Failed to expand datastore: ' . $artisanService->getLastError());
+        }
+
+        return $this->respondEmpty();
     }
 }
