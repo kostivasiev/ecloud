@@ -33,8 +33,8 @@ use App\Models\V1\SolutionNetwork;
 use App\Models\V1\SolutionSite;
 
 use App\Models\V1\Datastore;
-use App\Exceptions\V1\DatastoreNotFoundException;
-use App\Exceptions\V1\DatastoreInsufficientSpaceException;
+use App\Datastore\Exceptions\DatastoreNotFoundException;
+use App\Datastore\Exceptions\DatastoreInsufficientSpaceException;
 
 use App\Exceptions\V1\KingpinException;
 

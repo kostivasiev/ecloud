@@ -533,6 +533,47 @@ class KingpinService
     }
 
     /**
+     * Perform a cluster rescan
+     * @param $solutionId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function clusterRescan($solutionId)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'cluster/rescan';
+
+        try {
+            $this->makeRequest('PUT', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Expand a datastore
+     * @param $solutionId
+     * @param $datastoreName
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function expandDatastore($solutionId, $datastoreName)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'datastore/'. $datastoreName  .'/expand';
+
+        try {
+            $this->makeRequest('PUT', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get Host by its MAC address
      * @param $solutionId
      * @param $eth0_mac
@@ -656,8 +697,6 @@ class KingpinService
             );
         } catch (TransferException $exception) {
             throw new KingpinException($exception->getMessage());
-        } catch (\Exception $exception) {
-            exit('bbb');
         }
 
         $datastores = [];

@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\KingpinException;
 use Illuminate\Database\Eloquent\Model;
 
@@ -195,6 +196,8 @@ class Datastore extends Model implements Filterable, Sortable
     }
 
     /**
+     * todo: We will need to be careful with this now as it returns the *solution's* pod, not the pod for the datastore
+     * (which could be different?) We should look at refactoring this out.
      * Return Pod
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
@@ -244,7 +247,7 @@ class Datastore extends Model implements Filterable, Sortable
 
         try {
             $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
-                $this->pod,
+                $this->storage->pod,
                 $this->reseller_lun_type
             ]);
             $vmwareDatastore = $kingpin->getDatastore(
@@ -397,5 +400,65 @@ class Datastore extends Model implements Filterable, Sortable
 
         $defaultDatastore->isSystemStorage = true;
         return $defaultDatastore;
+    }
+
+
+    /**
+     * Expand the volume on the SAN
+     * @param $newSizeMiB
+     * @return bool
+     * @throws ArtisanException
+     */
+    public function expandVolume($newSizeMiB)
+    {
+        $artisanService = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $this]]);
+
+        if (!$artisanService->expandVolume($this->reseller_lun_name, $newSizeMiB)) {
+            throw new ArtisanException('Failed to expand datastore volume: ' . $artisanService->getLastError());
+        }
+
+        return true;
+    }
+
+    /**
+     * Expand datastore
+     * @return bool
+     * @throws \Exception
+     */
+    public function expand()
+    {
+        $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
+                $this->storage->pod,
+                $this->reseller_lun_type
+        ]);
+
+        if (!$kingpin->expandDatastore($this->reseller_lun_ucs_reseller_id, $this->reseller_lun_name)) {
+            throw new \Exception('Failed to expand datastore: ' . $kingpin->getLastError());
+        }
+
+        return true;
+    }
+
+    /**
+     * Rescan the cluster on vmware after resizing the datastore
+     * @throws \Exception
+     */
+    public function clusterRescan()
+    {
+        try {
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
+                $this->storage->pod,
+                $this->reseller_lun_type
+            ]);
+
+            if (!$kingpin->clusterRescan($this->reseller_lun_ucs_reseller_id)) {
+                throw new \Exception('Failed to perform cluster rescan: ' . $kingpin->getLastError());
+            }
+
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to perform cluster rescan ' . $exception->getMessage());
+        }
+
+        return true;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Exceptions\V1;
+namespace App\Datastore\Exceptions;
+
+use App\Exceptions\V1\InsufficientResourceException;
 
 class DatastoreInsufficientSpaceException extends InsufficientResourceException
 {

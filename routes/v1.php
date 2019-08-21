@@ -95,6 +95,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Datastores
     $router->get('datastores', 'DatastoreController@index');
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
+    $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand'); //Fires off automation
 
 
     // Firewalls
@@ -175,9 +176,10 @@ $router->group($baseRouteParameters, function () use ($router) {
      * Base middleware + is-administrator
      */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        // Datastores
-        $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand'); //Fire off automation
-        $router->post('datastores/{datastore_id}/expand-datastore', 'DatastoreController@expandDatastore'); //Expand the datastore (used by automation)
+        // Datastores (Expand datastore automation)
+        $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume'); //Expand the datastore volume via Artisan
+        $router->post('datastores/{datastore_id}/rescan', 'DatastoreController@clusterRescan'); //Perform cluster rescan
+        $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore'); //Expand the datastore on VMWare
     });
 });
 

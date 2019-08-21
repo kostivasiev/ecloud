@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Datastore\Status;
 use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\IntapiServiceException;
-use App\Models\V1\San;
-use App\Services\Artisan\V1\ArtisanService;
+use App\Exceptions\V1\KingpinException;
 use App\Services\IntapiService;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 
 use App\Models\V1\Datastore;
 use App\Resources\V1\DatastoreResource;
-use App\Exceptions\V1\DatastoreNotFoundException;
+use App\Datastore\Exceptions\DatastoreNotFoundException;
 
 class DatastoreController extends BaseController
 {
@@ -92,8 +92,7 @@ class DatastoreController extends BaseController
         if ($newSizeGB <= $datastore->reseller_lun_size_gb) {
             throw new ForbiddenException('New datastore size must be greater than the current size');
         }
-
-        $datastore->reseller_lun_status = 'Expanding';
+        $datastore->reseller_lun_status = Status::EXPANDING;
         $datastore->save();
 
         try {
@@ -102,7 +101,7 @@ class DatastoreController extends BaseController
                 'reseller_lun',
                 $datastore->getKey(),
                 [
-                    'size_gb' => $newSizeGB
+                    'new_capacity_gb' => $newSizeGB
                 ],
                 'ecloud_ucs_' . $datastore->storage->pod->getKey(),
                 $request->user->applicationId
@@ -184,19 +183,18 @@ class DatastoreController extends BaseController
     }
 
     /**
-     * Expand the datastore on the SAN - admin only functionality to be performed by automation
+     * Expand the datastore volume on the SAN
      * @param Request $request
-     * @param ArtisanService $artisanService
      * @param $datastoreId
      * @return \Illuminate\Http\Response
-     * @throws ArtisanException
      * @throws DatastoreNotFoundException
      * @throws ForbiddenException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function expandDatastore(Request $request, ArtisanService $artisanService, $datastoreId)
+    public function expandVolume(Request $request, $datastoreId)
     {
         $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
+
+        $this->validate($request, ['size_gb' => 'required|integer|min:2']);
 
         // check the new size is larger than the current size
         $newSizeGB = $request->input('size_gb');
@@ -207,8 +205,49 @@ class DatastoreController extends BaseController
         // Convert GB to Mib
         $newSizeMiB = $newSizeGB * 1024;
 
-        if (!$artisanService->expandVolume($datastore->reseller_lun_name, $newSizeMiB)) {
-            throw new ArtisanException('Failed to expand datastore: ' . $artisanService->getLastError());
+        $datastore->expandVolume($newSizeMiB);
+
+        return $this->respondEmpty();
+    }
+
+
+    /**
+     * Rescan a cluster on VMWare after expanding a datastore
+     * @param Request $request
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws DatastoreNotFoundException
+     * @throws KingpinException
+     */
+    public function clusterRescan(Request $request, $datastoreId)
+    {
+        $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
+
+        try {
+            $datastore->clusterRescan();
+        } catch (\Exception $exception) {
+            throw new KingpinException('Failed to rescan datastore: ' . $exception->getMessage());
+        }
+
+        return $this->respondEmpty();
+    }
+
+    /**
+     * Expand the datastore
+     * @param Request $request
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws DatastoreNotFoundException
+     * @throws KingpinException
+     */
+    public function expandDatastore(Request $request, $datastoreId)
+    {
+        $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
+
+        try {
+            $datastore->expand();
+        } catch (\Exception $exception) {
+            throw new KingpinException('Failed to expand datastore: ' . $exception->getMessage());
         }
 
         return $this->respondEmpty();
