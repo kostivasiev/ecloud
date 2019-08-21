@@ -454,7 +454,6 @@ class Datastore extends Model implements Filterable, Sortable
             if (!$kingpin->clusterRescan($this->reseller_lun_ucs_reseller_id)) {
                 throw new \Exception('Failed to perform cluster rescan: ' . $kingpin->getLastError());
             }
-
         } catch (\Exception $exception) {
             throw new \Exception('Failed to perform cluster rescan ' . $exception->getMessage());
         }
