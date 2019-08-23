@@ -129,7 +129,9 @@ class DatastoreController extends BaseController
         $datastore->reseller_lun_status = Status::EXPANDING;
 
         if ($datastore->reseller_lun_lun_type != 'DATA') {
-            throw new ForbiddenException('Datastores of type ' . $datastore->reseller_lun_lun_type . ' can not be expanded automatically');
+            throw new ForbiddenException(
+                'Datastores of type ' . $datastore->reseller_lun_lun_type . ' can not be expanded automatically'
+            );
         }
 
         try {
