@@ -127,7 +127,10 @@ class DatastoreController extends BaseController
             throw new ForbiddenException('New datastore size must be greater than the current size');
         }
         $datastore->reseller_lun_status = Status::EXPANDING;
-        $datastore->save();
+
+        if ($datastore->reseller_lun_lun_type != 'DATA') {
+            throw new ForbiddenException('Datastores of type ' . $datastore->reseller_lun_lun_type . ' can not be expanded automatically');
+        }
 
         try {
             $automationRequestId = $intapiService->automationRequest(
@@ -143,6 +146,8 @@ class DatastoreController extends BaseController
         } catch (IntapiServiceException $exception) {
             throw new ArtisanException('Failed to expand datastore: ' . $exception->getMessage());
         }
+
+        $datastore->save();
 
         $headers = [];
         if ($request->user->isAdministrator) {
