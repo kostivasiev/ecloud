@@ -155,7 +155,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('active-directory/domains', 'ActiveDirectoryDomainController@index');
     $router->get('active-directory/domains/{domain_id}', 'ActiveDirectoryDomainController@show');
 
-
     /**
      * Base middleware + reseller ID scope
      */
@@ -175,8 +174,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     /**
      * Base middleware + is-administrator
      */
+
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        // Datastores (Expand datastore automation)
+        // Datastores
+        $router->patch('datastores/{datastore_id}', 'DatastoreController@update');
         $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume'); //Expand the datastore volume via Artisan
         $router->post('datastores/{datastore_id}/rescan', 'DatastoreController@clusterRescan'); //Perform cluster rescan
         $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore'); //Expand the datastore on VMWare

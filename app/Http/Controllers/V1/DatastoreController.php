@@ -7,6 +7,7 @@ use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\KingpinException;
 use App\Services\IntapiService;
+use App\Traits\V1\SanitiseRequestData;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -21,7 +22,7 @@ use App\Datastore\Exceptions\DatastoreNotFoundException;
 
 class DatastoreController extends BaseController
 {
-    use ResponseHelper, RequestHelper;
+    use ResponseHelper, RequestHelper, SanitiseRequestData;
 
     /**
      * List all Datastores
@@ -67,6 +68,39 @@ class DatastoreController extends BaseController
             [],
             Datastore::$itemProperties
         );
+    }
+
+    /**
+     * Update datastore
+     * @param Request $request
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws DatastoreNotFoundException
+     */
+    public function update(Request $request, $datastoreId)
+    {
+        $datastore = static::getDatastoreById($request, $datastoreId);
+
+        $rules = Datastore::getRules();
+
+        $rules = array_merge(
+            $rules,
+            [
+                'capacity' => ['nullable', 'numeric'],
+            ]
+        );
+
+        // Only allow status to be updated at this time
+        $this->sanitiseRequestData($request, ['status', 'capacity']);
+
+        $request['id'] = $datastoreId;
+        $this->validate($request, $rules);
+
+        $datastore = $this->receiveItem($request, Datastore::class);
+
+        $datastore->resource->save();
+
+        return $this->respondEmpty();
     }
 
     /**

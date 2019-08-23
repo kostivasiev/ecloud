@@ -2,10 +2,12 @@
 
 namespace App\Models\V1;
 
+use App\Datastore\Status;
 use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\KingpinException;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Validation\Rule;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
@@ -28,6 +30,18 @@ class Datastore extends Model implements Filterable, Sortable
     public $timestamps = false;
 
     public $isSystemStorage = false;
+
+    // Validation Rules
+    public static $rules = [
+        'capacity' => ['required', 'numeric']
+    ];
+
+    public static function getRules()
+    {
+        $rules = static::$rules;
+        $rules['status'] = ['sometimes', Rule::in(Status::all())];
+        return $rules;
+    }
 
     /**
      * Ditto configuration
