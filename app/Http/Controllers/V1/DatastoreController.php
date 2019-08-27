@@ -114,6 +114,7 @@ class DatastoreController extends BaseController
      * @throws ArtisanException
      * @throws DatastoreNotFoundException
      * @throws ForbiddenException
+     * Todo: This is locked down to admin until we move billing from myukfast to an automation step for expand datastore
      */
     public function expand(Request $request, IntapiService $intapiService, $datastoreId)
     {
