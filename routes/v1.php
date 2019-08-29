@@ -166,9 +166,10 @@ $router->group($baseRouteParameters, function () use ($router) {
          * Base middleware + reseller ID scope + is-administrator
          */
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            //
+            $router->post('datastores', 'DatastoreController@create'); //Fires off automation
         });
     });
+
 
     /**
      * Base middleware + is-administrator

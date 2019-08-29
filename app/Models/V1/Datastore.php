@@ -33,7 +33,14 @@ class Datastore extends Model implements Filterable, Sortable
 
     // Validation Rules
     public static $rules = [
-        'capacity' => ['required', 'numeric']
+        'solution_id' => ['required', 'numeric'],
+        'name' => ['sometimes', 'max:255'],
+        'type' => ['required', 'in:Hybrid,Private'],
+        'capacity' => ['required', 'numeric'],
+        'lun_type' => ['required', 'in:DATA,CLUSTER,QRM'],
+        'site_id' => ['sometimes', 'integer'],
+        'san_id' => ['sometimes', 'integer'],
+        'max_iops' => ['required', 'integer']
     ];
 
     public static function getRules()
@@ -144,7 +151,7 @@ class Datastore extends Model implements Filterable, Sortable
             StringProperty::create('reseller_lun_name', 'lun_name'),
             StringProperty::create('reseller_lun_wwn', 'lun_wwn'),
             StringProperty::create('reseller_lun_lun_type', 'lun_type'),
-            StringProperty::create('reseller_lun_lun_sub_type', 'lun_subtype'),
+            StringProperty::create('reseller_lun_lun_sub_type', 'lun_subtype'), //@deprecated
         ];
     }
 

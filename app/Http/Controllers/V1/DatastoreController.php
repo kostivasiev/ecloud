@@ -4,12 +4,19 @@ namespace App\Http\Controllers\V1;
 
 use App\Datastore\Status;
 use App\Exceptions\V1\ArtisanException;
+use App\Exceptions\V1\ConflictException;
 use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\KingpinException;
+use App\Exceptions\V1\SanNotFoundException;
+use App\Exceptions\V1\ServiceUnavailableException;
+use App\Models\V1\Storage;
 use App\Services\IntapiService;
 use App\Traits\V1\SanitiseRequestData;
+use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\ForbiddenException;
+use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
+use Log;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
@@ -71,6 +78,118 @@ class DatastoreController extends BaseController
     }
 
     /**
+     * Create datastore
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @return \Illuminate\Http\Response
+     * @throws ArtisanException
+     * @throws ConflictException
+     * @throws SanNotFoundException
+     * @throws UnprocessableEntityException
+     * @throws \App\Exceptions\V1\SiteNotFoundException
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     */
+    public function create(Request $request, IntapiService $intapiService)
+    {
+        $this->validate($request, Datastore::getRules());
+
+        if ($request->has('name')) {
+            // Validate volume friendly name is unique to the solution or solution site
+            $datastores = Collect(Datastore::getForSolution($request->input('solution_id'), $request->input('site_id')));
+
+            if ($datastores->contains('reseller_lun_friendly_name', '=', $request->input('name'))) {
+                throw new ConflictException(
+                    "Datastore with name '{$request->input('name')}' already exists for this " . ($request->has('site_id') ? 'solution site' : 'solution')
+                );
+            }
+        }
+
+        // Receive the user data
+        $datastoreResource = $this->receiveItem(
+            new Request($request->only(['solution_id', 'type', 'lun_type', 'capacity', 'name'])),
+            Datastore::class
+        );
+
+        // Determine the pod
+        if ($request->has('site_id')) {
+            $solutionSite = SolutionSiteController::getSiteById($request, $request->input('site_id'));
+            $pod = $solutionSite->pod;
+        } else {
+            $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
+            $pod = $solution->pod;
+        }
+
+        if ($pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are available on the solution\'s pod');
+        }
+
+        // If more than 1 san is available on the pod user must specify a san_id
+        if ($pod->sans->count() > 1 && !$request->has('san_id')) {
+            throw new UnprocessableEntityException(
+                'More than one SAN is available on the solution\'s pod - Please specify a san_id'
+            );
+        }
+
+        // If the user specified a san_id check that the san in on the solution / solution sites pod
+        if ($request->has('san_id')) {
+            $storage = Storage::withPod($pod->getKey())
+                ->where('server_id', '=', $request->input('san_id'));
+
+            if ($storage->count() < 1) {
+                $errorMessage = 'A SAN with the requested ID was not found on the solution\'s pod';
+                Log::error(
+                    $errorMessage,
+                    [
+                        'san_id' => $request->input('san_id'),
+                        'pod_id' => $pod->getKey()
+                    ]
+                );
+                throw new SanNotFoundException($errorMessage);
+            };
+
+            $storage = $storage->first();
+        }
+
+        // Only one SAN is available for the pod so use that
+        if (empty($storage)) {
+            $storage = Storage::withPod($pod->getKey())
+                ->where('server_id', '=', $pod->sans->first()->servers_id)
+                ->first();
+        }
+
+        $datastore = $datastoreResource->resource;
+        $datastore->reseller_lun_ucs_storage_id = $storage->getKey();
+        $datastore->reseller_lun_reseller_id = $this->resellerId;
+        $datastore->reseller_lun_status = Status::QUEUED;
+        $datastore->save();
+        $datastore->refresh();
+
+        try {
+            $automationRequestId = $intapiService->automationRequest(
+                'add_lun',
+                'reseller_lun',
+                $datastore->getKey(),
+                [
+                    'max_iops' => $request->input('max_iops')
+                ],
+                'ecloud_ucs_' . $pod->getKey(),
+                $request->user->applicationId
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ArtisanException('Failed to expand datastore: ' . $exception->getMessage());
+        }
+
+        $headers = [];
+        if ($request->user->isAdministrator) {
+            $headers = [
+                'X-AutomationRequestId' => $automationRequestId
+            ];
+        }
+
+        return $this->respondEmpty(202, $headers);
+    }
+
+    /**
      * Update datastore
      * @param Request $request
      * @param $datastoreId
@@ -87,6 +206,12 @@ class DatastoreController extends BaseController
             $rules,
             [
                 'capacity' => ['nullable', 'numeric'],
+                'solution_id' => ['sometimes', 'numeric'],
+                'type' => ['sometimes'],
+                'lun_type' => ['sometimes', 'in:DATA,CLUSTER,QRM'],
+                'name' => ['nullable'],
+                'max_iops' => ['sometimes', 'integer'],
+                'lun_wwn' => ['nullable', 'max:255']
             ]
         );
 
@@ -111,9 +236,9 @@ class DatastoreController extends BaseController
      * @param IntapiService $intapiService
      * @param $datastoreId
      * @return \Illuminate\Http\Response
-     * @throws ArtisanException
      * @throws DatastoreNotFoundException
      * @throws ForbiddenException
+     * @throws ServiceUnavailableException
      * Todo: This is locked down to admin until we move billing from myukfast to an automation step for expand datastore
      */
     public function expand(Request $request, IntapiService $intapiService, $datastoreId)
@@ -147,7 +272,7 @@ class DatastoreController extends BaseController
                 $request->user->applicationId
             );
         } catch (IntapiServiceException $exception) {
-            throw new ArtisanException('Failed to expand datastore: ' . $exception->getMessage());
+            throw new ServiceUnavailableException('Failed to expand datastore: ' . $exception->getMessage());
         }
 
         $datastore->save();

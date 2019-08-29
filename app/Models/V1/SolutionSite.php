@@ -146,6 +146,19 @@ class SolutionSite extends Model implements Filterable, Sortable
     }
 
     /**
+     * Return Pod
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function pod()
+    {
+        return $this->hasOne(
+            'App\Models\V1\Pod',
+            'ucs_datacentre_id',
+            'ucs_site_ucs_datacentre_id'
+        );
+    }
+
+    /**
      * Scope a query to only include sites for a given solution
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param $solutionId

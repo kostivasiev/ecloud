@@ -162,6 +162,26 @@ class Pod extends Model implements Filterable, Sortable
         );
     }
 
+    /**
+     *
+     * Return SAN's on the Pod
+     *
+     * Has-many relationship through ucs_storage mapping table
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function sans()
+    {
+        return $this->hasManyThrough(
+            San::class,
+            Storage::class,
+            'ucs_datacentre_id', // Foreign key on ucs_storage table
+            'servers_id', // servers.servers_id
+            'ucs_datacentre_id',
+            'server_id' // ucs_storage.server_id
+        );
+    }
+
 
     /**
      * Load VCE server details/credentials by username
