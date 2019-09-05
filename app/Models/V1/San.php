@@ -33,12 +33,24 @@ class San extends Model
     }
 
     /**
-     * Return teh SAN name
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * Return the SAN name
      */
     public function name()
     {
         return $this->servers_netnios_name;
+    }
+
+    /**
+     * Map to ucs_storage
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function storage()
+    {
+        return $this->belongsTo(
+            Storage::class,
+            'servers_id',
+            'server_id'
+        );
     }
 
     /**

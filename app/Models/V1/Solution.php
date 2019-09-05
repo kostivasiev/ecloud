@@ -314,6 +314,19 @@ class Solution extends Model implements Filterable, Sortable
 
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function volumeSets()
+    {
+        return $this->hasMany(
+            VolumeSet::class,
+            'ucs_reseller_id', //Local Column
+            'ucs_reseller_id' //Relation's column
+        );
+    }
+
+
+    /**
      * Get the total RAM in GB for a Solution by adding up the RAM specification of all the Solution's Hosts
      * @param null $datacentreId Limit to a particular datacentre
      * @return int calculated total (based on host specification name)

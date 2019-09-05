@@ -3,8 +3,10 @@
 namespace App\Models\V1;
 
 use App\Datastore\Status;
+use App\Events\V1\DatastoreCreatedEvent;
 use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\KingpinException;
+use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Validation\Rule;
@@ -31,23 +33,24 @@ class Datastore extends Model implements Filterable, Sortable
 
     public $isSystemStorage = false;
 
-    // Validation Rules
-    public static $rules = [
-        'solution_id' => ['required', 'numeric'],
-        'name' => ['sometimes', 'max:255'],
-        'type' => ['required', 'in:Hybrid,Private'],
-        'capacity' => ['required', 'numeric'],
-        'lun_type' => ['required', 'in:DATA,CLUSTER,QRM'],
-        'site_id' => ['sometimes', 'integer'],
-        'san_id' => ['sometimes', 'integer'],
-        'max_iops' => ['required', 'integer']
+    // Events triggered by actions on the model
+    protected $dispatchesEvents = [
+        'created' => DatastoreCreatedEvent::class,
     ];
 
+    // Validation Rules
     public static function getRules()
     {
-        $rules = static::$rules;
-        $rules['status'] = ['sometimes', Rule::in(Status::all())];
-        return $rules;
+        return [
+            'solution_id' => ['required', 'numeric'],
+            'name' => ['sometimes', 'max:255'],
+            'type' => ['required', 'in:Hybrid,Private'],
+            'capacity' => ['required', 'numeric'],
+            'lun_type' => ['required', 'in:DATA,CLUSTER,QRM'],
+            'site_id' => ['sometimes', 'integer'],
+            'san_id' => ['sometimes', 'integer'],
+            'status' => ['sometimes', Rule::in(Status::all())]
+        ];
     }
 
     /**
@@ -423,20 +426,86 @@ class Datastore extends Model implements Filterable, Sortable
         return $defaultDatastore;
     }
 
+    /**
+     * Generates the next identifier for a volume for a solution. Volume identifiers are based on the lun_type
+     * and the number owned by the solution, e.g. solution 17106 has 2 x DATA volumes, "MCS_G0_VV_17106_DATA_1" and
+     * "MCS_G0_VV_17106_DATA_2", so the next identifier would be "DATA_3"
+     * @return string
+     */
+    protected function getNextVolumeIdentifier()
+    {
+        // Get all the datastores for this datastore's solution, including deleted so we can generate a unique identifier
+        $datastores = Datastore::query()
+            ->join('ucs_reseller', 'ucs_reseller_id', '=', 'reseller_lun_ucs_reseller_id')
+            ->where('ucs_reseller_id', '=', $this->reseller_lun_ucs_reseller_id)
+            ->where('reseller_lun_status', '!=', Status::QUEUED)
+            ->where('reseller_lun_lun_type', '=', $this->reseller_lun_lun_type);
+
+        if ($datastores->count() < 1) {
+            return $this->reseller_lun_lun_type . '_' . 1;
+        }
+
+        $index = 0;
+        $datastores->get()->map(function ($item) use (&$index) {
+            if (preg_match('/\w+(DATA|CLUSTER|QRM)_?(\d+)*/', $item->reseller_lun_name, $matches) == true) {
+                $numeric = $matches[2] ?? 1;
+                $index = ($numeric > $index) ? (int) $numeric : $index;
+            }
+        });
+
+        return $this->reseller_lun_lun_type . '_' . ++$index;
+    }
+
 
     /**
-     * Expand the volume on the SAN
-     * @param $newSizeMiB
+     * Create the volume for the datastore on the SAN
      * @return bool
      * @throws ArtisanException
      */
-    public function expandVolume($newSizeMiB)
+    public function createVolume()
     {
-        $artisanService = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $this]]);
+        $identifier = $this->getNextVolumeIdentifier();
+
+        $artisanService = app()->makeWith(ArtisanService::class, [['datastore' => $this]]);
+
+        // Convert GB to MiB
+        $sizeMiB = $this->reseller_lun_size_gb * 1024;
+
+        $artisanResult = $artisanService->createVolume($identifier, $this->reseller_lun_lun_type, $sizeMiB);
+
+        if (!$artisanResult) {
+            throw new ArtisanException('Failed to create volume: ' . $artisanService->getLastError());
+        }
+
+        // Update the volume properties
+        $this->reseller_lun_name = $artisanResult->name;
+        $this->reseller_lun_wwn = $artisanResult->wwn;
+        $this->reseller_lun_size_gb = $artisanResult->sizeMiB/1024;
+
+        $this->save();
+
+        return true;
+    }
+
+    /**
+     * Expand the volume on the SAN
+     * @param $newSizeGB
+     * @return bool
+     * @throws ArtisanException
+     */
+    public function expandVolume($newSizeGB)
+    {
+        $artisanService = app()->makeWith(ArtisanService::class, [['datastore' => $this]]);
+
+        // Convert GB to Mib
+        $newSizeMiB = $newSizeGB * 1024;
 
         if (!$artisanService->expandVolume($this->reseller_lun_name, $newSizeMiB)) {
             throw new ArtisanException('Failed to expand datastore volume: ' . $artisanService->getLastError());
         }
+
+        $this->reseller_lun_size_gb = $newSizeGB;
+        $this->save();
 
         return true;
     }

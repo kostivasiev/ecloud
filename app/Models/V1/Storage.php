@@ -44,6 +44,15 @@ class Storage extends Model
     }
 
     /**
+     * Return whether IOPS is configurable for the SAN
+     * @return bool
+     */
+    public function qosEnabled()
+    {
+        return ($this->attributes['qos_enabled'] == 'Yes');
+    }
+
+    /**
      * Scope a query to only include solutions for a given reseller
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param int $podId

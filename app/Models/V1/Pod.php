@@ -146,12 +146,6 @@ class Pod extends Model implements Filterable, Sortable
      */
     public function gpuProfiles()
     {
-        /**
-         * select * from `gpu_profile`
-         * inner join `gpu_profile_pod_availability` on `gpu_profile_pod_availability`.`gpu_profile_id` =
-         * `gpu_profile`.`id`  where `gpu_profile_pod_availability`.`ucs_datacentre_id` = ?
-         * and `gpu_profile`.`deleted_at` is null
-         */
         return $this->hasManyThrough(
             'App\Models\V1\GpuProfile',
             'App\Models\V1\GpuProfilePodAvailability', // Map table
@@ -252,7 +246,7 @@ class Pod extends Model implements Filterable, Sortable
     /**
      * Return the kingpin passowrd
      * @return bool
-     * TODO: implement this isn the kingpin service provider
+     * TODO: implement this in the kingpin service provider
      */
     public function vmwareApiPassword()
     {

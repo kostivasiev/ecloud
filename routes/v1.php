@@ -96,6 +96,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('datastores', 'DatastoreController@index');
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
 
+    // IOPS
+    $router->get('iops', 'IOPSController@index');
+
 
     // Firewalls
     $router->get('firewalls', 'FirewallController@index');
@@ -154,6 +157,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('active-directory/domains', 'ActiveDirectoryDomainController@index');
     $router->get('active-directory/domains/{domain_id}', 'ActiveDirectoryDomainController@show');
 
+    // IOPS
+    $router->get('iops', 'IOPSController@index');
+    $router->get('iops/{uuid}', 'IOPSController@show');
+
     /**
      * Base middleware + reseller ID scope
      */
@@ -183,6 +190,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume'); //Expand the datastore volume via Artisan
         $router->post('datastores/{datastore_id}/rescan', 'DatastoreController@clusterRescan'); //Perform cluster rescan
         $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore'); //Expand the datastore on VMWare
+
+        $router->post('datastores/{datastore_id}/createvolume', 'DatastoreController@createvolume'); // Create a new volume on the SAN
+        // Storage volume sets
+        $router->get('volumesets', 'VolumeSetController@index');
+        $router->get('volumesets/{volue_set_id}', 'VolumeSetController@show');
+        $router->post('volumesets', 'VolumeSetController@create'); //Create a volume set
+        $router->post('volumesets/{volume_set_id}/iops', 'VolumeSetController@setIOPS');
+        $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore'); // Add datastore/volume to a volume set
     });
 });
+
 

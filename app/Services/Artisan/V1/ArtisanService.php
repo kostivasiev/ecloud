@@ -45,7 +45,6 @@ class ArtisanService
      */
     private $sanName;
 
-
     /**
      * Solution ID
      * @var null
@@ -534,12 +533,13 @@ class ArtisanService
     /**
      * Creates a volume
      * @param $volumeIdentifier
+     * @param $type
      * @param $sizeMiB
      * @return bool|\StdClass
      * @throws ArtisanException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createVolume($volumeIdentifier, $sizeMiB)
+    public function createVolume($volumeIdentifier, $type, $sizeMiB)
     {
         $baseUrl       = $this->generateV1URL();
         $url           = $baseUrl . '/volume';
@@ -547,7 +547,7 @@ class ArtisanService
         $model = array(
             'volumeIdentifier' => $volumeIdentifier,
             'sizeMiB' => $sizeMiB,
-            'type' => 'DATA'
+            'type' => $type
 
         );
 
@@ -700,7 +700,7 @@ class ArtisanService
 
 
     /**
-     * Handles instances of ServerException
+     * Handles instances of TransferException
      * @param TransferException $exception
      * @return bool
      */

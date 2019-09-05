@@ -5,8 +5,9 @@ namespace App\Providers;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Http\Controllers\V1\DatastoreController;
 use App\Models\V1\Datastore;
-use App\Models\V1\Pod;
 use App\Models\V1\San;
+use App\Models\V1\Solution;
+use App\Models\V1\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\ServiceProvider;
 use App\Services\Artisan\V1\ArtisanService;
@@ -25,17 +26,12 @@ use Log;
  * - or Load from Solution + San (using Solution's Pod)
  * $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['solution'=>$solution, 'san' => $san]);
  *
- * or load using Solution + Pod + San
- * $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['solution'=>$solution, 'san' => $san, 'pod' => $solution->pod]]);
- *
  * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 class ArtisanServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
-     *
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     * Register Artisan services.
      * @return void
      */
     public function register()
@@ -50,15 +46,7 @@ class ArtisanServiceProvider extends ServiceProvider
             // Do we have a datastore to get the config from in a route? (i.e does the route have datastore_id?
             if (in_array('datastore_id', array_keys($routeParams))) {
                 $datastore = DatastoreController::getDatastoreById($this->app['request'], $routeParams['datastore_id']);
-
-                if (!is_object($datastore) || !is_a($datastore, 'App\Models\V1\Datastore')) {
-                    $log_message = 'Unable to create ArtisanService: Invalid Datastore Object';
-                    Log::error($log_message);
-                    throw new \Exception($log_message);
-                }
-
                 $config = $this->loadConfigFromDatastore($datastore);
-                $config['solution_id'] = $datastore->reseller_lun_ucs_reseller_id;
 
                 return $this->launchArtisanService($config);
             }
@@ -70,6 +58,11 @@ class ArtisanServiceProvider extends ServiceProvider
                  */
                 if (!empty($parameters[0]['datastore'])) {
                     $datastore = $parameters[0]['datastore'];
+                    if (!is_object($datastore) || !is_a($datastore, Datastore::class)) {
+                        $log_message = 'Unable to create ArtisanService: Invalid datastore Object';
+                        Log::error($log_message);
+                        throw new \Exception($log_message);
+                    }
                     $config = $this->loadConfigFromDatastore($datastore);
 
                     return $this->launchArtisanService($config);
@@ -82,21 +75,18 @@ class ArtisanServiceProvider extends ServiceProvider
                     $solution = $parameters[0]['solution'];
                     $san = $parameters[0]['san'];
 
-                    if (!is_object($solution) || !is_a($solution, 'App\Models\V1\Solution')) {
+                    if (!is_object($solution) || !is_a($solution, Solution::class)) {
                         $log_message = 'Unable to create ArtisanService: Invalid Solution Object';
                         Log::error($log_message);
                         throw new \Exception($log_message);
                     }
 
-                    $pod = $parameters[0]['pod'] ?? $solution->pod;
-
-                    if (!is_object($san) || !is_a($san, 'App\Models\V1\San')) {
+                    if (!is_object($san) || !is_a($san, San::class)) {
                         $log_message = 'Unable to create ArtisanService: Invalid San Object';
-                        Log::error($log_message);
                         throw new \Exception($log_message);
                     }
 
-                    $config = $this->loadConfig($pod, $san);
+                    $config = $this->loadConfig($san->storage);
                     $config['solution_id'] = $solution->getKey();
 
                     return $this->launchArtisanService($config);
@@ -117,21 +107,22 @@ class ArtisanServiceProvider extends ServiceProvider
             throw new ServiceUnavailableException('No storage is configured for this datastore.');
         }
 
-        return $this->loadConfig(
-            $datastore->storage->pod,
-            $datastore->storage->san
-        );
+        $config = $this->loadConfig($datastore->storage);
+        $config['solution_id'] = $datastore->reseller_lun_ucs_reseller_id;
+        return $config;
     }
 
     /**
-     * Load the config for the Pod and SAN
-     * @param Pod $pod
-     * @param San $san
+     * Load the Artisan config for the SAN
+     * @param Storage $storage
      * @return array
      * @throws ServiceUnavailableException
      */
-    private function loadConfig(Pod $pod, San $san) : array
+    private function loadConfig(Storage $storage) : array
     {
+        $pod = $storage->pod;
+        $san = $storage->san;
+
         $storageApiUrl = $pod->storageApiUrl();
         if (empty($storageApiUrl)) {
             Log::error(

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Datastore\Status;
+use App\Events\V1\DatastoreExpandEvent;
 use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\ConflictException;
 use App\Exceptions\V1\IntapiServiceException;
@@ -12,6 +13,7 @@ use App\Exceptions\V1\ServiceUnavailableException;
 use App\Models\V1\Storage;
 use App\Services\IntapiService;
 use App\Traits\V1\SanitiseRequestData;
+use Illuminate\Support\Facades\Event;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
@@ -79,6 +81,8 @@ class DatastoreController extends BaseController
 
     /**
      * Create datastore
+     *
+     * Creates the initial reseller_lun record and fires off automation
      * @param Request $request
      * @param IntapiService $intapiService
      * @return \Illuminate\Http\Response
@@ -88,6 +92,7 @@ class DatastoreController extends BaseController
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\SiteNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws BadRequestException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -157,6 +162,20 @@ class DatastoreController extends BaseController
                 ->first();
         }
 
+        $automationData = [
+            'san_id' => $storage->server_id
+        ];
+
+        if ($request->has('iops_tier')) {
+            if (!$storage->qosEnabled()){
+                throw new BadRequestException('IOPS is not configurable for this datastore');
+            }
+            $this->validate($request, ['iops_tier' => ['required', new IsValidUuid()]]);
+            // Validate teh input is a valid IOPS tier, but pass a numeric value to automation
+            $iops = IOPSController::getById($request->input('iops_tier'));
+            $automationData['max_iops'] = $iops->max_iops;
+        }
+
         $datastore = $datastoreResource->resource;
         $datastore->reseller_lun_ucs_storage_id = $storage->getKey();
         $datastore->reseller_lun_reseller_id = $this->resellerId;
@@ -169,9 +188,7 @@ class DatastoreController extends BaseController
                 'add_lun',
                 'reseller_lun',
                 $datastore->getKey(),
-                [
-                    'max_iops' => $request->input('max_iops')
-                ],
+                $automationData,
                 'ecloud_ucs_' . $pod->getKey(),
                 $request->user->applicationId
             );
@@ -190,6 +207,27 @@ class DatastoreController extends BaseController
     }
 
     /**
+     * Create a volume on the SAN for the datastore
+     * @param Request $request
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws BadRequestException
+     * @throws DatastoreNotFoundException
+     */
+    public function createVolume(Request $request, $datastoreId)
+    {
+        $datastore = static::getDatastoreById($request, $datastoreId);
+
+        if (!empty($datastore->reseller_lun_name)) {
+            throw new BadRequestException('A volume has already been assigned to this datastore.');
+        }
+
+        $datastore->createVolume();
+
+        return $this->respondEmpty(201);
+    }
+
+    /**
      * Update datastore
      * @param Request $request
      * @param $datastoreId
@@ -198,7 +236,7 @@ class DatastoreController extends BaseController
      */
     public function update(Request $request, $datastoreId)
     {
-        $datastore = static::getDatastoreById($request, $datastoreId);
+        static::getDatastoreById($request, $datastoreId);
 
         $rules = Datastore::getRules();
 
@@ -210,18 +248,14 @@ class DatastoreController extends BaseController
                 'type' => ['sometimes'],
                 'lun_type' => ['sometimes', 'in:DATA,CLUSTER,QRM'],
                 'name' => ['nullable'],
-                'max_iops' => ['sometimes', 'integer'],
                 'lun_wwn' => ['nullable', 'max:255']
             ]
         );
 
-        // Only allow status to be updated at this time
-        $this->sanitiseRequestData($request, ['status', 'capacity']);
-
         $request['id'] = $datastoreId;
         $this->validate($request, $rules);
 
-        $datastore = $this->receiveItem($request, Datastore::class);
+        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'capacity', 'name'])), Datastore::class);
 
         $datastore->resource->save();
 
@@ -283,6 +317,8 @@ class DatastoreController extends BaseController
                 'X-AutomationRequestId' => $automationRequestId
             ];
         }
+
+        Event::fire(new DatastoreExpandEvent($datastore, $newSizeGB));
 
         return $this->respondEmpty(202, $headers);
     }
@@ -369,10 +405,7 @@ class DatastoreController extends BaseController
             throw new ForbiddenException('New datastore size must be greater than the current size');
         }
 
-        // Convert GB to Mib
-        $newSizeMiB = $newSizeGB * 1024;
-
-        $datastore->expandVolume($newSizeMiB);
+        $datastore->expandVolume($newSizeGB);
 
         return $this->respondEmpty();
     }
@@ -400,7 +433,7 @@ class DatastoreController extends BaseController
     }
 
     /**
-     * Expand the datastore
+     * Expand the datastore on VMWare
      * @param Request $request
      * @param $datastoreId
      * @return \Illuminate\Http\Response
