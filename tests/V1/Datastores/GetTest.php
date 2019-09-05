@@ -6,8 +6,6 @@ use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use App\Models\V1\Datastore;
-use App\Models\V1\Solution;
-use App\Models\V1\Pod;
 
 class GetTest extends TestCase
 {
@@ -24,6 +22,7 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
+        Datastore::flushEventListeners();
         $count = 2;
         factory(Datastore::class, $count)->create();
 
