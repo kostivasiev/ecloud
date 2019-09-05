@@ -93,6 +93,7 @@ class DatastoreController extends BaseController
      * @throws \App\Exceptions\V1\SiteNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws BadRequestException
+     * @throws ServiceUnavailableException
      */
     public function create(Request $request, IntapiService $intapiService)
     {
@@ -194,7 +195,7 @@ class DatastoreController extends BaseController
                 $request->user->applicationId
             );
         } catch (IntapiServiceException $exception) {
-            throw new ArtisanException('Failed to expand datastore: ' . $exception->getMessage());
+            throw new ServiceUnavailableException('Failed to expand datastore', null, 502);
         }
 
         $headers = [];
