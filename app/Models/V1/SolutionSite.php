@@ -159,6 +159,20 @@ class SolutionSite extends Model implements Filterable, Sortable
     }
 
     /**
+     * Return Solution
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function solution()
+    {
+        return $this->hasOne(
+            'App\Models\V1\Solution',
+            'ucs_reseller_id',
+            'ucs_site_ucs_reseller_id'
+        );
+    }
+
+
+    /**
      * Scope a query to only include sites for a given solution
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param $solutionId

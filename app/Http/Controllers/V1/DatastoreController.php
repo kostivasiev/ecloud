@@ -98,9 +98,19 @@ class DatastoreController extends BaseController
     {
         $this->validate($request, Datastore::getRules());
 
+        // Determine the pod
+        if ($request->has('site_id')) {
+            $solutionSite = SolutionSiteController::getSiteById($request, $request->input('site_id'));
+            $solution = $solutionSite->solution;
+            $pod = $solutionSite->pod;
+        } else {
+            $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
+            $pod = $solution->pod;
+        }
+
         if ($request->has('name')) {
             // Validate volume friendly name is unique to the solution or solution site
-            $datastores = Collect(Datastore::getForSolution($request->input('solution_id'), $request->input('site_id')));
+            $datastores = Collect(Datastore::getForSolution($solution->getKey(), $request->input('site_id')));
 
             if ($datastores->contains('reseller_lun_friendly_name', '=', $request->input('name'))) {
                 throw new ConflictException(
@@ -114,15 +124,6 @@ class DatastoreController extends BaseController
             new Request($request->only(['solution_id', 'type', 'lun_type', 'capacity', 'name'])),
             Datastore::class
         );
-
-        // Determine the pod
-        if ($request->has('site_id')) {
-            $solutionSite = SolutionSiteController::getSiteById($request, $request->input('site_id'));
-            $pod = $solutionSite->pod;
-        } else {
-            $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
-            $pod = $solution->pod;
-        }
 
         if ($pod->sans->count() == 0) {
             throw new SanNotFoundException('No SANS are available on the solution\'s pod');

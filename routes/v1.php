@@ -95,6 +95,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Datastores
     $router->get('datastores', 'DatastoreController@index');
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
+    $router->post('datastores', 'DatastoreController@create'); //Fires off automation
 
     // IOPS
     $router->get('iops', 'IOPSController@index');
@@ -173,7 +174,7 @@ $router->group($baseRouteParameters, function () use ($router) {
          * Base middleware + reseller ID scope + is-administrator
          */
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->post('datastores', 'DatastoreController@create'); //Fires off automation
+
         });
     });
 
