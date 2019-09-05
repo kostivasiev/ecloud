@@ -16,7 +16,6 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
 
-
 class VolumeSet extends Model implements Filterable, Sortable
 {
     // Table uses UUID's

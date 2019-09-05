@@ -167,7 +167,7 @@ class DatastoreController extends BaseController
         ];
 
         if ($request->has('iops_tier')) {
-            if (!$storage->qosEnabled()){
+            if (!$storage->qosEnabled()) {
                 throw new BadRequestException('IOPS is not configurable for this datastore');
             }
             $this->validate($request, ['iops_tier' => ['required', new IsValidUuid()]]);
