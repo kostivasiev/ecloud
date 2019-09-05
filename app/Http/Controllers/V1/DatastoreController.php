@@ -18,7 +18,7 @@ use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
