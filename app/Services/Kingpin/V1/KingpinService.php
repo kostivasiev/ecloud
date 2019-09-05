@@ -747,8 +747,6 @@ class KingpinService
             unset($exceptionData['StackTrace']);
         }
 
-        Log::critical($logMessage, $exceptionData);
-
         if (is_null($response)) {
             Log::debug('No response body from Kingpin request, service may be unavailable.');
             return true;
