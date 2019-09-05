@@ -6,20 +6,6 @@ ARG BUILDPACK_URL
 ENV BUILDPACK_URL ${BUILDPACK_URL}
 ENV PORT 8080
 
-ENV APP_PATH /app
-ENV ENV_PATH /herokuish/env
-ENV BUILD_PATH /herokuish/build
-ENV CACHE_PATH /herokuish/cache
-ENV IMPORT_PATH /herokuish/import
-ENV BUILDPACK_PATH /herokuish/buildpack
-
-RUN mkdir -p /app
-RUN mkdir -p /herokuish/env
-RUN mkdir -p /herokuish/build
-RUN mkdir -p /herokuish/cache
-RUN mkdir -p /herokuish/import
-RUN mkdir -p /herokuish/buildpack
-
 ADD . /app
 
 # Create ".env" file if it doesn't exist

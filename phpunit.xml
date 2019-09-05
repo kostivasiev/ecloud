@@ -21,11 +21,16 @@
         </whitelist>
     </filter>
     <php>
-        <env name="APP_NAME" value="ecloud" force="true"/>
         <env name="APP_ENV" value="testing" force="true"/>
-
         <env name="CACHE_DRIVER" value="array" force="true"/>
-        <env name="QUEUE_DRIVER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+
+        <env name="APP_NAME" value="ecloud" force="true"/>
+
+<!--        <env name="DB_RESELLER_HOST" value="127.0.0.1" force="true"/>-->
+<!--        <env name="DB_RESELLER_PORT" value="3307" force="true"/>-->
+<!--        <env name="DB_ECLOUD_HOST" value="127.0.0.1" force="true"/>-->
+<!--        <env name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
 
         <env name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
         <env name="DB_RESELLER_DRIVER" value="sqlite" force="true"/>
