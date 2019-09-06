@@ -123,7 +123,7 @@ class DatastoreController extends BaseController
 
         // Receive the user data
         $datastoreResource = $this->receiveItem(
-            new Request($request->only(['solution_id', 'lun_type', 'capacity', 'name'])),
+            new Request($request->only(['solution_id', 'capacity', 'name'])),
             Datastore::class
         );
 
@@ -179,10 +179,18 @@ class DatastoreController extends BaseController
             $automationData['max_iops'] = $iops->max_iops;
         }
 
+        // Only allow DATA LUN's for non-admins
+        if ($request->has('lun_type')) {
+            if (!$this->isAdmin && $request->input('lun_type') != 'DATA') {
+                throw new BadRequestException('lun_type \'' . $request->input('lun_type') . '\' is not supported');
+            }
+        }
+
         $datastore = $datastoreResource->resource;
         $datastore->reseller_lun_ucs_storage_id = $storage->getKey();
         $datastore->reseller_lun_type = $solution->ucs_reseller_type;
         $datastore->reseller_lun_reseller_id = $this->resellerId;
+        $datastore->reseller_lun_lun_type = $request->input('lun_type', 'DATA');
         $datastore->reseller_lun_status = Status::QUEUED;
         $datastore->save();
         $datastore->refresh();

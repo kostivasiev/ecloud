@@ -46,7 +46,7 @@ class Datastore extends Model implements Filterable, Sortable
             'name' => ['sometimes', 'max:255'],
             'type' => ['sometimes', 'in:Hybrid,Private'],
             'capacity' => ['required', 'numeric'],
-            'lun_type' => ['required', 'in:DATA,CLUSTER,QRM'],
+            'lun_type' => ['sometimes', 'in:DATA,CLUSTER,QRM'],
             'site_id' => ['sometimes', 'integer'],
             'san_id' => ['sometimes', 'integer'],
             'status' => ['sometimes', Rule::in(Status::all())]
