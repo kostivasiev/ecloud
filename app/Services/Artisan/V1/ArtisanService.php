@@ -3,7 +3,6 @@
 namespace App\Services\Artisan\V1;
 
 use App\Exceptions\V1\ArtisanException;
-use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TransferException;
 use Log;
 use Psr\Http\Message\ResponseInterface;
