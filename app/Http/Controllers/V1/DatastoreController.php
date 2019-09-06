@@ -123,7 +123,7 @@ class DatastoreController extends BaseController
 
         // Receive the user data
         $datastoreResource = $this->receiveItem(
-            new Request($request->only(['solution_id', 'type', 'lun_type', 'capacity', 'name'])),
+            new Request($request->only(['solution_id', 'lun_type', 'capacity', 'name'])),
             Datastore::class
         );
 
@@ -181,6 +181,7 @@ class DatastoreController extends BaseController
 
         $datastore = $datastoreResource->resource;
         $datastore->reseller_lun_ucs_storage_id = $storage->getKey();
+        $datastore->reseller_lun_type = $solution->ucs_reseller_type;
         $datastore->reseller_lun_reseller_id = $this->resellerId;
         $datastore->reseller_lun_status = Status::QUEUED;
         $datastore->save();

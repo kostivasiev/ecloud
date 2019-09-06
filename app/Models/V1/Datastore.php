@@ -44,7 +44,7 @@ class Datastore extends Model implements Filterable, Sortable
         return [
             'solution_id' => ['required', 'numeric'],
             'name' => ['sometimes', 'max:255'],
-            'type' => ['required', 'in:Hybrid,Private'],
+            'type' => ['sometimes', 'in:Hybrid,Private'],
             'capacity' => ['required', 'numeric'],
             'lun_type' => ['required', 'in:DATA,CLUSTER,QRM'],
             'site_id' => ['sometimes', 'integer'],
