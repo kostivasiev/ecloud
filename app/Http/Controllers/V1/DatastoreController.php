@@ -11,6 +11,7 @@ use App\Exceptions\V1\KingpinException;
 use App\Exceptions\V1\SanNotFoundException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Models\V1\Storage;
+use App\Rules\V1\IsValidUuid;
 use App\Services\IntapiService;
 use App\Traits\V1\SanitiseRequestData;
 use Illuminate\Support\Facades\Event;
@@ -308,7 +309,7 @@ class DatastoreController extends BaseController
                 $request->user->applicationId
             );
         } catch (IntapiServiceException $exception) {
-            throw new ServiceUnavailableException('Failed to expand datastore: ' . $exception->getMessage());
+            throw new ServiceUnavailableException('Failed to expand datastore.');
         }
 
         $datastore->save();
