@@ -438,7 +438,7 @@ class Datastore extends Model implements Filterable, Sortable
         $datastores = Datastore::query()
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'reseller_lun_ucs_reseller_id')
             ->where('ucs_reseller_id', '=', $this->reseller_lun_ucs_reseller_id)
-            ->where('reseller_lun_status', '!=', Status::QUEUED)
+            ->where('reseller_lun_name', '!=', '')
             ->where('reseller_lun_lun_type', '=', $this->reseller_lun_lun_type);
 
         if ($datastores->count() < 1) {
