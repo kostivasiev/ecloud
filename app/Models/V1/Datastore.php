@@ -458,6 +458,34 @@ class Datastore extends Model implements Filterable, Sortable
 
 
     /**
+     * Add the datastore to VMWare
+     * @return bool
+     * @throws \Exception
+     */
+    public function create()
+    {
+        try {
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
+                $this->storage->pod,
+                $this->reseller_lun_type
+            ]);
+        } catch (\Exception $exception) {
+            throw new KingpinException('Failed to create datastore usage on VMWare');
+        }
+
+        $result = $kingpin->createDatastore(
+            $this->reseller_lun_ucs_reseller_id,
+            $this->reseller_lun_name,
+            $this->reseller_lun_wwn
+        );
+
+        if (!$result) {
+            throw new KingpinException('Failed to create datastore on VMWare: ' . $kingpin->getLastError());
+        }
+    }
+
+
+    /**
      * Create the volume for the datastore on the SAN
      * @return bool
      * @throws ArtisanException

@@ -95,7 +95,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Datastores
     $router->get('datastores', 'DatastoreController@index');
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
-    $router->post('datastores', 'DatastoreController@create'); //Fires off automation
 
     // IOPS
     $router->get('iops', 'IOPSController@index');
@@ -186,6 +185,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         // Datastores
         $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand'); //Fires off automation
+        $router->post('datastores', 'DatastoreController@create'); //Fires off automation
 
         $router->patch('datastores/{datastore_id}', 'DatastoreController@update');
         $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume'); //Expand the datastore volume via Artisan
@@ -193,11 +193,14 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore'); //Expand the datastore on VMWare
 
         $router->post('datastores/{datastore_id}/createvolume', 'DatastoreController@createvolume'); // Create a new volume on the SAN
+        $router->post('datastores/{datastore_id}/create', 'DatastoreController@createDatastore'); // Create a new volume on the VMWare
+
         // Storage volume sets
         $router->get('volumesets', 'VolumeSetController@index');
         $router->get('volumesets/{volue_set_id}', 'VolumeSetController@show');
         $router->post('volumesets', 'VolumeSetController@create'); //Create a volume set
         $router->post('volumesets/{volume_set_id}/iops', 'VolumeSetController@setIOPS');
+
         $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore'); // Add datastore/volume to a volume set
     });
 });

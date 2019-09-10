@@ -240,6 +240,23 @@ class DatastoreController extends BaseController
     }
 
     /**
+     * Create the datastore on VMWare
+     * @param Request $request
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws DatastoreNotFoundException
+     * @throws KingpinException
+     */
+    public function createDatastore(Request $request, $datastoreId)
+    {
+        $datastore = static::getDatastoreById($request, $datastoreId);
+
+        $datastore->create();
+
+        return $this->respondEmpty(201);
+    }
+
+    /**
      * Update datastore
      * @param Request $request
      * @param $datastoreId

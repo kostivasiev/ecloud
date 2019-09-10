@@ -553,6 +553,32 @@ class KingpinService
     }
 
     /**
+     * Create datastore
+     * @param $solutionId
+     * @param $datastoreName
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function createDatastore($solutionId, $datastoreName, $wwn)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'datastore';
+
+        $model = [
+            'datastoreName' => $datastoreName,
+            'wwn' => $wwn
+        ];
+
+        try {
+            $this->makeRequest('POST', $url, $model);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Expand a datastore
      * @param $solutionId
      * @param $datastoreName
