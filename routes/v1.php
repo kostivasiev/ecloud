@@ -200,6 +200,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('volumesets/{volue_set_id}', 'VolumeSetController@show');
         $router->post('volumesets', 'VolumeSetController@create'); //Create a volume set
         $router->post('volumesets/{volume_set_id}/iops', 'VolumeSetController@setIOPS');
+        $router->post('volumesets/{volume_set_id}/export', 'VolumeSetController@export'); // Export volume set to host set
+
 
         $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore'); // Add datastore/volume to a volume set
     });

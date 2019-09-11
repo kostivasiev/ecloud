@@ -293,6 +293,20 @@ class Solution extends Model implements Filterable, Sortable
     }
 
     /**
+     * Get the hostSet for the solution
+     * At the moment we have a single host set for a solution
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function hostSet()
+    {
+        return $this->hasOne(
+            'App\Models\V1\HostSet',
+            'ucs_reseller_id',
+            'ucs_reseller_id'
+        );
+    }
+
+    /**
      * Get the Hosts (ucs_nodes) for a solution
      * @param null $datacentreId
      * @return \Illuminate\Database\Eloquent\Collection

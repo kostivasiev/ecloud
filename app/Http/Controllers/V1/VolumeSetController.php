@@ -13,6 +13,7 @@ use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Support\Facades\Event;
+use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -232,7 +233,54 @@ class VolumeSetController extends BaseController
 
         return $this->respondEmpty();
     }
-    
+
+
+    /**
+     * Export a volume set to a host set
+     * @param Request $request
+     * @param $volumeSetId
+     * @return \Illuminate\Http\Response
+     * @throws ArtisanException
+     * @throws NotFoundException
+     */
+    public function export(Request $request, $volumeSetId)
+    {
+        $rules = [
+            'volume_set_id' => ['required', new IsValidUuid()],
+            'san_id' => ['required', 'numeric']
+        ];
+
+        $request['volume_set_id'] = $volumeSetId;
+        $this->validate($request, $rules);
+        $volumeSet = static::getById($request, $volumeSetId);
+
+        $san = San::findOrFail($request->input('san_id'));
+
+        $hostSet = $volumeSet->solution->hostSet;
+
+        if (!$hostSet) {
+            throw new NotFoundException('No host set was found for solution ' . $volumeSet->solution->getKey());
+        }
+
+        $artisan = app()->makeWith(
+            ArtisanService::class,
+            [
+                [
+                    'solution'=>$volumeSet->solution,
+                    'san' => $san
+                ]
+            ]
+        );
+
+        $artisanResponse = $artisan->exportVolumeSet($volumeSet->name, $hostSet->name);
+
+        if (!$artisanResponse) {
+            throw new ArtisanException('Failed to export volume set to host set: ' . $artisan->getLastError());
+        }
+
+        return $this->respondEmpty();
+    }
+
     /**
      * get item by ID
      * @param Request $request
