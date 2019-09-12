@@ -136,7 +136,7 @@ class VolumeSetController extends BaseController
             return ++$index;
         }
 
-        $solution->volumeSets->each(function ($item)  use (&$index, $solution)  {
+        $solution->volumeSets->each(function ($item) use (&$index, $solution) {
             if (preg_match('/\w+SET_'. $solution->getKey() . '_?(\d+)?/', $item->name, $matches) == true) {
                 $numeric = $matches[1] ?? 1;
                 $index = ($numeric > $index) ? (int) $numeric : $index;

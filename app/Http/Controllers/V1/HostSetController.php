@@ -32,7 +32,7 @@ class HostSetController extends BaseController
         $identifier = $this->getNextHostSetIdentifier($solution);
 
         $hostSetName = '';
-        $solution->pod->sans->each(function($san) use ($solution, $identifier, &$hostSetName){
+        $solution->pod->sans->each(function ($san) use ($solution, $identifier, &$hostSetName) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
             $artisaResponse = $artisan->createHostSet($identifier);
@@ -66,7 +66,7 @@ class HostSetController extends BaseController
             return ++$index;
         }
 
-        $solution->hostSets->each(function ($item)  use (&$index, $solution)  {
+        $solution->hostSets->each(function ($item) use (&$index, $solution) {
             if (preg_match('/\w+SET_'. $solution->getKey() . '_?(\d+)?/', $item->name, $matches) == true) {
                 $numeric = $matches[1] ?? 1;
                 $index = ($numeric > $index) ? (int) $numeric : $index;

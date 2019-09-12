@@ -91,7 +91,7 @@ class HostController extends BaseController
 
         // Loop over all the sans for the solutions pod and create the host on all sans
         $solution = $host->solution;
-        $solution->pod->sans->each(function($san) use ($host, $solution, $fcwwns){
+        $solution->pod->sans->each(function ($san) use ($host, $solution, $fcwwns) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
             // Create host on san
