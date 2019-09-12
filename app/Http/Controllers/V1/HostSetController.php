@@ -45,6 +45,7 @@ class HostSetController extends BaseController
             $hostSetName = $artisaResponse->name;
         });
 
+        // Create the host set record
         $hostSet = new HostSet;
         $hostSet->name = $hostSetName;
         $hostSet->ucs_reseller_id = $request->input('solution_id');
