@@ -114,3 +114,26 @@ deploy_production:
   except:
     - branches
 
+deploy_staging:
+  stage: Deploy
+  tags:
+    - rnd
+    - php
+  cache: {}
+  dependencies: []
+  before_script: []
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - ssh -o "StrictHostKeyChecking=no" -t root@web-02.staging.rnd.ukfast 'cd /home/vhost/ecloud-apio ; git pull origin master ; cp .env.example .env ; composer install --ignore-platform-reqs';
+  environment:
+    name: staging
+    url: https://ecloud-apio.staging.rnd.ukfast/
+  only:
+    refs:
+      - master
+
+
+
