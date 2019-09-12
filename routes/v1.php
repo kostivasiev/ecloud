@@ -202,6 +202,12 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('volumesets/{volume_set_id}/iops', 'VolumeSetController@setIOPS');
         $router->post('volumesets/{volume_set_id}/export', 'VolumeSetController@export'); // Export volume set to host set
 
+        // Storage host sets
+        $router->post('hostsets', 'HostSetController@create'); //Create a host set
+
+        // Hosts
+        //Create a host on the SAN, lets use /create and reserve POST /hosts for a customer facing create host endpoint later
+        $router->post('hosts/{host_id}/create', 'HostController@createHost');
 
         $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore'); // Add datastore/volume to a volume set
     });

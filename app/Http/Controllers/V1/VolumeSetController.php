@@ -122,22 +122,28 @@ class VolumeSetController extends BaseController
     }
 
     /**
+     * Determine the next volume set identifier
      * Volumesets are of the format MCS_G0_VVSET_17106_(x),  where x is an increment for the solution.
-     * Extracts the number and increments accordingly
+     * Old volume sets are just MCS_G0_VVSET_17106, so account for this when generating next identifiers
      * @param Solution $solution
      * @return int|mixed
      */
     protected function getNextVolumeSetIdentifier(Solution $solution)
     {
+        $index = 0;
+
         if ($solution->volumeSets->count() == 0) {
-            return 1;
+            return ++$index;
         }
 
-        $identifiers = $solution->volumeSets()->get()->map(function ($item) {
-            return ['name' => substr($item->name, strrpos($item->name, '_') + 1)];
+        $solution->volumeSets->each(function ($item)  use (&$index, $solution)  {
+            if (preg_match('/\w+SET_'. $solution->getKey() . '_?(\d+)?/', $item->name, $matches) == true) {
+                $numeric = $matches[1] ?? 1;
+                $index = ($numeric > $index) ? (int) $numeric : $index;
+            }
         });
 
-        return max($identifiers->pluck('name')->toArray()) + 1;
+        return ++$index;
     }
 
 
@@ -256,7 +262,8 @@ class VolumeSetController extends BaseController
 
         $san = San::findOrFail($request->input('san_id'));
 
-        $hostSet = $volumeSet->solution->hostSet;
+        // eCloud solutions should only have a single host set at this point, but this may change in the future.
+        $hostSet = $volumeSet->solution->hostSets->first();
 
         if (!$hostSet) {
             throw new NotFoundException('No host set was found for solution ' . $volumeSet->solution->getKey());

@@ -666,20 +666,20 @@ class ArtisanService
     /**
      * Creates a host
      * @param $hostIdentifier
-     * @param $iSCSIName
-     * @param $osType
+     * @param array $FCWWNs
+     * @param string $osType
      * @return bool|\stdClass
      * @throws ArtisanException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createHost($hostIdentifier, $iSCSIName, $osType)
+    public function createHost($hostIdentifier, array $FCWWNs = [], $osType = "VMWare")
     {
         $baseUrl       = $this->generateV1URL();
         $url           = $baseUrl . '/host';
 
         $model = array(
             'hostIdentifier' => $hostIdentifier,
-            'iSCSINames' => [$iSCSIName],
+            'FCWWNs' => $FCWWNs,
             'osType' => $osType
         );
 

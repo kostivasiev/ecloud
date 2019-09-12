@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\ArtisanException;
+use App\Services\Artisan\V1\ArtisanService;
+use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -56,6 +59,50 @@ class HostController extends BaseController
             200,
             HostResource::class
         );
+    }
+
+    /**
+     * Create Host
+     *
+     * For creating hosts we need to create the host on all SAN's associated with the Pod for the reseller's solution
+     * as we don't have a way of targeting a specific SAN, and Hosts can have storage from different SAN's.
+     *
+     * @param Request $request
+     * @param $hostId
+     * @return \Illuminate\Http\Response
+     * @throws BadRequestException
+     * @throws HostNotFoundException
+     */
+    public function createHost(Request $request, $hostId)
+    {
+        $host = static::getHostById($request, $hostId);
+
+        if (!empty($host->ucs_node_internal_name)) {
+            throw new BadRequestException('A host has already been assigned to this record.');
+        }
+
+        $fcwwns = [];
+        for ($i = 0; $i < 4; $i++) {
+            $wwn = 'ucs_node_fc'. $i .'_wwpn';
+            if (!empty($host->$wwn)) {
+                $fcwwns[] = $host->$wwn;
+            }
+        }
+
+        // Loop over all the sans for the solutions pod and create the host on all sans
+        $solution = $host->solution;
+        $solution->pod->sans->each(function($san) use ($host, $solution, $fcwwns){
+            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+
+            // Create host on san
+            $artisanResponse = $artisan->createHost($host->getKey(), $fcwwns);
+
+            if (!$artisanResponse) {
+                throw new ArtisanException('Failed to create Host: ' . $artisan->getLastError());
+            }
+        });
+
+        return $this->respondEmpty(201);
     }
 
     /**

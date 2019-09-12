@@ -172,7 +172,7 @@ class Host extends Model implements Filterable, Sortable
     }
 
     /**
-     * Return Solution
+     * Return Pod
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function pod()
@@ -181,6 +181,19 @@ class Host extends Model implements Filterable, Sortable
             'App\Models\V1\Pod',
             'ucs_datacentre_id',
             'ucs_node_datacentre_id'
+        );
+    }
+
+    /**
+     * Returns the SOlution that the host belongs to
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function solution()
+    {
+        return $this->hasOne(
+            'App\Models\V1\Solution',
+            'ucs_reseller_id',
+            'ucs_node_ucs_reseller_id'
         );
     }
 
