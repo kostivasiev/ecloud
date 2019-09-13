@@ -90,8 +90,9 @@ class HostController extends BaseController
         }
 
         // Loop over all the sans for the solutions pod and create the host on all sans
+        $hostInternalName = null;
         $solution = $host->solution;
-        $solution->pod->sans->each(function ($san) use ($host, $solution, $fcwwns) {
+        $solution->pod->sans->each(function ($san) use ($host, $solution, $fcwwns, &$hostInternalName) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
             // Create host on san
@@ -100,7 +101,11 @@ class HostController extends BaseController
             if (!$artisanResponse) {
                 throw new ArtisanException('Failed to create Host: ' . $artisan->getLastError());
             }
+            $hostInternalName = $artisanResponse->name;
         });
+
+        $host->ucs_node_internal_name = $hostInternalName;
+        $host->save();
 
         return $this->respondEmpty(201);
     }
