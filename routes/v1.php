@@ -207,11 +207,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('hostsets', 'HostSetController@create'); //Create a host set
         $router->post('hostsets/{host_set_id}/hosts', 'HostSetController@addHost'); // Add host to a host set
 
-
         // Hosts
         //Create a host on the SAN, lets use /create and reserve POST /hosts for a customer facing create host endpoint later
         $router->post('hosts/{host_id}/create', 'HostController@createHost');
-
     });
 });
 
