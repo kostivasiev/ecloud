@@ -68,7 +68,8 @@ class VolumeSetController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\Response
      * @throws ArtisanException
-     * @throws \App\Exceptions\V1\PodNotFoundException
+     * @throws DatastoreNotFoundException
+     * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
@@ -82,18 +83,29 @@ class VolumeSetController extends BaseController
             [
                 'solution_id' => ['required', 'integer'],
                 'san_id' => ['required', 'integer'],
-                'pod_id' => ['sometimes', 'integer']
+                'datastore_id' => ['required', 'integer'] // We want the volume set identidier to match the volume index
             ]
         );
         $this->validate($request, $rules);
 
         $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
 
-        $identifier = $this->getNextVolumeSetIdentifier($solution);
+        $datastore = DatastoreController::getDatastoreById($request, $request->input('datastore_id'));
 
-        $pod = ($request->has('pod_id')) ? PodController::getPodById($request, $request->input('pod_id')) : $solution->pod;
+        // If the datastore record is not mapped to a volume on the SAN, fail, as we can't match the volume set name to
+        // the volume name.
+        if (empty($datastore->reseller_lun_name)) {
+            throw new UnprocessableEntityException('Unable to determine datastore name');
+        }
 
-        $san = Storage::withPod($pod->getKey())->where('server_id', '=', $request->input('san_id'))->firstOrFail()->san;
+        // If the volume has been created by the APIO it should be of the format MCS_G0_VV_17106_DATA_2
+        if (!preg_match('/\w+[DATA|CLUSTER|QRM]_(\d+)+/', $datastore->reseller_lun_name, $matches) == true) {
+            throw new UnprocessableEntityException('Invalid datastore name');
+        }
+
+        $identifier = (int) $matches[1];
+
+        $san = $solution->pod->sans()->where('server_id', '=', $request->input('san_id'))->firstOrFail();
 
         $artisan = app()->makeWith(
             ArtisanService::class,
@@ -120,32 +132,6 @@ class VolumeSetController extends BaseController
 
         return $this->respondSave($request, $volumeSet, 201);
     }
-
-    /**
-     * Determine the next volume set identifier
-     * Volumesets are of the format MCS_G0_VVSET_17106_(x),  where x is an increment for the solution.
-     * Old volume sets are just MCS_G0_VVSET_17106, so account for this when generating next identifiers
-     * @param Solution $solution
-     * @return int|mixed
-     */
-    protected function getNextVolumeSetIdentifier(Solution $solution)
-    {
-        $index = 0;
-
-        if ($solution->volumeSets->count() == 0) {
-            return ++$index;
-        }
-
-        $solution->volumeSets->each(function ($item) use (&$index, $solution) {
-            if (preg_match('/\w+SET_'. $solution->getKey() . '_?(\d+)?/', $item->name, $matches) == true) {
-                $numeric = $matches[1] ?? 1;
-                $index = ($numeric > $index) ? (int) $numeric : $index;
-            }
-        });
-
-        return ++$index;
-    }
-
 
     /**
      * Set the max IOPS on a volume set.
