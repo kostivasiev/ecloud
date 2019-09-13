@@ -77,18 +77,11 @@ class VolumeSetController extends BaseController
      */
     public function create(Request $request)
     {
-        $rules = VolumeSet::$rules;
-        $rules = array_merge(
-            $rules,
-            [
-                'solution_id' => ['required', 'integer'],
-                'san_id' => ['required', 'integer'],
-                'datastore_id' => ['required', 'integer'] // We want the volume set identidier to match the volume index
-            ]
-        );
-        $this->validate($request, $rules);
+        $rules = [
+            'datastore_id' => ['required', 'numeric']
+        ];
 
-        $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
+        $this->validate($request, $rules);
 
         $datastore = DatastoreController::getDatastoreById($request, $request->input('datastore_id'));
 
@@ -105,17 +98,7 @@ class VolumeSetController extends BaseController
 
         $identifier = (int) $matches[1];
 
-        $san = $solution->pod->sans()->where('server_id', '=', $request->input('san_id'))->firstOrFail();
-
-        $artisan = app()->makeWith(
-            ArtisanService::class,
-            [
-                [
-                    'solution'=>$solution,
-                    'san' => $san
-                ]
-            ]
-        );
+        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $datastore]]);
 
         $artisaResponse = $artisan->createVolumeSet($identifier);
 
@@ -125,7 +108,7 @@ class VolumeSetController extends BaseController
 
         $volumeSet = new VolumeSet;
         $volumeSet->name = $artisaResponse->name;
-        $volumeSet->ucs_reseller_id = $request->input('solution_id');
+        $volumeSet->ucs_reseller_id = $datastore->reseller_lun_ucs_reseller_id;
 
         // return id & link to resource in meta
         $volumeSet->save();
