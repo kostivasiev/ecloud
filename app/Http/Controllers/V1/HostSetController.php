@@ -9,10 +9,47 @@ use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class HostSetController extends BaseController
 {
     private static $model = HostSet::class;
+
+    /**
+     * Show collection
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        $collectionQuery = static::getQuery($request);
+
+        (new QueryTransformer($request))
+            ->config(self::$model)
+            ->transform($collectionQuery);
+
+        $items = $collectionQuery->paginate($this->perPage);
+
+        return $this->respondCollection(
+            $request,
+            $items
+        );
+    }
+
+    /**
+     * Show item
+     *
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\http\Response
+     * @throws NotFoundException
+     */
+    public function show(Request $request, $id)
+    {
+        return $this->respondItem($request, static::getById($request, $id));
+    }
+
 
     /**
      * Create a host set

@@ -204,6 +204,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore'); // Add datastore/volume to a volume set
 
         // Storage host sets
+        $router->get('hostsets', 'HostSetController@index');
+        $router->get('hostsets/{host_set_id}', 'HostSetController@show');
         $router->post('hostsets', 'HostSetController@create'); //Create a host set
         $router->post('hostsets/{host_set_id}/hosts', 'HostSetController@addHost'); // Add host to a host set
 
