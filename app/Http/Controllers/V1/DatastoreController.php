@@ -215,7 +215,7 @@ class DatastoreController extends BaseController
             ];
         }
 
-        return $this->respondEmpty(202, $headers);
+        return $this->respondSave($request, $datastore, 202, null, $headers);
     }
 
     /**
