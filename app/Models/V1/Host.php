@@ -34,6 +34,10 @@ class Host extends Model implements Filterable, Sortable
      * ----------------------
      */
 
+    public static $adminProperties = [
+        'ucs_node_internal_name'
+    ];
+
 
     /**
      * Ditto maps raw database names to friendly names.
@@ -106,6 +110,7 @@ class Host extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {
@@ -116,6 +121,8 @@ class Host extends Model implements Filterable, Sortable
             IntProperty::create('ucs_node_datacentre_id', 'pod_id'),
 
             StringProperty::create('ucs_specification_friendly_name', 'name'),
+
+            StringProperty::create('ucs_node_internal_name', 'internal_name'),
 
             'cpu' => [
                 IntProperty::create('ucs_specification_cpu_qty', 'qty'),

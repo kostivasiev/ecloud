@@ -2,6 +2,7 @@
 
 namespace App\Resources\V1;
 
+use App\Models\V1\Host;
 use UKFast\Api\Resource\CustomResource;
 
 class HostResource extends CustomResource
@@ -18,6 +19,10 @@ class HostResource extends CustomResource
                     'available' => $this->resource->usage->ram->available,
                 ],
             ]);
+        }
+
+        if (!$request->user->isAdministrator) {
+            unset($attributes['internal_name']);
         }
 
         return $this->filterProperties($request, $attributes);
