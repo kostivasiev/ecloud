@@ -87,14 +87,16 @@ class DatastoreController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @return \Illuminate\Http\Response
-     * @throws ArtisanException
+     * @throws BadRequestException
      * @throws ConflictException
      * @throws SanNotFoundException
+     * @throws ServiceUnavailableException
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\SiteNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
-     * @throws BadRequestException
-     * @throws ServiceUnavailableException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
      */
     public function create(Request $request, IntapiService $intapiService)
     {

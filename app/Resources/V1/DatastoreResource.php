@@ -2,6 +2,7 @@
 
 namespace App\Resources\V1;
 
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Resource\CustomResource;
 use App\Models\V1\Datastore;
 
@@ -35,12 +36,24 @@ class DatastoreResource extends CustomResource
         }
 
         $attributes = $this->getModelAttributes($this->resource, $request, $visible);
-
         if ($response_type === 'item') {
-            $attributes = array_merge($attributes, [
-                'allocated' => $this->resource->usage->provisioned,
-                'available' => $this->resource->usage->available,
-            ]);
+            try {
+                $attributes = array_merge($attributes, [
+                    'allocated' => $this->resource->usage->provisioned,
+                    'available' => $this->resource->usage->available,
+                ]);
+            } catch (\Exception $e) {
+                Log::info(
+                    'Failed to load VMWare usage for datastore',
+                    [
+                        'datastore_id' => $attributes['id']
+                    ]
+                );
+                $attributes = array_merge($attributes, [
+                    'allocated' => 'Unknown',
+                    'available' => 'Unknown',
+                ]);
+            }
         }
 
         return $this->filterProperties($request, $attributes);
