@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Models\V1\GpuProfile;
+use App\Models\V1\San;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -114,6 +115,25 @@ class PodController extends BaseController
             null,
             [],
             ($this->isAdmin) ? null : GpuProfile::VISIBLE_SCOPE_RESELLER
+        );
+    }
+
+    public function indexStorage(Request $request, $podId)
+    {
+        $pod = static::getPodById($request, $podId);
+
+        $sans = $pod->sans()->getQuery();
+
+        (new QueryTransformer($request))
+            ->config(San::class)
+            ->transform($sans);
+
+        $sans = $sans->paginate($this->perPage);
+
+        return $this->respondCollection(
+            $request,
+            $sans,
+            200
         );
     }
 }

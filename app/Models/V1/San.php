@@ -4,6 +4,8 @@ namespace App\Models\V1;
 
 use App\Scopes\SanServersScope;
 use Illuminate\Database\Eloquent\Model;
+use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\StringProperty;
 
 /**
  * Class San
@@ -19,6 +21,67 @@ class San extends Model
     public $timestamps = false;
 
     public const SAN_USERNAME = 'apiuser';
+
+    /**
+     * Ditto maps raw database names to friendly names.
+     * @return array
+     */
+    public function databaseNames()
+    {
+        return [
+            'id' => 'servers_id',
+            'name' => 'servers_netnios_name'
+        ];
+    }
+
+    /**
+     * Resource package
+     * Map request property to database field
+     *
+     * @return array
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
+     */
+    public function properties()
+    {
+        return [
+            IdProperty::create('servers_id', 'id'),
+            StringProperty::create('servers_netnios_name', 'name')
+        ];
+    }
+
+    /**
+     * Ditto sorting configuration
+     * @param SortFactory $factory
+     * @return array
+     */
+    public function sortableColumns(SortFactory $factory)
+    {
+        return [
+            $factory->create('id'),
+            $factory->create('name')
+        ];
+    }
+
+    /**
+     * Ditto sorting
+     * @param SortFactory $sortFactory
+     * @return array
+     */
+    public function defaultSort(SortFactory $sortFactory)
+    {
+        return [
+            $sortFactory->create('name', 'asc'),
+        ];
+    }
+
+    /**
+     * Ditto Selectable persistent Properties
+     * @return array
+     */
+    public function persistentProperties()
+    {
+        return ['id'];
+    }
 
     /**
      * The "booting" method of the model.

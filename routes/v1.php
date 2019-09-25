@@ -113,6 +113,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('pods/{pod_id}/templates/{template_name}', 'TemplateController@showPodTemplate');
     $router->post('pods/{pod_id}/templates/{template_name}/move', 'TemplateController@renamePodTemplate');
     $router->get('pods/{pod_id}/gpu-profiles', 'PodController@gpuProfiles');
+    $router->get('pods/{pod_id}/storage', 'PodController@indexStorage');
     // todo datastores
 
     $router->get('pods/{pod_id}/appliances', 'ApplianceController@podAvailability');
