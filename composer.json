@@ -11,7 +11,7 @@
     "laravel/lumen-framework": "5.5.*",
     "vlucas/phpdotenv": "~2.2",
     "ukfast/health-check": "~1.0",
-    "ukfast/api-auth": "^2.1",
+    "ukfast/api-auth": "^2.2",
     "ukfast/api-resources": "^4.0.3",
     "ukfast/api-exceptions": "^2.2",
     "ukfast/api-helper-datetime": "^2.0.1",
