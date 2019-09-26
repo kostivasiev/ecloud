@@ -2894,11 +2894,11 @@
         },
         {
             "name": "ukfast/api-auth",
-            "version": "v2.2.0",
+            "version": "v2.2.1",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/authentication.git",
-                "reference": "fcb11c5469472e91aa779a0f3f4aee9d21ec0233"
+                "reference": "2858df4471c69d1e856c3445b2d3e0129cf39f93"
             },
             "require": {
                 "illuminate/auth": "^5.4",
@@ -2926,7 +2926,7 @@
                 }
             ],
             "description": "Authentication and Authorization for use with you UKFast API",
-            "time": "2019-09-24T08:26:23+00:00"
+            "time": "2019-09-26T10:17:03+00:00"
         },
         {
             "name": "ukfast/api-exceptions",
