@@ -11,8 +11,4 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 |
 */
 
-$router->get('/ping', function () use ($router) {
-    return 'pong';
-});
-
 require('v1.php');
