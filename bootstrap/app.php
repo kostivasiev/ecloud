@@ -30,7 +30,6 @@ $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 
 $app->withFacades();
-
 $app->withEloquent();
 
 /*
@@ -65,10 +64,6 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
-
 $app->routeMiddleware([
     'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
@@ -89,20 +84,12 @@ $app->routeMiddleware([
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 $app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\PaginationServiceProvider::class);
-
-//VMWare service provider (Kingpin)
 $app->register(App\Providers\KingpinServiceProvider::class);
-
-// APIo service providers
 $app->register(App\Providers\NetworkingServiceProvider::class);
 $app->register(App\Providers\AccountsServiceProvider::class);
-
-// intAPI
 $app->register(App\Providers\IntapiServiceProvider::class);
-
-// Event Service provider
 $app->register(App\Providers\EventServiceProvider::class);
-
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 
 /*
