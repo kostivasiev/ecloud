@@ -41,6 +41,7 @@ envSecrets:
       - "VMWARE_API_PASS"
       - "VMWARE_API_PORT"
       - "APIO_ACCOUNT_HOST"
+      - "LOG_CHANNEL"
       - "ELASTICSEARCH_URL"
       - "ELASTICSEARCH_USERNAME"
       - "ELASTICSEARCH_PASSWORD"
