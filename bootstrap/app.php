@@ -23,6 +23,11 @@ $app = new Laravel\Lumen\Application(
 
 $app->configure('database');
 
+$app->configure('mail');
+$app->alias('mailer', Illuminate\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
+
 $app->withFacades();
 
 $app->withEloquent();
@@ -96,6 +101,8 @@ $app->register(App\Providers\IntapiServiceProvider::class);
 
 // Event Service provider
 $app->register(App\Providers\EventServiceProvider::class);
+
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
