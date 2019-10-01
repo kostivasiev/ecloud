@@ -24,7 +24,8 @@
     "ukfast/api-validation": "~1.0",
     "ukfast/ditto": "4.7.*",
     "ukfast/log-provider": "~1.0",
-    "vlucas/phpdotenv": "^3.3"
+    "vlucas/phpdotenv": "^3.3",
+    "ukfast/health-check": "~1.0"
   },
   "require-dev": {
     "ext-sqlite3": "*",
@@ -110,6 +111,10 @@
     {
       "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/validation.git"
+    },
+    {
+      "type": "vcs",
+      "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/health-check.git"
     }
   ]
 }

@@ -11,13 +11,4 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 |
 */
 
-$router->get('/ping', function () use ($router) {
-    return 'pong';
-});
-
-// Hostname check
-$router->get('/host', function () {
-    return $_SERVER['SERVER_ADDR'];
-});
-
 require('v1.php');

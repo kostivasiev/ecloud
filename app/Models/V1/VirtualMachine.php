@@ -838,7 +838,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      */
     public function canBeDeleted()
     {
-        if ($this->isBuilding() || $this->isCloning() || $this->isDeleting()) {
+        if ($this->isCloning() || $this->isDeleting()) {
             return false;
         }
 
