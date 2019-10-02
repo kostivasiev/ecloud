@@ -569,4 +569,35 @@ class Solution extends Model implements Filterable, Sortable
     {
         return $this->ucs_reseller_reseller_id;
     }
+
+    /**
+     * Get the DRS Rules for the Solution
+     *
+     * @return DrsRule[]
+     * @throws KingpinException
+     */
+    public function drsRules()
+    {
+        $rules = [];
+        try {
+            $kingpin = app()->makeWith(
+                'App\Services\Kingpin\V1\KingpinService',
+                [
+                    $this->pod,
+                    $this->ucs_reseller_type
+                ]
+            );
+        } catch (\Exception $exception) {
+            //Failed to connect to Kingpin
+            throw new KingpinException('Unable to load constraints');
+        }
+
+        $result = $kingpin->getDrsRulesForSolution($this);
+
+        foreach ($result as $rule) {
+            $rules[] = new DrsRule($rule);
+        }
+
+        return $rules;
+    }
 }

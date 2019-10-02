@@ -175,7 +175,7 @@ $router->group($baseRouteParameters, function () use ($router) {
      * Base middleware + is-administrator
      */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        //
+        $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
     });
 });
 
