@@ -883,7 +883,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 'ecloud_ucs_' . $virtualMachine->pod->getKey(),
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule deletion request');
@@ -1445,7 +1446,8 @@ class VirtualMachineController extends BaseController
                     $virtualMachine->getKey(),
                     $automationData,
                     !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                    $request->user->applicationId
+                    $request->user->id,
+                    $request->user->type
                 );
             } catch (IntapiServiceException $exception) {
                 throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
@@ -1636,7 +1638,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 $automationData,
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
@@ -1724,7 +1727,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
 
             $intapiData = $intapiService->getResponseData();
@@ -1831,7 +1835,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
 
             $intapiData = $intapiService->getResponseData();

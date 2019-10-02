@@ -185,7 +185,9 @@ class TemplateController extends BaseController
                     'template_name' => $solutionTemplate->name,
                     'new_template_name' => $newTemplateName
                 ],
-                'ecloud_ucs_' . $solution->pod->getKey()
+                'ecloud_ucs_' . $solution->pod->getKey(),
+                $request->user->id,
+                $request->user->type
             );
 
             return $this->respondEmpty(202);
@@ -235,7 +237,10 @@ class TemplateController extends BaseController
                     'template_name' => $template->name,
                     'new_template_name' => $newTemplateName,
                     'datacentre_id' => $podId
-                ]
+                ],
+                'ecloud_ucs_' . $podId,
+                $request->user->id,
+                $request->user->type
             );
 
             return $this->respondEmpty(202);
@@ -276,7 +281,9 @@ class TemplateController extends BaseController
                     'template_type' => 'solution',
                     'template_name' => $templateName,
                 ],
-                'ecloud_ucs_' . $solution->pod->getKey()
+                'ecloud_ucs_' . $solution->pod->getKey(),
+                $request->user->id,
+                $request->user->type
             );
 
             return $this->respondEmpty(202);
@@ -320,7 +327,10 @@ class TemplateController extends BaseController
                     'template_type' => 'system',
                     'template_name' => $template->name,
                     'datacentre_id' => $podId
-                ]
+                ],
+                'ecloud_ucs_' . $podId,
+                $request->user->id,
+                $request->user->type
             );
 
             return $this->respondEmpty(202);
