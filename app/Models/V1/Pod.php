@@ -2,8 +2,10 @@
 
 namespace App\Models\V1;
 
+use App\Services\Kingpin\V1\KingpinService;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -157,5 +159,30 @@ class Pod extends Model implements Filterable, Sortable
             'ucs_datacentre_id', // Local key on gpu_profile_pod_availability table.
             'gpu_profile_id'  // Local key on gpu_profile_pod_availability table.
         );
+    }
+
+
+    /**
+     * Load VCE server details
+     * @return array|bool
+     */
+    public function vceServerDetails()
+    {
+        if (empty($this->ucs_datacentre_vce_server_id)) {
+            Log::error('Invalid or missing VCE server ID for Pod ' . $this->getKey());
+            return false;
+        }
+
+        $serverDetail = ServerDetail::withParent($this->ucs_datacentre_vce_server_id)
+            ->where('server_detail_type', '=', 'API')
+            ->where('server_detail_user', '=', KingpinService::KINGPIN_USER)
+            ->first();
+
+        if (!$serverDetail) {
+            Log::error('Failed to load Kingpin server details record for VCE server #' . $this->ucs_datacentre_vce_server_id);
+            return false;
+        }
+
+        return $serverDetail;
     }
 }

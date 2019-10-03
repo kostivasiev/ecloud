@@ -212,7 +212,8 @@ class IntapiService
      * @param $referenceId
      * @param null $data
      * @param null $queue
-     * @param int $applicationId
+     * @param int $submittedById
+     * @param string $submittedByType
      * @return mixed
      * @throws IntapiServiceException
      */
@@ -222,15 +223,20 @@ class IntapiService
         $referenceId,
         $data = null,
         $queue = null,
-        $applicationId = 0
+        $submittedById = 0,
+        $submittedByType = 'application'
     ) {
+        if (strtolower($submittedByType) == 'application') {
+            $submittedByType = 'API Client';
+        }
+
         $post_data = [
             'process_system' => 'ucs_vmware',
             'process_name' => $processName,
             'reference_type' => $reference,
             'reference_id' => $referenceId,
-            'submitted_by_type' => 'API Client',
-            'submitted_by_id' => $applicationId,
+            'submitted_by_type' => ucfirst($submittedByType),
+            'submitted_by_id' => $submittedById,
             'data' => $data,
             'queue' => $queue
         ];

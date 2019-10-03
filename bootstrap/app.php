@@ -82,10 +82,13 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
 */
-$app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
-$app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
-$app->register(App\Providers\PaginationServiceProvider::class);
+
 $app->register(UKFast\Providers\LogServiceProvider::class);
+$app->register(\UKFast\HealthCheck\HealthCheckServiceProvider::class);
+$app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
+
+$app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
+$app->register(App\Providers\PaginationServiceProvider::class);
 
 //VMWare service provider (Kingpin)
 $app->register(App\Providers\KingpinServiceProvider::class);

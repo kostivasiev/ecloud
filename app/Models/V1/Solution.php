@@ -7,6 +7,7 @@ use App\Exceptions\V1\SolutionNotFoundException;
 use App\Solution\EncryptionBillingType;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use UKFast\Api\Resource\Property\DateProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
@@ -357,7 +358,9 @@ class Solution extends Model implements Filterable, Sortable
                 ]
             );
         } catch (\Exception $exception) {
-            throw new KingpinException('Unable to load hosts');
+            $error = 'Unable to load hosts';
+            Log::error($error . ': ' . $exception->getMessage());
+            throw new KingpinException($error);
         }
 
         try {
@@ -565,5 +568,36 @@ class Solution extends Model implements Filterable, Sortable
     public function resellerId()
     {
         return $this->ucs_reseller_reseller_id;
+    }
+
+    /**
+     * Get the DRS Rules for the Solution
+     *
+     * @return DrsRule[]
+     * @throws KingpinException
+     */
+    public function drsRules()
+    {
+        $rules = [];
+        try {
+            $kingpin = app()->makeWith(
+                'App\Services\Kingpin\V1\KingpinService',
+                [
+                    $this->pod,
+                    $this->ucs_reseller_type
+                ]
+            );
+        } catch (\Exception $exception) {
+            //Failed to connect to Kingpin
+            throw new KingpinException('Unable to load constraints');
+        }
+
+        $result = $kingpin->getDrsRulesForSolution($this);
+
+        foreach ($result as $rule) {
+            $rules[] = new DrsRule($rule);
+        }
+
+        return $rules;
     }
 }

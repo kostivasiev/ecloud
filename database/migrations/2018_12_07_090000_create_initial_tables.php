@@ -173,6 +173,7 @@ class CreateInitialTables extends Migration
             $table->integer('metadata_createdby_id');
         });
     }
+
     /**
      * Reverse the migrations.
      *

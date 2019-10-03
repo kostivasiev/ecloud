@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Models\V1\ActiveDirectoryDomain;
 use App\Exceptions\V1\InsufficientCreditsException;
 use App\Models\V1\PodTemplate;
 use App\Models\V1\SolutionTemplate;
+use App\Models\V1\Trigger;
 use App\Services\AccountsService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
@@ -133,6 +135,9 @@ class VirtualMachineController extends BaseController
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst,GPU'],
 
+            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'tags' => ['nullable', 'array'],
+
              // User must either specify a vm template or an appliance_id
             'template' => ['required_without:appliance_id'],
             'appliance_id' => ['required_without:template', new IsValidUuid()],
@@ -145,10 +150,7 @@ class VirtualMachineController extends BaseController
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
             'site_id' => ['nullable', 'integer'],
-
-            'tags' => ['nullable', 'array'],
-
-            'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
+            'ad_domain_id' => ['nullable', 'integer'],
 
             'ssh_keys' => ['nullable', 'array'],
             'ssh_keys.*' => [new IsValidSSHPublicKey()],
@@ -491,17 +493,16 @@ class VirtualMachineController extends BaseController
                     throw new Exceptions\NotFoundException('gpu_profile \'' . $request->input('gpu_profile') . '\' was not found');
                 }
 
-                $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);
+                $template = PodTemplate::withFriendlyName($pod, $templateName);
 
                 try {
-                    $template = $podTemplate->getGpuVersion($gpuProfile);
+                    $gpuTemplate = $template->getGpuVersion($gpuProfile);
                 } catch (TemplateNotFoundException $exception) {
                     throw new TemplateNotFoundException('No GPU template found matching requested template and gpu_profile');
                 } catch (\Exception $exception) {
                     throw new ServiceUnavailableException($exception->getMessage());
                 }
 
-                // Update the template name to the GPU version of this template
                 $templateName = $template->name;
             } else {
                 // Validate the template exists: Try to load from both Solution & Pod templates
@@ -569,7 +570,7 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->has('template')) {
-            if ($template->subType != 'Base' || $request->input('environment') == 'GPU') {
+            if ($template->subType != 'Base') {
                 $post_data['template'] = $templateName;
 
                 if ($template->type != 'Solution') {
@@ -644,6 +645,20 @@ class VirtualMachineController extends BaseController
             });
         }
 
+        // set active directory domain
+        if ($request->has('ad_domain_id')) {
+            $domain = ActiveDirectoryDomain::withReseller($request->user->resellerId)
+                ->find($request->input('ad_domain_id'));
+
+            if (is_null($domain)) {
+                throw new Exceptions\BadRequestException(
+                    "An Active Directory domain matching the requested ID was not found",
+                    'ad_domain_id'
+                );
+            }
+
+            $post_data['ad_domain_id'] = $request->input('ad_domain_id');
+        }
 
         // set networking
         if ($request->has('network_id')) {
@@ -703,8 +718,13 @@ class VirtualMachineController extends BaseController
         if ($request->has('appliance_id')) {
             $post_data['is_appliance'] = true;
             if (!empty($applianceScript)) {
-                $post_data['bootstrap_script'] = json_encode($applianceScript);
+                $post_data['appliance_bootstrap_script'] = base64_encode($applianceScript);
             }
+        }
+
+        //set bootstrap script
+        if ($request->has('bootstrap_script')) {
+            $post_data['bootstrap_script'] = base64_encode($request->input('bootstrap_script'));
         }
 
         if ($request->input('environment') == 'Public') {
@@ -863,7 +883,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 'ecloud_ucs_' . $virtualMachine->pod->getKey(),
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule deletion request');
@@ -1198,9 +1219,9 @@ class VirtualMachineController extends BaseController
                     $contractRamTrigger = $virtualMachine->trigger('ecloud_ram');
                     $contractHddTrigger = $virtualMachine->trigger('ecloud_hdd');
 
-                    $minCpu = $this->extractTriggerNumeric($contractCpuTrigger);
-                    $minRam = $this->extractTriggerNumeric($contractRamTrigger);
-                    $minHdd = $this->extractTriggerNumeric($contractHddTrigger);
+                    $minCpu = $this->extractContractTriggerCPUValue($contractCpuTrigger);
+                    $minRam = $this->extractContractTriggerRAMValue($contractRamTrigger);
+                    $minHdd = $this->extractContractTriggerHDDValue($contractHddTrigger);
                 }
                 break;
 
@@ -1425,7 +1446,8 @@ class VirtualMachineController extends BaseController
                     $virtualMachine->getKey(),
                     $automationData,
                     !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                    $request->user->applicationId
+                    $request->user->id,
+                    $request->user->type
                 );
             } catch (IntapiServiceException $exception) {
                 throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
@@ -1616,7 +1638,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 $automationData,
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
@@ -1704,7 +1727,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
 
             $intapiData = $intapiService->getResponseData();
@@ -1811,7 +1835,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
 
             $intapiData = $intapiService->getResponseData();
@@ -1855,25 +1880,37 @@ class VirtualMachineController extends BaseController
         return $this->respondEmpty(202, $headers);
     }
 
-
     /**
-     * Extract the numeric value from a trigger description
-     * @param $trigger
+     * Extract contracted CPU value from Trigger
+     * @param Trigger $trigger
      * @return int
      */
-    protected function extractTriggerNumeric($trigger)
+    protected function extractContractTriggerCPUValue(Trigger $trigger)
     {
-        $noLabel = str_replace(
-            'eCloud VM #' . $trigger->trigger_reference_id,
-            '',
-            $trigger->trigger_description
-        );
+        preg_match("/\sCPU: ([0-9]+)\s/", $trigger->trigger_description, $regex_matches);
+        return intval($regex_matches[1]);
+    }
 
-        $noPg = preg_replace("/(- PG[0-9]*)/", "", $noLabel);
+    /**
+     * Extract contracted RAM value from Trigger
+     * @param Trigger $trigger
+     * @return int
+     */
+    protected function extractContractTriggerRAMValue(Trigger $trigger)
+    {
+        preg_match("/\sRAM: ([0-9]+)GB\s/", $trigger->trigger_description, $regex_matches);
+        return intval($regex_matches[1]);
+    }
 
-        $numeric = intval(preg_replace("/[^0-9,.]/", "", $noPg));
-
-        return intval($numeric);
+    /**
+     * Extract contracted HDD value from Trigger
+     * @param Trigger $trigger
+     * @return int
+     */
+    protected function extractContractTriggerHDDValue(Trigger $trigger)
+    {
+        preg_match("/\sHDD: ([0-9]+)GB\s/", $trigger->trigger_description, $regex_matches);
+        return intval($regex_matches[1]);
     }
 
     /**

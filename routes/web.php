@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(E_ALL ^ E_DEPRECATED);
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -10,9 +10,5 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
-
-$router->get('/ping', function () use ($router) {
-    return 'pong';
-});
 
 require('v1.php');
