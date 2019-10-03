@@ -9,7 +9,7 @@ class ApplianceActiveException extends ApiException
      * HTTP response code
      * @var int
      */
-    public $statusCode = 403;
+    public $statusCode = 400;
 
     /**
      * Error message to display
