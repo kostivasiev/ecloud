@@ -88,11 +88,11 @@ class DeleteTest extends ApplianceTestCase
         $versions = $appliance->versions->where('appliance_version_active', '=', 'Yes');
         $this->assertEquals(1, $versions->count());
 
-        $this->json(
+        $res = $this->json(
             'DELETE',
             '/v1/appliance-versions/' . $versions->first()->appliance_version_uuid,
             [],
-            $this->validReadHeaders
+            $this->validWriteHeaders
         );
 
         $this->assertResponseStatus(400);
