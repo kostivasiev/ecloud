@@ -95,6 +95,6 @@ class DeleteTest extends ApplianceTestCase
             $this->validReadHeaders
         );
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(400);
     }
 }
