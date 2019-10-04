@@ -73,12 +73,12 @@ class HostSetController extends BaseController
         $solution->pod->sans->each(function ($san) use ($solution, $identifier, &$hostSetName) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
-            $artisaResponse = $artisan->createHostSet($identifier);
+            $artisanResponse = $artisan->createHostSet($identifier);
 
-            if (!$artisaResponse) {
+            if (!$artisanResponse) {
                 throw new ArtisanException('Failed to create host set: ' . $artisan->getLastError());
             }
-            $hostSetName = $artisaResponse->name;
+            $hostSetName = $artisanResponse->name;
         });
 
         // Create the host set record
