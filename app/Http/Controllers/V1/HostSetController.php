@@ -56,7 +56,6 @@ class HostSetController extends BaseController
      * When creating a host set we need to create it on all SAN's on the Pod for the reseller's solution
      * @param Request $request
      * @return \Illuminate\Http\Response
-     * @throws ArtisanException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
@@ -139,7 +138,7 @@ class HostSetController extends BaseController
     {
         $index = 0;
 
-        if ($solution->volumeSets->count() == 0) {
+        if ($solution->hostSets->count() == 0) {
             return ++$index;
         }
 
