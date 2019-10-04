@@ -81,13 +81,7 @@ class HostController extends BaseController
             throw new BadRequestException('A host has already been assigned to this record.');
         }
 
-        $fcwwns = [];
-        for ($i = 0; $i < 4; $i++) {
-            $wwn = 'ucs_node_fc'. $i .'_wwpn';
-            if (!empty($host->$wwn)) {
-                $fcwwns[] = $host->$wwn;
-            }
-        }
+        $fcwwns = $host->getFCWWNs();
 
         // Loop over all the sans for the solutions pod and create the host on all sans
         $hostInternalName = null;

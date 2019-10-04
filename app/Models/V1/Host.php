@@ -269,4 +269,22 @@ class Host extends Model implements Filterable, Sortable
             'virtualMachines' => $virtualMachines
         ]));
     }
+
+    /**
+     * We have 4 columns on the host record storing Fibre Channel World Wide Port Names.
+     * Determine which ones are set and return as an array.
+     * @return array
+     */
+    public function getFCWWNs()
+    {
+        $fcwwns = [];
+        for ($i = 0; $i < 4; $i++) {
+            $wwn = 'ucs_node_fc'. $i .'_wwpn';
+            if (!empty($this->$wwn)) {
+                $fcwwns[] = $this->$wwn;
+            }
+        }
+
+        return $fcwwns;
+    }
 }

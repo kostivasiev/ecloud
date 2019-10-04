@@ -7,8 +7,6 @@ use App\Events\V1\VolumeSetIopsUpdatedEvent;
 use App\Exceptions\V1\ArtisanException;
 use App\Models\V1\IopsTier;
 use App\Models\V1\San;
-use App\Models\V1\Solution;
-use App\Models\V1\Storage;
 use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
@@ -100,14 +98,14 @@ class VolumeSetController extends BaseController
 
         $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $datastore]]);
 
-        $artisaResponse = $artisan->createVolumeSet($identifier);
+        $artisanResponse = $artisan->createVolumeSet($identifier);
 
-        if (!$artisaResponse) {
+        if (!$artisanResponse) {
             throw new ArtisanException('Failed to create volume set: ' . $artisan->getLastError());
         }
 
         $volumeSet = new VolumeSet;
-        $volumeSet->name = $artisaResponse->name;
+        $volumeSet->name = $artisanResponse->name;
         $volumeSet->ucs_reseller_id = $datastore->reseller_lun_ucs_reseller_id;
 
         // return id & link to resource in meta
