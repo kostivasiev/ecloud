@@ -743,7 +743,6 @@ class ArtisanService
             $info['response'] = $exceptionData;
         }
 
-
         Log::critical($logMessage, $info);
         return;
     }
