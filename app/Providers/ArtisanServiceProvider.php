@@ -58,10 +58,10 @@ class ArtisanServiceProvider extends ServiceProvider
                  */
                 if (!empty($parameters[0]['datastore'])) {
                     $datastore = $parameters[0]['datastore'];
+
                     if (!is_object($datastore) || !is_a($datastore, Datastore::class)) {
-                        $log_message = 'Unable to create ArtisanService: Invalid datastore Object';
-                        Log::error($log_message);
-                        throw new \Exception($log_message);
+                        Log::error('Unable to create ArtisanService: Invalid datastore Object');
+                        throw new ServiceUnavailableException('Unable to load ArtisanService: Invalid datastore');
                     }
                     $config = $this->loadConfigFromDatastore($datastore);
 
@@ -78,12 +78,18 @@ class ArtisanServiceProvider extends ServiceProvider
                     if (!is_object($solution) || !is_a($solution, Solution::class)) {
                         $log_message = 'Unable to create ArtisanService: Invalid Solution Object';
                         Log::error($log_message);
-                        throw new \Exception($log_message);
+                        throw new ServiceUnavailableException('Unable to load ArtisanService: Invalid Solution');
                     }
 
                     if (!is_object($san) || !is_a($san, San::class)) {
                         $log_message = 'Unable to create ArtisanService: Invalid San Object';
-                        throw new \Exception($log_message);
+                        Log::error(
+                            $log_message,
+                            [
+                                'soluton_id' => $solution->getKey()
+                            ]
+                        );
+                        throw new ServiceUnavailableException('Unable to load ArtisanService: Invalid SAN');
                     }
 
                     $config = $this->loadConfig($san->storage);
