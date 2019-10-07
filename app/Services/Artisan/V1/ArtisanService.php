@@ -721,7 +721,7 @@ class ArtisanService
 
         $stream = $response->getBody();
         $stream->rewind();
-        $this->response = $responseBody = $stream->getContents();
+        $responseBody = $stream->getContents();
 
         if (!empty($responseBody)) {
             $exceptionData = json_decode($responseBody, true);
