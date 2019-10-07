@@ -2,12 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\V1\DatastoreCreatedEvent;
-use App\Events\V1\DatastoreExpandEvent;
-use App\Events\V1\VolumeSetIopsUpdatedEvent;
-use App\Listeners\V1\DatastoreCreatedListener;
-use App\Listeners\V1\DatastoreExpandListener;
-use App\Listeners\V1\VolumeSetIopsUpdatedListener;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -39,14 +33,14 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\V1\ApplianceLaunchedEvent' => [
             'App\Listeners\V1\ApplianceLaunchedListener',
         ],
-        DatastoreCreatedEvent::class => [
-            DatastoreCreatedListener::class,
+        'App\Events\V1\DatastoreCreatedEvent' => [
+            'App\Listeners\V1\DatastoreCreatedListener',
         ],
-        DatastoreExpandEvent::class => [
-            DatastoreExpandListener::class,
+        'App\Events\V1\DatastoreExpandEvent' => [
+            'App\Listeners\V1\DatastoreExpandListener',
         ],
-        VolumeSetIopsUpdatedEvent::class => [
-            VolumeSetIopsUpdatedListener::class,
+        'App\Events\V1\VolumeSetIopsUpdatedEvent' => [
+            'App\Listeners\V1\VolumeSetIopsUpdatedListener',
         ]
     ];
 }
