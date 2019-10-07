@@ -161,7 +161,7 @@ class ArtisanServiceProvider extends ServiceProvider
         }
 
         try {
-            $sanPassword = $san->password();
+            $sanPassword = $san->getPassword();
         } catch (ModelNotFoundException $exception) {
             Log::error(
                 'Failed to load SAN password.',

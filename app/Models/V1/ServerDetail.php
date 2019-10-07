@@ -138,7 +138,11 @@ class ServerDetail extends Model
         return $this->attributes['server_detail_pass'];
     }
 
-    public function password()
+    /**
+     * Returns the decrypted server detail password
+     * @return mixed
+     */
+    public function getPassword()
     {
         return $this->server_detail_pass;
     }

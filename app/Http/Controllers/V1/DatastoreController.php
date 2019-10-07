@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Datastore\Status;
 use App\Events\V1\DatastoreExpandEvent;
-use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\ConflictException;
 use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\KingpinException;

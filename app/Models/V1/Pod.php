@@ -219,7 +219,7 @@ class Pod extends Model implements Filterable, Sortable
     {
         $serverDetail = $this->vceServerDetails(ArtisanService::ARTISAN_API_USER);
         if ($serverDetail) {
-            return $serverDetail->password();
+            return $serverDetail->getPassword();
         }
         return false;
     }
@@ -252,7 +252,7 @@ class Pod extends Model implements Filterable, Sortable
     {
         $serverDetail = $this->vceServerDetails(KingpinService::KINGPIN_USER);
         if (!$serverDetail) {
-            return $serverDetail->password();
+            return $serverDetail->getPassword();
         }
         return false;
     }

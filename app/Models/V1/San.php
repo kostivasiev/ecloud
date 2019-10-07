@@ -120,7 +120,7 @@ class San extends Model
      * Retrieve the SAN password from the associated server details record
      * @return mixed
      */
-    public function password()
+    public function getPassword()
     {
         return $this->hasOne(
             'App\Models\V1\ServerDetail',
@@ -128,6 +128,6 @@ class San extends Model
             'servers_id'
         )
             ->where('server_detail_type', '=', 'API')
-            ->where('server_detail_user', '=', static::SAN_USERNAME)->firstOrFail()->password();
+            ->where('server_detail_user', '=', static::SAN_USERNAME)->firstOrFail()->getPassword();
     }
 }
