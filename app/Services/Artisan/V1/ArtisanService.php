@@ -711,7 +711,7 @@ class ArtisanService
         $this->lastError = $exception->getMessage();
 
         // Get the full exception message because Guzzle truncates it
-        $response = $exception->getResponse();
+        $this->response = $response = $exception->getResponse();
 
         if (is_null($response)) {
             $logMessage .= ' No response body from Artisan request, service may be unavailable.';
