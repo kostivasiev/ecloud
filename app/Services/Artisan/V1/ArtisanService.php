@@ -701,42 +701,51 @@ class ArtisanService
     /**
      * Handles instances of TransferException
      * @param TransferException $exception
-     * @return bool
+     * @return void
      */
-    protected function handleException(TransferException $exception): bool
+    protected function handleException(TransferException $exception): void
     {
-        // Faff around to get the details because Guzzle is a PITA & truncates our exception message...
-        $responseBody = null;
+        $logMessage = 'Failed to make request to ' . $this->getRequestMethod() . ' ' . $this->getRequestUrl();
+        $info = [];
+
+        $this->lastError = $exception->getMessage();
+
+        // Get the full exception message because Guzzle truncates it
         $response = $exception->getResponse();
-        if (!is_null($response)) {
-            $stream = $response->getBody();
-            $stream->rewind();
-            $responseBody = $stream->getContents(); // returns all the contents
+
+        if (is_null($response)) {
+            $logMessage .= ' No response body from Artisan request, service may be unavailable.';
+            Log::critical($logMessage);
+            return;
         }
 
-        $decodedResponseBody = json_decode($responseBody, true);
-        $logMessage          = 'Failed to make request to ' . $this->getRequestMethod() . ' ' . $this->getRequestUrl();
+        $stream = $response->getBody();
+        $stream->rewind();
+        $this->response = $responseBody = $stream->getContents();
 
-        // Set a default set of data to log
-        $exceptionData = [
-            'response' => $responseBody
-        ];
+        if (!empty($responseBody)) {
+            $exceptionData = json_decode($responseBody, true);
 
-        // If we can't JSON-decode it, there's not much we can do with the response
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $exceptionData = $decodedResponseBody;
+            // If we can't JSON-decode it, there's not much we can do with the response
+            if ((json_last_error() !== JSON_ERROR_NONE) || empty($exceptionData)) {
+                $logMessage .= ' Invalid or missing response message.';
+                Log::critical($logMessage);
+                return;
+            }
 
             // We don't care about logging the stack trace
             unset($exceptionData['StackTrace']);
+
+            if (array_key_exists('ExceptionMessage', $exceptionData)) {
+                $this->lastError = $exceptionData['ExceptionMessage'];
+            }
+
+            $info['response'] = $exceptionData;
         }
 
-        Log::critical($logMessage, $exceptionData);
 
-        if (is_null($response)) {
-            Log::debug('No response body from Artisan request, service may be unavailable.');
-        }
-
-        return true;
+        Log::critical($logMessage, $info);
+        return;
     }
 
     /**
@@ -781,23 +790,6 @@ class ArtisanService
             $this->responseData = json_decode($this->response->getBody()->getContents());
         } catch (TransferException $exception) {
             $this->handleException($exception);
-            $this->response = $exception->getResponse();
-
-            $this->lastError = $exception->getMessage();
-            //TODO: setting last error into handleException()
-            // Faff around to get the details because Guzzle is a PITA & truncates our exception message...
-            $message = null;
-            $response = $exception->getResponse();
-            if (!is_null($response)) {
-                $stream = $response->getBody();
-                $stream->rewind();
-                $message = $stream->getContents(); // returns all the contents
-            }
-
-            if (preg_match('/"ExceptionMessage":"([^"]+)/', $message, $matches)) {
-                $this->lastError = $matches[1];
-            }
-
             throw $exception;
         }
 
