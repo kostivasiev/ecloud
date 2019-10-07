@@ -112,7 +112,9 @@ class DatastoreController extends BaseController
             $pod = $solution->pod;
         }
 
-        if ($request->has('name')) {
+        $whitelist = ['solution_id', 'capacity'];
+
+        if ($request->filled('name')) {
             // Validate volume friendly name is unique to the solution or solution site
             $datastores = Collect(Datastore::getForSolution($solution->getKey(), $request->input('site_id')));
 
@@ -121,11 +123,13 @@ class DatastoreController extends BaseController
                     "Datastore with name '{$request->input('name')}' already exists for this " . ($request->has('site_id') ? 'solution site' : 'solution')
                 );
             }
+
+            $whitelist[] = 'name';
         }
 
         // Receive the user data
         $datastoreResource = $this->receiveItem(
-            new Request($request->only(['solution_id', 'capacity', 'name'])),
+            new Request($request->only($whitelist)),
             Datastore::class
         );
 
