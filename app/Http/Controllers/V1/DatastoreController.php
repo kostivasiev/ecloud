@@ -145,7 +145,7 @@ class DatastoreController extends BaseController
 
         // If the user specified a san_id check that the san in on the solution / solution sites pod
         if ($request->has('san_id')) {
-            $storage = Storage::withPod($pod->getKey())
+            $storage = Storage::withPod($pod)
                 ->where('server_id', '=', $request->input('san_id'));
 
             if ($storage->count() < 1) {
@@ -165,7 +165,7 @@ class DatastoreController extends BaseController
 
         // Only one SAN is available for the pod so use that
         if (empty($storage)) {
-            $storage = Storage::withPod($pod->getKey())
+            $storage = Storage::withPod($pod)
                 ->where('server_id', '=', $pod->sans->first()->servers_id)
                 ->first();
         }

@@ -55,17 +55,12 @@ class Storage extends Model
     /**
      * Scope a query to only include solutions for a given reseller
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $podId
+     * @param Pod $pod
      * @return \Illuminate\Database\Eloquent\Builder $query
      */
-    public function scopeWithPod($query, $podId)
+    public function scopeWithPod($query, Pod $pod)
     {
-        $podId = filter_var($podId, FILTER_SANITIZE_NUMBER_INT);
-
-        if (!empty($podId)) {
-            $query->where('ucs_datacentre_id', $podId);
-        }
-
+        $query->where('ucs_datacentre_id', '=', $pod->getKey());
         return $query;
     }
 }
