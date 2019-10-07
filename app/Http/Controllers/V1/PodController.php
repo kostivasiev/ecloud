@@ -118,6 +118,13 @@ class PodController extends BaseController
         );
     }
 
+    /**
+     * Return a list od SANS available to the Pod
+     * @param Request $request
+     * @param $podId
+     * @return \Illuminate\Http\Response
+     * @throws PodNotFoundException
+     */
     public function indexStorage(Request $request, $podId)
     {
         $pod = static::getPodById($request, $podId);

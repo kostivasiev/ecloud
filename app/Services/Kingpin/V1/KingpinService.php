@@ -556,6 +556,7 @@ class KingpinService
      * Create datastore
      * @param $solutionId
      * @param $datastoreName
+     * @param $wwn
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
