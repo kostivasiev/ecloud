@@ -38,7 +38,7 @@ class HostSetController extends BaseController
     }
 
     /**
-     * Show item
+     * Show host set item
      *
      * @param Request $request
      * @param $id
