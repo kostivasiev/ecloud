@@ -185,6 +185,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('datastores', 'DatastoreController@create');
 
         $router->patch('datastores/{datastore_id}', 'DatastoreController@update');
+        $router->delete('datastores/{datastore_id}', 'DatastoreController@delete');
         $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume');
         $router->post('datastores/{datastore_id}/rescan', 'DatastoreController@clusterRescan');
         $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore');
@@ -199,6 +200,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('volumesets/{volume_set_id}/iops', 'VolumeSetController@setIOPS');
         $router->post('volumesets/{volume_set_id}/export', 'VolumeSetController@export');
         $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore');
+        $router->delete('volumesets/{volume_set_id}/datastores/{datastore_id}', 'VolumeSetController@removeDatastore');
+        $router->delete('volumesets/{volue_set_id}', 'VolumeSetController@delete');
 
         // Storage host sets
         $router->get('hostsets', 'HostSetController@index');

@@ -11,6 +11,7 @@ use App\Exceptions\V1\SanNotFoundException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Models\V1\Storage;
 use App\Rules\V1\IsValidUuid;
+use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
 use App\Traits\V1\SanitiseRequestData;
 use Illuminate\Support\Facades\Event;
@@ -294,6 +295,79 @@ class DatastoreController extends BaseController
         $datastore->resource->save();
 
         return $this->respondEmpty();
+    }
+
+
+    /**
+     * Fire off automation to delete a datastore
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws DatastoreNotFoundException
+     * @throws ServiceUnavailableException
+     */
+    public function delete(Request $request, IntapiService $intapiService, $datastoreId)
+    {
+        $datastore = static::getDatastoreById($request, $datastoreId);
+
+        // Work out the volume set for the volume
+        $identifier = null;
+        if (preg_match('/\w+[DATA|CLUSTER|QRM]_(\d+)+/', $datastore->reseller_lun_name, $matches) != false) {
+            $identifier = (int) $matches[1];
+        }
+
+        $query = VolumeSetController::getQuery($request);
+        $query->where('ucs_reseller_id', '=', $datastore->solution->getKey());
+
+        if (!empty($identifier)) {
+            $query->where('name', 'LIKE', '%_' . $identifier);
+        }
+
+        if ($query->count() > 0) {
+            $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $datastore]]);
+
+            foreach ($query->get() as $volumeSet) {
+                $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
+
+                if (!$artisanResponse) {
+                    $error = $artisan->getLastError();
+                    if (strpos($error, 'Set does not exist') !== false) {
+                        continue;
+                    }
+                    throw new ServiceUnavailableException('Failed to schedule datastore deletion');
+                }
+
+                if (!empty($artisanResponse->volumes) && in_array($datastore->reseller_lun_name, $artisanResponse->volumes)) {
+                    try {
+                        $automationRequestId = $intapiService->automationRequest(
+                            'delete_lun',
+                            'reseller_lun',
+                            $datastore->getKey(),
+                            ['volume_set_id' => $volumeSet->getKey()],
+                            'ecloud_ucs_' . $datastore->pod->getKey(),
+                            $request->user->applicationId
+                        );
+                    } catch (IntapiServiceException $exception) {
+                        throw new ServiceUnavailableException('Failed to scheduele datastore for deletion', null, 502);
+                    }
+
+                    $headers = [
+                        'X-AutomationRequestId' => $automationRequestId
+                    ];
+
+                    return $this->respondEmpty(202, $headers);
+                }
+            }
+        }
+
+        Log::error(
+            'Failed to find volume set for datastore',
+            [
+                'datastore_id' => $datastoreId
+            ]
+        );
+        throw new ServiceUnavailableException('Failed to schedule datastore deletion');
     }
 
     /**

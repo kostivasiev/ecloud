@@ -11,6 +11,7 @@ use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Support\Facades\Event;
+use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -209,6 +210,37 @@ class VolumeSetController extends BaseController
 
 
     /**
+     * Remove volume/datastore from volume set
+     * @param Request $request
+     * @param $volumeSetId
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws ArtisanException
+     * @throws DatastoreNotFoundException
+     */
+    public function removeDatastore(Request $request, $volumeSetId, $datastoreId)
+    {
+        $rules = ['volume_set_id' => ['required', new IsValidUuid()]];
+        $request['volume_set_id'] = $volumeSetId;
+        $this->validate($request, $rules);
+
+        $volumeSet = static::getById($request, $volumeSetId);
+
+        $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
+
+        $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $datastore]]);
+
+        $artisanResponse = $artisan->removeVolumeFromVolumeSet($volumeSet->name, $datastore->reseller_lun_name);
+
+        if (!$artisanResponse) {
+            throw new ArtisanException('Failed to remove datastore to volume set: ' . $artisan->getLastError());
+        }
+
+        return $this->respondEmpty();
+    }
+
+
+    /**
      * Export a volume set to a host set
      * @param Request $request
      * @param $volumeSetId
@@ -251,6 +283,61 @@ class VolumeSetController extends BaseController
         if (!$artisanResponse) {
             throw new ArtisanException('Failed to export volume set to host set: ' . $artisan->getLastError());
         }
+
+        return $this->respondEmpty();
+    }
+
+
+    /**
+     * Delete volume set. Default to database record only unless told otherwise, then delete from SAN.
+     * @param Request $request
+     * @param $volumeSetId
+     * @return \Illuminate\Http\Response
+     * @throws ArtisanException
+     * @throws BadRequestException
+     * @throws DatastoreNotFoundException
+     */
+    public function delete(Request $request, $volumeSetId)
+    {
+        $rules = [
+            'volume_set_id' => ['required', new IsValidUuid()],
+            'datastore_id' => ['required', 'integer'],
+            'record_only' => ['sometimes', 'boolean']
+        ];
+        $request['volume_set_id'] = $volumeSetId;
+        $this->validate($request, $rules);
+
+        $volumeSet = static::getById($request, $volumeSetId);
+
+        $datastore = DatastoreController::getDatastoreById($request, $request->input('datastore_id'));
+
+        $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $datastore]]);
+
+        // Check if the volume set is empty
+        $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
+
+        if (!$artisanResponse) {
+            $error = $artisan->getLastError();
+            throw new ArtisanException('Failed to load volume set: ' . $error);
+        }
+
+        $errorMessage = 'Failed to delete volume set: ' ;
+
+        if (!empty($artisanResponse->volumes)) {
+            throw new ArtisanException($errorMessage . 'The volume set is not empty.');
+        }
+
+        $recordOnly = $request->input('record_only', true);
+        if (!$recordOnly) {
+            $artisanResponse = $artisan->deleteVolumeSet($volumeSet->name);
+
+            if (!$artisanResponse) {
+                $error = $artisan->getLastError();
+                throw new ArtisanException($errorMessage . $error);
+            }
+        }
+
+        $volumeSet->delete();
 
         return $this->respondEmpty();
     }
