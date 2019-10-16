@@ -194,7 +194,6 @@ class HostController extends BaseController
                 );
                 throw new ArtisanException('Failed to delete Host: ' . $artisan->getLastError());
             }
-
         });
 
         return $this->respondEmpty();
