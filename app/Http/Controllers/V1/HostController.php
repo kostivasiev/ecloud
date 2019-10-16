@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ArtisanException;
+use App\Exceptions\V1\IntapiServiceException;
+use App\Exceptions\V1\ServiceUnavailableException;
 use App\Services\Artisan\V1\ArtisanService;
+use App\Services\IntapiService;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -11,6 +14,7 @@ use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
 
 use Illuminate\Http\Request;
+use Log;
 
 use App\Models\V1\Host;
 use App\Resources\V1\HostResource;
@@ -102,6 +106,98 @@ class HostController extends BaseController
         $host->save();
 
         return $this->respondEmpty(201);
+    }
+
+
+    /**
+     * Fire off automation to delete a host
+     * @param Request $request
+     * @param IntapiService $intapiService
+     * @param $hostId
+     * @return \Illuminate\Http\Response
+     * @throws HostNotFoundException
+     * @throws ServiceUnavailableException
+     */
+    public function delete(Request $request, IntapiService $intapiService, $hostId)
+    {
+        $host = static::getHostById($request, $hostId);
+
+        if ($host->solution->hostSets()->count() != 1) {
+            Log::error(
+                'Unable to determine host set for host',
+                [
+                    'host_id' => $hostId,
+                    'solution_id' => $host->solution->getKey()
+                ]
+            );
+            throw new ServiceUnavailableException('Unable to delete host at this time');
+        }
+
+        // eCloud solutions should only have a single host set
+        $hostSet = $host->solution->hostSets()->first();
+
+        try {
+            $automationRequestId = $intapiService->automationRequest(
+                'expand_lun',
+                'reseller_lun',
+                $host->getKey(),
+                ['host_set_id' => $hostSet->getKey()],
+                'ecloud_ucs_' . $host->pod->getKey(),
+                $request->user->id,
+                $request->user->type
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Failed to expand datastore.');
+        }
+
+        $headers = [];
+        if ($request->user->isAdministrator) {
+            $headers = [
+                'X-AutomationRequestId' => $automationRequestId
+            ];
+        }
+
+        return $this->respondEmpty(202, $headers);
+    }
+
+
+    /**
+     * Delete a host from the SAN (actually all SAN's associated with the Pod for the reseller's solution)
+     * @param Request $request
+     * @param $hostId
+     * @return \Illuminate\Http\Response
+     * @throws BadRequestException
+     * @throws HostNotFoundException
+     */
+    public function deleteHost(Request $request, $hostId)
+    {
+        $host = static::getHostById($request, $hostId);
+
+        if (empty($host->ucs_node_internal_name)) {
+            throw new BadRequestException('Invalid host record: Missing host internal name');
+        }
+
+        // Loop over all the sans for the solutions pod and delete the host on all SANs
+        $solution = $host->solution;
+        $solution->pod->sans->each(function ($san) use ($host, $solution) {
+            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+
+            // Delete host on san
+            $artisanResponse = $artisan->removeHost($host->ucs_node_internal_name);
+
+            if (!$artisanResponse) {
+                Log::error(
+                    'Failed to delete Host from SAN',
+                    [
+                        'san_id' => $san->id
+                    ]
+                );
+                throw new ArtisanException('Failed to delete Host: ' . $artisan->getLastError());
+            }
+
+        });
+
+        return $this->respondEmpty();
     }
 
     /**

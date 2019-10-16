@@ -129,6 +129,47 @@ class HostSetController extends BaseController
 
 
     /**
+     * Remove a host from a host set (we need to do this on all SAN's on the Pod for the reseller's solution
+     * @param Request $request
+     * @param $hostSetId
+     * @param $hostId
+     * @return \Illuminate\Http\Response
+     * @throws UnprocessableEntityException
+     * @throws \App\Exceptions\V1\HostNotFoundException
+     */
+    public function removeHost(Request $request, $hostSetId, $hostId)
+    {
+        $rules = [
+            'host_set_id' => ['required', new IsValidUuid()],
+            'host_id' => ['required', 'integer']
+        ];
+        $request['host_set_id'] = $hostSetId;
+        $request['host_id'] = $hostId;
+        $this->validate($request, $rules);
+
+        $hostSet = HostSetController::getById($request, $hostSetId);
+        $host = HostController::getHostById($request, $request->input('host_id'));
+
+        if (empty($host->ucs_node_internal_name)) {
+            throw new UnprocessableEntityException('Host is not mapped to a SAN entity');
+        }
+
+        $solution = $host->solution;
+        $solution->pod->sans->each(function ($san) use ($solution, $hostSet, $host) {
+            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+
+            $artisaResponse = $artisan->removeHostFromHostSet($hostSet->name, $host->ucs_node_internal_name);
+
+            if (!$artisaResponse) {
+                throw new ArtisanException('Failed to add host to host set: ' . $artisan->getLastError());
+            }
+        });
+
+        return $this->respondEmpty();
+    }
+
+
+    /**
      * Host sets are of the format MCS_G0_SET_17106_(x),  where x is an increment for the solution.
      * Extracts the number and increments accordingly
      * @param Solution $solution

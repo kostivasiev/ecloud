@@ -208,10 +208,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('hostsets/{host_set_id}', 'HostSetController@show');
         $router->post('hostsets', 'HostSetController@create');
         $router->post('hostsets/{host_set_id}/hosts', 'HostSetController@addHost');
+        $router->delete('hostsets/{host_set_id}/hosts/{host_id}', 'HostSetController@removeHost');
+
+        //
 
         // Hosts
         //Create a host on the SAN, lets use /create and reserve POST /hosts for a customer facing create host endpoint later
         $router->post('hosts/{host_id}/create', 'HostController@createHost');
+        $router->delete('hosts/{host_id}', 'HostController@delete'); // Fire off automation
+        $router->post('hosts/{host_id}/delete', 'HostController@deleteHost'); // Delete the host from the SAN
 
         //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
