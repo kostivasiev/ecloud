@@ -115,7 +115,6 @@ class DatastoreController extends BaseController
         $whitelist = ['solution_id', 'capacity'];
 
         if ($request->filled('name')) {
-
             $datastoresQuery = Datastore::where('reseller_lun_ucs_reseller_id', '=', $solution->getKey())
                 ->where('reseller_lun_status', '!=', Status::DELETED);
 
