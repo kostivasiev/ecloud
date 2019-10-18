@@ -54,3 +54,8 @@ envSecrets:
       - "VMWARE_API_PASS"
       - "VMWARE_API_PORT"
       - "APIO_ACCOUNT_HOST"
+      
+hostAliases:
+- ip: "172.16.64.22"
+  hostnames:
+  - vault.ukfast.net
