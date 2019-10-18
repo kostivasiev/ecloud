@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
 use App\Exceptions\V1\ServiceUnavailableException;
+use App\Models\V1\DrsRule;
 use App\Services\AccountsService;
 use App\Solution\CanModifyResource;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -19,6 +20,9 @@ use UKFast\Api\Exceptions\DatabaseException;
 
 use App\Traits\V1\SanitiseRequestData;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Collection;
+
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SolutionController extends BaseController
 {
@@ -157,5 +161,61 @@ class SolutionController extends BaseController
         }
 
         return $solutionQuery;
+    }
+
+    /**
+     * List Solution DRS Rules
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\Http\Response
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     */
+    public function getDrsRules(Request $request, $solutionId)
+    {
+        $solution = static::getSolutionById($request, $solutionId);
+
+        $rules = $solution->drsRules();
+
+        return $this->respondCollection(
+            $request,
+            $this->paginateDrsRuleData($rules)
+        );
+    }
+    
+    /**
+     * Paginate template data
+     * @param $rules
+     * @return LengthAwarePaginator
+     */
+    protected function paginateDrsRuleData($rules)
+    {
+        if (!is_array($rules)) {
+            $rules = [$rules];
+        }
+
+        $collection = new Collection($rules);
+
+        $collection->transform(function (DrsRule $item) {
+            return [
+                'uuid' => $item->getUuid(),
+                'name' => $item->getName(),
+                'rule_type' => $item->getRuleType(),
+                'enabled' => $item->getEnabled(),
+                'host_group' => $item->getHostGroup(),
+                'vm_group' => $item->getVmGroup(),
+                'vms_in_rule' => $item->getVmsInRule()
+            ];
+        });
+
+        $paginator = new LengthAwarePaginator(
+            $collection->slice(
+                LengthAwarePaginator::resolveCurrentPage('page') - 1 * $this->perPage,
+                $this->perPage
+            )->all(),
+            count($collection),
+            $this->perPage
+        );
+
+        return $paginator;
     }
 }
