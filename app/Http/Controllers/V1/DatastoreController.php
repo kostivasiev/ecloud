@@ -115,8 +115,15 @@ class DatastoreController extends BaseController
         $whitelist = ['solution_id', 'capacity'];
 
         if ($request->filled('name')) {
-            // Validate volume friendly name is unique to the solution or solution site
-            $datastores = Collect(Datastore::getForSolution($solution->getKey(), $request->input('site_id')));
+
+            $datastoresQuery = Datastore::where('reseller_lun_ucs_reseller_id', '=', $solution->getKey())
+                ->where('reseller_lun_status', '!=', Status::DELETED);
+
+            if (isset($solutionSite)) {
+                $datastoresQuery->where('reseller_lun_ucs_site_id', '=', $solutionSite->getKey());
+            }
+
+            $datastores = $datastoresQuery->get();
 
             if ($datastores->contains('reseller_lun_friendly_name', '=', $request->input('name'))) {
                 throw new ConflictException(
