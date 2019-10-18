@@ -789,7 +789,7 @@ class VirtualMachineController extends BaseController
         }
 
         if (isset($appliance)) {
-            Event::fire(new ApplianceLaunchedEvent($appliance));
+            Event::dispatch(new ApplianceLaunchedEvent($appliance));
         }
 
         // If PAYG encryption, assign credit. We need to do after the intapi call so we have the server id
