@@ -5,9 +5,9 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "php": ">=7.1.3",
+    "php": "~7.1.0",
     "ext-json": "*",
-    "ext-pdo_sqlite": "^7.2",
+    "ext-mcrypt": "^7.1",
     "guzzlehttp/guzzle": "~6.0",
     "illuminate/mail": "^5.8",
     "illuminate/redis": "5.8.*",
@@ -23,9 +23,9 @@
     "ukfast/api-resources": "4.0.*",
     "ukfast/api-validation": "~1.0",
     "ukfast/ditto": "4.7.*",
+    "ukfast/health-check": "~1.0",
     "ukfast/log-provider": "~1.0",
-    "vlucas/phpdotenv": "^3.3",
-    "ukfast/health-check": "~1.0"
+    "vlucas/phpdotenv": "^3.3"
   },
   "require-dev": {
     "ext-sqlite3": "*",
