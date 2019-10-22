@@ -153,7 +153,6 @@ class HostSetController extends BaseController
         if (empty($host->ucs_node_internal_name)) {
             throw new UnprocessableEntityException('Host is not mapped to a SAN entity');
         }
-
         $solution = $host->solution;
         $solution->pod->sans->each(function ($san) use ($solution, $hostSet, $host) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);

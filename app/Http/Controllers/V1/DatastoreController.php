@@ -101,7 +101,6 @@ class DatastoreController extends BaseController
     public function create(Request $request, IntapiService $intapiService)
     {
         $this->validate($request, Datastore::getRules());
-
         // Determine the pod
         if ($request->has('site_id')) {
             $solutionSite = SolutionSiteController::getSiteById($request, $request->input('site_id'));
@@ -341,6 +340,14 @@ class DatastoreController extends BaseController
                     if (strpos($error, 'Set does not exist') !== false) {
                         continue;
                     }
+                    Log::error(
+                        'Failed to get volume set details from the SAN',
+                        [
+                            'datastore_id' => $datastoreId,
+                            'volume_set' => $volumeSet->name,
+                            'SAN error message' => $error
+                        ]
+                    );
                     throw new ServiceUnavailableException('Failed to schedule datastore deletion');
                 }
 
