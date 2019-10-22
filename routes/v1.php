@@ -201,7 +201,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('volumesets/{volume_set_id}/export', 'VolumeSetController@export');
         $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore');
         $router->delete('volumesets/{volume_set_id}/datastores/{datastore_id}', 'VolumeSetController@removeDatastore');
-        $router->delete('volumesets/{volue_set_id}', 'VolumeSetController@delete');
+
+        $router->delete('volumesets/{volume_set_id}', 'VolumeSetController@delete');
+        $router->post('volumesets/{volume_set_id}/delete', 'VolumeSetController@deleteVolumeSet');
+
 
         // Storage host sets
         $router->get('hostsets', 'HostSetController@index');

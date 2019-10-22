@@ -178,7 +178,6 @@ class VolumeSetController extends BaseController
         return $this->respondEmpty();
     }
 
-
     /**
      * Add a datastore volume to a volumeset
      * @param Request $request
@@ -289,20 +288,60 @@ class VolumeSetController extends BaseController
 
 
     /**
-     * Delete volume set. Default to database record only unless told otherwise, then delete from SAN.
+     * Delete volume set record. Check the SAN to see if the volume set contains any volumes to
+     * prevent delete of non empty volume sets.
+     * @param Request $request
+     * @param $volumeSetId
+     * @return \Illuminate\Http\Response
+     */
+    public function delete(Request $request, $volumeSetId)
+    {
+        $rules = ['volume_set_id' => ['required', new IsValidUuid()]];
+        $request['volume_set_id'] = $volumeSetId;
+        $this->validate($request, $rules);
+
+        $volumeSet = static::getById($request, $volumeSetId);
+
+        $solution = $volumeSet->solution;
+        // Check if the volume set is empty, as we cant target a specific san we'll need to check all the sans for the solutions pod
+        $solution->pod->sans->each(function ($san) use ($solution, $volumeSet) {
+            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+            
+            $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
+
+            if (!$artisanResponse) {
+                $error = $artisan->getLastError();
+                if (strpos($error, 'Set does not exist') !== false) {
+                    return true; //continue to the next san
+                }
+
+                throw new ArtisanException('Failed to load volume set: ' . $error);
+            }
+
+            if (!empty($artisanResponse->volumes)) {
+                throw new ArtisanException('Failed to delete volume set. The volume set is not empty.');
+            }
+        });
+
+        $volumeSet->delete();
+
+        return $this->respondEmpty();
+    }
+
+
+    /**
+     * Delete a volume set from the SAN
      * @param Request $request
      * @param $volumeSetId
      * @return \Illuminate\Http\Response
      * @throws ArtisanException
-     * @throws BadRequestException
      * @throws DatastoreNotFoundException
      */
-    public function delete(Request $request, $volumeSetId)
+    public function deleteVolumeSet(Request $request, $volumeSetId)
     {
         $rules = [
             'volume_set_id' => ['required', new IsValidUuid()],
             'datastore_id' => ['required', 'integer'],
-            'record_only' => ['sometimes', 'boolean']
         ];
         $request['volume_set_id'] = $volumeSetId;
         $this->validate($request, $rules);
@@ -327,17 +366,12 @@ class VolumeSetController extends BaseController
             throw new ArtisanException($errorMessage . 'The volume set is not empty.');
         }
 
-        $recordOnly = $request->input('record_only', true);
-        if (!$recordOnly) {
-            $artisanResponse = $artisan->deleteVolumeSet($volumeSet->name);
+        $artisanResponse = $artisan->deleteVolumeSet($volumeSet->name);
 
-            if (!$artisanResponse) {
-                $error = $artisan->getLastError();
-                throw new ArtisanException($errorMessage . $error);
-            }
+        if (!$artisanResponse) {
+            $error = $artisan->getLastError();
+            throw new ArtisanException($errorMessage . $error);
         }
-
-        $volumeSet->delete();
 
         return $this->respondEmpty();
     }
