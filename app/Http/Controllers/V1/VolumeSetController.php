@@ -306,7 +306,7 @@ class VolumeSetController extends BaseController
         // Check if the volume set is empty, as we cant target a specific san we'll need to check all the sans for the solutions pod
         $solution->pod->sans->each(function ($san) use ($solution, $volumeSet) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
-            
+
             $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
 
             if (!$artisanResponse) {
