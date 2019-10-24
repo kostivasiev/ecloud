@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\IntapiServiceException;
+use App\Exceptions\V1\KingpinException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
@@ -195,6 +196,27 @@ class HostController extends BaseController
                 throw new ArtisanException('Failed to delete Host: ' . $artisan->getLastError());
             }
         });
+
+        return $this->respondEmpty();
+    }
+
+    /**
+     * Rescan the host's cluster on VMWare
+     * @param Request $request
+     * @param $hostId
+     * @return \Illuminate\Http\Response
+     * @throws HostNotFoundException
+     * @throws KingpinException
+     */
+    public function clusterRescan(Request $request, $hostId)
+    {
+        $host = static::getHostById($request, $hostId);
+
+        try {
+            $host->clusterRescan();
+        } catch (\Exception $exception) {
+            throw new KingpinException('Failed to rescan host cluster: ' . $exception->getMessage());
+        }
 
         return $this->respondEmpty();
     }

@@ -271,6 +271,28 @@ class Host extends Model implements Filterable, Sortable
     }
 
     /**
+     * Rescan the host's cluster on vmware
+     * @throws \Exception
+     */
+    public function clusterRescan()
+    {
+        try {
+            $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
+                $this->solution->pod,
+                $this->solution->ucs_reseller_type
+            ]);
+
+            if (!$kingpin->clusterRescan($this->solution->getKey())) {
+                throw new \Exception('Failed to perform cluster rescan: ' . $kingpin->getLastError());
+            }
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to perform cluster rescan ' . $exception->getMessage());
+        }
+
+        return true;
+    }
+
+    /**
      * We have 4 columns on the host record storing Fibre Channel World Wide Port Names.
      * Determine which ones are set and return as an array.
      * @return array

@@ -533,7 +533,7 @@ class DatastoreController extends BaseController
 
 
     /**
-     * Rescan a cluster on VMWare after expanding a datastore
+     * Rescan the datastore's cluster on VMWare
      * @param Request $request
      * @param $datastoreId
      * @return \Illuminate\Http\Response

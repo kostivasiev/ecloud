@@ -559,7 +559,7 @@ class Datastore extends Model implements Filterable, Sortable
     }
 
     /**
-     * Rescan the cluster on vmware after resizing the datastore
+     * Rescan the datastore's cluster on vmware
      * @throws \Exception
      */
     public function clusterRescan()

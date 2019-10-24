@@ -220,6 +220,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('hosts/{host_id}/create', 'HostController@createHost');
         $router->delete('hosts/{host_id}', 'HostController@delete'); // Fire off automation
         $router->post('hosts/{host_id}/delete', 'HostController@deleteHost'); // Delete the host from the SAN
+        $router->post('hosts/{host_id}/rescan', 'HostController@clusterRescan');
 
         //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
