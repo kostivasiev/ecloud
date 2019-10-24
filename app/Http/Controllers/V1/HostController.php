@@ -56,7 +56,16 @@ class HostController extends BaseController
     public function show(Request $request, $hostId)
     {
         $host = static::getHostById($request, $hostId);
-        $host->getVmwareUsage();
+        try {
+            $host->getVmwareUsage();
+        } catch (\Exception $exception) {
+            Log::error(
+                'Failed to load VMWare usage for host: ' . $exception->getMessage(),
+                [
+                    'host_id' => $hostId
+                ]
+            );
+        }
 
         return $this->respondItem(
             $request,
