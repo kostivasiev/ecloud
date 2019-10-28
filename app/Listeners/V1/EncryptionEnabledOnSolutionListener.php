@@ -42,7 +42,8 @@ class EncryptionEnabledOnSolutionListener
                 $event->solution->getKey(),
                 [],
                 'ecloud_ucs_' . $event->solution->pod->getKey(),
-                $this->request->user->applicationId
+                $this->request->user->id,
+                $this->request->user->type
             );
 
             $intapiData = $this->intapiService->getResponseData();

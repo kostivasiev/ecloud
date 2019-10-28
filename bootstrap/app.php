@@ -2,11 +2,9 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-try {
-    (new Dotenv\Dotenv(__DIR__.'/../'))->load();
-} catch (Dotenv\Exception\InvalidPathException $e) {
-    //
-}
+(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
+    dirname(__DIR__)
+))->bootstrap();
 
 /*
 |--------------------------------------------------------------------------
@@ -24,9 +22,14 @@ $app = new Laravel\Lumen\Application(
 );
 
 $app->configure('database');
+$app->configure('logging');
+$app->configure('mail');
+
+$app->alias('mailer', Illuminate\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 
 $app->withFacades();
-
 $app->withEloquent();
 
 /*
@@ -61,10 +64,6 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
-
 $app->routeMiddleware([
     'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
@@ -82,23 +81,18 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
 */
-$app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
-$app->register(\UKFast\Api\Auth\Providers\AuthServiceProvider::class);
+
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(App\Providers\PaginationServiceProvider::class);
-$app->register(UKFast\Providers\LogServiceProvider::class);
-
-//VMWare service provider (Kingpin)
 $app->register(App\Providers\KingpinServiceProvider::class);
-
-// APIo service providers
 $app->register(App\Providers\NetworkingServiceProvider::class);
 $app->register(App\Providers\AccountsServiceProvider::class);
-
-// intAPI
 $app->register(App\Providers\IntapiServiceProvider::class);
-
-// Event Service provider
 $app->register(App\Providers\EventServiceProvider::class);
+$app->register(UKFast\HealthCheck\HealthCheckServiceProvider::class);
+$app->register(UKFast\Api\Auth\Providers\AuthServiceProvider::class);
+$app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

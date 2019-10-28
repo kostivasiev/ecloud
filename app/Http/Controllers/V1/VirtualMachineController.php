@@ -508,14 +508,13 @@ class VirtualMachineController extends BaseController
                 $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);
 
                 try {
-                    $template = $podTemplate->getGpuVersion($gpuProfile);
+                    $gpuTemplate = $template->getGpuVersion($gpuProfile);
                 } catch (TemplateNotFoundException $exception) {
                     throw new TemplateNotFoundException('No GPU template found matching requested template and gpu_profile');
                 } catch (\Exception $exception) {
                     throw new ServiceUnavailableException($exception->getMessage());
                 }
 
-                // Update the template name to the GPU version of this template
                 $templateName = $template->name;
             } else {
                 // Validate the template exists: Try to load from both Solution & Pod templates
@@ -583,7 +582,7 @@ class VirtualMachineController extends BaseController
         }
 
         if ($request->has('template')) {
-            if ($template->subType != 'Base' || $request->input('environment') == 'GPU') {
+            if ($template->subType != 'Base') {
                 $post_data['template'] = $templateName;
 
                 if ($template->type != 'Solution') {
@@ -731,8 +730,13 @@ class VirtualMachineController extends BaseController
         if ($request->has('appliance_id')) {
             $post_data['is_appliance'] = true;
             if (!empty($applianceScript)) {
-                $post_data['bootstrap_script'] = json_encode($applianceScript);
+                $post_data['appliance_bootstrap_script'] = base64_encode($applianceScript);
             }
+        }
+
+        //set bootstrap script
+        if ($request->has('bootstrap_script')) {
+            $post_data['bootstrap_script'] = base64_encode($request->input('bootstrap_script'));
         }
 
         if ($request->input('environment') == 'Public') {
@@ -797,7 +801,7 @@ class VirtualMachineController extends BaseController
         }
 
         if (isset($appliance)) {
-            Event::fire(new ApplianceLaunchedEvent($appliance));
+            Event::dispatch(new ApplianceLaunchedEvent($appliance));
         }
 
         // If PAYG encryption, assign credit. We need to do after the intapi call so we have the server id
@@ -891,7 +895,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 'ecloud_ucs_' . $virtualMachine->pod->getKey(),
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule deletion request');
@@ -1453,7 +1458,8 @@ class VirtualMachineController extends BaseController
                     $virtualMachine->getKey(),
                     $automationData,
                     !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                    $request->user->applicationId
+                    $request->user->id,
+                    $request->user->type
                 );
             } catch (IntapiServiceException $exception) {
                 throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
@@ -1644,7 +1650,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 $automationData,
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Unable to schedule virtual machine changes');
@@ -1732,7 +1739,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
 
             $intapiData = $intapiService->getResponseData();
@@ -1839,7 +1847,8 @@ class VirtualMachineController extends BaseController
                 $virtualMachine->getKey(),
                 [],
                 !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
-                $request->user->applicationId
+                $request->user->id,
+                $request->user->type
             );
 
             $intapiData = $intapiService->getResponseData();

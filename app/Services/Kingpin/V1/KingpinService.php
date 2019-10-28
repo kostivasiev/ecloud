@@ -666,6 +666,27 @@ class KingpinService
         return $datastores;
     }
 
+        /**
+     * Returns an array of DRS rules for the solution
+     * @param $solution
+     * @return null
+     * @throws KingpinException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getDrsRulesForSolution(Solution $solution)
+    {
+        try {
+            $this->makeRequest(
+                'GET',
+                $this->generateV1URL($solution->getKey()) . 'cluster/drs/rule'
+            );
+        } catch (TransferException $exception) {
+            throw new KingpinException($exception->getMessage());
+        }
+
+        return $this->responseData;
+    }
+
     /**
      * format datastore object to standard response
      * @param $vmwareObject
@@ -746,8 +767,6 @@ class KingpinService
             // We don't care about logging the stack trace
             unset($exceptionData['StackTrace']);
         }
-
-        Log::critical($logMessage, $exceptionData);
 
         if (is_null($response)) {
             Log::debug('No response body from Kingpin request, service may be unavailable.');

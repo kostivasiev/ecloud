@@ -234,6 +234,20 @@ class Appliance extends Model implements Filterable, Sortable
     }
 
     /**
+     * Return the Pods that the appliance is active in.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pods()
+    {
+        return $this->hasMany(
+            'App\Models\V1\AppliancePodAvailability',
+            'appliance_pod_availability_appliance_id',
+            'appliance_id'
+        );
+    }
+
+
+    /**
      * Get the latest version of the appliance.
      * @return Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
      * @throws ApplianceVersionNotFoundException
