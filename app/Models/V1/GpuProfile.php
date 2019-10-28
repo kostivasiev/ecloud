@@ -6,6 +6,8 @@ use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -60,20 +62,6 @@ class GpuProfile extends Model implements Filterable, Sortable
         'name',
         'card_type'
     ];
-
-    /**
-     * Profile names to half and full GPU cards mapping
-     */
-    const CARD_PROFILES = [
-            'grid_v100d-16q' => 0.5,
-            'grid_v100d-32q' => 1
-        ];
-
-    /**
-     * This is the amount of GPU cards that we have available for customer use.
-     * We will need to update this as we purchase more GPU cards.
-     */
-    const CARDS_AVAILABLE = 6;
 
     /**
      * Ditto configuration
@@ -169,5 +157,56 @@ class GpuProfile extends Model implements Filterable, Sortable
             DateTimeProperty::create('appliance_created_at', 'created_at'),
             DateTimeProperty::create('appliance_updated_at', 'updated_at')
         ];
+    }
+
+    /**
+     * Get GPU resource pool availability
+     * @return int|mixed
+     */
+    public static function gpuResourcePoolAvailability()
+    {
+        $available = config('gpu.cards_available');
+
+        $profiles = static::select('uuid', 'profile_name')->get()->pluck('uuid', 'profile_name');
+        $profiles = $profiles->flip()->toArray();
+
+        // Get a list of active VM's with a GPU profile assigned
+        $vms = VirtualMachine::query()
+            ->where('servers_ecloud_gpu_profile_uuid', '!=', '0')
+            ->where('servers_active', '=', 'y')
+            ->whereNotNull('servers_ecloud_gpu_profile_uuid')
+            ->where('servers_ecloud_gpu_profile_uuid', '!=', '')
+            ->pluck('servers_ecloud_gpu_profile_uuid', 'servers_id')
+            ->toArray();
+
+        $cardProfiles = config('gpu.card_profiles');
+
+        foreach ($vms as $vmId => $profileUuid) {
+            if (!in_array($profileUuid, array_keys($profiles)) || !in_array($profiles[$profileUuid], array_keys($cardProfiles))) {
+                Log::error(
+                    'Unrecognised GPU profile \'' . $profileUuid . '\' found on Virtual Machine # ' . $vmId .' when calculating GPU pool availability'
+                );
+                continue;
+            }
+
+            $available -= $cardProfiles[$profiles[$profileUuid]];
+        }
+
+        return $available;
+    }
+
+    /**
+     * Return how much resource this profile allocates, 0.5 or 1 GPU card.
+     * @return mixed
+     * @throws NotFoundException
+     */
+    public function getResourceAllocation() : int
+    {
+        $cardProfiles = config('gpu.card_profiles');
+        if (!in_array($this->profile_name, array_keys($cardProfiles))) {
+            throw new NotFoundException('GPU profile ' . $this->profile_name . ' is not a valid card type');
+        }
+
+        return $cardProfiles[$this->profile_name];
     }
 }

@@ -495,9 +495,9 @@ class VirtualMachineController extends BaseController
                 }
 
                 // Check we have enough GPU resources available to launch the VM
-                $availableGpuPool = GpuProfileController::gpuResourcePoolAvailability();
+                $availableGpuPool = GpuProfile::gpuResourcePoolAvailability();
 
-                $requiredUsage = GpuProfile::CARD_PROFILES[$gpuProfile->profile_name];
+                $requiredUsage = $gpuProfile->getResourceAllocation();
 
                 if ($requiredUsage > $availableGpuPool) {
                     throw new InsufficientResourceException(
