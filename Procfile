@@ -1,1 +1,1 @@
-web: vendor/bin/heroku-php-nginx -C nginx.inc.conf -F php-fpm.inc.conf public/
+web: vendor/bin/heroku-php-nginx -c nginx.conf -F php-fpm.inc.conf public/

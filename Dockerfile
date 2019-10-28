@@ -8,9 +8,6 @@ ENV PORT 8080
 
 ADD . /app
 
-# Create ".env" file if it doesn't exist
-RUN cp -n /app/.env.example /app/.env
-
 # Authorize SSH Host
 RUN mkdir -p /app/.ssh && \
     chmod 0700 /app/.ssh && \
