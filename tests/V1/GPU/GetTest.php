@@ -25,7 +25,7 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
-        
+
         $this->json('GET', '/v1/gpu-profiles', [], $this->validWriteHeaders)
             ->seeStatusCode(200)
             ->seeJson([
