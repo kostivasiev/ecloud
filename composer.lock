@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "99913d8617d1a8d69def801019009d27",
+    "content-hash": "067513e88b0e15d0b992096dfc57e095",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -4164,11 +4164,11 @@
         },
         {
             "name": "ukfast/api-auth",
-            "version": "2.1.2",
+            "version": "v2.2.3",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/authentication.git",
-                "reference": "d4aa96428f32a5e0b9601ea367e6aaff05d4f5d9"
+                "reference": "e87ece2f14741c1814504e5d6538e6138261ecf5"
             },
             "require": {
                 "illuminate/auth": "^5.4",
@@ -4196,7 +4196,7 @@
                 }
             ],
             "description": "Authentication and Authorization for use with you UKFast API",
-            "time": "2019-04-26T14:26:57+00:00"
+            "time": "2019-10-29T16:32:25+00:00"
         },
         {
             "name": "ukfast/api-exceptions",
@@ -4450,18 +4450,18 @@
         },
         {
             "name": "ukfast/health-check",
-            "version": "v1.1.4",
+            "version": "v1.1.5",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/health-check.git",
-                "reference": "f4165a794726bbca0ceed6c6624daf36a860f3a0"
+                "reference": "cbde496212099a544a629e51f418c6e922049512"
             },
             "require": {
-                "illuminate/database": "^5.4",
-                "illuminate/http": "^5.4",
-                "illuminate/log": "^5.4",
-                "illuminate/redis": "^5.4",
-                "illuminate/support": "^5.4"
+                "illuminate/database": "^5.4|^6.0",
+                "illuminate/http": "^5.4|^6.0",
+                "illuminate/log": "^5.4|^6.0",
+                "illuminate/redis": "^5.4|^6.0",
+                "illuminate/support": "^5.4|^6.0"
             },
             "require-dev": {
                 "orchestra/testbench": "^3.5",
@@ -4488,7 +4488,7 @@
                 }
             ],
             "description": "A package for checking the health of your laravel/lumen apis",
-            "time": "2019-10-29T07:54:04+00:00"
+            "time": "2019-10-29T11:47:49+00:00"
         },
         {
             "name": "ukfast/log-provider",
@@ -5613,20 +5613,20 @@
             "authors": [
                 {
                     "name": "Manuel Pichler",
+                    "role": "Project Founder",
                     "email": "github@manuel-pichler.de",
-                    "homepage": "https://github.com/manuelpichler",
-                    "role": "Project Founder"
+                    "homepage": "https://github.com/manuelpichler"
                 },
                 {
                     "name": "Marc Würth",
+                    "role": "Project Maintainer",
                     "email": "ravage@bluewin.ch",
-                    "homepage": "https://github.com/ravage84",
-                    "role": "Project Maintainer"
+                    "homepage": "https://github.com/ravage84"
                 },
                 {
                     "name": "Other contributors",
-                    "homepage": "https://github.com/phpmd/phpmd/graphs/contributors",
-                    "role": "Contributors"
+                    "role": "Contributors",
+                    "homepage": "https://github.com/phpmd/phpmd/graphs/contributors"
                 }
             ],
             "description": "PHPMD is a spin-off project of PHP Depend and aims to be a PHP equivalent of the well known Java tool PMD.",
@@ -5895,8 +5895,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
-                    "role": "lead"
+                    "role": "lead",
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "Utility class for timing",
