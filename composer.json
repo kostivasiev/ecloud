@@ -70,7 +70,7 @@
     "optimize-autoloader": true,
     "discard-changes": true,
     "platform": {
-      "php": "7.1.30"
+      "php": "7.1.32"
     }
   },
   "minimum-stability": "dev",
