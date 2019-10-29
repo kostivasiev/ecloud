@@ -36,7 +36,7 @@ return [
         // Default database connection
         'reseller' => [
             'driver'    => env('DB_RESELLER_DRIVER', 'mysql'),
-            'host'      => env('DB_RESELLER_HOST'),
+            'host'      => env('DB_RESELLER_HOST', '127.0.0.1'),
             'port'      => env('DB_RESELLER_PORT', 3306),
             'database'  => env('DB_RESELLER_DATABASE', 'reseller'),
             'username'  => env('DB_RESELLER_USERNAME'),
@@ -45,7 +45,7 @@ return [
 
         'ecloud' => [
             'driver'    => env('DB_ECLOUD_DRIVER', 'mysql'),
-            'host'      => env('DB_ECLOUD_HOST'),
+            'host'      => env('DB_ECLOUD_HOST', '127.0.0.1'),
             'port'      => env('DB_ECLOUD_PORT', 3306),
             'database'  => env('DB_ECLOUD_DATABASE', 'ecloud'),
             'username'  => env('DB_ECLOUD_USERNAME'),
