@@ -875,13 +875,31 @@ class VirtualMachineController extends BaseController
             );
         }
 
+        $post_data = [];
+        if ($request->user->isAdministrator) {
+            $rules = [
+                'reason' => ['sometimes', 'string'],
+                'cancel_billing' => ['sometimes', 'boolean']
+            ];
+
+            $this->validate($request, $rules);
+
+            if (!empty($request->input('reason'))) {
+                $post_data['deleted_reason'] = $request->input('reason');
+            }
+
+            if (!empty($request->input('cancel_billing'))) {
+                $post_data['cancel_without_charge'] = $request->input('cancel_billing');
+            }
+        }
+
         //schedule automation
         try {
             $automationRequestId = $intapiService->automationRequest(
                 'delete_vm',
                 'server',
                 $virtualMachine->getKey(),
-                [],
+                $post_data,
                 'ecloud_ucs_' . $virtualMachine->pod->getKey(),
                 $request->user->id,
                 $request->user->type
