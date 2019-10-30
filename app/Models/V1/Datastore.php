@@ -6,6 +6,7 @@ use App\Datastore\Status;
 use App\Events\V1\DatastoreCreatedEvent;
 use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\KingpinException;
+use App\Http\Controllers\V1\VolumeSetController;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Database\Eloquent\Model;
 
@@ -578,5 +579,55 @@ class Datastore extends Model implements Filterable, Sortable
         }
 
         return true;
+    }
+
+
+    /**
+     * Load the volume set for a datastore
+     * This is quite an expensive method to run, so lets only do it when we have to!
+     * @return |null
+     */
+    public function volumeSet()
+    {
+        $identifier = null;
+        if (preg_match('/\w+[DATA|CLUSTER|QRM]_(\d+)+/', $this->reseller_lun_name, $matches) != false) {
+            $identifier = (int) $matches[1];
+        }
+        $query = VolumeSetController::getQuery(app('request'));
+
+        $query->where('ucs_reseller_id', '=', $this->solution->getKey());
+
+        if (!empty($identifier)) {
+            $query->where('name', 'LIKE', '%_' . $identifier);
+        }
+
+        if ($query->count() > 0) {
+            $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $this]]);
+
+            foreach ($query->get() as $volumeSet) {
+                $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
+
+                if (!$artisanResponse) {
+                    $error = $artisan->getLastError();
+                    if (strpos($error, 'Set does not exist') !== false) {
+                        continue;
+                    }
+                    Log::error(
+                        'Failed to get volume set details from the SAN',
+                        [
+                            'datastore_id' => $this->getKey(),
+                            'volume_set' => $volumeSet->name,
+                            'SAN error message' => $error
+                        ]
+                    );
+                }
+
+                if (!empty($artisanResponse->volumes) && in_array($this->reseller_lun_name, $artisanResponse->volumes)) {
+                    return $volumeSet;
+                }
+            }
+        }
+
+        return null;
     }
 }

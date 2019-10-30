@@ -4,6 +4,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Datastore\Status;
 use App\Events\V1\DatastoreExpandEvent;
+use App\Events\V1\VolumeSetIopsUpdatedEvent;
+use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\ConflictException;
 use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\KingpinException;
@@ -78,6 +80,89 @@ class DatastoreController extends BaseController
             [],
             Datastore::$itemProperties
         );
+    }
+
+
+    /**
+     * Update IOPS on a datastore's volume set
+     * @param Request $request
+     * @param $datastoreId
+     * @return \Illuminate\Http\Response
+     * @throws ArtisanException
+     * @throws BadRequestException
+     * @throws DatastoreNotFoundException
+     * @throws ServiceUnavailableException
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateIops(Request $request, $datastoreId)
+    {
+        $datastore = static::getDatastoreById($request, $datastoreId);
+        $this->validate($request, ['iops_tier' => ['required', new IsValidUuid()]]);
+        $iopsTier = IOPSController::getById($request->input('iops_tier'));
+
+        if (!$datastore->storage->qosEnabled()) {
+            throw new BadRequestException('IOPS is not configurable for this datastore');
+        }
+
+        $volumeSet = $datastore->volumeSet();
+
+        if (empty($volumeSet)) {
+            throw new ServiceUnavailableException('IOPS can not be configured for this datastore');
+        }
+
+        $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $datastore]]);
+        $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
+
+        if (!$artisanResponse) {
+            Log::error(
+                'Failed to get volume set details from the SAN',
+                [
+                    'datastore_id' => $this->getKey(),
+                    'volume_set' => $volumeSet->name,
+                    'SAN error message' => $artisan->getLastError()
+                ]
+            );
+
+            throw new ServiceUnavailableException('Failed to configure IOPS');
+        }
+
+        if (count($artisanResponse->volumes) > 1) {
+            Log::error(
+                'Unable to configure IOPS on datastore. The volume set contains more than one volume.',
+                [
+                    'datastore_id' => $this->getKey(),
+                    'volume_set' => $volumeSet->name
+                ]
+            );
+            throw new BadRequestException('It is not possible to configure IOPS on this datastore');
+        }
+
+        $artisanResponse = $artisan->setIOPS($volumeSet->name, $iopsTier->max_iops);
+
+        if (!$artisanResponse) {
+            $errorMessage = 'Failed to set IOPS for volume set.';
+            $error = $artisan->getLastError();
+            if (strpos($error, 'Invalid QOS target object') !== false) {
+                $errorMessage .= ' The volume set is not valid.';
+            }
+
+            Log::error(
+                'Unable to configure IOPS on datastore',
+                [
+                    'datastore_id' => $this->getKey(),
+                    'volume_set' => $volumeSet->name,
+                    'error' => $error
+                ]
+            );
+
+            throw new ArtisanException($errorMessage);
+        }
+
+        $volumeSet->max_iops = $iopsTier->max_iops;
+        $volumeSet->save();
+        Event::fire(new VolumeSetIopsUpdatedEvent($volumeSet));
+
+        return $this->respondEmpty();
     }
 
     /**
@@ -199,7 +284,7 @@ class DatastoreController extends BaseController
 
         $datastore = $datastoreResource->resource;
         $datastore->reseller_lun_ucs_storage_id = $storage->getKey();
-        $datastore->reseller_lun_type = $solution->ucs_reseller_type;
+        $datastore->reseller_lun_type = $request->input('type', $solution->ucs_reseller_type);
         $datastore->reseller_lun_reseller_id = $solution->resellerId();
         $datastore->reseller_lun_lun_type = $request->input('lun_type', 'DATA');
         $datastore->reseller_lun_status = Status::QUEUED;
@@ -273,6 +358,7 @@ class DatastoreController extends BaseController
      * @param $datastoreId
      * @return \Illuminate\Http\Response
      * @throws DatastoreNotFoundException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, $datastoreId)
     {
@@ -285,7 +371,6 @@ class DatastoreController extends BaseController
             [
                 'capacity' => ['nullable', 'numeric'],
                 'solution_id' => ['sometimes', 'numeric'],
-                'type' => ['sometimes'],
                 'lun_type' => ['sometimes', 'in:DATA,CLUSTER,QRM'],
                 'name' => ['nullable'],
                 'lun_wwn' => ['nullable', 'max:255']
@@ -295,7 +380,7 @@ class DatastoreController extends BaseController
         $request['id'] = $datastoreId;
         $this->validate($request, $rules);
 
-        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'capacity', 'name'])), Datastore::class);
+        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'capacity', 'name', 'type'])), Datastore::class);
 
         $datastore->resource->save();
 

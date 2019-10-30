@@ -189,6 +189,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume');
         $router->post('datastores/{datastore_id}/rescan', 'DatastoreController@clusterRescan');
         $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore');
+        $router->post('datastores/{datastore_id}/iops', 'DatastoreController@updateIops');
+
 
         $router->post('datastores/{datastore_id}/createvolume', 'DatastoreController@createvolume');
         $router->post('datastores/{datastore_id}/create', 'DatastoreController@createDatastore');

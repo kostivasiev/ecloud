@@ -190,4 +190,21 @@ class VolumeSet extends Model implements Filterable, Sortable
 
         return $query;
     }
+
+    /**
+     * Returns the IOPS tier for a volume set if it has one assigned
+     * @return IopsTier|null
+     */
+    public function getIopsTier()
+    {
+        if (empty($this->max_iops)) {
+            return null;
+        }
+
+        $iopsTierQuery = IopsTier::where('max_iops', '=', $this->max_iops);
+
+        if ($iopsTierQuery->count() > 0) {
+            return $iopsTierQuery->first();
+        }
+    }
 }
