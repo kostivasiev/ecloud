@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Models\V1\GpuProfile;
-use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -45,7 +44,6 @@ class GpuProfileController extends BaseController
      * @param Request $request
      * @param $id
      * @return \Illuminate\http\Response
-     * @throws NotFoundException
      */
     public function show(Request $request, $id)
     {
@@ -53,18 +51,14 @@ class GpuProfileController extends BaseController
     }
 
     /**
-     * get item by ID
+     * Get item by ID
      * @param Request $request
      * @param $id
      * @return mixed
-     * @throws NotFoundException
      */
     public static function getById(Request $request, $id)
     {
-        $object = static::getQuery($request)->find($id);
-        if (is_null($object)) {
-            throw new NotFoundException('Resource \'' . $id . '\' not found');
-        }
+        $object = static::getQuery($request)->findOrFail($id);
 
         return $object;
     }
@@ -77,4 +71,9 @@ class GpuProfileController extends BaseController
     {
         return self::$model::query();
     }
+
+    /**
+     * Calculates available GPU resources in pool for assigning to VM's
+     * @return int
+     */
 }
