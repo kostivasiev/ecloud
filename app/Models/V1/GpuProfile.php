@@ -200,7 +200,7 @@ class GpuProfile extends Model implements Filterable, Sortable
      * @return mixed
      * @throws NotFoundException
      */
-    public function getResourceAllocation() : int
+    public function getResourceAllocation()
     {
         $cardProfiles = config('gpu.card_profiles');
         if (!in_array($this->profile_name, array_keys($cardProfiles))) {
