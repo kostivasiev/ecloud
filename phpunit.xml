@@ -7,7 +7,9 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         executionOrder="random"
+         resolveDependencies="true">
     <testsuites>
         <testsuite name="Application Test Suite">
             <directory suffix="Test.php">./tests</directory>
@@ -19,16 +21,26 @@
         </whitelist>
     </filter>
     <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="CACHE_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="CACHE_DRIVER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
 
-        <env name="DB_RESELLER_CONNECTION" value="reseller"/>
-        <env name="DB_RESELLER_DRIVER" value="sqlite"/>
-        <env name="DB_RESELLER_DATABASE" value=":memory:"/>
+        <env name="APP_NAME" value="ecloud" force="true"/>
+        <env name="PAGINATION_LIMIT" value="100" force="true"/>
 
-        <env name="DB_ECLOUD_CONNECTION" value="ecloud"/>
-        <env name="DB_ECLOUD_DRIVER" value="sqlite"/>
-        <env name="DB_ECLOUD_DATABASE" value=":memory:"/>
+<!--        <env name="DB_RESELLER_HOST" value="127.0.0.1" force="true"/>-->
+<!--        <env name="DB_RESELLER_PORT" value="3307" force="true"/>-->
+<!--        <env name="DB_ECLOUD_HOST" value="127.0.0.1" force="true"/>-->
+<!--        <env name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
+
+        <env name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
+        <env name="DB_RESELLER_HOST" value="" force="true"/>
+        <env name="DB_RESELLER_DRIVER" value="sqlite" force="true"/>
+        <env name="DB_RESELLER_DATABASE" value=":memory:" force="true"/>
+
+        <env name="DB_ECLOUD_CONNECTION" value="ecloud" force="true"/>
+        <env name="DB_ECLOUD_HOST" value="" force="true"/>
+        <env name="DB_ECLOUD_DRIVER" value="sqlite" force="true"/>
+        <env name="DB_ECLOUD_DATABASE" value=":memory:" force="true"/>
     </php>
 </phpunit>

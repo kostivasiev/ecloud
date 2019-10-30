@@ -136,8 +136,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('appliance-versions', 'ApplianceVersionController@create');
     $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
     $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
-    $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
-
 
     //Appliance Parameters
     $router->get('appliance-parameters', 'ApplianceParametersController@index');
@@ -226,6 +224,9 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
+
+        //Appliance Versions
+        $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
     });
 });
 

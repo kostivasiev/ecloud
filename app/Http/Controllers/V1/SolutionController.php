@@ -123,7 +123,7 @@ class SolutionController extends BaseController
             && $request->input('encryption_enabled') === true
             && ($encryptionStatus == 'No') // Only fire off the automation if the encryption was not already enabled.
         ) {
-            Event::fire(new EncryptionEnabledOnSolutionEvent($solution->resource));
+            Event::dispatch(new EncryptionEnabledOnSolutionEvent($solution->resource));
         }
 
         return $this->respondEmpty();

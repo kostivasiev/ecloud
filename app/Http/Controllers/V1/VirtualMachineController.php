@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Models\V1\ActiveDirectoryDomain;
 use App\Exceptions\V1\InsufficientCreditsException;
+use App\Models\V1\GpuProfile;
 use App\Models\V1\PodTemplate;
 use App\Models\V1\SolutionTemplate;
 use App\Models\V1\Trigger;
@@ -493,7 +494,18 @@ class VirtualMachineController extends BaseController
                     throw new Exceptions\NotFoundException('gpu_profile \'' . $request->input('gpu_profile') . '\' was not found');
                 }
 
-                $template = PodTemplate::withFriendlyName($pod, $templateName);
+                // Check we have enough GPU resources available to launch the VM
+                $availableGpuPool = GpuProfile::gpuResourcePoolAvailability();
+
+                $requiredUsage = $gpuProfile->getResourceAllocation();
+
+                if ($requiredUsage > $availableGpuPool) {
+                    throw new InsufficientResourceException(
+                        'Insufficient GPU resources available to launch Virtual Machine at this time'
+                    );
+                }
+
+                $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);
 
                 try {
                     $gpuTemplate = $template->getGpuVersion($gpuProfile);
@@ -789,7 +801,7 @@ class VirtualMachineController extends BaseController
         }
 
         if (isset($appliance)) {
-            Event::fire(new ApplianceLaunchedEvent($appliance));
+            Event::dispatch(new ApplianceLaunchedEvent($appliance));
         }
 
         // If PAYG encryption, assign credit. We need to do after the intapi call so we have the server id
