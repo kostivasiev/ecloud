@@ -845,6 +845,7 @@ class VirtualMachineController extends BaseController
      * @throws ServiceUnavailableException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function destroy(Request $request, IntapiService $intapiService, AccountsService $accountsService, $vmId)
     {
