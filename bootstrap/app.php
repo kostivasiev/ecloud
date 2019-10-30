@@ -24,6 +24,7 @@ $app = new Laravel\Lumen\Application(
 $app->configure('database');
 $app->configure('logging');
 $app->configure('mail');
+$app->configure('gpu');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
