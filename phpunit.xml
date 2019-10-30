@@ -26,6 +26,7 @@
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
 
         <env name="APP_NAME" value="ecloud" force="true"/>
+        <env name="PAGINATION_LIMIT" value="100" force="true"/>
 
 <!--        <env name="DB_RESELLER_HOST" value="127.0.0.1" force="true"/>-->
 <!--        <env name="DB_RESELLER_PORT" value="3307" force="true"/>-->
