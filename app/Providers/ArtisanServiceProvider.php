@@ -109,7 +109,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     private function loadConfigFromDatastore(Datastore $datastore) : array
     {
-        if ($datastore->storage->count() < 1) {
+        if (empty($datastore->storage) || $datastore->storage->count() < 1) {
             throw new ServiceUnavailableException('No storage is configured for this datastore.');
         }
 
