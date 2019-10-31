@@ -55,26 +55,26 @@ class DatastoreResource extends CustomResource
                 ]);
             }
 
+
             if ($request->user->isAdministrator) {
+                $iops = null;
                 try {
                     $volumeSet = $this->resource->volumeSet();
-                    $iopsTier = $volumeSet->getIopsTier();
-
-                    $attributes = array_merge($attributes, [
-                        'iops_tier' => !empty($iopsTier) ? $iopsTier->getKey() : null,
-                    ]);
+                    if (!empty($volumeSet)) {
+                        $iops = $volumeSet->max_iops;
+                    }
                 } catch (\Exception $exception) {
                     Log::info(
-                        'Failed to load IOPS tier for datastore',
+                        'Failed to load IOPS for datastore',
                         [
                             'datastore_id' => $attributes['id']
                         ]
                     );
-
-                    $attributes = array_merge($attributes, [
-                        'iops_tier' => null,
-                    ]);
                 }
+
+                $attributes = array_merge($attributes, [
+                    'iops' => $iops,
+                ]);
             }
         }
 
