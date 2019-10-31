@@ -373,14 +373,15 @@ class DatastoreController extends BaseController
                 'solution_id' => ['sometimes', 'numeric'],
                 'lun_type' => ['sometimes', 'in:DATA,CLUSTER,QRM'],
                 'name' => ['nullable'],
-                'lun_wwn' => ['nullable', 'max:255']
+                'lun_wwn' => ['nullable', 'max:255'],
+                'lun_name' => ['sometimes']
             ]
         );
 
         $request['id'] = $datastoreId;
         $this->validate($request, $rules);
 
-        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'capacity', 'name', 'type'])), Datastore::class);
+        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'capacity', 'name', 'type', 'lun_name', 'lun_wwn', 'site_id'])), Datastore::class);
 
         $datastore->resource->save();
 
