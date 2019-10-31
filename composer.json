@@ -16,7 +16,7 @@
     "predis/predis": "^1.1",
     "ramsey/uuid": "^3.8",
     "ruflin/elastica": "^6.1",
-    "ukfast/api-auth": "2.1.*",
+    "ukfast/api-auth": "2.*",
     "ukfast/api-exceptions": "2.3.*",
     "ukfast/api-helper-datetime": "2.0.*",
     "ukfast/api-paginator": "2.0.*",
@@ -70,7 +70,7 @@
     "optimize-autoloader": true,
     "discard-changes": true,
     "platform": {
-      "php": "7.1.30"
+      "php": "7.1.32"
     }
   },
   "minimum-stability": "dev",
