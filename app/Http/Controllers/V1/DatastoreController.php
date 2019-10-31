@@ -97,8 +97,7 @@ class DatastoreController extends BaseController
     public function updateIops(Request $request, $datastoreId)
     {
         $datastore = static::getDatastoreById($request, $datastoreId);
-        $this->validate($request, ['iops_tier' => ['required', new IsValidUuid()]]);
-        $iopsTier = IOPSController::getById($request->input('iops_tier'));
+        $this->validate($request, ['max_iops' => ['required', 'integer']]);
 
         if (!$datastore->storage->qosEnabled()) {
             throw new BadRequestException('IOPS is not configurable for this datastore');
@@ -107,6 +106,12 @@ class DatastoreController extends BaseController
         $volumeSet = $datastore->volumeSet();
 
         if (empty($volumeSet)) {
+            Log::error(
+                'Failed to load datastore\'s volume set details from database',
+                [
+                    'datastore_id' => $this->getKey()
+                ]
+            );
             throw new ServiceUnavailableException('IOPS can not be configured for this datastore');
         }
 
@@ -137,7 +142,7 @@ class DatastoreController extends BaseController
             throw new BadRequestException('It is not possible to configure IOPS on this datastore');
         }
 
-        $artisanResponse = $artisan->setIOPS($volumeSet->name, $iopsTier->max_iops);
+        $artisanResponse = $artisan->setIOPS($volumeSet->name, $request->input('max_iops'));
 
         if (!$artisanResponse) {
             $errorMessage = 'Failed to set IOPS for volume set.';
@@ -158,7 +163,7 @@ class DatastoreController extends BaseController
             throw new ArtisanException($errorMessage);
         }
 
-        $volumeSet->max_iops = $iopsTier->max_iops;
+        $volumeSet->max_iops = $request->input('max_iops');
         $volumeSet->save();
         Event::fire(new VolumeSetIopsUpdatedEvent($volumeSet));
 

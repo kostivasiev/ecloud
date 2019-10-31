@@ -54,7 +54,7 @@ class DatastoreResource extends CustomResource
                     'available' => null,
                 ]);
             }
-            
+
             if ($request->user->isAdministrator) {
                 $iops = null;
                 try {
