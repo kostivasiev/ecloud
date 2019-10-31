@@ -50,8 +50,8 @@ class DatastoreResource extends CustomResource
                     ]
                 );
                 $attributes = array_merge($attributes, [
-                    'allocated' => null,
-                    'available' => null,
+                    'allocated' => 'Unknown',
+                    'available' => 'Unknown',
                 ]);
             }
 
