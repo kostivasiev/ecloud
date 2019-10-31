@@ -1,4 +1,4 @@
 include:
   - project: 'ukfast/infrastructure/ci-cd-templates'
-    ref: fix-envvars-deployment
+    ref: master
     file: '/templates/main.yml'
