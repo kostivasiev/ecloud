@@ -26,8 +26,6 @@ envSecrets:
       - "APP_DEBUG"
       - "APP_KEY"
       - "APP_TIMEZONE"
-      - "CACHE_DRIVER"
-      - "QUEUE_DRIVER"
       - "PAGINATION_LIMIT"
       - "DB_CONNECTION"
       - "DB_HOST"

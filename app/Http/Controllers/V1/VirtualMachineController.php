@@ -505,8 +505,7 @@ class VirtualMachineController extends BaseController
                     );
                 }
 
-                $podTemplate = PodTemplate::withFriendlyName($pod, $templateName);
-
+                $template = PodTemplate::withFriendlyName($pod, $templateName);
                 try {
                     $gpuTemplate = $template->getGpuVersion($gpuProfile);
                 } catch (TemplateNotFoundException $exception) {
