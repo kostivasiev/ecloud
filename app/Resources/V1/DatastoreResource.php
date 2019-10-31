@@ -50,12 +50,11 @@ class DatastoreResource extends CustomResource
                     ]
                 );
                 $attributes = array_merge($attributes, [
-                    'allocated' => 'Unknown',
-                    'available' => 'Unknown',
+                    'allocated' => null,
+                    'available' => null,
                 ]);
             }
-
-
+            
             if ($request->user->isAdministrator) {
                 $iops = null;
                 try {
