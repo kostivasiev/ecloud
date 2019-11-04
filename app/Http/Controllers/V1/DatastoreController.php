@@ -386,7 +386,7 @@ class DatastoreController extends BaseController
         $request['id'] = $datastoreId;
         $this->validate($request, $rules);
 
-        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'name', 'type', 'lun_name', 'lun_wwn', 'site_id'])), Datastore::class);
+        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'name', 'type', 'lun_name', 'lun_wwn', 'site_id', 'capacity'])), Datastore::class);
 
         $datastore->resource->save();
 
