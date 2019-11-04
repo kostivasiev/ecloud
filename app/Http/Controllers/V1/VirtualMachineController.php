@@ -2280,6 +2280,7 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param $vmId
      * @return void
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateVirtualMachineId(&$request, $vmId)
     {
