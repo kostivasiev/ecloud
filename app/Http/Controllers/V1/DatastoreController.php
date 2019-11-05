@@ -485,16 +485,17 @@ class DatastoreController extends BaseController
      * @throws DatastoreNotFoundException
      * @throws ForbiddenException
      * @throws ServiceUnavailableException
+     * @throws \Illuminate\Validation\ValidationException
      * Todo: This is locked down to admin until we move billing from myukfast to an automation step for expand datastore
      */
     public function expand(Request $request, IntapiService $intapiService, $datastoreId)
     {
-        $this->validate($request, ['size_gb' => 'required|integer|min:2']);
+        $this->validate($request, ['capacity' => 'required|integer|min:2']);
 
         $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
 
         // check the new size is larger than the current size
-        $newSizeGB = $request->input('size_gb');
+        $newSizeGB = $request->input('capacity');
         if ($newSizeGB <= $datastore->reseller_lun_size_gb) {
             throw new ForbiddenException('New datastore size must be greater than the current size');
         }
