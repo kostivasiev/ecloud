@@ -165,7 +165,7 @@ class DatastoreController extends BaseController
 
         $volumeSet->max_iops = $request->input('max_iops');
         $volumeSet->save();
-        Event::fire(new VolumeSetIopsUpdatedEvent($volumeSet));
+        Event::dispatch(new VolumeSetIopsUpdatedEvent($volumeSet));
 
         return $this->respondEmpty();
     }
@@ -531,7 +531,7 @@ class DatastoreController extends BaseController
             ];
         }
 
-        Event::fire(new DatastoreExpandEvent($datastore, $newSizeGB));
+        Event::dispatch(new DatastoreExpandEvent($datastore, $newSizeGB));
 
         return $this->respondEmpty(202, $headers);
     }

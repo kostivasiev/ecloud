@@ -173,7 +173,7 @@ class VolumeSetController extends BaseController
 
         $volumeSet->max_iops = $request->input('max_iops');
         $volumeSet->save();
-        Event::fire(new VolumeSetIopsUpdatedEvent($volumeSet));
+        Event::dispatch(new VolumeSetIopsUpdatedEvent($volumeSet));
 
         return $this->respondEmpty();
     }
