@@ -9,11 +9,13 @@ use App\Models\V1\San;
 use App\Models\V1\Solution;
 use App\Models\V1\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 use Illuminate\Support\ServiceProvider;
 use App\Services\Artisan\V1\ArtisanService;
 
 use GuzzleHttp\Client;
 use Log;
+use UKFast\Api\Exceptions\NotFoundException;
 
 /**
  * Load the Artisan service
@@ -122,12 +124,19 @@ class ArtisanServiceProvider extends ServiceProvider
      * Load the Artisan config for the SAN
      * @param Storage $storage
      * @return array
+     * @throws NotFoundException
      * @throws ServiceUnavailableException
      */
     private function loadConfig(Storage $storage) : array
     {
         $pod = $storage->pod;
         $san = $storage->san;
+        if (empty($san)) {
+            Log::error(
+                'Failed to load server record of type \'san\' with id #' . $storage->server_id
+            );
+            throw new NotFoundException('Failed to load SAN details');
+        }
 
         $storageApiUrl = $pod->storageApiUrl();
         if (empty($storageApiUrl)) {
