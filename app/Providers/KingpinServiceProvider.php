@@ -75,7 +75,7 @@ class KingpinServiceProvider extends ServiceProvider
             }
 
             // Load the VCE server details / credentials for the Pod
-            $serverDetail = $pod->vceServerDetails();
+            $serverDetail = $pod->vceServerDetails(KingpinService::KINGPIN_USER);
 
             if (!$serverDetail) {
                 throw new \Exception('Unable to create KingpinService: Unable to load VCE server details');

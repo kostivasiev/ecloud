@@ -96,7 +96,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('datastores', 'DatastoreController@index');
     $router->get('datastores/{datastore_id}', 'DatastoreController@show');
 
-
     // Firewalls
     $router->get('firewalls', 'FirewallController@index');
     $router->get('firewalls/{firewall_id}', 'FirewallController@show');
@@ -110,6 +109,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('pods/{pod_id}/templates/{template_name}', 'TemplateController@showPodTemplate');
     $router->post('pods/{pod_id}/templates/{template_name}/move', 'TemplateController@renamePodTemplate');
     $router->get('pods/{pod_id}/gpu-profiles', 'PodController@gpuProfiles');
+    $router->get('pods/{pod_id}/storage', 'PodController@indexStorage');
     // todo datastores
 
     $router->get('pods/{pod_id}/appliances', 'ApplianceController@podAvailability');
@@ -152,6 +152,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('active-directory/domains', 'ActiveDirectoryDomainController@index');
     $router->get('active-directory/domains/{domain_id}', 'ActiveDirectoryDomainController@show');
 
+    // IOPS
+    $router->get('iops', 'IOPSController@index');
+    $router->get('iops/{uuid}', 'IOPSController@show');
 
     /**
      * Base middleware + reseller ID scope
@@ -165,18 +168,66 @@ $router->group($baseRouteParameters, function () use ($router) {
          * Base middleware + reseller ID scope + is-administrator
          */
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            //
+
         });
     });
+
 
     /**
      * Base middleware + is-administrator
      */
+
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        // Datastores
+        $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand');
+        $router->post('datastores', 'DatastoreController@create');
+
+        $router->patch('datastores/{datastore_id}', 'DatastoreController@update');
+        $router->delete('datastores/{datastore_id}', 'DatastoreController@delete');
+        $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume');
+        $router->post('datastores/{datastore_id}/rescan', 'DatastoreController@clusterRescan');
+        $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore');
+        $router->post('datastores/{datastore_id}/iops', 'DatastoreController@updateIops');
+
+
+        $router->post('datastores/{datastore_id}/createvolume', 'DatastoreController@createvolume');
+        $router->post('datastores/{datastore_id}/create', 'DatastoreController@createDatastore');
+
+        // Storage volume sets
+        $router->get('volumesets', 'VolumeSetController@index');
+        $router->get('volumesets/{volue_set_id}', 'VolumeSetController@show');
+        $router->post('volumesets', 'VolumeSetController@create');
+        $router->post('volumesets/{volume_set_id}/iops', 'VolumeSetController@setIOPS');
+        $router->post('volumesets/{volume_set_id}/export', 'VolumeSetController@export');
+        $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore');
+        $router->delete('volumesets/{volume_set_id}/datastores/{datastore_id}', 'VolumeSetController@removeDatastore');
+
+        $router->delete('volumesets/{volume_set_id}', 'VolumeSetController@delete');
+        $router->post('volumesets/{volume_set_id}/delete', 'VolumeSetController@deleteVolumeSet');
+
+
+        // Storage host sets
+        $router->get('hostsets', 'HostSetController@index');
+        $router->get('hostsets/{host_set_id}', 'HostSetController@show');
+        $router->post('hostsets', 'HostSetController@create');
+        $router->post('hostsets/{host_set_id}/hosts', 'HostSetController@addHost');
+        $router->delete('hostsets/{host_set_id}/hosts/{host_id}', 'HostSetController@removeHost');
+
+        //
+
+        // Hosts
+        //Create a host on the SAN, lets use /create and reserve POST /hosts for a customer facing create host endpoint later
+        $router->post('hosts/{host_id}/create', 'HostController@createHost');
+        $router->delete('hosts/{host_id}', 'HostController@delete'); // Fire off automation
+        $router->post('hosts/{host_id}/delete', 'HostController@deleteHost'); // Delete the host from the SAN
+        $router->post('hosts/{host_id}/rescan', 'HostController@clusterRescan');
+
+        //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
 
         //Appliance Versions
         $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
     });
 });
+
 

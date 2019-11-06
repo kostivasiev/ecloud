@@ -1,11 +1,12 @@
 <?php
 
-namespace Tests\Datastores;
+namespace Tests\Iops;
 
+use App\Models\V1\IopsTier;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
-use App\Models\V1\Datastore;
+use Mockery;
 
 class GetTest extends TestCase
 {
@@ -22,11 +23,10 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
-        Datastore::flushEventListeners();
         $count = 2;
-        factory(Datastore::class, $count)->create();
+        factory(IopsTier::class, $count)->create();
 
-        $this->get('/v1/datastores', [
+        $this->get('/v1/iops', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
@@ -41,24 +41,18 @@ class GetTest extends TestCase
      * Test for valid item
      * @return void
      */
-//    public function testValidItem()
-//    {
-//        factory(Pod::class, 1)->create();
-//        factory(Solution::class, 1)->create();
-//        factory(Datastore::class, 1)->create([
-//            'reseller_lun_id' => 123,
-//        ]);
-//
-//        $this->get('/v1/datastores/123', [
-//            'X-consumer-custom-id' => '1-1',
-//            'X-consumer-groups' => 'ecloud.read',
-//        ]);
-//
-//        echo $this->response->getContent();
-//        exit(PHP_EOL);
-//
-//        $this->assertResponseStatus(200);
-//    }
+    public function testValidItem()
+    {
+        $item = (factory(IopsTier::class, 1)->create())->first();
+
+        $this->json('GET', '/v1/iops/' . $item->uuid, [], $this->validWriteHeaders)
+            ->seeStatusCode(200)
+            ->seeJson([
+                'id' => $item->uuid,
+                'name' => $item->name,
+                'limit' => $item->max_iops,
+            ]);
+    }
 
     /**
      * Test for invalid item
@@ -66,7 +60,7 @@ class GetTest extends TestCase
      */
     public function testInvalidItem()
     {
-        $this->get('/v1/datastores/abc', [
+        $this->get('/v1/iops/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);

@@ -86,12 +86,12 @@ class SolutionSiteController extends BaseController
      */
     public static function getSiteById(Request $request, $siteId)
     {
-        $solution = static::getSiteQuery($request)->find($siteId);
-        if (is_null($solution)) {
-            throw new SiteNotFoundException('Solution ID #' . $siteId . ' not found', 'solution_id');
+        $solutionSite = static::getSiteQuery($request)->find($siteId);
+        if (is_null($solutionSite)) {
+            throw new SiteNotFoundException('Site ID #' . $siteId . ' not found', 'site_id');
         }
 
-        return $solution;
+        return $solutionSite;
     }
 
     /**
@@ -100,11 +100,11 @@ class SolutionSiteController extends BaseController
      */
     public static function getSiteQuery(Request $request)
     {
-        $solutionQuery = SolutionSite::withReseller($request->user->resellerId);
+        $siteQuery = SolutionSite::withReseller($request->user->resellerId);
         if (!$request->user->isAdministrator) {
-            $solutionQuery->where('ucs_reseller_active', 'Yes');
+            $siteQuery->where('ucs_reseller_active', 'Yes');
         }
 
-        return $solutionQuery;
+        return $siteQuery;
     }
 }

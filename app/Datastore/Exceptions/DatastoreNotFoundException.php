@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\V1;
+namespace App\Datastore\Exceptions;
 
 use UKFast\Api\Exceptions\NotFoundException;
 

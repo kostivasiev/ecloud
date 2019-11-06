@@ -32,6 +32,15 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\V1\ApplianceLaunchedEvent' => [
             'App\Listeners\V1\ApplianceLaunchedListener',
+        ],
+        'App\Events\V1\DatastoreCreatedEvent' => [
+            'App\Listeners\V1\DatastoreCreatedListener',
+        ],
+        'App\Events\V1\DatastoreExpandEvent' => [
+            'App\Listeners\V1\DatastoreExpandListener',
+        ],
+        'App\Events\V1\VolumeSetIopsUpdatedEvent' => [
+            'App\Listeners\V1\VolumeSetIopsUpdatedListener',
         ]
     ];
 }

@@ -95,6 +95,9 @@ $app->register(UKFast\HealthCheck\HealthCheckServiceProvider::class);
 $app->register(UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 
+// Artisan service provider
+$app->register(App\Providers\ArtisanServiceProvider::class);
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

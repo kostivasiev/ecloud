@@ -293,6 +293,20 @@ class Solution extends Model implements Filterable, Sortable
     }
 
     /**
+     * Get the hostSet for the solution
+     * At the moment we have a single host set for a solution
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function hostSets()
+    {
+        return $this->hasMany(
+            'App\Models\V1\HostSet',
+            'ucs_reseller_id',
+            'ucs_reseller_id'
+        );
+    }
+
+    /**
      * Get the Hosts (ucs_nodes) for a solution
      * @param null $datacentreId
      * @return \Illuminate\Database\Eloquent\Collection
@@ -310,6 +324,19 @@ class Solution extends Model implements Filterable, Sortable
         }
 
         return $query->get();
+    }
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function volumeSets()
+    {
+        return $this->hasMany(
+            VolumeSet::class,
+            'ucs_reseller_id', //Local Column
+            'ucs_reseller_id' //Relation's column
+        );
     }
 
 

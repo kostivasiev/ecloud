@@ -533,6 +533,74 @@ class KingpinService
     }
 
     /**
+     * Perform a cluster rescan
+     * @param $solutionId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function clusterRescan($solutionId)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'cluster/rescan';
+
+        try {
+            $this->makeRequest('PUT', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Create datastore
+     * @param $solutionId
+     * @param $datastoreName
+     * @param $wwn
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function createDatastore($solutionId, $datastoreName, $wwn)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'datastore';
+
+        $model = [
+            'datastoreName' => $datastoreName,
+            'wwn' => $wwn
+        ];
+
+        try {
+            $this->makeRequest('POST', $url, $model);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Expand a datastore
+     * @param $solutionId
+     * @param $datastoreName
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function expandDatastore($solutionId, $datastoreName)
+    {
+        $url = $this->generateV1URL($solutionId);
+        $url .= 'datastore/'. $datastoreName  .'/expand';
+
+        try {
+            $this->makeRequest('PUT', $url);
+        } catch (TransferException $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get Host by its MAC address
      * @param $solutionId
      * @param $eth0_mac

@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
 use Illuminate\Database\Eloquent\Model;
 
@@ -145,12 +146,6 @@ class Pod extends Model implements Filterable, Sortable
      */
     public function gpuProfiles()
     {
-        /**
-         * select * from `gpu_profile`
-         * inner join `gpu_profile_pod_availability` on `gpu_profile_pod_availability`.`gpu_profile_id` =
-         * `gpu_profile`.`id`  where `gpu_profile_pod_availability`.`ucs_datacentre_id` = ?
-         * and `gpu_profile`.`deleted_at` is null
-         */
         return $this->hasManyThrough(
             'App\Models\V1\GpuProfile',
             'App\Models\V1\GpuProfilePodAvailability', // Map table
@@ -161,12 +156,33 @@ class Pod extends Model implements Filterable, Sortable
         );
     }
 
+    /**
+     *
+     * Return SAN's on the Pod
+     *
+     * Has-many relationship through ucs_storage mapping table
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function sans()
+    {
+        return $this->hasManyThrough(
+            San::class,
+            Storage::class,
+            'ucs_datacentre_id', // Foreign key on ucs_storage table
+            'servers_id', // servers.servers_id
+            'ucs_datacentre_id',
+            'server_id' // ucs_storage.server_id
+        );
+    }
+
 
     /**
-     * Load VCE server details
+     * Load VCE server details/credentials by username
+     * @param string $username
      * @return array|bool
      */
-    public function vceServerDetails()
+    public function vceServerDetails($username)
     {
         if (empty($this->ucs_datacentre_vce_server_id)) {
             Log::error('Invalid or missing VCE server ID for Pod ' . $this->getKey());
@@ -175,7 +191,7 @@ class Pod extends Model implements Filterable, Sortable
 
         $serverDetail = ServerDetail::withParent($this->ucs_datacentre_vce_server_id)
             ->where('server_detail_type', '=', 'API')
-            ->where('server_detail_user', '=', KingpinService::KINGPIN_USER)
+            ->where('server_detail_user', '=', $username)
             ->first();
 
         if (!$serverDetail) {
@@ -184,5 +200,60 @@ class Pod extends Model implements Filterable, Sortable
         }
 
         return $serverDetail;
+    }
+
+    /**
+     * Return the storage api URL
+     * @return mixed
+     */
+    public function storageApiUrl()
+    {
+        return $this->ucs_datacentre_storage_api_url;
+    }
+
+    /**
+     * Return the storage API password
+     * @return mixed
+     */
+    public function storageApiPassword()
+    {
+        $serverDetail = $this->vceServerDetails(ArtisanService::ARTISAN_API_USER);
+        if ($serverDetail) {
+            return $serverDetail->getPassword();
+        }
+        return false;
+    }
+
+    public function storageApiPort()
+    {
+        $serverDetail = $this->vceServerDetails(ArtisanService::ARTISAN_API_USER);
+        if ($serverDetail) {
+            return $serverDetail->server_detail_login_port;
+        }
+        return false;
+    }
+
+    /**
+     * Return the VMWare API URL
+     * @return mixed
+     * TODO: Implement this in the kingpin service provider
+     */
+    public function vmwareApiUrl()
+    {
+        return $this->ucs_datacentre_vmware_api_url;
+    }
+
+    /**
+     * Return the kingpin passowrd
+     * @return bool
+     * TODO: implement this in the kingpin service provider
+     */
+    public function vmwareApiPassword()
+    {
+        $serverDetail = $this->vceServerDetails(KingpinService::KINGPIN_USER);
+        if (!$serverDetail) {
+            return $serverDetail->getPassword();
+        }
+        return false;
     }
 }
