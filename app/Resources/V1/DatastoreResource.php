@@ -44,7 +44,7 @@ class DatastoreResource extends CustomResource
                 ]);
             } catch (\Exception $e) {
                 Log::info(
-                    'Failed to load VMWare usage for datastore',
+                    'Failed to load VMWare usage for datastore: ' . $e->getMessage(),
                     [
                         'datastore_id' => $attributes['id']
                     ]
