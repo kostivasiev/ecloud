@@ -497,7 +497,7 @@ class DatastoreController extends BaseController
         // check the new size is larger than the current size
         $newSizeGB = $request->input('capacity');
         if ($newSizeGB <= $datastore->reseller_lun_size_gb) {
-            throw new ForbiddenException('New datastore size must be greater than the current size');
+            throw new ForbiddenException('New datastore size must be greater than the current size of ' . $datastore->reseller_lun_size_gb . 'GB');
         }
         $datastore->reseller_lun_status = Status::EXPANDING;
 
