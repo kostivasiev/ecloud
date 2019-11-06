@@ -10,6 +10,7 @@ use App\Http\Controllers\V1\VolumeSetController;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -275,7 +276,7 @@ class Datastore extends Model implements Filterable, Sortable
 
         try {
             $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
-                $this->storage->pod,
+                $this->pod,
                 $this->reseller_lun_type
             ]);
             $vmwareDatastore = $kingpin->getDatastore(
@@ -283,6 +284,14 @@ class Datastore extends Model implements Filterable, Sortable
                 $this->reseller_lun_name
             );
         } catch (KingpinException $exception) {
+            Log::error(
+                'Failed to load datastore usage from VMWare',
+                [
+                    'error' => $exception->getMessage(),
+                    'reseller_id' => $this->reseller_lun_ucs_reseller_id,
+                    'lun_name' => $this->reseller_lun_name
+                ]
+            );
             throw new \Exception('Unable to load datastore usage from VMWare');
         }
 
