@@ -64,7 +64,7 @@ class DatastoreResource extends CustomResource
                     }
                 } catch (\Exception $exception) {
                     Log::info(
-                        'Failed to load IOPS for datastore',
+                        'Failed to load IOPS for datastore:' . $exception->getMessage(),
                         [
                             'datastore_id' => $attributes['id']
                         ]
