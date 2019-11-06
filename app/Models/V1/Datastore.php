@@ -285,7 +285,7 @@ class Datastore extends Model implements Filterable, Sortable
             );
         } catch (KingpinException $exception) {
             Log::error(
-              'Failed to load datastore usage from VMWare',
+                'Failed to load datastore usage from VMWare',
                 [
                     'error' => $exception->getMessage(),
                     'reseller_id' => $this->reseller_lun_ucs_reseller_id,
