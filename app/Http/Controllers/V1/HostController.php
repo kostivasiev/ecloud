@@ -148,8 +148,8 @@ class HostController extends BaseController
 
         try {
             $automationRequestId = $intapiService->automationRequest(
-                'expand_lun',
-                'reseller_lun',
+                'remove_host',
+                'ucs_node',
                 $host->getKey(),
                 ['host_set_id' => $hostSet->getKey()],
                 'ecloud_ucs_' . $host->pod->getKey(),
@@ -157,7 +157,7 @@ class HostController extends BaseController
                 $request->user->type
             );
         } catch (IntapiServiceException $exception) {
-            throw new ServiceUnavailableException('Failed to expand datastore.');
+            throw new ServiceUnavailableException('Failed to delete host.');
         }
 
         $headers = [];
