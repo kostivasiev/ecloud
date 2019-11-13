@@ -105,14 +105,19 @@ class San extends Model
 
     /**
      * Map to ucs_storage
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     *
+     * NOTE: this may return multiple records as pods can share the same SAN,
+     * You may want to use scopeWithPod to limit to a Pod
+     * e.g. $san->storage()->withPod($volumeSet->solution->pod)->firstOrFail()
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function storage()
     {
-        return $this->belongsTo(
+        return $this->hasMany(
             Storage::class,
-            'servers_id',
-            'server_id'
+            'server_id',
+            'servers_id'
         );
     }
 
