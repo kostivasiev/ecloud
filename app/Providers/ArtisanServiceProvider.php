@@ -88,13 +88,23 @@ class ArtisanServiceProvider extends ServiceProvider
                         Log::error(
                             $log_message,
                             [
-                                'soluton_id' => $solution->getKey()
+                                'solution_id' => $solution->getKey()
                             ]
                         );
                         throw new ServiceUnavailableException('Unable to load ArtisanService: Invalid SAN');
                     }
 
-                    $config = $this->loadConfig($san->storage);
+                    if ($san->storage()->withPod($solution->pod)->count() > 1) {
+                        Log::error(
+                            'Unable to determine storage for SAN',
+                            [
+                                'solution_id' => $solution->getKey()
+                            ]
+                        );
+                        throw new ServiceUnavailableException('Unable to load ArtisanService: Invalid storage configuration');
+                    }
+
+                    $config = $this->loadConfig($san->storage()->withPod($solution->pod)->firstOrFail());
                     $config['solution_id'] = $solution->getKey();
 
                     return $this->launchArtisanService($config);

@@ -53,7 +53,7 @@ class Storage extends Model
     }
 
     /**
-     * Scope a query to only include solutions for a given reseller
+     * Scope a query to only include storage records for a given Pod
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param Pod $pod
      * @return \Illuminate\Database\Eloquent\Builder $query
