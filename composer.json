@@ -20,7 +20,7 @@
     "ukfast/api-exceptions": "2.3.*",
     "ukfast/api-helper-datetime": "2.0.*",
     "ukfast/api-paginator": "2.0.*",
-    "ukfast/api-resources": "4.0.*",
+    "ukfast/api-resources": "^4.2",
     "ukfast/api-validation": "~1.0",
     "ukfast/ditto": "4.7.*",
     "ukfast/health-check": "~1.0",

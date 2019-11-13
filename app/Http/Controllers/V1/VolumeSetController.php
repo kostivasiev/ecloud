@@ -148,6 +148,7 @@ class VolumeSetController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws ArtisanException
      * @throws UnprocessableEntityException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function setIops(Request $request, $volumeSetId)
     {
@@ -169,7 +170,7 @@ class VolumeSetController extends BaseController
 
         $san = San::findOrFail($request->input('san_id'));
 
-        if (!$san->storage->qosEnabled()) {
+        if (!$san->storage()->withPod($volumeSet->solution->pod)->firstOrFail()->qosEnabled()) {
             throw new UnprocessableEntityException('Unable to configure IOPS: QoS is not available on the SAN');
         }
 
