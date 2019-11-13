@@ -94,6 +94,7 @@ $app->register(App\Providers\EventServiceProvider::class);
 $app->register(UKFast\HealthCheck\HealthCheckServiceProvider::class);
 $app->register(UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
+$app->register(UKFast\Api\Resource\ResourceServiceProvider::class);
 
 // Artisan service provider
 $app->register(App\Providers\ArtisanServiceProvider::class);
