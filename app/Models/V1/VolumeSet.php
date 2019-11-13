@@ -190,4 +190,27 @@ class VolumeSet extends Model implements Filterable, Sortable
 
         return $query;
     }
+
+    /**
+     * Generate a sequential ID for the volume sets based on the solution.
+     * Include deleted items too so that we *always* use a unique identifier
+     * @param Solution $solution
+     * @return int|mixed
+     */
+    public static function getNextIdentifier(Solution $solution) : int
+    {
+        if ($solution->volumeSets()->withTrashed()->count() == 0) {
+            return 1;
+        }
+
+        $index = 0;
+        $solution->volumeSets()->withTrashed()->get()->map(function ($item) use (&$index, $solution) {
+            if (preg_match('/\w+('.$solution->getKey().')_?(\d+)*$/', $item->name, $matches) == true) {
+                $numeric = $matches[2] ?? 1;
+                $index = ($numeric > $index) ? (int) $numeric : $index;
+            }
+        });
+
+        return ++$index;
+    }
 }
