@@ -160,7 +160,7 @@ class HostSetController extends BaseController
             $artisaResponse = $artisan->removeHostFromHostSet($hostSet->name, $host->ucs_node_internal_name);
 
             if (!$artisaResponse) {
-                throw new ArtisanException('Failed to add host to host set: ' . $artisan->getLastError());
+                throw new ArtisanException('Failed to remove host to host set: ' . $artisan->getLastError());
             }
         });
 
