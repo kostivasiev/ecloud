@@ -106,6 +106,7 @@ class VirtualMachineController extends BaseController
      * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
      * @throws Exceptions\UnauthorisedException
      * @throws InsufficientCreditsException
      * @throws InsufficientResourceException
@@ -116,10 +117,10 @@ class VirtualMachineController extends BaseController
      * @throws \App\Exceptions\V1\ApplianceNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
-     * @throws Exceptions\NotFoundException
      */
     public function create(Request $request, IntapiService $intapiService, AccountsService $accountsService)
     {
@@ -135,6 +136,7 @@ class VirtualMachineController extends BaseController
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst,GPU'],
+            'pod_id' => ['required_if:environment,Public'],
 
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'tags' => ['nullable', 'array'],
@@ -222,7 +224,7 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         if ($request->input('environment') == 'Public') {
-            // if admin reseller scope is 0, we won't know the owner for the new VM
+            // if admin reseller scope is empty, we won't know the owner for the new VM
             if (empty($request->user->resellerId)) {
                 throw new Exceptions\UnauthorisedException('Unable to determine account id');
             }
@@ -238,9 +240,16 @@ class VirtualMachineController extends BaseController
                     'Legacy Control Panel installation is not available at this time.'
                 );
             }
-
+            
             $solution = null;
-            $pod = Pod::find(14);
+            $pod = Pod::findOrFail($request->input('pod_id'));
+
+            if (!$pod->hasEnabledService('Public')) {
+                throw new Exceptions\BadRequestException(
+                    'eCloud Public is not available on the requested Pod'
+                );
+            }
+
             $datastore = Datastore::getDefault(
                 null,
                 'Public',
@@ -556,6 +565,10 @@ class VirtualMachineController extends BaseController
             'submitted_by_id' => $request->user->applicationId,
             'launched_by' => '-5',
         );
+
+        if ($request->input('environment') == 'Public') {
+            $post_data['ucs_datacentre_id'] = $request->input('pod_id');
+        }
 
         if (isset($gpuProfile)) {
             $post_data['gpu_profile_uuid'] = $gpuProfile->getKey();

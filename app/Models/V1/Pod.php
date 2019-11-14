@@ -256,4 +256,14 @@ class Pod extends Model implements Filterable, Sortable
         }
         return false;
     }
+
+    /**
+     * has the pod got the requested service enabled
+     * @param $serviceName
+     * @return bool
+     */
+    public function hasEnabledService($serviceName)
+    {
+        return $this->{'ucs_datacentre_'.strtolower($serviceName).'_enabled'} == 'Yes';
+    }
 }
