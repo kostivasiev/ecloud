@@ -407,18 +407,9 @@ class DatastoreController extends BaseController
     {
         $datastore = static::getDatastoreById($request, $datastoreId);
 
-        // Work out the volume set for the volume
-        $identifier = null;
-        if (preg_match('/\w+[DATA|CLUSTER|QRM]_(\d+)+/', $datastore->reseller_lun_name, $matches) != false) {
-            $identifier = (int) $matches[1];
-        }
-
+        // Work out the volume set for the volume.
         $query = VolumeSetController::getQuery($request);
         $query->where('ucs_reseller_id', '=', $datastore->solution->getKey());
-
-        if (!empty($identifier)) {
-            $query->where('name', 'LIKE', '%_' . $identifier);
-        }
 
         if ($query->count() > 0) {
             $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $datastore]]);
