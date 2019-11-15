@@ -426,14 +426,6 @@ class DatastoreController extends BaseController
         ];
 
         return $this->respondEmpty(202, $headers);
-
-        Log::error(
-            'Failed to find volume set for datastore',
-            [
-                'datastore_id' => $datastoreId
-            ]
-        );
-        throw new ServiceUnavailableException('Failed to schedule datastore deletion');
     }
 
     /**
