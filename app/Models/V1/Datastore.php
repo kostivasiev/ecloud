@@ -44,7 +44,7 @@ class Datastore extends Model implements Filterable, Sortable
     public static function getRules()
     {
         return [
-            'solution_id' => ['required', 'numeric'],
+            'solution_id' => ['required_without:site_id', 'integer'],
             'name' => ['sometimes', 'max:255'],
             'type' => ['sometimes', 'in:Hybrid,Private'],
             'capacity' => ['required', 'numeric'],

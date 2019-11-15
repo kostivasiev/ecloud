@@ -184,6 +184,7 @@ class DatastoreController extends BaseController
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\SiteNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws \Illuminate\Validation\ValidationException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
