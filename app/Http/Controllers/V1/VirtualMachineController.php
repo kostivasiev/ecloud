@@ -82,7 +82,7 @@ class VirtualMachineController extends BaseController
     public function show(Request $request, $vmId)
     {
         $this->validateVirtualMachineId($request, $vmId);
-        $virtualMachines = $this->getVirtualMachines(null, [$vmId]);
+        $virtualMachines = $this->getVirtualMachines([$vmId]);
         $virtualMachine = $virtualMachines->first();
         if (!$virtualMachine) {
             throw new Exceptions\NotFoundException("Virtual Machine '$vmId' Not Found");
@@ -849,7 +849,7 @@ class VirtualMachineController extends BaseController
     {
         $refundCredit = false;
         $this->validateVirtualMachineId($request, $vmId);
-        $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
+        $virtualMachine = $this->getVirtualMachines()->find($vmId);
         if (!$virtualMachine) {
             throw new Exceptions\NotFoundException("Virtual Machine with ID '$vmId' not found");
         }
@@ -2220,7 +2220,7 @@ class VirtualMachineController extends BaseController
     protected function getVirtualMachine($vmId)
     {
         // Load the VM
-        $virtualMachineQuery = $this->getVirtualMachines(null, [$vmId]);
+        $virtualMachineQuery = $this->getVirtualMachines([$vmId]);
         $VirtualMachine = $virtualMachineQuery->first();
         if (!$VirtualMachine) {
             throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
@@ -2235,16 +2235,18 @@ class VirtualMachineController extends BaseController
      * @param array $vmIds
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function getVirtualMachines($resellerId = null, $vmIds = [])
+    protected function getVirtualMachines($vmIds = [])
     {
         $virtualMachineQuery = VirtualMachine::query();
         if (!empty($vmIds)) {
             $virtualMachineQuery->whereIn('servers_id', $vmIds);
         }
+
         if ($this->isAdmin) {
-            if (!is_null($resellerId)) {
-                $virtualMachineQuery->withResellerId($resellerId);
+            if (!empty($this->resellerId)) {
+                $virtualMachineQuery->withResellerId($this->resellerId);
             }
+
             // Return ALL VM's
             return $virtualMachineQuery;
         }
