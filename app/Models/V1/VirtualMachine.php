@@ -168,7 +168,9 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'status' => 'servers_status',
             'environment' => 'servers_ecloud_type',
             'encrypted' => 'servers_encrypted',
-            'role' => 'servers_role'
+            'role' => 'servers_role',
+            'active' => 'servers_active',
+            'reseller_id' => 'servers_reseller_id',
         ];
     }
 
@@ -191,7 +193,9 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('status', Filter::$stringDefaults),
             $factory->create('environment', Filter::$stringDefaults),
             $factory->boolean()->create('encrypted', 'Yes', 'No'),
-            $factory->create('role', Filter::$stringDefaults)
+            $factory->create('role', Filter::$stringDefaults),
+            $factory->boolean()->create('active', 'y', 'n'),
+            $factory->create('reseller_id', Filter::$numericDefaults),
         ];
     }
 
@@ -254,7 +258,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      */
     public function properties()
     {
-        $array = [
+        $properties = [
             IdProperty::create('servers_id', 'id'),
 
             StringProperty::create('servers_friendly_name', 'name'),
@@ -286,7 +290,16 @@ class VirtualMachine extends Model implements Filterable, Sortable
             IntProperty::create('servers_ad_domain_id', 'ad_domain_id'),
         ];
 
-        return $array;
+        $request = app('request');
+        if (!$request->user->isAdministrator) {
+            return $properties;
+        }
+
+        // admin only properties
+        return array_merge($properties, [
+            IntProperty::create('servers_reseller_id', 'reseller_id'),
+            BooleanProperty::create('servers_active', 'active'),
+        ]);
     }
 
     /**
