@@ -139,22 +139,17 @@ class DataTest extends TestCase
     public function applianceStateDataProvider()
     {
         return [
-            'appliance_active_equals_yes_returns_OK' => [
+            'appliance_active_and_public_returns_OK' => [
                 'active' => 'Yes',
                 'is_public' => 'Yes',
                 'responseCode' => Response::HTTP_OK,
             ],
-            'appliance_active_equals_no_returns_NOT_FOUND' => [
+            'appliance_not_active_returns_NOT_FOUND' => [
                 'active' => 'No',
                 'is_public' => 'Yes',
                 'responseCode' => Response::HTTP_NOT_FOUND,
             ],
-            'appliance_is_public_equals_yes_returns_OK' => [
-                'active' => 'Yes',
-                'is_public' => 'Yes',
-                'responseCode' => Response::HTTP_OK,
-            ],
-            'appliance_is_public_equals_no_returns_NOT_FOUND' => [
+            'appliance_not_public_returns_NOT_FOUND' => [
                 'active' => 'Yes',
                 'is_public' => 'No',
                 'responseCode' => Response::HTTP_NOT_FOUND,
@@ -192,11 +187,11 @@ class DataTest extends TestCase
     public function applianceVersionStateDataProvider()
     {
         return [
-            'appliance_version_active_equals_yes_returns_OK' => [
+            'appliance_version_active_returns_OK' => [
                 'active' => 'Yes',
                 'responseCode' => Response::HTTP_OK,
             ],
-            'appliance_version_active_equals_no_returns_NOT_FOUND' => [
+            'appliance_version_not_active_returns_NOT_FOUND' => [
                 'active' => 'No',
                 'responseCode' => Response::HTTP_NOT_FOUND,
             ],
