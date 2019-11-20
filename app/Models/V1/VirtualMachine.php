@@ -171,6 +171,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             'role' => 'servers_role',
             'active' => 'servers_active',
             'reseller_id' => 'servers_reseller_id',
+            'pod_id' => 'servers_ecloud_datacentre_id',
         ];
     }
 
@@ -196,6 +197,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             $factory->create('role', Filter::$stringDefaults),
             $factory->boolean()->create('active', 'y', 'n'),
             $factory->create('reseller_id', Filter::$numericDefaults),
+            $factory->create('pod_id', Filter::$numericDefaults),
         ];
     }
 
@@ -283,6 +285,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             StringProperty::create('servers_status', 'status'),
 
             StringProperty::create('servers_ecloud_type', 'environment'),
+            IntProperty::create('servers_ecloud_datacentre_id', 'pod_id'),
             IntProperty::create('servers_ecloud_ucs_reseller_id', 'solution_id'),
 
             BooleanProperty::create('servers_encrypted', 'encrypted'),

@@ -112,6 +112,7 @@ class VirtualMachineResource extends CustomResource
             'tools_status' => $this->vmwareToolsStatus(),
 
             'environment' => $this->resource->servers_ecloud_type,
+            'pod_id' => $this->resource->servers_ecloud_datacentre_id,
             'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
 
             'ad_domain_id' => $this->resource->servers_ad_domain_id,
