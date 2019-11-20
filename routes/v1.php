@@ -129,13 +129,35 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
     $router->delete('appliances/{appliance_id}', 'ApplianceController@delete');
 
-
     //Appliance Versions
     $router->get('appliance-versions', 'ApplianceVersionController@index');
     $router->get('appliance-versions/{appliance_version_id}', 'ApplianceVersionController@show');
     $router->post('appliance-versions', 'ApplianceVersionController@create');
     $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
     $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
+    $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
+
+    // Appliance Versions Data
+//    $router->get(
+//        'appliance-versions/{appliance_version_uuid}/data',
+//        '\App\Http\Controllers\V1\Appliance\Version\DataController@index'
+//    );
+//    $router->get(
+//        'appliance-versions/{appliance_version_uuid}/data/{key}',
+//        '\App\Http\Controllers\V1\Appliance\Version\DataController@show'
+//    );
+    $router->post(
+        'appliance-versions/{appliance_version_uuid}/data',
+        '\App\Http\Controllers\V1\Appliance\Version\DataController@create'
+    );
+//    $router->patch(
+//        'appliance-versions/{appliance_version_uuid}/data/{key}',
+//        '\App\Http\Controllers\V1\Appliance\Version\DataController@update'
+//    );
+//    $router->delete(
+//        'appliance-versions/{appliance_version_uuid}/data/{key}',
+//        '\App\Http\Controllers\V1\Appliance\Version\DataController@delete'
+//    );
 
     //Appliance Parameters
     $router->get('appliance-parameters', 'ApplianceParametersController@index');
@@ -224,9 +246,6 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
-
-        //Appliance Versions
-        $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
     });
 });
 
