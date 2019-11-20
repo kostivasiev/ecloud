@@ -298,7 +298,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         // admin only properties
         return array_merge($properties, [
             IntProperty::create('servers_reseller_id', 'reseller_id'),
-            BooleanProperty::create('servers_active', 'active'),
+            BooleanProperty::create('servers_active', 'active', null, 'y', 'n'),
         ]);
     }
 
