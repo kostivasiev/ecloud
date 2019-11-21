@@ -102,11 +102,12 @@ class DataTest extends TestCase
     /**
      * Return the Appliance Version UUID or and invalid value
      * @param bool $valid
+     * @param string $invalidValue
      * @return string
      */
-    protected function getApplianceVersionUuid(bool $valid = true)
+    protected function getApplianceVersionUuid(bool $valid = true, string $invalidValue = 'x')
     {
-        return $valid ? $this->applianceVersion->appliance_version_uuid : 'x';
+        return $valid ? $this->applianceVersion->appliance_version_uuid : $invalidValue;
     }
 
     /**
