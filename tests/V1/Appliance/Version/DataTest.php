@@ -18,6 +18,26 @@ class DataTest extends TestCase
      */
     protected $applianceVersion;
 
+    /**
+     * @param $uuid
+     * @return string
+     */
+    protected function getApplianceVersionUri($uuid)
+    {
+        return '/v1/appliance-versions/' . $uuid . '/data';
+    }
+
+    /**
+     * Return the Appliance Version UUID or and invalid value
+     * @param bool $valid
+     * @param string $invalidValue
+     * @return string
+     */
+    protected function getApplianceVersionUuid(bool $valid = true, string $invalidValue = 'x')
+    {
+        return $valid ? $this->applianceVersion->appliance_version_uuid : $invalidValue;
+    }
+
     protected function setUp() : void
     {
         parent::setUp();
@@ -70,7 +90,7 @@ class DataTest extends TestCase
     {
         $response = $this->json(
             'POST',
-            '/v1/appliance-versions/' . $this->applianceVersion->appliance_version_uuid . '/data',
+            $this->getApplianceVersionUri($this->getApplianceVersionUuid()),
             $data,
             $this->validWriteHeaders
         );
@@ -79,7 +99,7 @@ class DataTest extends TestCase
         $this->$databaseCheckMethod(
             'appliance_version_data',
             $data + [
-                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+                'appliance_version_uuid' => $this->getApplianceVersionUuid(),
             ],
             'ecloud'
         );
@@ -100,17 +120,6 @@ class DataTest extends TestCase
     }
 
     /**
-     * Return the Appliance Version UUID or and invalid value
-     * @param bool $valid
-     * @param string $invalidValue
-     * @return string
-     */
-    protected function getApplianceVersionUuid(bool $valid = true, string $invalidValue = 'x')
-    {
-        return $valid ? $this->applianceVersion->appliance_version_uuid : $invalidValue;
-    }
-
-    /**
      * @dataProvider applianceVersionUuidDataProvider
      * @param int $responseCode
      * @param bool $useValidUuid
@@ -125,7 +134,7 @@ class DataTest extends TestCase
 
         $response = $this->json(
             'POST',
-            '/v1/appliance-versions/' . $this->getApplianceVersionUuid($useValidUuid) . '/data',
+            $this->getApplianceVersionUri($this->getApplianceVersionUuid($useValidUuid)),
             $data,
             $this->validWriteHeaders
         );
@@ -174,7 +183,7 @@ class DataTest extends TestCase
 
         $response = $this->json(
             'POST',
-            '/v1/appliance-versions/' . $this->applianceVersion->appliance_version_uuid . '/data',
+            $this->getApplianceVersionUri($this->getApplianceVersionUuid()),
             $data,
             $this->validWriteHeaders
         );
@@ -213,7 +222,7 @@ class DataTest extends TestCase
 
         $response = $this->json(
             'POST',
-            '/v1/appliance-versions/' . $this->applianceVersion->appliance_version_uuid . '/data',
+            $this->getApplianceVersionUri($this->getApplianceVersionUuid()),
             $data,
             $this->validWriteHeaders
         );
