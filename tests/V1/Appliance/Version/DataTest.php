@@ -4,6 +4,7 @@ namespace Tests\V1\Appliance\Version;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceVersion;
+use Laravel\Lumen\Testing\Concerns\MakesHttpRequests;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -14,11 +15,6 @@ class DataTest extends TestCase
     use DatabaseTransactions, DatabaseMigrations;
 
     /**
-     * @var Appliance
-     */
-    protected $appliance;
-
-    /**
      * @var ApplianceVersion
      */
     protected $applianceVersion;
@@ -27,16 +23,16 @@ class DataTest extends TestCase
     {
         parent::setUp();
 
-        $this->appliance = factory(Appliance::class)->create();
         $this->applianceVersion = factory(ApplianceVersion::class)->create([
-            'appliance_uuid' => $this->appliance->appliance_uuid,
+            'appliance_uuid' => function () {
+                return factory(Appliance::class)->create()->appliance_uuid;
+            },
             'appliance_version_version' => 1,
         ]);
     }
 
     protected function tearDown(): void
     {
-        $this->appliance = null;
         $this->applianceVersion = null;
 
         parent::tearDown();
@@ -111,7 +107,7 @@ class DataTest extends TestCase
      */
     protected function getApplianceVersionUuid(bool $valid = true)
     {
-        return $valid ? $this->applianceVersion->appliance_version_uuid : 'xxxx';
+        return $valid ? $this->applianceVersion->appliance_version_uuid : 'x';
     }
 
     /**
@@ -165,9 +161,10 @@ class DataTest extends TestCase
      */
     public function testApplianceState($active, $isPublic, $responseCode)
     {
-        $this->appliance->active = $active;
-        $this->appliance->is_public = $isPublic;
-        $this->appliance->save();
+        $appliance = $this->applianceVersion->appliance;
+        $appliance->active = $active;
+        $appliance->is_public = $isPublic;
+        $appliance->save();
 
         $faker = \Faker\Factory::create();
         $data = [

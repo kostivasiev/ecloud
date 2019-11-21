@@ -10,7 +10,7 @@ use Illuminate\Http\Response;
 
 class DataController extends Controller
 {
-    const ERROR_INVALID_VALUE = 'Invalid "value"';
+    const ERROR_INVALID_VALUE = 'Invalid value provided';
     const ERROR_CANT_FIND_APPLIANCE_VERSION = 'Can\'t find appliance version';
 
     /**
@@ -23,27 +23,32 @@ class DataController extends Controller
             return new Response(self::ERROR_INVALID_VALUE, Response::HTTP_BAD_REQUEST);
         }
 
-        $applianceVersion = ApplianceVersion::findOrFail($request->appliance_version_uuid);
-        if ($request->appliance_version_uuid !== $applianceVersion->appliance_version_uuid) {
+        $version = ApplianceVersion::findOrFail($request->appliance_version_uuid);
+        if ($request->appliance_version_uuid !== $version->appliance_version_uuid ||
+            $version->active != 'Yes' ||
+            $version->appliance->active != 'Yes' ||
+            $version->appliance->is_public != 'Yes'
+        ) {
             return new Response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
         }
 
-        if ($applianceVersion->active != 'Yes') {
-            return new Response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
-        }
-
-        if ($applianceVersion->appliance->active != 'Yes') {
-            return new Response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
-        }
-
-        if ($applianceVersion->appliance->is_public != 'Yes') {
-            return new Response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
-        }
-
-        return factory(Data::class)->create([
+        $data = factory(Data::class)->create([
             'key' => $request->key,
             'value' => $request->value,
             'appliance_version_uuid' => $request->appliance_version_uuid,
         ]);
+
+        return new Response(
+            json_encode([
+                'data' => [
+                    'key' => $data->key,
+                    'value' => $data->value,
+                ],
+                'meta' => [
+                    'location' => config('app.url') . 'v1/appliance-versions/' . $data->appliance_version_uuid . '/data'
+                ],
+            ]),
+            Response::HTTP_OK
+        );
     }
 }
