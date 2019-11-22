@@ -34,8 +34,7 @@ class DataController extends Controller
         }
 
         $existing = Data::where('key', $request->key)
-            ->where('appliance_version_uuid', $request->appliance_version_uuid)
-            ->get();
+            ->where('appliance_version_uuid', $request->appliance_version_uuid);
         if ($existing->count()) {
             return new Response(self::ERROR_DUPLICATE_KEY, Response::HTTP_CONFLICT);
         }
