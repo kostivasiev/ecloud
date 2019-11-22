@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 class DataController extends Controller
 {
     const ERROR_INVALID_VALUE = 'Invalid value provided';
+    const ERROR_DUPLICATE_KEY = 'Duplicate key provided';
     const ERROR_CANT_FIND_APPLIANCE_VERSION = 'Can\'t find appliance version';
 
     /**
@@ -30,6 +31,13 @@ class DataController extends Controller
             $version->appliance->is_public != 'Yes'
         ) {
             return new Response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
+        }
+
+        $existing = Data::where('key', $request->key)
+            ->where('appliance_version_uuid', $request->appliance_version_uuid)
+            ->get();
+        if ($existing->count()) {
+            return new Response(self::ERROR_DUPLICATE_KEY, Response::HTTP_CONFLICT);
         }
 
         $data = factory(Data::class)->create([

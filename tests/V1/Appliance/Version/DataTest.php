@@ -220,4 +220,28 @@ class DataTest extends TestCase
         );
         $response->seeStatusCode($responseCode);
     }
+
+    public function testDuplicateKey()
+    {
+        $data = [
+            'key' => 'duplicate-test-key',
+            'value' => 'duplicate-test-value',
+        ];
+
+        $response = $this->json(
+            'POST',
+            $this->getApplianceVersionDataUri(),
+            $data,
+            $this->validWriteHeaders
+        );
+        $response->seeStatusCode(Response::HTTP_OK);
+
+        $response = $this->json(
+            'POST',
+            $this->getApplianceVersionDataUri(),
+            $data,
+            $this->validWriteHeaders
+        );
+        $response->seeStatusCode(Response::HTTP_CONFLICT);
+    }
 }
