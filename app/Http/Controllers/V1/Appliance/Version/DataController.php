@@ -21,7 +21,7 @@ class DataController extends Controller
     public function create(Request $request)
     {
         if (empty($request->value)) {
-            return new Response(self::ERROR_INVALID_VALUE, Response::HTTP_BAD_REQUEST);
+            return response(self::ERROR_INVALID_VALUE, Response::HTTP_BAD_REQUEST);
         }
 
         $version = ApplianceVersion::findOrFail($request->appliance_version_uuid);
@@ -30,13 +30,13 @@ class DataController extends Controller
             $version->appliance->active != 'Yes' ||
             $version->appliance->is_public != 'Yes'
         ) {
-            return new Response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
+            return response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
         }
 
         $existing = Data::where('key', '=', $request->key)
             ->where('appliance_version_uuid', '=', $request->appliance_version_uuid);
         if ($existing->count()) {
-            return new Response(self::ERROR_DUPLICATE_KEY, Response::HTTP_CONFLICT);
+            return response(self::ERROR_DUPLICATE_KEY, Response::HTTP_CONFLICT);
         }
 
         $data = factory(Data::class)->create([
@@ -45,17 +45,18 @@ class DataController extends Controller
             'appliance_version_uuid' => $request->appliance_version_uuid,
         ]);
 
-        return new Response(
-            json_encode([
+        $location = config('app.url') . '/v1/appliance-versions/' . $data->appliance_version_uuid . '/data';
+
+        return response()->json(
+            [
                 'data' => [
                     'key' => $data->key,
                     'value' => $data->value,
                 ],
                 'meta' => [
-                    'location' => config('app.url') . 'v1/appliance-versions/' . $data->appliance_version_uuid . '/data'
+                    'location' => $location
                 ],
-            ]),
-            Response::HTTP_OK
+            ]
         );
     }
 }
