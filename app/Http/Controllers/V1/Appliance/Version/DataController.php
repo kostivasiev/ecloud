@@ -33,8 +33,8 @@ class DataController extends Controller
             return new Response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
         }
 
-        $existing = Data::where('key', $request->key)
-            ->where('appliance_version_uuid', $request->appliance_version_uuid);
+        $existing = Data::where('key', '=', $request->key)
+            ->where('appliance_version_uuid', '=', $request->appliance_version_uuid);
         if ($existing->count()) {
             return new Response(self::ERROR_DUPLICATE_KEY, Response::HTTP_CONFLICT);
         }
