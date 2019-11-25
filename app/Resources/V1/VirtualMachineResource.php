@@ -112,6 +112,7 @@ class VirtualMachineResource extends CustomResource
             'tools_status' => $this->vmwareToolsStatus(),
 
             'environment' => $this->resource->servers_ecloud_type,
+            'pod_id' => $this->resource->servers_ecloud_datacentre_id,
             'solution_id' => $this->resource->servers_ecloud_ucs_reseller_id,
 
             'ad_domain_id' => $this->resource->servers_ad_domain_id,
@@ -119,6 +120,14 @@ class VirtualMachineResource extends CustomResource
 
         if ($this->resource->servers_ecloud_type == 'GPU') {
             $data['gpu_profile'] = $this->resource->servers_ecloud_gpu_profile_uuid;
+        }
+
+        // admin only properties
+        if ($request->user->isAdministrator) {
+            $data = array_merge($data, [
+                'reseller_id' => $this->resource->servers_reseller_id,
+                'active' => ($this->resource->servers_active == 'y'),
+            ]);
         }
 
         return $this->filterProperties($request, $data);
