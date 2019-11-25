@@ -413,7 +413,7 @@ class DatastoreController extends BaseController
                 'delete_lun',
                 'reseller_lun',
                 $datastore->getKey(),
-                [],
+                null,
                 'ecloud_ucs_' . $datastore->pod->getKey(),
                 $request->user->applicationId
             );
