@@ -13,6 +13,11 @@ class DataTest extends TestCase
 {
     use DatabaseTransactions, DatabaseMigrations;
 
+    const TEST_DATA = [
+        'key' => 'test-key',
+        'value' => 'test-value',
+    ];
+
     /**
      * @var ApplianceVersion
      */
@@ -51,19 +56,15 @@ class DataTest extends TestCase
 
     public function valueDataProvider()
     {
-        $faker = \Faker\Factory::create();
         return [
             'valid_value_returns_OK' => [
-                'data' => [
-                    'key' => $faker->word(),
-                    'value' => $faker->sentence(),
-                ],
+                'data' => self::TEST_DATA,
                 'responseCode' => Response::HTTP_OK,
                 'databaseCheckMethod' => 'seeInDatabase',
             ],
             'invalid_value_returns_BAD_REQUEST' => [
                 'data' => [
-                    'key' => $faker->word(),
+                    'key' => 'test-key',
                     'value' => '',
                 ],
                 'responseCode' => Response::HTTP_BAD_REQUEST,
@@ -118,16 +119,10 @@ class DataTest extends TestCase
      */
     public function testApplianceVersionUuid(int $responseCode, bool $useValidUuid)
     {
-        $faker = \Faker\Factory::create();
-        $data = [
-            'key' => $faker->word(),
-            'value' => $faker->sentence(),
-        ];
-
         $response = $this->json(
             'POST',
             $this->getApplianceVersionDataUri($useValidUuid),
-            $data,
+            self::TEST_DATA,
             $this->validWriteHeaders
         );
         $response->seeStatusCode($responseCode);
@@ -167,16 +162,10 @@ class DataTest extends TestCase
         $appliance->is_public = $isPublic;
         $appliance->save();
 
-        $faker = \Faker\Factory::create();
-        $data = [
-            'key' => $faker->word(),
-            'value' => $faker->sentence(),
-        ];
-
         $response = $this->json(
             'POST',
             $this->getApplianceVersionDataUri(),
-            $data,
+            self::TEST_DATA,
             $this->validWriteHeaders
         );
         $response->seeStatusCode($responseCode);
@@ -206,16 +195,10 @@ class DataTest extends TestCase
         $this->applianceVersion->active = $active;
         $this->applianceVersion->save();
 
-        $faker = \Faker\Factory::create();
-        $data = [
-            'key' => $faker->word(),
-            'value' => $faker->sentence(),
-        ];
-
         $response = $this->json(
             'POST',
             $this->getApplianceVersionDataUri(),
-            $data,
+            self::TEST_DATA,
             $this->validWriteHeaders
         );
         $response->seeStatusCode($responseCode);
@@ -223,15 +206,10 @@ class DataTest extends TestCase
 
     public function testDuplicateKey()
     {
-        $data = [
-            'key' => 'duplicate-test-key',
-            'value' => 'duplicate-test-value',
-        ];
-
         $response = $this->json(
             'POST',
             $this->getApplianceVersionDataUri(),
-            $data,
+            self::TEST_DATA,
             $this->validWriteHeaders
         );
         $response->seeStatusCode(Response::HTTP_OK);
@@ -239,9 +217,47 @@ class DataTest extends TestCase
         $response = $this->json(
             'POST',
             $this->getApplianceVersionDataUri(),
-            $data,
+            self::TEST_DATA,
             $this->validWriteHeaders
         );
         $response->seeStatusCode(Response::HTTP_CONFLICT);
+    }
+
+    public function testDeleteExistingKey()
+    {
+        $this->json(
+            'POST',
+            $this->getApplianceVersionDataUri(),
+            self::TEST_DATA,
+            $this->validWriteHeaders
+        );
+
+        $response = $this->json(
+            'DELETE',
+            $this->getApplianceVersionDataUri() . '/test-key',
+            [],
+            $this->validWriteHeaders
+        );
+        $response->seeStatusCode(Response::HTTP_OK);
+
+        $this->notSeeInDatabase(
+            'appliance_version_data',
+            self::TEST_DATA + [
+                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+                'deleted_at' => null,
+            ],
+            'ecloud'
+        );
+    }
+
+    public function testDeleteNonExistentKey()
+    {
+        $response = $this->json(
+            'DELETE',
+            $this->getApplianceVersionDataUri() . '/test-key',
+            [],
+            $this->validWriteHeaders
+        );
+        $response->seeStatusCode(Response::HTTP_NOT_FOUND);
     }
 }
