@@ -3,8 +3,8 @@
 namespace App\Http\Middleware\Appliance;
 
 use Closure;
-use Illuminate\Http\Response;
 use App\Models\V1\ApplianceVersion;
+use Illuminate\Http\Response;
 
 class Version
 {
@@ -21,14 +21,12 @@ class Version
     public function handle($request, Closure $next, $guard = null)
     {
         $version = ApplianceVersion::findOrFail($request->appliance_version_uuid);
-        if ($request->appliance_version_uuid !== $version->appliance_version_uuid ||
-            $version->active != 'Yes' ||
+        if ($version->active != 'Yes' ||
             $version->appliance->active != 'Yes' ||
-            $version->appliance->is_public != 'Yes'
+            (!$request->user->isAdministrator && $version->appliance->is_public != 'Yes')
         ) {
-            return response(self::ERROR_CANT_FIND_APPLIANCE_VERSION, Response::HTTP_NOT_FOUND);
+            abort(Response::HTTP_NOT_FOUND, self::ERROR_CANT_FIND_APPLIANCE_VERSION);
         }
-
         return $next($request);
     }
 }

@@ -130,21 +130,51 @@ class DataTest extends TestCase
 
     public function applianceStateDataProvider()
     {
+        $adminHeaders = [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ];
+        $nonAdminHeaders = [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ];
+
         return [
             'appliance_active_and_public_returns_OK' => [
                 'active' => 'Yes',
                 'is_public' => 'Yes',
                 'responseCode' => Response::HTTP_OK,
+                'headersToUse' => $nonAdminHeaders,
             ],
             'appliance_not_active_returns_NOT_FOUND' => [
                 'active' => 'No',
                 'is_public' => 'Yes',
                 'responseCode' => Response::HTTP_NOT_FOUND,
+                'headersToUse' => $nonAdminHeaders,
             ],
             'appliance_not_public_returns_NOT_FOUND' => [
                 'active' => 'Yes',
                 'is_public' => 'No',
                 'responseCode' => Response::HTTP_NOT_FOUND,
+                'headersToUse' => $nonAdminHeaders,
+            ],
+            'appliance_active_and_public_as_admin_returns_OK' => [
+                'active' => 'Yes',
+                'is_public' => 'Yes',
+                'responseCode' => Response::HTTP_OK,
+                'headersToUse' => $adminHeaders,
+            ],
+            'appliance_not_active_as_admin_returns_NOT_FOUND' => [
+                'active' => 'No',
+                'is_public' => 'Yes',
+                'responseCode' => Response::HTTP_NOT_FOUND,
+                'headersToUse' => $adminHeaders,
+            ],
+            'appliance_not_public_as_admin_returns_NOT_FOUND' => [
+                'active' => 'Yes',
+                'is_public' => 'No',
+                'responseCode' => Response::HTTP_OK,    // Admin always sees appliance
+                'headersToUse' => $adminHeaders,
             ],
         ];
     }
@@ -154,8 +184,9 @@ class DataTest extends TestCase
      * @param $active
      * @param $isPublic
      * @param $responseCode
+     * @param $headersToUse
      */
-    public function testApplianceState($active, $isPublic, $responseCode)
+    public function testApplianceState($active, $isPublic, $responseCode, $headersToUse)
     {
         $appliance = $this->applianceVersion->appliance;
         $appliance->active = $active;
@@ -166,7 +197,7 @@ class DataTest extends TestCase
             'POST',
             $this->getApplianceVersionDataUri(),
             self::TEST_DATA,
-            $this->validWriteHeaders
+            $headersToUse
         );
         $response->seeStatusCode($responseCode);
     }
