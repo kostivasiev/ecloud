@@ -57,6 +57,5 @@ class DataController extends Controller
             ['key', '=', $request->key],
             ['appliance_version_uuid', '=', $request->appliance_version_uuid],
         ])->firstOrFail()->delete();
-        //return response()->json();
     }
 }
