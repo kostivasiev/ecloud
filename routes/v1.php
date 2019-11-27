@@ -137,16 +137,29 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
     $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
 
-    // Appliance Versions Data
-    $router->group(['middleware' => \App\Http\Middleware\Appliance\Version::class], function () use ($router) {
-//        $router->get(
-//            'appliance-versions/{appliance_version_uuid}/data',
-//            '\App\Http\Controllers\V1\Appliance\Version\DataController@index'
-//        );
-//        $router->get(
-//            'appliance-versions/{appliance_version_uuid}/data/{key}',
-//            '\App\Http\Controllers\V1\Appliance\Version\DataController@show'
-//        );
+    // Appliance Versions Data - Public
+    $router->group([
+        'middleware' => [
+            \App\Http\Middleware\Appliance\Version::class,
+        ],
+    ], function () use ($router) {
+        $router->get(
+            'appliance-versions/{appliance_version_uuid}/data',
+            '\App\Http\Controllers\V1\Appliance\Version\DataController@index'
+        );
+        $router->get(
+            'appliance-versions/{appliance_version_uuid}/data/{key}',
+            '\App\Http\Controllers\V1\Appliance\Version\DataController@show'
+        );
+    });
+
+    // Appliance Versions Data - Admin
+    $router->group([
+        'middleware' => [
+            'is-administrator',
+            \App\Http\Middleware\Appliance\Version::class,
+        ],
+    ], function () use ($router) {
         $router->post(
             'appliance-versions/{appliance_version_uuid}/data',
             '\App\Http\Controllers\V1\Appliance\Version\DataController@create'

@@ -49,7 +49,6 @@ class DataController extends Controller
 
     /**
      * @param Request $request
-     * @return Response
      */
     public function delete(Request $request)
     {
