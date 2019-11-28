@@ -138,26 +138,28 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
 
     // Appliance Versions Data
-//    $router->get(
-//        'appliance-versions/{appliance_version_uuid}/data',
-//        '\App\Http\Controllers\V1\Appliance\Version\DataController@index'
-//    );
-//    $router->get(
-//        'appliance-versions/{appliance_version_uuid}/data/{key}',
-//        '\App\Http\Controllers\V1\Appliance\Version\DataController@show'
-//    );
-    $router->post(
-        'appliance-versions/{appliance_version_uuid}/data',
-        '\App\Http\Controllers\V1\Appliance\Version\DataController@create'
-    );
-//    $router->patch(
-//        'appliance-versions/{appliance_version_uuid}/data/{key}',
-//        '\App\Http\Controllers\V1\Appliance\Version\DataController@update'
-//    );
-//    $router->delete(
-//        'appliance-versions/{appliance_version_uuid}/data/{key}',
-//        '\App\Http\Controllers\V1\Appliance\Version\DataController@delete'
-//    );
+    $router->group(['middleware' => \App\Http\Middleware\Appliance\Version::class], function () use ($router) {
+//        $router->get(
+//            'appliance-versions/{appliance_version_uuid}/data',
+//            '\App\Http\Controllers\V1\Appliance\Version\DataController@index'
+//        );
+//        $router->get(
+//            'appliance-versions/{appliance_version_uuid}/data/{key}',
+//            '\App\Http\Controllers\V1\Appliance\Version\DataController@show'
+//        );
+        $router->post(
+            'appliance-versions/{appliance_version_uuid}/data',
+            '\App\Http\Controllers\V1\Appliance\Version\DataController@create'
+        );
+//        $router->patch(
+//            'appliance-versions/{appliance_version_uuid}/data/{key}',
+//            '\App\Http\Controllers\V1\Appliance\Version\DataController@update'
+//        );
+        $router->delete(
+            'appliance-versions/{appliance_version_uuid}/data/{key}',
+            '\App\Http\Controllers\V1\Appliance\Version\DataController@delete'
+        );
+    });
 
     //Appliance Parameters
     $router->get('appliance-parameters', 'ApplianceParametersController@index');
