@@ -33,18 +33,6 @@ class DataTest extends TestCase
      */
     protected $applianceVersion;
 
-    /**
-     * Return the URI for the appliance version data endpoint or an invalid one
-     * @param bool $valid
-     * @param string $invalidValue
-     * @return string
-     */
-    protected function getApplianceVersionDataUri(bool $valid = true, string $invalidValue = 'x')
-    {
-        $uuid = $valid ? $this->applianceVersion->appliance_version_uuid : $invalidValue;
-        return '/v1/appliance-versions/' . $uuid . '/data';
-    }
-
     protected function setUp() : void
     {
         parent::setUp();
@@ -62,6 +50,18 @@ class DataTest extends TestCase
         $this->applianceVersion = null;
 
         parent::tearDown();
+    }
+
+    /**
+     * Return the URI for the appliance version data endpoint or an invalid one
+     * @param bool $valid
+     * @param string $invalidValue
+     * @return string
+     */
+    protected function getApplianceVersionDataUri(bool $valid = true, string $invalidValue = 'x')
+    {
+        $uuid = $valid ? $this->applianceVersion->appliance_version_uuid : $invalidValue;
+        return '/v1/appliance-versions/' . $uuid . '/data';
     }
 
     public function testCreateIsAdminOnly()
@@ -291,5 +291,57 @@ class DataTest extends TestCase
             [],
             self::HEADERS_ADMIN
         )->seeStatusCode(Response::HTTP_NOT_FOUND);
+    }
+
+    public function testGetExistingKey()
+    {
+        $this->json(
+            'POST',
+            $this->getApplianceVersionDataUri(),
+            self::TEST_DATA,
+            self::HEADERS_ADMIN
+        )->seeStatusCode(Response::HTTP_OK);
+
+        $this->json(
+            'GET',
+            $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
+            [],
+            self::HEADERS_PUBLIC
+        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+            'data' => [
+                'value' => self::TEST_DATA['value'],
+            ]
+        ]);
+    }
+
+    public function testGetNonExistingKey()
+    {
+        $this->json(
+            'GET',
+            $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
+            [],
+            self::HEADERS_PUBLIC
+        )->seeStatusCode(Response::HTTP_NOT_FOUND);
+    }
+
+    public function testGetAll()
+    {
+        $this->json(
+            'POST',
+            $this->getApplianceVersionDataUri(),
+            self::TEST_DATA,
+            self::HEADERS_ADMIN
+        )->seeStatusCode(Response::HTTP_OK);
+
+        $this->json(
+            'GET',
+            $this->getApplianceVersionDataUri(),
+            [],
+            self::HEADERS_PUBLIC
+        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+            'data' => [
+                self::TEST_DATA,
+            ]
+        ]);
     }
 }
