@@ -60,7 +60,7 @@ class DataController extends Controller
             abort(Response::HTTP_CONFLICT, self::ERROR_DUPLICATE_KEY);
         }
 
-        $data = factory(Data::class)->create([
+        $data = Data::create([
             'key' => $request->key,
             'value' => $request->value,
             'appliance_version_uuid' => $request->appliance_version_uuid,
@@ -95,12 +95,21 @@ class DataController extends Controller
      */
     public function update(Request $request)
     {
+        if (empty($request->value)) {
+            abort(Response::HTTP_BAD_REQUEST, self::ERROR_INVALID_VALUE);
+        }
+
+        $data = Data::firstOrNew([
+            'key' => $request->key,
+            'appliance_version_uuid' => $request->appliance_version_uuid,
+        ]);
+        $data->value = $request->value;
+        $data->save();
         return response()->json([
-            'data' => [],
-            'meta' => [
-                'location' => config('app.url') . '/v1/appliance-versions/' .
-                    $request->appliance_version_uuid . '/data'
+            'data' => [
+                'value' => $data->value,
             ],
+            'meta' => [],
         ]);
     }
 }

@@ -64,6 +64,23 @@ class DataTest extends TestCase
         return '/v1/appliance-versions/' . $uuid . '/data';
     }
 
+    protected function createData()
+    {
+        $this->json(
+            'POST',
+            $this->getApplianceVersionDataUri(),
+            self::TEST_DATA,
+            self::HEADERS_ADMIN
+        )->seeStatusCode(Response::HTTP_OK)->seeInDatabase(
+            'appliance_version_data',
+            self::TEST_DATA + [
+                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+                'deleted_at' => null,
+            ],
+            'ecloud'
+        );
+    }
+
     public function testCreateIsAdminOnly()
     {
         $this->json(
@@ -242,13 +259,7 @@ class DataTest extends TestCase
 
     public function testDuplicateKey()
     {
-        $this->json(
-            'POST',
-            $this->getApplianceVersionDataUri(),
-            self::TEST_DATA,
-            self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK);
-
+        $this->createData();
         $this->json(
             'POST',
             $this->getApplianceVersionDataUri(),
@@ -259,13 +270,7 @@ class DataTest extends TestCase
 
     public function testDeleteExistingKey()
     {
-        $this->json(
-            'POST',
-            $this->getApplianceVersionDataUri(),
-            self::TEST_DATA,
-            self::HEADERS_ADMIN
-        );
-
+        $this->createData();
         $this->json(
             'DELETE',
             $this->getApplianceVersionDataUri() . '/test-key',
@@ -295,13 +300,7 @@ class DataTest extends TestCase
 
     public function testGetExistingKey()
     {
-        $this->json(
-            'POST',
-            $this->getApplianceVersionDataUri(),
-            self::TEST_DATA,
-            self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK);
-
+        $this->createData();
         $this->json(
             'GET',
             $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
@@ -326,13 +325,7 @@ class DataTest extends TestCase
 
     public function testGetAll()
     {
-        $this->json(
-            'POST',
-            $this->getApplianceVersionDataUri(),
-            self::TEST_DATA,
-            self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK);
-
+        $this->createData();
         $this->json(
             'GET',
             $this->getApplianceVersionDataUri(),
@@ -343,5 +336,56 @@ class DataTest extends TestCase
                 self::TEST_DATA,
             ]
         ]);
+    }
+
+    public function testPatchExistingKey()
+    {
+        $this->createData();
+        $this->json(
+            'PATCH',
+            $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
+            [
+                'value' => 'new_value',
+            ],
+            self::HEADERS_ADMIN
+        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+            'data' => [
+                'value' => 'new_value',
+            ]
+        ])->seeInDatabase(
+            'appliance_version_data',
+            [
+                'key' => self::TEST_DATA['key'],
+                'value' => 'new_value',
+                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+                'deleted_at' => null,
+            ],
+            'ecloud'
+        );
+    }
+
+    public function testPatchNewKey()
+    {
+        $this->json(
+            'PATCH',
+            $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
+            [
+                'value' => 'new_value',
+            ],
+            self::HEADERS_ADMIN
+        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+            'data' => [
+                'value' => 'new_value',
+            ]
+        ])->seeInDatabase(
+            'appliance_version_data',
+            [
+                'key' => self::TEST_DATA['key'],
+                'value' => 'new_value',
+                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+                'deleted_at' => null,
+            ],
+            'ecloud'
+        );
     }
 }

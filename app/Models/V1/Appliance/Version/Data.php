@@ -21,4 +21,13 @@ class Data extends Model
      * @var string
      */
     protected $table = 'appliance_version_data';
+
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        'key',
+        'value',
+        'appliance_version_uuid',
+    ];
 }
