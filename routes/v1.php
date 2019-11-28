@@ -145,11 +145,11 @@ $router->group($baseRouteParameters, function () use ($router) {
     ], function () use ($router) {
         $router->get(
             'appliance-versions/{appliance_version_uuid}/data',
-            '\App\Http\Controllers\V1\Appliance\Version\DataController@index'
+            'Appliance\Version\DataController@index'
         );
         $router->get(
             'appliance-versions/{appliance_version_uuid}/data/{key}',
-            '\App\Http\Controllers\V1\Appliance\Version\DataController@show'
+            'Appliance\Version\DataController@show'
         );
     });
 
@@ -162,15 +162,15 @@ $router->group($baseRouteParameters, function () use ($router) {
     ], function () use ($router) {
         $router->post(
             'appliance-versions/{appliance_version_uuid}/data',
-            '\App\Http\Controllers\V1\Appliance\Version\DataController@create'
+            'Appliance\Version\DataController@create'
         );
 //        $router->patch(
 //            'appliance-versions/{appliance_version_uuid}/data/{key}',
-//            '\App\Http\Controllers\V1\Appliance\Version\DataController@update'
+//            'Appliance\Version\DataController@update'
 //        );
         $router->delete(
             'appliance-versions/{appliance_version_uuid}/data/{key}',
-            '\App\Http\Controllers\V1\Appliance\Version\DataController@delete'
+            'Appliance\Version\DataController@delete'
         );
     });
 

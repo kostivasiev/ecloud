@@ -16,6 +16,37 @@ class DataController extends Controller
      * @param Request $request
      * @return Response
      */
+    public function index(Request $request)
+    {
+        return response()->json([
+            'data' => Data::select('key', 'value')->where([
+                ['appliance_version_uuid', '=', $request->appliance_version_uuid],
+            ])->get()->all(),
+            'meta' => [],
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function show(Request $request)
+    {
+        return response()->json([
+            'data' => [
+                'value' => Data::select('value')->where([
+                    ['key', '=', $request->key],
+                    ['appliance_version_uuid', '=', $request->appliance_version_uuid],
+                ])->firstOrFail()->value('value'),
+            ],
+            'meta' => [],
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
     public function create(Request $request)
     {
         if (empty($request->value)) {
@@ -42,7 +73,7 @@ class DataController extends Controller
             ],
             'meta' => [
                 'location' => config('app.url') . '/v1/appliance-versions/' .
-                    $data->appliance_version_uuid . '/data'
+                    $request->appliance_version_uuid . '/data'
             ],
         ]);
     }
