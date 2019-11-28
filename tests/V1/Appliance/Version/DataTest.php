@@ -84,6 +84,16 @@ class DataTest extends TestCase
         )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
     }
 
+    public function testPatchIsAdminOnly()
+    {
+        $this->json(
+            'PATCH',
+            $this->getApplianceVersionDataUri() . '/test-key',
+            [],
+            self::HEADERS_PUBLIC
+        )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
+    }
+
     public function valueDataProvider()
     {
         return [

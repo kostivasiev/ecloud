@@ -88,4 +88,19 @@ class DataController extends Controller
             ['appliance_version_uuid', '=', $request->appliance_version_uuid],
         ])->firstOrFail()->delete();
     }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function update(Request $request)
+    {
+        return response()->json([
+            'data' => [],
+            'meta' => [
+                'location' => config('app.url') . '/v1/appliance-versions/' .
+                    $request->appliance_version_uuid . '/data'
+            ],
+        ]);
+    }
 }

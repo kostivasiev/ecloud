@@ -164,10 +164,10 @@ $router->group($baseRouteParameters, function () use ($router) {
             'appliance-versions/{appliance_version_uuid}/data',
             'Appliance\Version\DataController@create'
         );
-//        $router->patch(
-//            'appliance-versions/{appliance_version_uuid}/data/{key}',
-//            'Appliance\Version\DataController@update'
-//        );
+        $router->patch(
+            'appliance-versions/{appliance_version_uuid}/data/{key}',
+            'Appliance\Version\DataController@update'
+        );
         $router->delete(
             'appliance-versions/{appliance_version_uuid}/data/{key}',
             'Appliance\Version\DataController@delete'
