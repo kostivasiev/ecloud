@@ -37,7 +37,7 @@ class DataController extends Controller
                 'value' => Data::select('value')->where([
                     ['key', '=', $request->key],
                     ['appliance_version_uuid', '=', $request->appliance_version_uuid],
-                ])->firstOrFail()->value('value'),
+                ])->firstOrFail()->value,
             ],
             'meta' => [],
         ]);
