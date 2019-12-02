@@ -111,6 +111,16 @@ class DataTest extends TestCase
         )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
     }
 
+    public function testGetIsAdminOnly()
+    {
+        $this->json(
+            'GET',
+            $this->getApplianceVersionDataUri(),
+            [],
+            self::HEADERS_PUBLIC
+        )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
+    }
+
     public function valueDataProvider()
     {
         return [
@@ -305,7 +315,7 @@ class DataTest extends TestCase
             'GET',
             $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
             [],
-            self::HEADERS_PUBLIC
+            self::HEADERS_ADMIN
         )->seeStatusCode(Response::HTTP_OK)->seeJson([
             'data' => [
                 'value' => self::TEST_DATA['value'],
@@ -319,7 +329,7 @@ class DataTest extends TestCase
             'GET',
             $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
             [],
-            self::HEADERS_PUBLIC
+            self::HEADERS_ADMIN
         )->seeStatusCode(Response::HTTP_NOT_FOUND);
     }
 
@@ -330,7 +340,7 @@ class DataTest extends TestCase
             'GET',
             $this->getApplianceVersionDataUri(),
             [],
-            self::HEADERS_PUBLIC
+            self::HEADERS_ADMIN
         )->seeStatusCode(Response::HTTP_OK)->seeJson([
             'data' => [
                 self::TEST_DATA,

@@ -2,13 +2,17 @@
 
 namespace Tests\Appliances\Appliances;
 
+use App\Models\V1\Appliance;
 use App\Models\V1\AppliancePodAvailability;
+use App\Models\V1\ApplianceVersion;
 use App\Models\V1\Pod;
+use Illuminate\Http\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use Ramsey\Uuid\Uuid;
 
 use Tests\ApplianceTestCase;
+use Tests\V1\Appliance\Version\DataTest;
 
 class GetTest extends ApplianceTestCase
 {
@@ -149,5 +153,31 @@ class GetTest extends ApplianceTestCase
             ]);
     }
 
+    public function testApplianceData()
+    {
+        $appliance = factory(Appliance::class)->create();
+        $applianceVersion = factory(ApplianceVersion::class)->create([
+            'appliance_uuid' => $appliance->appliance_uuid,
+            'appliance_version_version' => 1,
+        ]);
+        $applianceVersionData = factory(Appliance\Version\Data::class)->create([
+            'appliance_version_uuid' => $applianceVersion->appliance_version_uuid,
+            'key' => 'key_value',
+            'value' => 'value_value',
+        ]);
 
+        $this->json(
+            'GET',
+            '/v1/appliances/' . $appliance->uuid . '/data',
+            [],
+            DataTest::HEADERS_ADMIN
+        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+            'data' => [
+                [
+                    'key' => $applianceVersionData->key,
+                    'value' => $applianceVersionData->value,
+                ]
+            ]
+        ]);
+    }
 }

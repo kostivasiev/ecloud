@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\ApplianceNotFoundException;
 use App\Exceptions\V1\InvalidJsonException;
 use App\Exceptions\V1\TemplateNotFoundException;
+use App\Models\V1\Appliance\Version\Data;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\Pod;
 use App\Rules\V1\IsValidUuid;
