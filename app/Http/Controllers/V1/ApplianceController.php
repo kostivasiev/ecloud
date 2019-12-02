@@ -234,6 +234,24 @@ class ApplianceController extends BaseController
         return $applianceVersionController->versionParameters($request, $applianceVersion->uuid);
     }
 
+    /**
+     * Return the data for the latest version of the appliance
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     */
+    public function latestVersionData(Request $request, $applianceId)
+    {
+        $appliance = static::getApplianceById($request, $applianceId);
+        return response()->json([
+            'data' => Data::select('key', 'value')->where([
+                ['appliance_version_uuid', '=', $appliance->getLatestVersion()->appliance_version_uuid],
+            ])->get()->all(),
+            'meta' => [],
+        ]);
+    }
+
 
     /**
      * Return the latest appliance version
