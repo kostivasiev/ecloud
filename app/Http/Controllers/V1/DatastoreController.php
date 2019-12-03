@@ -294,6 +294,7 @@ class DatastoreController extends BaseController
         $datastore->reseller_lun_reseller_id = $solution->resellerId();
         $datastore->reseller_lun_lun_type = $request->input('lun_type', 'DATA');
         $datastore->reseller_lun_status = Status::QUEUED;
+        $datastore->reseller_lun_ucs_site_id = $request->input('site_id');
         $datastore->save();
         $datastore->refresh();
 
