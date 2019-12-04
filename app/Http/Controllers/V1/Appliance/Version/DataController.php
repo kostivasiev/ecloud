@@ -73,7 +73,7 @@ class DataController extends Controller
             ],
             'meta' => [
                 'location' => config('app.url') . '/v1/appliance-versions/' .
-                    $request->appliance_version_uuid . '/data/' . $data->key
+                    $request->appliance_version_uuid . '/data/' . urlencode($data->key)
             ],
         ]);
     }
