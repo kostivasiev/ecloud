@@ -16,6 +16,37 @@ class DataController extends Controller
      * @param Request $request
      * @return Response
      */
+    public function index(Request $request)
+    {
+        return response()->json([
+            'data' => Data::select('key', 'value')->where([
+                ['appliance_version_uuid', '=', $request->appliance_version_uuid],
+            ])->get()->all(),
+            'meta' => [],
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function show(Request $request)
+    {
+        return response()->json([
+            'data' => [
+                'value' => Data::select('value')->where([
+                    ['key', '=', urldecode($request->key)],
+                    ['appliance_version_uuid', '=', $request->appliance_version_uuid],
+                ])->firstOrFail()->value,
+            ],
+            'meta' => [],
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
     public function create(Request $request)
     {
         if (empty($request->value)) {
@@ -29,7 +60,7 @@ class DataController extends Controller
             abort(Response::HTTP_CONFLICT, self::ERROR_DUPLICATE_KEY);
         }
 
-        $data = factory(Data::class)->create([
+        $data = Data::create([
             'key' => $request->key,
             'value' => $request->value,
             'appliance_version_uuid' => $request->appliance_version_uuid,
@@ -42,20 +73,43 @@ class DataController extends Controller
             ],
             'meta' => [
                 'location' => config('app.url') . '/v1/appliance-versions/' .
-                    $data->appliance_version_uuid . '/data'
+                    $request->appliance_version_uuid . '/data/' . urlencode($data->key)
             ],
         ]);
     }
 
     /**
      * @param Request $request
-     * @return Response
      */
     public function delete(Request $request)
     {
         Data::where([
-            ['key', '=', $request->key],
+            ['key', '=', urldecode($request->key)],
             ['appliance_version_uuid', '=', $request->appliance_version_uuid],
         ])->firstOrFail()->delete();
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function update(Request $request)
+    {
+        if (empty($request->value)) {
+            abort(Response::HTTP_BAD_REQUEST, self::ERROR_INVALID_VALUE);
+        }
+
+        $data = Data::firstOrNew([
+            'key' => urldecode($request->key),
+            'appliance_version_uuid' => $request->appliance_version_uuid,
+        ]);
+        $data->value = $request->value;
+        $data->save();
+        return response()->json([
+            'data' => [
+                'value' => $data->value,
+            ],
+            'meta' => [],
+        ]);
     }
 }
