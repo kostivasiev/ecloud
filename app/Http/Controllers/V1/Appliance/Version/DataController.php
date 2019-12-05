@@ -35,7 +35,7 @@ class DataController extends Controller
         return response()->json([
             'data' => [
                 'value' => Data::select('value')->where([
-                    ['key', '=', $request->key],
+                    ['key', '=', urldecode($request->key)],
                     ['appliance_version_uuid', '=', $request->appliance_version_uuid],
                 ])->firstOrFail()->value,
             ],
@@ -73,7 +73,7 @@ class DataController extends Controller
             ],
             'meta' => [
                 'location' => config('app.url') . '/v1/appliance-versions/' .
-                    $request->appliance_version_uuid . '/data'
+                    $request->appliance_version_uuid . '/data/' . urlencode($data->key)
             ],
         ]);
     }
@@ -84,7 +84,7 @@ class DataController extends Controller
     public function delete(Request $request)
     {
         Data::where([
-            ['key', '=', $request->key],
+            ['key', '=', urldecode($request->key)],
             ['appliance_version_uuid', '=', $request->appliance_version_uuid],
         ])->firstOrFail()->delete();
     }
@@ -100,7 +100,7 @@ class DataController extends Controller
         }
 
         $data = Data::updateOrCreate([
-            'key' => $request->key,
+            'key' => urldecode($request->key),
             'appliance_version_uuid' => $request->appliance_version_uuid
         ], [
             'value' => $request->value
