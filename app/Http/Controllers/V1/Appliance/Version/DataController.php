@@ -99,12 +99,13 @@ class DataController extends Controller
             abort(Response::HTTP_BAD_REQUEST, self::ERROR_INVALID_VALUE);
         }
 
-        $data = Data::firstOrNew([
+        $data = Data::updateOrCreate([
             'key' => urldecode($request->key),
-            'appliance_version_uuid' => $request->appliance_version_uuid,
+            'appliance_version_uuid' => $request->appliance_version_uuid
+        ], [
+            'value' => $request->value
         ]);
-        $data->value = $request->value;
-        $data->save();
+
         return response()->json([
             'data' => [
                 'value' => $data->value,
