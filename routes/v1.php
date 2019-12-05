@@ -150,7 +150,7 @@ $router->group($baseRouteParameters, function () use ($router) {
             'Appliance\Version\DataController@index'
         );
         $router->get(
-            'appliance-versions/{appliance_version_uuid}/data/{key}',
+            'appliance-versions/{appliance_version_uuid}/data/{ball}',
             'Appliance\Version\DataController@show'
         );
         $router->post(

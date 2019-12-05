@@ -35,7 +35,7 @@ class DataController extends Controller
         return response()->json([
             'data' => [
                 'value' => Data::select('value')->where([
-                    ['key', '=', $request->key],
+                    ['key', '=', urldecode($request->key)],
                     ['appliance_version_uuid', '=', $request->appliance_version_uuid],
                 ])->firstOrFail()->value,
             ],
@@ -84,7 +84,7 @@ class DataController extends Controller
     public function delete(Request $request)
     {
         Data::where([
-            ['key', '=', $request->key],
+            ['key', '=', urldecode($request->key)],
             ['appliance_version_uuid', '=', $request->appliance_version_uuid],
         ])->firstOrFail()->delete();
     }
@@ -100,7 +100,7 @@ class DataController extends Controller
         }
 
         $data = Data::firstOrNew([
-            'key' => $request->key,
+            'key' => urldecode($request->key),
             'appliance_version_uuid' => $request->appliance_version_uuid,
         ]);
         $data->value = $request->value;
