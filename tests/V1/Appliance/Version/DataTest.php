@@ -71,7 +71,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             self::TEST_DATA,
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeInDatabase(
+        )->seeStatusCode(Response::HTTP_CREATED)->seeInDatabase(
             'appliance_version_data',
             self::TEST_DATA + [
                 'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
@@ -126,7 +126,7 @@ class DataTest extends TestCase
         return [
             'valid_value_returns_OK' => [
                 'data' => self::TEST_DATA,
-                'responseCode' => Response::HTTP_OK,
+                'responseCode' => Response::HTTP_CREATED,
                 'databaseCheckMethod' => 'seeInDatabase',
             ],
             'invalid_value_returns_BAD_REQUEST' => [
@@ -168,7 +168,7 @@ class DataTest extends TestCase
     {
         return [
             'valid_appliance_version_uuid_returns_OK' => [
-                'responseCode' => Response::HTTP_OK,
+                'responseCode' => Response::HTTP_CREATED,
                 'useValidUuid' => true,
             ],
             'invalid_appliance_version_uuid_returns_NOT_FOUND' => [
@@ -199,7 +199,7 @@ class DataTest extends TestCase
             'appliance_active_and_public_returns_OK' => [
                 'active' => 'Yes',
                 'is_public' => 'Yes',
-                'responseCode' => Response::HTTP_OK,
+                'responseCode' => Response::HTTP_CREATED,
             ],
             'appliance_not_active_returns_NOT_FOUND' => [
                 'active' => 'No',
@@ -209,7 +209,7 @@ class DataTest extends TestCase
             'appliance_not_public_returns_NOT_FOUND' => [
                 'active' => 'Yes',
                 'is_public' => 'No',
-                'responseCode' => Response::HTTP_OK,
+                'responseCode' => Response::HTTP_CREATED,
             ],
         ];
     }
@@ -240,7 +240,7 @@ class DataTest extends TestCase
         return [
             'appliance_version_active_returns_OK' => [
                 'active' => 'Yes',
-                'responseCode' => Response::HTTP_OK,
+                'responseCode' => Response::HTTP_CREATED,
             ],
             'appliance_version_not_active_returns_NOT_FOUND' => [
                 'active' => 'No',
@@ -358,7 +358,11 @@ class DataTest extends TestCase
                 'value' => 'new_value',
             ],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_NO_CONTENT)->seeInDatabase(
+        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+            'data' => [
+                'value' => 'new_value',
+            ]
+        ])->seeInDatabase(
             'appliance_version_data',
             [
                 'key' => self::TEST_DATA['key'],
