@@ -110,9 +110,12 @@ class DataController extends Controller
         $data->save();
         return response()->json([
             'data' => [
-                'value' => $data->value,
+                'key' => $data->key,
             ],
-            'meta' => [],
+            'meta' => [
+                'location' => config('app.url') . '/v1/appliance-versions/' .
+                    $request->appliance_version_uuid . '/data/' . urlencode($data->key)
+            ],
         ]);
     }
 }
