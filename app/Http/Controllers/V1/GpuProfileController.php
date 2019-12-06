@@ -34,7 +34,11 @@ class GpuProfileController extends BaseController
 
         return $this->respondCollection(
             $request,
-            $items
+            $items,
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : GpuProfile::VISIBLE_SCOPE_RESELLER
         );
     }
 
@@ -47,7 +51,14 @@ class GpuProfileController extends BaseController
      */
     public function show(Request $request, $id)
     {
-        return $this->respondItem($request, static::getById($request, $id));
+        return $this->respondItem(
+            $request,
+            static::getById($request, $id),
+            200,
+            null,
+            [],
+            ($this->isAdmin) ? null : GpuProfile::VISIBLE_SCOPE_RESELLER
+        );
     }
 
     /**
