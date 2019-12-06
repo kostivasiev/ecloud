@@ -360,7 +360,7 @@ class DataTest extends TestCase
             self::HEADERS_ADMIN
         )->seeStatusCode(Response::HTTP_OK)->seeJson([
             'data' => [
-                'value' => 'new_value',
+                'key' => self::TEST_DATA['key'],
             ]
         ])->seeInDatabase(
             'appliance_version_data',
