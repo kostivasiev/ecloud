@@ -80,6 +80,7 @@ class DataController extends Controller
 
     /**
      * @param Request $request
+     * @return Response
      */
     public function delete(Request $request)
     {
@@ -87,6 +88,7 @@ class DataController extends Controller
             ['key', '=', urldecode($request->key)],
             ['appliance_version_uuid', '=', $request->appliance_version_uuid],
         ])->firstOrFail()->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -99,18 +101,12 @@ class DataController extends Controller
             abort(Response::HTTP_BAD_REQUEST, self::ERROR_INVALID_VALUE);
         }
 
-        $data = Data::updateOrCreate([
-            'key' => urldecode($request->key),
-            'appliance_version_uuid' => $request->appliance_version_uuid
-        ], [
-            'value' => $request->value
-        ]);
-
-        return response()->json([
-            'data' => [
-                'value' => $data->value,
-            ],
-            'meta' => [],
-        ]);
+        $data = Data::where([
+            ['key', '=', $request->key],
+            ['appliance_version_uuid', '=', $request->appliance_version_uuid],
+        ])->firstOrFail();
+        $data->value = $request->value;
+        $data->save();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

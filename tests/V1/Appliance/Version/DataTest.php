@@ -286,7 +286,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/test-key',
             [],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK);
+        )->seeStatusCode(Response::HTTP_NO_CONTENT);
 
         $this->notSeeInDatabase(
             'appliance_version_data',
@@ -358,36 +358,7 @@ class DataTest extends TestCase
                 'value' => 'new_value',
             ],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeJson([
-            'data' => [
-                'value' => 'new_value',
-            ]
-        ])->seeInDatabase(
-            'appliance_version_data',
-            [
-                'key' => self::TEST_DATA['key'],
-                'value' => 'new_value',
-                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
-                'deleted_at' => null,
-            ],
-            'ecloud'
-        );
-    }
-
-    public function testPatchNewKey()
-    {
-        $this->json(
-            'PATCH',
-            $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
-            [
-                'value' => 'new_value',
-            ],
-            self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeJson([
-            'data' => [
-                'value' => 'new_value',
-            ]
-        ])->seeInDatabase(
+        )->seeStatusCode(Response::HTTP_NO_CONTENT)->seeInDatabase(
             'appliance_version_data',
             [
                 'key' => self::TEST_DATA['key'],
