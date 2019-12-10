@@ -409,62 +409,24 @@ class DatastoreController extends BaseController
     {
         $datastore = static::getDatastoreById($request, $datastoreId);
 
-        // Work out the volume set for the volume.
-        $query = VolumeSetController::getQuery($request);
-        $query->where('ucs_reseller_id', '=', $datastore->solution->getKey());
-
-        if ($query->count() > 0) {
-            $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $datastore]]);
-
-            foreach ($query->get() as $volumeSet) {
-                $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
-
-                if (!$artisanResponse) {
-                    $error = $artisan->getLastError();
-                    if (strpos($error, 'Set does not exist') !== false) {
-                        continue;
-                    }
-                    Log::error(
-                        'Failed to get volume set details from the SAN',
-                        [
-                            'datastore_id' => $datastoreId,
-                            'volume_set' => $volumeSet->name,
-                            'SAN error message' => $error
-                        ]
-                    );
-                    throw new ServiceUnavailableException('Failed to schedule datastore deletion');
-                }
-
-                if (!empty($artisanResponse->volumes) && in_array($datastore->reseller_lun_name, $artisanResponse->volumes)) {
-                    try {
-                        $automationRequestId = $intapiService->automationRequest(
-                            'delete_lun',
-                            'reseller_lun',
-                            $datastore->getKey(),
-                            ['volume_set_id' => $volumeSet->getKey()],
-                            'ecloud_ucs_' . $datastore->pod->getKey(),
-                            $request->user->applicationId
-                        );
-                    } catch (IntapiServiceException $exception) {
-                        throw new ServiceUnavailableException('Failed to scheduele datastore for deletion', null, 502);
-                    }
-
-                    $headers = [
-                        'X-AutomationRequestId' => $automationRequestId
-                    ];
-
-                    return $this->respondEmpty(202, $headers);
-                }
-            }
+        try {
+            $automationRequestId = $intapiService->automationRequest(
+                'delete_lun',
+                'reseller_lun',
+                $datastore->getKey(),
+                null,
+                'ecloud_ucs_' . $datastore->pod->getKey(),
+                $request->user->applicationId
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Failed to scheduele datastore for deletion', null, 502);
         }
 
-        Log::error(
-            'Failed to find volume set for datastore',
-            [
-                'datastore_id' => $datastoreId
-            ]
-        );
-        throw new ServiceUnavailableException('Failed to schedule datastore deletion');
+        $headers = [
+            'X-AutomationRequestId' => $automationRequestId
+        ];
+
+        return $this->respondEmpty(202, $headers);
     }
 
     /**
