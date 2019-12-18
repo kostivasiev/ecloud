@@ -599,6 +599,8 @@ class VirtualMachineController extends BaseController
         $post_data['ram_gb'] = $request->input('ram');
 
         // set storage
+        $post_data['reseller_lun_id'] = $datastore->getKey();
+
         if ($request->has('hdd')) {
             $post_data['hdd_gb'] = $request->input('hdd');
         } elseif ($request->has('hdd_disks')) {
@@ -608,10 +610,6 @@ class VirtualMachineController extends BaseController
                 $post_data['hdd_gb'][$disk['name']] = $disk['capacity'];
             }
             $post_data['hdd_gb'] = serialize($post_data['hdd_gb']);
-        }
-
-        if ($request->has('datastore_id')) {
-            $post_data['reseller_lun_id'] = $request->input('datastore_id');
         }
 
         if ($request->has('hdd_iops') && in_array($request->input('environment'), ['Public', 'Burst'])) {
