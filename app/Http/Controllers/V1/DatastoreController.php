@@ -16,6 +16,7 @@ use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
 use App\Traits\V1\SanitiseRequestData;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\ForbiddenException;
@@ -96,7 +97,14 @@ class DatastoreController extends BaseController
         $solution = SolutionController::getSolutionById($request, $solutionId);
         $datastore = Datastore::getDefault($solution->getKey(), $solution->ucs_reseller_type);
 
-        return redirect('/v1//datastores/' . $datastore->getKey(), 302);
+        return new Response([
+            'data' => [
+                'id' => $datastore->getKey(),
+            ],
+            'meta' => [
+                'location' => config('app.url') . '/v1/datastores/' . $datastore->getKey()
+            ],
+        ], 200);
     }
 
 
