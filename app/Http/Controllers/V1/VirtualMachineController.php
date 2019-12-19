@@ -1243,9 +1243,9 @@ class VirtualMachineController extends BaseController
             case 'Public':
                 if ($virtualMachine->isContract()) {
                     //Determine contract specific limits
-                    $contractCpuTrigger = $virtualMachine->trigger('ecloud_cpu');
-                    $contractRamTrigger = $virtualMachine->trigger('ecloud_ram');
-                    $contractHddTrigger = $virtualMachine->trigger('ecloud_hdd');
+                    $contractCpuTrigger = $virtualMachine->trigger('cpu');
+                    $contractRamTrigger = $virtualMachine->trigger('ram');
+                    $contractHddTrigger = $virtualMachine->trigger('hdd');
 
                     $minCpu = $this->extractContractTriggerCPUValue($contractCpuTrigger);
                     $minRam = $this->extractContractTriggerRAMValue($contractRamTrigger);
