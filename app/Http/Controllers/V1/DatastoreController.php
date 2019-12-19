@@ -82,6 +82,23 @@ class DatastoreController extends BaseController
         );
     }
 
+    /**
+     * Get the "default" aka "auto" datastore for a solution
+     *
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\http\Response
+     * @throws DatastoreNotFoundException
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     */
+    public function getSolutionDefault(Request $request, $solutionId)
+    {
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+        $datastore = Datastore::getDefault($solution->getKey(), $solution->ucs_reseller_type);
+
+        return redirect('/v1//datastores/' . $datastore->getKey(), 302);
+    }
+
 
     /**
      * Update IOPS on a datastore's volume set
