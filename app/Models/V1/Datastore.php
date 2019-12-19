@@ -410,7 +410,7 @@ class Datastore extends Model implements Filterable, Sortable
                             continue;
                         }
 
-                        if ($datastore->available > $defaultDatastore->available) {
+                        if ($datastore->usage->available > $defaultDatastore->usage->available) {
                             $defaultDatastore = $datastore;
                         }
                     }
