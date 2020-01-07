@@ -531,7 +531,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
             ->where('trigger_reseller_id', '=', $this->attributes['servers_reseller_id']);
 
         if (!empty($category)) {
-            $hasMany->where('trigger_description', 'like', 'ecloud vm%' . $category . ':%');
+            $hasMany->where('trigger_description', 'like', '% ' . $category . ': %');
         }
 
         return $hasMany->first();

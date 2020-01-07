@@ -172,6 +172,14 @@ class CreateInitialTables extends Migration
             $table->string('metadata_createdby');
             $table->integer('metadata_createdby_id');
         });
+
+        Schema::create('triggers', function (Blueprint $table) {
+            $table->increments('trigger_id');
+            $table->integer('trigger_reseller_id');
+            $table->string('trigger_description');
+            $table->integer('trigger_reference_id');
+            $table->string('trigger_reference_name');
+        });
     }
 
     /**
@@ -191,5 +199,6 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('server_ip_address');
         Schema::dropIfExists('server_subtype');
         Schema::dropIfExists('metadata');
+        Schema::dropIfExists('triggers');
     }
 }
