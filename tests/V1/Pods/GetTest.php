@@ -111,8 +111,7 @@ class GetTest extends TestCase
     public function testVclVceServerIdAdmin()
     {
         $pod = factory(Pod::class, 1)->create([
-            'ucs_datacentre_id' => 123,
-            'ucs_datacentre_reseller_id' => 999,
+            'ucs_datacentre_id' => 123
         ]);
 
         $this->json('GET', '/v1/pods/123', [
@@ -132,8 +131,7 @@ class GetTest extends TestCase
     public function testVclVceServerIdNotAdmin()
     {
         $pod = factory(Pod::class, 1)->create([
-            'ucs_datacentre_id' => 123,
-            'ucs_datacentre_reseller_id' => 999,
+            'ucs_datacentre_id' => 123
         ]);
 
         $this->json('GET', '/v1/pods/123', [
