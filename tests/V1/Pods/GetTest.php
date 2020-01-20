@@ -116,10 +116,10 @@ class GetTest extends TestCase
             'ucs_datacentre_vce_server_id' => 54321,
         ]);
 
-        $this->json('GET', '/v1/pods/123', [
+        $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ], $this->validReadHeaders)
+        ])
             ->seeStatusCode(200)
             ->seeJson([
                 'vce_server_id' => $pod->vce_server_id,
@@ -138,10 +138,10 @@ class GetTest extends TestCase
             'ucs_datacentre_vce_server_id' => 54321,
         ]);
 
-        $this->json('GET', '/v1/pods/123', [
+        $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ], $this->validReadHeaders)
+        ])
             ->seeStatusCode(200)
             ->dontSeeJson([
                 'vce_server_id' => $pod->vce_server_id,
