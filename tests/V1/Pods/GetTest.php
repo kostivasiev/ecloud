@@ -104,4 +104,46 @@ class GetTest extends TestCase
 
         $this->assertResponseStatus(404);
     }
+
+    /**
+     * Test GET pod VCL / VCE server id's (admin)
+     */
+    public function testVclVceServerIdAdmin()
+    {
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_reseller_id' => 999,
+        ]);
+
+        $this->json('GET', '/v1/pods/123', [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ], $this->validReadHeaders)
+            ->seeStatusCode(200)
+            ->seeJson([
+                'vce_server_id' => $pod->vce_server_id,
+                'vcl_server_id' => $pod->vcl_server_id
+            ]);
+    }
+
+    /**
+     * Test GET pod VCL / VCE server id's (not admin)
+     */
+    public function testVclVceServerIdNotAdmin()
+    {
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_reseller_id' => 999,
+        ]);
+
+        $this->json('GET', '/v1/pods/123', [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ], $this->validReadHeaders)
+            ->seeStatusCode(200)
+            ->dontSeeJson([
+                'vce_server_id' => $pod->vce_server_id,
+                'vcl_server_id' => $pod->vcl_server_id
+            ]);
+    }
 }
