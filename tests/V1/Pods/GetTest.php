@@ -114,7 +114,7 @@ class GetTest extends TestCase
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_vcl_server_id' => 12345,
             'ucs_datacentre_vce_server_id' => 54321,
-        ]);
+        ])->first();
 
         $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '0-0',
@@ -122,8 +122,8 @@ class GetTest extends TestCase
         ])
             ->seeStatusCode(200)
             ->seeJson([
-                'vce_server_id' => $pod->vce_server_id,
-                'vcl_server_id' => $pod->vcl_server_id
+                'vce_server_id' => $pod->ucs_datacentre_vce_server_id,
+                'vcl_server_id' => $pod->ucs_datacentre_vcl_server_id
             ]);
     }
 
@@ -136,7 +136,7 @@ class GetTest extends TestCase
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_vcl_server_id' => 12345,
             'ucs_datacentre_vce_server_id' => 54321,
-        ]);
+        ])->first();
 
         $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '1-0',
@@ -144,8 +144,8 @@ class GetTest extends TestCase
         ])
             ->seeStatusCode(200)
             ->dontSeeJson([
-                'vce_server_id' => $pod->vce_server_id,
-                'vcl_server_id' => $pod->vcl_server_id
+                'vce_server_id' => $pod->ucs_datacentre_vce_server_id,
+                'vcl_server_id' => $pod->ucs_datacentre_vcl_server_id
             ]);
     }
 }
