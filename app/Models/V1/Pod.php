@@ -133,6 +133,8 @@ class Pod extends Model implements Filterable, Sortable
         // admin only properties
         return array_merge($properties, [
             IntProperty::create('ucs_datacentre_datacentre_id', 'datacentre_id'),
+            IntProperty::create('ucs_datacentre_vce_server_id', 'vce_server_id'),
+            IntProperty::create('ucs_datacentre_vcl_server_id', 'vcl_server_id'),
         ]);
     }
 

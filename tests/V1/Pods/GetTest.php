@@ -104,4 +104,48 @@ class GetTest extends TestCase
 
         $this->assertResponseStatus(404);
     }
+
+    /**
+     * Test GET pod VCL / VCE server id's (admin)
+     */
+    public function testVclVceServerIdAdmin()
+    {
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_vcl_server_id' => 12345,
+            'ucs_datacentre_vce_server_id' => 54321,
+        ])->first();
+
+        $this->json('GET', '/v1/pods/123', [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])
+            ->seeStatusCode(200)
+            ->seeJson([
+                'vce_server_id' => $pod->ucs_datacentre_vce_server_id,
+                'vcl_server_id' => $pod->ucs_datacentre_vcl_server_id
+            ]);
+    }
+
+    /**
+     * Test GET pod VCL / VCE server id's (not admin)
+     */
+    public function testVclVceServerIdNotAdmin()
+    {
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_vcl_server_id' => 12345,
+            'ucs_datacentre_vce_server_id' => 54321,
+        ])->first();
+
+        $this->json('GET', '/v1/pods/123', [], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ])
+            ->seeStatusCode(200)
+            ->dontSeeJson([
+                'vce_server_id' => $pod->ucs_datacentre_vce_server_id,
+                'vcl_server_id' => $pod->ucs_datacentre_vcl_server_id
+            ]);
+    }
 }
