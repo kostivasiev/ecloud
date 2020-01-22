@@ -54,6 +54,8 @@ use Mustache_Engine;
 
 class VirtualMachineController extends BaseController
 {
+    const HDD_MAX_SIZE_GB = 2500;
+
     /**
      * List all VM's
      * @param Request $request
@@ -145,9 +147,16 @@ class VirtualMachineController extends BaseController
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
-            'hdd' => ['required_without:hdd_disks', 'integer'],
-            'hdd_disks' => ['required_without:hdd', 'array', "max:".VirtualMachine::MAX_HDD_COUNT.""],
-
+            'hdd' => [
+                'required_without:hdd_disks',
+                'integer',
+                'max:' . static::HDD_MAX_SIZE_GB,
+            ],
+            'hdd_disks' => [
+                'required_without:hdd',
+                'array',
+                "max:".VirtualMachine::MAX_HDD_COUNT."",
+            ],
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
             'site_id' => ['nullable', 'integer'],
@@ -275,6 +284,7 @@ class VirtualMachineController extends BaseController
                         'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
                 }
+                $maxHdd = min(static::HDD_MAX_SIZE_GB, $maxHdd);
 
                 if ($solution->isMultiSite()) {
                     $rules['site_id'] = ['required', 'integer'];
@@ -1320,6 +1330,12 @@ class VirtualMachineController extends BaseController
             $newDisksCount = 0;
             foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object) $hdd;
+
+                if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
+                    throw new Exceptions\BadRequestException(
+                        'HDD with UUID ' . $hdd->uuid . ' cannot exceed '. static::HDD_MAX_SIZE_GB . 'GB'
+                    );
+                }
 
                 $isExistingDisk = false;
                 if (isset($hdd->uuid)) {
