@@ -54,6 +54,8 @@ use Mustache_Engine;
 
 class VirtualMachineController extends BaseController
 {
+    const HDD_MAX_SIZE_GB = 2500;
+
     /**
      * List all VM's
      * @param Request $request
@@ -145,9 +147,15 @@ class VirtualMachineController extends BaseController
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
-            'hdd' => ['required_without:hdd_disks', 'integer'],
-            'hdd_disks' => ['required_without:hdd', 'array', "max:".VirtualMachine::MAX_HDD_COUNT.""],
-
+            'hdd' => [
+                'required_without:hdd_disks',
+                'integer',
+            ],
+            'hdd_disks' => [
+                'required_without:hdd',
+                'array',
+                "max:".VirtualMachine::MAX_HDD_COUNT."",
+            ],
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
             'site_id' => ['nullable', 'integer'],
@@ -160,6 +168,15 @@ class VirtualMachineController extends BaseController
 
             'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()]
         ];
+
+
+        if (!$request->user->isAdministrator) {
+            $rules['hdd'] = [
+                'required_without:hdd_disks',
+                'integer',
+                'max:' . static::HDD_MAX_SIZE_GB,
+            ];
+        }
 
         // Validate role is allowed
         if ($request->has('role')) {
@@ -274,6 +291,10 @@ class VirtualMachineController extends BaseController
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
                         'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
+                }
+
+                if (!$request->user->isAdministrator) {
+                    $maxHdd = min(static::HDD_MAX_SIZE_GB, $maxHdd);
                 }
 
                 if ($solution->isMultiSite()) {
@@ -1320,6 +1341,14 @@ class VirtualMachineController extends BaseController
             $newDisksCount = 0;
             foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object) $hdd;
+
+                if (!$request->user->isAdministrator) {
+                    if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
+                        throw new Exceptions\BadRequestException(
+                            'HDD with UUID ' . $hdd->uuid . ' cannot exceed ' . static::HDD_MAX_SIZE_GB . 'GB'
+                        );
+                    }
+                }
 
                 $isExistingDisk = false;
                 if (isset($hdd->uuid)) {
