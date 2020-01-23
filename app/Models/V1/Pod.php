@@ -180,7 +180,7 @@ class Pod extends Model implements Filterable, Sortable
         );
 
         if ($sans->count() < 1) {
-            throw new DatabaseException('No SAN database records associated with this Pod');
+            throw new DatabaseException('No SAN records associated with this Pod');
         }
 
         return $sans;
