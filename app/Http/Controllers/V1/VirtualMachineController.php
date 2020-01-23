@@ -150,7 +150,6 @@ class VirtualMachineController extends BaseController
             'hdd' => [
                 'required_without:hdd_disks',
                 'integer',
-                'max:' . static::HDD_MAX_SIZE_GB,
             ],
             'hdd_disks' => [
                 'required_without:hdd',
@@ -169,6 +168,15 @@ class VirtualMachineController extends BaseController
 
             'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()]
         ];
+
+
+        if (!$request->user->isAdministrator) {
+            $rules['hdd'] = [
+                'required_without:hdd_disks',
+                'integer',
+                'max:' . static::HDD_MAX_SIZE_GB,
+            ];
+        }
 
         // Validate role is allowed
         if ($request->has('role')) {
@@ -284,7 +292,10 @@ class VirtualMachineController extends BaseController
                         'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
                 }
-                $maxHdd = min(static::HDD_MAX_SIZE_GB, $maxHdd);
+
+                if (!$request->user->isAdministrator) {
+                    $maxHdd = min(static::HDD_MAX_SIZE_GB, $maxHdd);
+                }
 
                 if ($solution->isMultiSite()) {
                     $rules['site_id'] = ['required', 'integer'];
@@ -1331,10 +1342,12 @@ class VirtualMachineController extends BaseController
             foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object) $hdd;
 
-                if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
-                    throw new Exceptions\BadRequestException(
-                        'HDD with UUID ' . $hdd->uuid . ' cannot exceed '. static::HDD_MAX_SIZE_GB . 'GB'
-                    );
+                if (!$request->user->isAdministrator) {
+                    if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
+                        throw new Exceptions\BadRequestException(
+                            'HDD with UUID ' . $hdd->uuid . ' cannot exceed ' . static::HDD_MAX_SIZE_GB . 'GB'
+                        );
+                    }
                 }
 
                 $isExistingDisk = false;
