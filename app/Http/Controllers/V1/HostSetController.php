@@ -8,6 +8,7 @@ use App\Models\V1\Solution;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Http\Request;
+use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -60,6 +61,7 @@ class HostSetController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws DatabaseException
      */
     public function create(Request $request)
     {
@@ -98,6 +100,7 @@ class HostSetController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\HostNotFoundException
+     * @throws DatabaseException
      */
     public function addHost(Request $request, $hostSetId)
     {
@@ -136,6 +139,7 @@ class HostSetController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\HostNotFoundException
+     * @throws DatabaseException
      */
     public function removeHost(Request $request, $hostSetId, $hostId)
     {

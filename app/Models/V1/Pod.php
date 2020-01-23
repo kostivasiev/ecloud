@@ -179,7 +179,7 @@ class Pod extends Model implements Filterable, Sortable
             'server_id' // ucs_storage.server_id
         );
 
-        if ($sans->count() < 2) {
+        if ($sans->count() < 1) {
             throw new DatabaseException('No SAN database records associated with this Pod');
         }
 
