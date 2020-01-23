@@ -9,6 +9,7 @@ use App\Exceptions\V1\ServiceUnavailableException;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
 use UKFast\Api\Exceptions\BadRequestException;
+use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -86,6 +87,7 @@ class HostController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws BadRequestException
      * @throws HostNotFoundException
+     * @throws DatabaseException
      */
     public function createHost(Request $request, $hostId)
     {

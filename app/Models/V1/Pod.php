@@ -7,6 +7,7 @@ use App\Services\Kingpin\V1\KingpinService;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Support\Facades\Log;
+use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -165,10 +166,11 @@ class Pod extends Model implements Filterable, Sortable
      * Has-many relationship through ucs_storage mapping table
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * @throws DatabaseException
      */
     public function sans()
     {
-        return $this->hasManyThrough(
+        $sans = $this->hasManyThrough(
             San::class,
             Storage::class,
             'ucs_datacentre_id', // Foreign key on ucs_storage table
@@ -176,6 +178,12 @@ class Pod extends Model implements Filterable, Sortable
             'ucs_datacentre_id',
             'server_id' // ucs_storage.server_id
         );
+
+        if ($sans->count() < 2) {
+            throw new DatabaseException('No SAN database records associated with this Pod');
+        }
+
+        return $sans;
     }
 
 
