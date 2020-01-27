@@ -10,7 +10,6 @@ use App\Exceptions\V1\ServiceUnavailableException;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
 use UKFast\Api\Exceptions\BadRequestException;
-use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use UKFast\Api\Resource\Traits\ResponseHelper;
