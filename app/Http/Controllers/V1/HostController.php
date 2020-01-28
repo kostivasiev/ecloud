@@ -185,6 +185,7 @@ class HostController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws BadRequestException
      * @throws HostNotFoundException
+     * @throws SanNotFoundException
      */
     public function deleteHost(Request $request, $hostId)
     {
@@ -196,6 +197,11 @@ class HostController extends BaseController
 
         // Loop over all the sans for the solutions pod and delete the host on all SANs
         $solution = $host->solution;
+
+        if ($solution->pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are found on the solution\'s pod');
+        }
+
         $solution->pod->sans->each(function ($san) use ($host, $solution) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
