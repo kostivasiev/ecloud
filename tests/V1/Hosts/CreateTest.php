@@ -31,14 +31,14 @@ class CreateTest extends TestCase
 
         $solution = factory(Solution::class, 1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
-        ])->first(); //pod_id
+        ])->first(); 
 
         $this->assertEquals(0, $solution->pod->sans->count());
 
         // Add a SAN mapped to the solution
         $storage = factory(Storage::class, 1)->create([
             'ucs_datacentre_id' => $pod->ucs_datacentre_id
-        ])->first(); //pod_id
+        ])->first();
 
         $this->assertEquals(1, $solution->pod->sans->count());
     }
