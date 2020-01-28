@@ -133,19 +133,41 @@ class GetTest extends TestCase
     public function testVclVceServerIdNotAdmin()
     {
         $pod = factory(Pod::class, 1)->create([
-            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_id'            => 123,
             'ucs_datacentre_vcl_server_id' => 12345,
             'ucs_datacentre_vce_server_id' => 54321,
         ])->first();
 
         $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.read',
+            'X-consumer-groups'    => 'ecloud.read',
         ])
             ->seeStatusCode(200)
             ->dontSeeJson([
                 'vce_server_id' => $pod->ucs_datacentre_vce_server_id,
                 'vcl_server_id' => $pod->ucs_datacentre_vcl_server_id
             ]);
+    }
+
+    public function testFilteringCollectionByService()
+    {
+        factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_public_enabled' => true,
+        ]);
+
+        factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 321,
+            'ucs_datacentre_public_enabled' => false,
+        ]);
+
+        $this->get('/v1/pods?services.public:eq=true', [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(200) && $this->seeJson([
+            'total' => 1,
+        ]);
     }
 }
