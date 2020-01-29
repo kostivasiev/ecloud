@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\KingpinException;
+use App\Exceptions\V1\SanNotFoundException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
@@ -86,6 +87,7 @@ class HostController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws BadRequestException
      * @throws HostNotFoundException
+     * @throws SanNotFoundException
      */
     public function createHost(Request $request, $hostId)
     {
@@ -100,6 +102,11 @@ class HostController extends BaseController
         // Loop over all the sans for the solutions pod and create the host on all sans
         $hostInternalName = null;
         $solution = $host->solution;
+
+        if ($solution->pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are found on the solution\'s pod');
+        }
+
         $solution->pod->sans->each(function ($san) use ($host, $solution, $fcwwns, &$hostInternalName) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
@@ -178,6 +185,7 @@ class HostController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws BadRequestException
      * @throws HostNotFoundException
+     * @throws SanNotFoundException
      */
     public function deleteHost(Request $request, $hostId)
     {
@@ -189,6 +197,11 @@ class HostController extends BaseController
 
         // Loop over all the sans for the solutions pod and delete the host on all SANs
         $solution = $host->solution;
+
+        if ($solution->pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are found on the solution\'s pod');
+        }
+
         $solution->pod->sans->each(function ($san) use ($host, $solution) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 

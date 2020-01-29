@@ -17,6 +17,7 @@ use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
+use App\Models\V1\San;
 
 class Pod extends Model implements Filterable, Sortable
 {

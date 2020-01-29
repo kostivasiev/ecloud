@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ArtisanException;
+use App\Exceptions\V1\SanNotFoundException;
 use App\Models\V1\HostSet;
 use App\Models\V1\Solution;
 use App\Rules\V1\IsValidUuid;
@@ -60,6 +61,8 @@ class HostSetController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws SanNotFoundException
      */
     public function create(Request $request)
     {
@@ -70,6 +73,11 @@ class HostSetController extends BaseController
         $identifier = $this->getNextHostSetIdentifier($solution);
 
         $hostSetName = '';
+
+        if ($solution->pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are available on the solution\'s pod');
+        }
+
         $solution->pod->sans->each(function ($san) use ($solution, $identifier, &$hostSetName) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
@@ -98,6 +106,8 @@ class HostSetController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\HostNotFoundException
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws SanNotFoundException
      */
     public function addHost(Request $request, $hostSetId)
     {
@@ -115,6 +125,10 @@ class HostSetController extends BaseController
         }
 
         $solution = $host->solution;
+        if ($solution->pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are available on the solution\'s pod');
+        }
+
         $solution->pod->sans->each(function ($san) use ($solution, $hostSet, $host) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 
@@ -136,6 +150,8 @@ class HostSetController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\HostNotFoundException
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws SanNotFoundException
      */
     public function removeHost(Request $request, $hostSetId, $hostId)
     {
@@ -154,6 +170,11 @@ class HostSetController extends BaseController
             throw new UnprocessableEntityException('Host is not mapped to a SAN entity');
         }
         $solution = $host->solution;
+
+        if ($solution->pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are found on the solution\'s pod');
+        }
+
         $solution->pod->sans->each(function ($san) use ($solution, $hostSet, $host) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
 

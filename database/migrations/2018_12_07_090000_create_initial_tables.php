@@ -47,6 +47,7 @@ class CreateInitialTables extends Migration
             $table->integer('ucs_node_datacentre_id');
             $table->integer('ucs_node_specification_id');
             $table->string('ucs_node_status');
+            $table->string('ucs_node_internal_name')->default('');
         });
 
         Schema::create('ucs_specification', function (Blueprint $table) {
