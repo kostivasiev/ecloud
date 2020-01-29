@@ -14,11 +14,6 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /**
      * Test for creating a hostset with no SAN mapped to the solution
      * @return void
@@ -31,7 +26,7 @@ class CreateTest extends TestCase
             'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
-        $res = $this->json('POST', '/v1/hostsets', [
+        $this->json('POST', '/v1/hostsets', [
             'solution_id' => $solution->getKey()
         ], [
             'X-consumer-custom-id' => '0-0',
@@ -52,14 +47,14 @@ class CreateTest extends TestCase
 
         $solution = factory(Solution::class, 1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
-        ])->first(); //pod_id
+        ])->first();
 
         $san = factory(San::class, 1)->create([])->first();
 
         factory(Storage::class, 1)->create([
             'ucs_datacentre_id' => $pod->getKey(),
             'server_id' => $san->getKey()
-        ])->first(); //pod_id
+        ]);
 
         // This won't complete, but we can check that it's not throwing 'san not found'
         $this->json('POST', '/v1/hostsets', [
