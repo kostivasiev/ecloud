@@ -12,12 +12,7 @@ use App\Models\V1\Pod;
 class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
+    
     /**
      * Test for deleting a host with no SAN mapped to the solution
      * @return void
