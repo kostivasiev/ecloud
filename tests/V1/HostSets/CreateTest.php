@@ -57,12 +57,14 @@ class CreateTest extends TestCase
         ]);
 
         // This won't complete, but we can check that it's not throwing 'san not found'
-        $this->json('POST', '/v1/hostsets', [
+        $response = $this->json('POST', '/v1/hostsets', [
             'solution_id' => $solution->getKey()
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeStatusCode(503);
+        ]);
+
+        $this->assertNotEquals(404, $response->response->getStatusCode());
     }
 }
 
