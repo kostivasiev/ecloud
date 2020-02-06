@@ -44,16 +44,19 @@ class VolumesTest extends TestCase
             }));
         });
 
-        $this->json('GET', '/v1/volumesets/' . $volumeSet->uuid . '/volumes', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
-                'data' => [
-                    'volumes' => [
-                        'myMockVolume',
-                    ]
-                ],
-                'meta' => [],
-            ]);
+        $this->json(
+            'GET',
+            '/v1/volumesets/' . $volumeSet->uuid . '/volumes',
+            [],
+            $this->validWriteHeaders
+        )->seeJson([
+            'data' => [
+                'volumes' => [
+                    'myMockVolume',
+                ]
+            ],
+            'meta' => [],
+        ])->seeStatusCode(200);
     }
 
     public function testSameVolumeSetFoundOnManySans()
