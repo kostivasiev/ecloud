@@ -389,7 +389,7 @@ class VolumeSetController extends BaseController
     {
         $volumeSet = VolumeSet::find($volumeSetId);
         if (!$volumeSet) {
-            return Response::create(null,404);
+            return Response::create(null, 404);
         }
 
         $sanVolumes = $volumeSet->volumes();
