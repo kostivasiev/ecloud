@@ -13,6 +13,7 @@ use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
@@ -383,30 +384,31 @@ class VolumeSetController extends BaseController
     {
         $volumeSet = VolumeSet::find($volumeSetId);
         $solution = $volumeSet->solution;
-        $solution->pod->sans->each(function ($san) use ($solution, $volumeSet) {
+        $volumes = [];
+        $volumeSetName = $volumeSet->name;
+        $solution->pod->sans->each(function ($san) use ($solution, $volumeSetName, &$volumes) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
-            $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
-            dd($artisanResponse);
-        });
-
-        return;
-        $volumeSets = VolumeSet::all()->reject(function ($volumeSet) use ($volumeSetId, $resellerId) {
-            return ($volumeSet->uuid !== $volumeSetId) || ($resellerId !== 0 && $volumeSet->ucs_reseller_id !== $resellerId);
-        });
-        $volumeSet->solution()->id;
-
-        //$artisan = app()->make(ArtisanService::class);
-        foreach ($volumeSets as $volumeSet) {
-            var_dump($volumeSet);
-            die();
-
-            $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
-            foreach ($artisanResponse->volumes as $volume) {
-                dd($volume);
+            $artisanResponse = $artisan->getVolumeSet($volumeSetName);
+            if (!$artisanResponse) {
+                Log::error($artisan->getLastError());
+                return;
             }
+            $volumes[] = $artisanResponse->volumes ?? null;
+        });
+
+        if (count($volumes) > 1) {
+            abort(500, 'More than one set of volumes found for a single volume set');
         }
 
-        return Response::create($volumeSets);
+        $data = [];
+        if (count($volumes) == 1) {
+            $data['volumes'] = array_shift($volumes);
+        }
+
+        return Response::create([
+            'data' => $data,
+            'meta' => [],
+        ]);
     }
 
     /**
