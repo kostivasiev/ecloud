@@ -222,22 +222,20 @@ class VolumeSet extends Model implements Filterable, Sortable
      */
     public function volumes()
     {
-        $solution = $this->solution;
         if (!$this->solution) {
             return [];
         }
 
-        $volumeSetName = $this->name;
         $sanVolumes = [];
-        $solution->pod->sans->each(function ($san) use ($solution, $volumeSetName, &$sanVolumes) {
-            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
-            $artisanResponse = $artisan->getVolumeSet($volumeSetName);
+        foreach($this->solution->pod->sans as $san) {
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $this->solution, 'san' => $san]]);
+            $artisanResponse = $artisan->getVolumeSet($this->name);
             if (!$artisanResponse) {
                 Log::error($artisan->getLastError());
-                return;
+                continue;
             }
             $sanVolumes[$san->servers_id] = $artisanResponse->volumes ?? null;
-        });
+        }
         return $sanVolumes;
     }
 }
