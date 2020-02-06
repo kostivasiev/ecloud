@@ -227,7 +227,7 @@ class VolumeSet extends Model implements Filterable, Sortable
         }
 
         $sanVolumes = [];
-        foreach($this->solution->pod->sans as $san) {
+        foreach ($this->solution->pod->sans as $san) {
             $artisan = app()->makeWith(ArtisanService::class, [['solution' => $this->solution, 'san' => $san]]);
             $artisanResponse = $artisan->getVolumeSet($this->name);
             if (!$artisanResponse) {
