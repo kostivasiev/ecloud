@@ -380,29 +380,26 @@ class VolumeSetController extends BaseController
         return $this->respondEmpty();
     }
 
+    /**
+     * @param Request $request
+     * @param $volumeSetId
+     * @return Response
+     */
     public function volumes(Request $request, $volumeSetId)
     {
         $volumeSet = VolumeSet::find($volumeSetId);
-        $solution = $volumeSet->solution;
-        $volumes = [];
-        $volumeSetName = $volumeSet->name;
-        $solution->pod->sans->each(function ($san) use ($solution, $volumeSetName, &$volumes) {
-            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
-            $artisanResponse = $artisan->getVolumeSet($volumeSetName);
-            if (!$artisanResponse) {
-                Log::error($artisan->getLastError());
-                return;
-            }
-            $volumes[] = $artisanResponse->volumes ?? null;
-        });
+        if (!$volumeSet) {
+            return Response::create(null,404);
+        }
 
-        if (count($volumes) > 1) {
+        $sanVolumes = $volumeSet->volumes();
+        if (count($sanVolumes) > 1) {
             abort(500, 'More than one set of volumes found for a single volume set');
         }
 
         $data = [];
-        if (count($volumes) == 1) {
-            $data['volumes'] = array_shift($volumes);
+        if (count($sanVolumes) == 1) {
+            $data['volumes'] = array_shift($sanVolumes);
         }
 
         return Response::create([

@@ -2,10 +2,12 @@
 
 namespace App\Models\V1;
 
+use App\Services\Artisan\V1\ArtisanService;
 use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
@@ -212,5 +214,26 @@ class VolumeSet extends Model implements Filterable, Sortable
         });
 
         return ++$index;
+    }
+
+    /**
+     * Get a list of volumes from Artisan
+     * @return array
+     */
+    public function volumes()
+    {
+        $solution = $this->solution;
+        $volumeSetName = $this->name;
+        $sanVolumes = [];
+        $solution->pod->sans->each(function ($san) use ($solution, $volumeSetName, &$sanVolumes) {
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
+            $artisanResponse = $artisan->getVolumeSet($volumeSetName);
+            if (!$artisanResponse) {
+                Log::error($artisan->getLastError());
+                return;
+            }
+            $sanVolumes[$san->servers_id] = $artisanResponse->volumes ?? null;
+        });
+        return $sanVolumes;
     }
 }
