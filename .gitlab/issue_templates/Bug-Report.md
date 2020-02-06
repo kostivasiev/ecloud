@@ -35,7 +35,7 @@ Process Affecting - the problem is preventing me or the customer from doing a ta
 /weight 7
 
 <!--- Set Team label - Delete as appropriate -->
-/label ~PHP ~dotNET
+/label ~PHP ~dotNET ~DevOps
 
 <!--- Set necessary labels - don't remove -->
 /label ~Bug ~Triage 
