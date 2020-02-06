@@ -223,6 +223,10 @@ class VolumeSet extends Model implements Filterable, Sortable
     public function volumes()
     {
         $solution = $this->solution;
+        if (!$this->solution) {
+            return [];
+        }
+
         $volumeSetName = $this->name;
         $sanVolumes = [];
         $solution->pod->sans->each(function ($san) use ($solution, $volumeSetName, &$sanVolumes) {

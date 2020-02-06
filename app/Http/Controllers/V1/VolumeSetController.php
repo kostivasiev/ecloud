@@ -387,14 +387,17 @@ class VolumeSetController extends BaseController
      */
     public function volumes(Request $request, $volumeSetId)
     {
-        $volumeSet = VolumeSet::find($volumeSetId);
+        $resellerId = $request->user->resellerId;
+        $volumeSet = VolumeSet::all()->reject(function ($volumeSet) use ($volumeSetId, $resellerId) {
+            return ($volumeSet->uuid !== $volumeSetId) || ($resellerId !== 0 && $volumeSet->ucs_reseller_id !== $resellerId);
+        })->first();
         if (!$volumeSet) {
             return Response::create(null, 404);
         }
 
         $sanVolumes = $volumeSet->volumes();
         if (count($sanVolumes) > 1) {
-            abort(500, 'More than one set of volumes found for a single volume set');
+            abort(500, 'Same volume set found on more than one San');
         }
 
         $data = [];
