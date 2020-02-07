@@ -18,18 +18,18 @@ class VolumesTest extends TestCase
 
     public function testValidVolumeSet()
     {
-        (factory(Solution::class, 1)->create())->first();
+        (factory(Solution::class, 1)->create());
         (factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 1
-        ]))->first();
+        ]));
 
         (factory(Storage::class, 1)->create([
             'server_id' => 1,
             'ucs_datacentre_id' => 1,
-        ]))->first();
+        ]));
         (factory(San::class, 1)->create([
             'servers_id' => 1
-        ]))->first();
+        ]));
 
         $volumeSet = (factory(VolumeSet::class, 1)->create())->first();
 
@@ -61,26 +61,26 @@ class VolumesTest extends TestCase
 
     public function testSameVolumeSetFoundOnManySans()
     {
-        (factory(Solution::class, 1)->create())->first();
+        (factory(Solution::class, 1)->create());
         (factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 1
-        ]))->first();
+        ]));
 
         (factory(Storage::class, 1)->create([
             'server_id' => 1,
             'ucs_datacentre_id' => 1,
-        ]))->first();
+        ]));
         (factory(San::class, 1)->create([
             'servers_id' => 1
-        ]))->first();
+        ]));
 
         (factory(Storage::class, 1)->create([
             'server_id' => 2,
             'ucs_datacentre_id' => 1,
-        ]))->first();
+        ]));
         (factory(San::class, 1)->create([
             'servers_id' => 2
-        ]))->first();
+        ]));
 
         $volumeSet = (factory(VolumeSet::class, 1)->create())->first();
 
