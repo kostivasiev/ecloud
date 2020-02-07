@@ -8,15 +8,15 @@ use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\SanNotFoundException;
 use App\Models\V1\IopsTier;
 use App\Models\V1\San;
+use App\Models\V1\Solution;
 use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
-use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
-
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
 
@@ -376,6 +376,38 @@ class VolumeSetController extends BaseController
         }
 
         return $this->respondEmpty();
+    }
+
+    /**
+     * @param Request $request
+     * @param $volumeSetId
+     * @return Response
+     */
+    public function volumes(Request $request, $volumeSetId)
+    {
+        $volumeSet = VolumeSet::find($volumeSetId);
+        if (!$volumeSet) {
+            return Response::create(null, 404);
+        }
+
+        if ($request->user->resellerId !== 0 && $volumeSet->solution->reseller_id !== $request->user->resellerId) {
+            return Response::create(null, 404);
+        }
+
+        $sanVolumes = $volumeSet->volumes();
+        if (count($sanVolumes) > 1) {
+            abort(500, 'Same volume set found on more than one San');
+        }
+
+        $data = [];
+        if (count($sanVolumes) == 1) {
+            $data['volumes'] = array_shift($sanVolumes);
+        }
+
+        return Response::create([
+            'data' => $data,
+            'meta' => [],
+        ]);
     }
 
     /**

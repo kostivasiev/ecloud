@@ -627,4 +627,9 @@ class Solution extends Model implements Filterable, Sortable
 
         return $rules;
     }
+
+    public function getResellerIdAttribute()
+    {
+        return $this->ucs_reseller_reseller_id;
+    }
 }

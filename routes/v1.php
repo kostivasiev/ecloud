@@ -235,6 +235,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         $router->delete('volumesets/{volume_set_id}', 'VolumeSetController@delete');
         $router->post('volumesets/{volume_set_id}/delete', 'VolumeSetController@deleteVolumeSet');
+        $router->get('volumesets/{volume_set_id}/volumes', 'VolumeSetController@volumes');
 
 
         // Storage host sets
