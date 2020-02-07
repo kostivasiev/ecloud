@@ -8,6 +8,7 @@ use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\SanNotFoundException;
 use App\Models\V1\IopsTier;
 use App\Models\V1\San;
+use App\Models\V1\Solution;
 use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
@@ -384,8 +385,12 @@ class VolumeSetController extends BaseController
      */
     public function volumes(Request $request, $volumeSetId)
     {
-        $volumeSet = static::getById($request, $volumeSetId)->first();
+        $volumeSet = VolumeSet::find($volumeSetId);
         if (!$volumeSet) {
+            return Response::create(null, 404);
+        }
+
+        if ($request->user->resellerId !== 0 && $volumeSet->solution->reseller_id !== $request->user->resellerId) {
             return Response::create(null, 404);
         }
 
