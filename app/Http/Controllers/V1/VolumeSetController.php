@@ -384,10 +384,7 @@ class VolumeSetController extends BaseController
      */
     public function volumes(Request $request, $volumeSetId)
     {
-        $resellerId = $request->user->resellerId;
-        $volumeSet = VolumeSet::all()->reject(function ($volumeSet) use ($volumeSetId, $resellerId) {
-            return ($volumeSet->uuid !== $volumeSetId) || ($resellerId !== 0 && $volumeSet->ucs_reseller_id !== $resellerId);
-        })->first();
+        $volumeSet = static::getById($request, $volumeSetId)->first();
         if (!$volumeSet) {
             return Response::create(null, 404);
         }
