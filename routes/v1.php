@@ -82,7 +82,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->patch('solutions/{solution_id}/tags/{name}', 'TagController@updateSolutionTag');
     $router->delete('solutions/{solution_id}/tags/{name}', 'TagController@destroySolutionTag');
 
-
     // Solution Sites
     $router->get('sites', 'SolutionSiteController@index');
     $router->get('sites/{site_id}', 'SolutionSiteController@show');
@@ -92,6 +91,17 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('hosts', 'HostController@index');
     $router->get('hosts/{host_id}', 'HostController@show');
 
+    // Hosts - Admin
+    $router->group([
+        'middleware' => [
+            'is-administrator',
+        ],
+    ], function () use ($router) {
+        $router->get(
+            'hosts/{host_id}/ucs_info',
+            'HostController@ucsInfo'
+        );
+    });
 
     // Datastores
     $router->get('datastores', 'DatastoreController@index');

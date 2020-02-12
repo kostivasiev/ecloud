@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Database\Eloquent\Model;
 
 use UKFast\Api\Resource\Property\IdProperty;
@@ -13,6 +14,7 @@ use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
+use GuzzleHttp\Client;
 
 class Host extends Model implements Filterable, Sortable
 {
@@ -308,5 +310,30 @@ class Host extends Model implements Filterable, Sortable
         }
 
         return $fcwwns;
+    }
+
+    public function getUcsInfoAttribute()
+    {
+        $computeName = $this->ucs_node_location;
+        $solutionId = $this->ucs_node_ucs_reseller_id;
+        $nodeName = $this->ucs_node_profile_id;
+
+        $client = new Client([
+            'base_uri' => 'http://conjurer.rnd.ukfast:8443/api/',   // TODO :- Read from DB
+            'timeout'  => 10,
+        ]);
+        $uri = 'v1/compute/' . urlencode($computeName) . '/solution/' . (int)$solutionId . '/node/' . urlencode($nodeName);
+        $response = $client->request('GET', $uri, [
+            'auth' => ['conjurerapi', '=$6rj9%bfRZ7'],
+            'headers' => [
+                'X-UKFast-Compute-Username' => 'conjurerapi',
+                'X-UKFast-Compute-Password' => '=$6rj9%bfRZ7',
+                'Accept' => 'application/json',
+            ],
+        ]);
+
+        $ucsInfo = json_decode($response->getBody()->getContents());
+
+        return $ucsInfo;
     }
 }
