@@ -8,7 +8,7 @@
 <!-- e.g. Save time, perform a task quicker, reduce problem for staff, customers, add new feature/value to a product. -->
 <!-- Putting this benefit into context allows us to prioritise this against other feature requests. -->
 
-- <!-- e.g. This will save us 2 hours per week of manual effort by an engineer -->
+<!-- e.g. This will save us 2 hours per week of manual effort by an engineer -->
 - 
 
 ### Additional information and context 
