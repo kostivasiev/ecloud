@@ -5,17 +5,18 @@ namespace App\Http\Controllers\V1;
 use App\Datastore\Exceptions\DatastoreNotFoundException;
 use App\Events\V1\VolumeSetIopsUpdatedEvent;
 use App\Exceptions\V1\ArtisanException;
+use App\Exceptions\V1\SanNotFoundException;
 use App\Models\V1\IopsTier;
 use App\Models\V1\San;
+use App\Models\V1\Solution;
 use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
-use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
 use UKFast\DB\Ditto\QueryTransformer;
-
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
 
@@ -67,9 +68,11 @@ class VolumeSetController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\Response
      * @throws ArtisanException
-     * @throws DatastoreNotFoundException
+     * @throws SanNotFoundException
      * @throws UnprocessableEntityException
+     * @throws \App\Exceptions\V1\SiteNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws \Illuminate\Validation\ValidationException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -77,27 +80,47 @@ class VolumeSetController extends BaseController
     public function create(Request $request)
     {
         $rules = [
-            'datastore_id' => ['required', 'numeric']
+            'solution_id' =>['required_without:site_id', 'integer'],
+            'site_id' => ['required_without:solution_id', 'integer'],
+            'san_id' => ['sometimes', 'integer']
         ];
-
         $this->validate($request, $rules);
 
-        $datastore = DatastoreController::getDatastoreById($request, $request->input('datastore_id'));
-
-        // If the datastore record is not mapped to a volume on the SAN, fail, as we can't match the volume set name to
-        // the volume name.
-        if (empty($datastore->reseller_lun_name)) {
-            throw new UnprocessableEntityException('Unable to determine datastore name');
+        // Determine the pod
+        if ($request->has('site_id')) {
+            $solutionSite = SolutionSiteController::getSiteById($request, $request->input('site_id'));
+            $solution = $solutionSite->solution;
+            $pod = $solutionSite->pod;
         }
 
-        // If the volume has been created by the APIO it should be of the format MCS_G0_VV_17106_DATA_2
-        if (!preg_match('/\w+[DATA|CLUSTER|QRM]_(\d+)+/', $datastore->reseller_lun_name, $matches) == true) {
-            throw new UnprocessableEntityException('Invalid datastore name');
+        if ($request->has('solution_id')) {
+            $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
+            $pod = $solution->pod;
         }
 
-        $identifier = (int) $matches[1];
+        if ($pod->sans->count() == 0) {
+            throw new SanNotFoundException('No SANS are available on the solution\'s pod');
+        }
 
-        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['datastore' => $datastore]]);
+        if ($pod->sans->count() == 1) {
+            $san = $pod->sans->first();
+        }
+
+        // If more than 1 san is available on the pod user must specify a san_id
+        if ($pod->sans->count() > 1 && !$request->has('san_id')) {
+            throw new UnprocessableEntityException(
+                'More than one SAN is available on the solution\'s pod - Please specify a san_id'
+            );
+        }
+
+        // If the user specified a san_id check that the san in on the solution / solution sites pod
+        if ($request->has('san_id')) {
+            $san = $pod->sans()->findOrFail($request->input('san_id'));
+        }
+
+        $identifier = VolumeSet::getNextIdentifier($solution);
+
+        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['solution'=>$solution, 'san' => $san]]);
 
         $artisanResponse = $artisan->createVolumeSet($identifier);
 
@@ -107,7 +130,7 @@ class VolumeSetController extends BaseController
 
         $volumeSet = new VolumeSet;
         $volumeSet->name = $artisanResponse->name;
-        $volumeSet->ucs_reseller_id = $datastore->reseller_lun_ucs_reseller_id;
+        $volumeSet->ucs_reseller_id = $solution->getKey();
 
         // return id & link to resource in meta
         $volumeSet->save();
@@ -125,6 +148,7 @@ class VolumeSetController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws ArtisanException
      * @throws UnprocessableEntityException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function setIops(Request $request, $volumeSetId)
     {
@@ -146,7 +170,7 @@ class VolumeSetController extends BaseController
 
         $san = San::findOrFail($request->input('san_id'));
 
-        if (!$san->storage->qosEnabled()) {
+        if (!$san->storage()->withPod($volumeSet->solution->pod)->firstOrFail()->qosEnabled()) {
             throw new UnprocessableEntityException('Unable to configure IOPS: QoS is not available on the SAN');
         }
 
@@ -352,6 +376,40 @@ class VolumeSetController extends BaseController
         }
 
         return $this->respondEmpty();
+    }
+
+    /**
+     * @param Request $request
+     * @param $volumeSetId
+     * @return Response
+     */
+    public function volumes(Request $request, $volumeSetId)
+    {
+        $volumeSet = VolumeSet::find($volumeSetId);
+        if (!$volumeSet || ($request->user->resellerId !== 0 && $volumeSet->solution->reseller_id !== $request->user->resellerId)) {
+            return Response::create([
+                'errors' => [
+                    'title' => 'Not found',
+                    'detail' => 'No Volume Set with that ID was found',
+                    'status' => 404,
+                ]
+            ], 404);
+        }
+
+        $sanVolumes = $volumeSet->volumes();
+        if (count($sanVolumes) > 1) {
+            abort(500, 'Same volume set found on more than one San');
+        }
+
+        $data = [];
+        if (count($sanVolumes) == 1) {
+            $data['volumes'] = array_shift($sanVolumes);
+        }
+
+        return Response::create([
+            'data' => $data,
+            'meta' => [],
+        ]);
     }
 
     /**

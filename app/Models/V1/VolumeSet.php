@@ -2,10 +2,12 @@
 
 namespace App\Models\V1;
 
+use App\Services\Artisan\V1\ArtisanService;
 use App\Traits\V1\UUIDHelper;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
@@ -189,5 +191,51 @@ class VolumeSet extends Model implements Filterable, Sortable
         $query->where('ucs_reseller_id', $solutionId);
 
         return $query;
+    }
+
+    /**
+     * Generate a sequential ID for the volume sets based on the solution.
+     * Include deleted items too so that we *always* use a unique identifier
+     * @param Solution $solution
+     * @return int|mixed
+     */
+    public static function getNextIdentifier(Solution $solution) : int
+    {
+        if ($solution->volumeSets()->withTrashed()->count() == 0) {
+            return 1;
+        }
+
+        $index = 0;
+        $solution->volumeSets()->withTrashed()->get()->map(function ($item) use (&$index, $solution) {
+            if (preg_match('/\w+('.$solution->getKey().')_?(\d+)*$/', $item->name, $matches) == true) {
+                $numeric = $matches[2] ?? 1;
+                $index = ($numeric > $index) ? (int) $numeric : $index;
+            }
+        });
+
+        return ++$index;
+    }
+
+    /**
+     * Get a list of volumes from Artisan
+     * @return array
+     */
+    public function volumes()
+    {
+        if (!$this->solution) {
+            return [];
+        }
+
+        $sanVolumes = [];
+        foreach ($this->solution->pod->sans as $san) {
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $this->solution, 'san' => $san]]);
+            $artisanResponse = $artisan->getVolumeSet($this->name);
+            if (!$artisanResponse) {
+                Log::error($artisan->getLastError());
+                continue;
+            }
+            $sanVolumes[$san->servers_id] = $artisanResponse->volumes ?? null;
+        }
+        return $sanVolumes;
     }
 }

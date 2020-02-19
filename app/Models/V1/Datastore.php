@@ -44,7 +44,7 @@ class Datastore extends Model implements Filterable, Sortable
     public static function getRules()
     {
         return [
-            'solution_id' => ['required', 'numeric'],
+            'solution_id' => ['required_without:site_id', 'integer'],
             'name' => ['sometimes', 'max:255'],
             'type' => ['sometimes', 'in:Hybrid,Private'],
             'capacity' => ['required', 'numeric'],
@@ -410,7 +410,7 @@ class Datastore extends Model implements Filterable, Sortable
                             continue;
                         }
 
-                        if ($datastore->available > $defaultDatastore->available) {
+                        if ($datastore->usage->available > $defaultDatastore->usage->available) {
                             $defaultDatastore = $datastore;
                         }
                     }
@@ -592,25 +592,16 @@ class Datastore extends Model implements Filterable, Sortable
         return true;
     }
 
-
     /**
      * Load the volume set for a datastore
      * This is quite an expensive method to run, so lets only do it when we have to!
-     * @return |null
+     * @return VolumeSet|null
      */
     public function volumeSet()
     {
-        $identifier = null;
-        if (preg_match('/\w+[DATA|CLUSTER|QRM]_(\d+)+/', $this->reseller_lun_name, $matches) != false) {
-            $identifier = (int) $matches[1];
-        }
         $query = VolumeSetController::getQuery(app('request'));
 
         $query->where('ucs_reseller_id', '=', $this->solution->getKey());
-
-        if (!empty($identifier)) {
-            $query->where('name', 'LIKE', '%_' . $identifier);
-        }
 
         if ($query->count() > 0) {
             $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $this]]);

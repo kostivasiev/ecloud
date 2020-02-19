@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\ApplianceNotFoundException;
 use App\Exceptions\V1\InvalidJsonException;
 use App\Exceptions\V1\TemplateNotFoundException;
+use App\Models\V1\Appliance\Version\Data;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\Pod;
 use App\Rules\V1\IsValidUuid;
@@ -231,6 +232,24 @@ class ApplianceController extends BaseController
         $applianceVersionController = new ApplianceVersionController($request);
 
         return $applianceVersionController->versionParameters($request, $applianceVersion->uuid);
+    }
+
+    /**
+     * Return the data for the latest version of the appliance
+     * @param Request $request
+     * @param $applianceId
+     * @return \Illuminate\Http\Response
+     * @throws ApplianceNotFoundException
+     */
+    public function latestVersionData(Request $request, $applianceId)
+    {
+        $appliance = static::getApplianceById($request, $applianceId);
+        return response()->json([
+            'data' => Data::select('key', 'value')->where([
+                ['appliance_version_uuid', '=', $appliance->getLatestVersion()->appliance_version_uuid],
+            ])->get()->all(),
+            'meta' => [],
+        ]);
     }
 
 

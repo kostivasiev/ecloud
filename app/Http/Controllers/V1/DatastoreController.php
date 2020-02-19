@@ -16,6 +16,7 @@ use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
 use App\Traits\V1\SanitiseRequestData;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\ForbiddenException;
@@ -80,6 +81,30 @@ class DatastoreController extends BaseController
             [],
             Datastore::$itemProperties
         );
+    }
+
+    /**
+     * Get the "default" aka "auto" datastore for a solution
+     *
+     * @param Request $request
+     * @param $solutionId
+     * @return \Illuminate\http\Response
+     * @throws DatastoreNotFoundException
+     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     */
+    public function getSolutionDefault(Request $request, $solutionId)
+    {
+        $solution = SolutionController::getSolutionById($request, $solutionId);
+        $datastore = Datastore::getDefault($solution->getKey(), $solution->ucs_reseller_type);
+
+        return new Response([
+            'data' => [
+                'id' => $datastore->getKey(),
+            ],
+            'meta' => [
+                'location' => config('app.url') . '/v1/datastores/' . $datastore->getKey()
+            ],
+        ], 200);
     }
 
 
@@ -184,6 +209,7 @@ class DatastoreController extends BaseController
      * @throws UnprocessableEntityException
      * @throws \App\Exceptions\V1\SiteNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws \Illuminate\Validation\ValidationException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
@@ -293,27 +319,29 @@ class DatastoreController extends BaseController
         $datastore->reseller_lun_reseller_id = $solution->resellerId();
         $datastore->reseller_lun_lun_type = $request->input('lun_type', 'DATA');
         $datastore->reseller_lun_status = Status::QUEUED;
+        $datastore->reseller_lun_ucs_site_id = $request->input('site_id', 0);
         $datastore->save();
         $datastore->refresh();
 
-        try {
-            $automationRequestId = $intapiService->automationRequest(
-                'add_lun',
-                'reseller_lun',
-                $datastore->getKey(),
-                $automationData,
-                'ecloud_ucs_' . $pod->getKey(),
-                $request->user->applicationId
-            );
-        } catch (IntapiServiceException $exception) {
-            throw new ServiceUnavailableException('Failed to expand datastore', null, 502);
-        }
-
         $headers = [];
-        if ($request->user->isAdministrator) {
-            $headers = [
-                'X-AutomationRequestId' => $automationRequestId
-            ];
+        if ($request->input('type', $solution->ucs_reseller_type) !== 'Private') {
+            try {
+                $automationRequestId = $intapiService->automationRequest(
+                    'add_lun',
+                    'reseller_lun',
+                    $datastore->getKey(),
+                    $automationData,
+                    'ecloud_ucs_' . $pod->getKey(),
+                    $request->user->applicationId
+                );
+            } catch (IntapiServiceException $exception) {
+                throw new ServiceUnavailableException('Failed to expand datastore', null, 502);
+            }
+            if ($request->user->isAdministrator) {
+                $headers = [
+                    'X-AutomationRequestId' => $automationRequestId
+                ];
+            }
         }
 
         return $this->respondSave($request, $datastore, 202, null, $headers);
@@ -407,71 +435,24 @@ class DatastoreController extends BaseController
     {
         $datastore = static::getDatastoreById($request, $datastoreId);
 
-        // Work out the volume set for the volume
-        $identifier = null;
-        if (preg_match('/\w+[DATA|CLUSTER|QRM]_(\d+)+/', $datastore->reseller_lun_name, $matches) != false) {
-            $identifier = (int) $matches[1];
+        try {
+            $automationRequestId = $intapiService->automationRequest(
+                'delete_lun',
+                'reseller_lun',
+                $datastore->getKey(),
+                null,
+                'ecloud_ucs_' . $datastore->pod->getKey(),
+                $request->user->applicationId
+            );
+        } catch (IntapiServiceException $exception) {
+            throw new ServiceUnavailableException('Failed to scheduele datastore for deletion', null, 502);
         }
 
-        $query = VolumeSetController::getQuery($request);
-        $query->where('ucs_reseller_id', '=', $datastore->solution->getKey());
+        $headers = [
+            'X-AutomationRequestId' => $automationRequestId
+        ];
 
-        if (!empty($identifier)) {
-            $query->where('name', 'LIKE', '%_' . $identifier);
-        }
-
-        if ($query->count() > 0) {
-            $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $datastore]]);
-
-            foreach ($query->get() as $volumeSet) {
-                $artisanResponse = $artisan->getVolumeSet($volumeSet->name);
-
-                if (!$artisanResponse) {
-                    $error = $artisan->getLastError();
-                    if (strpos($error, 'Set does not exist') !== false) {
-                        continue;
-                    }
-                    Log::error(
-                        'Failed to get volume set details from the SAN',
-                        [
-                            'datastore_id' => $datastoreId,
-                            'volume_set' => $volumeSet->name,
-                            'SAN error message' => $error
-                        ]
-                    );
-                    throw new ServiceUnavailableException('Failed to schedule datastore deletion');
-                }
-
-                if (!empty($artisanResponse->volumes) && in_array($datastore->reseller_lun_name, $artisanResponse->volumes)) {
-                    try {
-                        $automationRequestId = $intapiService->automationRequest(
-                            'delete_lun',
-                            'reseller_lun',
-                            $datastore->getKey(),
-                            ['volume_set_id' => $volumeSet->getKey()],
-                            'ecloud_ucs_' . $datastore->pod->getKey(),
-                            $request->user->applicationId
-                        );
-                    } catch (IntapiServiceException $exception) {
-                        throw new ServiceUnavailableException('Failed to scheduele datastore for deletion', null, 502);
-                    }
-
-                    $headers = [
-                        'X-AutomationRequestId' => $automationRequestId
-                    ];
-
-                    return $this->respondEmpty(202, $headers);
-                }
-            }
-        }
-
-        Log::error(
-            'Failed to find volume set for datastore',
-            [
-                'datastore_id' => $datastoreId
-            ]
-        );
-        throw new ServiceUnavailableException('Failed to schedule datastore deletion');
+        return $this->respondEmpty(202, $headers);
     }
 
     /**

@@ -89,6 +89,12 @@ return [
             'level' => 'debug',
         ],
 
+        'ukfast' => [
+            'driver' => 'stack',
+            'channels' => ['elasticsearch', 'single'],
+            'ignore_exceptions' => true,
+        ],
+
         'elasticsearch' => [
             'driver' => 'monolog',
             'level' => 'debug',

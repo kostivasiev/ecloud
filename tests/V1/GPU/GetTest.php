@@ -21,11 +21,6 @@ class GetTest extends TestCase
 
     public function testValidCollection()
     {
-        $this->get('/v1/gpu-profiles', [
-            'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups' => 'ecloud.read',
-        ]);
-
         $this->json('GET', '/v1/gpu-profiles', [], $this->validWriteHeaders)
             ->seeStatusCode(200)
             ->seeJson([
@@ -33,23 +28,45 @@ class GetTest extends TestCase
                 'name' => $this->gpu_profile->name,
                 'profile_name' => $this->gpu_profile->profile_name,
                 'card_type' => $this->gpu_profile->card_type,
+            ]);
+    }
 
+    public function testValidCollectionReadOnly()
+    {
+        $this->json('GET', '/v1/gpu-profiles', [], $this->validReadHeaders)
+            ->seeStatusCode(200)
+            ->dontSeeJson([
+                'profile_name' => $this->gpu_profile->profile_name,
+            ])
+            ->seeJson([
+                'id' => $this->gpu_profile->getKey(),
+                'name' => $this->gpu_profile->name,
+                'card_type' => $this->gpu_profile->card_type,
             ]);
     }
 
     public function testValidItem()
     {
-        $this->get('/v1/gpu-profiles', [
-            'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups' => 'ecloud.read',
-        ]);
-
         $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->getKey(), [], $this->validWriteHeaders)
             ->seeStatusCode(200)
             ->seeJson([
                 'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'profile_name' => $this->gpu_profile->profile_name,
+                'card_type' => $this->gpu_profile->card_type,
+            ]);
+    }
+
+    public function testValidItemReadOnly()
+    {
+        $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->getKey(), [], $this->validReadHeaders)
+            ->seeStatusCode(200)
+            ->dontSeeJson([
+                'profile_name' => $this->gpu_profile->profile_name,
+            ])
+            ->seeJson([
+                'id' => $this->gpu_profile->getKey(),
+                'name' => $this->gpu_profile->name,
                 'card_type' => $this->gpu_profile->card_type,
             ]);
     }

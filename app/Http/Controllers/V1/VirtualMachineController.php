@@ -54,6 +54,8 @@ use Mustache_Engine;
 
 class VirtualMachineController extends BaseController
 {
+    const HDD_MAX_SIZE_GB = 2500;
+
     /**
      * List all VM's
      * @param Request $request
@@ -82,7 +84,7 @@ class VirtualMachineController extends BaseController
     public function show(Request $request, $vmId)
     {
         $this->validateVirtualMachineId($request, $vmId);
-        $virtualMachines = $this->getVirtualMachines(null, [$vmId]);
+        $virtualMachines = $this->getVirtualMachines([$vmId]);
         $virtualMachine = $virtualMachines->first();
         if (!$virtualMachine) {
             throw new Exceptions\NotFoundException("Virtual Machine '$vmId' Not Found");
@@ -147,9 +149,15 @@ class VirtualMachineController extends BaseController
 
             'cpu' => ['required', 'integer'],
             'ram' => ['required', 'integer'],
-            'hdd' => ['required_without:hdd_disks', 'integer'],
-            'hdd_disks' => ['required_without:hdd', 'array', "max:".VirtualMachine::MAX_HDD_COUNT.""],
-
+            'hdd' => [
+                'required_without:hdd_disks',
+                'integer',
+            ],
+            'hdd_disks' => [
+                'required_without:hdd',
+                'array',
+                "max:".VirtualMachine::MAX_HDD_COUNT."",
+            ],
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
             'site_id' => ['nullable', 'integer'],
@@ -162,6 +170,15 @@ class VirtualMachineController extends BaseController
 
             'gpu_profile' => ['required_if:environment,GPU', new IsValidUuid()]
         ];
+
+
+        if (!$request->user->isAdministrator) {
+            $rules['hdd'] = [
+                'required_without:hdd_disks',
+                'integer',
+                'max:' . static::HDD_MAX_SIZE_GB,
+            ];
+        }
 
         // Validate role is allowed
         if ($request->has('role')) {
@@ -283,6 +300,10 @@ class VirtualMachineController extends BaseController
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
                         'datastore has insufficient space, ' . $maxHdd . 'GB remaining'
                     ));
+                }
+
+                if (!$request->user->isAdministrator) {
+                    $maxHdd = min(static::HDD_MAX_SIZE_GB, $maxHdd);
                 }
 
                 if ($solution->isMultiSite()) {
@@ -612,6 +633,8 @@ class VirtualMachineController extends BaseController
         $post_data['ram_gb'] = $request->input('ram');
 
         // set storage
+        $post_data['reseller_lun_id'] = $datastore->getKey();
+
         if ($request->has('hdd')) {
             $post_data['hdd_gb'] = $request->input('hdd');
         } elseif ($request->has('hdd_disks')) {
@@ -621,10 +644,6 @@ class VirtualMachineController extends BaseController
                 $post_data['hdd_gb'][$disk['name']] = $disk['capacity'];
             }
             $post_data['hdd_gb'] = serialize($post_data['hdd_gb']);
-        }
-
-        if ($request->has('datastore_id')) {
-            $post_data['reseller_lun_id'] = $request->input('datastore_id');
         }
 
         if ($request->has('hdd_iops') && in_array($request->input('environment'), ['Public', 'Burst'])) {
@@ -857,12 +876,13 @@ class VirtualMachineController extends BaseController
      * @throws ServiceUnavailableException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function destroy(Request $request, IntapiService $intapiService, AccountsService $accountsService, $vmId)
     {
         $refundCredit = false;
         $this->validateVirtualMachineId($request, $vmId);
-        $virtualMachine = $this->getVirtualMachines($request->user->resellerId)->find($vmId);
+        $virtualMachine = $this->getVirtualMachines()->find($vmId);
         if (!$virtualMachine) {
             throw new Exceptions\NotFoundException("Virtual Machine with ID '$vmId' not found");
         }
@@ -899,13 +919,31 @@ class VirtualMachineController extends BaseController
             );
         }
 
+        $post_data = [];
+        if ($request->user->isAdministrator) {
+            $rules = [
+                'reason' => ['sometimes', 'string'],
+                'cancel_billing' => ['sometimes', 'boolean']
+            ];
+
+            $this->validate($request, $rules);
+
+            if (!empty($request->input('reason'))) {
+                $post_data['deleted_reason'] = $request->input('reason');
+            }
+
+            if (!empty($request->input('cancel_billing'))) {
+                $post_data['cancel_without_charge'] = $request->input('cancel_billing');
+            }
+        }
+
         //schedule automation
         try {
             $automationRequestId = $intapiService->automationRequest(
                 'delete_vm',
                 'server',
                 $virtualMachine->getKey(),
-                [],
+                $post_data,
                 'ecloud_ucs_' . $virtualMachine->pod->getKey(),
                 $request->user->id,
                 $request->user->type
@@ -1239,9 +1277,9 @@ class VirtualMachineController extends BaseController
             case 'Public':
                 if ($virtualMachine->isContract()) {
                     //Determine contract specific limits
-                    $contractCpuTrigger = $virtualMachine->trigger('ecloud_cpu');
-                    $contractRamTrigger = $virtualMachine->trigger('ecloud_ram');
-                    $contractHddTrigger = $virtualMachine->trigger('ecloud_hdd');
+                    $contractCpuTrigger = $virtualMachine->trigger('cpu');
+                    $contractRamTrigger = $virtualMachine->trigger('ram');
+                    $contractHddTrigger = $virtualMachine->trigger('hdd');
 
                     $minCpu = $this->extractContractTriggerCPUValue($contractCpuTrigger);
                     $minRam = $this->extractContractTriggerRAMValue($contractRamTrigger);
@@ -1316,6 +1354,14 @@ class VirtualMachineController extends BaseController
             $newDisksCount = 0;
             foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object) $hdd;
+
+                if (!$request->user->isAdministrator) {
+                    if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
+                        throw new Exceptions\BadRequestException(
+                            'HDD with UUID ' . $hdd->uuid . ' cannot exceed ' . static::HDD_MAX_SIZE_GB . 'GB'
+                        );
+                    }
+                }
 
                 $isExistingDisk = false;
                 if (isset($hdd->uuid)) {
@@ -2233,7 +2279,7 @@ class VirtualMachineController extends BaseController
     protected function getVirtualMachine($vmId)
     {
         // Load the VM
-        $virtualMachineQuery = $this->getVirtualMachines(null, [$vmId]);
+        $virtualMachineQuery = $this->getVirtualMachines([$vmId]);
         $VirtualMachine = $virtualMachineQuery->first();
         if (!$VirtualMachine) {
             throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
@@ -2248,16 +2294,18 @@ class VirtualMachineController extends BaseController
      * @param array $vmIds
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function getVirtualMachines($resellerId = null, $vmIds = [])
+    protected function getVirtualMachines($vmIds = [])
     {
         $virtualMachineQuery = VirtualMachine::query();
         if (!empty($vmIds)) {
             $virtualMachineQuery->whereIn('servers_id', $vmIds);
         }
+
         if ($this->isAdmin) {
-            if (!is_null($resellerId)) {
-                $virtualMachineQuery->withResellerId($resellerId);
+            if (!empty($this->resellerId)) {
+                $virtualMachineQuery->withResellerId($this->resellerId);
             }
+
             // Return ALL VM's
             return $virtualMachineQuery;
         }
@@ -2273,6 +2321,7 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param $vmId
      * @return void
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateVirtualMachineId(&$request, $vmId)
     {

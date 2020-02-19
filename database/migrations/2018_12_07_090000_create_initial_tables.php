@@ -21,6 +21,8 @@ class CreateInitialTables extends Migration
             $table->string('ucs_datacentre_api_enabled');
             $table->string('ucs_datacentre_public_enabled')->default('No');
             $table->string('ucs_datacentre_oneclick_enabled')->default('No');
+            $table->integer('ucs_datacentre_vcl_server_id')->default('0');
+            $table->integer('ucs_datacentre_vce_server_id')->default('0');
         });
 
 
@@ -45,6 +47,7 @@ class CreateInitialTables extends Migration
             $table->integer('ucs_node_datacentre_id');
             $table->integer('ucs_node_specification_id');
             $table->string('ucs_node_status');
+            $table->string('ucs_node_internal_name')->default('');
         });
 
         Schema::create('ucs_specification', function (Blueprint $table) {
@@ -173,6 +176,14 @@ class CreateInitialTables extends Migration
             $table->string('metadata_createdby');
             $table->integer('metadata_createdby_id');
         });
+
+        Schema::create('triggers', function (Blueprint $table) {
+            $table->increments('trigger_id');
+            $table->integer('trigger_reseller_id');
+            $table->string('trigger_description');
+            $table->integer('trigger_reference_id');
+            $table->string('trigger_reference_name');
+        });
     }
 
     /**
@@ -192,5 +203,6 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('server_ip_address');
         Schema::dropIfExists('server_subtype');
         Schema::dropIfExists('metadata');
+        Schema::dropIfExists('triggers');
     }
 }

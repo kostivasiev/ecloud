@@ -17,6 +17,7 @@ use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
+use App\Models\V1\San;
 
 class Pod extends Model implements Filterable, Sortable
 {
@@ -62,6 +63,12 @@ class Pod extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$primaryKeyDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('datacentre_id', Filter::$numericDefaults),
+
+            $factory->boolean()->create('services_public', 'Yes', 'No', 'ucs_datacentre_public_enabled'),
+            $factory->boolean()->create('services_burst', 'Yes', 'No', 'ucs_datacentre_burst_enabled'),
+            $factory->boolean()->create('services_gpu', 'Yes', 'No', 'ucs_datacentre_gpu_enabled'),
+            $factory->boolean()->create('services_appliances', 'Yes', 'No', 'ucs_datacentre_oneclick_enabled'),
         ];
     }
 
@@ -133,6 +140,8 @@ class Pod extends Model implements Filterable, Sortable
         // admin only properties
         return array_merge($properties, [
             IntProperty::create('ucs_datacentre_datacentre_id', 'datacentre_id'),
+            IntProperty::create('ucs_datacentre_vce_server_id', 'vce_server_id'),
+            IntProperty::create('ucs_datacentre_vcl_server_id', 'vcl_server_id'),
         ]);
     }
 

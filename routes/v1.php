@@ -68,6 +68,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}/vms', 'VirtualMachineController@getSolutionVMs');
     $router->get('solutions/{solution_id}/hosts', 'HostController@indexSolution');
     $router->get('solutions/{solution_id}/datastores', 'DatastoreController@indexSolution');
+    $router->get('solutions/{solution_id}/datastores/default', 'DatastoreController@getSolutionDefault');
     $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
     $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
@@ -124,11 +125,11 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliances/{appliance_id}/versions', 'ApplianceController@versions');
     $router->get('appliances/{appliance_id}/version', 'ApplianceController@latestVersion');
     $router->get('appliances/{appliance_id}/parameters', 'ApplianceController@latestVersionParameters');
+    $router->get('appliances/{appliance_id}/data', 'ApplianceController@latestVersionData');
     $router->get('appliances/{appliance_id}/pods', 'ApplianceController@pods');
     $router->post('appliances', 'ApplianceController@create');
     $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
     $router->delete('appliances/{appliance_id}', 'ApplianceController@delete');
-
 
     //Appliance Versions
     $router->get('appliance-versions', 'ApplianceVersionController@index');
@@ -136,6 +137,36 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('appliance-versions', 'ApplianceVersionController@create');
     $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
     $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
+    $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
+
+    // Appliance Versions Data - Admin
+    $router->group([
+        'middleware' => [
+            'is-administrator',
+            \App\Http\Middleware\Appliance\Version::class,
+        ],
+    ], function () use ($router) {
+        $router->get(
+            'appliance-versions/{appliance_version_uuid}/data',
+            'Appliance\Version\DataController@index'
+        );
+        $router->get(
+            'appliance-versions/{appliance_version_uuid}/data/{key}',
+            'Appliance\Version\DataController@show'
+        );
+        $router->post(
+            'appliance-versions/{appliance_version_uuid}/data',
+            'Appliance\Version\DataController@create'
+        );
+        $router->patch(
+            'appliance-versions/{appliance_version_uuid}/data/{key}',
+            'Appliance\Version\DataController@update'
+        );
+        $router->delete(
+            'appliance-versions/{appliance_version_uuid}/data/{key}',
+            'Appliance\Version\DataController@delete'
+        );
+    });
 
     //Appliance Parameters
     $router->get('appliance-parameters', 'ApplianceParametersController@index');
@@ -204,6 +235,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         $router->delete('volumesets/{volume_set_id}', 'VolumeSetController@delete');
         $router->post('volumesets/{volume_set_id}/delete', 'VolumeSetController@deleteVolumeSet');
+        $router->get('volumesets/{volume_set_id}/volumes', 'VolumeSetController@volumes');
 
 
         // Storage host sets
@@ -224,9 +256,6 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
-
-        //Appliance Versions
-        $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
     });
 });
 
