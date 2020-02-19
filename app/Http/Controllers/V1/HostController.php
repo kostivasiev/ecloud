@@ -243,8 +243,10 @@ class HostController extends BaseController
             ], 404);
         }
 
-        $response = $host->ucs_info;
-        dd($response);
+        return Response::create([
+            'data' => $host->ucs_info,
+            'meta' => [],
+        ], 200);
     }
 
     /**

@@ -6,5 +6,6 @@ $factory->define(App\Models\V1\Pod::class, function (Faker\Generator $faker) {
         'ucs_datacentre_active' => 'Yes',
         'ucs_datacentre_api_enabled' => 'Yes',
         'ucs_datacentre_public_enabled' => 'No',
+        'ucs_datacentre_ucs_api_url' => 'http://localhost',
     ];
 });
