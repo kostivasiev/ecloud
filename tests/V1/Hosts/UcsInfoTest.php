@@ -103,7 +103,7 @@ class UcsInfoTest extends TestCase
                 'meta' => [],
             ])));
 
-        // Finally UCS Info endpoint and check the expected result matches
+        // Finally hit the UCS Info endpoint and check the expected result matches
         $this->get('/v1/hosts/' . $host->ucs_node_id . '/ucs_info', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
@@ -117,10 +117,35 @@ class UcsInfoTest extends TestCase
 
     public function testHostWithoutCredentials()
     {
-        factory(Pod::class)->create();
+        // Pod, Solution and Host setup
+        factory(Pod::class)->create([
+            'ucs_datacentre_vce_server_id' => 1,
+            'ucs_datacentre_ucs_api_url' => 'http://localhost'
+        ]);
         factory(Solution::class)->create();
         $host = factory(Host::class)->create()->first();
 
+        // Mock the Devices API
+        $mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
+        $mockAdminDeviceClient = \Mockery::mock(\UKFast\Admin\Devices\AdminDeviceClient::class);
+        $mockCredentials = \Mockery::mock(\UKFast\Admin\Devices\Entities\Credentials::class);
+        app()->bind(\UKFast\Admin\Devices\AdminClient::class, function() use ($mockAdminClient) {
+            return $mockAdminClient;
+        });
+
+        // Mock the Devices API "$adminClient->devices()->getCredentials(...)->getItems()[0]" call
+        $mockAdminClient->shouldReceive('devices')
+            ->andReturn($mockAdminDeviceClient);
+        $mockAdminDeviceClient->shouldReceive('getCredentials')
+            ->withArgs([1, 1, 1, ['type' => 'API', 'user' => 'conjurerapi']])
+            ->andReturn($mockCredentials);
+        $mockCredentials->shouldReceive('getItems')
+            ->andReturn([]);
+
+        // Devices API "$adminClient->credentials()" call should never happen
+        $mockAdminClient->shouldNotReceive('credentials');
+
+        // Finally hit the UCS Info endpoint and check the expected result matches
         $this->get('/v1/hosts/' . $host->ucs_node_id . '/ucs_info', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
