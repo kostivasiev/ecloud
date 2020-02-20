@@ -14,13 +14,36 @@ class UcsInfoTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testHostWithCredentials()
+    public function hostWithCredentialsDataProvider()
+    {
+        return [
+            'get_credentials_with_login_port' => [
+                'get_items_response' => [0 => (object)[
+                    'id' => 1,
+                    'loginPort' => 80,
+                    'password' => 'password'
+                ]],
+            ],
+            'get_credentials_without_login_port' => [
+                'get_items_response' => [0 => (object)[
+                    'id' => 1,
+                    'password' => 'password'
+                ]],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider hostWithCredentialsDataProvider
+     * @param array $getItemsResponse
+     */
+    public function testHostWithCredentials($getItemsResponse)
     {
         // Pod, Solution and Host setup
         factory(Pod::class)->create([
             'ucs_datacentre_vce_server_id' => 1,
             'ucs_datacentre_ucs_api_url' => 'http://localhost'
-        ])->first();
+        ]);
         factory(Solution::class)->create();
         $host = factory(Host::class)->create()->first();
 
@@ -40,13 +63,7 @@ class UcsInfoTest extends TestCase
             ->withArgs([1, 1, 1, ['type' => 'API', 'user' => 'conjurerapi']])
             ->andReturn($mockCredentials);
         $mockCredentials->shouldReceive('getItems')
-            ->andReturn([
-                0 => (object)[
-                    'id' => 1,
-                    'loginPort' => 80,
-                    'password' => 'password'
-                ]
-            ]);
+            ->andReturn($getItemsResponse);
 
         // Mock the Devices API "$adminClient->credentials()->getPassword(...)" call
         $mockAdminClient->shouldReceive('credentials')
@@ -57,7 +74,11 @@ class UcsInfoTest extends TestCase
 
         // Mock the Conjurer API
         $client = \Mockery::mock(Client::class);
-        app()->bind(Client::class, function() use ($client) {
+        app()->bind(Client::class, function($app, $args) use ($client, $getItemsResponse) {
+            $expectedUri = empty($getItemsResponse[0]->loginPort) ?
+                'http://localhost' :
+                'http://localhost:' . $getItemsResponse[0]->loginPort;
+            $this->assertEquals($expectedUri, $args['base_uri']);
             return $client;
         });
 
