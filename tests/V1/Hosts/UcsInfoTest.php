@@ -52,9 +52,7 @@ class UcsInfoTest extends TestCase
         $mockAdminDeviceClient = \Mockery::mock(\UKFast\Admin\Devices\AdminDeviceClient::class);
         $mockCredentials = \Mockery::mock(\UKFast\Admin\Devices\Entities\Credentials::class);
         $mockAdminCredentialsClient = \Mockery::mock(\UKFast\Admin\Devices\AdminCredentialsClient::class);
-        app()->bind(\UKFast\Admin\Devices\AdminClient::class, function() use ($mockAdminClient) {
-            return $mockAdminClient;
-        });
+        app()->instance(\UKFast\Admin\Devices\AdminClient::class, $mockAdminClient);
 
         // Mock the Devices API "$adminClient->devices()->getCredentials(...)->getItems()[0]" call
         $mockAdminClient->shouldReceive('devices')
