@@ -78,7 +78,7 @@ class UcsInfoTest extends TestCase
             $expectedUri = empty($getItemsResponse[0]->loginPort) ?
                 'http://localhost' :
                 'http://localhost:' . $getItemsResponse[0]->loginPort;
-            $this->assertEquals($expectedUri, $args['base_uri']);
+            $this->assertEquals($expectedUri, $args['config']['base_uri']);
             return $client;
         });
 

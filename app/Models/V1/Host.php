@@ -345,8 +345,10 @@ class Host extends Model implements Filterable, Sortable
 
         // Finally do the call to Conjurer using the credentials we retrieved from the DB and devices API
         $client = app()->makeWith(Client::class, [
-            'base_uri' => $conjurerUrl,
-            'timeout'  => 10,
+            'config' => [
+                'base_uri' => $conjurerUrl,
+                'timeout'  => 10,
+            ]
         ]);
         $response = $client->request('GET', '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node), [
             'auth' => ['conjurerapi', $credentials->password],
