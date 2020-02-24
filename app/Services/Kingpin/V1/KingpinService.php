@@ -913,4 +913,23 @@ class KingpinService
 
         return $this->response;
     }
+
+    /**
+     * @param $vmId
+     * @param null $solutionId
+     * @return array|bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function consoleSession($vmId, $solutionId = null)
+    {
+        try {
+            $this->makeRequest('POST', $this->generateV1URL($solutionId) . 'vm/' . (int)$vmId . '/console/session', []);
+        } catch (TransferException $exception) {
+            return false;
+        }
+        return [
+            'host' => $this->responseData->host ?? '',
+            'ticket' => $this->responseData->ticket ?? '',
+        ];
+    }
 }

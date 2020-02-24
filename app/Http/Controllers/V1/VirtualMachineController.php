@@ -6,11 +6,13 @@ use App\Models\V1\ActiveDirectoryDomain;
 use App\Exceptions\V1\InsufficientCreditsException;
 use App\Models\V1\GpuProfile;
 use App\Models\V1\PodTemplate;
+use App\Models\V1\Solution;
 use App\Models\V1\SolutionTemplate;
 use App\Models\V1\Trigger;
 use App\Services\AccountsService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Event;
 use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
@@ -2253,7 +2255,7 @@ class VirtualMachineController extends BaseController
     /**
      * Load and configure the Kingpin service for a Virtual Machine
      * @param VirtualMachine $virtualMachine
-     * @return mixed
+     * @return \App\Services\Kingpin\V1\KingpinService
      * @throws KingpinException
      */
     protected function loadKingpinService(VirtualMachine $virtualMachine)
@@ -2378,5 +2380,43 @@ class VirtualMachineController extends BaseController
         }
 
         return $VirtualMachine;
+    }
+
+    public function consoleSession(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        // hit Kingpin endpoint retrieving the host and ticket values
+        $kingpin = $this->loadKingpinService($virtualMachine);
+        $response = $kingpin->consoleSession(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+        $host = $response['host'] ?? null;
+        $ticket = $response['ticket'] ?? null;
+
+        // hit Envoy endpoint, using the host and ticket from Kingpin, retrieving the uuid for the Envoy session
+        $client = new Client([
+            'base_uri' => 'https://envoy-01.rnd.ukfast:8080',
+            'verify' => false,
+            'headers' => [
+                'X-API-Authentication' => 'Z3KAm7RPoeFBUelj9n1FM9XK',
+            ],
+        ]);
+        $response = $client->post('/session', [\GuzzleHttp\RequestOptions::JSON => [
+            'host' => $host,
+            'ticket' => $ticket,
+        ]]);
+        $responseJson = json_decode($response->getBody()->getContents());
+        $uuid = $responseJson->uuid ?? '';
+
+        // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
+        return response()->json([
+            'data' => [
+                'url' => 'https://envoy-01.rnd.ukfast/console/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
+            ],
+            'meta' => []
+        ]);
     }
 }
