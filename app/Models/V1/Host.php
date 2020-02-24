@@ -347,17 +347,44 @@ class Host extends Model implements Filterable, Sortable
         $client = app()->makeWith(Client::class, [
             'config' => [
                 'base_uri' => $conjurerUrl,
-                'timeout'  => 10,
+                'timeout' => 10,
             ]
         ]);
-        $response = $client->request('GET', '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node), [
-            'auth' => ['conjurerapi', $credentials->password],
-            'headers' => [
-                'X-UKFast-Compute-Username' => 'conjurerapi',
-                'X-UKFast-Compute-Password' => $credentials->password,
-                'Accept' => 'application/json',
-            ],
-        ]);
-        return json_decode($response->getBody()->getContents());
+        $response = $client->request('GET',
+            '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node), [
+                'auth' => ['conjurerapi', $credentials->password],
+                'headers' => [
+                    'X-UKFast-Compute-Username' => 'conjurerapi',
+                    'X-UKFast-Compute-Password' => $credentials->password,
+                    'Accept' => 'application/json',
+                ],
+            ]);
+        $responseObj = json_decode($response->getBody()->getContents());
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [];
+        }
+
+        // Now since we use snake case in our API and camel case in our other API we need to convert from one to another
+        $interfaces = [];
+        if (isset($responseObj->interfaces)) {
+            foreach ($responseObj->interfaces as $interface) {
+                $interfaces[] = [
+                    'name' => $interface->name ?? '',
+                    'address' => $interface->address ?? '',
+                    'type' => $interface->type ?? '',
+                ];
+            }
+        }
+
+        return [
+            'associated' => $responseObj->associated ?? '',
+            'configuration_state' => $responseObj->configurationState ?? '',
+            'power_state' => $responseObj->powerState ?? '',
+            'location' => $responseObj->location ?? '',
+            'assigned' => $responseObj->assigned ?? '',
+            'specification' => $responseObj->specification ?? '',
+            'name' => $responseObj->name ?? '',
+            'interfaces' => $interfaces ?? '',
+        ];
     }
 }
