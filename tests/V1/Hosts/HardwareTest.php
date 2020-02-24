@@ -10,7 +10,7 @@ use App\Models\V1\Pod;
 use App\Models\V1\Host;
 use App\Models\V1\Solution;
 
-class UcsInfoTest extends TestCase
+class HardwareTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -97,18 +97,45 @@ class UcsInfoTest extends TestCase
                 ]
             ])
             ->andReturn(new Response(200, [], json_encode([
-                'data' => ['key' => 'value'],
-                'meta' => [],
+                'assigned' => 'assigned',
+                'associated' => 'associated',
+                'configurationState' => 'configurationState',
+                'interfaces' => [
+                    [
+                        'name' => 'name',
+                        'address' => 'address',
+                        'type' => 'type',
+                    ],
+                ],
+                'location' => 'location',
+                'name' => 'name',
+                'powerState' => 'powerState',
+                'specification' => 'specification',
             ])));
 
         // Finally hit the UCS Info endpoint and check the expected result matches
-        $this->get('/v1/hosts/' . $host->ucs_node_id . '/ucs_info', [
+        $this->get('/v1/hosts/' . $host->ucs_node_id . '/hardware', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ]);
         $this->assertResponseStatus(200);
         $this->seeJson([
-            'data' => ['key' => 'value'],
+            'data' => [
+                'assigned' => 'assigned',
+                'associated' => 'associated',
+                'configuration_state' => 'configurationState',
+                'interfaces' => [
+                    [
+                        'name' => 'name',
+                        'address' => 'address',
+                        'type' => 'type',
+                    ],
+                ],
+                'location' => 'location',
+                'name' => 'name',
+                'power_state' => 'powerState',
+                'specification' => 'specification',
+            ],
             'meta' => [],
         ]);
     }
@@ -144,7 +171,7 @@ class UcsInfoTest extends TestCase
         $mockAdminClient->shouldNotReceive('credentials');
 
         // Finally hit the UCS Info endpoint and check the expected result matches
-        $this->get('/v1/hosts/' . $host->ucs_node_id . '/ucs_info', [
+        $this->get('/v1/hosts/' . $host->ucs_node_id . '/hardware', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ]);
