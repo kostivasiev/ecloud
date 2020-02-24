@@ -98,8 +98,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         ],
     ], function () use ($router) {
         $router->get(
-            'hosts/{host_id}/ucs_info',
-            'HostController@ucsInfo'
+            'hosts/{host_id}/hardware',
+            'HostController@hardware'
         );
         $router->post(
             'hosts/{host_id}/create',

@@ -316,7 +316,7 @@ class Host extends Model implements Filterable, Sortable
      * @see http://conjurer.rnd.ukfast:8443/swagger/ui/index#/Compute_v1/Compute_v1_RetrieveSolutionNode
      * @return array|mixed
      */
-    public function getUcsInfoAttribute()
+    public function getHardwareAttribute()
     {
         $devicesAdminClient = app()->make(AdminClient::class);
 

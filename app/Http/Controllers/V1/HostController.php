@@ -230,7 +230,7 @@ class HostController extends BaseController
      * @param $hostId
      * @return \Illuminate\http\Response
      */
-    public function ucsInfo(Request $request, $hostId)
+    public function hardware(Request $request, $hostId)
     {
         $host = Host::find($hostId);
         if (!$host) {
@@ -244,7 +244,7 @@ class HostController extends BaseController
         }
 
         return Response::create([
-            'data' => $host->ucs_info,
+            'data' => $host->hardware,
             'meta' => [],
         ], 200);
     }
