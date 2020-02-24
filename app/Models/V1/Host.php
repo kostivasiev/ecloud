@@ -3,16 +3,17 @@
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
-
+use UKFast\Admin\Devices\AdminClient;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
-
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 use UKFast\DB\Ditto\Filter;
+use GuzzleHttp\Client;
+use UKFast\SDK\Page;
 
 class Host extends Model implements Filterable, Sortable
 {
@@ -308,5 +309,85 @@ class Host extends Model implements Filterable, Sortable
         }
 
         return $fcwwns;
+    }
+
+    /**
+     * Call to Conjurer to get information on the UCS hosts
+     * @see http://conjurer.rnd.ukfast:8443/swagger/ui/index#/Compute_v1/Compute_v1_RetrieveSolutionNode
+     * @return array|mixed
+     */
+    public function getHardwareAttribute()
+    {
+        $devicesAdminClient = app()->make(AdminClient::class);
+
+        // Get credentials using the POD "vce_server_id" (This "server" is a VM running vCenter)
+        /** @var Page $response */
+        $response = $devicesAdminClient->devices()->getCredentials($this->pod->ucs_datacentre_vce_server_id, 1, 1, [
+            'type' => 'API',
+            'user' => 'conjurerapi'
+        ]);
+        $credentials = $response->getItems()[0] ?? null;
+        if ($credentials === null) {
+            return []; // No credentials found
+        }
+
+        // Now we have the details lets just do another API call to get the password (This make it secure right?)
+        $credentials->password = $devicesAdminClient->credentials()->getPassword($credentials->id);
+
+        // Assign UCS values to Conjurer variables so I don't go mad working out what is used below
+        $compute = $this->ucs_node_location;
+        $solution = $this->ucs_node_ucs_reseller_id;
+        $node = $this->ucs_node_profile_id;
+        $conjurerUrl = $this->pod->ucs_datacentre_ucs_api_url;
+
+        // Add the port number we got from the devices API to the Conjurer URL (wtf?)
+        $conjurerUrl = empty($credentials->loginPort) ? $conjurerUrl : $conjurerUrl . ':' . $credentials->loginPort;
+
+        // Finally do the call to Conjurer using the credentials we retrieved from the DB and devices API
+        $client = app()->makeWith(Client::class, [
+            'config' => [
+                'base_uri' => $conjurerUrl,
+                'timeout' => 10,
+            ]
+        ]);
+        $response = $client->request(
+            'GET',
+            '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node),
+            [
+                'auth' => ['conjurerapi', $credentials->password],
+                'headers' => [
+                    'X-UKFast-Compute-Username' => 'conjurerapi',
+                    'X-UKFast-Compute-Password' => $credentials->password,
+                    'Accept' => 'application/json',
+                ],
+            ]
+        );
+        $responseObj = json_decode($response->getBody()->getContents());
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [];
+        }
+
+        // Now since we use snake case in our API and camel case in our other API we need to convert from one to another
+        $interfaces = [];
+        if (isset($responseObj->interfaces)) {
+            foreach ($responseObj->interfaces as $interface) {
+                $interfaces[] = [
+                    'name' => $interface->name ?? '',
+                    'address' => $interface->address ?? '',
+                    'type' => $interface->type ?? '',
+                ];
+            }
+        }
+
+        return [
+            'associated' => $responseObj->associated ?? '',
+            'configuration_state' => $responseObj->configurationState ?? '',
+            'power_state' => $responseObj->powerState ?? '',
+            'location' => $responseObj->location ?? '',
+            'assigned' => $responseObj->assigned ?? '',
+            'specification' => $responseObj->specification ?? '',
+            'name' => $responseObj->name ?? '',
+            'interfaces' => $interfaces ?? '',
+        ];
     }
 }
