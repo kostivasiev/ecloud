@@ -360,7 +360,8 @@ class Host extends Model implements Filterable, Sortable
                     'X-UKFast-Compute-Password' => $credentials->password,
                     'Accept' => 'application/json',
                 ],
-            ]);
+            ]
+        );
         $responseObj = json_decode($response->getBody()->getContents());
         if (json_last_error() !== JSON_ERROR_NONE) {
             return [];
