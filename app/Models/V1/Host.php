@@ -350,8 +350,10 @@ class Host extends Model implements Filterable, Sortable
                 'timeout' => 10,
             ]
         ]);
-        $response = $client->request('GET',
-            '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node), [
+        $response = $client->request(
+            'GET',
+            '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node),
+            [
                 'auth' => ['conjurerapi', $credentials->password],
                 'headers' => [
                     'X-UKFast-Compute-Username' => 'conjurerapi',
