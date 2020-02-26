@@ -1,8 +1,0 @@
-PUT https://ecloud.pete.rnd.ukfast/v1/vms/123/console-session
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.write
-
-###
