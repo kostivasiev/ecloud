@@ -281,6 +281,7 @@ class Pod extends Model implements Filterable, Sortable
 
     /**
      * Load VCE server details/credentials by username
+     * @deprecated Use the devices API
      * @param string $username
      * @return array|bool
      */
