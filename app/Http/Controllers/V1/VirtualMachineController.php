@@ -2397,11 +2397,12 @@ class VirtualMachineController extends BaseController
         $ticket = $response['ticket'] ?? null;
 
         // hit Envoy endpoint, using the host and ticket from Kingpin, retrieving the uuid for the Envoy session
+        $envoyService = $virtualMachine->pod->service('envoy');
         $client = new Client([
-            'base_uri' => 'https://envoy-01.rnd.ukfast:8080',
+            'base_uri' => $envoyService->url,
             'verify' => false,
             'headers' => [
-                'X-API-Authentication' => 'Z3KAm7RPoeFBUelj9n1FM9XK',
+                'X-API-Authentication' => $envoyService->token,
             ],
         ]);
         $response = $client->post('/session', [\GuzzleHttp\RequestOptions::JSON => [
@@ -2414,9 +2415,9 @@ class VirtualMachineController extends BaseController
         // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
         return response()->json([
             'data' => [
-                'url' => 'https://envoy-01.rnd.ukfast/console/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
+                'url' => $envoyService->console_url . '/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
             ],
-            'meta' => []
+            'meta' => (object)[]
         ]);
     }
 }

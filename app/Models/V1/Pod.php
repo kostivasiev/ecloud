@@ -2,6 +2,8 @@
 
 namespace App\Models\V1;
 
+use App\Models\V1\Pod\Service;
+use App\Models\V1\Pod\ServiceAbstract;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
 use Illuminate\Database\Eloquent\Model;
@@ -185,6 +187,97 @@ class Pod extends Model implements Filterable, Sortable
         );
     }
 
+    /**
+     * Get all the service types available
+     * @return array
+     */
+    public function getServiceTypesAttribute()
+    {
+        return [
+            'artisan' => \App\Models\V1\Pod\Service\Artisan::class,
+            'conjurer' => \App\Models\V1\Pod\Service\Conjurer::class,
+            'envoy' => \App\Models\V1\Pod\Service\Envoy::class,
+            'flint' => \App\Models\V1\Pod\Service\Flint::class,
+            'kingpin' => \App\Models\V1\Pod\Service\Kingpin::class,
+        ];
+    }
+
+    /**
+     * Add a service to this pod
+     * @param ServiceAbstract $service
+     * @return bool
+     */
+    public function addService(ServiceAbstract $service)
+    {
+        $rows = app('db')->connection('ecloud')
+            ->table('pod_service')
+            ->where([
+                ['pod_id', '=', $this->ucs_datacentre_id],
+                ['service_id', '=', $service->id],
+                ['service_type', '=', array_search(get_class($service), $this->service_types)],
+            ])
+            ->get();
+        if (count($rows) !== 0) {
+            return true; // Don't create duplicates, respond with success
+        }
+
+        return app('db')->connection('ecloud')->table('pod_service')->insert([
+            'pod_id' => $this->ucs_datacentre_id,
+            'service_id' => $service->id,
+            'service_type' => array_search(get_class($service), $this->service_types),
+        ]);
+    }
+
+    /**
+     * Remove a service from this pod
+     * @param ServiceAbstract $service
+     * @return bool
+     */
+    public function removeService(ServiceAbstract $service)
+    {
+        return app('db')->connection('ecloud')
+            ->table('pod_service')
+            ->where([
+                ['pod_id', '=', $this->ucs_datacentre_id],
+                ['service_id', '=', $service->id],
+                ['service_type', '=', array_search(get_class($service), $this->service_types)],
+            ])
+            ->delete();
+    }
+
+    /**
+     * Get all the services used by this pod
+     * @return ServiceAbstract[]
+     */
+    public function services()
+    {
+        $rows = app('db')->connection('ecloud')
+            ->table('pod_service')
+            ->select('service_id', 'service_type')
+            ->where('pod_id', '=', $this->ucs_datacentre_id)
+            ->get();
+        $services = [];
+        foreach ($rows as $row) {
+            if (!isset($this->service_types[$row->service_type])) {
+                continue;
+            }
+            $services[] = $this->service_types[$row->service_type]::find($row->service_id);
+        }
+        return $services;
+    }
+
+    /**
+     * Get the first instance of the type
+     * @param $type
+     * @return mixed
+     */
+    public function service($type)
+    {
+        $services = array_filter($this->services(), function($v, $k) use ($type) {
+            return array_search(get_class($v), $this->service_types) === $type;
+        }, ARRAY_FILTER_USE_BOTH);
+        return array_shift($services);
+    }
 
     /**
      * Load VCE server details/credentials by username
