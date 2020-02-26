@@ -9,6 +9,7 @@ use App\Exceptions\V1\SanNotFoundException;
 use App\Exceptions\V1\ServiceUnavailableException;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
+use Illuminate\Http\Response;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -220,6 +221,32 @@ class HostController extends BaseController
         });
 
         return $this->respondEmpty();
+    }
+
+    /**
+     * Query conjurer and get Cisco USC data for the host
+     * @url http://conjurer.rnd.ukfast:8443/swagger/ui/index#/Compute_v1/Compute_v1_RetrieveSolutionNode
+     * @param Request $request
+     * @param $hostId
+     * @return \Illuminate\http\Response
+     */
+    public function hardware(Request $request, $hostId)
+    {
+        $host = Host::find($hostId);
+        if (!$host) {
+            return Response::create([
+                'errors' => [
+                    'title' => 'Not found',
+                    'detail' => 'Host not found',
+                    'status' => 404,
+                ]
+            ], 404);
+        }
+
+        return Response::create([
+            'data' => $host->hardware,
+            'meta' => [],
+        ], 200);
     }
 
     /**

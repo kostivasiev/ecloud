@@ -23,6 +23,7 @@ class CreateInitialTables extends Migration
             $table->string('ucs_datacentre_oneclick_enabled')->default('No');
             $table->integer('ucs_datacentre_vcl_server_id')->default('0');
             $table->integer('ucs_datacentre_vce_server_id')->default('0');
+            $table->string('ucs_datacentre_ucs_api_url');
         });
 
 

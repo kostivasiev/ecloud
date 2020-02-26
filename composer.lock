@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f6625a74a209509369ce77f2f7f12717",
+    "content-hash": "06a37f6c817cd5750c9028cf3110066f",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -4237,6 +4237,46 @@
             "time": "2019-10-24T08:53:34+00:00"
         },
         {
+            "name": "ukfast/admin-client",
+            "version": "v0.30.0",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
+                "reference": "a8c634b65df4da1d4b2af8bfe182079e91437c40"
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.3",
+                "illuminate/support": "^5.4|^6.0",
+                "php": ">=5.6",
+                "ukfast/sdk": "0.*.*"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "^1.9.1",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "3.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\Admin\\": "src/SDK"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "UKFast Admin SDK for PHP",
+            "support": {
+                "email": "developers@ukfast.co.uk"
+            },
+            "time": "2020-02-17T11:27:08+00:00"
+        },
+        {
             "name": "ukfast/api-auth",
             "version": "v2.2.3",
             "source": {
@@ -4274,11 +4314,11 @@
         },
         {
             "name": "ukfast/api-exceptions",
-            "version": "v2.5.0",
+            "version": "v2.3.2",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/exceptions.git",
-                "reference": "2ad58488f4323804b80c4450064cfeb2fd27f8eb"
+                "reference": "ffa439c4377406136464721ae46cb665519e95e3"
             },
             "require": {
                 "illuminate/contracts": "^5.5",
@@ -4324,7 +4364,7 @@
                 }
             ],
             "description": "Standard exceptions for the UKFast API",
-            "time": "2020-02-20T12:00:59+00:00"
+            "time": "2019-05-07T10:46:53+00:00"
         },
         {
             "name": "ukfast/api-helper-datetime",
@@ -4368,6 +4408,48 @@
             ],
             "description": "Transform DateTimes and Timestamps between the UKFast database formats and ISO 8601",
             "time": "2019-05-21T13:40:42+00:00"
+        },
+        {
+            "name": "ukfast/api-internal-communication",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/api-internal-communication.git",
+                "reference": "5df5344f9d81e3bf1ea85b1c1f83a6f20d31f32f"
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~6.0",
+                "ukfast/admin-client": "~0.30.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "UKFast\\ApiInternalCommunication\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\ApiInternalCommunication\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "peter.boulderstone",
+                    "email": "peter.boulderstone@ukfast.co.uk"
+                }
+            ],
+            "description": "Handles APIs talking to each other",
+            "time": "2020-02-18T14:53:26+00:00"
         },
         {
             "name": "ukfast/api-paginator",
@@ -4601,6 +4683,43 @@
             ],
             "description": "Package for enabling custom placement of log files",
             "time": "2019-07-18T08:55:54+00:00"
+        },
+        {
+            "name": "ukfast/sdk",
+            "version": "v0.17.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ukfast/sdk-php.git",
+                "reference": "84db870d4c152255228d0a23587b83d7de6a4097"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ukfast/sdk-php/zipball/84db870d4c152255228d0a23587b83d7de6a4097",
+                "reference": "84db870d4c152255228d0a23587b83d7de6a4097",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.3",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "^1.4",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "3.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\SDK\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "UKFast SDK for PHP",
+            "time": "2020-02-12T12:44:40+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

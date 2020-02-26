@@ -94,6 +94,9 @@ $app->register(UKFast\HealthCheck\HealthCheckServiceProvider::class);
 $app->register(UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 $app->register(UKFast\Api\Resource\ResourceServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
 
 // ecloud service providers
 $app->register(App\Providers\KingpinServiceProvider::class);
