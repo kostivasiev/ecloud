@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06a37f6c817cd5750c9028cf3110066f",
+    "content-hash": "a5cefb7261e401869399cdee1f5dddbb",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -2644,16 +2644,16 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "3.9.2",
+            "version": "3.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "7779489a47d443f845271badbdcedfe4df8e06fb"
+                "reference": "7e1633a6964b48589b142d60542f9ed31bd37a92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/7779489a47d443f845271badbdcedfe4df8e06fb",
-                "reference": "7779489a47d443f845271badbdcedfe4df8e06fb",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/7e1633a6964b48589b142d60542f9ed31bd37a92",
+                "reference": "7e1633a6964b48589b142d60542f9ed31bd37a92",
                 "shasum": ""
             },
             "require": {
@@ -2727,7 +2727,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2019-12-17T08:18:51+00:00"
+            "time": "2020-02-21T04:36:14+00:00"
         },
         {
             "name": "react/promise",
@@ -4238,11 +4238,11 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v0.30.0",
+            "version": "v0.30.1",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "a8c634b65df4da1d4b2af8bfe182079e91437c40"
+                "reference": "438115ace14f7841b6f3ba88682d29bfd8c9f5a6"
             },
             "require": {
                 "ext-json": "*",
@@ -4274,7 +4274,7 @@
             "support": {
                 "email": "developers@ukfast.co.uk"
             },
-            "time": "2020-02-17T11:27:08+00:00"
+            "time": "2020-02-19T08:21:19+00:00"
         },
         {
             "name": "ukfast/api-auth",
@@ -4314,11 +4314,11 @@
         },
         {
             "name": "ukfast/api-exceptions",
-            "version": "v2.3.2",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/exceptions.git",
-                "reference": "ffa439c4377406136464721ae46cb665519e95e3"
+                "reference": "2ad58488f4323804b80c4450064cfeb2fd27f8eb"
             },
             "require": {
                 "illuminate/contracts": "^5.5",
@@ -4364,7 +4364,7 @@
                 }
             ],
             "description": "Standard exceptions for the UKFast API",
-            "time": "2019-05-07T10:46:53+00:00"
+            "time": "2020-02-20T12:00:59+00:00"
         },
         {
             "name": "ukfast/api-helper-datetime",
@@ -4686,16 +4686,16 @@
         },
         {
             "name": "ukfast/sdk",
-            "version": "v0.17.11",
+            "version": "v0.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ukfast/sdk-php.git",
-                "reference": "84db870d4c152255228d0a23587b83d7de6a4097"
+                "reference": "2eeb39043636eb590afdfcc554b48f6c8ed813aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ukfast/sdk-php/zipball/84db870d4c152255228d0a23587b83d7de6a4097",
-                "reference": "84db870d4c152255228d0a23587b83d7de6a4097",
+                "url": "https://api.github.com/repos/ukfast/sdk-php/zipball/2eeb39043636eb590afdfcc554b48f6c8ed813aa",
+                "reference": "2eeb39043636eb590afdfcc554b48f6c8ed813aa",
                 "shasum": ""
             },
             "require": {
@@ -4719,7 +4719,7 @@
                 "MIT"
             ],
             "description": "UKFast SDK for PHP",
-            "time": "2020-02-12T12:44:40+00:00"
+            "time": "2020-02-20T15:32:25+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -5835,22 +5835,22 @@
         },
         {
             "name": "phpmd/phpmd",
-            "version": "2.8.1",
+            "version": "2.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpmd/phpmd.git",
-                "reference": "5664b95d484797582f5af9536238deb9ecde58a1"
+                "reference": "714629ed782537f638fe23c4346637659b779a77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpmd/phpmd/zipball/5664b95d484797582f5af9536238deb9ecde58a1",
-                "reference": "5664b95d484797582f5af9536238deb9ecde58a1",
+                "url": "https://api.github.com/repos/phpmd/phpmd/zipball/714629ed782537f638fe23c4346637659b779a77",
+                "reference": "714629ed782537f638fe23c4346637659b779a77",
                 "shasum": ""
             },
             "require": {
                 "composer/xdebug-handler": "^1.0",
                 "ext-xml": "*",
-                "pdepend/pdepend": "^2.6",
+                "pdepend/pdepend": "^2.7.1",
                 "php": ">=5.3.9"
             },
             "require-dev": {
@@ -5901,7 +5901,7 @@
                 "phpmd",
                 "pmd"
             ],
-            "time": "2019-12-27T11:09:06+00:00"
+            "time": "2020-02-16T20:15:50+00:00"
         },
         {
             "name": "phpspec/prophecy",
