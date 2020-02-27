@@ -798,6 +798,12 @@ class VirtualMachineController extends BaseController
             }
         }
 
+        // set billing options
+        if ($request->input('environment') == 'Public') {
+            $post_data['billing_type'] = 'PAYG';
+            $post_data['billing_period'] = 'Month';
+        }
+
         // remove debugging when ready to retest
 //        print_r($post_data);
 //        exit;
