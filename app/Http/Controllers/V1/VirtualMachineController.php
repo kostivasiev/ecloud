@@ -2387,14 +2387,6 @@ class VirtualMachineController extends BaseController
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
-// TODO - DELETE THIS DEBUG CODE
-//        $consoleResource = \App\Models\V1\Pod\Resource\Console::create([
-//            'token' => 'XXXXXXXXXXXXXXXXXXXXXXX',
-//            'url' => 'https://envoy-01.rnd.ukfast:8080',
-//            'console_url' => 'https://envoy-01.rnd.ukfast/console',
-//        ]);
-//        $virtualMachine->pod->addResource($consoleResource);
-
         // hit management resource retrieving the host and ticket values
         $managementResource = $this->loadKingpinService($virtualMachine);
         $response = $managementResource->consoleSession(

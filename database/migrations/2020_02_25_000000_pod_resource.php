@@ -17,25 +17,26 @@ class PodResource extends Migration
             $table->text('resource_type');
         });
 
-        Schema::connection('ecloud')->create('pod_resource_artisan', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('pod_resource_compute', function (Blueprint $table) {
             $table->uuid('id')->primary();
         });
 
-        Schema::connection('ecloud')->create('pod_resource_conjurer', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-        });
-
-        Schema::connection('ecloud')->create('pod_resource_envoy', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('pod_resource_console', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->binary('token');
             $table->text('url');
+            $table->text('console_url');
         });
 
-        Schema::connection('ecloud')->create('pod_resource_flint', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('pod_resource_management', function (Blueprint $table) {
             $table->uuid('id')->primary();
         });
 
-        Schema::connection('ecloud')->create('pod_resource_kingpin', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('pod_resource_network', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+        });
+
+        Schema::connection('ecloud')->create('pod_resource_storage', function (Blueprint $table) {
             $table->uuid('id')->primary();
         });
     }
@@ -43,10 +44,10 @@ class PodResource extends Migration
     public function down()
     {
         Schema::connection('ecloud')->drop('pod_resource');
-        Schema::connection('ecloud')->drop('pod_resource_artisan');
-        Schema::connection('ecloud')->drop('pod_resource_conjurer');
-        Schema::connection('ecloud')->drop('pod_resource_envoy');
-        Schema::connection('ecloud')->drop('pod_resource_flint');
-        Schema::connection('ecloud')->drop('pod_resource_kingpin');
+        Schema::connection('ecloud')->drop('pod_resource_compute');
+        Schema::connection('ecloud')->drop('pod_resource_console');
+        Schema::connection('ecloud')->drop('pod_resource_management');
+        Schema::connection('ecloud')->drop('pod_resource_network');
+        Schema::connection('ecloud')->drop('pod_resource_storage');
     }
 }
