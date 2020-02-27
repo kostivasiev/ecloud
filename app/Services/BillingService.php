@@ -27,7 +27,7 @@ class BillingService extends AbstractApioService
     public function verifyDefaultPaymentCard()
     {
         try {
-            $response = $this->makeRequest('GET', 'Xv1/cards?primary_card:eq=true');
+            $response = $this->makeRequest('GET', 'v1/cards?primary_card:eq=true');
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('unexpected response ('.$response->getStatusCode().') from accounts apio');
             }
