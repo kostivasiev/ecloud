@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06ed8d2b71df2575da7ba9348e5a8017",
+    "content-hash": "a5cefb7261e401869399cdee1f5dddbb",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -4313,47 +4313,12 @@
             "time": "2019-10-29T16:32:25+00:00"
         },
         {
-            "name": "ukfast/api-encryption",
-            "version": "v4.0.0",
-            "source": {
-                "type": "git",
-                "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/encryption.git",
-                "reference": "8183191bcd5081b7a67d7c98341baea55442ee1b"
-            },
-            "require": {
-                "ext-mcrypt": "*",
-                "guzzlehttp/guzzle": ">=6.0.0",
-                "php": ">=7.1.3"
-            },
-            "require-dev": {
-                "phpmd/phpmd": "^2.6.0",
-                "phpunit/phpunit": "^7.0",
-                "squizlabs/php_codesniffer": "^3.0.0",
-                "ukfast/rulesets": "^2.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "UKFast\\Helpers\\Encryption\\": "src/",
-                    "UKFast\\Helpers\\Encryption\\Tests\\": "tests/"
-                }
-            },
-            "authors": [
-                {
-                    "name": "Phil Young",
-                    "email": "phil.young@ukfast.co.uk"
-                }
-            ],
-            "description": "Encrypt and decrypt secrets with ease",
-            "time": "2019-11-26T11:21:16+00:00"
-        },
-        {
             "name": "ukfast/api-exceptions",
-            "version": "v2.3.2",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/exceptions.git",
-                "reference": "ffa439c4377406136464721ae46cb665519e95e3"
+                "reference": "2ad58488f4323804b80c4450064cfeb2fd27f8eb"
             },
             "require": {
                 "illuminate/contracts": "^5.5",
@@ -4399,7 +4364,7 @@
                 }
             ],
             "description": "Standard exceptions for the UKFast API",
-            "time": "2019-05-07T10:46:53+00:00"
+            "time": "2020-02-20T12:00:59+00:00"
         },
         {
             "name": "ukfast/api-helper-datetime",
