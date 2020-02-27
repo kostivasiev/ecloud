@@ -1,16 +1,16 @@
 <?php
-namespace App\Models\V1\Pod\Service;
+namespace App\Models\V1\Pod\Resource;
 
-use App\Models\V1\Pod\ServiceAbstract;
+use App\Models\V1\Pod\ResourceAbstract;
 
-class Artisan extends ServiceAbstract
+class Management extends ResourceAbstract
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'pod_service_artisan';
+    protected $table = 'pod_resource_management';
 
     /**
      * @var array

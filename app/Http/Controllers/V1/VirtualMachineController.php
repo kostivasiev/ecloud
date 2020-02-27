@@ -2387,22 +2387,35 @@ class VirtualMachineController extends BaseController
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
-        // hit Kingpin endpoint retrieving the host and ticket values
-        $kingpin = $this->loadKingpinService($virtualMachine);
-        $response = $kingpin->consoleSession(
+// TODO - DELETE THIS DEBUG CODE
+//        $consoleResource = \App\Models\V1\Pod\Resource\Console::create([
+//            'token' => 'XXXXXXXXXXXXXXXXXXXXXXX',
+//            'url' => 'https://envoy-01.rnd.ukfast:8080',
+//            'console_url' => 'https://envoy-01.rnd.ukfast/console',
+//        ]);
+//        $virtualMachine->pod->addResource($consoleResource);
+
+        // hit management resource retrieving the host and ticket values
+        $managementResource = $this->loadKingpinService($virtualMachine);
+        $response = $managementResource->consoleSession(
             $virtualMachine->getKey(),
             $virtualMachine->solutionId()
         );
         $host = $response['host'] ?? null;
         $ticket = $response['ticket'] ?? null;
 
-        // hit Envoy endpoint, using the host and ticket from Kingpin, retrieving the uuid for the Envoy session
-        $envoyService = $virtualMachine->pod->service('envoy');
+        // hit console resource, using the host and ticket from the management resource
+        // retrieving the uuid for the console resource session
+        $consoleResource = $virtualMachine->pod->resource('console');
+        if (!$consoleResource) {
+            abort(503);
+        }
+
         $client = new Client([
-            'base_uri' => $envoyService->url,
+            'base_uri' => $consoleResource->url,
             'verify' => false,
             'headers' => [
-                'X-API-Authentication' => $envoyService->token,
+                'X-API-Authentication' => $consoleResource->token,
             ],
         ]);
         $response = $client->post('/session', [\GuzzleHttp\RequestOptions::JSON => [
@@ -2415,7 +2428,7 @@ class VirtualMachineController extends BaseController
         // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
         return response()->json([
             'data' => [
-                'url' => $envoyService->console_url . '/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
+                'url' => $consoleResource->console_url . '/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
             ],
             'meta' => (object)[]
         ]);

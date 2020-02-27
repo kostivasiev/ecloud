@@ -4,7 +4,7 @@ namespace App\Models\V1\Pod;
 use App\Traits\V1\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 
-class ServiceAbstract extends Model
+class ResourceAbstract extends Model
 {
     use UUIDHelper;
 

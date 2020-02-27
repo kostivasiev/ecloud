@@ -2,7 +2,8 @@
 
 namespace App\Models\V1;
 
-use App\Models\V1\Pod\Service;
+use App\Models\V1\Pod\Resource;
+use App\Models\V1\Pod\ResourceAbstract;
 use App\Models\V1\Pod\ServiceAbstract;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
@@ -188,82 +189,82 @@ class Pod extends Model implements Filterable, Sortable
     }
 
     /**
-     * Get all the service types available
+     * Get all the resource types available
      * @return array
      */
-    public function getServiceTypesAttribute()
+    public function getResourceTypesAttribute()
     {
         return [
-            'artisan' => \App\Models\V1\Pod\Service\Artisan::class,
-            'conjurer' => \App\Models\V1\Pod\Service\Conjurer::class,
-            'envoy' => \App\Models\V1\Pod\Service\Envoy::class,
-            'flint' => \App\Models\V1\Pod\Service\Flint::class,
-            'kingpin' => \App\Models\V1\Pod\Service\Kingpin::class,
+            'compute' => \App\Models\V1\Pod\Resource\Compute::class,
+            'console' => \App\Models\V1\Pod\Resource\Console::class,
+            'management' => \App\Models\V1\Pod\Resource\Management::class,
+            'network' => \App\Models\V1\Pod\Resource\Network::class,
+            'storage' => \App\Models\V1\Pod\Resource\Storage::class,
         ];
     }
 
     /**
-     * Add a service to this pod
-     * @param ServiceAbstract $service
+     * Add a resource to this pod
+     * @param ResourceAbstract $resource
      * @return bool
      */
-    public function addService(ServiceAbstract $service)
+    public function addResource(ResourceAbstract $resource)
     {
         $rows = app('db')->connection('ecloud')
-            ->table('pod_service')
+            ->table('pod_resource')
             ->where([
                 ['pod_id', '=', $this->ucs_datacentre_id],
-                ['service_id', '=', $service->id],
-                ['service_type', '=', array_search(get_class($service), $this->service_types)],
+                ['resource_id', '=', $resource->id],
+                ['resource_type', '=', array_search(get_class($resource), $this->resource_types)],
             ])
             ->get();
         if (count($rows) !== 0) {
             return true; // Don't create duplicates, respond with success
         }
 
-        return app('db')->connection('ecloud')->table('pod_service')->insert([
+        return app('db')->connection('ecloud')->table('pod_resource')->insert([
             'pod_id' => $this->ucs_datacentre_id,
-            'service_id' => $service->id,
-            'service_type' => array_search(get_class($service), $this->service_types),
+            'resource_id' => $resource->id,
+            'resource_type' => array_search(get_class($resource), $this->resource_types),
         ]);
     }
 
     /**
-     * Remove a service from this pod
-     * @param ServiceAbstract $service
+     * Remove a resource from this pod
+     * @param ResourceAbstract $resource
      * @return bool
      */
-    public function removeService(ServiceAbstract $service)
+    public function removeResource(ResourceAbstract $resource)
     {
         return app('db')->connection('ecloud')
-            ->table('pod_service')
+            ->table('pod_resource')
             ->where([
                 ['pod_id', '=', $this->ucs_datacentre_id],
-                ['service_id', '=', $service->id],
-                ['service_type', '=', array_search(get_class($service), $this->service_types)],
+                ['resource_id', '=', $resource->id],
+                ['resource_type', '=', array_search(get_class($resource), $this->resource_types)],
             ])
             ->delete();
     }
 
     /**
-     * Get all the services used by this pod
-     * @return ServiceAbstract[]
+     * Get all the resources used by this pod
+     * @return ResourceAbstract[]
      */
-    public function services()
+    public function resources()
     {
         $rows = app('db')->connection('ecloud')
-            ->table('pod_service')
-            ->select('service_id', 'service_type')
+            ->table('pod_resource')
+            ->select('resource_id', 'resource_type')
             ->where('pod_id', '=', $this->ucs_datacentre_id)
             ->get();
-        $services = [];
+        $resources = [];
         foreach ($rows as $row) {
-            if (!isset($this->service_types[$row->service_type])) {
+            if (!isset($this->resource_types[$row->resource_type])) {
                 continue;
             }
-            $services[] = $this->service_types[$row->service_type]::find($row->service_id);
+            $resources[] = $this->resource_types[$row->resource_type]::find($row->resource_id);
         }
-        return $services;
+        return $resources;
     }
 
     /**
@@ -271,12 +272,12 @@ class Pod extends Model implements Filterable, Sortable
      * @param $type
      * @return mixed
      */
-    public function service($type)
+    public function resource($type)
     {
-        $services = array_filter($this->services(), function($v, $k) use ($type) {
-            return array_search(get_class($v), $this->service_types) === $type;
+        $resources = array_filter($this->resources(), function($v, $k) use ($type) {
+            return array_search(get_class($v), $this->resource_types) === $type;
         }, ARRAY_FILTER_USE_BOTH);
-        return array_shift($services);
+        return array_shift($resources);
     }
 
     /**

@@ -1,16 +1,16 @@
 <?php
-namespace App\Models\V1\Pod\Service;
+namespace App\Models\V1\Pod\Resource;
 
-use App\Models\V1\Pod\ServiceAbstract;
+use App\Models\V1\Pod\ResourceAbstract;
 
-class Envoy extends ServiceAbstract
+class Console extends ResourceAbstract
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'pod_service_envoy';
+    protected $table = 'pod_resource_console';
 
     /**
      * @var array
