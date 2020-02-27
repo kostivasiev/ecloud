@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\V1\ServiceResponseException;
 use GuzzleHttp\Exception\TransferException;
 use Liquid\Exception\NotFoundException;
 
@@ -70,6 +71,57 @@ class AccountsService extends AbstractApioService
             return ($response->getStatusCode() == 204);
         } catch (TransferException $exception) {
             return false;
+        }
+    }
+
+    /**
+     * Get Customers Payment Method
+     * @param $resellerId
+     * @return bool
+     * @throws ServiceResponseException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getPaymentMethod($resellerId)
+    {
+        try {
+            $response = $this->makeRequest('GET', 'v1/customers/'.$resellerId.'');
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('unexpected response ('.$response->getStatusCode().') from accounts apio');
+            }
+
+            $data = $this->parseResponseData($response->getBody()->getContents())->data;
+            if (empty($data->payment_method)) {
+                throw new \Exception('missing account payment method');
+            }
+
+            return $data->payment_method;
+        } catch (TransferException $exception) {
+            throw new ServiceResponseException('unable to confirm account payment method');
+        }
+    }
+
+    /**
+     * @param $resellerId
+     * @return bool
+     * @throws ServiceResponseException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function isDemoCustomer($resellerId)
+    {
+        try {
+            $response = $this->makeRequest('GET', 'v1/customers/'.$resellerId.'');
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('unexpected response ('.$response->getStatusCode().') from accounts apio');
+            }
+
+            $data = $this->parseResponseData($response->getBody()->getContents())->data;
+            if (!is_bool($data->is_demo_account)) {
+                throw new \Exception('missing demo account status');
+            }
+
+            return $data->is_demo_account == true;
+        } catch (Exception $exception) {
+            throw new ServiceResponseException('unable to confirm account status');
         }
     }
 }

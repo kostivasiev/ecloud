@@ -17,7 +17,7 @@
     "ramsey/uuid": "^3.8",
     "ruflin/elastica": "^6.1",
     "ukfast/api-auth": "2.*",
-    "ukfast/api-exceptions": "2.3.*",
+    "ukfast/api-exceptions": "2.*",
     "ukfast/api-helper-datetime": "2.0.*",
     "ukfast/api-paginator": "2.0.*",
     "ukfast/api-resources": "^4.2",

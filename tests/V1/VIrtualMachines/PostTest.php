@@ -21,18 +21,6 @@ class PostTest extends TestCase
         parent::setUp();
     }
 
-    public function testPublicDeployDisabled()
-    {
-        $this->json('POST', '/v1/vms', [
-            'environment' => 'Public',
-        ], [
-            'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(403);
-    }
-
     public function testBurstDeployDisabled()
     {
         $this->json('POST', '/v1/vms', [

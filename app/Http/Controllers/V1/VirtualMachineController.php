@@ -9,6 +9,7 @@ use App\Models\V1\PodTemplate;
 use App\Models\V1\SolutionTemplate;
 use App\Models\V1\Trigger;
 use App\Services\AccountsService;
+use App\Services\BillingService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
 use Illuminate\Support\Facades\Event;
@@ -103,6 +104,7 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @param AccountsService $accountsService
+     * @param BillingService $billingService
      * @return \Illuminate\Http\Response
      * @throws ApplianceServerLicenseNotFoundException
      * @throws EncryptionServiceNotEnabledException
@@ -123,13 +125,17 @@ class VirtualMachineController extends BaseController
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws Exceptions\PaymentRequiredException
      */
-    public function create(Request $request, IntapiService $intapiService, AccountsService $accountsService)
-    {
-        // todo remove when public/burst VMs supported
-        // - template validation issue on public
-        // - need `add_billing` step on create_vm automation
-        if (!$this->isAdmin && in_array($request->input('environment'), ['Public', 'Burst', 'GPU'])) {
+    public function create(
+        Request $request,
+        IntapiService $intapiService,
+        AccountsService $accountsService,
+        BillingService $billingService
+    ) {
+        // todo remove when burst/gpu VMs supported
+        // - need to update `add_billing` step on create_vm automation
+        if (!$this->isAdmin && in_array($request->input('environment'), ['Burst', 'GPU'])) {
             throw new Exceptions\ForbiddenException(
                 $request->input('environment') . ' VM creation is temporarily disabled'
             );
@@ -192,7 +198,7 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        // Check we either have template or appliance_id but not both
+        // Check we either have hdd or hdd_disks but not both
         if (!($request->has('hdd') xor $request->has('hdd_disks'))) {
             throw new Exceptions\BadRequestException(
                 'Virtual machines must be launched with either the hdd or hdd_disks parameter'
@@ -241,9 +247,21 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         if ($request->input('environment') == 'Public') {
-            // if admin reseller scope is empty, we won't know the owner for the new VM
             if (empty($request->user->resellerId)) {
+                // if admin reseller scope is empty, we won't know the owner for the new VM
                 throw new Exceptions\UnauthorisedException('Unable to determine account id');
+            }
+
+            // check for demo accounts
+            if ($accountsService->isDemoCustomer($request->user->resellerId)) {
+                throw new Exceptions\ForbiddenException(
+                    'eCloud Public is not available to demo account users, please upgrade via MyUKfast'
+                );
+            }
+
+            // check the customer has a valid payment method on their account
+            if ($accountsService->getPaymentMethod($request->user->resellerId) == 'Credit Card') {
+                $billingService->scopeResellerId($request->user->resellerId)->verifyDefaultPaymentCard();
             }
 
             if ($request->has('encrypt')) {
@@ -254,7 +272,7 @@ class VirtualMachineController extends BaseController
 
             if ($request->has('controlpanel_id') && !$this->isAdmin) {
                 throw new Exceptions\BadRequestException(
-                    'Legacy Control Panel installation is not available at this time.'
+                    'Legacy Control Panel installation is no longer available, please use a marketplace appliance.'
                 );
             }
             
