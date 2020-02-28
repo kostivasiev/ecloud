@@ -143,4 +143,14 @@ class PodController extends BaseController
             200
         );
     }
+
+    public function consoleAvailable(Request $request, $podId)
+    {
+        $pod = static::getPodById($request, $podId);
+        $consoleResource = $pod->resource('console');
+        if (!$consoleResource) {
+            abort(404);
+        }
+        return response('', 200);
+    }
 }
