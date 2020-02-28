@@ -2434,6 +2434,9 @@ class VirtualMachineController extends BaseController
         ]]);
         $responseJson = json_decode($response->getBody()->getContents());
         $uuid = $responseJson->uuid ?? '';
+        if (empty($uuid)) {
+            abort(503);
+        }
 
         // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
         return response()->json([
