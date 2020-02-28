@@ -143,6 +143,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('pods/{pod_id}/appliances', 'ApplianceController@addToPod');
     $router->delete('pods/{pod_id}/appliances/{appliance_id}', 'ApplianceController@removeFromPod');
     $router->delete('pods/{pod_id}/templates/{template_name}', 'TemplateController@deletePodTemplate');
+    $router->get('pods/{pod_id}/console-available', 'PodController@consoleAvailable');
 
 
     // Appliances
