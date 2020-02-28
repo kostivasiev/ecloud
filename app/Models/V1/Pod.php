@@ -274,7 +274,7 @@ class Pod extends Model implements Filterable, Sortable
      */
     public function resource($type)
     {
-        $resources = array_filter($this->resources(), function($v, $k) use ($type) {
+        $resources = array_filter($this->resources(), function ($v, $k) use ($type) {
             return array_search(get_class($v), $this->resource_types) === $type;
         }, ARRAY_FILTER_USE_BOTH);
         return array_shift($resources);
