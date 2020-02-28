@@ -26,7 +26,8 @@
     "ukfast/health-check": "~1.0",
     "ukfast/log-provider": "~1.0",
     "vlucas/phpdotenv": "^3.3",
-    "ukfast/api-internal-communication": "~1.0"
+    "ukfast/api-internal-communication": "~1.0",
+    "ukfast/api-encryption": "^4.0.0"
   },
   "require-dev": {
     "ext-sqlite3": "*",
@@ -123,6 +124,9 @@
     }, {
     "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git"
+    }, {
+      "type": "vcs",
+      "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/encryption.git"
     }
   ]
 }

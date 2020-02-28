@@ -6,12 +6,14 @@ use App\Models\V1\ActiveDirectoryDomain;
 use App\Exceptions\V1\InsufficientCreditsException;
 use App\Models\V1\GpuProfile;
 use App\Models\V1\PodTemplate;
+use App\Models\V1\Solution;
 use App\Models\V1\SolutionTemplate;
 use App\Models\V1\Trigger;
 use App\Services\AccountsService;
 use App\Services\BillingService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Event;
 use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
@@ -2277,7 +2279,7 @@ class VirtualMachineController extends BaseController
     /**
      * Load and configure the Kingpin service for a Virtual Machine
      * @param VirtualMachine $virtualMachine
-     * @return mixed
+     * @return \App\Services\Kingpin\V1\KingpinService
      * @throws KingpinException
      */
     protected function loadKingpinService(VirtualMachine $virtualMachine)
@@ -2402,5 +2404,52 @@ class VirtualMachineController extends BaseController
         }
 
         return $VirtualMachine;
+    }
+
+    public function consoleSession(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        // hit management resource retrieving the host and ticket values
+        $managementResource = $this->loadKingpinService($virtualMachine);
+        $response = $managementResource->consoleSession(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+        $host = $response['host'] ?? null;
+        $ticket = $response['ticket'] ?? null;
+
+        // hit console resource, using the host and ticket from the management resource
+        // retrieving the uuid for the console resource session
+        $consoleResource = $virtualMachine->pod->resource('console');
+        if (!$consoleResource) {
+            abort(503);
+        }
+
+        $client = new Client([
+            'base_uri' => $consoleResource->url,
+            'verify' => false,
+            'headers' => [
+                'X-API-Authentication' => $consoleResource->token,
+            ],
+        ]);
+        $response = $client->post('/session', [\GuzzleHttp\RequestOptions::JSON => [
+            'host' => $host,
+            'ticket' => $ticket,
+        ]]);
+        $responseJson = json_decode($response->getBody()->getContents());
+        $uuid = $responseJson->uuid ?? '';
+        if (empty($uuid)) {
+            abort(503);
+        }
+
+        // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
+        return response()->json([
+            'data' => [
+                'url' => $consoleResource->console_url . '/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
+            ],
+            'meta' => (object)[]
+        ]);
     }
 }
