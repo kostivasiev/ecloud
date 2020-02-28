@@ -2406,6 +2406,17 @@ class VirtualMachineController extends BaseController
         return $VirtualMachine;
     }
 
+    public function consoleAvailable(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+        $consoleResource = $virtualMachine->pod->resource('console');
+        if (!$consoleResource) {
+            abort(404);
+        }
+        return response('', 200);
+    }
+
     public function consoleSession(Request $request, $vmId)
     {
         $this->validateVirtualMachineId($request, $vmId);

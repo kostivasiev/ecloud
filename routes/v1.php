@@ -60,6 +60,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->post('vms/{vmId}/join-ad-domain', 'VirtualMachineController@joinActiveDirectoryDomain');
     $router->put('vms/{vmId}/console-session', 'VirtualMachineController@consoleSession');
+    $router->get('vms/{vmId}/console-available', 'VirtualMachineController@consoleAvailable');
 
     // Solution's
     $router->get('solutions', 'SolutionController@index');
