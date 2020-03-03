@@ -121,7 +121,7 @@ class GetTest extends TestCase
         Datastore::flushEventListeners();
 
         $pod = factory(Pod::class, 1)->create([
-            'ucs_datacentre_id' => 1,
+            'ucs_datacentre_id' => 14,
         ])->first();
 
         $clusterName = 'MCS_VV_P1_VMPUBLICSTORE_SSD_NONBACKUP';

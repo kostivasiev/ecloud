@@ -449,14 +449,24 @@ class Datastore extends Model implements Filterable, Sortable
      */
     public static function getPublicDefault($pod, $backupRequired)
     {
-        $clusterName = 'MCS_P'.$pod->getKey().'_VV_VMPUBLICSTORE_SSD_' . ($backupRequired?'BACKUP':'NONBACKUP');
+        // clusters arent named after their db IDs, need to investigate using the pod short name if we can update them.
+        // for now I will have to map here
+        $podMapping = [
+            14 => 1,
+            21 => 3,
+        ];
 
-        // temp fudge until infra fix the cluster name
-        if ($pod->getKey() === 1 && $backupRequired == false) {
-            $clusterName = 'MCS_VV_P1_VMPUBLICSTORE_SSD_NONBACKUP';
+        $podId = $pod->getKey();
+        if (array_key_exists($podId, $podMapping)) {
+            $podId = $podMapping[$pod->getKey()];
         }
 
-        Log::debug('call to getPublicDefault, cluster name: ' . $clusterName);
+        $clusterName = 'MCS_P'.$podId.'_VV_VMPUBLICSTORE_SSD_' . ($backupRequired?'BACKUP':'NONBACKUP');
+
+        // temp fudge until infra fix the cluster name
+        if ($podId === 1 && $backupRequired == false) {
+            $clusterName = 'MCS_VV_P1_VMPUBLICSTORE_SSD_NONBACKUP';
+        }
 
         $datastore = static::where('reseller_lun_name', $clusterName)->first();
         if (empty($datastore)) {
