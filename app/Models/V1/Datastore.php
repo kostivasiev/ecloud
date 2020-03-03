@@ -473,6 +473,9 @@ class Datastore extends Model implements Filterable, Sortable
             throw new DatastoreNotFoundException('unable to locate datastore');
         }
 
+        // flag as system storage to bypass resource checks
+        $datastore->isSystemStorage = true;
+
         return $datastore;
     }
 
