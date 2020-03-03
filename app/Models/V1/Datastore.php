@@ -456,6 +456,8 @@ class Datastore extends Model implements Filterable, Sortable
             $clusterName = 'MCS_VV_P1_VMPUBLICSTORE_SSD_NONBACKUP';
         }
 
+        Log::debug('call to getPublicDefault, cluster name: ' . $clusterName);
+
         $datastore = static::where('reseller_lun_name', $clusterName)->first();
         if (empty($datastore)) {
             throw new DatastoreNotFoundException('unable to locate datastore');
