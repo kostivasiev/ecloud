@@ -287,11 +287,7 @@ class VirtualMachineController extends BaseController
                 );
             }
 
-            $datastore = Datastore::getDefault(
-                null,
-                'Public',
-                ($request->input('backup') == true)
-            );
+            $datastore = Datastore::getPublicDefault($pod, ($request->input('backup') == true));
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
