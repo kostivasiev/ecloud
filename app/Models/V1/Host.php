@@ -2,7 +2,9 @@
 
 namespace App\Models\V1;
 
+use App\Models\V1\Pod\Location;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Devices\AdminClient;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -334,8 +336,24 @@ class Host extends Model implements Filterable, Sortable
         // Now we have the details lets just do another API call to get the password (This make it secure right?)
         $credentials->password = $devicesAdminClient->credentials()->getPassword($credentials->id);
 
+        // Get the hosts pod
+        if ($this->pod === null) {
+            return []; // No pod found
+        }
+
+        // Get the hosts location
+        if ($this->location === null) {
+            return []; // No location found
+        }
+
+        // Sanity check the host is in a location within the pod it lives in
+        if ($this->pod->ucs_datacentre_id !== $this->location->pod->ucs_datacentre_id) {
+            Log::error('The host ' . $this->ucs_node_id . ' is in a location outside its current pod');
+            return []; // The hosts location does not belong in the hosts pod
+        }
+
         // Assign UCS values to Conjurer variables so I don't go mad working out what is used below
-        $compute = $this->ucs_node_location;
+        $compute = $this->location->ucs_datacentre_location_name;
         $solution = $this->ucs_node_ucs_reseller_id;
         $node = $this->ucs_node_profile_id;
         $conjurerUrl = $this->pod->ucs_datacentre_ucs_api_url;
@@ -389,5 +407,16 @@ class Host extends Model implements Filterable, Sortable
             'name' => $responseObj->name ?? '',
             'interfaces' => $interfaces ?? '',
         ];
+    }
+
+    /**
+     * This join makes no sense to me... `ucs_datacentre` is a Pod and so in turn `ucs_datacentre_location` is a
+     * physical location within a pod. So why is a host directly joining on the location that could be in any pod?
+     * The fact that locations within a pod are referenced directly leads me to question the design.
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function location()
+    {
+        return $this->hasOne(Location::class, 'ucs_datacentre_location_id', 'ucs_node_location_id');
     }
 }
