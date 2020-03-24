@@ -26,11 +26,14 @@ class Console extends ResourceAbstract
 
     public function setTokenAttribute($value)
     {
-        $this->attributes['token'] = $this->encryption()->encrypt($value);
+        $this->attributes['token'] = (empty($value)) ? '' : $this->encryption()->encrypt($value);
     }
 
     public function getTokenAttribute($value)
     {
+        if (empty($value)) {
+            return '';
+        }
         return $this->encryption()->decrypt($value);
     }
 }
