@@ -145,6 +145,18 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->delete('pods/{pod_id}/templates/{template_name}', 'TemplateController@deletePodTemplate');
     $router->get('pods/{pod_id}/console-available', 'PodController@consoleAvailable');
 
+    // Pod resource - Admin
+    $router->group([
+        'middleware' => [
+            'is-administrator',
+        ],
+    ], function () use ($router) {
+        $router->get('pods/{pod_id}/resources', 'PodController@resource');
+        $router->get('pods/{pod_id}/resources/types', 'PodController@resourceTypes');
+        $router->post('pods/{pod_id}/resources', 'PodController@resourceAdd');
+        $router->delete('pods/{pod_id}/resources/{resource_id}', 'PodController@resourceRemove');
+        $router->put('pods/{pod_id}/resources/{resource_id}', 'PodController@resourceUpdate');
+    });
 
     // Appliances
     $router->get('appliances', 'ApplianceController@index');
