@@ -143,4 +143,80 @@ class PodController extends BaseController
             200
         );
     }
+
+    public function consoleAvailable(Request $request, $podId)
+    {
+        $pod = static::getPodById($request, $podId);
+        $consoleResource = $pod->resource('console');
+        if (!$consoleResource) {
+            abort(404);
+        }
+        return response('', 200);
+    }
+
+    public function resource(Request $request, $podId)
+    {
+        $pod = static::getPodById($request, $podId);
+        $resources = [];
+        foreach ($pod->resources() as $resource) {
+            $resources[] = [
+                $resource->toArray() + [
+                    'type' => array_search(get_class($resource), $pod->resource_types)
+                ],
+            ];
+        }
+        return response([
+            'data' => $resources,
+            'meta' => [],
+        ]);
+    }
+
+    public function resourceTypes(Request $request, $podId)
+    {
+        $pod = static::getPodById($request, $podId);
+        return response([
+            'data' => array_keys($pod->resource_types),
+            'meta' => [],
+        ]);
+    }
+
+    public function resourceAdd(Request $request, $podId)
+    {
+        $pod = static::getPodById($request, $podId);
+        $resource = $pod->resource_types[$request->type]::Create();
+        $pod->addResource($resource);
+        return response([
+            'data' => [
+                'id' => $resource->id,
+            ],
+            'meta' => [],
+        ], 201);
+    }
+
+    public function resourceRemove(Request $request, $podId, $resourceId)
+    {
+        $pod = static::getPodById($request, $podId);
+        $resources = array_filter($pod->resources(), function ($v, $k) use ($resourceId) {
+            return $v = $resourceId;
+        }, ARRAY_FILTER_USE_BOTH);
+        $resource = array_shift($resources);
+        $pod->removeResource($resource);
+        return response('', 204);
+    }
+
+    public function resourceUpdate(Request $request, $podId, $resourceId)
+    {
+        $pod = static::getPodById($request, $podId);
+        $resources = array_filter($pod->resources(), function ($v, $k) use ($resourceId) {
+            return $v->id == $resourceId;
+        }, ARRAY_FILTER_USE_BOTH);
+        $resource = array_shift($resources);
+        $resource->fill($request->post() ?? [] + $resource->toArray())
+            ->save();
+
+        return response([
+            'data' => $resource->toArray(),
+            'meta' => [],
+        ]);
+    }
 }

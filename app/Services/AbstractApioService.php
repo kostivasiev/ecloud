@@ -55,7 +55,7 @@ abstract class AbstractApioService
             'User-Agent'           => 'service-' . env('APP_NAME') . '/1.0',
             'Accept'               => 'application/json',
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => $this->serviceName . '.write'
+            'X-consumer-groups' => $this->serviceName . '.read' . ', ' .$this->serviceName . '.write'
         ];
     }
 

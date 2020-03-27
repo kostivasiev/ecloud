@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use App\Models\V1\Datastore;
+use App\Models\V1\Pod;
 
 class GetTest extends TestCase
 {
@@ -72,5 +73,65 @@ class GetTest extends TestCase
         ]);
 
         $this->assertResponseStatus(404);
+    }
+
+    /**
+     * Test loading Default Public Datastore
+     * @return void
+     * @throws \App\Datastore\Exceptions\DatastoreNotFoundException
+     */
+    public function testCanLoadPublicDefault()
+    {
+        Datastore::flushEventListeners();
+
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+        ])->first();
+
+        // Backup
+        $clusterName = 'MCS_P'.$pod->getKey().'_VV_VMPUBLICSTORE_SSD_BACKUP';
+        factory(Datastore::class, 1)->create([
+            'reseller_lun_name' => $clusterName,
+        ]);
+
+        $this->assertEquals(
+            $clusterName,
+            Datastore::getPublicDefault($pod, true)->reseller_lun_name
+        );
+
+        // Non-Backup
+        $clusterName = 'MCS_P'.$pod->getKey().'_VV_VMPUBLICSTORE_SSD_NONBACKUP';
+        factory(Datastore::class, 1)->create([
+            'reseller_lun_name' => $clusterName,
+        ]);
+
+        $this->assertEquals(
+            $clusterName,
+            Datastore::getPublicDefault($pod, false)->reseller_lun_name
+        );
+    }
+
+    /**
+     * Test loading Pod1 Non-Backup Public Datastore
+     * @return void
+     * @throws \App\Datastore\Exceptions\DatastoreNotFoundException
+     */
+    public function testCanLoadPublicPod1NonBackup()
+    {
+        Datastore::flushEventListeners();
+
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 14,
+        ])->first();
+
+        $clusterName = 'MCS_VV_P1_VMPUBLICSTORE_SSD_NONBACKUP';
+        factory(Datastore::class, 1)->create([
+            'reseller_lun_name' => $clusterName,
+        ]);
+
+        $this->assertEquals(
+            $clusterName,
+            Datastore::getPublicDefault($pod, false)->reseller_lun_name
+        );
     }
 }

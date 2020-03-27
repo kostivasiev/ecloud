@@ -6,11 +6,14 @@ use App\Models\V1\ActiveDirectoryDomain;
 use App\Exceptions\V1\InsufficientCreditsException;
 use App\Models\V1\GpuProfile;
 use App\Models\V1\PodTemplate;
+use App\Models\V1\Solution;
 use App\Models\V1\SolutionTemplate;
 use App\Models\V1\Trigger;
 use App\Services\AccountsService;
+use App\Services\BillingService;
 use App\Solution\EncryptionBillingType;
 use App\VM\Status;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Event;
 use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
@@ -103,11 +106,13 @@ class VirtualMachineController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @param AccountsService $accountsService
+     * @param BillingService $billingService
      * @return \Illuminate\Http\Response
      * @throws ApplianceServerLicenseNotFoundException
      * @throws EncryptionServiceNotEnabledException
      * @throws Exceptions\BadRequestException
      * @throws Exceptions\ForbiddenException
+     * @throws Exceptions\NotFoundException
      * @throws Exceptions\UnauthorisedException
      * @throws InsufficientCreditsException
      * @throws InsufficientResourceException
@@ -118,17 +123,21 @@ class VirtualMachineController extends BaseController
      * @throws \App\Exceptions\V1\ApplianceNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
      * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
-     * @throws Exceptions\NotFoundException
+     * @throws Exceptions\PaymentRequiredException
      */
-    public function create(Request $request, IntapiService $intapiService, AccountsService $accountsService)
-    {
-        // todo remove when public/burst VMs supported
-        // - template validation issue on public
-        // - need `add_billing` step on create_vm automation
-        if (!$this->isAdmin && in_array($request->input('environment'), ['Public', 'Burst', 'GPU'])) {
+    public function create(
+        Request $request,
+        IntapiService $intapiService,
+        AccountsService $accountsService,
+        BillingService $billingService
+    ) {
+        // todo remove when burst/gpu VMs supported
+        // - need to update `add_billing` step on create_vm automation
+        if (!$this->isAdmin && in_array($request->input('environment'), ['Burst', 'GPU'])) {
             throw new Exceptions\ForbiddenException(
                 $request->input('environment') . ' VM creation is temporarily disabled'
             );
@@ -137,6 +146,7 @@ class VirtualMachineController extends BaseController
         // default validation
         $rules = [
             'environment' => ['required', 'in:Public,Hybrid,Private,Burst,GPU'],
+            'pod_id' => ['required_if:environment,Public'],
 
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'tags' => ['nullable', 'array'],
@@ -190,7 +200,7 @@ class VirtualMachineController extends BaseController
             );
         }
 
-        // Check we either have template or appliance_id but not both
+        // Check we either have hdd or hdd_disks but not both
         if (!($request->has('hdd') xor $request->has('hdd_disks'))) {
             throw new Exceptions\BadRequestException(
                 'Virtual machines must be launched with either the hdd or hdd_disks parameter'
@@ -239,9 +249,21 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         if ($request->input('environment') == 'Public') {
-            // if admin reseller scope is 0, we won't know the owner for the new VM
             if (empty($request->user->resellerId)) {
+                // if admin reseller scope is empty, we won't know the owner for the new VM
                 throw new Exceptions\UnauthorisedException('Unable to determine account id');
+            }
+
+            // check for demo accounts
+            if ($accountsService->isDemoCustomer($request->user->resellerId)) {
+                throw new Exceptions\ForbiddenException(
+                    'eCloud Public is not available to demo account users, please upgrade via MyUKfast'
+                );
+            }
+
+            // check the customer has a valid payment method on their account
+            if ($accountsService->getPaymentMethod($request->user->resellerId) == 'Credit Card') {
+                $billingService->scopeResellerId($request->user->resellerId)->verifyDefaultPaymentCard();
             }
 
             if ($request->has('encrypt')) {
@@ -252,17 +274,20 @@ class VirtualMachineController extends BaseController
 
             if ($request->has('controlpanel_id') && !$this->isAdmin) {
                 throw new Exceptions\BadRequestException(
-                    'Legacy Control Panel installation is not available at this time.'
+                    'Legacy Control Panel installation is no longer available, please use a marketplace appliance.'
+                );
+            }
+            
+            $solution = null;
+            $pod = Pod::findOrFail($request->input('pod_id'));
+
+            if (!$pod->hasEnabledService('Public')) {
+                throw new Exceptions\BadRequestException(
+                    'eCloud Public is not available on the requested Pod'
                 );
             }
 
-            $solution = null;
-            $pod = Pod::find(14);
-            $datastore = Datastore::getDefault(
-                null,
-                'Public',
-                ($request->input('backup') == true)
-            );
+            $datastore = Datastore::getPublicDefault($pod, ($request->input('backup') == true));
         } else {
             $solution = SolutionController::getSolutionById($request, $request->input('solution_id'));
             $pod = $solution->pod;
@@ -578,6 +603,10 @@ class VirtualMachineController extends BaseController
             'launched_by' => '-5',
         );
 
+        if ($request->input('environment') == 'Public') {
+            $post_data['ucs_datacentre_id'] = $request->input('pod_id');
+        }
+
         if (isset($gpuProfile)) {
             $post_data['gpu_profile_uuid'] = $gpuProfile->getKey();
         }
@@ -765,6 +794,12 @@ class VirtualMachineController extends BaseController
             if ($request->has('controlpanel_id')) {
                 $post_data['control_panel_id'] = $request->input('controlpanel_id');
             }
+        }
+
+        // set billing options
+        if ($request->input('environment') == 'Public') {
+            $post_data['billing_type'] = 'PAYG';
+            $post_data['billing_period'] = 'Month';
         }
 
         // remove debugging when ready to retest
@@ -2240,7 +2275,7 @@ class VirtualMachineController extends BaseController
     /**
      * Load and configure the Kingpin service for a Virtual Machine
      * @param VirtualMachine $virtualMachine
-     * @return mixed
+     * @return \App\Services\Kingpin\V1\KingpinService
      * @throws KingpinException
      */
     protected function loadKingpinService(VirtualMachine $virtualMachine)
@@ -2365,5 +2400,52 @@ class VirtualMachineController extends BaseController
         }
 
         return $VirtualMachine;
+    }
+
+    public function consoleSession(Request $request, $vmId)
+    {
+        $this->validateVirtualMachineId($request, $vmId);
+        $virtualMachine = $this->getVirtualMachine($vmId);
+
+        // hit management resource retrieving the host and ticket values
+        $managementResource = $this->loadKingpinService($virtualMachine);
+        $response = $managementResource->consoleSession(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+        $host = $response['host'] ?? null;
+        $ticket = $response['ticket'] ?? null;
+
+        // hit console resource, using the host and ticket from the management resource
+        // retrieving the uuid for the console resource session
+        $consoleResource = $virtualMachine->pod->resource('console');
+        if (!$consoleResource) {
+            abort(503);
+        }
+
+        $client = new Client([
+            'base_uri' => $consoleResource->url,
+            'verify' => false,
+            'headers' => [
+                'X-API-Authentication' => $consoleResource->token,
+            ],
+        ]);
+        $response = $client->post('/session', [\GuzzleHttp\RequestOptions::JSON => [
+            'host' => $host,
+            'ticket' => $ticket,
+        ]]);
+        $responseJson = json_decode($response->getBody()->getContents());
+        $uuid = $responseJson->uuid ?? '';
+        if (empty($uuid)) {
+            abort(503);
+        }
+
+        // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
+        return response()->json([
+            'data' => [
+                'url' => $consoleResource->console_url . '/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
+            ],
+            'meta' => (object)[]
+        ]);
     }
 }

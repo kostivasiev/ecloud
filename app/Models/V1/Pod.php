@@ -2,6 +2,9 @@
 
 namespace App\Models\V1;
 
+use App\Models\V1\Pod\Resource;
+use App\Models\V1\Pod\ResourceAbstract;
+use App\Models\V1\Pod\ServiceAbstract;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
 use Illuminate\Database\Eloquent\Model;
@@ -185,6 +188,97 @@ class Pod extends Model implements Filterable, Sortable
         );
     }
 
+    /**
+     * Get all the resource types available
+     * @return array
+     */
+    public function getResourceTypesAttribute()
+    {
+        return [
+            'compute' => \App\Models\V1\Pod\Resource\Compute::class,
+            'console' => \App\Models\V1\Pod\Resource\Console::class,
+            'management' => \App\Models\V1\Pod\Resource\Management::class,
+            'network' => \App\Models\V1\Pod\Resource\Network::class,
+            'storage' => \App\Models\V1\Pod\Resource\Storage::class,
+        ];
+    }
+
+    /**
+     * Add a resource to this pod
+     * @param ResourceAbstract $resource
+     * @return bool
+     */
+    public function addResource(ResourceAbstract $resource)
+    {
+        $rows = app('db')->connection('ecloud')
+            ->table('pod_resource')
+            ->where([
+                ['pod_id', '=', $this->ucs_datacentre_id],
+                ['resource_id', '=', $resource->id],
+                ['resource_type', '=', array_search(get_class($resource), $this->resource_types)],
+            ])
+            ->get();
+        if (count($rows) !== 0) {
+            return true; // Don't create duplicates, respond with success
+        }
+
+        return app('db')->connection('ecloud')->table('pod_resource')->insert([
+            'pod_id' => $this->ucs_datacentre_id,
+            'resource_id' => $resource->id,
+            'resource_type' => array_search(get_class($resource), $this->resource_types),
+        ]);
+    }
+
+    /**
+     * Remove a resource from this pod
+     * @param ResourceAbstract $resource
+     * @return bool
+     */
+    public function removeResource(ResourceAbstract $resource)
+    {
+        return app('db')->connection('ecloud')
+            ->table('pod_resource')
+            ->where([
+                ['pod_id', '=', $this->ucs_datacentre_id],
+                ['resource_id', '=', $resource->id],
+                ['resource_type', '=', array_search(get_class($resource), $this->resource_types)],
+            ])
+            ->delete();
+    }
+
+    /**
+     * Get all the resources used by this pod
+     * @return ResourceAbstract[]
+     */
+    public function resources()
+    {
+        $rows = app('db')->connection('ecloud')
+            ->table('pod_resource')
+            ->select('resource_id', 'resource_type')
+            ->where('pod_id', '=', $this->ucs_datacentre_id)
+            ->get();
+        $resources = [];
+        foreach ($rows as $row) {
+            if (!isset($this->resource_types[$row->resource_type])) {
+                continue;
+            }
+            $resources[] = $this->resource_types[$row->resource_type]::find($row->resource_id);
+        }
+        return $resources;
+    }
+
+    /**
+     * Get the first instance of the type
+     * @param $type
+     * @return mixed
+     */
+    public function resource($type)
+    {
+        $resources = array_filter($this->resources(), function ($v, $k) use ($type) {
+            return array_search(get_class($v), $this->resource_types) === $type;
+        }, ARRAY_FILTER_USE_BOTH);
+        return array_shift($resources);
+    }
 
     /**
      * Load VCE server details/credentials by username
@@ -265,5 +359,15 @@ class Pod extends Model implements Filterable, Sortable
             return $serverDetail->getPassword();
         }
         return false;
+    }
+
+    /**
+     * has the pod got the requested service enabled
+     * @param $serviceName
+     * @return bool
+     */
+    public function hasEnabledService($serviceName)
+    {
+        return $this->{'ucs_datacentre_'.strtolower($serviceName).'_enabled'} == 'Yes';
     }
 }

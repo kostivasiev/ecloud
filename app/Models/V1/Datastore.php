@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use App\Datastore\Exceptions\DatastoreNotFoundException;
 use App\Datastore\Status;
 use App\Events\V1\DatastoreCreatedEvent;
 use App\Exceptions\V1\ArtisanException;
@@ -381,7 +382,7 @@ class Datastore extends Model implements Filterable, Sortable
 
 
     /**
-     * Gt default datastore
+     * Get default datastore
      * @param $solutionId
      * @param string $ecloudType
      * @param bool $backupRequired
@@ -437,6 +438,46 @@ class Datastore extends Model implements Filterable, Sortable
 
         $defaultDatastore->isSystemStorage = true;
         return $defaultDatastore;
+    }
+
+    /**
+     * Get default datastore for Public VMs
+     * @param $pod
+     * @param $backupRequired
+     * @return Datastore
+     * @throws DatastoreNotFoundException
+     */
+    public static function getPublicDefault($pod, $backupRequired)
+    {
+        // clusters arent named after their db IDs, need to investigate using the pod short name if we can update them.
+        // for now I will have to map here
+        $podMapping = [
+            14 => 1,
+            21 => 3,
+            22 => 8,
+        ];
+
+        $podId = $pod->getKey();
+        if (array_key_exists($podId, $podMapping)) {
+            $podId = $podMapping[$pod->getKey()];
+        }
+
+        $clusterName = 'MCS_P'.$podId.'_VV_VMPUBLICSTORE_SSD_' . ($backupRequired?'BACKUP':'NONBACKUP');
+
+        // temp fudge until infra fix the cluster name
+        if ($podId === 1 && $backupRequired == false) {
+            $clusterName = 'MCS_VV_P1_VMPUBLICSTORE_SSD_NONBACKUP';
+        }
+
+        $datastore = static::where('reseller_lun_name', $clusterName)->first();
+        if (empty($datastore)) {
+            throw new DatastoreNotFoundException('unable to locate datastore');
+        }
+
+        // flag as system storage to bypass resource checks
+        $datastore->isSystemStorage = true;
+
+        return $datastore;
     }
 
     /**

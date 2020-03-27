@@ -25,6 +25,7 @@ $app->configure('database');
 $app->configure('logging');
 $app->configure('mail');
 $app->configure('gpu');
+$app->configure('encryption');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -83,14 +84,14 @@ $app->routeMiddleware([
 |
 */
 
+$app->register(App\Providers\AppServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(App\Providers\PaginationServiceProvider::class);
-$app->register(App\Providers\KingpinServiceProvider::class);
-$app->register(App\Providers\NetworkingServiceProvider::class);
-$app->register(App\Providers\AccountsServiceProvider::class);
-$app->register(App\Providers\IntapiServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
+
+// ukfast
+$app->register(App\Providers\IntapiServiceProvider::class);
 $app->register(UKFast\HealthCheck\HealthCheckServiceProvider::class);
 $app->register(UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
@@ -99,8 +100,14 @@ $app->register(UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider
 $app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
 
-// Artisan service provider
+// ecloud service providers
+$app->register(App\Providers\KingpinServiceProvider::class);
 $app->register(App\Providers\ArtisanServiceProvider::class);
+
+// apio service providers
+$app->register(App\Providers\NetworkingServiceProvider::class);
+$app->register(App\Providers\AccountsServiceProvider::class);
+$app->register(App\Providers\BillingServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

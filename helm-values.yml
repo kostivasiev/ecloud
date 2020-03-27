@@ -7,3 +7,6 @@ hostAliases:
 - ip: "172.16.64.22"
   hostnames:
   - vault.ukfast.net
+- ip: "94.229.162.196"
+  hostnames:
+  - "uk-man4-14.console.ecloud.uk"

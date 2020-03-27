@@ -386,12 +386,14 @@ class VolumeSetController extends BaseController
     public function volumes(Request $request, $volumeSetId)
     {
         $volumeSet = VolumeSet::find($volumeSetId);
-        if (!$volumeSet) {
-            return Response::create(null, 404);
-        }
-
-        if ($request->user->resellerId !== 0 && $volumeSet->solution->reseller_id !== $request->user->resellerId) {
-            return Response::create(null, 404);
+        if (!$volumeSet || ($request->user->resellerId !== 0 && $volumeSet->solution->reseller_id !== $request->user->resellerId)) {
+            return Response::create([
+                'errors' => [
+                    'title' => 'Not found',
+                    'detail' => 'No Volume Set with that ID was found',
+                    'status' => 404,
+                ]
+            ], 404);
         }
 
         $sanVolumes = $volumeSet->volumes();

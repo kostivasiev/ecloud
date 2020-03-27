@@ -323,24 +323,25 @@ class DatastoreController extends BaseController
         $datastore->save();
         $datastore->refresh();
 
-        try {
-            $automationRequestId = $intapiService->automationRequest(
-                'add_lun',
-                'reseller_lun',
-                $datastore->getKey(),
-                $automationData,
-                'ecloud_ucs_' . $pod->getKey(),
-                $request->user->applicationId
-            );
-        } catch (IntapiServiceException $exception) {
-            throw new ServiceUnavailableException('Failed to expand datastore', null, 502);
-        }
-
         $headers = [];
-        if ($request->user->isAdministrator) {
-            $headers = [
-                'X-AutomationRequestId' => $automationRequestId
-            ];
+        if ($request->input('type', $solution->ucs_reseller_type) !== 'Private') {
+            try {
+                $automationRequestId = $intapiService->automationRequest(
+                    'add_lun',
+                    'reseller_lun',
+                    $datastore->getKey(),
+                    $automationData,
+                    'ecloud_ucs_' . $pod->getKey(),
+                    $request->user->applicationId
+                );
+            } catch (IntapiServiceException $exception) {
+                throw new ServiceUnavailableException('Failed to expand datastore', null, 502);
+            }
+            if ($request->user->isAdministrator) {
+                $headers = [
+                    'X-AutomationRequestId' => $automationRequestId
+                ];
+            }
         }
 
         return $this->respondSave($request, $datastore, 202, null, $headers);
