@@ -409,11 +409,11 @@ class Host extends Model implements Filterable, Sortable
         }
 
         return [
-            'associated' => $responseObj->associated ?? '',
+            'associate_state' => $responseObj->associated ?? '',
             'configuration_state' => $responseObj->configurationState ?? '',
             'power_state' => $responseObj->powerState ?? '',
             'location' => $responseObj->location ?? '',
-            'assigned' => $responseObj->assigned ?? '',
+            'assign_state' => $responseObj->assigned ?? '',
             'specification' => $responseObj->specification ?? '',
             'name' => $responseObj->name ?? '',
             'interfaces' => $interfaces ?? '',
