@@ -26,6 +26,11 @@ class CreateInitialTables extends Migration
             $table->string('ucs_datacentre_ucs_api_url');
         });
 
+        Schema::create('ucs_datacentre_location', function (Blueprint $table) {
+            $table->increments('ucs_datacentre_location_id');
+            $table->integer('ucs_datacentre_location_datacentre_id')->default('0');
+            $table->string('ucs_datacentre_location_name')->default('');
+        });
 
         Schema::create('ucs_reseller', function (Blueprint $table) {
             $table->increments('ucs_reseller_id');
@@ -47,6 +52,7 @@ class CreateInitialTables extends Migration
             $table->integer('ucs_node_ucs_reseller_id');
             $table->integer('ucs_node_datacentre_id');
             $table->integer('ucs_node_specification_id');
+            $table->integer('ucs_node_location_id');
             $table->string('ucs_node_status');
             $table->string('ucs_node_internal_name')->default('');
         });

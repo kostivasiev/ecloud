@@ -39,11 +39,12 @@ class HardwareTest extends TestCase
      */
     public function testHostWithCredentials($getItemsResponse)
     {
-        // Pod, Solution and Host setup
+        // Pod, Pod location, Solution and Host setup
         factory(Pod::class)->create([
             'ucs_datacentre_vce_server_id' => 1,
             'ucs_datacentre_ucs_api_url' => 'http://localhost'
         ]);
+        factory(Pod\Location::class)->create();
         factory(Solution::class)->create();
         $host = factory(Host::class)->create()->first();
 
@@ -84,7 +85,7 @@ class HardwareTest extends TestCase
         $client->shouldReceive('request')
             ->withArgs([
                 'GET',
-                '/api/v1/compute/' . urlencode($host->ucs_node_location) .
+                '/api/v1/compute/' . urlencode($host->location->ucs_datacentre_location_name) .
                     '/solution/' . (int)$host->ucs_node_ucs_reseller_id .
                     '/node/' . urlencode($host->ucs_node_profile_id),
                 [
@@ -118,6 +119,7 @@ class HardwareTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ]);
+
         $this->assertResponseStatus(200);
         $this->seeJson([
             'data' => [

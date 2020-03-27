@@ -7,5 +7,6 @@ $factory->define(App\Models\V1\Host::class, function (Faker\Generator $faker) {
         'ucs_node_datacentre_id' => 1,
         'ucs_node_specification_id' => 1,
         'ucs_node_status' => 'Complete',
+        'ucs_node_location_id' => 1,
     ];
 });
