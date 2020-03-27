@@ -328,13 +328,24 @@ class Host extends Model implements Filterable, Sortable
             'type' => 'API',
             'user' => 'conjurerapi'
         ]);
-        $credentials = $response->getItems()[0] ?? null;
-        if ($credentials === null) {
+        $conjurerCredentials = $response->getItems()[0] ?? null;
+        if ($conjurerCredentials === null) {
             return []; // No credentials found
         }
-
         // Now we have the details lets just do another API call to get the password (This make it secure right?)
-        $credentials->password = $devicesAdminClient->credentials()->getPassword($credentials->id);
+        $conjurerCredentials->password = $devicesAdminClient->credentials()->getPassword($conjurerCredentials->id);
+
+        // Now for fun lets do the whole process again to get another set of details that we need
+        /** @var Page $response */
+        $response = $devicesAdminClient->devices()->getCredentials($this->pod->ucs_datacentre_vce_server_id, 1, 1, [
+            'type' => 'API',
+            'user' => 'ucs-api'
+        ]);
+        $podCredentials = $response->getItems()[0] ?? null;
+        if ($podCredentials === null) {
+            return []; // No credentials found
+        }
+        $podCredentials->password = $devicesAdminClient->credentials()->getPassword($podCredentials->id);
 
         // Get the hosts pod
         if ($this->pod === null) {
@@ -359,7 +370,7 @@ class Host extends Model implements Filterable, Sortable
         $conjurerUrl = $this->pod->ucs_datacentre_ucs_api_url;
 
         // Add the port number we got from the devices API to the Conjurer URL (wtf?)
-        $conjurerUrl = empty($credentials->loginPort) ? $conjurerUrl : $conjurerUrl . ':' . $credentials->loginPort;
+        $conjurerUrl = empty($conjurerCredentials->loginPort) ? $conjurerUrl : $conjurerUrl . ':' . $conjurerCredentials->loginPort;
 
         // Finally do the call to Conjurer using the credentials we retrieved from the DB and devices API
         $client = app()->makeWith(Client::class, [
@@ -372,10 +383,10 @@ class Host extends Model implements Filterable, Sortable
             'GET',
             '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node),
             [
-                'auth' => ['conjurerapi', $credentials->password],
+                'auth' => ['conjurerapi', $conjurerCredentials->password],
                 'headers' => [
-                    'X-UKFast-Compute-Username' => 'conjurerapi',
-                    'X-UKFast-Compute-Password' => $credentials->password,
+                    'X-UKFast-Compute-Username' => 'ucs-api',
+                    'X-UKFast-Compute-Password' => $podCredentials->password,
                     'Accept' => 'application/json',
                 ],
             ]
