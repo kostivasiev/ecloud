@@ -71,6 +71,22 @@ class HardwareTest extends TestCase
             ->withArgs([1])
             ->andReturn('password');
 
+        // Mock the Devices API "$adminClient->devices()->getCredentials(...)->getItems()[0]" call
+        $mockAdminClient->shouldReceive('devices')
+            ->andReturn($mockAdminDeviceClient);
+        $mockAdminDeviceClient->shouldReceive('getCredentials')
+            ->withArgs([1, 1, 1, ['type' => 'API', 'user' => 'ucs-api']])
+            ->andReturn($mockCredentials);
+        $mockCredentials->shouldReceive('getItems')
+            ->andReturn($getItemsResponse);
+
+        // Mock the Devices API "$adminClient->credentials()->getPassword(...)" call
+        $mockAdminClient->shouldReceive('credentials')
+            ->andReturn($mockAdminCredentialsClient);
+        $mockAdminCredentialsClient->shouldReceive('getPassword')
+            ->withArgs([1])
+            ->andReturn('password');
+
         // Mock the Conjurer API
         $client = \Mockery::mock(Client::class);
         app()->bind(Client::class, function($app, $args) use ($client, $getItemsResponse) {
@@ -91,7 +107,7 @@ class HardwareTest extends TestCase
                 [
                     'auth' => ['conjurerapi', 'password'],
                     'headers' => [
-                        'X-UKFast-Compute-Username' => 'conjurerapi',
+                        'X-UKFast-Compute-Username' => 'ucs-api',
                         'X-UKFast-Compute-Password' => 'password',
                         'Accept' => 'application/json',
                     ]
