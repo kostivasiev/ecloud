@@ -139,8 +139,8 @@ class HardwareTest extends TestCase
         $this->assertResponseStatus(200);
         $this->seeJson([
             'data' => [
-                'assigned' => 'assigned',
-                'associated' => 'associated',
+                'assign_state' => 'assigned',
+                'associate_state' => 'associated',
                 'configuration_state' => 'configurationState',
                 'interfaces' => [
                     [
