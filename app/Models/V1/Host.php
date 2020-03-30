@@ -380,7 +380,7 @@ class Host extends Model implements Filterable, Sortable
             ]
         ]);
 
-         $response = $client->request(
+        $response = $client->request(
             'GET',
             '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node),
             [
