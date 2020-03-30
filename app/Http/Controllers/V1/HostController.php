@@ -243,8 +243,19 @@ class HostController extends BaseController
             ], 404);
         }
 
+        try {
+            $hardware = $host->hardware;
+        } catch (\Exception $exception) {
+            return Response::create([
+                'errors' => [
+                    'title' => $exception->getMessage(),
+                    'status' => 500,
+                ]
+            ], 500);
+        }
+
         return Response::create([
-            'data' => $host->hardware,
+            'data' => $hardware,
             'meta' => [],
         ], 200);
     }
