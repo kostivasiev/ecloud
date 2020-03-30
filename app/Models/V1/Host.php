@@ -379,6 +379,7 @@ class Host extends Model implements Filterable, Sortable
                 'timeout' => 10,
             ]
         ]);
+
         $response = $client->request(
             'GET',
             '/api/v1/compute/' . urlencode($compute) . '/solution/' . (int)$solution . '/node/' . urlencode($node),
@@ -409,11 +410,11 @@ class Host extends Model implements Filterable, Sortable
         }
 
         return [
-            'associated' => $responseObj->associated ?? '',
+            'associate_state' => $responseObj->associated ?? '',
             'configuration_state' => $responseObj->configurationState ?? '',
             'power_state' => $responseObj->powerState ?? '',
             'location' => $responseObj->location ?? '',
-            'assigned' => $responseObj->assigned ?? '',
+            'assign_state' => $responseObj->assigned ?? '',
             'specification' => $responseObj->specification ?? '',
             'name' => $responseObj->name ?? '',
             'interfaces' => $interfaces ?? '',
