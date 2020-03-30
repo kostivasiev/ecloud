@@ -7,6 +7,35 @@ hostAliases:
 - ip: "172.16.64.22"
   hostnames:
   - vault.ukfast.net
+  
 - ip: "94.229.162.196"
   hostnames:
   - "uk-man4-14.console.ecloud.uk"
+  
+- ip: "45.84.21.236"
+  hostnames:
+  - "uk-lon2-22.console.ecloud.uk"
+  
+- ip: "185.221.207.243"
+  hostnames:
+  - "uk-man5-19.console.ecloud.uk"
+  
+- ip: "178.238.137.237"
+  hostnames:
+  - "uk-man5-9.console.ecloud.uk"
+  
+- ip: "178.238.131.75"
+  hostnames:
+  - "uk-man5-16.console.ecloud.uk"
+  
+- ip: "45.84.20.249"
+  hostnames:
+  - "uk-lon1-21.console.ecloud.uk"
+  
+- ip: "78.137.126.7"
+  hostnames:
+  - "uk-man5-15.console.ecloud.uk"
+  
+- ip: "185.197.63.87"
+  hostnames:
+  - "uk-man6-20.console.ecloud.uk"
