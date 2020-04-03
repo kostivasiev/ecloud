@@ -149,7 +149,7 @@ class PodController extends BaseController
         $pod = static::getPodById($request, $podId);
         $consoleResource = $pod->resource('console');
         if (!$consoleResource) {
-            abort(404);
+            return response('', 404);
         }
         return response('', 200);
     }
