@@ -187,7 +187,7 @@ class GetTest extends TestCase
         ])
             ->seeStatusCode(200)
             ->seeJson([
-                'vmware_api_url' => $pod->ucs_datacentre_vmware_api_url
+                'mgmt_api_url' => $pod->ucs_datacentre_vmware_api_url
             ]);
     }
 
@@ -207,7 +207,7 @@ class GetTest extends TestCase
         ])
             ->seeStatusCode(200)
             ->dontSeeJson([
-                'vmware_api_url' => $pod->ucs_datacentre_vmware_api_url
+                'mgmt_api_url' => $pod->ucs_datacentre_vmware_api_url
             ]);
     }
 }
