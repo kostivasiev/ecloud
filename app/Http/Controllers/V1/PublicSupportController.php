@@ -23,12 +23,12 @@ class PublicSupportController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $supportClients = PublicSupport::query();
+        $collection = PublicSupport::query();
 
         $queryTransformer->config(PublicSupport::class)
-            ->transform($supportClients);
+            ->transform($collection);
 
-        return $supportClients->paginate(
+        return $collection->paginate(
             $request->input('per_page', $this->perPage)
         );
     }
@@ -42,13 +42,13 @@ class PublicSupportController extends BaseController
      */
     public function show(Request $request, $id)
     {
-        $support = PublicSupport::find($id);
-        if (!$support) {
+        $item = PublicSupport::find($id);
+        if (!$item) {
             throw new NotFoundException('Support not found');
         }
 
         return response()->json([
-            'data' => $support,
+            'data' => $item,
             'meta' => [],
         ]);
     }

@@ -234,6 +234,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('credits', 'CreditsController@index');
 
 
+
         /**
          * Base middleware + reseller ID scope + is-administrator
          */
@@ -286,11 +287,13 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
+    });
+});
 
-        // Public Support
+// Public Support
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('support', 'PublicSupportController@index');
         $router->get('support/{id}', 'PublicSupportController@show');
     });
 });
-
-
