@@ -145,6 +145,7 @@ class Pod extends Model implements Filterable, Sortable
             IntProperty::create('ucs_datacentre_datacentre_id', 'datacentre_id'),
             IntProperty::create('ucs_datacentre_vce_server_id', 'vce_server_id'),
             IntProperty::create('ucs_datacentre_vcl_server_id', 'vcl_server_id'),
+            StringProperty::create('ucs_datacentre_vmware_api_url', 'vmware_api_url'),
         ]);
     }
 
