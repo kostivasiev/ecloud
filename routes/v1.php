@@ -286,6 +286,10 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         //DRS
         $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
+
+        // Public Support
+        $router->get('support', 'PublicSupportController@index');
+        $router->get('support/{id}', 'PublicSupportController@show');
     });
 });
 
