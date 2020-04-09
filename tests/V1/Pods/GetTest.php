@@ -170,4 +170,44 @@ class GetTest extends TestCase
             'total' => 1,
         ]);
     }
+
+    /**
+     * Test GET pod VMWare API URL (Admin)
+     */
+    public function testVmwareApiUrlAdmin()
+    {
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_vmware_api_url' => 'http://example.com'
+        ])->first();
+
+        $this->json('GET', '/v1/pods/123', [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])
+            ->seeStatusCode(200)
+            ->seeJson([
+                'mgmt_api_url' => $pod->ucs_datacentre_vmware_api_url
+            ]);
+    }
+
+    /**
+     * Test GET pod VMWare API URL (Not admin)
+     */
+    public function testVmwareApiUrlNotAdmin()
+    {
+        $pod = factory(Pod::class, 1)->create([
+            'ucs_datacentre_id'            => 123,
+            'ucs_datacentre_vmware_api_url' => 'http://example.com'
+        ])->first();
+
+        $this->json('GET', '/v1/pods/123', [], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups'    => 'ecloud.read',
+        ])
+            ->seeStatusCode(200)
+            ->dontSeeJson([
+                'mgmt_api_url' => $pod->ucs_datacentre_vmware_api_url
+            ]);
+    }
 }

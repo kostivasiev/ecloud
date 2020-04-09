@@ -24,6 +24,7 @@ class CreateInitialTables extends Migration
             $table->integer('ucs_datacentre_vcl_server_id')->default('0');
             $table->integer('ucs_datacentre_vce_server_id')->default('0');
             $table->string('ucs_datacentre_ucs_api_url');
+            $table->string('ucs_datacentre_vmware_api_url');
         });
 
         Schema::create('ucs_datacentre_location', function (Blueprint $table) {
