@@ -147,6 +147,9 @@ class IntapiService
             case (preg_match('/^invalid tag key:/i', $error) == true):
                 return $error;
 
+            case (preg_match('/: no available firewall./i', $error) == true):
+                return 'Unable to locate solution firewall, please contact support';
+
             default:
 //                return $error;
                 return 'Please try again in a few moments or contact our support team if the fault persists.';
