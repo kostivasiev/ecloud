@@ -47,6 +47,7 @@ class PublicSupport extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
+            'reseller_id' => 'reseller_id',
         ];
     }
 
@@ -62,7 +63,6 @@ class PublicSupport extends Model implements Filterable, Sortable
             $factory->create('reseller_id', Filter::$numericDefaults),
         ];
     }
-
 
     /**
      * Ditto sorting configuration

@@ -69,4 +69,24 @@ class GetTest extends TestCase
 
         $this->assertResponseStatus(401);
     }
+
+    public function testCanFilterCollectionByResellerId()
+    {
+        factory(PublicSupport::class)->create([
+            'reseller_id' => 1,
+        ]);
+
+        factory(PublicSupport::class)->create([
+            'reseller_id' => 2,
+        ]);
+
+        $this->get('/v1/support?reseller_id=1', [
+            'X-consumer-custom-id' => '0-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
+
+        $this->assertResponseStatus(200) && $this->seeJson([
+            'total' => 1,
+        ]);
+    }
 }
