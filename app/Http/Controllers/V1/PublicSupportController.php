@@ -7,19 +7,16 @@ use UKFast\Api\Exceptions;
 use App\Models\V1\PublicSupport;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
+use App\Responses\PaginatedCollectionResponse;
 
 class PublicSupportController extends BaseController
 {
-    use ResponseHelper, RequestHelper;
-
     /**
      * Display list of support resources
      *
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return PaginatedCollectionResponse
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -28,9 +25,7 @@ class PublicSupportController extends BaseController
         $queryTransformer->config(PublicSupport::class)
             ->transform($collection);
 
-        return $collection->paginate(
-            $request->input('per_page', $this->perPage)
-        );
+        return new PaginatedCollectionResponse($collection->get());
     }
 
     /**
