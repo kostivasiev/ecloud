@@ -10,9 +10,8 @@ class CreatePublicSupportTable extends Migration
         Schema::connection('ecloud')->create('public_support', function ($table) {
             $table->uuid('id')->primary();
             $table->integer('reseller_id');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
-            $table->timestamp('deleted_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -60,7 +60,7 @@ class PublicSupportController extends BaseController
             throw new Exceptions\UnauthorisedException('Unable to determine account id');
         }
 
-        $item = new PublicSupport;
+        $item = app()->make(PublicSupport::class);
         $item->reseller_id = $request->user->resellerId;
         $item->save();
 
