@@ -234,6 +234,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('credits', 'CreditsController@index');
 
 
+
         /**
          * Base middleware + reseller ID scope + is-administrator
          */
@@ -289,4 +290,11 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 });
 
-
+// Public Support
+$router->group($baseRouteParameters, function () use ($router) {
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('support', 'PublicSupportController@index');
+        $router->post('support', 'PublicSupportController@store');
+        $router->get('support/{id}', 'PublicSupportController@show');
+    });
+});
