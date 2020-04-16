@@ -39,3 +39,7 @@ hostAliases:
 - ip: "185.197.63.87"
   hostnames:
   - "uk-man6-20.console.ecloud.uk"
+
+- ip: "185.160.255.86"
+  hostnames:
+  - "uk-aql-10.console.ecloud.uk"
