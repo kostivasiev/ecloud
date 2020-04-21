@@ -49,13 +49,13 @@ class VirtualMachine extends Model implements Filterable, Sortable
     const MAX_CPU = 10;
 
     const MIN_RAM = 1;
-    const MAX_RAM = 30;
+    const MAX_RAM = 64;
 
     const MIN_HDD = 20;
     const MIN_HDD_LINUX = 20;
     const MIN_HDD_WINDOWS = 40;
 
-    const MAX_HDD = 300;
+    const MAX_HDD = 1000;
     const MAX_HDD_COUNT = 20;
 
     const MAX_MBR_PARTITION = 2000;
