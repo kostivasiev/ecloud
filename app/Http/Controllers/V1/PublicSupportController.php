@@ -5,9 +5,9 @@ namespace App\Http\Controllers\V1;
 use Illuminate\Http\JsonResponse;
 use UKFast\Api\Exceptions;
 use App\Models\V1\PublicSupport;
+use App\Resources\V1\PublicSupportResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
-use App\Responses\PaginatedCollectionResponse;
 
 class PublicSupportController extends BaseController
 {
@@ -16,7 +16,6 @@ class PublicSupportController extends BaseController
      *
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return PaginatedCollectionResponse
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -25,14 +24,16 @@ class PublicSupportController extends BaseController
         $queryTransformer->config(PublicSupport::class)
             ->transform($collection);
 
-        return new PaginatedCollectionResponse($collection->get());
+        return PublicSupportResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
      * Display single support resource
      * @param Request $request
      * @param integer $id
-     * @return JsonResponse
+     * @return PublicSupportResource
      * @throws Exceptions\NotFoundException
      */
     public function show(Request $request, $id)
@@ -42,10 +43,7 @@ class PublicSupportController extends BaseController
             throw new Exceptions\NotFoundException('Support not found');
         }
 
-        return response()->json([
-            'data' => $item,
-            'meta' => [],
-        ]);
+        return new PublicSupportResource($item);
     }
 
     /**
@@ -64,13 +62,9 @@ class PublicSupportController extends BaseController
         $item->reseller_id = $request->user->resellerId;
         $item->save();
 
-        return response()->json([
-            'data' => [
-                'id' => $item->getKey(),
-            ],
-            'meta' => [
-                'location' => config('app.url') . '/v1/support/' . $item->getKey()
-            ],
-        ], 202);
+        return response()->self(
+            'support.item',
+            $item->getKey()
+        );
     }
 }

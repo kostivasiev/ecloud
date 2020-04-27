@@ -28,7 +28,8 @@
     "ukfast/log-provider": "~1.0",
     "vlucas/phpdotenv": "^3.3",
     "ukfast/api-internal-communication": "~1.0",
-    "ukfast/api-encryption": "^4.0.0"
+    "ukfast/api-encryption": "^4.0.0",
+    "ukfast/responses": "~1.0"
   },
   "require-dev": {
     "ext-sqlite3": "*",
@@ -130,6 +131,10 @@
     }, {
       "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/encryption.git"
+    },
+    {
+      "type": "vcs",
+      "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/responses.git"
     }
   ]
 }

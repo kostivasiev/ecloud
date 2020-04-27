@@ -295,6 +295,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('support', 'PublicSupportController@index');
         $router->post('support', 'PublicSupportController@store');
-        $router->get('support/{id}', 'PublicSupportController@show');
+        $router->get('support/{id}', [
+            'uses' => 'PublicSupportController@show',
+            'as' => 'support.item',
+        ]);
     });
 });
