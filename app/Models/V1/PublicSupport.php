@@ -28,11 +28,6 @@ class PublicSupport extends Model implements Filterable, Sortable
     public $incrementing = false;
     public $timestamps = true;
 
-//    protected $casts = [
-//        'created_at' => 'datetime:' . \DateTime::ATOM,
-//    ];
-
-//    protected $dateFormat = \DateTime::ATOM;
 
     /**
      * Ditto configuration
