@@ -25,7 +25,7 @@ class PostTest extends TestCase
             'X-reseller-id' => 1,
         ]);
 
-        $this->assertResponseStatus(202);
+        $this->assertResponseStatus(201);
     }
 
     public function testClientCantCreateItem()
