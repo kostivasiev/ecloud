@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\V1;
 
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use UKFast\Api\Exceptions;
 use App\Models\V1\PublicSupport;
 use App\Resources\V1\PublicSupportResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
+use UKFast\Responses\UKFastResourceCollection;
 
 class PublicSupportController extends BaseController
 {
@@ -16,6 +17,7 @@ class PublicSupportController extends BaseController
      *
      * @param Request $request
      * @param QueryTransformer $queryTransformer
+     * @return UKFastResourceCollection
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -49,7 +51,7 @@ class PublicSupportController extends BaseController
     /**
      * Store new support resource
      * @param Request $request
-     * @return JsonResponse
+     * @return Response
      * @throws Exceptions\UnauthorisedException
      */
     public function store(Request $request)
@@ -65,6 +67,6 @@ class PublicSupportController extends BaseController
         return response()->self(
             'support.item',
             $item->getKey()
-        );
+        )->setStatusCode(202);
     }
 }
