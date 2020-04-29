@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12ceb2e83e4f97e52f9f5e00314e4b86",
+    "content-hash": "e0b1ad4b818e2746cf72b986602d5a9b",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -353,23 +353,24 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.5.2",
+            "version": "6.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "43ece0e75098b7ecd8d13918293029e555a50f82"
+                "reference": "aab4ebd862aa7d04f01a4b51849d657db56d882e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/43ece0e75098b7ecd8d13918293029e555a50f82",
-                "reference": "43ece0e75098b7ecd8d13918293029e555a50f82",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/aab4ebd862aa7d04f01a4b51849d657db56d882e",
+                "reference": "aab4ebd862aa7d04f01a4b51849d657db56d882e",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/promises": "^1.0",
                 "guzzlehttp/psr7": "^1.6.1",
-                "php": ">=5.5"
+                "php": ">=5.5",
+                "symfony/polyfill-intl-idn": "^1.11"
             },
             "require-dev": {
                 "ext-curl": "*",
@@ -377,7 +378,6 @@
                 "psr/log": "^1.1"
             },
             "suggest": {
-                "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
             "type": "library",
@@ -416,7 +416,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2019-12-23T11:57:10+00:00"
+            "time": "2020-04-18T10:38:46+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -4393,16 +4393,16 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v0.42.0",
+            "version": "v0.43.5",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "fd08cac2f7ebcc5514dda315cf836f6b9fb377ae"
+                "reference": "cae4f85020af5d6d049f4aa2fb034797c5032d73"
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.3",
-                "illuminate/support": "^5.4|^6.0",
+                "illuminate/support": "^5.4|^6.0|^7.0",
                 "php": ">=5.6",
                 "ukfast/sdk": "0.*.*"
             },
@@ -4429,7 +4429,7 @@
             "support": {
                 "email": "developers@ukfast.co.uk"
             },
-            "time": "2020-04-09T12:39:25+00:00"
+            "time": "2020-04-24T14:29:17+00:00"
         },
         {
             "name": "ukfast/api-auth",
@@ -4759,11 +4759,11 @@
         },
         {
             "name": "ukfast/ditto",
-            "version": "v4.9.0",
+            "version": "v4.9.1",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/db/ditto.git",
-                "reference": "78d94b301c575df83210b9d619f0e1692f1578d4"
+                "reference": "4d0dd1b6be62b4cf19ad8e58b08a7f687fb81168"
             },
             "require": {
                 "illuminate/database": "~5.0|^6.0|^7.0",
@@ -4800,7 +4800,7 @@
                 }
             ],
             "description": "Transforms, sorts, and filters api requests and responses",
-            "time": "2020-04-08T11:40:34+00:00"
+            "time": "2020-04-15T13:04:52+00:00"
         },
         {
             "name": "ukfast/health-check",
@@ -4882,17 +4882,57 @@
             "time": "2019-07-18T08:55:54+00:00"
         },
         {
+            "name": "ukfast/responses",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/responses.git",
+                "reference": "d6151aa1c1c8554182771dc8cf682ee4fcd9b838"
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/http": "^5.8|^6.0",
+                "illuminate/pagination": "^5.8|^6.0",
+                "illuminate/support": "^5.8|^6.0",
+                "ukfast/api-paginator": "^2.1"
+            },
+            "require-dev": {
+                "laravel/lumen-framework": "^5.8|^6.0",
+                "phpunit/phpunit": "^7.5",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\Responses\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "UKFast\\Responses\\Tests\\": "tests/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Phil Young",
+                    "email": "philip.young@ukfast.co.uk"
+                }
+            ],
+            "description": "Provides standardized Lumen APIo response formats",
+            "time": "2020-02-26T11:07:16+00:00"
+        },
+        {
             "name": "ukfast/sdk",
-            "version": "v0.21.0",
+            "version": "v0.21.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ukfast/sdk-php.git",
-                "reference": "981a17fec0a4d68c69d094365c0b9b9dbed5e67c"
+                "reference": "099066c2a4d1e0e0e32e1271290590072a470f22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ukfast/sdk-php/zipball/981a17fec0a4d68c69d094365c0b9b9dbed5e67c",
-                "reference": "981a17fec0a4d68c69d094365c0b9b9dbed5e67c",
+                "url": "https://api.github.com/repos/ukfast/sdk-php/zipball/099066c2a4d1e0e0e32e1271290590072a470f22",
+                "reference": "099066c2a4d1e0e0e32e1271290590072a470f22",
                 "shasum": ""
             },
             "require": {
@@ -4916,7 +4956,7 @@
                 "MIT"
             ],
             "description": "UKFast SDK for PHP",
-            "time": "2020-04-07T06:54:41+00:00"
+            "time": "2020-04-23T10:17:01+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -5893,23 +5933,20 @@
         },
         {
             "name": "phpdocumentor/reflection-common",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionCommon.git",
-                "reference": "63a995caa1ca9e5590304cd845c15ad6d482a62a"
+                "reference": "6568f4687e5b41b054365f9ae03fcb1ed5f2069b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/63a995caa1ca9e5590304cd845c15ad6d482a62a",
-                "reference": "63a995caa1ca9e5590304cd845c15ad6d482a62a",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/6568f4687e5b41b054365f9ae03fcb1ed5f2069b",
+                "reference": "6568f4687e5b41b054365f9ae03fcb1ed5f2069b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~6"
             },
             "type": "library",
             "extra": {
@@ -5941,7 +5978,7 @@
                 "reflection",
                 "static analysis"
             ],
-            "time": "2018-08-07T13:53:10+00:00"
+            "time": "2020-04-27T09:25:28+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -7079,16 +7116,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.5.4",
+            "version": "3.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "dceec07328401de6211037abbb18bda423677e26"
+                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/dceec07328401de6211037abbb18bda423677e26",
-                "reference": "dceec07328401de6211037abbb18bda423677e26",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
+                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
                 "shasum": ""
             },
             "require": {
@@ -7126,7 +7163,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2020-01-30T22:20:29+00:00"
+            "time": "2020-04-17T01:09:41+00:00"
         },
         {
             "name": "symfony/config",
@@ -7381,16 +7418,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.7.0",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598"
+                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/aed98a490f9a8f78468232db345ab9cf606cf598",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
+                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
                 "shasum": ""
             },
             "require": {
@@ -7398,7 +7435,7 @@
                 "symfony/polyfill-ctype": "^1.8"
             },
             "conflict": {
-                "vimeo/psalm": "<3.6.0"
+                "vimeo/psalm": "<3.9.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8.36 || ^7.5.13"
@@ -7425,7 +7462,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2020-02-14T12:15:55+00:00"
+            "time": "2020-04-18T12:12:48+00:00"
         }
     ],
     "aliases": [],

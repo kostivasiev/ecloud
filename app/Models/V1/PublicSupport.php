@@ -28,10 +28,6 @@ class PublicSupport extends Model implements Filterable, Sortable
     public $incrementing = false;
     public $timestamps = true;
 
-    protected $casts = [
-        'reseller_id' => 'integer',
-    ];
-
 
     /**
      * Ditto configuration

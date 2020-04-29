@@ -21,6 +21,7 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
+$app->configure('app');
 $app->configure('database');
 $app->configure('logging');
 $app->configure('mail');
@@ -84,14 +85,15 @@ $app->routeMiddleware([
 |
 */
 
-$app->register(App\Providers\AppServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
-$app->register(App\Providers\PaginationServiceProvider::class);
-$app->register(App\Providers\EventServiceProvider::class);
 
 // ukfast
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
 $app->register(App\Providers\IntapiServiceProvider::class);
+$app->register(UKFast\Responses\ResponseServiceProvider::class);
+$app->register(UKFast\Api\Paginator\PaginationServiceProvider::class);
 $app->register(UKFast\HealthCheck\HealthCheckServiceProvider::class);
 $app->register(UKFast\Api\Auth\Providers\AuthServiceProvider::class);
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
