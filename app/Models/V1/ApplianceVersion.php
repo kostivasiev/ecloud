@@ -375,4 +375,36 @@ class ApplianceVersion extends Model implements Filterable, Sortable
             "No Server license found for Appliance version '" . $this->getKey() . "'"
         );
     }
+
+    /**
+     * Return the data for the appliance version
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function data()
+    {
+        return $this->hasMany(
+            'App\Models\V1\Appliance\Version\Data',
+            'appliance_version_uuid',
+            'appliance_version_uuid'
+        );
+    }
+
+    /**
+     * Return array of the data for the Appliance version
+     * @return array
+     */
+    public function getDataArray()
+    {
+        $versionData = $this->data()->get();
+        if (empty($versionData)) {
+            return [];
+        }
+
+        $returnData = [];
+        foreach ($versionData as $data) {
+            $returnData[$data->key] = $data->value;
+        }
+
+        return $returnData;
+    }
 }

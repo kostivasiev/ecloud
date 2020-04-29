@@ -453,6 +453,7 @@ class VirtualMachineController extends BaseController
             $appliance = ApplianceController::getApplianceById($request, $request->input('appliance_id'));
 
             $applianceVersion = $appliance->getLatestVersion();
+            $applianceVersionData = $applianceVersion->getDataArray();
 
             // Load the VM template from the appliance version specification
             if (empty($applianceVersion->vm_template)) {
@@ -779,6 +780,10 @@ class VirtualMachineController extends BaseController
             if (!empty($applianceScript)) {
                 $post_data['appliance_bootstrap_script'] = base64_encode($applianceScript);
             }
+
+            if (in_array('ukfast.license.cp', array_keys($applianceVersionData))) {
+                $post_data['control_panel_id'] = $applianceVersionData['ukfast.license.cp'];
+            }
         }
 
         //set bootstrap script
@@ -802,7 +807,7 @@ class VirtualMachineController extends BaseController
             $post_data['billing_period'] = 'Month';
         }
 
-        // remove debugging when ready to retest
+        // todo remove debugging when ready to retest
 //        print_r($post_data);
 //        exit;
         // ---
