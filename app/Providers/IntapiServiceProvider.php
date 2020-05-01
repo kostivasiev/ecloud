@@ -20,6 +20,7 @@ class IntapiServiceProvider extends ServiceProvider
             $httpClient = new Client([
                 'base_uri' => env('INTAPI_HOST'),
                 'auth' => [env('INTAPI_USER'), env('INTAPI_PASS')],
+                'verify' => app()->environment() === 'production',
             ]);
 
             $intapiService = new IntapiService($httpClient);

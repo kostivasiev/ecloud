@@ -23,6 +23,7 @@ use App\Rules\V1\IsValidSSHPublicKey;
 use App\Rules\V1\IsValidUuid;
 use App\Solution\CanModifyResource;
 use Illuminate\Http\Request;
+use UKFast\Admin\Devices\AdminClient;
 use UKFast\DB\Ditto\QueryTransformer;
 
 use App\Models\V1\VirtualMachine;
@@ -2404,6 +2405,11 @@ class VirtualMachineController extends BaseController
 
     public function consoleSession(Request $request, $vmId)
     {
+        $response = app()->make(AdminClient::class)->devices()->getById($vmId);
+        if ($response->managed) {
+            abort(403, 'Unable to start session on a managed device');
+        }
+
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
@@ -2425,7 +2431,7 @@ class VirtualMachineController extends BaseController
 
         $client = new Client([
             'base_uri' => $consoleResource->url,
-            'verify' => false,
+            'verify' => app()->environment() === 'production',
             'headers' => [
                 'X-API-Authentication' => $consoleResource->token,
             ],

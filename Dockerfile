@@ -24,7 +24,7 @@ RUN echo "PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin" >> 
 RUN echo "* * * * * root herokuish procfile exec php artisan schedule:run > /proc/1/fd/1 2>/proc/1/fd/2" >> /etc/crontab
 
 # Opcache clearing tool
-RUN curl -o /app/cachetool.phar -s http://gordalina.github.io/cachetool/downloads/cachetool.phar
+RUN curl -o /app/cachetool.phar -s https://gordalina.github.io/cachetool/downloads/cachetool-4.1.1.phar
 RUN chmod +x /app/cachetool.phar
 RUN echo "alias opcache-status=\"herokuish procfile exec php cachetool.phar opcache:status --fcgi=/tmp/heroku.fcgi.$PORT.sock\"" >> ~/.bash_aliases
 RUN echo "alias opcache-clear=\"herokuish procfile exec php cachetool.phar opcache:reset --fcgi=/tmp/heroku.fcgi.$PORT.sock\"" >> ~/.bash_aliases

@@ -21,7 +21,7 @@ class NetworkingServiceProvider extends ServiceProvider
             $httpClient = new Client([
                 'base_uri' => env('APIO_NETWORKING_HOST'),
                 'timeout'  => 10,
-                'verify' => $this->app->environment() === 'production',
+                'verify' => app()->environment() === 'production',
             ]);
 
             $networkingService = new NetworkingService($httpClient);
