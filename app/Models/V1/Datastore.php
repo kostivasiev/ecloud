@@ -449,10 +449,11 @@ class Datastore extends Model implements Filterable, Sortable
      */
     public static function getPublicDefault($pod, $backupRequired)
     {
-        // clusters arent named after their db IDs, need to investigate using the pod short name if we can update them.
-        // for now I will have to map here
+        // clusters aren't named after their db IDs, need to investigate using
+        // the pod short name if we can update them. for now I will have to map here
         $podMapping = [
             14 => 1,
+            20 => 0,
             21 => 3,
             22 => 8,
         ];
@@ -471,6 +472,12 @@ class Datastore extends Model implements Filterable, Sortable
 
         $datastore = static::where('reseller_lun_name', $clusterName)->first();
         if (empty($datastore)) {
+            Log::error(
+                'Failed to locate public datastore record',
+                [
+                    'cluster_name' => $clusterName
+                ]
+            );
             throw new DatastoreNotFoundException('unable to locate datastore');
         }
 
