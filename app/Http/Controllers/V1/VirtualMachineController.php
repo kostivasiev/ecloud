@@ -781,8 +781,8 @@ class VirtualMachineController extends BaseController
                 $post_data['appliance_bootstrap_script'] = base64_encode($applianceScript);
             }
 
-            if (in_array('ukfast.license.cp', array_keys($applianceVersionData))) {
-                $post_data['control_panel_id'] = $applianceVersionData['ukfast.license.cp'];
+            if (in_array('ukfast.license.legacy-cp-id', array_keys($applianceVersionData))) {
+                $post_data['control_panel_id'] = $applianceVersionData['ukfast.license.legacy-cp-id'];
             }
         }
 
