@@ -418,6 +418,7 @@ class Host extends Model implements Filterable, Sortable
             'specification' => $responseObj->specification ?? '',
             'name' => $responseObj->name ?? '',
             'interfaces' => $interfaces ?? '',
+            'hardwareVersion' => $responseObj->hardwareVersion ?? '',
         ];
     }
 
