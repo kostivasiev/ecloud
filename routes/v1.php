@@ -98,6 +98,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         ],
     ], function () use ($router) {
         $router->get(
+            'hosts/{host_id}/hardwareVersion',
+            'HostController@hardwareVersion'
+        );
+        $router->get(
             'hosts/{host_id}/hardware',
             'HostController@hardware'
         );
