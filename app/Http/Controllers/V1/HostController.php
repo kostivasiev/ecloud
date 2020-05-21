@@ -224,34 +224,6 @@ class HostController extends BaseController
     }
 
     /**
-     * Query conjurer and get Hardware Version for the host
-     * @url https://gitlab.devops.ukfast.co.uk/ukfast/eCloud/ecloud-issues/-/issues/289
-     * @param \Illuminate\Http\Request $request
-     * @param $hostId
-     * @return \Illuminate\Http\Response
-     */
-    public function hardwareVersion(Request $request, $hostId)
-    {
-        $host = Host::find($hostId);
-        if (!$host) {
-            return Response::create([
-                'errors' => [
-                    'title' => 'Not found',
-                    'detail' => 'Host not found',
-                    'status' => 404,
-                ]
-            ], 404);
-        }
-
-        return Response::create([
-            'data' => [
-                'hardware_version' => ((object) $host->hardware)->hardwareVersion,
-            ],
-            'meta' => [],
-        ], 200);
-    }
-
-    /**
      * Query conjurer and get Cisco USC data for the host
      * @url http://conjurer.rnd.ukfast:8443/swagger/ui/index#/Compute_v1/Compute_v1_RetrieveSolutionNode
      * @param Request $request
