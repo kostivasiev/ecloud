@@ -8,7 +8,6 @@
     "php": "~7.4.0",
     "ext-pdo": "*",
     "ext-json": "*",
-    "ext-mcrypt": "*",
     "guzzlehttp/guzzle": "~6.0",
     "illuminate/mail": "^5.8",
     "illuminate/redis": "5.8.*",
