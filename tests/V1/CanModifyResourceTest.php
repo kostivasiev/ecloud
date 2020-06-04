@@ -10,6 +10,7 @@ use App\Solution\Status;
 use Illuminate\Http\Request;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CanModifyResourceTest extends TestCase
 {
