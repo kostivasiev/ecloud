@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests;
+namespace Tests\V1;
 
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 use App\Models\V1\Solution;
 
-class GetTest extends TestCase
+class GetDrsRuleTest extends TestCase
 {
     use DatabaseMigrations;
 

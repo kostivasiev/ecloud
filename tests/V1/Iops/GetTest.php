@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Iops;
+namespace Tests\V1\Iops;
 
 use App\Models\V1\IopsTier;
 use Tests\TestCase;

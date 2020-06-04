@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Hosts;
+namespace Tests\V1\Hosts;
 
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;

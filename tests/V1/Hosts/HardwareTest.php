@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Hosts;
+namespace Tests\V1\Hosts;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;

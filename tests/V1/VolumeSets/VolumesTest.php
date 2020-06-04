@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\VolumeSets;
+namespace Tests\V1\VolumeSets;
 
 use Mockery;
 use App\Services\Artisan\V1\ArtisanService;

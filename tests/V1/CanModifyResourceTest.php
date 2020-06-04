@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\V1;
 
 use App\Models\V1\Solution;
 use App\Solution\Exceptions\InvalidSolutionStateException;

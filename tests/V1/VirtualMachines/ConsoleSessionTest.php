@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\VirtualMachines;
+namespace Tests\V1\VirtualMachines;
 
 use App\Models\V1\Pod;
 use Tests\TestCase;
