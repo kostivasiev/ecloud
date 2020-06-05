@@ -1,4 +1,10 @@
+
+.test_services:
+  services:
+  - name: registry.devops.ukfast.co.uk/ukfast/team-projects/rnd/db-schema/mysql.ukfast.net:latest
+    alias: mysql-ukfast-net
+
 include:
-  - project: 'ukfast/infrastructure/ci-cd-templates'
+  - project: 'ukfast/api.ukfast/gitlab-ci'
     ref: master
     file: '/templates/main.yml'
