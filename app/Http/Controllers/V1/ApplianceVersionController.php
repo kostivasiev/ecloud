@@ -266,7 +266,7 @@ class ApplianceVersionController extends BaseController
      * - script_template - string, optional
      * - active - boolean, optional
      * @param $applianceVersionId
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      * @throws ApplianceNotFoundException
      * @throws ApplianceVersionNotFoundException
      * @throws DatabaseException
@@ -332,8 +332,7 @@ class ApplianceVersionController extends BaseController
 
             throw new DatabaseException($errorMessage);
         }
-
-        return $this->respondEmpty();
+        return $this->responseIdMeta($request, $applianceVersionId, 202);
     }
 
     /**
