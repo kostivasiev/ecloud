@@ -120,10 +120,11 @@ class ApplianceController extends BaseController
      * Update an application resource
      * @param Request $request
      * @param $applianceId
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws DatabaseException
      * @throws ForbiddenException
      * @throws ApplianceNotFoundException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, $applianceId)
     {
@@ -152,7 +153,7 @@ class ApplianceController extends BaseController
             throw new DatabaseException('Could not update appliance');
         }
 
-        return $this->respondEmpty();
+        return $this->responseIdMeta($request, $applianceId, 202);
     }
 
 
