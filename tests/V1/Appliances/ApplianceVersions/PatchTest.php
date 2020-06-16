@@ -53,9 +53,14 @@ class PatchTest extends ApplianceTestCase
                 $property => $newValue,
             ], $this->validWriteHeaders);
 
-            $this->assertResponseStatus(204);
+            $this->assertResponseStatus(202);
 
-            $this->seeInDatabase('appliance_version',
+            $this->seeJson([
+                'id' => $applianceVersion->uuid
+            ]);
+
+            $this->seeInDatabase(
+                'appliance_version',
                 [
                     'appliance_version_uuid' => $applianceVersion->uuid,
                     'appliance_version_' . $property => $newValue,
