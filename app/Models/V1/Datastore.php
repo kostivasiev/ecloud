@@ -456,6 +456,7 @@ class Datastore extends Model implements Filterable, Sortable
             20 => 0,
             21 => 3,
             22 => 8,
+            23 => 'X',
         ];
 
         $podId = $pod->getKey();
