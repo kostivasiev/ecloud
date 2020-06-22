@@ -153,7 +153,7 @@ class ApplianceController extends BaseController
             throw new DatabaseException('Could not update appliance');
         }
 
-        return $this->responseIdMeta($request, $applianceId, 202);
+        return $this->responseIdMeta($request, $applianceId, 200);
     }
 
 
