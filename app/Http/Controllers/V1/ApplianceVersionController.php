@@ -332,7 +332,7 @@ class ApplianceVersionController extends BaseController
 
             throw new DatabaseException($errorMessage);
         }
-        return $this->responseIdMeta($request, $applianceVersionId, 202);
+        return $this->responseIdMeta($request, $applianceVersionId, 200);
     }
 
     /**
