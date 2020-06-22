@@ -58,7 +58,7 @@ class PatchTest extends ApplianceTestCase
                 'id' => $uuid
             ]);
 
-            $this->assertResponseStatus(202) && $this->seeInDatabase('appliance', [
+            $this->assertResponseStatus(200) && $this->seeInDatabase('appliance', [
                 'appliance_uuid' => $uuid,
                 $property => $newValue,
             ]);
