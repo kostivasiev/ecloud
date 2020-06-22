@@ -53,7 +53,7 @@ class PatchTest extends ApplianceTestCase
                 $property => $newValue,
             ], $this->validWriteHeaders);
 
-            $this->assertResponseStatus(202);
+            $this->assertResponseStatus(200);
 
             $this->seeJson([
                 'id' => $applianceVersion->uuid
