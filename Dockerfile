@@ -1,13 +1,19 @@
-FROM php:7.1-apache AS builder
+FROM php:7.1-apache AS apio
+RUN apt update && \
+    apt install -y \
+    libmcrypt-dev
+RUN docker-php-ext-install pdo_mysql \
+                           mcrypt \
+                           opcache
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+FROM apio AS builder
 RUN apt update && \
     apt install -y \
     ssh \
     git \
-    zip \
-    libmcrypt-dev
-RUN docker-php-ext-install mcrypt
-
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+    zip
 
 # Use prestissimo until composer v2
 RUN composer global require hirak/prestissimo
@@ -30,16 +36,7 @@ else \
 composer install --no-dev; \
 fi
 
-FROM php:7.1-apache
-RUN apt update && \
-    apt install -y \
-    libmcrypt-dev
-RUN docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mcrypt \
-    && docker-php-ext-install opcache \
-    && docker-php-ext-enable opcache
-
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+FROM apio
 RUN a2enmod rewrite
 
 COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
