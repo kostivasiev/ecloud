@@ -42,4 +42,25 @@ class BaseController extends Controller
 
         $this->resellerId = $request->user->resellerId;
     }
+
+    /**
+     * @param $request
+     * @param $id
+     * @param $statusCode
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function responseIdMeta($request, $id, $statusCode)
+    {
+        return response()->json(
+            [
+                'data' => [
+                    'id' => $id,
+                ],
+                'meta' => [
+                    'location' => $request->fullUrl()
+                ],
+            ],
+            $statusCode
+        );
+    }
 }
