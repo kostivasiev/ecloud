@@ -1,4 +1,4 @@
-FROM php:7.1-apache AS apio
+FROM php:7.4-apache AS apio
 RUN apt update && \
     apt install -y \
     libmcrypt-dev
