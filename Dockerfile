@@ -1,9 +1,7 @@
-FROM php:7.3-apache AS apio
-RUN apt update && \
-    apt install -y \
-    libmcrypt-dev
+FROM php:7.4-apache AS apio
+RUN pecl install redis-5.1.1 \
+    && docker-php-ext-enable redis
 RUN docker-php-ext-install pdo_mysql \
-                           mcrypt \
                            opcache
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
