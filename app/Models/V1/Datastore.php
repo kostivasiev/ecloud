@@ -102,6 +102,8 @@ class Datastore extends Model implements Filterable, Sortable
             $factory->create('capacity', Filter::$numericDefaults),
             $factory->create('solution_id', Filter::$numericDefaults),
             $factory->create('site_id', Filter::$numericDefaults),
+            $factory->create('lun_type', Filter::$stringDefaults),
+            $factory->create('status', Filter::$stringDefaults),
         ];
     }
 
