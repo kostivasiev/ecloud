@@ -17,3 +17,7 @@ checklist of the tasks required to determine this issue as done
 /label ~PHP ~dotNET ~DevOps
 
 <!--- set product or project labels if available  -->
+
+<!--- set initial issue status and weight  -->
+/label ~"To Do" 
+/weight 5
