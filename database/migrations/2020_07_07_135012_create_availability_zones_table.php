@@ -12,7 +12,7 @@ class CreateAvailabilityZonesTable extends Migration
      */
     public function up()
     {
-        Schema::create('availability_zones', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('availability_zones', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('code');
             $table->string('name');
@@ -31,6 +31,6 @@ class CreateAvailabilityZonesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('availability_zones');
+        Schema::connection('ecloud')->dropIfExists('availability_zones');
     }
 }
