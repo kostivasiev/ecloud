@@ -1,7 +1,7 @@
 ###
 # Run these steps one by one
 ###
-# First Create a Zone
+# 1. First Create a Zone
 POST https://{{host}}/{{version}}/availability-zones
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -19,21 +19,21 @@ client.log('Zone UUID: ' + response.body.data.id);
 %}
 
 ###
-# Now view the zone collection
+# 2. View the zone collection
 GET https://{{host}}/{{version}}/availability-zones
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 ###
-# Get detail on the zone we created
+# 3. Get detail on the zone we created
 GET https://{{host}}/{{version}}/availability-zones/{{zone_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 ###
-# Update the zone we created
+# 4. Update the zone we created
 PATCH https://{{host}}/{{version}}/availability-zones/{{zone_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -46,21 +46,21 @@ Content-Type:  application/json
 }
 
 ###
-# Verify the name has changed
+# 5. Verify the name has changed
 GET https://{{host}}/{{version}}/availability-zones/{{zone_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 ###
-# Now delete the zone
+# 6. Now delete the zone
 DELETE https://{{host}}/{{version}}/availability-zones/{{zone_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 ###
-# And verify that the zone is deleted
+# 7. And verify that the zone is deleted
 GET https://{{host}}/{{version}}/availability-zones/{{zone_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
