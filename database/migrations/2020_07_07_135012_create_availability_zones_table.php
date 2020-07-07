@@ -17,9 +17,7 @@ class CreateAvailabilityZonesTable extends Migration
             $table->string('code');
             $table->string('name');
             $table->integer('site_id', false)->index();
-            $table->timestamp('created_at', 0)->useCurrent();
-            $table->timestamp('updated_at', 0)
-                ->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            $table->timestamps();
             $table->softDeletes();
         });
     }
