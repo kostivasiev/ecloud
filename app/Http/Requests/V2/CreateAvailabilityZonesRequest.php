@@ -29,4 +29,13 @@ class CreateAvailabilityZonesRequest extends FormRequest
         ];
     }
 
+    public function messages()
+    {
+        return [
+            'code.required' => 'The :attribute field is required',
+            'name.required' => 'The :attribute field is required',
+            'site_id.required' => 'The :attribute field is required',
+        ];
+    }
+
 }
