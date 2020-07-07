@@ -2,9 +2,13 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V1\UUIDHelper;
+use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Resource\Property\DateTimeProperty;
+use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\IntProperty;
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -69,7 +73,7 @@ class AvailabilityZones extends Model implements Filterable, Sortable
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $sortFactory->create('code', 'asc'),
+            $factory->create('code', 'asc'),
         ];
     }
 
@@ -87,4 +91,22 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             'updated_at' => 'appliance_updated_at',
         ];
     }
+
+    /**
+     * @return array
+     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
+     */
+    public function properties()
+    {
+        return [
+            IdProperty::create('id', 'id', null, 'uuid'),
+            StringProperty::create('code', 'code'),
+            StringProperty::create('name', 'name'),
+            IntProperty::create('site_id', 'site_id'),
+            DateTimeProperty::create('created_at', 'created_at'),
+            DateTimeProperty::create('updated_at', 'updated_at')
+        ];
+    }
+
+
 }
