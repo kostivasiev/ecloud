@@ -37,5 +37,4 @@ class CreateAvailabilityZonesRequest extends FormRequest
             'site_id.required' => 'The :attribute field is required',
         ];
     }
-
 }

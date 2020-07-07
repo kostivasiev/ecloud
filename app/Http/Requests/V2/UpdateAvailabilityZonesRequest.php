@@ -37,5 +37,4 @@ class UpdateAvailabilityZonesRequest extends FormRequest
             'site_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
-
 }
