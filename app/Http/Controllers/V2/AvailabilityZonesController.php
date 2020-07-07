@@ -67,7 +67,7 @@ class AvailabilityZonesController extends BaseController
     public function update(UpdateAvailabilityZonesRequest $request, string $zoneId)
     {
         $availabilityZone = AvailabilityZones::findOrFail($zoneId);
-        $availabilityZone->replace($request->only([
+        $availabilityZone->fill($request->only([
             'code', 'name', 'site_id',
         ]));
         $availabilityZone->save();
