@@ -64,6 +64,11 @@ class AvailabilityZonesController extends BaseController
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 201);
     }
 
+    /**
+     * @param \App\Http\Requests\V2\UpdateAvailabilityZonesRequest $request
+     * @param string $zoneId
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(UpdateAvailabilityZonesRequest $request, string $zoneId)
     {
         $availabilityZone = AvailabilityZones::findOrFail($zoneId);
@@ -74,6 +79,11 @@ class AvailabilityZonesController extends BaseController
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 202);
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param string $zoneId
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(Request $request, string $zoneId)
     {
         $availabilityZone = AvailabilityZones::findOrFail($zoneId);
