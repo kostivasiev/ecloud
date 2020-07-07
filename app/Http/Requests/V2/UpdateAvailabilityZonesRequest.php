@@ -23,9 +23,18 @@ class UpdateAvailabilityZonesRequest extends FormRequest
     public function rules()
     {
         return [
-            'code'    => 'sometimes|string',
-            'name'    => 'sometimes|string',
-            'site_id' => 'sometimes|integer',
+            'code'    => 'sometimes|required|string',
+            'name'    => 'sometimes|required|string',
+            'site_id' => 'sometimes|required|integer',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'code.required' => 'The :attribute field, when specified, cannot be null',
+            'name.required' => 'The :attribute field, when specified, cannot be null',
+            'site_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 
