@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2;
+namespace App\Events\V2\AvailabilityZones;
 
 use App\Events\Event;
 
-class AfterDeleteAvailabilityZones extends Event
+class BeforeCreateEvent extends Event
 {
     /**
      * Create a new event instance.
