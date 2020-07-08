@@ -134,7 +134,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(202);
+            ->assertResponseStatus(200);
 
         $availabilityZone = AvailabilityZones::findOrFail($zone->getKey());
         $this->assertEquals($data['code'], $availabilityZone->code);

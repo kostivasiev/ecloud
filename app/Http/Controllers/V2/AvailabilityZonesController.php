@@ -86,7 +86,7 @@ class AvailabilityZonesController extends BaseController
         ]));
         $availabilityZone->save();
         event(new AfterUpdateEvent());
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 202);
+        return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
     }
 
     /**
