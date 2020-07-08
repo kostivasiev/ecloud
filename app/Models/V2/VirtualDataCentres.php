@@ -99,5 +99,4 @@ class VirtualDataCentres extends Model implements Filterable, Sortable
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
     }
-
 }
