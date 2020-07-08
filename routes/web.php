@@ -12,3 +12,7 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 */
 
 require('v1.php');
+
+$router->get('docs.yml', function () {
+    return \Illuminate\Support\Facades\File::get(base_path() . '/docs/public.yaml');
+});
