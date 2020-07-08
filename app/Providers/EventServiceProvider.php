@@ -60,5 +60,23 @@ class EventServiceProvider extends ServiceProvider
 //        'App\Events\V2\AvailabilityZones\BeforeUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
+//        'App\Events\V2\VirtualDataCentres\AfterCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualDataCentres\AfterDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualDataCentres\AfterUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualDataCentres\BeforeCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualDataCentres\BeforeDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualDataCentres\BeforeUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
     ];
 }
