@@ -24,7 +24,6 @@ class CreateRoutersRequest extends FormRequest
     {
         return [
             'name'    => 'required|string',
-            'gateway_id' => 'required|uuid',
         ];
     }
 
@@ -37,7 +36,6 @@ class CreateRoutersRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field is required',
-            'gateway_id.required' => 'The :attribute field is required',
         ];
     }
 }

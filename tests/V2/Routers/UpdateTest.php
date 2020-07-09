@@ -24,7 +24,6 @@ class UpdateTest extends TestCase
         $zone = $this->createRouter();
         $data = [
             'name'       => 'Manchester Router 2',
-            'gateway_id' => $this->faker->uuid,
         ];
         $this->patch(
             '/v2/routers/' . $zone->getKey(),
@@ -47,7 +46,6 @@ class UpdateTest extends TestCase
         $zone = $this->createRouter();
         $data = [
             'name'       => '',
-            'gateway_id' => $this->faker->uuid,
         ];
         $this->patch(
             '/v2/routers/' . $zone->getKey(),
@@ -66,36 +64,11 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testNullGatewayIdIsDenied()
-    {
-        $zone = $this->createRouter();
-        $data = [
-            'name'       => 'Manchester Router 2',
-            'gateway_id' => '',
-        ];
-        $this->patch(
-            '/v2/routers/' . $zone->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The gateway id field, when specified, cannot be null',
-                'status' => 422,
-                'source' => 'gateway_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testValidDataIsSuccessful()
     {
         $zone = $this->createRouter();
         $data = [
             'name'       => 'Manchester Router 2',
-            'gateway_id' => $this->faker->uuid,
         ];
         $this->patch(
             '/v2/routers/' . $zone->getKey(),
@@ -109,7 +82,6 @@ class UpdateTest extends TestCase
 
         $routerItem = Routers::findOrFail($zone->getKey());
         $this->assertEquals($data['name'], $routerItem->name);
-        $this->assertEquals($data['gateway_id'], $routerItem->gateway_id);
     }
 
     /**

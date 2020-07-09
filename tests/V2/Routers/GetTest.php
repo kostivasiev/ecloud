@@ -40,7 +40,6 @@ class GetTest extends TestCase
     {
         $routerItem = factory(Routers::class, 1)->create([
             'name'       => 'Manchester Router 1',
-            'gateway_id' => $this->faker->uuid,
         ])->first();
         $this->get(
             '/v2/routers',
@@ -52,7 +51,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id'         => $routerItem->id,
                 'name'       => $routerItem->name,
-                'gateway_id' => $routerItem->gateway_id,
             ])
             ->assertResponseStatus(200);
     }
@@ -61,7 +59,6 @@ class GetTest extends TestCase
     {
         $router = factory(Routers::class, 1)->create([
             'name'       => 'Manchester Router 1',
-            'gateway_id' => $this->faker->uuid,
         ])->first();
         $router->save();
         $router->refresh();
@@ -76,7 +73,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id'         => $router->id,
                 'name'       => $router->name,
-                'gateway_id' => $router->gateway_id,
             ])
             ->assertResponseStatus(200);
     }

@@ -8,6 +8,5 @@ use Faker\Generator as Faker;
 $factory->define(Routers::class, function (Faker $faker) {
     return [
         'name'       => 'Primary Router',
-        'gateway_id' => $faker->uuid,
     ];
 });

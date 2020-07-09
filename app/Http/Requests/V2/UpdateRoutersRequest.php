@@ -24,7 +24,6 @@ class UpdateRoutersRequest extends FormRequest
     {
         return [
             'name'    => 'sometimes|required|string',
-            'gateway_id' => 'sometimes|required|uuid',
         ];
     }
 
@@ -37,7 +36,6 @@ class UpdateRoutersRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field, when specified, cannot be null',
-            'gateway_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }

@@ -8,8 +8,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Manchester Router 1",
-  "gateway_id": "c6e7bd3c-0e14-47df-9121-516551b4f990"
+  "name": "Manchester Router 1"
 }
 
 > {%
@@ -39,8 +38,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Manchester Region Router 1",
-  "gateway_id": "af265d69-fd93-45b5-8611-1589443b1064"
+  "name": "Manchester Region Router 1"
 }
 
 ###

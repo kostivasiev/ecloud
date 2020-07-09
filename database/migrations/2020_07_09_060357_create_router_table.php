@@ -16,7 +16,6 @@ class CreateRouterTable extends Migration
         Schema::connection('ecloud')->create('router', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->uuid('gateway_id')->index();
             $table->timestamps();
             $table->softDeletes();
         });

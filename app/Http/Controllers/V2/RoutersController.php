@@ -63,7 +63,7 @@ class RoutersController extends BaseController
     public function create(CreateRoutersRequest $request)
     {
         event(new BeforeCreateEvent());
-        $router = new Routers($request->only(['name', 'gateway_id']));
+        $router = new Routers($request->only(['name']));
         $router->save();
         $router->refresh();
         event(new AfterCreateEvent());
@@ -79,7 +79,7 @@ class RoutersController extends BaseController
     {
         event(new BeforeUpdateEvent());
         $router = Routers::findOrFail($routerUuid);
-        $router->fill($request->only(['name', 'gateway_id']));
+        $router->fill($request->only(['name']));
         $router->save();
         event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $router->getKey(), 200);

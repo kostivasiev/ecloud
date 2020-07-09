@@ -28,8 +28,8 @@ class Routers extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'router';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'gateway_id'];
-    protected $visible = ['id', 'name', 'gateway_id', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'name'];
+    protected $visible = ['id', 'name', 'created_at', 'updated_at'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -43,7 +43,6 @@ class Routers extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('gateway_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -59,7 +58,6 @@ class Routers extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('gateway_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -84,7 +82,6 @@ class Routers extends Model implements Filterable, Sortable
         return [
             'id'         => 'id',
             'name'       => 'name',
-            'gateway_id'    => 'gateway_id',
             'created_at' => 'appliance_created_at',
             'updated_at' => 'appliance_updated_at',
         ];
@@ -99,7 +96,6 @@ class Routers extends Model implements Filterable, Sortable
         return [
             IdProperty::create('id', 'id', null, 'uuid'),
             StringProperty::create('name', 'name'),
-            StringProperty::create('gateway_id', 'gateway_id', 'uuid'),
             DateTimeProperty::create('created_at', 'created_at'),
             DateTimeProperty::create('updated_at', 'updated_at')
         ];

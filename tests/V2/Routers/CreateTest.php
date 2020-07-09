@@ -23,7 +23,6 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => 'Manchester Router 1',
-            'gateway_id' => $this->faker->randomDigit(),
         ];
         $this->post(
             '/v2/routers',
@@ -44,7 +43,7 @@ class CreateTest extends TestCase
     public function testNullNameIsFailed()
     {
         $data = [
-            'gateway_id' => $this->faker->randomDigit(),
+            'name' => '',
         ];
         $this->post(
             '/v2/routers',
@@ -63,33 +62,10 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testNullGatewayIdIsFailed()
-    {
-        $data = [
-            'name'    => 'Manchester Router 1',
-        ];
-        $this->post(
-            '/v2/routers',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The gateway id field is required',
-                'status' => 422,
-                'source' => 'gateway_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testValidDataSucceeds()
     {
         $data = [
             'name'    => 'Manchester Router 1',
-            'gateway_id' => $this->faker->uuid,
         ];
         $this->post(
             '/v2/routers',
