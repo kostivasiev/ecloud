@@ -34,4 +34,13 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('vdcs/{vdcUuid}', 'VirtualDataCentresController@update');
         $router->delete('vdcs/{vdcUuid}', 'VirtualDataCentresController@destroy');
     });
+
+    /** Routers */
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('routers', 'RoutersController@index');
+        $router->get('routers/{routerUuid}', 'RoutersController@show');
+        $router->post('routers', 'RoutersController@create');
+        $router->patch('routers/{routerUuid}', 'RoutersController@update');
+        $router->delete('routers/{routerUuid}', 'RoutersController@destroy');
+    });
 });
