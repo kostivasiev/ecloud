@@ -55,11 +55,6 @@ components:
           type: string
           example: 'Primary Router'
           readOnly: false
-        gateway_id:
-          type: string
-          example: af265d69-fd93-45b5-8611-1589443b1064
-          generationStrategy: uuid
-          readOnly: false
         created_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
