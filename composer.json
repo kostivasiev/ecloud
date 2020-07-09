@@ -6,9 +6,9 @@
   "type": "project",
   "require": {
     "php": "~7.1.0",
-    "ext-pdo": "*",
     "ext-json": "*",
     "ext-mcrypt": "*",
+    "ext-pdo": "*",
     "guzzlehttp/guzzle": "~6.0",
     "illuminate/mail": "^5.8",
     "illuminate/redis": "5.8.*",
@@ -18,18 +18,19 @@
     "ramsey/uuid": "^3.8",
     "ruflin/elastica": "^6.1",
     "ukfast/api-auth": "2.*",
+    "ukfast/api-encryption": "^4.0.0",
     "ukfast/api-exceptions": "2.*",
     "ukfast/api-helper-datetime": "2.0.*",
+    "ukfast/api-internal-communication": "~1.0",
     "ukfast/api-paginator": "^2.1",
     "ukfast/api-resources": "^4.2",
     "ukfast/api-validation": "~1.0",
     "ukfast/ditto": "^4.8",
+    "ukfast/form-requests": "^0.1.1",
     "ukfast/health-check": "~1.0",
     "ukfast/log-provider": "~1.0",
-    "vlucas/phpdotenv": "^3.3",
-    "ukfast/api-internal-communication": "~1.0",
-    "ukfast/api-encryption": "^4.0.0",
-    "ukfast/responses": "~1.0"
+    "ukfast/responses": "~1.0",
+    "vlucas/phpdotenv": "^3.3"
   },
   "require-dev": {
     "ext-sqlite3": "*",
@@ -135,6 +136,10 @@
     {
       "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/responses.git"
+    },
+    {
+      "type": "vcs",
+      "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/form-requests.git"
     }
   ]
 }
