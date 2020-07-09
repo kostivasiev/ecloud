@@ -17,7 +17,6 @@ class NsxServiceProvider extends ServiceProvider
                 'headers' => [
                     'Authorization' => ['Basic ' . $auth],
                 ],
-                //'auth' => [config('nsx.username'), config('nsx.password')],
                 'timeout'  => 10,
                 'verify' => $this->app->environment() === 'production',
             ]));
