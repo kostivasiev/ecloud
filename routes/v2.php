@@ -43,4 +43,13 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('routers/{routerUuid}', 'RoutersController@update');
         $router->delete('routers/{routerUuid}', 'RoutersController@destroy');
     });
+
+    /** Gateways */
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('gateways', 'GatewaysController@index');
+        $router->get('gateways/{routerUuid}', 'GatewaysController@show');
+        $router->post('gateways', 'GatewaysController@create');
+        $router->patch('gateways/{routerUuid}', 'GatewaysController@update');
+        $router->delete('gateways/{routerUuid}', 'GatewaysController@destroy');
+    });
 });
