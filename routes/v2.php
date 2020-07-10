@@ -24,6 +24,18 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZonesController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZonesController@update');
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZonesController@destroy');
+
+        /** Availability Zones Routers */
+        $router->group([], function () use ($router) {
+            $router->put(
+                'availability-zones/{zoneId}/routers/{routerUuid}',
+                'AvailabilityZonesController@routersCreate'
+            );
+            $router->delete(
+                'availability-zones/{zoneId}/routers/{routerUuid}',
+                'AvailabilityZonesController@routersDestroy'
+            );
+        });
     });
 
     /** Virtual Data Centres */
