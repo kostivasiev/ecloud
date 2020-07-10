@@ -17,7 +17,7 @@ client.log('Router UUID: ' + response.body.data.id);
 %}
 
 ###
-# 2. First Create a Gateway
+# 2. Then Create a Gateway
 POST https://{{host}}/{{version}}/gateways
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
