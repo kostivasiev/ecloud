@@ -81,8 +81,8 @@ class VirtualDataCentres extends Model implements Filterable, Sortable
         return [
             'id'         => 'id',
             'name'       => 'name',
-            'created_at' => 'appliance_created_at',
-            'updated_at' => 'appliance_updated_at',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 

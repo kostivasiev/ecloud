@@ -87,8 +87,8 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             'code'       => 'code',
             'name'       => 'name',
             'site_id'    => 'site_id',
-            'created_at' => 'appliance_created_at',
-            'updated_at' => 'appliance_updated_at',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 
