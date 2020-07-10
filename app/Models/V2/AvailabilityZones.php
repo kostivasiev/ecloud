@@ -27,8 +27,8 @@ class AvailabilityZones extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'availability_zones';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'code', 'name', 'site_id'];
-    protected $visible = ['id', 'code', 'name', 'site_id', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'code', 'name', 'site_id', 'nsx_manager_endpoint'];
+    protected $visible = ['id', 'code', 'name', 'site_id', 'nsx_manager_endpoint', 'created_at', 'updated_at'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -44,6 +44,7 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             $factory->create('code', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('site_id', Filter::$numericDefaults),
+            $factory->create('nsx_manager_endpoint', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -61,6 +62,7 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             $factory->create('code'),
             $factory->create('name'),
             $factory->create('site_id'),
+            $factory->create('nsx_manager_endpoint'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -87,6 +89,7 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             'code'       => 'code',
             'name'       => 'name',
             'site_id'    => 'site_id',
+            'nsx_manager_endpoint'    => 'nsx_manager_endpoint',
             'created_at' => 'appliance_created_at',
             'updated_at' => 'appliance_updated_at',
         ];
@@ -103,6 +106,7 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             StringProperty::create('code', 'code'),
             StringProperty::create('name', 'name'),
             IntProperty::create('site_id', 'site_id'),
+            StringProperty::create('nsx_manager_endpoint', 'nsx_manager_endpoint'),
             DateTimeProperty::create('created_at', 'created_at'),
             DateTimeProperty::create('updated_at', 'updated_at')
         ];

@@ -12,5 +12,6 @@ $factory->define(AvailabilityZones::class, function (Faker $faker) {
         'code'    => 'LON1',
         'name'    => 'London Zone 1',
         'site_id' => 1,
+        'nsx_manager_endpoint' => 'https://www.ukfast.co.uk/',
     ];
 });

@@ -64,7 +64,7 @@ class AvailabilityZonesController extends BaseController
     {
         event(new BeforeCreateEvent());
         $availabilityZone = new AvailabilityZones($request->only([
-            'code', 'name', 'site_id',
+            'code', 'name', 'site_id', 'nsx_manager_endpoint',
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
@@ -82,7 +82,7 @@ class AvailabilityZonesController extends BaseController
         event(new BeforeUpdateEvent());
         $availabilityZone = AvailabilityZones::findOrFail($zoneId);
         $availabilityZone->fill($request->only([
-            'code', 'name', 'site_id',
+            'code', 'name', 'site_id', 'nsx_manager_endpoint',
         ]));
         $availabilityZone->save();
         event(new AfterUpdateEvent());
