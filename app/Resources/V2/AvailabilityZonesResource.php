@@ -37,5 +37,4 @@ class AvailabilityZonesResource extends UKFastResource
             )->toIso8601String(),
         ];
     }
-
 }
