@@ -114,4 +114,17 @@ class Routers extends Model implements Filterable, Sortable
             'gateways_id'
         );
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function availabilityZones()
+    {
+        return $this->belongsToMany(
+            AvailabilityZones::class,
+            'availability_zones_router',
+            'router_id',
+            'zone_id'
+        );
+    }
 }
