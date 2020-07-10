@@ -107,4 +107,17 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function routers()
+    {
+        return $this->belongsToMany(
+            Routers::class,
+            'availability_zones_router',
+            'zone_id',
+            'router_id'
+        );
+    }
 }
