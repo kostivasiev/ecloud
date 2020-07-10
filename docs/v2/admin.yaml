@@ -276,6 +276,49 @@ paths:
           schema:
             type: uuid
           example: e61bfc11-f423-437c-bde3-68b07bb3d371
+  '/ecloud/v2/availability-zones/{zoneUuid}/routers/{routerUuid}':
+    put:
+      responses:
+        204:
+          description: Success
+      tags:
+        - Routers
+      parameters:
+        -
+          name: zoneUuid
+          in: path
+          required: true
+          schema:
+            type: uuid
+          example: e61bfc11-f423-437c-bde3-68b07bb3d371
+        -
+          name: routerUuid
+          in: path
+          required: true
+          schema:
+            type: uuid
+          example: 78caebc2-7393-42a1-89c4-ef5fc82323e9
+    delete:
+      responses:
+        204:
+          description: Success
+      tags:
+        - Routers
+      parameters:
+        -
+          name: zoneUuid
+          in: path
+          required: true
+          schema:
+            type: uuid
+          example: e61bfc11-f423-437c-bde3-68b07bb3d371
+        -
+          name: routerUuid
+          in: path
+          required: true
+          schema:
+            type: uuid
+          example: 78caebc2-7393-42a1-89c4-ef5fc82323e9
   '/ecloud/v2/gateways':
     get:
       responses:
