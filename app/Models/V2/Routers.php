@@ -100,4 +100,18 @@ class Routers extends Model implements Filterable, Sortable
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
     }
+
+    /**
+     * Many to Many with Gateways table
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function gateways()
+    {
+        return $this->belongsToMany(
+            Gateways::class,
+            'router_gateways',
+            'router_id',
+            'gateways_id'
+        );
+    }
 }
