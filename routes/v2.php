@@ -42,14 +42,26 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('routers', 'RoutersController@create');
         $router->patch('routers/{routerUuid}', 'RoutersController@update');
         $router->delete('routers/{routerUuid}', 'RoutersController@destroy');
+
+        /** Routers Gateways */
+        $router->group([], function () use ($router) {
+            $router->put(
+                'routers/{routerUuid}/gateways/{gatewaysUuid}',
+                'RoutersController@gatewaysCreate'
+            );
+            $router->delete(
+                'routers/{routerUuid}/gateways/{gatewaysUuid}',
+                'RoutersController@gatewaysDestroy'
+            );
+        });
     });
 
     /** Gateways */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('gateways', 'GatewaysController@index');
-        $router->get('gateways/{routerUuid}', 'GatewaysController@show');
+        $router->get('gateways/{gatewayUuid}', 'GatewaysController@show');
         $router->post('gateways', 'GatewaysController@create');
-        $router->patch('gateways/{routerUuid}', 'GatewaysController@update');
-        $router->delete('gateways/{routerUuid}', 'GatewaysController@destroy');
+        $router->patch('gateways/{gatewayUuid}', 'GatewaysController@update');
+        $router->delete('gateways/{gatewayUuid}', 'GatewaysController@destroy');
     });
 });
