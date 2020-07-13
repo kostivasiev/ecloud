@@ -24,8 +24,7 @@ components:
       properties:
         id:
           type: string
-          example: 78e8a223-c125-4641-8ca9-c201d2cc4785
-          generationStrategy: uuid
+          example: vdc-2b66bb79
           readOnly: false
         name:
           type: string
@@ -130,7 +129,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: e61bfc11-f423-437c-bde3-68b07bb3d371
+                        example: vdc-2b66bb79
                   meta:
                     type: object
                     properties:
@@ -146,7 +145,7 @@ paths:
       tags:
         - VirtualDataCentres
       parameters: {  }
-  '/ecloud/v2/vdcs/{vdcUuid}':
+  '/ecloud/v2/vdcs/{vdcId}':
     get:
       responses:
         200:
@@ -165,12 +164,12 @@ paths:
         - VirtualDataCentres
       parameters:
         -
-          name: vdcUuid
+          name: vdcId
           in: path
           required: true
           schema:
-            type: uuid
-          example: e61bfc11-f423-437c-bde3-68b07bb3d371
+            type: string
+          example: vdc-2b66bb79
     patch:
       responses:
         200:
@@ -184,13 +183,13 @@ paths:
                     type: object
                     properties:
                       id: string
-                      example: e61bfc11-f423-437c-bde3-68b07bb3d371
+                      example: vdc-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/{vdcUuid}'
+                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/{vdcId}'
       requestBody:
         required: true
         content:
@@ -201,12 +200,12 @@ paths:
         - VirtualDataCentres
       parameters:
         -
-          name: vdcUuid
+          name: vdcId
           in: path
           required: true
           schema:
-            type: uuid
-          example: e61bfc11-f423-437c-bde3-68b07bb3d371
+            type: string
+          example: vdc-2b66bb79
     delete:
       responses:
         204:
@@ -215,9 +214,9 @@ paths:
         - VirtualDataCentres
       parameters:
         -
-          name: zoneUuid
+          name: zoneId
           in: path
           required: true
           schema:
-            type: uuid
-          example: e61bfc11-f423-437c-bde3-68b07bb3d371
+            type: string
+          example: avz-2b66bb79
