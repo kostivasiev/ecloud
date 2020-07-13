@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\VirtualDataCentres;
+namespace App\Events\V2\VirtualPrivateClouds;
 
 use App\Events\Event;
 
-class BeforeDeleteEvent extends Event
+class BeforeCreateEvent extends Event
 {
     /**
      * Create a new event instance.
