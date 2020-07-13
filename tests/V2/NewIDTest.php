@@ -5,7 +5,7 @@ namespace Tests\V2;
 use App\Models\V2\AvailabilityZones;
 use App\Models\V2\Gateways;
 use App\Models\V2\Routers;
-use App\Models\V2\VirtualDataCentres;
+use App\Models\V2\VirtualPrivateClouds;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -99,7 +99,7 @@ class NewIDTest extends TestCase
         )
             ->assertResponseStatus(201);
         $this->assertRegExp(
-            $this->generateRegExp(VirtualDataCentres::class),
+            $this->generateRegExp(VirtualPrivateClouds::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
