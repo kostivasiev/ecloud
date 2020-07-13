@@ -24,6 +24,7 @@ class Gateways extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
+    public const KEY_PREFIX = 'GWY';
     protected $connection = 'ecloud';
     protected $table = 'gateways';
     protected $primaryKey = 'id';

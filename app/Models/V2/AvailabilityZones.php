@@ -24,6 +24,7 @@ class AvailabilityZones extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
+    public const KEY_PREFIX = 'AVZ';
     protected $connection = 'ecloud';
     protected $table = 'availability_zones';
     protected $primaryKey = 'id';
