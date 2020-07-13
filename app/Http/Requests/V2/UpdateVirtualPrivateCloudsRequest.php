@@ -5,10 +5,10 @@ namespace App\Http\Requests\V2;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateVirtualDataCentresRequest
+ * Class UpdateVirtualPrivateCloudsRequest
  * @package App\Http\Requests\V2
  */
-class CreateVirtualDataCentresRequest extends FormRequest
+class UpdateVirtualPrivateCloudsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class CreateVirtualDataCentresRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'required|string',
+            'name'    => 'sometimes|required|string',
         ];
     }
 
@@ -40,7 +40,7 @@ class CreateVirtualDataCentresRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field is required',
+            'name.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }
