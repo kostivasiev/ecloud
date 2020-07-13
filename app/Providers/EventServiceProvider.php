@@ -60,22 +60,22 @@ class EventServiceProvider extends ServiceProvider
 //        'App\Events\V2\AvailabilityZones\BeforeUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\AfterCreateEvent' => [
+//        'App\Events\V2\VirtualPrivateClouds\AfterCreateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\AfterDeleteEvent' => [
+//        'App\Events\V2\VirtualPrivateClouds\AfterDeleteEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\AfterUpdateEvent' => [
+//        'App\Events\V2\VirtualPrivateClouds\AfterUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\BeforeCreateEvent' => [
+//        'App\Events\V2\VirtualPrivateClouds\BeforeCreateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\BeforeDeleteEvent' => [
+//        'App\Events\V2\VirtualPrivateClouds\BeforeDeleteEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\BeforeUpdateEvent' => [
+//        'App\Events\V2\VirtualPrivateClouds\BeforeUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
 //        'App\Events\V2\Routers\AfterCreateEvent' => [
