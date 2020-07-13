@@ -25,7 +25,6 @@ class Routers extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'RTR';
     protected $connection = 'ecloud';
     protected $table = 'router';
     protected $primaryKey = 'id';

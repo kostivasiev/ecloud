@@ -23,7 +23,6 @@ class VirtualDataCentres extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'VDC';
     protected $connection = 'ecloud';
     protected $table = 'virtual_data_centre';
     protected $primaryKey = 'id';

@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Gateways::class, function (Faker $faker) {
     return [
-        'id'   => Gateways::generateId(new Gateways()),
+        'id'   => $faker->uuid,
         'name' => 'My Gateway 1'
     ];
 });

@@ -4,10 +4,11 @@
 
 use App\Models\V2\AvailabilityZones;
 use Faker\Generator as Faker;
+use Ramsey\Uuid\Uuid;
 
 $factory->define(AvailabilityZones::class, function (Faker $faker) {
     return [
-        'id'      => AvailabilityZones::generateId(new AvailabilityZones()),
+        'id'      => Uuid::uuid4()->toString(),
         'code'    => 'LON1',
         'name'    => 'London Zone 1',
         'site_id' => 1,

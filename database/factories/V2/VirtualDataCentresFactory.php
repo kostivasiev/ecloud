@@ -4,10 +4,11 @@
 
 use App\Models\V2\VirtualDataCentres;
 use Faker\Generator as Faker;
+use Ramsey\Uuid\Uuid;
 
 $factory->define(VirtualDataCentres::class, function (Faker $faker) {
     return [
-        'id'   => VirtualDataCentres::generateId(new VirtualDataCentres()),
+        'id'   => Uuid::uuid4()->toString(),
         'name' => 'Virtual Datacentre Name',
     ];
 });
