@@ -15,17 +15,17 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class VirtualDataCentres
+ * Class VirtualPrivateClouds
  * @package App\Models\V2
  * @method static findOrFail(string $vdcUuid)
  */
-class VirtualDataCentres extends Model implements Filterable, Sortable
+class VirtualPrivateClouds extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'vdc';
+    public const KEY_PREFIX = 'vpc';
     protected $connection = 'ecloud';
-    protected $table = 'virtual_data_centre';
+    protected $table = 'virtual_private_clouds';
     protected $primaryKey = 'id';
     protected $fillable = ['id', 'name'];
     protected $visible = ['id', 'name', 'created_at', 'updated_at'];
