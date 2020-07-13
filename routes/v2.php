@@ -40,11 +40,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Virtual Data Centres */
     $router->group([], function () use ($router) {
-        $router->get('vdcs', 'VirtualDataCentresController@index');
-        $router->get('vdcs/{vdcUuid}', 'VirtualDataCentresController@show');
-        $router->post('vdcs', 'VirtualDataCentresController@create');
-        $router->patch('vdcs/{vdcUuid}', 'VirtualDataCentresController@update');
-        $router->delete('vdcs/{vdcUuid}', 'VirtualDataCentresController@destroy');
+        $router->get('vpcs', 'VirtualPrivateCloudsController@index');
+        $router->get('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@show');
+        $router->post('vpcs', 'VirtualPrivateCloudsController@create');
+        $router->patch('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@update');
+        $router->delete('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@destroy');
     });
 
     /** Routers */
