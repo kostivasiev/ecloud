@@ -20,7 +20,7 @@ components:
       in: header
       name: Authorization
   schemas:
-    VirtualDataCentres:
+    VirtualPrivateClouds:
       properties:
         id:
           type: string
@@ -28,7 +28,7 @@ components:
           readOnly: false
         name:
           type: string
-          example: 'Manchester Datacentre 1'
+          example: 'Manchester Cloud 1'
           readOnly: false
         created_at:
           type: string
@@ -42,10 +42,10 @@ components:
           type: string
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
-      description: 'Virtual Data Centres'
+      description: 'Virtual Private Clouds'
       required: {  }
 paths:
-  '/ecloud/v2/vdcs':
+  '/ecloud/v2/vpcs':
     get:
       responses:
         200:
@@ -58,7 +58,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/VirtualDataCentres'
+                      $ref: '#/components/schemas/VirtualPrivateClouds'
                   meta:
                     type: object
                     required:
@@ -87,18 +87,18 @@ paths:
                             properties:
                               first:
                                 type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/vdcs?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=1'
                               previous:
                                 type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/vdcs?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=1'
                               next:
                                 type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/vdcs?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=2'
                               last:
                                 type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/vdcs?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=2'
       tags:
-        - VirtualDataCentres
+        - VirtualPrivateClouds
       parameters:
         -
           name: per_page
@@ -135,17 +135,17 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/vdcs'
+                        example: 'https://api.ukfast.io/ecloud/v2/vpcs'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VirtualDataCentres'
+              $ref: '#/components/schemas/VirtualPrivateClouds'
       tags:
-        - VirtualDataCentres
+        - VirtualPrivateClouds
       parameters: {  }
-  '/ecloud/v2/vdcs/{vdcId}':
+  '/ecloud/v2/vpcs/{vpcId}':
     get:
       responses:
         200:
@@ -157,14 +157,14 @@ paths:
                 properties:
                   data:
                     type: object
-                    $ref: '#/components/schemas/VirtualDataCentres'
+                    $ref: '#/components/schemas/VirtualPrivateClouds'
                   meta:
                     type: object
       tags:
-        - VirtualDataCentres
+        - VirtualPrivateClouds
       parameters:
         -
-          name: vdcId
+          name: vpcId
           in: path
           required: true
           schema:
@@ -189,18 +189,18 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/{vdcId}'
+                        example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VirtualDataCentres'
+              $ref: '#/components/schemas/VirtualPrivateClouds'
       tags:
-        - VirtualDataCentres
+        - VirtualPrivateClouds
       parameters:
         -
-          name: vdcId
+          name: vpcId
           in: path
           required: true
           schema:
@@ -211,7 +211,7 @@ paths:
         204:
           description: Success
       tags:
-        - VirtualDataCentres
+        - VirtualPrivateClouds
       parameters:
         -
           name: zoneId
