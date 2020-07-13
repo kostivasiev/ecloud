@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\V2\VirtualDataCentres;
+namespace Tests\V2\VirtualPrivateClouds;
 
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -25,7 +25,7 @@ class CreateTest extends TestCase
             'name'    => 'Manchester DC',
         ];
         $this->post(
-            '/v2/vdcs',
+            '/v2/vpcs',
             $data,
             []
         )
@@ -43,7 +43,7 @@ class CreateTest extends TestCase
             'name'    => '',
         ];
         $this->post(
-            '/v2/vdcs',
+            '/v2/vpcs',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -65,7 +65,7 @@ class CreateTest extends TestCase
             'name'    => 'Manchester DC',
         ];
         $this->post(
-            '/v2/vdcs',
+            '/v2/vpcs',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -74,9 +74,9 @@ class CreateTest extends TestCase
         )
             ->assertResponseStatus(201);
 
-        $virtualDataCentreId = (json_decode($this->response->getContent()))->data->id;
+        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
-            'id' => $virtualDataCentreId,
+            'id' => $virtualPrivateCloudId,
         ]);
     }
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\VirtualDataCentres;
+namespace Tests\V2\VirtualPrivateClouds;
 
-use App\Models\V2\VirtualDataCentres;
+use App\Models\V2\VirtualPrivateClouds;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -21,12 +21,12 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $vdc = $this->createDataCentre();
+        $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => 'Manchester DC',
         ];
         $this->patch(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             []
         )
@@ -40,12 +40,12 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $vdc = $this->createDataCentre();
+        $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => '',
         ];
         $this->patch(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -63,12 +63,12 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $vdc = $this->createDataCentre();
+        $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => 'Manchester DC',
         ];
         $this->patch(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,17 +77,17 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $virtualDataCentre = VirtualDataCentres::findOrFail($vdc->getKey());
-        $this->assertEquals($data['name'], $virtualDataCentre->name);
+        $virtualPrivateCloud = VirtualPrivateClouds::findOrFail($vdc->getKey());
+        $this->assertEquals($data['name'], $virtualPrivateCloud->name);
     }
 
     /**
-     * Create Data Centre
-     * @return \App\Models\V2\VirtualDataCentres
+     * Create Private Cloud
+     * @return \App\Models\V2\VirtualPrivateClouds
      */
-    public function createDataCentre(): VirtualDataCentres
+    public function createPrivateCloud(): VirtualPrivateClouds
     {
-        $vdc = factory(VirtualDataCentres::class, 1)->create()->first();
+        $vdc = factory(VirtualPrivateClouds::class, 1)->create()->first();
         $vdc->save();
         $vdc->refresh();
         return $vdc;
