@@ -15,16 +15,17 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class VirtualDataCentres
+ * Class Gateways
  * @package App\Models\V2
- * @method static findOrFail(string $vdcUuid)
+ * @method static find(string $routerId)
+ * @method static findOrFail(string $routerUuid)
  */
-class VirtualDataCentres extends Model implements Filterable, Sortable
+class Gateways extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
     protected $connection = 'ecloud';
-    protected $table = 'virtual_data_centre';
+    protected $table = 'gateways';
     protected $primaryKey = 'id';
     protected $fillable = ['id', 'name'];
     protected $visible = ['id', 'name', 'created_at', 'updated_at'];
@@ -64,7 +65,6 @@ class VirtualDataCentres extends Model implements Filterable, Sortable
     /**
      * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -98,5 +98,19 @@ class VirtualDataCentres extends Model implements Filterable, Sortable
             DateTimeProperty::create('created_at', 'created_at'),
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
+    }
+
+    /**
+     * Many to Many with Routers table
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function routers()
+    {
+        return $this->belongsToMany(
+            Routers::class,
+            'router_gateways',
+            'gateways_id',
+            'router_id'
+        );
     }
 }
