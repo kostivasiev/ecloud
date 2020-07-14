@@ -65,6 +65,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('networks/{networkId}', 'NetworksController@destroy');
     });
 
+    /** Vpns */
+    $router->group([], function () use ($router) {
+        $router->get('vpns', 'VpnsController@index');
+        $router->get('vpns/{vpnId}', 'VpnsController@show');
+        $router->post('vpns', 'VpnsController@create');
+        $router->patch('vpns/{vpnId}', 'VpnsController@update');
+        $router->delete('vpns/{vpnId}', 'VpnsController@destroy');
+    });
+
     /** Routers */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('routers', 'RoutersController@index');
