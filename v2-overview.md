@@ -39,6 +39,7 @@ classDiagram
     class network {
         +String id
     }
+    network --> "single" router
     network -- "many" instance : Contains
 
     class router {
