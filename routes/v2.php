@@ -47,6 +47,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@destroy');
     });
 
+    /** Dhcps */
+    $router->group([], function () use ($router) {
+        $router->get('dhcps', 'DhcpsController@index');
+        $router->get('dhcps/{dhcpId}', 'DhcpsController@show');
+        $router->post('dhcps', 'DhcpsController@create');
+        $router->patch('dhcps/{dhcpId}', 'DhcpsController@update');
+        $router->delete('dhcps/{dhcpId}', 'DhcpsController@destroy');
+    });
+
     /** Networks */
     $router->group([], function () use ($router) {
         $router->get('networks', 'NetworksController@index');
