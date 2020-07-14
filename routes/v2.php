@@ -47,6 +47,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@destroy');
     });
 
+    /** Networks */
+    $router->group([], function () use ($router) {
+        $router->get('networks', 'NetworksController@index');
+        $router->get('networks/{networkId}', 'NetworksController@show');
+        $router->post('networks', 'NetworksController@create');
+        $router->patch('networks/{networkId}', 'NetworksController@update');
+        $router->delete('networks/{networkId}', 'NetworksController@destroy');
+    });
+
     /** Routers */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('routers', 'RoutersController@index');
