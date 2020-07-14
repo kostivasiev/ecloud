@@ -6,7 +6,10 @@ classDiagram
         timestamp created_at
         timestamp updated_at
         timestamp deleted_at
+        char[12] vpc_id
     }
+    vpc --> "many" router : Has
+    vpc --> "single" region
 
     class region {
         +String id
@@ -31,11 +34,14 @@ classDiagram
 
     class gateway {
         +String id
+        char[12] availability_zone_id
     }
     gateway --> "single" availability_zone
 
     class network {
         +String id
+        char[12] router_id
+        char[12] availability_zone_id
     }
     network --> "single" router
     network --> "single" availability_zone
@@ -48,6 +54,8 @@ classDiagram
 
     class vpn {
         +String id
+        char[12] router_id
+        char[12] availability_zone_id
     }
     vpn --> "single" router
     vpn --> "single" availability_zone
