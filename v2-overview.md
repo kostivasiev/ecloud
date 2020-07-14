@@ -1,69 +1,68 @@
 ```mermaid
 classDiagram
+    class region {
+        char[12] id
+        char[255] name
+    }
+
     class vpc {
         char[12] id
+        char[12] region_id
         varchar[255] name
-        timestamp created_at
-        timestamp updated_at
-        timestamp deleted_at
-        char[12] vpc_id
     }
-    vpc --> "many" router : Has
-    vpc --> "single" region
-
-    class region {
-        +String id
-        +String name
-    }
-    region --> "many" site : Contains
+    vpc --> region
 
     class site {
-        +String id
+        char[12] id
+        char[12] region_id
     }
-    site -- "single" availability_zone : Has
+    site --> region
 
     class availability_zone {
         char[12] id 
+        char[12] site_id
         varchar[255] code
         varchar[255] name
-        uint site_id
-        timestamp created_at
-        timestamp updated_at
-        timestamp deleted_at
     }
+    availability_zone --> site
 
     class gateway {
-        +String id
+        char[12] id
         char[12] availability_zone_id
     }
-    gateway --> "single" availability_zone
+    gateway --> availability_zone
 
     class network {
-        +String id
+        char[12] id
         char[12] router_id
         char[12] availability_zone_id
     }
-    network --> "single" router
-    network --> "single" availability_zone
+    network --> router
+    network --> availability_zone
 
     class router {
-        +String id
+        char[12] id
+        char[12] vpc_id
+        char[12] gateway_id
+        char[12] availability_zone_id
     }
-    router --> "many" availability_zone : Has
-    router --> "many" gateway : Has
+    router --> vpc
+    router --> gateway
+    router --> availability_zone
 
     class vpn {
-        +String id
+        char[12] id
         char[12] router_id
         char[12] availability_zone_id
     }
-    vpn --> "single" router
-    vpn --> "single" availability_zone
+    vpn --> router
+    vpn --> availability_zone
 
     class instance {
-        +String id
+        char[12] id
+        char[12] network_id
     }
-    instance --> "many" network
+    instance --> network
 ```
 
 # Notes
