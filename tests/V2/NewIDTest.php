@@ -90,7 +90,7 @@ class NewIDTest extends TestCase
             'name'    => 'Manchester DC',
         ];
         $this->post(
-            '/v2/vdcs',
+            '/v2/vpcs',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
