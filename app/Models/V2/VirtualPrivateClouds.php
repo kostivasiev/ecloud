@@ -100,4 +100,12 @@ class VirtualPrivateClouds extends Model implements Filterable, Sortable
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function dhcps()
+    {
+        return $this->belongsTo(Dhcps::class, 'id', 'vpc_id');
+    }
 }
