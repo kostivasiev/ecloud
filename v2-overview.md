@@ -1,64 +1,64 @@
 ```mermaid
 classDiagram
     class region {
-        char[12] id
+        uuid id
         char[255] name
     }
 
     class vpc {
-        char[12] id
-        char[12] region_id
+        uuid id
+        uuid region_id
         varchar[255] name
     }
     vpc --> region
 
     class site {
-        char[12] id
-        char[12] region_id
+        uuid id
+        uuid region_id
     }
     site --> region
 
     class availability_zone {
-        char[12] id 
-        char[12] site_id
+        uuid id 
+        uuid site_id
         varchar[255] code
         varchar[255] name
     }
     availability_zone --> site
 
     class gateway {
-        char[12] id
-        char[12] availability_zone_id
+        uuid id
+        uuid availability_zone_id
     }
     gateway --> availability_zone
 
     class network {
-        char[12] id
-        char[12] router_id
-        char[12] availability_zone_id
+        uuid id
+        uuid router_id
+        uuid availability_zone_id
     }
     network --> router
     network --> availability_zone
 
     class router {
-        char[12] id
-        char[12] vpc_id
+        uuid id
+        uuid vpc_id
     }
     router --> vpc
     router --> "many" gateway : router_gateway
     router --> "many" availability_zone : router_availability_zone
 
     class vpn {
-        char[12] id
-        char[12] router_id
-        char[12] availability_zone_id
+        uuid id
+        uuid router_id
+        uuid availability_zone_id
     }
     vpn --> router
     vpn --> availability_zone
 
     class instance {
-        char[12] id
-        char[12] network_id
+        uuid id
+        uuid network_id
     }
     instance --> network
 ```
