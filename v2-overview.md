@@ -43,12 +43,10 @@ classDiagram
     class router {
         char[12] id
         char[12] vpc_id
-        char[12] gateway_id
-        char[12] availability_zone_id
     }
     router --> vpc
-    router --> gateway
-    router --> availability_zone
+    router --> "many" gateway : router_gateway
+    router --> "many" availability_zone : router_availability_zone
 
     class vpn {
         char[12] id
