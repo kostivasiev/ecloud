@@ -29,7 +29,6 @@ classDiagram
         timestamp deleted_at
     }
     availability_zone -- "single" gateway : Has
-    availability_zone -- "single" network : Has
 
     class gateway {
         +String id
@@ -39,7 +38,7 @@ classDiagram
         +String id
     }
     network --> "single" router
-    network -- "many" instance : Contains
+    network --> "single" availability_zone
 
     class router {
         +String id
@@ -51,7 +50,7 @@ classDiagram
     }
     vpn --> "many" router
     vpn --> "many" dhcp
-    vpn --> "many" network
+    vpn --> "single" network
     vpn --> "single" availability_zone
 
     class dhcp {
@@ -62,6 +61,7 @@ classDiagram
     class instance {
         +String id
     }
+    instance --> "many" network
     instance --> "single" storage : Has
 
     class storage {
