@@ -60,22 +60,76 @@ class EventServiceProvider extends ServiceProvider
 //        'App\Events\V2\AvailabilityZones\BeforeUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\AfterCreateEvent' => [
+//        'App\Events\V2\Dhcps\AfterCreateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\AfterDeleteEvent' => [
+//        'App\Events\V2\Dhcps\AfterDeleteEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\AfterUpdateEvent' => [
+//        'App\Events\V2\Dhcps\AfterUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\BeforeCreateEvent' => [
+//        'App\Events\V2\Dhcps\BeforeCreateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\BeforeDeleteEvent' => [
+//        'App\Events\V2\Dhcps\BeforeDeleteEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
-//        'App\Events\V2\VirtualDataCentres\BeforeUpdateEvent' => [
+//        'App\Events\V2\Dhcps\BeforeUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualPrivateClouds\AfterCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualPrivateClouds\AfterDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualPrivateClouds\AfterUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualPrivateClouds\BeforeCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualPrivateClouds\BeforeDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\VirtualPrivateClouds\BeforeUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Networks\AfterCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Networks\AfterDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Networks\AfterUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Networks\BeforeCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Networks\BeforeDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Networks\BeforeUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Routers\AfterCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Routers\AfterDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Routers\AfterUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Routers\BeforeCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Routers\BeforeDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Routers\BeforeUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
     ];

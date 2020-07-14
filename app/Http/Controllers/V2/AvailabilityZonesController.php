@@ -10,7 +10,9 @@ use App\Events\V2\AvailabilityZones\BeforeDeleteEvent;
 use App\Events\V2\AvailabilityZones\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateAvailabilityZonesRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZonesRequest;
+use App\Resources\V2\AvailabilityZonesResource;
 use App\Models\V2\AvailabilityZones;
+use App\Models\V2\Routers;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -23,36 +25,30 @@ class AvailabilityZonesController extends BaseController
     /**
      * Get availability zones collection
      * @param \Illuminate\Http\Request $request
+     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collectionQuery = AvailabilityZones::query();
+        $collection = AvailabilityZones::query();
 
-        (new QueryTransformer($request))
-            ->config(AvailabilityZones::class)
-            ->transform($collectionQuery);
+        $queryTransformer->config(AvailabilityZones::class)
+            ->transform($collection);
 
-        $availabilityZones = $collectionQuery->paginate($this->perPage);
-
-        return $this->respondCollection(
-            $request,
-            $availabilityZones,
-            200
-        );
+        return AvailabilityZonesResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
      * @param \Illuminate\Http\Request $request
      * @param string $zoneId
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\V2\AvailabilityZonesResource
      */
     public function show(Request $request, string $zoneId)
     {
-        return $this->respondItem(
-            $request,
-            AvailabilityZones::findOrFail($zoneId),
-            200
+        return new AvailabilityZonesResource(
+            AvailabilityZones::findOrFail($zoneId)
         );
     }
 
@@ -100,6 +96,34 @@ class AvailabilityZonesController extends BaseController
         $availabilityZone = AvailabilityZones::findOrFail($zoneId);
         $availabilityZone->delete();
         event(new AfterDeleteEvent());
+        return response()->json([], 204);
+    }
+
+    /**
+     * Associate a router with an availability_zone
+     * @param string $zoneId
+     * @param string $routerUuid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function routersCreate(string $zoneId, string $routerUuid)
+    {
+        $availabilityZone = AvailabilityZones::findOrFail($zoneId);
+        $router = Routers::findOrFail($routerUuid);
+        $availabilityZone->routers()->attach($router->id);
+        return response()->json([], 204);
+    }
+
+    /**
+     * Disassociate a route with an availability_zone
+     * @param string $zoneId
+     * @param string $routerUuid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function routersDestroy(string $zoneId, string $routerUuid)
+    {
+        $availabilityZone = AvailabilityZones::findOrFail($zoneId);
+        $router = Routers::findOrFail($routerUuid);
+        $availabilityZone->routers()->detach($router->id);
         return response()->json([], 204);
     }
 }
