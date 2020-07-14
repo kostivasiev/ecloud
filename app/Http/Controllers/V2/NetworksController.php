@@ -73,13 +73,13 @@ class NetworksController extends BaseController
     public function update(UpdateNetworksRequest $request, string $networkId)
     {
         event(new BeforeUpdateEvent());
-        $availabilityZone = Networks::findOrFail($networkId);
-        $availabilityZone->fill($request->only([
+        $networks = Networks::findOrFail($networkId);
+        $networks->fill($request->only([
             'code', 'name',
         ]));
-        $availabilityZone->save();
+        $networks->save();
         event(new AfterUpdateEvent());
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
+        return $this->responseIdMeta($request, $networks->getKey(), 200);
     }
 
     /**
@@ -89,8 +89,8 @@ class NetworksController extends BaseController
     public function destroy(string $networkId)
     {
         event(new BeforeDeleteEvent());
-        $availabilityZone = Networks::findOrFail($networkId);
-        $availabilityZone->delete();
+        $networks = Networks::findOrFail($networkId);
+        $networks->delete();
         event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
