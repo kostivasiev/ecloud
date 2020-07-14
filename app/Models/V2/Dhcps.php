@@ -82,4 +82,12 @@ class Dhcps extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function virtualPrivateClouds()
+    {
+        return $this->hasOne(VirtualPrivateClouds::class, 'id', 'vpc_id');
+    }
 }
