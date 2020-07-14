@@ -49,14 +49,8 @@ classDiagram
         +String id
     }
     vpn --> "many" router
-    vpn --> "many" dhcp
     vpn --> "single" network
     vpn --> "single" availability_zone
-
-    class dhcp {
-        +String id
-    }
-    dhcp -- "single" router
 
     class instance {
         +String id
@@ -68,3 +62,7 @@ classDiagram
         +String id
     }
 ```
+
+# Notes
+
+- The DHCP server needs to be added in somewhere, but we need to know what is required. What needs to be federated? What needs to be configered by the customer? etc..
