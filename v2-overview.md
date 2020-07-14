@@ -28,11 +28,11 @@ classDiagram
         timestamp updated_at
         timestamp deleted_at
     }
-    availability_zone -- "single" gateway : Has
 
     class gateway {
         +String id
     }
+    gateway --> "single" availability_zone
 
     class network {
         +String id
@@ -44,25 +44,22 @@ classDiagram
         +String id
     }
     router --> "many" availability_zone : Has
+    router --> "many" gateway : Has
 
     class vpn {
         +String id
     }
-    vpn --> "many" router
-    vpn --> "single" network
+    vpn --> "single" router
     vpn --> "single" availability_zone
 
     class instance {
         +String id
     }
     instance --> "many" network
-    instance --> "single" storage : Has
-
-    class storage {
-        +String id
-    }
 ```
 
 # Notes
 
 - The DHCP server needs to be added in somewhere, but we need to know what is required. What needs to be federated? What needs to be configered by the customer? etc..
+- Need VPN connections/properties confirming with JL and Joe
+- Instance storage is not displayed on this UML but may in future
