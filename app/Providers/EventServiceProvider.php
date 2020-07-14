@@ -60,6 +60,24 @@ class EventServiceProvider extends ServiceProvider
 //        'App\Events\V2\AvailabilityZones\BeforeUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
+//        'App\Events\V2\Dhcps\AfterCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Dhcps\AfterDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Dhcps\AfterUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Dhcps\BeforeCreateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Dhcps\BeforeDeleteEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
+//        'App\Events\V2\Dhcps\BeforeUpdateEvent' => [
+//            'App\Listeners\V2\ListenerClass',
+//        ],
 //        'App\Events\V2\VirtualPrivateClouds\AfterCreateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
