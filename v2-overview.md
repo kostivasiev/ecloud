@@ -23,6 +23,7 @@ classDiagram
         uuid site_id
         varchar[255] code
         varchar[255] name
+        varchar[255] nsx_manager_endpoint
     }
     availability_zone --> site
 
