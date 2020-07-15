@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVirtualDataCentreTable extends Migration
+class CreateNetworksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateVirtualDataCentreTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('virtual_data_centre', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('networks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->timestamps();
@@ -28,6 +28,6 @@ class CreateVirtualDataCentreTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('virtual_data_centre');
+        Schema::connection('ecloud')->dropIfExists('networks');
     }
 }

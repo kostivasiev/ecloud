@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\V2\VirtualDataCentres;
+namespace Tests\V2\Networks;
 
-use App\Models\V2\VirtualDataCentres;
+use App\Models\V2\Networks;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
@@ -21,12 +21,12 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $vdc = $this->createDataCentre();
+        $net = $this->createNetwork();
         $data = [
-            'name'    => 'Manchester DC',
+            'name'    => 'Manchester Network',
         ];
         $this->patch(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/networks/' . $net->getKey(),
             $data,
             []
         )
@@ -40,12 +40,12 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $vdc = $this->createDataCentre();
+        $net = $this->createNetwork();
         $data = [
             'name'    => '',
         ];
         $this->patch(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/networks/' . $net->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -63,12 +63,12 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $vdc = $this->createDataCentre();
+        $net = $this->createNetwork();
         $data = [
-            'name'    => 'Manchester DC',
+            'name'    => 'Manchester Network',
         ];
         $this->patch(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/networks/' . $net->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,20 +77,20 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $virtualDataCentre = VirtualDataCentres::findOrFail($vdc->getKey());
-        $this->assertEquals($data['name'], $virtualDataCentre->name);
+        $networks = Networks::findOrFail($net->getKey());
+        $this->assertEquals($data['name'], $networks->name);
     }
 
     /**
-     * Create Data Centre
-     * @return \App\Models\V2\VirtualDataCentres
+     * Create Network
+     * @return \App\Models\V2\Networks
      */
-    public function createDataCentre(): VirtualDataCentres
+    public function createNetwork(): Networks
     {
-        $vdc = factory(VirtualDataCentres::class, 1)->create()->first();
-        $vdc->save();
-        $vdc->refresh();
-        return $vdc;
+        $net = factory(Networks::class, 1)->create()->first();
+        $net->save();
+        $net->refresh();
+        return $net;
     }
 
 }

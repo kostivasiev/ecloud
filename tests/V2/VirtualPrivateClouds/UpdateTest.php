@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\V2\VirtualDataCentres;
+namespace Tests\V2\VirtualPrivateClouds;
 
+use App\Models\V2\VirtualPrivateClouds;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
-class CreateTest extends TestCase
+class UpdateTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     protected $faker;
@@ -21,11 +21,12 @@ class CreateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
+        $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => 'Manchester DC',
         ];
-        $this->post(
-            '/v2/vdcs',
+        $this->patch(
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             []
         )
@@ -37,13 +38,14 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsFailed()
+    public function testNullNameIsDenied()
     {
+        $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => '',
         ];
-        $this->post(
-            '/v2/vdcs',
+        $this->patch(
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -52,32 +54,43 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The name field is required',
+                'detail' => 'The name field, when specified, cannot be null',
                 'status' => 422,
                 'source' => 'name'
             ])
             ->assertResponseStatus(422);
     }
 
-    public function testValidDataSucceeds()
+    public function testValidDataIsSuccessful()
     {
+        $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => 'Manchester DC',
         ];
-        $this->post(
-            '/v2/vdcs',
+        $this->patch(
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(200);
 
-        $virtualDataCentreId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $virtualDataCentreId,
-        ]);
+        $virtualPrivateCloud = VirtualPrivateClouds::findOrFail($vdc->getKey());
+        $this->assertEquals($data['name'], $virtualPrivateCloud->name);
+    }
+
+    /**
+     * Create Private Cloud
+     * @return \App\Models\V2\VirtualPrivateClouds
+     */
+    public function createPrivateCloud(): VirtualPrivateClouds
+    {
+        $vdc = factory(VirtualPrivateClouds::class, 1)->create()->first();
+        $vdc->save();
+        $vdc->refresh();
+        return $vdc;
     }
 
 }

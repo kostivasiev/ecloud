@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\VirtualDataCentres;
+namespace Tests\V2\Networks;
 
-use App\Models\V2\VirtualDataCentres;
+use App\Models\V2\Networks;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -21,10 +21,10 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $vdc = factory(VirtualDataCentres::class, 1)->create()->first();
-        $vdc->refresh();
+        $net = factory(Networks::class, 1)->create()->first();
+        $net->refresh();
         $this->delete(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/networks/' . $net->getKey(),
             [],
             []
         )
@@ -39,7 +39,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/vdcs/' . $this->faker->uuid,
+            '/v2/networks/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -48,7 +48,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Virtual Data Centres with that ID was found',
+                'detail' => 'No Networks with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -56,10 +56,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $vdc = factory(VirtualDataCentres::class, 1)->create()->first();
-        $vdc->refresh();
+        $net = factory(Networks::class, 1)->create()->first();
+        $net->refresh();
         $this->delete(
-            '/v2/vdcs/' . $vdc->getKey(),
+            '/v2/networks/' . $net->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -67,8 +67,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $virtualDataCentre = VirtualDataCentres::withTrashed()->findOrFail($vdc->getKey());
-        $this->assertNotNull($virtualDataCentre->deleted_at);
+        $network = Networks::withTrashed()->findOrFail($net->getKey());
+        $this->assertNotNull($network->deleted_at);
     }
 
 }

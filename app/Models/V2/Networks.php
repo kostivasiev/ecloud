@@ -15,16 +15,15 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class VirtualDataCentres
- * @package App\Models\V2
- * @method static findOrFail(string $vdcUuid)
+ * @method static findOrFail(string $networkId)
  */
-class VirtualDataCentres extends Model implements Filterable, Sortable
+class Networks extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
+    public const KEY_PREFIX = 'net';
     protected $connection = 'ecloud';
-    protected $table = 'virtual_data_centre';
+    protected $table = 'networks';
     protected $primaryKey = 'id';
     protected $fillable = ['id', 'name'];
     protected $visible = ['id', 'name', 'created_at', 'updated_at'];
@@ -64,7 +63,6 @@ class VirtualDataCentres extends Model implements Filterable, Sortable
     /**
      * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -81,8 +79,8 @@ class VirtualDataCentres extends Model implements Filterable, Sortable
         return [
             'id'         => 'id',
             'name'       => 'name',
-            'created_at' => 'appliance_created_at',
-            'updated_at' => 'appliance_updated_at',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 

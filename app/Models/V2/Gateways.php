@@ -24,6 +24,7 @@ class Gateways extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
+    public const KEY_PREFIX = 'gtw';
     protected $connection = 'ecloud';
     protected $table = 'gateways';
     protected $primaryKey = 'id';
@@ -98,5 +99,19 @@ class Gateways extends Model implements Filterable, Sortable
             DateTimeProperty::create('created_at', 'created_at'),
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
+    }
+
+    /**
+     * Many to Many with Routers table
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function routers()
+    {
+        return $this->belongsToMany(
+            Routers::class,
+            'router_gateways',
+            'gateways_id',
+            'router_id'
+        );
     }
 }
