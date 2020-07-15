@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\QueryTransformer;
 class RoutersController extends BaseController
 {
     /**
-     * Get availability zones collection
+     * Get routers collection
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
