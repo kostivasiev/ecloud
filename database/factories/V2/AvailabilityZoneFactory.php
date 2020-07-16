@@ -2,12 +2,12 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\AvailabilityZones;
+use App\Models\V2\AvailabilityZone;
 use Faker\Generator as Faker;
 
-$factory->define(AvailabilityZones::class, function (Faker $faker) {
+$factory->define(AvailabilityZone::class, function (Faker $faker) {
     return [
-        'id'      => AvailabilityZones::generateId(new AvailabilityZones()),
+        'id'      => AvailabilityZone::generateId(new AvailabilityZone()),
         'code'    => 'LON1',
         'name'    => 'London Zone 1',
         'site_id' => 1,

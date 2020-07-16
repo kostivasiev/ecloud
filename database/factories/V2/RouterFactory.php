@@ -2,10 +2,10 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\Routers;
+use App\Models\V2\Router;
 use Faker\Generator as Faker;
 
-$factory->define(Routers::class, function (Faker $faker) {
+$factory->define(Router::class, function (Faker $faker) {
     return [
         'name'       => 'Primary Router',
     ];

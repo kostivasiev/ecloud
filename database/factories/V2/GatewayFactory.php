@@ -2,12 +2,12 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\Networks;
+use App\Models\V2\Gateway;
 use Faker\Generator as Faker;
 
-$factory->define(Networks::class, function (Faker $faker) {
+$factory->define(Gateway::class, function (Faker $faker) {
     return [
-        'id'   => Networks::generateId(new Networks()),
+        'id'   => Gateway::generateId(new Gateway()),
         'name' => 'My Gateway 1'
     ];
 });
