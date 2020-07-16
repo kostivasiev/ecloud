@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInstanceTable extends Migration
+class CreateInstancesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateInstanceTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('instance', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('instances', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('network_id');
             $table->timestamps();
@@ -28,6 +28,6 @@ class CreateInstanceTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('instance');
+        Schema::connection('ecloud')->dropIfExists('instances');
     }
 }

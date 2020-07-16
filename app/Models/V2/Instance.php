@@ -25,7 +25,7 @@ class Instance extends Model implements Filterable, Sortable
 
     public const KEY_PREFIX = 'i';
     protected $connection = 'ecloud';
-    protected $table = 'instance';
+    protected $table = 'instances';
     protected $primaryKey = 'id';
     protected $fillable = ['id', 'network_id'];
     protected $visible = ['id', 'network_id', 'created_at', 'updated_at'];
