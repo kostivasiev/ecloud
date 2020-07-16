@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Vpns\AfterCreateEvent;
-use App\Events\V2\Vpns\AfterDeleteEvent;
-use App\Events\V2\Vpns\AfterUpdateEvent;
-use App\Events\V2\Vpns\BeforeCreateEvent;
-use App\Events\V2\Vpns\BeforeDeleteEvent;
-use App\Events\V2\Vpns\BeforeUpdateEvent;
-use App\Http\Requests\V2\CreateVpnsRequest;
-use App\Http\Requests\V2\UpdateVpnsRequest;
-use App\Models\V2\Vpns;
-use App\Resources\V2\VpnsResource;
+use App\Events\V2\Vpn\AfterCreateEvent;
+use App\Events\V2\Vpn\AfterDeleteEvent;
+use App\Events\V2\Vpn\AfterUpdateEvent;
+use App\Events\V2\Vpn\BeforeCreateEvent;
+use App\Events\V2\Vpn\BeforeDeleteEvent;
+use App\Events\V2\Vpn\BeforeUpdateEvent;
+use App\Http\Requests\V2\CreateVpnRequest;
+use App\Http\Requests\V2\UpdateVpnRequest;
+use App\Models\V2\Vpn;
+use App\Resources\V2\VpnResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
- * Class VpnsController
+ * Class VpnController
  * @package App\Http\Controllers\V2
  */
-class VpnsController extends BaseController
+class VpnController extends BaseController
 {
     /**
      * @param \Illuminate\Http\Request $request
@@ -28,35 +28,35 @@ class VpnsController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Vpns::query();
+        $collection = Vpn::query();
 
-        $queryTransformer->config(Vpns::class)
+        $queryTransformer->config(Vpn::class)
             ->transform($collection);
 
-        return VpnsResource::collection($collection->paginate(
+        return VpnResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     /**
      * @param string $vpnId
-     * @return \App\Resources\V2\VpnsResource
+     * @return \App\Resources\V2\VpnResource
      */
     public function show(string $vpnId)
     {
-        return new VpnsResource(
-            Vpns::findOrFail($vpnId)
+        return new VpnResource(
+            Vpn::findOrFail($vpnId)
         );
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateVpnsRequest $request
+     * @param \App\Http\Requests\V2\CreateVpnRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateVpnsRequest $request)
+    public function create(CreateVpnRequest $request)
     {
         event(new BeforeCreateEvent());
-        $vpns = new Vpns($request->only(['router_id', 'availability_zone_id']));
+        $vpns = new Vpn($request->only(['router_id', 'availability_zone_id']));
         $vpns->save();
         $vpns->refresh();
         event(new AfterCreateEvent());
@@ -64,14 +64,14 @@ class VpnsController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateVpnsRequest $request
+     * @param \App\Http\Requests\V2\UpdateVpnRequest $request
      * @param string $vpnId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateVpnsRequest $request, string $vpnId)
+    public function update(UpdateVpnRequest $request, string $vpnId)
     {
         event(new BeforeUpdateEvent());
-        $vpns = Vpns::findOrFail($vpnId);
+        $vpns = Vpn::findOrFail($vpnId);
         $vpns->fill($request->only(['router_id', 'availability_zone_id']));
         $vpns->save();
         event(new AfterUpdateEvent());
@@ -85,7 +85,7 @@ class VpnsController extends BaseController
     public function destroy(string $vpnId)
     {
         event(new BeforeDeleteEvent());
-        $vpns = Vpns::findOrFail($vpnId);
+        $vpns = Vpn::findOrFail($vpnId);
         $vpns->delete();
         event(new AfterDeleteEvent());
         return response()->json([], 204);

@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Networks\AfterCreateEvent;
-use App\Events\V2\Networks\AfterDeleteEvent;
-use App\Events\V2\Networks\AfterUpdateEvent;
-use App\Events\V2\Networks\BeforeCreateEvent;
-use App\Events\V2\Networks\BeforeDeleteEvent;
-use App\Events\V2\Networks\BeforeUpdateEvent;
-use App\Http\Requests\V2\CreateNetworksRequest;
-use App\Http\Requests\V2\UpdateNetworksRequest;
-use App\Models\V2\Networks;
-use App\Resources\V2\NetworksResource;
+use App\Events\V2\Network\AfterCreateEvent;
+use App\Events\V2\Network\AfterDeleteEvent;
+use App\Events\V2\Network\AfterUpdateEvent;
+use App\Events\V2\Network\BeforeCreateEvent;
+use App\Events\V2\Network\BeforeDeleteEvent;
+use App\Events\V2\Network\BeforeUpdateEvent;
+use App\Http\Requests\V2\CreateNetworkRequest;
+use App\Http\Requests\V2\UpdateNetworkRequest;
+use App\Models\V2\Network;
+use App\Resources\V2\NetworkResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
- * Class NetworksController
+ * Class NetworkController
  * @package App\Http\Controllers\V2
  */
-class NetworksController extends BaseController
+class NetworkController extends BaseController
 {
     /**
      * @param \Illuminate\Http\Request $request
@@ -28,35 +28,35 @@ class NetworksController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Networks::query();
+        $collection = Network::query();
 
-        $queryTransformer->config(Networks::class)
+        $queryTransformer->config(Network::class)
             ->transform($collection);
 
-        return NetworksResource::collection($collection->paginate(
+        return NetworkResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     /**
      * @param string $networkId
-     * @return \App\Resources\V2\NetworksResource
+     * @return \App\Resources\V2\NetworkResource
      */
     public function show(string $networkId)
     {
-        return new NetworksResource(
-            Networks::findOrFail($networkId)
+        return new NetworkResource(
+            Network::findOrFail($networkId)
         );
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateNetworksRequest $request
+     * @param \App\Http\Requests\V2\CreateNetworkRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateNetworksRequest $request)
+    public function create(CreateNetworkRequest $request)
     {
         event(new BeforeCreateEvent());
-        $networks = new Networks($request->only([
+        $networks = new Network($request->only([
             'code', 'name',
         ]));
         $networks->save();
@@ -66,14 +66,14 @@ class NetworksController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateNetworksRequest $request
+     * @param \App\Http\Requests\V2\UpdateNetworkRequest $request
      * @param string $networkId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateNetworksRequest $request, string $networkId)
+    public function update(UpdateNetworkRequest $request, string $networkId)
     {
         event(new BeforeUpdateEvent());
-        $networks = Networks::findOrFail($networkId);
+        $networks = Network::findOrFail($networkId);
         $networks->fill($request->only([
             'code', 'name',
         ]));
@@ -89,7 +89,7 @@ class NetworksController extends BaseController
     public function destroy(string $networkId)
     {
         event(new BeforeDeleteEvent());
-        $networks = Networks::findOrFail($networkId);
+        $networks = Network::findOrFail($networkId);
         $networks->delete();
         event(new AfterDeleteEvent());
         return response()->json([], 204);

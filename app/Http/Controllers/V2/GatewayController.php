@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Gateways\AfterCreateEvent;
-use App\Events\V2\Gateways\AfterDeleteEvent;
-use App\Events\V2\Gateways\AfterUpdateEvent;
-use App\Events\V2\Gateways\BeforeCreateEvent;
-use App\Events\V2\Gateways\BeforeDeleteEvent;
-use App\Events\V2\Gateways\BeforeUpdateEvent;
-use App\Http\Requests\V2\CreateGatewaysRequest;
-use App\Http\Requests\V2\UpdateGatewaysRequest;
-use App\Models\V2\Gateways;
+use App\Events\V2\Gateway\AfterCreateEvent;
+use App\Events\V2\Gateway\AfterDeleteEvent;
+use App\Events\V2\Gateway\AfterUpdateEvent;
+use App\Events\V2\Gateway\BeforeCreateEvent;
+use App\Events\V2\Gateway\BeforeDeleteEvent;
+use App\Events\V2\Gateway\BeforeUpdateEvent;
+use App\Http\Requests\V2\CreateGatewayRequest;
+use App\Http\Requests\V2\UpdateGatewayRequest;
+use App\Models\V2\Gateway;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
- * Class GatewaysController
+ * Class GatewayController
  * @package App\Http\Controllers\V2
  */
-class GatewaysController extends BaseController
+class GatewayController extends BaseController
 {
     /**
      * Get availability zones collection
@@ -27,10 +27,10 @@ class GatewaysController extends BaseController
      */
     public function index(Request $request)
     {
-        $collectionQuery = Gateways::query();
+        $collectionQuery = Gateway::query();
 
         (new QueryTransformer($request))
-            ->config(Gateways::class)
+            ->config(Gateway::class)
             ->transform($collectionQuery);
 
         $gateways = $collectionQuery->paginate($this->perPage);
@@ -51,19 +51,19 @@ class GatewaysController extends BaseController
     {
         return $this->respondItem(
             $request,
-            Gateways::findOrFail($gatewayUuid),
+            Gateway::findOrFail($gatewayUuid),
             200
         );
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateGatewaysRequest $request
+     * @param \App\Http\Requests\V2\CreateGatewayRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateGatewaysRequest $request)
+    public function create(CreateGatewayRequest $request)
     {
         event(new BeforeCreateEvent());
-        $gateway = new Gateways($request->only(['name']));
+        $gateway = new Gateway($request->only(['name']));
         $gateway->save();
         $gateway->refresh();
         event(new AfterCreateEvent());
@@ -71,14 +71,14 @@ class GatewaysController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateGatewaysRequest $request
+     * @param \App\Http\Requests\V2\UpdateGatewayRequest $request
      * @param string $gatewayUuid
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateGatewaysRequest $request, string $gatewayUuid)
+    public function update(UpdateGatewayRequest $request, string $gatewayUuid)
     {
         event(new BeforeUpdateEvent());
-        $gateway = Gateways::findOrFail($gatewayUuid);
+        $gateway = Gateway::findOrFail($gatewayUuid);
         $gateway->fill($request->only(['name']));
         $gateway->save();
         event(new AfterUpdateEvent());
@@ -93,7 +93,7 @@ class GatewaysController extends BaseController
     public function destroy(Request $request, string $gatewayUuid)
     {
         event(new BeforeDeleteEvent());
-        $gateway = Gateways::findOrFail($gatewayUuid);
+        $gateway = Gateway::findOrFail($gatewayUuid);
         $gateway->delete();
         event(new AfterDeleteEvent());
         return response()->json([], 204);

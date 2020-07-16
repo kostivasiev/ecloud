@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Routers\AfterCreateEvent;
-use App\Events\V2\Routers\AfterDeleteEvent;
-use App\Events\V2\Routers\AfterUpdateEvent;
-use App\Events\V2\Routers\BeforeCreateEvent;
-use App\Events\V2\Routers\BeforeDeleteEvent;
-use App\Events\V2\Routers\BeforeUpdateEvent;
-use App\Http\Requests\V2\CreateRoutersRequest;
-use App\Http\Requests\V2\UpdateRoutersRequest;
-use App\Models\V2\Gateways;
-use App\Models\V2\Routers;
+use App\Events\V2\Router\AfterCreateEvent;
+use App\Events\V2\Router\AfterDeleteEvent;
+use App\Events\V2\Router\AfterUpdateEvent;
+use App\Events\V2\Router\BeforeCreateEvent;
+use App\Events\V2\Router\BeforeDeleteEvent;
+use App\Events\V2\Router\BeforeUpdateEvent;
+use App\Http\Requests\V2\CreateRouterRequest;
+use App\Http\Requests\V2\UpdateRouterRequest;
+use App\Models\V2\Gateway;
+use App\Models\V2\Router;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
- * Class RoutersController
+ * Class RouterController
  * @package App\Http\Controllers\V2
  */
-class RoutersController extends BaseController
+class RouterController extends BaseController
 {
     /**
      * Get availability zones collection
@@ -28,10 +28,10 @@ class RoutersController extends BaseController
      */
     public function index(Request $request)
     {
-        $collectionQuery = Routers::query();
+        $collectionQuery = Router::query();
 
         (new QueryTransformer($request))
-            ->config(Routers::class)
+            ->config(Router::class)
             ->transform($collectionQuery);
 
         $routers = $collectionQuery->paginate($this->perPage);
@@ -52,19 +52,19 @@ class RoutersController extends BaseController
     {
         return $this->respondItem(
             $request,
-            Routers::findOrFail($routerUuid),
+            Router::findOrFail($routerUuid),
             200
         );
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateRoutersRequest $request
+     * @param \App\Http\Requests\V2\CreateRouterRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateRoutersRequest $request)
+    public function create(CreateRouterRequest $request)
     {
         event(new BeforeCreateEvent());
-        $router = new Routers($request->only(['name']));
+        $router = new Router($request->only(['name']));
         $router->save();
         $router->refresh();
         event(new AfterCreateEvent());
@@ -72,14 +72,14 @@ class RoutersController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateRoutersRequest $request
+     * @param \App\Http\Requests\V2\UpdateRouterRequest $request
      * @param string $routerUuid
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateRoutersRequest $request, string $routerUuid)
+    public function update(UpdateRouterRequest $request, string $routerUuid)
     {
         event(new BeforeUpdateEvent());
-        $router = Routers::findOrFail($routerUuid);
+        $router = Router::findOrFail($routerUuid);
         $router->fill($request->only(['name']));
         $router->save();
         event(new AfterUpdateEvent());
@@ -94,7 +94,7 @@ class RoutersController extends BaseController
     public function destroy(Request $request, string $routerUuid)
     {
         event(new BeforeDeleteEvent());
-        $router = Routers::findOrFail($routerUuid);
+        $router = Router::findOrFail($routerUuid);
         $router->delete();
         event(new AfterDeleteEvent());
         return response()->json([], 204);
@@ -109,8 +109,8 @@ class RoutersController extends BaseController
      */
     public function gatewaysCreate(Request $request, string $routerUuid, string $gatewaysUuid)
     {
-        $router = Routers::findOrFail($routerUuid);
-        $gateway = Gateways::findOrFail($gatewaysUuid);
+        $router = Router::findOrFail($routerUuid);
+        $gateway = Gateway::findOrFail($gatewaysUuid);
         $router->gateways()->attach($gateway->id);
         return response()->json([], 204);
     }
@@ -124,8 +124,8 @@ class RoutersController extends BaseController
      */
     public function gatewaysDestroy(Request $request, string $routerUuid, string $gatewaysUuid)
     {
-        $router = Routers::findOrFail($routerUuid);
-        $gateway = Gateways::findOrFail($gatewaysUuid);
+        $router = Router::findOrFail($routerUuid);
+        $gateway = Gateway::findOrFail($gatewaysUuid);
         $router->gateways()->detach($gateway->id);
         return response()->json([], 204);
     }
