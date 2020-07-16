@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\Routers;
+namespace Tests\V2\Gateway;
 
-use App\Models\V2\Routers;
+use App\Models\V2\Gateway;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -21,12 +21,12 @@ class UpdateTest extends TestCase
 
     public function testNonAdminIsDenied()
     {
-        $zone = $this->createRouter();
+        $zone = $this->createGateway();
         $data = [
-            'name'       => 'Manchester Router 2',
+            'name' => 'Manchester Gateway 2',
         ];
         $this->patch(
-            '/v2/routers/' . $zone->getKey(),
+            '/v2/gateways/' . $zone->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '1-1',
@@ -43,12 +43,12 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $zone = $this->createRouter();
+        $zone = $this->createGateway();
         $data = [
-            'name'       => '',
+            'name' => '',
         ];
         $this->patch(
-            '/v2/routers/' . $zone->getKey(),
+            '/v2/gateways/' . $zone->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -66,12 +66,12 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $zone = $this->createRouter();
+        $zone = $this->createGateway();
         $data = [
-            'name'       => 'Manchester Router 2',
+            'name' => 'Manchester Gateway 2',
         ];
         $this->patch(
-            '/v2/routers/' . $zone->getKey(),
+            '/v2/gateways/' . $zone->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -80,20 +80,20 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $routerItem = Routers::findOrFail($zone->getKey());
-        $this->assertEquals($data['name'], $routerItem->name);
+        $gatewayItem = Gateway::findOrFail($zone->getKey());
+        $this->assertEquals($data['name'], $gatewayItem->name);
     }
 
     /**
-     * Create Router
-     * @return \App\Models\V2\Routers
+     * Create Gateway
+     * @return \App\Models\V2\Gateway
      */
-    public function createRouter(): Routers
+    public function createGateway(): Gateway
     {
-        $router = factory(Routers::class, 1)->create()->first();
-        $router->save();
-        $router->refresh();
-        return $router;
+        $gateway = factory(Gateway::class, 1)->create()->first();
+        $gateway->save();
+        $gateway->refresh();
+        return $gateway;
     }
 
 }

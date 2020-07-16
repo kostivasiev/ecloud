@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\V2\Networks;
+namespace Tests\V2\Vpc;
 
-use App\Models\V2\Networks;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class UpdateTest extends TestCase
 {
@@ -21,12 +21,12 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $net = $this->createNetwork();
+        $vdc = $this->createPrivateCloud();
         $data = [
-            'name'    => 'Manchester Network',
+            'name'    => 'Manchester DC',
         ];
         $this->patch(
-            '/v2/networks/' . $net->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             []
         )
@@ -40,12 +40,12 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $net = $this->createNetwork();
+        $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => '',
         ];
         $this->patch(
-            '/v2/networks/' . $net->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -63,12 +63,12 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $net = $this->createNetwork();
+        $vdc = $this->createPrivateCloud();
         $data = [
-            'name'    => 'Manchester Network',
+            'name'    => 'Manchester DC',
         ];
         $this->patch(
-            '/v2/networks/' . $net->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,20 +77,20 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $networks = Networks::findOrFail($net->getKey());
-        $this->assertEquals($data['name'], $networks->name);
+        $virtualPrivateCloud = Vpc::findOrFail($vdc->getKey());
+        $this->assertEquals($data['name'], $virtualPrivateCloud->name);
     }
 
     /**
-     * Create Network
-     * @return \App\Models\V2\Networks
+     * Create Private Cloud
+     * @return \App\Models\V2\Vpc
      */
-    public function createNetwork(): Networks
+    public function createPrivateCloud(): Vpc
     {
-        $net = factory(Networks::class, 1)->create()->first();
-        $net->save();
-        $net->refresh();
-        return $net;
+        $vdc = factory(Vpc::class, 1)->create()->first();
+        $vdc->save();
+        $vdc->refresh();
+        return $vdc;
     }
 
 }

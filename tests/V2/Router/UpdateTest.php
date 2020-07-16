@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\VirtualPrivateClouds;
+namespace Tests\V2\Router;
 
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\Router;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -19,16 +19,19 @@ class UpdateTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNoPermsIsDenied()
+    public function testNonAdminIsDenied()
     {
-        $vdc = $this->createPrivateCloud();
+        $zone = $this->createRouter();
         $data = [
-            'name'    => 'Manchester DC',
+            'name'       => 'Manchester Router 2',
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/routers/' . $zone->getKey(),
             $data,
-            []
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -40,12 +43,12 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $vdc = $this->createPrivateCloud();
+        $zone = $this->createRouter();
         $data = [
-            'name'    => '',
+            'name'       => '',
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/routers/' . $zone->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -63,12 +66,12 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $vdc = $this->createPrivateCloud();
+        $zone = $this->createRouter();
         $data = [
-            'name'    => 'Manchester DC',
+            'name'       => 'Manchester Router 2',
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/routers/' . $zone->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,20 +80,20 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $virtualPrivateCloud = VirtualPrivateClouds::findOrFail($vdc->getKey());
-        $this->assertEquals($data['name'], $virtualPrivateCloud->name);
+        $routerItem = Router::findOrFail($zone->getKey());
+        $this->assertEquals($data['name'], $routerItem->name);
     }
 
     /**
-     * Create Private Cloud
-     * @return \App\Models\V2\VirtualPrivateClouds
+     * Create Router
+     * @return \App\Models\V2\Router
      */
-    public function createPrivateCloud(): VirtualPrivateClouds
+    public function createRouter(): Router
     {
-        $vdc = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $vdc->save();
-        $vdc->refresh();
-        return $vdc;
+        $router = factory(Router::class, 1)->create()->first();
+        $router->save();
+        $router->refresh();
+        return $router;
     }
 
 }

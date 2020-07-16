@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\V2\Dhcps;
+namespace Tests\V2\Network;
 
-use App\Models\V2\Dhcps;
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\Network;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -22,13 +21,12 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $dhcp = $this->createDhcps();
-        $cloud = $this->createCloud();
+        $net = $this->createNetwork();
         $data = [
-            'vpc_id'    => $cloud->id,
+            'name'    => 'Manchester Network',
         ];
         $this->patch(
-            '/v2/dhcps/' . $dhcp->getKey(),
+            '/v2/networks/' . $net->getKey(),
             $data,
             []
         )
@@ -42,12 +40,12 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $dhcp = $this->createDhcps();
+        $net = $this->createNetwork();
         $data = [
-            'vpc_id'    => '',
+            'name'    => '',
         ];
         $this->patch(
-            '/v2/dhcps/' . $dhcp->getKey(),
+            '/v2/networks/' . $net->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -56,22 +54,21 @@ class UpdateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The vpc id field, when specified, cannot be null',
+                'detail' => 'The name field, when specified, cannot be null',
                 'status' => 422,
-                'source' => 'vpc_id'
+                'source' => 'name'
             ])
             ->assertResponseStatus(422);
     }
 
     public function testValidDataIsSuccessful()
     {
-        $dhcp = $this->createDhcps();
-        $cloud = $this->createCloud();
+        $net = $this->createNetwork();
         $data = [
-            'vpc_id'    => $cloud->id,
+            'name'    => 'Manchester Network',
         ];
         $this->patch(
-            '/v2/dhcps/' . $dhcp->getKey(),
+            '/v2/networks/' . $net->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -80,33 +77,20 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $dhcps = Dhcps::findOrFail($dhcp->getKey());
-        $this->assertEquals($data['vpc_id'], $dhcps->vpc_id);
+        $networks = Network::findOrFail($net->getKey());
+        $this->assertEquals($data['name'], $networks->name);
     }
 
     /**
-     * Create VirtualPrivateClouds
-     * @return \App\Models\V2\VirtualPrivateClouds
+     * Create Network
+     * @return \App\Models\V2\Network
      */
-    public function createCloud(): VirtualPrivateClouds
+    public function createNetwork(): Network
     {
-        $cloud = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
-    }
-
-    /**
-     * @return \App\Models\V2\Dhcps
-     */
-    public function createDhcps(): Dhcps
-    {
-        $dhcp = factory(Dhcps::class, 1)->create([
-            'vpc_id' => $this->createCloud()->id,
-        ])->first();
-        $dhcp->save();
-        $dhcp->refresh();
-        return $dhcp;
+        $net = factory(Network::class, 1)->create()->first();
+        $net->save();
+        $net->refresh();
+        return $net;
     }
 
 }

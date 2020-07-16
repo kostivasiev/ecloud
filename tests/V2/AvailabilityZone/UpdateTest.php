@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\AvailabilityZones;
+namespace Tests\V2\AvailabilityZone;
 
-use App\Models\V2\AvailabilityZones;
+use App\Models\V2\AvailabilityZone;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -136,7 +136,7 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $availabilityZone = AvailabilityZones::findOrFail($zone->getKey());
+        $availabilityZone = AvailabilityZone::findOrFail($zone->getKey());
         $this->assertEquals($data['code'], $availabilityZone->code);
         $this->assertEquals($data['name'], $availabilityZone->name);
         $this->assertEquals($data['site_id'], $availabilityZone->site_id);
@@ -144,11 +144,11 @@ class UpdateTest extends TestCase
 
     /**
      * Create Availability Zone
-     * @return \App\Models\V2\AvailabilityZones
+     * @return \App\Models\V2\AvailabilityZone
      */
-    public function createZone(): AvailabilityZones
+    public function createZone(): AvailabilityZone
     {
-        $zone = factory(AvailabilityZones::class, 1)->create()->first();
+        $zone = factory(AvailabilityZone::class, 1)->create()->first();
         $zone->save();
         $zone->refresh();
         return $zone;

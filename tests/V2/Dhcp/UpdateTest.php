@@ -1,11 +1,12 @@
 <?php
 
-namespace Tests\V2\Gateways;
+namespace Tests\V2\Dhcp;
 
-use App\Models\V2\Gateways;
+use App\Models\V2\Dhcp;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
@@ -19,19 +20,17 @@ class UpdateTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNonAdminIsDenied()
+    public function testNoPermsIsDenied()
     {
-        $zone = $this->createGateway();
+        $dhcp = $this->createDhcps();
+        $cloud = $this->createCloud();
         $data = [
-            'name' => 'Manchester Gateway 2',
+            'vpc_id'    => $cloud->id,
         ];
         $this->patch(
-            '/v2/gateways/' . $zone->getKey(),
+            '/v2/dhcps/' . $dhcp->getKey(),
             $data,
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
+            []
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -43,12 +42,12 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $zone = $this->createGateway();
+        $dhcp = $this->createDhcps();
         $data = [
-            'name' => '',
+            'vpc_id'    => '',
         ];
         $this->patch(
-            '/v2/gateways/' . $zone->getKey(),
+            '/v2/dhcps/' . $dhcp->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -57,21 +56,22 @@ class UpdateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The name field, when specified, cannot be null',
+                'detail' => 'The vpc id field, when specified, cannot be null',
                 'status' => 422,
-                'source' => 'name'
+                'source' => 'vpc_id'
             ])
             ->assertResponseStatus(422);
     }
 
     public function testValidDataIsSuccessful()
     {
-        $zone = $this->createGateway();
+        $dhcp = $this->createDhcps();
+        $cloud = $this->createCloud();
         $data = [
-            'name' => 'Manchester Gateway 2',
+            'vpc_id'    => $cloud->id,
         ];
         $this->patch(
-            '/v2/gateways/' . $zone->getKey(),
+            '/v2/dhcps/' . $dhcp->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -80,20 +80,33 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $gatewayItem = Gateways::findOrFail($zone->getKey());
-        $this->assertEquals($data['name'], $gatewayItem->name);
+        $dhcps = Dhcp::findOrFail($dhcp->getKey());
+        $this->assertEquals($data['vpc_id'], $dhcps->vpc_id);
     }
 
     /**
-     * Create Gateway
-     * @return \App\Models\V2\Gateways
+     * Create VirtualPrivateClouds
+     * @return \App\Models\V2\Vpc
      */
-    public function createGateway(): Gateways
+    public function createCloud(): Vpc
     {
-        $gateway = factory(Gateways::class, 1)->create()->first();
-        $gateway->save();
-        $gateway->refresh();
-        return $gateway;
+        $cloud = factory(Vpc::class, 1)->create()->first();
+        $cloud->save();
+        $cloud->refresh();
+        return $cloud;
+    }
+
+    /**
+     * @return \App\Models\V2\Dhcp
+     */
+    public function createDhcps(): Dhcp
+    {
+        $dhcp = factory(Dhcp::class, 1)->create([
+            'vpc_id' => $this->createCloud()->id,
+        ])->first();
+        $dhcp->save();
+        $dhcp->refresh();
+        return $dhcp;
     }
 
 }
