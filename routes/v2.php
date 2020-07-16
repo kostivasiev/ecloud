@@ -103,4 +103,14 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('gateways/{gatewayUuid}', 'GatewaysController@update');
         $router->delete('gateways/{gatewayUuid}', 'GatewaysController@destroy');
     });
+
+    $router->group([], function () use ($router) {
+        $router->get('floating-ips', 'FloatingIpController@index');
+        $router->get('floating-ips/{fipId}', 'FloatingIpController@show');
+        $router->post('floating-ips', 'FloatingIpController@store');
+        $router->patch('floating-ips/{fipId}', 'FloatingIpController@update');
+        $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
+    });
 });
+
+
