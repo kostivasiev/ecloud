@@ -47,6 +47,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@destroy');
     });
 
+    /** Dhcps */
+    $router->group([], function () use ($router) {
+        $router->get('dhcps', 'DhcpsController@index');
+        $router->get('dhcps/{dhcpId}', 'DhcpsController@show');
+        $router->post('dhcps', 'DhcpsController@create');
+        $router->patch('dhcps/{dhcpId}', 'DhcpsController@update');
+        $router->delete('dhcps/{dhcpId}', 'DhcpsController@destroy');
+    });
+
     /** Networks */
     $router->group([], function () use ($router) {
         $router->get('networks', 'NetworksController@index');
@@ -54,6 +63,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('networks', 'NetworksController@create');
         $router->patch('networks/{networkId}', 'NetworksController@update');
         $router->delete('networks/{networkId}', 'NetworksController@destroy');
+    });
+
+    /** Vpns */
+    $router->group([], function () use ($router) {
+        $router->get('vpns', 'VpnsController@index');
+        $router->get('vpns/{vpnId}', 'VpnsController@show');
+        $router->post('vpns', 'VpnsController@create');
+        $router->patch('vpns/{vpnId}', 'VpnsController@update');
+        $router->delete('vpns/{vpnId}', 'VpnsController@destroy');
     });
 
     /** Routers */
