@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\V2\AvailabilityZonesRouter;
+namespace Tests\V2\AvailabilityZoneRouter;
 
-use App\Models\V2\AvailabilityZones;
-use App\Models\V2\Routers;
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Router;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -22,8 +22,8 @@ class RelationshipTest extends TestCase
 
     public function testNotAdminIsDenied()
     {
-        $availabilityZones = (factory(AvailabilityZones::class, 1)->create()->first())->refresh();
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
+        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
             [],
@@ -42,7 +42,7 @@ class RelationshipTest extends TestCase
 
     public function testInvalidAvailabilityZoneFails()
     {
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/availability-zones/' . $this->faker->uuid . '/routers/' . $router->getKey(),
             [],
@@ -53,14 +53,14 @@ class RelationshipTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Availability Zones with that ID was found',
+                'detail' => 'No Availability Zone with that ID was found',
             ])
             ->assertResponseStatus(404);
     }
 
     public function testInvalidRouterFails()
     {
-        $availabilityZones = (factory(AvailabilityZones::class, 1)->create()->first())->refresh();
+        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $this->faker->uuid,
             [],
@@ -71,15 +71,15 @@ class RelationshipTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Routers with that ID was found',
+                'detail' => 'No Router with that ID was found',
             ])
             ->assertResponseStatus(404);
     }
 
     public function testCreateValidAssociation()
     {
-        $availabilityZones = (factory(AvailabilityZones::class, 1)->create()->first())->refresh();
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
+        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
             [],
@@ -98,8 +98,8 @@ class RelationshipTest extends TestCase
 
     public function testRemoveAssociation()
     {
-        $availabilityZones = (factory(AvailabilityZones::class, 1)->create()->first())->refresh();
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
+        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
         $availabilityZones->routers()->attach($router->getKey());
         $this->delete(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),

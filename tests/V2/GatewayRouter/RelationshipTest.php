@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\V2\RouterGateways;
+namespace Tests\V2\GatewayRouter;
 
-use App\Models\V2\Gateways;
-use App\Models\V2\Routers;
+use App\Models\V2\Gateway;
+use App\Models\V2\Router;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -22,8 +22,8 @@ class RelationshipTest extends TestCase
 
     public function testNotAdminIsDenied()
     {
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateways::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/routers/' . $router->getKey() . '/gateways/' . $gateway->id,
             [],
@@ -42,7 +42,7 @@ class RelationshipTest extends TestCase
 
     public function testInvalidRouterFails()
     {
-        $gateway = (factory(Gateways::class, 1)->create()->first())->refresh();
+        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/routers/' . $this->faker->uuid . '/gateways/' . $gateway->id,
             [],
@@ -53,14 +53,14 @@ class RelationshipTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Routers with that ID was found',
+                'detail' => 'No Router with that ID was found',
             ])
             ->assertResponseStatus(404);
     }
 
     public function testInvalidGatewayFails()
     {
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/routers/' . $router->id . '/gateways/' . $this->faker->uuid,
             [],
@@ -71,15 +71,15 @@ class RelationshipTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Gateways with that ID was found',
+                'detail' => 'No Gateway with that ID was found',
             ])
             ->assertResponseStatus(404);
     }
 
     public function testCreateValidAssociation()
     {
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateways::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
             [],
@@ -98,8 +98,8 @@ class RelationshipTest extends TestCase
 
     public function testRemoveAssociation()
     {
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateways::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
         $router->gateways()->attach($gateway->id);
         $this->delete(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
