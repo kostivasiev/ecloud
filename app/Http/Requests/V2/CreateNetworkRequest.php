@@ -5,10 +5,10 @@ namespace App\Http\Requests\V2;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateVirtualPrivateCloudsRequest
+ * Class CreateNetworksRequest
  * @package App\Http\Requests\V2
  */
-class CreateVirtualPrivateCloudsRequest extends FormRequest
+class CreateNetworkRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +17,7 @@ class CreateVirtualPrivateCloudsRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**

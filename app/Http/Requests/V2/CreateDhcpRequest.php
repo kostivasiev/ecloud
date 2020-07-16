@@ -1,9 +1,14 @@
 <?php
+
 namespace App\Http\Requests\V2;
 
 use UKFast\FormRequests\FormRequest;
 
-class UpdateRoutersRequest extends FormRequest
+/**
+ * Class CreateDhcpsRequest
+ * @package App\Http\Requests\V2
+ */
+class CreateDhcpRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -12,7 +17,7 @@ class UpdateRoutersRequest extends FormRequest
      */
     public function authorize()
     {
-        return ($this->user()->isAdmin());
+        return false;
     }
 
     /**
@@ -23,7 +28,7 @@ class UpdateRoutersRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'sometimes|required|string',
+            'vpc_id'    => 'required|string|exists:ecloud.virtual_private_clouds,id,deleted_at,NULL',
         ];
     }
 
@@ -35,7 +40,7 @@ class UpdateRoutersRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field, when specified, cannot be null',
+            'vpc_id.required' => 'The :attribute field is required',
         ];
     }
 }

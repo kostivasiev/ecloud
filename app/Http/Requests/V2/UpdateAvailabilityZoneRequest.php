@@ -3,7 +3,7 @@ namespace App\Http\Requests\V2;
 
 use UKFast\FormRequests\FormRequest;
 
-class UpdateGatewaysRequest extends FormRequest
+class UpdateAvailabilityZoneRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,19 +23,18 @@ class UpdateGatewaysRequest extends FormRequest
     public function rules()
     {
         return [
+            'code'    => 'sometimes|required|string',
             'name'    => 'sometimes|required|string',
+            'site_id' => 'sometimes|required|integer',
         ];
     }
 
-    /**
-     * Get the validation messages that apply to the request.
-     *
-     * @return array|string[]
-     */
     public function messages()
     {
         return [
+            'code.required' => 'The :attribute field, when specified, cannot be null',
             'name.required' => 'The :attribute field, when specified, cannot be null',
+            'site_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }

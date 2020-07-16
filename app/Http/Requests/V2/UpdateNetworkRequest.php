@@ -5,10 +5,10 @@ namespace App\Http\Requests\V2;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateVpnsRequest
+ * Class UpdateNetworksRequest
  * @package App\Http\Requests\V2
  */
-class CreateVpnsRequest extends FormRequest
+class UpdateNetworkRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,8 +28,7 @@ class CreateVpnsRequest extends FormRequest
     public function rules()
     {
         return [
-            'router_id'            => 'required|string|exists:ecloud.router,id,deleted_at,NULL',
-            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
+            'name'    => 'sometimes|required|string',
         ];
     }
 
@@ -41,8 +40,7 @@ class CreateVpnsRequest extends FormRequest
     public function messages()
     {
         return [
-            'router_id.required'            => 'The :attribute field is required',
-            'availability_zone_id.required' => 'The :attribute field is required',
+            'name.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }

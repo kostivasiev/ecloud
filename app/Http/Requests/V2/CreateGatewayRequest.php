@@ -1,14 +1,9 @@
 <?php
-
 namespace App\Http\Requests\V2;
 
 use UKFast\FormRequests\FormRequest;
 
-/**
- * Class UpdateVpnsRequest
- * @package App\Http\Requests\V2
- */
-class UpdateVpnsRequest extends FormRequest
+class CreateGatewayRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +12,7 @@ class UpdateVpnsRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return ($this->user()->isAdmin());
     }
 
     /**
@@ -28,8 +23,7 @@ class UpdateVpnsRequest extends FormRequest
     public function rules()
     {
         return [
-            'router_id'            => 'sometimes|required|string|exists:ecloud.router,id,deleted_at,NULL',
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
+            'name'    => 'required|string',
         ];
     }
 
@@ -41,8 +35,7 @@ class UpdateVpnsRequest extends FormRequest
     public function messages()
     {
         return [
-            'router_id.required'            => 'The :attribute field, when specified, cannot be null',
-            'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
+            'name.required' => 'The :attribute field is required',
         ];
     }
 }

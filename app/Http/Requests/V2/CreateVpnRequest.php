@@ -5,10 +5,10 @@ namespace App\Http\Requests\V2;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateDhcpsRequest
+ * Class CreateVpnsRequest
  * @package App\Http\Requests\V2
  */
-class UpdateDhcpsRequest extends FormRequest
+class CreateVpnRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,8 @@ class UpdateDhcpsRequest extends FormRequest
     public function rules()
     {
         return [
-            'vpc_id'    => 'sometimes|required|string|exists:ecloud.virtual_private_clouds,id,deleted_at,NULL',
+            'router_id'            => 'required|string|exists:ecloud.routers,id,deleted_at,NULL',
+            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
 
@@ -40,7 +41,8 @@ class UpdateDhcpsRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
+            'router_id.required'            => 'The :attribute field is required',
+            'availability_zone_id.required' => 'The :attribute field is required',
         ];
     }
 }

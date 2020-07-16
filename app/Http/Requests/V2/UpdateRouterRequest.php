@@ -1,14 +1,9 @@
 <?php
-
 namespace App\Http\Requests\V2;
 
 use UKFast\FormRequests\FormRequest;
 
-/**
- * Class CreateNetworksRequest
- * @package App\Http\Requests\V2
- */
-class CreateNetworksRequest extends FormRequest
+class UpdateRouterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +12,7 @@ class CreateNetworksRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return ($this->user()->isAdmin());
     }
 
     /**
@@ -28,7 +23,7 @@ class CreateNetworksRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'required|string',
+            'name'    => 'sometimes|required|string',
         ];
     }
 
@@ -40,7 +35,7 @@ class CreateNetworksRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field is required',
+            'name.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }
