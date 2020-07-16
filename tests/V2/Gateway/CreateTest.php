@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\V2\Networks;
+namespace Tests\V2\Gateway;
 
+use App\Models\V2\Gateway;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class CreateTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     protected $faker;
@@ -19,15 +19,18 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNoPermsIsDenied()
+    public function testNonAdminIsDenied()
     {
         $data = [
-            'name'    => 'Manchester Network',
+            'name'    => 'Manchester Gateway 1',
         ];
         $this->post(
-            '/v2/networks',
+            '/v2/gateways',
             $data,
-            []
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -40,10 +43,10 @@ class CreateTest extends TestCase
     public function testNullNameIsFailed()
     {
         $data = [
-            'name'    => '',
+            'name' => '',
         ];
         $this->post(
-            '/v2/networks',
+            '/v2/gateways',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -62,10 +65,10 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => 'Manchester Network',
+            'name'    => 'Manchester Gateway 1',
         ];
         $this->post(
-            '/v2/networks',
+            '/v2/gateways',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -74,10 +77,9 @@ class CreateTest extends TestCase
         )
             ->assertResponseStatus(201);
 
-        $networkId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $networkId,
-        ]);
+        $gatewayId = (json_decode($this->response->getContent()))->data->id;
+        $gateway = Gateway::find($gatewayId);
+        $this->assertNotNull($gateway);
     }
 
 }

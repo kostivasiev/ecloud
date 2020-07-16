@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\V2\Vpns;
+namespace Tests\V2\Vpn;
 
-use App\Models\V2\AvailabilityZones;
-use App\Models\V2\Routers;
-use App\Models\V2\Vpns;
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Router;
+use App\Models\V2\Vpn;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -104,18 +104,18 @@ class CreateTest extends TestCase
             ->assertResponseStatus(201);
 
         $vpnId = (json_decode($this->response->getContent()))->data->id;
-        $vpnItem = Vpns::findOrFail($vpnId);
+        $vpnItem = Vpn::findOrFail($vpnId);
         $this->assertEquals($vpnItem->router_id, $router->id);
         $this->assertEquals($vpnItem->availability_zone_id, $zone->id);
     }
 
     /**
      * Create Availability Zone
-     * @return \App\Models\V2\AvailabilityZones
+     * @return \App\Models\V2\AvailabilityZone
      */
-    public function createAvailabilityZone(): AvailabilityZones
+    public function createAvailabilityZone(): AvailabilityZone
     {
-        $zone = factory(AvailabilityZones::class, 1)->create()->first();
+        $zone = factory(AvailabilityZone::class, 1)->create()->first();
         $zone->save();
         $zone->refresh();
         return $zone;
@@ -123,11 +123,11 @@ class CreateTest extends TestCase
 
     /**
      * Create Router
-     * @return \App\Models\V2\Routers
+     * @return \App\Models\V2\Router
      */
-    public function createRouters(): Routers
+    public function createRouters(): Router
     {
-        $router = factory(Routers::class, 1)->create()->first();
+        $router = factory(Router::class, 1)->create()->first();
         $router->save();
         $router->refresh();
         return $router;

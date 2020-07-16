@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\V2\Routers;
+namespace Tests\V2\Vpc;
 
-use App\Models\V2\Routers;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class CreateTest extends TestCase
 {
+
     use DatabaseMigrations;
 
     protected $faker;
@@ -19,18 +19,15 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNonAdminIsDenied()
+    public function testNoPermsIsDenied()
     {
         $data = [
-            'name'    => 'Manchester Router 1',
+            'name'    => 'Manchester DC',
         ];
         $this->post(
-            '/v2/routers',
+            '/v2/vpcs',
             $data,
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
+            []
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -43,10 +40,10 @@ class CreateTest extends TestCase
     public function testNullNameIsFailed()
     {
         $data = [
-            'name' => '',
+            'name'    => '',
         ];
         $this->post(
-            '/v2/routers',
+            '/v2/vpcs',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -65,10 +62,10 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => 'Manchester Router 1',
+            'name'    => 'Manchester DC',
         ];
         $this->post(
-            '/v2/routers',
+            '/v2/vpcs',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,9 +74,10 @@ class CreateTest extends TestCase
         )
             ->assertResponseStatus(201);
 
-        $routerId = (json_decode($this->response->getContent()))->data->id;
-        $router = Routers::find($routerId);
-        $this->assertNotNull($router);
+        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
+        $this->seeJson([
+            'id' => $virtualPrivateCloudId,
+        ]);
     }
 
 }

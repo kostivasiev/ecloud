@@ -1,15 +1,14 @@
 <?php
 
-namespace Tests\V2\Dhcps;
+namespace Tests\V2\Router;
 
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\Router;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class CreateTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     protected $faker;
@@ -20,16 +19,18 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNoPermsIsDenied()
+    public function testNonAdminIsDenied()
     {
-        $cloud = $this->createCloud();
         $data = [
-            'vpc_id' => $cloud->id,
+            'name'    => 'Manchester Router 1',
         ];
         $this->post(
-            '/v2/dhcps',
+            '/v2/routers',
             $data,
-            []
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -42,10 +43,10 @@ class CreateTest extends TestCase
     public function testNullNameIsFailed()
     {
         $data = [
-            'vpc_id' => '',
+            'name' => '',
         ];
         $this->post(
-            '/v2/dhcps',
+            '/v2/routers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -54,21 +55,20 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The vpc id field is required',
+                'detail' => 'The name field is required',
                 'status' => 422,
-                'source' => 'vpc_id'
+                'source' => 'name'
             ])
             ->assertResponseStatus(422);
     }
 
     public function testValidDataSucceeds()
     {
-        $cloud = $this->createCloud();
         $data = [
-            'vpc_id' => $cloud->id,
+            'name'    => 'Manchester Router 1',
         ];
         $this->post(
-            '/v2/dhcps',
+            '/v2/routers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,21 +77,9 @@ class CreateTest extends TestCase
         )
             ->assertResponseStatus(201);
 
-        $dhcpId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $dhcpId,
-        ]);
-    }
-
-    /**
-     * @return \App\Models\V2\VirtualPrivateClouds
-     */
-    public function createCloud(): VirtualPrivateClouds
-    {
-        $cloud = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
+        $routerId = (json_decode($this->response->getContent()))->data->id;
+        $router = Router::find($routerId);
+        $this->assertNotNull($router);
     }
 
 }

@@ -1,10 +1,11 @@
 <?php
 
-namespace Tests\V2\VirtualPrivateClouds;
+namespace Tests\V2\Dhcp;
 
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -21,11 +22,12 @@ class CreateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
+        $cloud = $this->createCloud();
         $data = [
-            'name'    => 'Manchester DC',
+            'vpc_id' => $cloud->id,
         ];
         $this->post(
-            '/v2/vpcs',
+            '/v2/dhcps',
             $data,
             []
         )
@@ -40,10 +42,10 @@ class CreateTest extends TestCase
     public function testNullNameIsFailed()
     {
         $data = [
-            'name'    => '',
+            'vpc_id' => '',
         ];
         $this->post(
-            '/v2/vpcs',
+            '/v2/dhcps',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -52,20 +54,21 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The name field is required',
+                'detail' => 'The vpc id field is required',
                 'status' => 422,
-                'source' => 'name'
+                'source' => 'vpc_id'
             ])
             ->assertResponseStatus(422);
     }
 
     public function testValidDataSucceeds()
     {
+        $cloud = $this->createCloud();
         $data = [
-            'name'    => 'Manchester DC',
+            'vpc_id' => $cloud->id,
         ];
         $this->post(
-            '/v2/vpcs',
+            '/v2/dhcps',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -74,10 +77,21 @@ class CreateTest extends TestCase
         )
             ->assertResponseStatus(201);
 
-        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
+        $dhcpId = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
-            'id' => $virtualPrivateCloudId,
+            'id' => $dhcpId,
         ]);
+    }
+
+    /**
+     * @return \App\Models\V2\Vpc
+     */
+    public function createCloud(): Vpc
+    {
+        $cloud = factory(Vpc::class, 1)->create()->first();
+        $cloud->save();
+        $cloud->refresh();
+        return $cloud;
     }
 
 }

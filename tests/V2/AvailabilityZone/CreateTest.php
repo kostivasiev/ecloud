@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\AvailabilityZones;
+namespace Tests\V2\AvailabilityZone;
 
-use App\Models\V2\AvailabilityZones;
+use App\Models\V2\AvailabilityZone;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
