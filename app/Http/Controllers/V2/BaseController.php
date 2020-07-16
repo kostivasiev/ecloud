@@ -51,7 +51,7 @@ class BaseController extends Controller
                     'id' => $id,
                 ],
                 'meta' => [
-                    'location' => $request->fullUrl()
+                    'location' => sprintf('%s/%s', $request->url(), $id),
                 ],
             ],
             $statusCode
