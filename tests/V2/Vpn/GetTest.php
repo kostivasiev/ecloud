@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\V2\Vpns;
+namespace Tests\V2\Vpn;
 
-use App\Models\V2\AvailabilityZones;
-use App\Models\V2\Routers;
-use App\Models\V2\Vpns;
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Router;
+use App\Models\V2\Vpn;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -73,11 +73,11 @@ class GetTest extends TestCase
 
     /**
      * Create Vpns
-     * @return \App\Models\V2\Vpns
+     * @return \App\Models\V2\Vpn
      */
-    public function createVpn(): Vpns
+    public function createVpn(): Vpn
     {
-        $cloud = factory(Vpns::class, 1)->create([
+        $cloud = factory(Vpn::class, 1)->create([
             'router_id'            => $this->createRouters()->id,
             'availability_zone_id' => $this->createAvailabilityZone()->id,
         ])->first();
@@ -88,11 +88,11 @@ class GetTest extends TestCase
 
     /**
      * Create Availability Zone
-     * @return \App\Models\V2\AvailabilityZones
+     * @return \App\Models\V2\AvailabilityZone
      */
-    public function createAvailabilityZone(): AvailabilityZones
+    public function createAvailabilityZone(): AvailabilityZone
     {
-        $zone = factory(AvailabilityZones::class, 1)->create()->first();
+        $zone = factory(AvailabilityZone::class, 1)->create()->first();
         $zone->save();
         $zone->refresh();
         return $zone;
@@ -100,11 +100,11 @@ class GetTest extends TestCase
 
     /**
      * Create Router
-     * @return \App\Models\V2\Routers
+     * @return \App\Models\V2\Router
      */
-    public function createRouters(): Routers
+    public function createRouters(): Router
     {
-        $router = factory(Routers::class, 1)->create()->first();
+        $router = factory(Router::class, 1)->create()->first();
         $router->save();
         $router->refresh();
         return $router;

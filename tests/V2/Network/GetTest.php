@@ -1,12 +1,11 @@
 <?php
 
-namespace Tests\V2\Dhcps;
+namespace Tests\V2\Network;
 
-use App\Models\V2\Dhcps;
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\Network;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class GetTest extends TestCase
 {
@@ -23,7 +22,7 @@ class GetTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->get(
-            '/v2/dhcps',
+            '/v2/networks',
             []
         )
             ->seeJson([
@@ -36,47 +35,41 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $cloud = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        $dhcps = factory(Dhcps::class, 1)->create([
-            'vpc_id'    => $cloud->id,
+        $network = factory(Network::class, 1)->create([
+            'name'    => 'Manchester Network',
         ])->first();
         $this->get(
-            '/v2/dhcps',
+            '/v2/networks',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'     => $dhcps->id,
-                'vpc_id' => $dhcps->vpc_id,
+                'id'         => $network->id,
+                'name'       => $network->name,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $cloud = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        $dhcps = factory(Dhcps::class, 1)->create([
-            'vpc_id'    => $cloud->id,
+        $network = factory(Network::class, 1)->create([
+            'name'    => 'Manchester Network',
         ])->first();
-        $dhcps->save();
-        $dhcps->refresh();
+        $network->save();
+        $network->refresh();
 
         $this->get(
-            '/v2/dhcps/' . $dhcps->getKey(),
+            '/v2/networks/' . $network->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'     => $dhcps->id,
-                'vpc_id' => $dhcps->vpc_id,
+                'id'         => $network->id,
+                'name'       => $network->name,
             ])
             ->assertResponseStatus(200);
     }

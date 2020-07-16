@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\VirtualPrivateClouds;
+namespace Tests\V2\Vpc;
 
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -35,7 +35,7 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $virtualPrivateCloud = factory(VirtualPrivateClouds::class, 1)->create([
+        $virtualPrivateCloud = factory(Vpc::class, 1)->create([
             'name'    => 'Manchester DC',
         ])->first();
         $this->get(
@@ -54,7 +54,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $virtualPrivateCloud = factory(VirtualPrivateClouds::class, 1)->create([
+        $virtualPrivateCloud = factory(Vpc::class, 1)->create([
             'name'    => 'Manchester DC',
         ])->first();
         $virtualPrivateCloud->save();

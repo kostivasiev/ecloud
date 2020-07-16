@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\Routers;
+namespace Tests\V2\AvailabilityZone;
 
-use App\Models\V2\Routers;
+use App\Models\V2\AvailabilityZone;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -22,7 +22,7 @@ class GetTest extends TestCase
     public function testNonAdminIsDenied()
     {
         $this->get(
-            '/v2/routers',
+            '/v2/availability-zones',
             [
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',
@@ -38,41 +38,49 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $routerItem = factory(Routers::class, 1)->create([
-            'name'       => 'Manchester Router 1',
+        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+            'code'    => 'MAN1',
+            'name'    => 'Manchester Region 1',
+            'site_id' => 1,
         ])->first();
         $this->get(
-            '/v2/routers',
+            '/v2/availability-zones',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'         => $routerItem->id,
-                'name'       => $routerItem->name,
+                'id'         => $availabilityZone->id,
+                'code'       => $availabilityZone->code,
+                'name'       => $availabilityZone->name,
+                'site_id'    => $availabilityZone->site_id,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $router = factory(Routers::class, 1)->create([
-            'name'       => 'Manchester Router 1',
+        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+            'code'    => 'MAN1',
+            'name'    => 'Manchester Region 1',
+            'site_id' => 1,
         ])->first();
-        $router->save();
-        $router->refresh();
+        $availabilityZone->save();
+        $availabilityZone->refresh();
 
         $this->get(
-            '/v2/routers/' . $router->getKey(),
+            '/v2/availability-zones/' . $availabilityZone->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'         => $router->id,
-                'name'       => $router->name,
+                'id'         => $availabilityZone->id,
+                'code'       => $availabilityZone->code,
+                'name'       => $availabilityZone->name,
+                'site_id'    => (int) $availabilityZone->site_id,
             ])
             ->assertResponseStatus(200);
     }

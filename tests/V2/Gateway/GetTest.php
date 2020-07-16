@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\Gateways;
+namespace Tests\V2\Gateway;
 
-use App\Models\V2\Gateways;
+use App\Models\V2\Gateway;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -38,7 +38,7 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $gatewayItem = factory(Gateways::class, 1)->create([
+        $gatewayItem = factory(Gateway::class, 1)->create([
             'name'       => 'Manchester Gateway 1',
         ])->first();
         $this->get(
@@ -57,7 +57,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $gateway = factory(Gateways::class, 1)->create([
+        $gateway = factory(Gateway::class, 1)->create([
             'name'       => 'Manchester Gateway 1',
         ])->first();
         $gateway->save();
