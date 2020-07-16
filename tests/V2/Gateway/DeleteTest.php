@@ -1,12 +1,11 @@
 <?php
 
-namespace Tests\V2\Dhcps;
+namespace Tests\V2\Gateway;
 
-use App\Models\V2\Dhcps;
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\Gateway;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class DeleteTest extends TestCase
 {
@@ -20,16 +19,17 @@ class DeleteTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNoPermsIsDenied()
+    public function testNonAdminIsDenied()
     {
-        $dhcps = factory(Dhcps::class, 1)->create([
-            'vpc_id' => $this->createCloud()->id,
-        ])->first();
-        $dhcps->refresh();
+        $gateway = factory(Gateway::class, 1)->create()->first();
+        $gateway->refresh();
         $this->delete(
-            '/v2/dhcps/' . $dhcps->getKey(),
+            '/v2/gateways/' . $gateway->getKey(),
             [],
-            []
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/dhcps/' . $this->faker->uuid,
+            '/v2/gateways/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -51,7 +51,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Dhcps with that ID was found',
+                'detail' => 'No Gateway with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -59,12 +59,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $dhcps = factory(Dhcps::class, 1)->create([
-            'vpc_id' => $this->createCloud()->id,
-        ])->first();
-        $dhcps->refresh();
+        $gateway = factory(Gateway::class, 1)->create()->first();
+        $gateway->refresh();
         $this->delete(
-            '/v2/dhcps/' . $dhcps->getKey(),
+            '/v2/gateways/' . $gateway->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -72,20 +70,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $network = Dhcps::withTrashed()->findOrFail($dhcps->getKey());
-        $this->assertNotNull($network->deleted_at);
-    }
-
-    /**
-     * Create VirtualPrivateClouds
-     * @return \App\Models\V2\VirtualPrivateClouds
-     */
-    public function createCloud(): VirtualPrivateClouds
-    {
-        $cloud = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
+        $gatewayItem = Gateway::withTrashed()->findOrFail($gateway->getKey());
+        $this->assertNotNull($gatewayItem->deleted_at);
     }
 
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\Gateways;
+namespace Tests\V2\AvailabilityZone;
 
-use App\Models\V2\Gateways;
+use App\Models\V2\AvailabilityZone;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -21,10 +21,10 @@ class DeleteTest extends TestCase
 
     public function testNonAdminIsDenied()
     {
-        $gateway = factory(Gateways::class, 1)->create()->first();
-        $gateway->refresh();
+        $zone = factory(AvailabilityZone::class, 1)->create()->first();
+        $zone->refresh();
         $this->delete(
-            '/v2/gateways/' . $gateway->getKey(),
+            '/v2/availability-zones/' . $zone->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/gateways/' . $this->faker->uuid,
+            '/v2/availability-zones/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -51,7 +51,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Gateways with that ID was found',
+                'detail' => 'No Availability Zone with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -59,10 +59,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $gateway = factory(Gateways::class, 1)->create()->first();
-        $gateway->refresh();
+        $zone = factory(AvailabilityZone::class, 1)->create()->first();
+        $zone->refresh();
         $this->delete(
-            '/v2/gateways/' . $gateway->getKey(),
+            '/v2/availability-zones/' . $zone->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -70,8 +70,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $gatewayItem = Gateways::withTrashed()->findOrFail($gateway->getKey());
-        $this->assertNotNull($gatewayItem->deleted_at);
+        $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($zone->getKey());
+        $this->assertNotNull($availabilityZone->deleted_at);
     }
 
 }

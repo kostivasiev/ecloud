@@ -1,11 +1,12 @@
 <?php
 
-namespace Tests\V2\Routers;
+namespace Tests\V2\Dhcp;
 
-use App\Models\V2\Routers;
+use App\Models\V2\Dhcp;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
@@ -19,17 +20,16 @@ class DeleteTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNonAdminIsDenied()
+    public function testNoPermsIsDenied()
     {
-        $router = factory(Routers::class, 1)->create()->first();
-        $router->refresh();
+        $dhcps = factory(Dhcp::class, 1)->create([
+            'vpc_id' => $this->createCloud()->id,
+        ])->first();
+        $dhcps->refresh();
         $this->delete(
-            '/v2/routers/' . $router->getKey(),
+            '/v2/dhcps/' . $dhcps->getKey(),
             [],
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
+            []
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/routers/' . $this->faker->uuid,
+            '/v2/dhcps/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -51,7 +51,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Routers with that ID was found',
+                'detail' => 'No Dhcp with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -59,10 +59,12 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $router = factory(Routers::class, 1)->create()->first();
-        $router->refresh();
+        $dhcps = factory(Dhcp::class, 1)->create([
+            'vpc_id' => $this->createCloud()->id,
+        ])->first();
+        $dhcps->refresh();
         $this->delete(
-            '/v2/routers/' . $router->getKey(),
+            '/v2/dhcps/' . $dhcps->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -70,8 +72,20 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $routerItem = Routers::withTrashed()->findOrFail($router->getKey());
-        $this->assertNotNull($routerItem->deleted_at);
+        $network = Dhcp::withTrashed()->findOrFail($dhcps->getKey());
+        $this->assertNotNull($network->deleted_at);
+    }
+
+    /**
+     * Create VirtualPrivateClouds
+     * @return \App\Models\V2\Vpc
+     */
+    public function createCloud(): Vpc
+    {
+        $cloud = factory(Vpc::class, 1)->create()->first();
+        $cloud->save();
+        $cloud->refresh();
+        return $cloud;
     }
 
 }

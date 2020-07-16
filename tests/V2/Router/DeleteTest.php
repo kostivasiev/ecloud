@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\Networks;
+namespace Tests\V2\Router;
 
-use App\Models\V2\Networks;
+use App\Models\V2\Router;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -19,14 +19,17 @@ class DeleteTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNoPermsIsDenied()
+    public function testNonAdminIsDenied()
     {
-        $net = factory(Networks::class, 1)->create()->first();
-        $net->refresh();
+        $router = factory(Router::class, 1)->create()->first();
+        $router->refresh();
         $this->delete(
-            '/v2/networks/' . $net->getKey(),
+            '/v2/routers/' . $router->getKey(),
             [],
-            []
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -39,7 +42,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/networks/' . $this->faker->uuid,
+            '/v2/routers/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -48,7 +51,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Networks with that ID was found',
+                'detail' => 'No Router with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -56,10 +59,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $net = factory(Networks::class, 1)->create()->first();
-        $net->refresh();
+        $router = factory(Router::class, 1)->create()->first();
+        $router->refresh();
         $this->delete(
-            '/v2/networks/' . $net->getKey(),
+            '/v2/routers/' . $router->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -67,8 +70,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $network = Networks::withTrashed()->findOrFail($net->getKey());
-        $this->assertNotNull($network->deleted_at);
+        $routerItem = Router::withTrashed()->findOrFail($router->getKey());
+        $this->assertNotNull($routerItem->deleted_at);
     }
 
 }

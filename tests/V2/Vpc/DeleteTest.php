@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\AvailabilityZones;
+namespace Tests\V2\Vpc;
 
-use App\Models\V2\AvailabilityZones;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -19,17 +19,14 @@ class DeleteTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNonAdminIsDenied()
+    public function testNoPermsIsDenied()
     {
-        $zone = factory(AvailabilityZones::class, 1)->create()->first();
-        $zone->refresh();
+        $vdc = factory(Vpc::class, 1)->create()->first();
+        $vdc->refresh();
         $this->delete(
-            '/v2/availability-zones/' . $zone->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             [],
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
+            []
         )
             ->seeJson([
                 'title'  => 'Unauthorised',
@@ -42,7 +39,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/availability-zones/' . $this->faker->uuid,
+            '/v2/vpcs/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -51,7 +48,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Availability Zones with that ID was found',
+                'detail' => 'No Vpc with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -59,10 +56,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $zone = factory(AvailabilityZones::class, 1)->create()->first();
-        $zone->refresh();
+        $vdc = factory(Vpc::class, 1)->create()->first();
+        $vdc->refresh();
         $this->delete(
-            '/v2/availability-zones/' . $zone->getKey(),
+            '/v2/vpcs/' . $vdc->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -70,8 +67,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $availabilityZone = AvailabilityZones::withTrashed()->findOrFail($zone->getKey());
-        $this->assertNotNull($availabilityZone->deleted_at);
+        $virtualPrivateCloud = Vpc::withTrashed()->findOrFail($vdc->getKey());
+        $this->assertNotNull($virtualPrivateCloud->deleted_at);
     }
 
 }

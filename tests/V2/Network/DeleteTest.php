@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\VirtualPrivateClouds;
+namespace Tests\V2\Network;
 
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\Network;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -21,10 +21,10 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $vdc = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $vdc->refresh();
+        $net = factory(Network::class, 1)->create()->first();
+        $net->refresh();
         $this->delete(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/networks/' . $net->getKey(),
             [],
             []
         )
@@ -39,7 +39,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/vpcs/' . $this->faker->uuid,
+            '/v2/networks/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -48,7 +48,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Virtual Private Clouds with that ID was found',
+                'detail' => 'No Network with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -56,10 +56,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $vdc = factory(VirtualPrivateClouds::class, 1)->create()->first();
-        $vdc->refresh();
+        $net = factory(Network::class, 1)->create()->first();
+        $net->refresh();
         $this->delete(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/networks/' . $net->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -67,8 +67,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $virtualPrivateCloud = VirtualPrivateClouds::withTrashed()->findOrFail($vdc->getKey());
-        $this->assertNotNull($virtualPrivateCloud->deleted_at);
+        $network = Network::withTrashed()->findOrFail($net->getKey());
+        $this->assertNotNull($network->deleted_at);
     }
 
 }
