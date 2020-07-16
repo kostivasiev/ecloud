@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\V2\Vpns;
+namespace App\Events\V2\Gateway;
 
 use App\Events\Event;
 

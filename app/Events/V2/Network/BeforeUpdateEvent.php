@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Vpns;
+namespace App\Events\V2\Network;
 
 use App\Events\Event;
 
-class BeforeDeleteEvent extends Event
+class BeforeUpdateEvent extends Event
 {
     /**
      * Create a new event instance.

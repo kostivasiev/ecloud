@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\V2\VirtualPrivateClouds;
+namespace App\Events\V2\Router;
 
 use App\Events\Event;
 

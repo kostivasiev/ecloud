@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Vpns;
+namespace App\Events\V2\AvailabilityZone;
 
 use App\Events\Event;
 
-class BeforeCreateEvent extends Event
+class BeforeDeleteEvent extends Event
 {
     /**
      * Create a new event instance.

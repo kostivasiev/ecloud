@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\V2\Routers;
+namespace App\Events\V2\Vpn;
 
 use App\Events\Event;
 

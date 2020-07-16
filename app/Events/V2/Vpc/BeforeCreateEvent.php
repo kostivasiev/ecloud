@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\V2\AvailabilityZones;
+namespace App\Events\V2\Vpc;
 
 use App\Events\Event;
 

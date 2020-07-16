@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Gateways;
+namespace App\Events\V2\Dhcp;
 
 use App\Events\Event;
 
-class BeforeCreateEvent extends Event
+class BeforeUpdateEvent extends Event
 {
     /**
      * Create a new event instance.

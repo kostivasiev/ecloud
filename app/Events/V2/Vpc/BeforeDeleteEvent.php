@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Dhcps;
+namespace App\Events\V2\Vpc;
 
 use App\Events\Event;
 
-class BeforeUpdateEvent extends Event
+class BeforeDeleteEvent extends Event
 {
     /**
      * Create a new event instance.
