@@ -5,15 +5,16 @@ use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
 /**
- * Class VpnsResource
+ * Class AvailabilityZonesResource
  * @package App\Http\Resources\V2
  * @property string id
- * @property string router_id
- * @property string availability_zone_id
+ * @property string code
+ * @property string name
+ * @property int site_id
  * @property string created_at
  * @property string updated_at
  */
-class VpnsResource extends UKFastResource
+class AvailabilityZoneResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request
@@ -22,14 +23,15 @@ class VpnsResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'                   => $this->id,
-            'router_id'            => $this->router_id,
-            'availability_zone_id' => $this->availability_zone_id,
-            'created_at'           => Carbon::parse(
+            'id'         => $this->id,
+            'code'       => $this->code,
+            'name'       => $this->name,
+            'site_id'    => (int) $this->site_id,
+            'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at'           => Carbon::parse(
+            'updated_at' => Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

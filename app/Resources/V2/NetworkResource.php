@@ -5,14 +5,14 @@ use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
 /**
- * Class DhcpsResource
+ * Class NetworksResource
  * @package App\Http\Resources\V2
  * @property string id
- * @property string vpc_id
+ * @property string name
  * @property string created_at
  * @property string updated_at
  */
-class DhcpsResource extends UKFastResource
+class NetworkResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request
@@ -22,7 +22,7 @@ class DhcpsResource extends UKFastResource
     {
         return [
             'id'         => $this->id,
-            'vpc_id'     => $this->vpc_id,
+            'name'       => $this->name,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
