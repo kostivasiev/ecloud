@@ -47,7 +47,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Instance with that ID was found',
+                'detail' => 'No Floating Ip with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
