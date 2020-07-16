@@ -150,5 +150,9 @@ class EventServiceProvider extends ServiceProvider
 //        'App\Events\V2\Vpns\BeforeUpdateEvent' => [
 //            'App\Listeners\V2\ListenerClass',
 //        ],
+
+        'App\Events\V2\Routers\AfterCreateEvent' => [
+            'App\Listeners\V2\Federation\CreateRouterListener',
+        ],
     ];
 }
