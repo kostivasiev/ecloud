@@ -188,7 +188,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones'
+                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/avz-2b66bb79'
       requestBody:
         required: true
         content:
@@ -242,7 +242,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/{zoneId}'
+                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/avz-2b66bb79'
       requestBody:
         required: true
         content:
@@ -406,7 +406,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/gateways'
+                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gtw-2b66bb79'
       requestBody:
         required: true
         content:
@@ -460,7 +460,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/gateways/{gatewayUuid}'
+                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gtw-2b66bb79'
       requestBody:
         required: true
         content:
@@ -581,7 +581,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/routers'
+                        example: 'https://api.ukfast.io/ecloud/v2/routers/rtr-2b66bb79'
       requestBody:
         required: true
         content:
@@ -635,7 +635,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/routers/{routerId}'
+                        example: 'https://api.ukfast.io/ecloud/v2/routers/rtr-2b66bb79'
       requestBody:
         required: true
         content:

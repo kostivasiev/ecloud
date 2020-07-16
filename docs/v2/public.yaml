@@ -205,13 +205,13 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: vdc-2b66bb79
+                        example: vpc-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/vpcs'
+                        example: 'https://api.ukfast.io/ecloud/v2/vpcs/vpc-2b66bb79'
       requestBody:
         required: true
         content:
@@ -245,7 +245,7 @@ paths:
           required: true
           schema:
             type: string
-          example: vdc-2b66bb79
+          example: vpc-2b66bb79
     patch:
       responses:
         200:
@@ -259,13 +259,13 @@ paths:
                     type: object
                     properties:
                       id: string
-                      example: vdc-2b66bb79
+                      example: vpc-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}'
+                        example: 'https://api.ukfast.io/ecloud/v2/vpcs/vpc-2b66bb79'
       requestBody:
         required: true
         content:
@@ -281,7 +281,7 @@ paths:
           required: true
           schema:
             type: string
-          example: vdc-2b66bb79
+          example: vpc-2b66bb79
     delete:
       responses:
         204:
@@ -385,7 +385,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/networks'
+                        example: 'https://api.ukfast.io/ecloud/v2/networks/net-2b66bb79'
       requestBody:
         required: true
         content:
@@ -439,7 +439,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/networks/{networkId}'
+                        example: 'https://api.ukfast.io/ecloud/v2/networks/net-2b66bb79'
       requestBody:
         required: true
         content:
@@ -559,7 +559,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/dhcps'
+                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhc-2b66bb79'
       requestBody:
         required: true
         content:
@@ -613,7 +613,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/{dhcpsId}'
+                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhc-2b66bb79'
       requestBody:
         required: true
         content:
@@ -733,7 +733,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/vpns'
+                        example: 'https://api.ukfast.io/ecloud/v2/vpns/vpn-2b66bb79'
       requestBody:
         required: true
         content:
@@ -787,7 +787,7 @@ paths:
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/vpns/{vpnId}'
+                        example: 'https://api.ukfast.io/ecloud/v2/vpns/vpn-2b66bb79'
       requestBody:
         required: true
         content:
