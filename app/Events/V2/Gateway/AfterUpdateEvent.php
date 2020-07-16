@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Routers;
+namespace App\Events\V2\Gateway;
 
 use App\Events\Event;
 
-class AfterDeleteEvent extends Event
+class AfterUpdateEvent extends Event
 {
     /**
      * Create a new event instance.

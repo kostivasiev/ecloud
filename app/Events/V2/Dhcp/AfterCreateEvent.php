@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\AvailabilityZones;
+namespace App\Events\V2\Dhcp;
 
 use App\Events\Event;
 
-class AfterUpdateEvent extends Event
+class AfterCreateEvent extends Event
 {
     /**
      * Create a new event instance.

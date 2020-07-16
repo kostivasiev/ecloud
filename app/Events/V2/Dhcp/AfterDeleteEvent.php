@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Routers;
+namespace App\Events\V2\Dhcp;
 
 use App\Events\Event;
 
-class AfterCreateEvent extends Event
+class AfterDeleteEvent extends Event
 {
     /**
      * Create a new event instance.

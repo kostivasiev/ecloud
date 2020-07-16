@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Networks;
+namespace App\Events\V2\Router;
 
 use App\Events\Event;
 
-class AfterCreateEvent extends Event
+class AfterUpdateEvent extends Event
 {
     /**
      * Create a new event instance.

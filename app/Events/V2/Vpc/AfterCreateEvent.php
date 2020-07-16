@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events\V2\Gateways;
+namespace App\Events\V2\Vpc;
 
 use App\Events\Event;
 
-class AfterUpdateEvent extends Event
+class AfterCreateEvent extends Event
 {
     /**
      * Create a new event instance.

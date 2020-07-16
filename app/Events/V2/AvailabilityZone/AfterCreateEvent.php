@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\V2\Gateways;
+namespace App\Events\V2\AvailabilityZone;
 
 use App\Events\Event;
 
