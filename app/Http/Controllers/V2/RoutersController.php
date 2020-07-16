@@ -10,6 +10,7 @@ use App\Events\V2\Routers\BeforeDeleteEvent;
 use App\Events\V2\Routers\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateRoutersRequest;
 use App\Http\Requests\V2\UpdateRoutersRequest;
+use App\Models\V2\Gateways;
 use App\Models\V2\Routers;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -96,6 +97,36 @@ class RoutersController extends BaseController
         $router = Routers::findOrFail($routerUuid);
         $router->delete();
         event(new AfterDeleteEvent());
+        return response()->json([], 204);
+    }
+
+    /**
+     * Associate a gateway with a router
+     * @param \Illuminate\Http\Request $request
+     * @param string $routerUuid
+     * @param string $gatewaysUuid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function gatewaysCreate(Request $request, string $routerUuid, string $gatewaysUuid)
+    {
+        $router = Routers::findOrFail($routerUuid);
+        $gateway = Gateways::findOrFail($gatewaysUuid);
+        $router->gateways()->attach($gateway->id);
+        return response()->json([], 204);
+    }
+
+    /**
+     * Remove Association between Gateway and Router
+     * @param \Illuminate\Http\Request $request
+     * @param string $routerUuid
+     * @param string $gatewaysUuid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function gatewaysDestroy(Request $request, string $routerUuid, string $gatewaysUuid)
+    {
+        $router = Routers::findOrFail($routerUuid);
+        $gateway = Gateways::findOrFail($gatewaysUuid);
+        $router->gateways()->detach($gateway->id);
         return response()->json([], 204);
     }
 }

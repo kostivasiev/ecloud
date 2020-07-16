@@ -24,6 +24,7 @@ class AvailabilityZones extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
+    public const KEY_PREFIX = 'avz';
     protected $connection = 'ecloud';
     protected $table = 'availability_zones';
     protected $primaryKey = 'id';
@@ -90,8 +91,8 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             'name'       => 'name',
             'site_id'    => 'site_id',
             'nsx_manager_endpoint'    => 'nsx_manager_endpoint',
-            'created_at' => 'appliance_created_at',
-            'updated_at' => 'appliance_updated_at',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 
@@ -110,5 +111,26 @@ class AvailabilityZones extends Model implements Filterable, Sortable
             DateTimeProperty::create('created_at', 'created_at'),
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function routers()
+    {
+        return $this->belongsToMany(
+            Routers::class,
+            'availability_zones_router',
+            'zone_id',
+            'router_id'
+        );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function vpns()
+    {
+        return $this->hasOne(Vpns::class, 'id', 'availability_zone_id');
     }
 }
