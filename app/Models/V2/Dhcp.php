@@ -5,10 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -16,21 +12,20 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class Routers
+ * Class Dhcps
  * @package App\Models\V2
- * @method static find(string $routerId)
- * @method static findOrFail(string $routerUuid)
+ * @method static findOrFail(string $dhcpId)
  */
-class Routers extends Model implements Filterable, Sortable
+class Dhcp extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'rtr';
+    public const KEY_PREFIX = 'dhc';
     protected $connection = 'ecloud';
-    protected $table = 'router';
+    protected $table = 'dhcps';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name'];
-    protected $visible = ['id', 'name', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'vpc_id'];
+    protected $visible = ['id', 'vpc_id', 'created_at', 'updated_at'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -43,7 +38,7 @@ class Routers extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -58,7 +53,7 @@ class Routers extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('name'),
+            $factory->create('vpc_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -71,7 +66,7 @@ class Routers extends Model implements Filterable, Sortable
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('name', 'asc'),
+            $factory->create('id', 'asc'),
         ];
     }
 
@@ -82,58 +77,17 @@ class Routers extends Model implements Filterable, Sortable
     {
         return [
             'id'         => 'id',
-            'name'       => 'name',
+            'vpc_id'     => 'vpc_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
     }
 
     /**
-     * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
-     */
-    public function properties()
-    {
-        return [
-            IdProperty::create('id', 'id', null, 'uuid'),
-            StringProperty::create('name', 'name'),
-            DateTimeProperty::create('created_at', 'created_at'),
-            DateTimeProperty::create('updated_at', 'updated_at')
-        ];
-    }
-
-    /**
-     * Many to Many with Gateways table
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function gateways()
-    {
-        return $this->belongsToMany(
-            Gateways::class,
-            'router_gateways',
-            'router_id',
-            'gateways_id'
-        );
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function availabilityZones()
-    {
-        return $this->belongsToMany(
-            AvailabilityZones::class,
-            'availability_zones_router',
-            'router_id',
-            'zone_id'
-        );
-    }
-
-    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function vpns()
+    public function virtualPrivateClouds()
     {
-        return $this->hasOne(Vpns::class, 'id', 'router_id');
+        return $this->hasOne(Vpc::class, 'id', 'vpc_id');
     }
 }

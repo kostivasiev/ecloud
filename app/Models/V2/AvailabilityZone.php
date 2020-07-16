@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -15,21 +16,20 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class Gateways
+ * Class AvailabilityZones
  * @package App\Models\V2
- * @method static find(string $routerId)
- * @method static findOrFail(string $routerUuid)
+ * @method static findOrFail(string $zoneId)
  */
-class Gateways extends Model implements Filterable, Sortable
+class AvailabilityZone extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'gtw';
+    public const KEY_PREFIX = 'avz';
     protected $connection = 'ecloud';
-    protected $table = 'gateways';
+    protected $table = 'availability_zones';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name'];
-    protected $visible = ['id', 'name', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'code', 'name', 'site_id'];
+    protected $visible = ['id', 'code', 'name', 'site_id', 'created_at', 'updated_at'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -42,7 +42,9 @@ class Gateways extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('code', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('site_id', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -57,7 +59,9 @@ class Gateways extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('code'),
             $factory->create('name'),
+            $factory->create('site_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -70,7 +74,7 @@ class Gateways extends Model implements Filterable, Sortable
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('name', 'asc'),
+            $factory->create('code', 'asc'),
         ];
     }
 
@@ -81,7 +85,9 @@ class Gateways extends Model implements Filterable, Sortable
     {
         return [
             'id'         => 'id',
+            'code'       => 'code',
             'name'       => 'name',
+            'site_id'    => 'site_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
@@ -95,23 +101,27 @@ class Gateways extends Model implements Filterable, Sortable
     {
         return [
             IdProperty::create('id', 'id', null, 'uuid'),
+            StringProperty::create('code', 'code'),
             StringProperty::create('name', 'name'),
+            IntProperty::create('site_id', 'site_id'),
             DateTimeProperty::create('created_at', 'created_at'),
             DateTimeProperty::create('updated_at', 'updated_at')
         ];
     }
 
     /**
-     * Many to Many with Routers table
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function routers()
     {
-        return $this->belongsToMany(
-            Routers::class,
-            'router_gateways',
-            'gateways_id',
-            'router_id'
-        );
+        return $this->belongsToMany(Router::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function vpns()
+    {
+        return $this->hasOne(Vpn::class, 'id', 'availability_zone_id');
     }
 }

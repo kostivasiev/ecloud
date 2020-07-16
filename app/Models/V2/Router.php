@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -15,17 +16,18 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class VirtualPrivateClouds
+ * Class Routers
  * @package App\Models\V2
- * @method static findOrFail(string $vdcUuid)
+ * @method static find(string $routerId)
+ * @method static findOrFail(string $routerUuid)
  */
-class VirtualPrivateClouds extends Model implements Filterable, Sortable
+class Router extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'vpc';
+    public const KEY_PREFIX = 'rtr';
     protected $connection = 'ecloud';
-    protected $table = 'virtual_private_clouds';
+    protected $table = 'routers';
     protected $primaryKey = 'id';
     protected $fillable = ['id', 'name'];
     protected $visible = ['id', 'name', 'created_at', 'updated_at'];
@@ -65,7 +67,6 @@ class VirtualPrivateClouds extends Model implements Filterable, Sortable
     /**
      * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -102,10 +103,27 @@ class VirtualPrivateClouds extends Model implements Filterable, Sortable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Many to Many with Gateways table
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function dhcps()
+    public function gateways()
     {
-        return $this->belongsTo(Dhcps::class, 'id', 'vpc_id');
+        return $this->belongsToMany(Gateway::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function availabilityZones()
+    {
+        return $this->belongsToMany(AvailabilityZone::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function vpns()
+    {
+        return $this->hasOne(Vpn::class, 'id', 'router_id');
     }
 }
