@@ -87,20 +87,6 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
-     */
-    public function properties()
-    {
-        return [
-            IdProperty::create('id', 'id', null, 'uuid'),
-            IdProperty::create('network_id', 'network_id', null, 'uuid'),
-            DateTimeProperty::create('created_at', 'created_at'),
-            DateTimeProperty::create('updated_at', 'updated_at')
-        ];
-    }
-
-    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function network()
