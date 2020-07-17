@@ -103,4 +103,13 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('gateways/{gatewayUuid}', 'GatewayController@update');
         $router->delete('gateways/{gatewayUuid}', 'GatewayController@destroy');
     });
+
+    /** Instances */
+    $router->group([], function () use ($router) {
+        $router->get('instances', 'InstanceController@index');
+        $router->get('instances/{instanceId}', 'InstanceController@show');
+        $router->post('instances', 'InstanceController@store');
+        $router->patch('instances/{instanceId}', 'InstanceController@update');
+        $router->delete('instances/{instanceId}', 'InstanceController@destroy');
+    });
 });
