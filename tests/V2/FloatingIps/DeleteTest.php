@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\V2\Instances;
+namespace Tests\V2\FloatingIps;
 
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
+use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -18,18 +17,13 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class, 1)->create([
-            'name' => 'Manchester Network',
-        ])->first();
-        $this->instance = factory(Instance::class, 1)->create([
-            'network_id' => $this->network->getKey(),
-        ])->first();
+        $this->floatingIp = factory(FloatingIp::class, 1)->create()->first();
     }
 
     public function testNoPermsIsDenied()
     {
         $this->delete(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->getKey(),
             [],
             []
         )
@@ -44,7 +38,7 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/instances/' . $this->faker->uuid,
+            '/v2/floating-ips/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -53,7 +47,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Instance with that ID was found',
+                'detail' => 'No Floating Ip with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -62,7 +56,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -70,7 +64,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $instance = Instance::withTrashed()->findOrFail($this->instance->getKey());
-        $this->assertNotNull($instance->deleted_at);
+        $resource = FloatingIp::withTrashed()->findOrFail($this->floatingIp->getKey());
+        $this->assertNotNull($resource->deleted_at);
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\V2\Instances;
+namespace Tests\V2\FloatingIps;
 
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
+use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -18,18 +17,13 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class, 1)->create([
-            'name'    => 'Manchester Network',
-        ])->first();
-        $this->instance = factory(Instance::class, 1)->create([
-            'network_id'    => $this->network->getKey(),
-        ])->first();
+        $this->floatingIp = factory(FloatingIp::class, 1)->create()->first();
     }
 
     public function testNoPermsIsDenied()
     {
         $this->get(
-            '/v2/instances',
+            '/v2/floating-ips',
             []
         )
             ->seeJson([
@@ -43,15 +37,14 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/instances',
+            '/v2/floating-ips',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->instance->getKey(),
-                'network_id' => $this->instance->network_id,
+                'id' => $this->floatingIp->getKey()
             ])
             ->assertResponseStatus(200);
     }
@@ -59,17 +52,15 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->instance->getKey(),
-                'network_id' => $this->instance->network_id,
+                'id' => $this->floatingIp->getKey()
             ])
             ->assertResponseStatus(200);
     }
-
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\Instances;
+namespace Tests\V2\FloatingIps;
 
-use App\Models\V2\Network;
+use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,18 +17,14 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class, 1)->create([
-            'name'    => 'Manchester Network',
-        ])->first();
+        $this->floatingIp = factory(FloatingIp::class, 1)->create()->first();
     }
 
     public function testNoPermsIsDenied()
     {
-        $data = [
-            'network_id'    => $this->network->getKey(),
-        ];
+        $data = [];
         $this->post(
-            '/v2/instances',
+            '/v2/floating-ips',
             $data,
             []
         )
@@ -40,35 +36,11 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsFailed()
-    {
-        $data = [
-            'network_id'    => '',
-        ];
-        $this->post(
-            '/v2/instances',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The network id field is required',
-                'status' => 422,
-                'source' => 'network_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testValidDataSucceeds()
     {
-        $data = [
-            'network_id'    => $this->network->getKey(),
-        ];
+        $data = [];
         $this->post(
-            '/v2/instances',
+            '/v2/floating-ips',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

@@ -3,7 +3,7 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
-use App\Models\V2\Networks;
+use App\Models\V2\Network;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -18,7 +18,7 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Networks::class, 1)->create([
+        $this->network = factory(Network::class, 1)->create([
             'name' => 'Manchester Network',
         ])->first();
         $this->instance = factory(Instance::class, 1)->create([
@@ -95,7 +95,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $network = factory(Networks::class, 1)->create([
+        $network = factory(Network::class, 1)->create([
             'name' => 'Manchester Network',
         ])->first();
 
