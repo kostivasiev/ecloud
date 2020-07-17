@@ -2,10 +2,10 @@
 
 namespace Tests\V2;
 
-use App\Models\V2\AvailabilityZones;
-use App\Models\V2\Gateways;
-use App\Models\V2\Routers;
-use App\Models\V2\VirtualPrivateClouds;
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Gateway;
+use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -39,7 +39,7 @@ class NewIDTest extends TestCase
         )
             ->assertResponseStatus(201);
         $this->assertRegExp(
-            $this->generateRegExp(AvailabilityZones::class),
+            $this->generateRegExp(AvailabilityZone::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -59,7 +59,7 @@ class NewIDTest extends TestCase
         )
             ->assertResponseStatus(201);
         $this->assertRegExp(
-            $this->generateRegExp(Gateways::class),
+            $this->generateRegExp(Gateway::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -79,7 +79,7 @@ class NewIDTest extends TestCase
         )
             ->assertResponseStatus(201);
         $this->assertRegExp(
-            $this->generateRegExp(Routers::class),
+            $this->generateRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -99,15 +99,15 @@ class NewIDTest extends TestCase
         )
             ->assertResponseStatus(201);
         $this->assertRegExp(
-            $this->generateRegExp(VirtualPrivateClouds::class),
+            $this->generateRegExp(Vpc::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
 
     public function testAvailabilityZonesRouterAssociation()
     {
-        $availabilityZones = (factory(AvailabilityZones::class, 1)->create()->first())->refresh();
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
+        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
             [],
@@ -125,19 +125,19 @@ class NewIDTest extends TestCase
 
         // Test IDs
         $this->assertRegExp(
-            $this->generateRegExp(AvailabilityZones::class),
+            $this->generateRegExp(AvailabilityZone::class),
             $availabilityZones->id
         );
         $this->assertRegExp(
-            $this->generateRegExp(Routers::class),
+            $this->generateRegExp(Router::class),
             $router->id
         );
     }
 
     public function testAvailabilityZonesRouterDisassociation()
     {
-        $availabilityZones = (factory(AvailabilityZones::class, 1)->create()->first())->refresh();
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
+        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
         $availabilityZones->routers()->attach($router->getKey());
         $this->delete(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
@@ -153,19 +153,19 @@ class NewIDTest extends TestCase
 
         // Test IDs
         $this->assertRegExp(
-            $this->generateRegExp(AvailabilityZones::class),
+            $this->generateRegExp(AvailabilityZone::class),
             $availabilityZones->id
         );
         $this->assertRegExp(
-            $this->generateRegExp(Routers::class),
+            $this->generateRegExp(Router::class),
             $router->id
         );
     }
 
     public function testRoutersGatewaysAssociation()
     {
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateways::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
         $this->put(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
             [],
@@ -183,19 +183,19 @@ class NewIDTest extends TestCase
 
         // Test IDs
         $this->assertRegExp(
-            $this->generateRegExp(Routers::class),
+            $this->generateRegExp(Router::class),
             $router->id
         );
         $this->assertRegExp(
-            $this->generateRegExp(Gateways::class),
+            $this->generateRegExp(Gateway::class),
             $gateway->id
         );
     }
 
     public function testRoutersGatewaysDisassociation()
     {
-        $router = (factory(Routers::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateways::class, 1)->create()->first())->refresh();
+        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
         $router->gateways()->attach($gateway->id);
         $this->delete(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
@@ -211,11 +211,11 @@ class NewIDTest extends TestCase
 
         // Test IDs
         $this->assertRegExp(
-            $this->generateRegExp(Routers::class),
+            $this->generateRegExp(Router::class),
             $router->id
         );
         $this->assertRegExp(
-            $this->generateRegExp(Gateways::class),
+            $this->generateRegExp(Gateway::class),
             $gateway->id
         );
     }

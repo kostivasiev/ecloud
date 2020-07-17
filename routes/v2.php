@@ -19,89 +19,98 @@ $baseRouteParameters = [
 $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        $router->get('availability-zones', 'AvailabilityZonesController@index');
-        $router->get('availability-zones/{zoneId}', 'AvailabilityZonesController@show');
-        $router->post('availability-zones', 'AvailabilityZonesController@create');
-        $router->patch('availability-zones/{zoneId}', 'AvailabilityZonesController@update');
-        $router->delete('availability-zones/{zoneId}', 'AvailabilityZonesController@destroy');
+        $router->get('availability-zones', 'AvailabilityZoneController@index');
+        $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
+        $router->post('availability-zones', 'AvailabilityZoneController@create');
+        $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
+        $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
 
         /** Availability Zones Routers */
         $router->group([], function () use ($router) {
             $router->put(
                 'availability-zones/{zoneId}/routers/{routerUuid}',
-                'AvailabilityZonesController@routersCreate'
+                'AvailabilityZoneController@routersCreate'
             );
             $router->delete(
                 'availability-zones/{zoneId}/routers/{routerUuid}',
-                'AvailabilityZonesController@routersDestroy'
+                'AvailabilityZoneController@routersDestroy'
             );
         });
     });
 
     /** Virtual Data Centres */
     $router->group([], function () use ($router) {
-        $router->get('vpcs', 'VirtualPrivateCloudsController@index');
-        $router->get('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@show');
-        $router->post('vpcs', 'VirtualPrivateCloudsController@create');
-        $router->patch('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@update');
-        $router->delete('vpcs/{vdcUuid}', 'VirtualPrivateCloudsController@destroy');
+        $router->get('vpcs', 'VpcController@index');
+        $router->get('vpcs/{vdcUuid}', 'VpcController@show');
+        $router->post('vpcs', 'VpcController@create');
+        $router->patch('vpcs/{vdcUuid}', 'VpcController@update');
+        $router->delete('vpcs/{vdcUuid}', 'VpcController@destroy');
     });
 
     /** Dhcps */
     $router->group([], function () use ($router) {
-        $router->get('dhcps', 'DhcpsController@index');
-        $router->get('dhcps/{dhcpId}', 'DhcpsController@show');
-        $router->post('dhcps', 'DhcpsController@create');
-        $router->patch('dhcps/{dhcpId}', 'DhcpsController@update');
-        $router->delete('dhcps/{dhcpId}', 'DhcpsController@destroy');
+        $router->get('dhcps', 'DhcpController@index');
+        $router->get('dhcps/{dhcpId}', 'DhcpController@show');
+        $router->post('dhcps', 'DhcpController@create');
+        $router->patch('dhcps/{dhcpId}', 'DhcpController@update');
+        $router->delete('dhcps/{dhcpId}', 'DhcpController@destroy');
     });
 
     /** Networks */
     $router->group([], function () use ($router) {
-        $router->get('networks', 'NetworksController@index');
-        $router->get('networks/{networkId}', 'NetworksController@show');
-        $router->post('networks', 'NetworksController@create');
-        $router->patch('networks/{networkId}', 'NetworksController@update');
-        $router->delete('networks/{networkId}', 'NetworksController@destroy');
+        $router->get('networks', 'NetworkController@index');
+        $router->get('networks/{networkId}', 'NetworkController@show');
+        $router->post('networks', 'NetworkController@create');
+        $router->patch('networks/{networkId}', 'NetworkController@update');
+        $router->delete('networks/{networkId}', 'NetworkController@destroy');
     });
 
     /** Vpns */
     $router->group([], function () use ($router) {
-        $router->get('vpns', 'VpnsController@index');
-        $router->get('vpns/{vpnId}', 'VpnsController@show');
-        $router->post('vpns', 'VpnsController@create');
-        $router->patch('vpns/{vpnId}', 'VpnsController@update');
-        $router->delete('vpns/{vpnId}', 'VpnsController@destroy');
+        $router->get('vpns', 'VpnController@index');
+        $router->get('vpns/{vpnId}', 'VpnController@show');
+        $router->post('vpns', 'VpnController@create');
+        $router->patch('vpns/{vpnId}', 'VpnController@update');
+        $router->delete('vpns/{vpnId}', 'VpnController@destroy');
     });
 
     /** Routers */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        $router->get('routers', 'RoutersController@index');
-        $router->get('routers/{routerUuid}', 'RoutersController@show');
-        $router->post('routers', 'RoutersController@create');
-        $router->patch('routers/{routerUuid}', 'RoutersController@update');
-        $router->delete('routers/{routerUuid}', 'RoutersController@destroy');
+        $router->get('routers', 'RouterController@index');
+        $router->get('routers/{routerUuid}', 'RouterController@show');
+        $router->post('routers', 'RouterController@create');
+        $router->patch('routers/{routerUuid}', 'RouterController@update');
+        $router->delete('routers/{routerUuid}', 'RouterController@destroy');
 
         /** Routers Gateways */
         $router->group([], function () use ($router) {
             $router->put(
                 'routers/{routerUuid}/gateways/{gatewaysUuid}',
-                'RoutersController@gatewaysCreate'
+                'RouterController@gatewaysCreate'
             );
             $router->delete(
                 'routers/{routerUuid}/gateways/{gatewaysUuid}',
-                'RoutersController@gatewaysDestroy'
+                'RouterController@gatewaysDestroy'
             );
         });
     });
 
     /** Gateways */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        $router->get('gateways', 'GatewaysController@index');
-        $router->get('gateways/{gatewayUuid}', 'GatewaysController@show');
-        $router->post('gateways', 'GatewaysController@create');
-        $router->patch('gateways/{gatewayUuid}', 'GatewaysController@update');
-        $router->delete('gateways/{gatewayUuid}', 'GatewaysController@destroy');
+        $router->get('gateways', 'GatewayController@index');
+        $router->get('gateways/{gatewayUuid}', 'GatewayController@show');
+        $router->post('gateways', 'GatewayController@create');
+        $router->patch('gateways/{gatewayUuid}', 'GatewayController@update');
+        $router->delete('gateways/{gatewayUuid}', 'GatewayController@destroy');
+    });
+
+    /** Instances */
+    $router->group([], function () use ($router) {
+        $router->get('instances', 'InstanceController@index');
+        $router->get('instances/{instanceId}', 'InstanceController@show');
+        $router->post('instances', 'InstanceController@store');
+        $router->patch('instances/{instanceId}', 'InstanceController@update');
+        $router->delete('instances/{instanceId}', 'InstanceController@destroy');
     });
 
     $router->group([], function () use ($router) {
