@@ -3,7 +3,7 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
-use App\Models\V2\Networks;
+use App\Models\V2\Network;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -18,7 +18,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Networks::class, 1)->create([
+        $this->network = factory(Network::class, 1)->create([
             'name'    => 'Manchester Network',
         ])->first();
         $this->instance = factory(Instance::class, 1)->create([
