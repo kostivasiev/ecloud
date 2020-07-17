@@ -18,6 +18,9 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
         $this->floatingIp = factory(FloatingIp::class, 1)->create()->first();
+        exit(print_r(
+            $this->floatingIp
+        ));
     }
 
     public function testNoPermsIsDenied()

@@ -82,17 +82,4 @@ class FloatingIp extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
-
-    /**
-     * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
-     */
-    public function properties()
-    {
-        return [
-            IdProperty::create('id', 'id', null, 'uuid'),
-            DateTimeProperty::create('created_at', 'created_at'),
-            DateTimeProperty::create('updated_at', 'updated_at')
-        ];
-    }
 }
