@@ -27,6 +27,7 @@ $app->configure('logging');
 $app->configure('mail');
 $app->configure('gpu');
 $app->configure('encryption');
+$app->configure('nsx');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -111,6 +112,9 @@ $app->register(App\Providers\ArtisanServiceProvider::class);
 $app->register(App\Providers\NetworkingServiceProvider::class);
 $app->register(App\Providers\AccountsServiceProvider::class);
 $app->register(App\Providers\BillingServiceProvider::class);
+
+// NSX service provider
+$app->register(App\Providers\NsxServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
