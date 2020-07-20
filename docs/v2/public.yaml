@@ -156,6 +156,30 @@ components:
           readOnly: false
       description: 'Floating IP addresses'
       required: {  }
+    FirewallRules:
+      properties:
+        id:
+          type: string
+          example: fwr-2b66bb79
+          readOnly: false
+        name:
+          type: string
+          example: 'Internal FW Rule'
+          readOnly: false
+        created_at:
+          type: string
+          example: '2020-07-07T10:30:00+01:00'
+          readOnly: false
+        updated_at:
+          type: string
+          example: '2020-07-07T10:30:00+01:00'
+          readOnly: false
+        deleted_at:
+          type: string
+          example: '2020-07-07T10:30:00+01:00'
+          readOnly: false
+      description: 'FirewallRules'
+      required: {  }
 paths:
   '/ecloud/v2/vpcs':
     get:
@@ -1217,3 +1241,180 @@ paths:
             schema:
               type: string
             example: fip-cd226940
+
+
+  '/ecloud/v2/firewall-rules':
+    get:
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FirewallRules'
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 30
+                          count:
+                            type: integer
+                            example: 10
+                          per_page:
+                            type: integer
+                            example: 10
+                          current_page:
+                            type: integer
+                            example: 2
+                          total_pages:
+                            type: integer
+                            example: 3
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=1'
+                              previous:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=1'
+                              next:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=2'
+                              last:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=2'
+      tags:
+        - FirewallRules
+      parameters:
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 'Number of items to display per page'
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 'Page number to jump to'
+
+    post:
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: fwr-2b66bb79
+                  meta:
+                    type: object
+                    properties:
+                      location:
+                        type: string
+                        example: 'https://api.ukfast.io/ecloud/v2/firewall-rules/fwr-2b66bb79'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirewallRules'
+      tags:
+        - FirewallRules
+      parameters: {  }
+  '/ecloud/v2/firewall-rules/{firewallRuleId}':
+    get:
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/FirewallRules'
+                  meta:
+                    type: object
+      tags:
+        - FirewallRules
+      parameters:
+        -
+          name: firewallRuleId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: fwr-2b66bb79
+    patch:
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id: string
+                      example: fwr-2b66bb79
+                  meta:
+                    type: object
+                    properties:
+                      location:
+                        type: string
+                        example: 'https://api.ukfast.io/ecloud/v2/firewall-rules/fwr-2b66bb79'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirewallRules'
+      tags:
+        - FirewallRules
+      parameters:
+        -
+          name: firewallRuleId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: fwr-2b66bb79
+    delete:
+      responses:
+        204:
+          description: Success
+      tags:
+        - FirewallRules
+      parameters:
+        -
+          name: firewallRuleId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: fwr-2b66bb79
