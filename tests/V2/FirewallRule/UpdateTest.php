@@ -21,7 +21,7 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsFailed()
     {
-        $fwr = $this->getFirewallRule();
+        $fwr = factory(FirewallRule::class, 1)->create()->first();;
         $data = [
             'name' => '',
         ];
@@ -44,7 +44,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $fwr = $this->getFirewallRule();
+        $fwr = factory(FirewallRule::class, 1)->create()->first();;
         $data = [
             'name' => 'Demo firewall rule 1',
         ];
@@ -62,22 +62,6 @@ class UpdateTest extends TestCase
         $this->seeJson([
             'id' => $availabilityZoneId,
         ]);
-    }
-
-    /**
-     * @return \App\Models\V2\FirewallRule
-     */
-    public function getFirewallRule(): FirewallRule
-    {
-        return factory(FirewallRule::class, 1)->create()->first();
-    }
-
-    public function debug()
-    {
-        dd(
-            $this->response->getStatusCode(),
-            json_decode($this->response->getContent(), true)
-        );
     }
 
 }
