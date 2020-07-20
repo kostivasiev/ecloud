@@ -151,7 +151,7 @@ class EventServiceProvider extends ServiceProvider
 //            'App\Listeners\V2\ListenerClass',
 //        ],
 
-        'App\Events\V2\Routers\AfterCreateEvent' => [
+        'App\Events\V2\Router\AfterCreateEvent' => [
             'App\Listeners\V2\Federation\CreateRouterListener',
         ],
     ];

@@ -3,7 +3,7 @@
 namespace App\Listeners\V2\Federation;
 
 use App\Services\NsxService;
-use App\Events\V2\Routers\AfterCreateEvent;
+use App\Events\V2\Router\AfterCreateEvent;
 use Elastica\Response;
 use Illuminate\Queue\InteractsWithQueue;
 
