@@ -21,7 +21,7 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsFailed()
     {
-        $fwr = factory(FirewallRule::class, 1)->create()->first();;
+        $fwr = factory(FirewallRule::class, 1)->create()->first();
         $data = [
             'name' => '',
         ];
@@ -44,7 +44,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $fwr = factory(FirewallRule::class, 1)->create()->first();;
+        $fwr = factory(FirewallRule::class, 1)->create()->first();
         $data = [
             'name' => 'Demo firewall rule 1',
         ];
