@@ -16,6 +16,8 @@ class CreateNetworksTable extends Migration
         Schema::connection('ecloud')->create('networks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->uuid('router_id');
+            $table->uuid('availability_zone_id');
             $table->timestamps();
             $table->softDeletes();
         });

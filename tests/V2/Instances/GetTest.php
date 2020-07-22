@@ -71,5 +71,4 @@ class GetTest extends TestCase
             ])
             ->assertResponseStatus(200);
     }
-
 }
