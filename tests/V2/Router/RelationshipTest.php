@@ -32,7 +32,6 @@ class RelationshipTest extends TestCase
             'vpc_id' => $this->vpc->getKey()
         ])->first();
 
-
         $this->gateway = factory(Gateway::class, 1)->create([
             'name'       => 'Manchester Gateway 1',
         ])->first();

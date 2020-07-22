@@ -91,10 +91,6 @@ class Instance extends Model implements Filterable, Sortable
      */
     public function network()
     {
-        return $this->belongsTo(
-            Network::class,
-            'network_id',
-            'id'
-        );
+        return $this->belongsTo(Network::class);
     }
 }
