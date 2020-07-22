@@ -120,10 +120,18 @@ class Router extends Model implements Filterable, Sortable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function vpns()
     {
-        return $this->hasOne(Vpn::class, 'id', 'router_id');
+        return $this->hasMany(Vpn::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
     }
 }

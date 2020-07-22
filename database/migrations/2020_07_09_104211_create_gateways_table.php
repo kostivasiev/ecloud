@@ -15,6 +15,7 @@ class CreateGatewaysTable extends Migration
     {
         Schema::connection('ecloud')->create('gateways', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('availability_zone_id');
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();

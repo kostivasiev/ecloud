@@ -109,4 +109,12 @@ class Gateway extends Model implements Filterable, Sortable
     {
         return $this->belongsToMany(Router::class);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
 }
