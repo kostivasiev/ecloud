@@ -11,9 +11,11 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 |
 */
 
+// api docs
+$router->get('{apiVersion}/docs.yaml', function ($apiVersion) {
+    return \Illuminate\Support\Facades\File::get(base_path() . '/docs/'.$apiVersion.'/public-openapi.yaml');
+});
+
+// api endpoints
 require('v1.php');
 require('v2.php');
-
-$router->get('docs/{apiVersion}.yaml', function ($apiVersion) {
-    return \Illuminate\Support\Facades\File::get(base_path() . '/docs/'.$apiVersion.'/public.yaml');
-});
