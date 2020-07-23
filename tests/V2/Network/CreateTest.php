@@ -2,13 +2,15 @@
 
 namespace Tests\V2\Network;
 
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class CreateTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     protected $faker;
@@ -17,6 +19,18 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+
+        $this->vpc = factory(Vpc::class, 1)->create([
+            'name'    => 'Manchester DC',
+        ])->first();
+
+        $this->router = factory(Router::class, 1)->create([
+            'name'       => 'Manchester Router 1',
+            'vpc_id' => $this->vpc->getKey()
+        ])->first();
+
+        $this->availabilityZone = factory(AvailabilityZone::class, 1)->create([
+        ])->first();
     }
 
     public function testNoPermsIsDenied()
@@ -59,11 +73,14 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testValidDataSucceeds()
+    public function testInvalidRouterIdIsFailed()
     {
         $data = [
             'name'    => 'Manchester Network',
+            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'router_id' => $this->faker->uuid()
         ];
+
         $this->post(
             '/v2/networks',
             $data,
@@ -72,12 +89,55 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(201);
-
-        $networkId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $networkId,
-        ]);
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
+            ])
+            ->assertResponseStatus(422);
     }
 
+    public function testInvalidAvailabilityZoneIdIsFailed()
+    {
+        $data = [
+            'name'    => 'Manchester Network',
+            'availability_zone_id' => $this->faker->uuid(),
+            'router_id' => $this->router->getKey()
+        ];
+
+        $this->post(
+            '/v2/networks',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified availability zone id was not found',
+                'status' => 422,
+                'source' => 'availability_zone_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testValidDataSucceeds()
+    {
+        $data = [
+            'name'    => 'Manchester Network',
+            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'router_id' => $this->router->getKey()
+        ];
+
+        $this->post(
+            '/v2/networks',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(201);
+    }
 }

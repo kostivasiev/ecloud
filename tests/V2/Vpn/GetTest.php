@@ -4,6 +4,7 @@ namespace Tests\V2\Vpn;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -19,6 +20,9 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->vpc = factory(Vpc::class, 1)->create([
+            'name'    => 'Manchester DC',
+        ])->first();
     }
 
     public function testNoPermsIsDenied()
@@ -104,7 +108,9 @@ class GetTest extends TestCase
      */
     public function createRouters(): Router
     {
-        $router = factory(Router::class, 1)->create()->first();
+        $router = factory(Router::class, 1)->create([
+            'vpc_id' => $this->vpc->getKey()
+        ])->first();
         $router->save();
         $router->refresh();
         return $router;

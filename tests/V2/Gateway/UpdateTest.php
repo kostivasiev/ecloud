@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Gateway;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Gateway;
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -17,16 +18,19 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->availabilityZone = factory(AvailabilityZone::class, 1)->create([
+        ])->first();
     }
 
     public function testNonAdminIsDenied()
     {
-        $zone = $this->createGateway();
+        $gateway = $this->createGateway();
         $data = [
             'name' => 'Manchester Gateway 2',
+            'availability_zone_id'    => $this->availabilityZone->getKey()
         ];
         $this->patch(
-            '/v2/gateways/' . $zone->getKey(),
+            '/v2/gateways/' . $gateway->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '1-1',
@@ -43,12 +47,13 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $zone = $this->createGateway();
+        $gateway = $this->createGateway();
         $data = [
             'name' => '',
+            'availability_zone_id'    => $this->availabilityZone->getKey()
         ];
         $this->patch(
-            '/v2/gateways/' . $zone->getKey(),
+            '/v2/gateways/' . $gateway->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -64,14 +69,40 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testInvalidAvailabilityZoneIdIsFailed()
+    {
+        $gateway = $this->createGateway();
+        $data = [
+            'name'    => 'Manchester Gateway 1',
+            'availability_zone_id'    => $this->faker->uuid()
+        ];
+
+        $this->patch(
+            '/v2/gateways/' . $gateway->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified availability zone id was not found',
+                'status' => 422,
+                'source' => 'availability_zone_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataIsSuccessful()
     {
-        $zone = $this->createGateway();
+        $gateway = $this->createGateway();
         $data = [
             'name' => 'Manchester Gateway 2',
+            'availability_zone_id'    => $this->availabilityZone->getKey()
         ];
         $this->patch(
-            '/v2/gateways/' . $zone->getKey(),
+            '/v2/gateways/' . $gateway->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -80,7 +111,7 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $gatewayItem = Gateway::findOrFail($zone->getKey());
+        $gatewayItem = Gateway::findOrFail($gateway->getKey());
         $this->assertEquals($data['name'], $gatewayItem->name);
     }
 
@@ -90,7 +121,9 @@ class UpdateTest extends TestCase
      */
     public function createGateway(): Gateway
     {
-        $gateway = factory(Gateway::class, 1)->create()->first();
+        $gateway = factory(Gateway::class, 1)->create([
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ])->first();
         $gateway->save();
         $gateway->refresh();
         return $gateway;

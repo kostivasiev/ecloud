@@ -46,8 +46,10 @@ class NewIDTest extends TestCase
 
     public function testFormatOfGatewaysId()
     {
+        $availabilityZone = factory(AvailabilityZone::class, 1)->create()->first();
         $data = [
             'name'    => 'Manchester Gateway 1',
+            'availability_zone_id' => $availabilityZone->getKey()
         ];
         $this->post(
             '/v2/gateways',
@@ -66,8 +68,13 @@ class NewIDTest extends TestCase
 
     public function testFormatOfRoutersId()
     {
+        $vpc = factory(Vpc::class, 1)->create([
+            'name'    => 'Manchester DC',
+        ])->first();
+
         $data = [
             'name'    => 'Manchester Router 1',
+            'vpc_id' => $vpc->getKey()
         ];
         $this->post(
             '/v2/routers',
@@ -121,7 +128,7 @@ class NewIDTest extends TestCase
         // test that the association has occurred
         $router->refresh();
         $associated = $availabilityZones->routers()->first();
-        $this->assertEquals($associated->toArray(), $router->toArray());
+        $this->assertEquals($associated->getKey(), $router->getKey());
 
         // Test IDs
         $this->assertRegExp(
@@ -179,7 +186,7 @@ class NewIDTest extends TestCase
         // test that the association has occurred
         $router->refresh();
         $associated = $router->gateways()->first();
-        $this->assertEquals($associated->toArray(), $gateway->toArray());
+        $this->assertEquals($associated->getKey(), $gateway->getKey());
 
         // Test IDs
         $this->assertRegExp(

@@ -12,6 +12,7 @@ use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Models\V2\Gateway;
 use App\Models\V2\Router;
+use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -28,32 +29,26 @@ class RouterController extends BaseController
      */
     public function index(Request $request)
     {
-        $collectionQuery = Router::query();
+        $collection = Router::query();
 
         (new QueryTransformer($request))
             ->config(Router::class)
-            ->transform($collectionQuery);
+            ->transform($collection);
 
-        $routers = $collectionQuery->paginate($this->perPage);
-
-        return $this->respondCollection(
-            $request,
-            $routers,
-            200
-        );
+        return RouterResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
      * @param \Illuminate\Http\Request $request
      * @param string $routerUuid
-     * @return \Illuminate\Http\Response
+     * @return RouterResource
      */
     public function show(Request $request, string $routerUuid)
     {
-        return $this->respondItem(
-            $request,
-            Router::findOrFail($routerUuid),
-            200
+        return new RouterResource(
+            Router::findOrFail($routerUuid)
         );
     }
 
@@ -64,7 +59,7 @@ class RouterController extends BaseController
     public function create(CreateRouterRequest $request)
     {
         event(new BeforeCreateEvent());
-        $router = new Router($request->only(['name']));
+        $router = new Router($request->only(['name', 'vpc_id']));
         $router->save();
         $router->refresh();
         event(new AfterCreateEvent());
@@ -80,7 +75,7 @@ class RouterController extends BaseController
     {
         event(new BeforeUpdateEvent());
         $router = Router::findOrFail($routerUuid);
-        $router->fill($request->only(['name']));
+        $router->fill($request->only(['name', 'vpc_id']));
         $router->save();
         event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $router->getKey(), 200);
