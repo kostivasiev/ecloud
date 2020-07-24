@@ -25,7 +25,8 @@ class CreateAvailabilityZoneRequest extends FormRequest
         return [
             'code'    => 'required|string',
             'name'    => 'required|string',
-            'site_id' => 'required|integer',
+            'datacentre_site_id' => 'required|integer',
+            'is_public' => 'sometimes|required|boolean',
         ];
     }
 
@@ -34,7 +35,7 @@ class CreateAvailabilityZoneRequest extends FormRequest
         return [
             'code.required' => 'The :attribute field is required',
             'name.required' => 'The :attribute field is required',
-            'site_id.required' => 'The :attribute field is required',
+            'datacentre_site_id.required' => 'The :attribute field is required',
         ];
     }
 }
