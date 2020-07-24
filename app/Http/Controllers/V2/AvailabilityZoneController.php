@@ -60,7 +60,7 @@ class AvailabilityZoneController extends BaseController
     {
         event(new BeforeCreateEvent());
         $availabilityZone = new AvailabilityZone($request->only([
-            'code', 'name', 'site_id',
+            'code', 'name', 'datacentre_site_id', 'is_public',
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
@@ -78,7 +78,7 @@ class AvailabilityZoneController extends BaseController
         event(new BeforeUpdateEvent());
         $availabilityZone = AvailabilityZone::findOrFail($zoneId);
         $availabilityZone->fill($request->only([
-            'code', 'name', 'site_id',
+            'code', 'name', 'datacentre_site_id', 'is_public'
         ]));
         $availabilityZone->save();
         event(new AfterUpdateEvent());

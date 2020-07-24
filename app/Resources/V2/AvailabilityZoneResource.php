@@ -22,11 +22,11 @@ class AvailabilityZoneResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id'         => $this->id,
             'code'       => $this->code,
             'name'       => $this->name,
-            'site_id'    => (int) $this->site_id,
+            'datacentre_site_id'    => (int) $this->datacentre_site_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
@@ -36,5 +36,11 @@ class AvailabilityZoneResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if ($request->user->isAdministrator) {
+            $data['is_public'] = (boolean) $this->is_public;
+        }
+
+        return $data;
     }
 }

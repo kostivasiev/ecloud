@@ -10,6 +10,6 @@ $factory->define(AvailabilityZone::class, function (Faker $faker) {
         'id'      => AvailabilityZone::generateId(new AvailabilityZone()),
         'code'    => 'LON1',
         'name'    => 'London Zone 1',
-        'site_id' => 1,
+        'datacentre_site_id' => 1,
     ];
 });
