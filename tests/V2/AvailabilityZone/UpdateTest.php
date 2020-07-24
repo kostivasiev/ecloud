@@ -25,7 +25,7 @@ class UpdateTest extends TestCase
         $data = [
             'code'    => 'MAN2',
             'name'    => 'Manchester Zone 2',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->patch(
             '/v2/availability-zones/' . $zone->getKey(),
@@ -49,7 +49,7 @@ class UpdateTest extends TestCase
         $data = [
             'code'    => '',
             'name'    => 'Manchester Zone 2',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->patch(
             '/v2/availability-zones/' . $zone->getKey(),
@@ -74,7 +74,7 @@ class UpdateTest extends TestCase
         $data = [
             'code'    => 'MAN2',
             'name'    => '',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->patch(
             '/v2/availability-zones/' . $zone->getKey(),
@@ -99,7 +99,7 @@ class UpdateTest extends TestCase
         $data = [
             'code'    => 'MAN2',
             'name'    => 'Manchester Zone 2',
-            'site_id' => '',
+            'datacentre_site_id' => '',
         ];
         $this->patch(
             '/v2/availability-zones/' . $zone->getKey(),
@@ -111,9 +111,9 @@ class UpdateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The site id field, when specified, cannot be null',
+                'detail' => 'The datacentre site id field, when specified, cannot be null',
                 'status' => 422,
-                'source' => 'site_id'
+                'source' => 'datacentre_site_id'
             ])
             ->assertResponseStatus(422);
     }
@@ -124,7 +124,7 @@ class UpdateTest extends TestCase
         $data = [
             'code'    => 'MAN2',
             'name'    => 'Manchester Zone 2',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->patch(
             '/v2/availability-zones/' . $zone->getKey(),
@@ -139,7 +139,7 @@ class UpdateTest extends TestCase
         $availabilityZone = AvailabilityZone::findOrFail($zone->getKey());
         $this->assertEquals($data['code'], $availabilityZone->code);
         $this->assertEquals($data['name'], $availabilityZone->name);
-        $this->assertEquals($data['site_id'], $availabilityZone->site_id);
+        $this->assertEquals($data['datacentre_site_id'], $availabilityZone->datacentre_site_id);
     }
 
     /**

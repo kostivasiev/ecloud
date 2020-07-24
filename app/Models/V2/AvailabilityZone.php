@@ -88,7 +88,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'id'         => 'id',
             'code'       => 'code',
             'name'       => 'name',
-            'site_id'    => 'datacentre_site_id',
+            'datacentre_site_id'    => 'datacentre_site_id',
             'is_public'    => 'is_public',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

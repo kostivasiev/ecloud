@@ -35,7 +35,7 @@ class UpdateAvailabilityZoneRequest extends FormRequest
         return [
             'code.required' => 'The :attribute field, when specified, cannot be null',
             'name.required' => 'The :attribute field, when specified, cannot be null',
-            'site_id.required' => 'The :attribute field, when specified, cannot be null',
+            'datacentre_site_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }

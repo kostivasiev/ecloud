@@ -27,7 +27,7 @@ class NewIDTest extends TestCase
         $data = [
             'code'    => 'MAN1',
             'name'    => 'Manchester Zone 1',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->post(
             '/v2/availability-zones',
