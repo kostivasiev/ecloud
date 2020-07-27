@@ -26,7 +26,7 @@ class AvailabilityZoneResource extends UKFastResource
             'id'         => $this->id,
             'code'       => $this->code,
             'name'       => $this->name,
-            'datacentre_site_id'    => (int) $this->datacentre_site_id,
+            'datacentre_site_id' => $this->datacentre_site_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
