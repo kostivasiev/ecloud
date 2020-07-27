@@ -38,7 +38,7 @@ class AvailabilityZoneResource extends UKFastResource
         ];
 
         if ($request->user->isAdministrator) {
-            $data['is_public'] = (boolean) $this->is_public;
+            $data['is_public'] = $this->is_public;
         }
 
         return $data;
