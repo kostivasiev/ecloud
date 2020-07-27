@@ -89,7 +89,7 @@ class GetTest extends TestCase
                 'id'         => $availabilityZone->id,
                 'code'       => $availabilityZone->code,
                 'name'       => $availabilityZone->name,
-                'datacentre_site_id'    => (int) $availabilityZone->datacentre_site_id,
+                'datacentre_site_id' => $availabilityZone->datacentre_site_id,
             ])
             ->assertResponseStatus(200);
     }
