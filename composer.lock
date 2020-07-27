@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad6ef8107d60f13661da02ca1986c57c",
+    "content-hash": "d1d4aaf7df8dbe34d886dba22cc9e44e",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -5461,6 +5461,40 @@
             ],
             "description": "Transforms, sorts, and filters api requests and responses",
             "time": "2020-07-09T08:16:13+00:00"
+        },
+        {
+            "name": "ukfast/form-requests",
+            "version": "v0.1.1",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/form-requests.git",
+                "reference": "fcd4105fa594ce119f868ac04fd4fb9b9a2fafe4"
+            },
+            "require": {
+                "illuminate/http": "^5.6|^6.0|^7.0",
+                "illuminate/support": "^5.6|^6.0|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\FormRequests\\": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "George Kelly",
+                    "email": "george.kelly@ukfast.co.uk"
+                },
+                {
+                    "name": "Moien Ilyas",
+                    "email": "moien.ilyas@ukfast.co.uk"
+                }
+            ],
+            "description": "Patches form requests into lumen along with some extra ukfast functionality",
+            "time": "2020-04-09T07:47:46+00:00"
         },
         {
             "name": "ukfast/health-check",
