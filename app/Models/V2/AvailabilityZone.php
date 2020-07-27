@@ -29,7 +29,10 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     protected $table = 'availability_zones';
     protected $primaryKey = 'id';
     protected $fillable = ['id', 'code', 'name', 'datacentre_site_id', 'is_public'];
-    protected $casts = ['is_public' => 'boolean'];
+    protected $casts = [
+        'is_public' => 'boolean',
+        'datacentre_site_id' => 'integer',
+    ];
 
     public $incrementing = false;
     public $timestamps = true;
