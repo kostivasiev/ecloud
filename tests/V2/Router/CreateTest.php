@@ -3,6 +3,7 @@
 namespace Tests\V2\Router;
 
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,12 +18,22 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+
+        $this->vpc = factory(Vpc::class, 1)->create([
+            'name'    => 'Manchester DC',
+        ])->first();
+
+        $this->router = factory(Router::class, 1)->create([
+            'name'       => 'Manchester Router 1',
+            'vpc_id' => $this->vpc->getKey()
+        ])->first();
     }
 
     public function testNonAdminIsDenied()
     {
         $data = [
             'name'    => 'Manchester Router 1',
+            'vpc_id'    => $this->vpc->getKey(),
         ];
         $this->post(
             '/v2/routers',
@@ -62,10 +73,35 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testInvalidVpcIdIsFailed()
+    {
+        $data = [
+            'name'    => 'Manchester Network',
+            'vpc_id' => $this->faker->uuid(),
+        ];
+
+        $this->patch(
+            '/v2/routers/' . $this->router->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified vpc id was not found',
+                'status' => 422,
+                'source' => 'vpc_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataSucceeds()
     {
         $data = [
             'name'    => 'Manchester Router 1',
+            'vpc_id'    => $this->vpc->getKey()
         ];
         $this->post(
             '/v2/routers',

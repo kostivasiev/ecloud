@@ -5,7 +5,7 @@ namespace App\Http\Requests\V2;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateNetworksRequest
+ * Class CreateNetworkRequest
  * @package App\Http\Requests\V2
  */
 class CreateNetworkRequest extends FormRequest
@@ -29,6 +29,8 @@ class CreateNetworkRequest extends FormRequest
     {
         return [
             'name'    => 'required|string',
+            'router_id'    => 'required|string|exists:ecloud.routers,id,deleted_at,NULL',
+            'availability_zone_id'    => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
 
@@ -41,6 +43,10 @@ class CreateNetworkRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field is required',
+            'router_id.required' => 'The :attribute field is required',
+            'router_id.exists' => 'The specified :attribute was not found',
+            'availability_zone_id.required' => 'The :attribute field is required',
+            'availability_zone_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }

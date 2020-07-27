@@ -122,6 +122,22 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      */
     public function vpns()
     {
-        return $this->hasOne(Vpn::class, 'id', 'availability_zone_id');
+        return $this->hasMany(Vpn::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function networks()
+    {
+        return $this->hasMany(Network::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function gateways()
+    {
+        return $this->hasMany(Gateway::class);
     }
 }

@@ -56,13 +56,13 @@ class NetworkController extends BaseController
     public function create(CreateNetworkRequest $request)
     {
         event(new BeforeCreateEvent());
-        $networks = new Network($request->only([
-            'code', 'name',
+        $network = new Network($request->only([
+            'router_id', 'availability_zone_id',  'name'
         ]));
-        $networks->save();
-        $networks->refresh();
+        $network->save();
+        $network->refresh();
         event(new AfterCreateEvent());
-        return $this->responseIdMeta($request, $networks->getKey(), 201);
+        return $this->responseIdMeta($request, $network->getKey(), 201);
     }
 
     /**
@@ -75,7 +75,7 @@ class NetworkController extends BaseController
         event(new BeforeUpdateEvent());
         $networks = Network::findOrFail($networkId);
         $networks->fill($request->only([
-            'code', 'name',
+            'router_id', 'availability_zone_id',  'name'
         ]));
         $networks->save();
         event(new AfterUpdateEvent());

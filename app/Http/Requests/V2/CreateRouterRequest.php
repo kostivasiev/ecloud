@@ -23,7 +23,8 @@ class CreateRouterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'required|string',
+            'name' => 'required|string',
+            'vpc_id' => 'required|string|exists:ecloud.virtual_private_clouds,id,deleted_at,NULL',
         ];
     }
 
@@ -36,6 +37,8 @@ class CreateRouterRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field is required',
+            'vpc_id.required' => 'The :attribute field is required',
+            'vpc_id.exists' => 'The specified :attribute was not found'
         ];
     }
 }
