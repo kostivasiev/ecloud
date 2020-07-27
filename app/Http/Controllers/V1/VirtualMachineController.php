@@ -302,7 +302,7 @@ class VirtualMachineController extends BaseController
                 $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
             }
 
-            if ($request->input('environment') != 'Burst') {
+            if (!in_array($request->input('environment'), ['Burst', 'GPU'])) {
                 // get available compute
                 $maxRam = min($maxRam, $solution->ramAvailable());
                 if ($maxRam < 1) {

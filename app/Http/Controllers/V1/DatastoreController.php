@@ -473,7 +473,7 @@ class DatastoreController extends BaseController
      */
     public function expand(Request $request, IntapiService $intapiService, $datastoreId)
     {
-        $this->validate($request, ['capacity' => 'required|integer|min:2']);
+        $this->validate($request, Datastore::getExpandRules());
 
         $datastore = DatastoreController::getDatastoreById($request, $datastoreId);
 
