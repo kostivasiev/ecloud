@@ -38,14 +38,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
     });
 
-    /** Virtual Data Centres */
+    /** Virtual Private Clouds */
     $router->group([], function () use ($router) {
+        $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
+            $router->post('vpcs', 'VpcController@create');
+        });
+        $router->patch('vpcs/{vpcUuid}', 'VpcController@update');
         $router->get('vpcs', 'VpcController@index');
-        $router->get('vpcs/{vdcUuid}', 'VpcController@show');
-        $router->post('vpcs', 'VpcController@create');
-        $router->patch('vpcs/{vdcUuid}', 'VpcController@update');
-        $router->delete('vpcs/{vdcUuid}', 'VpcController@destroy');
+        $router->get('vpcs/{vpcUuid}', 'VpcController@show');
+        $router->delete('vpcs/{vpcUuid}', 'VpcController@destroy');
     });
+
 
     /** Dhcps */
     $router->group([], function () use ($router) {

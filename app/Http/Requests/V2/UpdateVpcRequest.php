@@ -29,6 +29,7 @@ class UpdateVpcRequest extends FormRequest
     {
         return [
             'name'    => 'sometimes|required|string',
+            'reseller_id' => 'sometimes|required|integer'
         ];
     }
 
@@ -41,6 +42,7 @@ class UpdateVpcRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field, when specified, cannot be null',
+            'reseller_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }
