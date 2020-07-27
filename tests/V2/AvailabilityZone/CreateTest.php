@@ -135,7 +135,7 @@ class CreateTest extends TestCase
         ]);
 
         $resource = AvailabilityZone::findOrFail($availabilityZoneId);
-        $this->assertFalse((boolean) $resource->is_public);
+        $this->assertFalse($resource->is_public);
     }
 
 }
