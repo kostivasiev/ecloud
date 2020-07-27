@@ -16,7 +16,7 @@ class CreateAvailabilityZonesTable extends Migration
             $table->uuid('id')->primary();
             $table->string('code');
             $table->string('name');
-            $table->integer('datacentre_site_id', false)->index();
+            $table->integer('datacentre_site_id');
             $table->boolean('is_public')->default(true);
             $table->timestamps();
             $table->softDeletes();
