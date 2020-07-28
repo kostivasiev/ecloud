@@ -48,6 +48,7 @@ class CreateTest extends TestCase
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => 1,
             ]
         )
             ->seeJson([
@@ -59,10 +60,11 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testValidDataSucceeds()
+    public function testNotScopedFails()
     {
         $data = [
-            'name'    => 'Manchester DC',
+            'name'    => $this->faker->word(),
+            'reseller_id' => 1
         ];
         $this->post(
             '/v2/vpcs',
@@ -72,6 +74,34 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
+            ->seeJson([
+                'title'  => 'Bad Request',
+                'detail' => 'Missing Reseller scope',
+                'status' => 400,
+            ])
+            ->assertResponseStatus(400);
+    }
+
+    public function testValidDataSucceeds()
+    {
+        $data = [
+            'name'    => $this->faker->word(),
+            'reseller_id' => 1
+        ];
+        $this->post(
+            '/v2/vpcs',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => 1
+            ]
+        )
+            ->seeInDatabase(
+                'virtual_private_clouds',
+                $data,
+                'ecloud'
+            )
             ->assertResponseStatus(201);
 
         $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;

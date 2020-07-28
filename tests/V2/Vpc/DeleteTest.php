@@ -54,6 +54,25 @@ class DeleteTest extends TestCase
             ->assertResponseStatus(404);
     }
 
+    public function testNonMatchingResellerIdFails()
+    {
+        $vdc = factory(Vpc::class, 1)->create(['reseller_id' => 3])->first();
+        $this->delete(
+            '/v2/vpcs/' . $vdc->getKey(),
+            [],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Not found',
+                'detail' => 'No Vpc with that ID was found',
+                'status' => 404,
+            ])
+            ->assertResponseStatus(404);
+    }
+
     public function testSuccessfulDelete()
     {
         $vdc = factory(Vpc::class, 1)->create()->first();

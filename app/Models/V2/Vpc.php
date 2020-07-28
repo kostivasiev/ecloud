@@ -27,8 +27,7 @@ class Vpc extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'virtual_private_clouds';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name'];
-    protected $visible = ['id', 'name', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'name', 'reseller_id'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -42,6 +41,7 @@ class Vpc extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -57,6 +57,7 @@ class Vpc extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('reseller_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -82,23 +83,27 @@ class Vpc extends Model implements Filterable, Sortable
         return [
             'id'         => 'id',
             'name'       => 'name',
+            'reseller_id' => 'reseller_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
     }
 
     /**
-     * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
+     * Scope a query to only include resources for a given reseller
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $resellerId
+     * @return \Illuminate\Database\Eloquent\Builder $query
      */
-    public function properties()
+    public function scopeWithReseller($query, $resellerId)
     {
-        return [
-            IdProperty::create('id', 'id', null, 'uuid'),
-            StringProperty::create('name', 'name'),
-            DateTimeProperty::create('created_at', 'created_at'),
-            DateTimeProperty::create('updated_at', 'updated_at')
-        ];
+        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
+
+        if (!empty($resellerId)) {
+            $query->where('reseller_id', $resellerId);
+        }
+
+        return $query;
     }
 
     /**

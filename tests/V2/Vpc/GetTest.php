@@ -52,6 +52,57 @@ class GetTest extends TestCase
             ->assertResponseStatus(200);
     }
 
+    public function testGetCollectionResellerScope()
+    {
+        $vpc = factory(Vpc::class, 1)->create([
+            'reseller_id' => 2,
+        ])->first();
+
+        $this->get(
+            '/v2/vpcs',
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->dontSeeJson([
+                'id'         => $vpc->getKey(),
+                'name'       => $vpc->name,
+            ])
+            ->assertResponseStatus(200);
+
+        $this->get(
+            '/v2/vpcs',
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id'         => $vpc->getKey(),
+                'name'       => $vpc->name,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testNonMatchingResellerIdFails()
+    {
+        $vdc = factory(Vpc::class, 1)->create(['reseller_id' => 3])->first();
+        $this->get(
+            '/v2/vpcs/' . $vdc->getKey(),
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Not found',
+                'detail' => 'No Vpc with that ID was found',
+                'status' => 404,
+            ])
+            ->assertResponseStatus(404);
+    }
+
     public function testGetItemDetail()
     {
         $virtualPrivateCloud = factory(Vpc::class, 1)->create([
