@@ -19,29 +19,12 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
     }
 
-    public function testNonAdminIsDenied()
-    {
-        $this->get(
-            '/v2/availability-zones',
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
     public function testGetCollection()
     {
         $availabilityZone = factory(AvailabilityZone::class, 1)->create([
             'code'    => 'MAN1',
             'name'    => 'Manchester Region 1',
-            'site_id' => 1,
+            'datacentre_site_id' => 1,
         ])->first();
         $this->get(
             '/v2/availability-zones',
@@ -54,7 +37,33 @@ class GetTest extends TestCase
                 'id'         => $availabilityZone->id,
                 'code'       => $availabilityZone->code,
                 'name'       => $availabilityZone->name,
-                'site_id'    => $availabilityZone->site_id,
+                'datacentre_site_id'    => $availabilityZone->datacentre_site_id,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testGetCollectionNonAdminPropertiesHidden()
+    {
+        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+            'code'    => 'MAN1',
+            'name'    => 'Manchester Region 1',
+            'datacentre_site_id' => 1,
+        ])->first();
+        $this->get(
+            '/v2/availability-zones',
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id'         => $availabilityZone->id,
+                'code'       => $availabilityZone->code,
+                'name'       => $availabilityZone->name,
+                'datacentre_site_id'    => $availabilityZone->datacentre_site_id,
+            ])
+            ->dontSeeJson([
+                'is_public' => true
             ])
             ->assertResponseStatus(200);
     }
@@ -64,7 +73,7 @@ class GetTest extends TestCase
         $availabilityZone = factory(AvailabilityZone::class, 1)->create([
             'code'    => 'MAN1',
             'name'    => 'Manchester Region 1',
-            'site_id' => 1,
+            'datacentre_site_id' => 1,
         ])->first();
         $availabilityZone->save();
         $availabilityZone->refresh();
@@ -80,7 +89,36 @@ class GetTest extends TestCase
                 'id'         => $availabilityZone->id,
                 'code'       => $availabilityZone->code,
                 'name'       => $availabilityZone->name,
-                'site_id'    => (int) $availabilityZone->site_id,
+                'datacentre_site_id' => $availabilityZone->datacentre_site_id,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testGetItemDetailNonAdminPropertiesHidden()
+    {
+        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+            'code'    => 'MAN1',
+            'name'    => 'Manchester Region 1',
+            'datacentre_site_id' => 1,
+        ])->first();
+        $availabilityZone->save();
+        $availabilityZone->refresh();
+
+        $this->get(
+            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id'         => $availabilityZone->id,
+                'code'       => $availabilityZone->code,
+                'name'       => $availabilityZone->name,
+                'datacentre_site_id' => $availabilityZone->datacentre_site_id,
+            ])
+            ->dontSeeJson([
+                'is_public' => true
             ])
             ->assertResponseStatus(200);
     }

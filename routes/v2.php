@@ -18,9 +18,10 @@ $baseRouteParameters = [
 /** @var \Laravel\Lumen\Routing\Router $router */
 $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
+    $router->get('availability-zones', 'AvailabilityZoneController@index');
+    $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
+
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        $router->get('availability-zones', 'AvailabilityZoneController@index');
-        $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
         $router->post('availability-zones', 'AvailabilityZoneController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
