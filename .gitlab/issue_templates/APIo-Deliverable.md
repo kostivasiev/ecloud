@@ -14,10 +14,10 @@ checklist of the tasks required to determine this issue as done
 #### Planning
 
 - [ ] Research what currently exists and detail what is needed to match our requirements
-    - any existing api's
-    - any existing db tables that need an api
-    - what do competitors do? what do they call similar resources so we can name ours, etc
+    - any existing api's, or any existing db tables that need an api?
+    - what do competitors do? what do they call similar resources so we can name ours to match what users expect
 - [ ] Detail proposed endpoints with example responses
+- [ ] Signoff proposed responses with project lead and relevent developers
 
 
 #### Development
