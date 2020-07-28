@@ -13,8 +13,11 @@ checklist of the tasks required to determine this issue as done
 
 #### Planning
 
-- [ ] Research what currently exists, api/db/etc, what is needed to match spec
-- [ ] Detail proposed routes with example responses
+- [ ] Research what currently exists and detail what is needed to match our requirements
+    - any existing api's
+    - any existing db tables that need an api
+    - what do competitors do? what do they call similar resources so we can name ours, etc
+- [ ] Detail proposed endpoints with example responses
 
 
 #### Development
