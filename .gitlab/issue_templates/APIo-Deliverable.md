@@ -35,4 +35,5 @@ checklist of the tasks required to determine this issue as done
 /label ~eCloud
 
 <!--- set issue status  -->
-/label ~"Awaiting Prioritisation"
+/label ~"To Do" 
+/weight 5
