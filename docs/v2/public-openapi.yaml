@@ -38,10 +38,6 @@ components:
           type: string
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
-        deleted_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
       description: 'Networks'
       required: {  }
     VirtualPrivateClouds:
@@ -62,10 +58,6 @@ components:
           type: string
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
-        deleted_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
       description: 'Virtual Private Clouds'
       required: {  }
     Dhcps:
@@ -83,10 +75,6 @@ components:
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
         updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        deleted_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
@@ -111,10 +99,6 @@ components:
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
         updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        deleted_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
@@ -171,10 +155,6 @@ components:
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
         updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        deleted_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
@@ -277,7 +257,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VirtualPrivateClouds'
+              type: object
+              properties:
+                name:
+                  description: Name of the Virtual Private Cloud
+                  type: string
+                  example: 'My Test VPC'
       tags:
         - VirtualPrivateClouds
       parameters: {  }
@@ -331,7 +316,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VirtualPrivateClouds'
+              type: object
+              properties:
+                name:
+                  description: Name of the Virtual Private Cloud
+                  type: string
+                  example: 'My Test VPC'
       tags:
         - VirtualPrivateClouds
       parameters:
@@ -451,7 +441,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VirtualPrivateClouds'
+              type: object
+              properties:
+                name:
+                  description: Name for the network
+                  type: string
+                  example: 'Network 1'
+                router_id:
+                  description: Identification of the router to assign the network to
+                  type: string
+                  example: rtr-2b66bb79
+                availability_zone_id:
+                  description: Identification of the availability zone to assign the network to
+                  type: string
+                  example: avz-2b66bb79
       tags:
         - Networks
       parameters: {  }
@@ -492,8 +495,9 @@ paths:
                   data:
                     type: object
                     properties:
-                      id: string
-                      example: net-2b66bb79
+                      id:
+                        type: string
+                        example: net-2b66bb79
                   meta:
                     type: object
                     properties:
@@ -505,7 +509,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Networks'
+              type: object
+              properties:
+                name:
+                  description: Name for the network
+                  type: string
+                  example: 'Network 1'
+                router_id:
+                  description: Identification of the router to assign the network to
+                  type: string
+                  example: rtr-2b66bb79
+                availability_zone_id:
+                  description: Identification of the availability zone to assign the network to
+                  type: string
+                  example: avz-2b66bb79
       tags:
         - Networks
       parameters:
@@ -625,7 +642,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Dhcps'
+              type: object
+              properties:
+                vpc_id:
+                  description: Identifier of the acssociated virtual private cloud
+                  type: string
+                  example: vpc-2b66bb79
       tags:
         - Dhcps
       parameters: {  }
@@ -679,7 +701,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Dhcps'
+              type: object
+              properties:
+                vpc_id:
+                  required: false
+                  description: Identifier of the acssociated virtual private cloud
+                  type: string
+                  example: vpc-2b66bb79
       tags:
         - Dhcps
       parameters:
@@ -799,7 +827,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Vpns'
+              type: object
+              properties:
+                router_id:
+                  description: Identification of the associated router
+                  type: string
+                  example: rtr-2b66bb79
+                availability_zone_id:
+                  description: Identification of the associated availability zone
+                  type: string
+                  example: avz-2b66bb79
       tags:
         - Vpns
       parameters: {  }
@@ -840,8 +877,9 @@ paths:
                   data:
                     type: object
                     properties:
-                      id: string
-                      example: vpn-2b66bb79
+                      id:
+                        type: string
+                        example: vpn-2b66bb79
                   meta:
                     type: object
                     properties:
@@ -853,7 +891,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Vpns'
+              type: object
+              properties:
+                router_id:
+                  required: false
+                  description: Identification of the associated router
+                  type: string
+                  example: rtr-2b66bb79
+                availability_zone_id:
+                  required: false
+                  description: Identification of the associated availability zone
+                  type: string
+                  example: avz-2b66bb79
       tags:
         - Vpns
       parameters:
@@ -1339,7 +1388,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FirewallRules'
+              type: object
+              properties:
+                name:
+                  description: Name of the firewall rule
+                  type: string
+                  example: fwr-2b66bb79
       tags:
         - FirewallRules
       parameters: {  }
@@ -1380,8 +1434,9 @@ paths:
                   data:
                     type: object
                     properties:
-                      id: string
-                      example: fwr-2b66bb79
+                      id:
+                        type: string
+                        example: fwr-2b66bb79
                   meta:
                     type: object
                     properties:
@@ -1393,7 +1448,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FirewallRules'
+              type: object
+              properties:
+                name:
+                  description: Name of the firewall rule
+                  type: string
+                  example: fwr-2b66bb79
       tags:
         - FirewallRules
       parameters:
