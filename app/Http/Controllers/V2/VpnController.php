@@ -80,14 +80,14 @@ class VpnController extends BaseController
     }
 
     /**
+     * @param Request $request
      * @param string $vpnId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(string $vpnId)
+    public function destroy(Request $request, string $vpnId)
     {
         event(new BeforeDeleteEvent());
-        $vpns = Vpn::findOrFail($vpnId);
-        $vpns->delete();
+        Vpn::forUser($request->user)->findOrFail($vpnId)->delete();
         event(new AfterDeleteEvent());
         return response()->json([], 204);
     }

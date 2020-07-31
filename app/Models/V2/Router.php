@@ -127,7 +127,7 @@ class Router extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, $user)
     {
-        if (!$user->isAdministrator) {
+        if (!$user->isAdministrator || !empty($user->resellerId)) {
             $query->whereHas('vpc', function ($query) use ($user) {
                 $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
                 if (!empty($resellerId)) {
