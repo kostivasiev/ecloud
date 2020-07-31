@@ -13,6 +13,7 @@ use UKFast\DB\Ditto\Sortable;
 
 /**
  * @method static findOrFail(string $networkId)
+ * @method static forUser(string $user)
  */
 class Network extends Model implements Filterable, Sortable
 {
@@ -100,5 +101,24 @@ class Network extends Model implements Filterable, Sortable
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!$user->isAdministrator) {
+            $query->whereHas('router.vpc', function ($query) use ($user) {
+                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($resellerId)) {
+                    $query->where('reseller_id', '=', $resellerId);
+                }
+            });
+        }
+
+        return $query;
     }
 }

@@ -18,6 +18,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class VirtualPrivateClouds
  * @package App\Models\V2
  * @method static findOrFail(string $vdcUuid)
+ * @method static forUser(string $user)
  */
 class Vpc extends Model implements Filterable, Sortable
 {
@@ -112,5 +113,22 @@ class Vpc extends Model implements Filterable, Sortable
     public function dhcps()
     {
         return $this->belongsTo(Dhcp::class, 'id', 'vpc_id');
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!$user->isAdministrator) {
+            $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($resellerId)) {
+                $query->where('reseller_id', '=', $resellerId);
+            }
+        }
+
+        return $query;
     }
 }
