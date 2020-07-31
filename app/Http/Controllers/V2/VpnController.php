@@ -71,8 +71,7 @@ class VpnController extends BaseController
      */
     public function update(UpdateVpnRequest $request, string $vpnId)
     {
-        event(new BeforeUpdateEvent());
-        $vpns = Vpn::forUser($request->user)->findOrFail($vpnId);
+        $vpns = Vpn::forUser(app('request')->user)->findOrFail($vpnId);
         $vpns->fill($request->only(['router_id', 'availability_zone_id']));
         $vpns->save();
         event(new AfterUpdateEvent());

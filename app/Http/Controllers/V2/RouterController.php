@@ -97,14 +97,14 @@ class RouterController extends BaseController
     /**
      * Associate a gateway with a router
      * @param \Illuminate\Http\Request $request
-     * @param string $routerUuid
-     * @param string $gatewaysUuid
+     * @param string $routerId
+     * @param string $gatewayId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function gatewaysCreate(Request $request, string $routerUuid, string $gatewaysUuid)
+    public function gatewaysCreate(Request $request, string $routerId, string $gatewayId)
     {
-        $router = Router::forUser($request->user)->findOrFail($routerUuid);
-        $gateway = Gateway::findOrFail($gatewaysUuid);
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+        $gateway = Gateway::findOrFail($gatewayId);
         $router->gateways()->attach($gateway->id);
         return response()->json([], 204);
     }

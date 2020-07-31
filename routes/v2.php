@@ -89,11 +89,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         /** Routers Gateways */
         $router->group([], function () use ($router) {
             $router->put(
-                'routers/{routerId}/gateways/{gatewaysUuid}',
+                'routers/{routerId}/gateways/{gatewayId}',
                 'RouterController@gatewaysCreate'
             );
             $router->delete(
-                'routers/{routerId}/gateways/{gatewaysUuid}',
+                'routers/{routerId}/gateways/{gatewayId}',
                 'RouterController@gatewaysDestroy'
             );
         });

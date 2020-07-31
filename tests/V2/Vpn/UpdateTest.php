@@ -92,6 +92,7 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $vpns = $this->createVpn();
+
         $data = [
             'router_id'            => $this->createRouters()->id,
             'availability_zone_id' => $this->createAvailabilityZone()->id,
@@ -103,8 +104,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(200);
+        )->assertResponseStatus(200);
 
         $vpnItem = Vpn::findOrFail($vpns->getKey());
         $this->assertEquals($data['router_id'], $vpnItem->router_id);
