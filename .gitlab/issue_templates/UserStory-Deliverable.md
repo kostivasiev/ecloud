@@ -6,18 +6,18 @@
 
 <!-- Define user stories -->
 
-| As an <type of user>       |  I want to <perform some task>                    |  so that I can <achieve some goal> |
-|----------------------------|---------------------------------------------------|------------------------------------|
+| As an <type of user> |  I want to <perform some task> |  so that I can <achieve some goal> |
+|---|---|---|
 | End User | View all VPC's | View an overview of my VPC's |
 
 ### Prerequisite:
-| As an <type of user>       |  I want to <perform some task>                    |  so that I can <achieve some goal> |
-|----------------------------|---------------------------------------------------|------------------------------------|
+| As an <type of user> |  I want to <perform some task> |  so that I can <achieve some goal> |
+|---|---|---|
 | End User | Create an account on the new eCloud platform | Start to create my own VPCs and laucnh instances |
 
 ### User Stories
-| GIVEN                      |  WHEN                                                |  THEN                                                         |
-|----------------------------|------------------------------------------------------|---------------------------------------------------------------|
+| GIVEN | WHEN | THEN |
+|---|---|---|
 | I am on the VPC Summary page | The page loads | I can see all VPCs I have created showing VPC ID, Name, status |
 | I have not yet created any VPCs on my account | The page loads | I see the Marketing for eCloud V2 page |
 | An error occurs when trying to show me the VPCs I have created | The page loads | I am shown a suitable error message to contact support or refresh page |
