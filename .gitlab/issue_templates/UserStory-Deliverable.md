@@ -1,7 +1,7 @@
-<!--- THIS TEMPLATE IS TO BE USED FOR API ENDPOINTS -->
+<!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
-### What is the Change?
-<!-- Enter clear and concise description of what your feature or change is. -->
+### What is the Feature/Change?
+<!-- Enter clear and concise description of what your feature or change request is. -->
 
 
 <!-- Define user stories -->
@@ -22,25 +22,37 @@
 | I have not yet created any VPCs on my account | The page loads | I see the Marketing for eCloud V2 page |
 | An error occurs when trying to show me the VPCs I have created | The page loads | I am shown a suitable error message to contact support or refresh page |
 
+
 ### Process Flows
-<!-- attach any flow charts -->
+ <!-- attach any flow charts and delete placeholder -->
+- no process flow required
 
 
 ### Story Tasks
 - [ ] Process flow created & Requirements defined
 - [ ] Technical specification
 - [ ] Development
-- [ ] Unit test
+- [ ] Unit tests
+- [ ] Documentation
 - [ ] Code Review
 
+
+<!--- How would you categorise this? - Delete as appropriate -->
+
+<!--- Business Critical - It's a must for the Business to Continue  -->
+/label ~"Business Critical" ~Triage 
+/weight 5
+
+<!--- Business Enhancing - Improves a product or service and increase its value, efficiency or effectiveness  -->
+/label ~"Business Enhancing" ~"Awaiting Prioritisation" 
+/weight 2
+
+<!--- Nice to Have - It's not a critical update, for a rainy day --> 
+/label ~"Nice to Have" ~"Awaiting Manager Authorisation"
 
 
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~dotNET ~DevOps
 
 <!--- set product or project labels if available  -->
-/label ~eCloud
-
-<!--- set issue status  -->
-/label ~"To Do" 
-/weight 5
+/label ~eCloud ~DDosX
