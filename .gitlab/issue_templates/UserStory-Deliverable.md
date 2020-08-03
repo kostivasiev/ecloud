@@ -34,7 +34,7 @@
 - [ ] Technical specification
 - [ ] Development
 - [ ] Unit tests
-- [ ] User Documentation  <!-- (delete if not applicable) -->
+- [ ] User Documentation  <!-- delete if not applicable -->
 - [ ] Code Review
 
 
