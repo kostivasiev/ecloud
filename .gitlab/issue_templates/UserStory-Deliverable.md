@@ -52,7 +52,7 @@
 
 
 <!--- Set Team label - Delete as appropriate -->
-/label ~PHP ~dotNET ~DevOps
+/label ~PHP ~DevOps
 
 <!--- set product or project labels if available  -->
-/label ~eCloud ~DDosX
+/label ~eCloud
