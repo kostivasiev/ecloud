@@ -6,12 +6,12 @@
 
 <!-- Define user stories -->
 
-| As an <type of user> |  I want to <perform some task> |  so that I can <achieve some goal> |
+| As an <type of user> | I want to <perform some task> | so that I can <achieve some goal> |
 |---|---|---|
 | End User | View all VPC's | View an overview of my VPC's |
 
 ### Prerequisite:
-| As an <type of user> |  I want to <perform some task> |  so that I can <achieve some goal> |
+| As an <type of user> | I want to <perform some task> | so that I can <achieve some goal> |
 |---|---|---|
 | End User | Create an account on the new eCloud platform | Start to create my own VPCs and laucnh instances |
 
@@ -33,7 +33,7 @@
 - [ ] Technical specification
 - [ ] Development
 - [ ] Unit tests
-- [ ] Documentation
+- [ ] User Documentation
 - [ ] Code Review
 
 
