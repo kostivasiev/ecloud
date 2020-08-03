@@ -36,22 +36,12 @@
 - [ ] Code Review
 
 
-<!--- How would you categorise this? - Delete as appropriate -->
-
-<!--- Business Critical - It's a must for the Business to Continue  -->
-/label ~"Business Critical" ~Triage 
-/weight 5
-
-<!--- Business Enhancing - Improves a product or service and increase its value, efficiency or effectiveness  -->
-/label ~"Business Enhancing" ~"Awaiting Prioritisation" 
-/weight 2
-
-<!--- Nice to Have - It's not a critical update, for a rainy day --> 
-/label ~"Nice to Have" ~"Awaiting Manager Authorisation"
-
-
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~DevOps
 
 <!--- set product or project labels - If appropriate  -->
 /label ~eCloud
+
+<!--- set initial issue status and weight  -->
+/label ~"To Do" 
+/weight 5
