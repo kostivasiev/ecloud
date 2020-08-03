@@ -33,7 +33,7 @@
 - [ ] Technical specification
 - [ ] Development
 - [ ] Unit tests
-- [ ] User Documentation
+- [ ] User Documentation  <!-- (delete if not applicable) -->
 - [ ] Code Review
 
 
