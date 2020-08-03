@@ -20,8 +20,6 @@
 | GIVEN | WHEN | THEN |
 |---|---|---|
 | I am on the VPC Summary page | The page loads | I can see all VPCs I have created showing VPC ID, Name, status |
-| I have not yet created any VPCs on my account | The page loads | I see the Marketing for eCloud V2 page |
-| An error occurs when trying to show me the VPCs I have created | The page loads | I am shown a suitable error message to contact support or refresh page |
 
 
 ### Process Flows
