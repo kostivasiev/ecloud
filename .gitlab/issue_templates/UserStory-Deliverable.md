@@ -1,5 +1,6 @@
 <!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
+
 ### What is the Feature/Change?
 <!-- Enter clear and concise description of what your feature or change request is. -->
 
@@ -54,5 +55,5 @@
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~DevOps
 
-<!--- set product or project labels if available  -->
+<!--- set product or project labels - If appropriate  -->
 /label ~eCloud
