@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Listeners\V2\Federation;
+namespace App\Listeners\V2;
 
+use App\Events\V2\RouterCreated;
 use App\Services\NsxService;
-use App\Events\V2\Router\AfterCreateEvent;
 use Elastica\Response;
 use Illuminate\Queue\InteractsWithQueue;
 
-final class CreateRouterListener //implements ShouldQueue TODO...
+final class RouterDeploy //implements ShouldQueue TODO...
 {
     //use InteractsWithQueue; TODO...
 
@@ -26,11 +26,13 @@ final class CreateRouterListener //implements ShouldQueue TODO...
     }
 
     /**
-     * @param AfterCreateEvent $event
+     * @param RouterCreated $event
      * @return void
      */
-    public function handle(AfterCreateEvent $event)
+    public function handle(RouterCreated $event)
     {
+        dd($event->router->toArray());
+
         try {
             $response = $this->nsxService->post('api/v1/logical-routers', [
                 'resource_type' => 'LogicalRouter',
@@ -59,7 +61,7 @@ final class CreateRouterListener //implements ShouldQueue TODO...
         die();
     }
 
-    public function failed(AfterCreateEvent $event, $exception)
+    public function failed(RouterCreated $event, $exception)
     {
         // TODO :- Handle it
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\RouterCreated;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -34,6 +35,15 @@ class Router extends Model implements Filterable, Sortable
 
     public $incrementing = false;
     public $timestamps = true;
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'created' => RouterCreated::class,
+    ];
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
