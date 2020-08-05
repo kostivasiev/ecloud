@@ -15,6 +15,7 @@
 
 ### Assumptions:
 1. All success and error events will be logged in the existing logging framework
+2. All success and error events will update the status of the resource in APIO
 
 
 ### Prerequisites:
