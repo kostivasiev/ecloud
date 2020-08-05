@@ -11,10 +11,15 @@
 |---|---|---|
 | End User | View all VPC's | View an overview of my VPC's |
 
-### Prerequisite:
-| As an <type of user> | I want to <perform some task> | so that I can <achieve some goal> |
-|---|---|---|
-| End User | Create an account on the new eCloud platform | Start to create my own VPCs and laucnh instances |
+
+
+### Assumptions:
+1. All success and error events will be logged in the existing logging framework
+
+
+### Prerequisites:
+<!-- Link to any issues that are required for development to begin -->
+
 
 ### User Stories
 | GIVEN | WHEN | THEN |
