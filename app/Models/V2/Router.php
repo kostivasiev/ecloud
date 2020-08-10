@@ -22,15 +22,11 @@ class Router extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const STATUS_OK = 0;
-    public const STATUS_FAIL = 1;
-
     public const KEY_PREFIX = 'rtr';
     protected $connection = 'ecloud';
     protected $table = 'routers';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name'];
-    protected $visible = ['id', 'name', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'name', 'vpc_id'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -51,7 +47,12 @@ class Router extends Model implements Filterable, Sortable
 
     public function vpns()
     {
-        return $this->hasOne(Vpn::class, 'id', 'router_id');
+        return $this->hasMany(Vpn::class);
+    }
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
     }
 
     /**
@@ -63,6 +64,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -78,6 +80,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('vpc_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -100,6 +103,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             'id'         => 'id',
             'name'       => 'name',
+            'vpc_id'       => 'vpc_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

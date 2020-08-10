@@ -61,11 +61,34 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNonMatchingResellerIdFails()
+    {
+        $vdc = factory(Vpc::class, 1)->create(['reseller_id' => 3])->first();
+        $data = [
+            'name'    => 'Manchester DC',
+        ];
+        $this->patch(
+            '/v2/vpcs/' . $vdc->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Not found',
+                'detail' => 'No Vpc with that ID was found',
+                'status' => 404,
+            ])
+            ->assertResponseStatus(404);
+    }
+
     public function testValidDataIsSuccessful()
     {
         $vdc = $this->createPrivateCloud();
         $data = [
-            'name'    => 'Manchester DC',
+            'name'    => $this->faker->word(),
+            'reseller_id' => 2
         ];
         $this->patch(
             '/v2/vpcs/' . $vdc->getKey(),
@@ -75,6 +98,11 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
+            ->seeInDatabase(
+                'virtual_private_clouds',
+                $data,
+                'ecloud'
+            )
             ->assertResponseStatus(200);
 
         $virtualPrivateCloud = Vpc::findOrFail($vdc->getKey());

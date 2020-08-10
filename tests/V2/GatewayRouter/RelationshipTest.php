@@ -2,6 +2,7 @@
 
 namespace Tests\V2\GatewayRouter;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Gateway;
 use App\Models\V2\Router;
 use Faker\Factory as Faker;
@@ -78,8 +79,11 @@ class RelationshipTest extends TestCase
 
     public function testCreateValidAssociation()
     {
+        $availabilityZone = factory(AvailabilityZone::class, 1)->create()->first();
         $router = (factory(Router::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+        $gateway = (factory(Gateway::class, 1)->create([
+            'availability_zone_id' => $availabilityZone->getKey()
+        ])->first())->refresh();
         $this->put(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
             [],
@@ -93,7 +97,7 @@ class RelationshipTest extends TestCase
         // test that the association has occurred
         $router->refresh();
         $associated = $router->gateways()->first();
-        $this->assertEquals($associated->toArray(), $gateway->toArray());
+        $this->assertEquals($associated->getKey(), $gateway->getKey());
     }
 
     public function testRemoveAssociation()

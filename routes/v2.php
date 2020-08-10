@@ -18,9 +18,10 @@ $baseRouteParameters = [
 /** @var \Laravel\Lumen\Routing\Router $router */
 $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
+    $router->get('availability-zones', 'AvailabilityZoneController@index');
+    $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
+
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        $router->get('availability-zones', 'AvailabilityZoneController@index');
-        $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
         $router->post('availability-zones', 'AvailabilityZoneController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
@@ -38,14 +39,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
     });
 
-    /** Virtual Data Centres */
+    /** Virtual Private Clouds */
     $router->group([], function () use ($router) {
+        $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
+            $router->post('vpcs', 'VpcController@create');
+        });
+        $router->patch('vpcs/{vpcUuid}', 'VpcController@update');
         $router->get('vpcs', 'VpcController@index');
-        $router->get('vpcs/{vdcUuid}', 'VpcController@show');
-        $router->post('vpcs', 'VpcController@create');
-        $router->patch('vpcs/{vdcUuid}', 'VpcController@update');
-        $router->delete('vpcs/{vdcUuid}', 'VpcController@destroy');
+        $router->get('vpcs/{vpcUuid}', 'VpcController@show');
+        $router->delete('vpcs/{vpcUuid}', 'VpcController@destroy');
     });
+
 
     /** Dhcps */
     $router->group([], function () use ($router) {
@@ -113,12 +117,22 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
     });
 
+    /** Floating Ips */
     $router->group([], function () use ($router) {
         $router->get('floating-ips', 'FloatingIpController@index');
         $router->get('floating-ips/{fipId}', 'FloatingIpController@show');
         $router->post('floating-ips', 'FloatingIpController@store');
         $router->patch('floating-ips/{fipId}', 'FloatingIpController@update');
         $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
+    });
+
+    /** Firewall Rules */
+    $router->group([], function () use ($router) {
+        $router->get('firewall-rules', 'FirewallRuleController@index');
+        $router->get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
+        $router->post('firewall-rules', 'FirewallRuleController@store');
+        $router->patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
+        $router->delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
     });
 });
 

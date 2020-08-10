@@ -31,7 +31,7 @@ components:
           type: string
           example: 'Manchester Region 1'
           readOnly: false
-        site_id:
+        datacentre_site_id:
           type: integer
           example: 999
           readOnly: false
@@ -43,9 +43,9 @@ components:
           type: string
           example: '2020-07-07T10:30:00+01:00'
           readOnly: false
-        deleted_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
+        is_public:
+          type: boolean
+          example: 'true'
           readOnly: false
       description: 'Availability Zones'
       required: {  }

@@ -90,10 +90,9 @@ class RelationshipTest extends TestCase
         )
             ->assertResponseStatus(204);
 
-        // test that the association has occurred
         $router->refresh();
         $associated = $availabilityZones->routers()->first();
-        $this->assertEquals($associated->toArray(), $router->toArray());
+        $this->assertEquals($associated->getKey(), $router->getKey());
     }
 
     public function testRemoveAssociation()

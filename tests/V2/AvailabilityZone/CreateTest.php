@@ -24,7 +24,7 @@ class CreateTest extends TestCase
         $data = [
             'code'    => 'MAN1',
             'name'    => 'Manchester Zone 1',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->post(
             '/v2/availability-zones',
@@ -46,7 +46,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => 'Manchester Zone 1',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->post(
             '/v2/availability-zones',
@@ -69,7 +69,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'code'    => 'MAN1',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
         ];
         $this->post(
             '/v2/availability-zones',
@@ -104,9 +104,9 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The site id field is required',
+                'detail' => 'The datacentre site id field is required',
                 'status' => 422,
-                'source' => 'site_id'
+                'source' => 'datacentre_site_id'
             ])
             ->assertResponseStatus(422);
     }
@@ -116,7 +116,8 @@ class CreateTest extends TestCase
         $data = [
             'code'    => 'MAN1',
             'name'    => 'Manchester Zone 1',
-            'site_id' => $this->faker->randomDigit(),
+            'datacentre_site_id' => $this->faker->randomDigit(),
+            'is_public' => false
         ];
         $this->post(
             '/v2/availability-zones',
@@ -132,6 +133,9 @@ class CreateTest extends TestCase
         $this->seeJson([
             'id' => $availabilityZoneId,
         ]);
+
+        $resource = AvailabilityZone::findOrFail($availabilityZoneId);
+        $this->assertFalse($resource->is_public);
     }
 
 }

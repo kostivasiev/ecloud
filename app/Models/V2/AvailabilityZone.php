@@ -28,8 +28,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'availability_zones';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'code', 'name', 'site_id', 'nsx_manager_endpoint'];
-    protected $visible = ['id', 'code', 'name', 'site_id', 'nsx_manager_endpoint', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'code', 'name', 'datacentre_site_id', 'is_public', 'nsx_manager_endpoint'];
+    protected $casts = [
+        'is_public' => 'boolean',
+        'datacentre_site_id' => 'integer',
+    ];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -44,7 +47,8 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('code', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('site_id', Filter::$numericDefaults),
+            $factory->create('datacentre_site_id', Filter::$numericDefaults),
+            $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('nsx_manager_endpoint', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
@@ -62,7 +66,8 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('code'),
             $factory->create('name'),
-            $factory->create('site_id'),
+            $factory->create('datacentre_site_id'),
+            $factory->create('is_public'),
             $factory->create('nsx_manager_endpoint'),
             $factory->create('created_at'),
             $factory->create('updated_at')
@@ -89,7 +94,8 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'id'         => 'id',
             'code'       => 'code',
             'name'       => 'name',
-            'site_id'    => 'site_id',
+            'datacentre_site_id'    => 'datacentre_site_id',
+            'is_public'    => 'is_public',
             'nsx_manager_endpoint'    => 'nsx_manager_endpoint',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
@@ -126,6 +132,22 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      */
     public function vpns()
     {
-        return $this->hasOne(Vpn::class, 'id', 'availability_zone_id');
+        return $this->hasMany(Vpn::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function networks()
+    {
+        return $this->hasMany(Network::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function gateways()
+    {
+        return $this->hasMany(Gateway::class);
     }
 }

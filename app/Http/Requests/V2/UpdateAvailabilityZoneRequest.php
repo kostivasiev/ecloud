@@ -25,7 +25,8 @@ class UpdateAvailabilityZoneRequest extends FormRequest
         return [
             'code'    => 'sometimes|required|string',
             'name'    => 'sometimes|required|string',
-            'site_id' => 'sometimes|required|integer',
+            'datacentre_site_id' => 'sometimes|required|integer',
+            'is_public' => 'sometimes|required|boolean',
         ];
     }
 
@@ -34,7 +35,7 @@ class UpdateAvailabilityZoneRequest extends FormRequest
         return [
             'code.required' => 'The :attribute field, when specified, cannot be null',
             'name.required' => 'The :attribute field, when specified, cannot be null',
-            'site_id.required' => 'The :attribute field, when specified, cannot be null',
+            'datacentre_site_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }

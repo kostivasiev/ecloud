@@ -24,6 +24,7 @@ class UpdateRouterRequest extends FormRequest
     {
         return [
             'name'    => 'sometimes|required|string',
+            'vpc_id' => 'sometimes|required|string|exists:ecloud.virtual_private_clouds,id,deleted_at,NULL',
         ];
     }
 
@@ -36,6 +37,8 @@ class UpdateRouterRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field, when specified, cannot be null',
+            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
+            'vpc_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }
