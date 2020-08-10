@@ -9,6 +9,9 @@ class RouterCreated
 {
     use SerializesModels;
 
+    /**
+     * @var Router
+     */
     public $router;
 
     /**

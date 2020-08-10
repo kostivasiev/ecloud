@@ -2,14 +2,22 @@
 
 namespace App\Listeners\V2;
 
-use App\Events\V2\RouterCreated;
 use App\Services\NsxService;
-use Elastica\Response;
+use App\Events\V2\RouterCreated;
+use App\Models\V2\Router;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use GuzzleHttp\Exception\GuzzleException;
 
-final class RouterDeploy //implements ShouldQueue TODO...
+class RouterDeploy implements ShouldQueue
 {
-    //use InteractsWithQueue; TODO...
+    use InteractsWithQueue;
+
+    /**
+     * This needs replacing with a lookup to find the edge cluster for
+     * the VPC this router belongs too
+     */
+    const EDGE_CLUSTER_ID = '8bc61267-583e-4988-b5d9-16b46f7fe900';
 
     /**
      * @var NsxService
@@ -31,38 +39,26 @@ final class RouterDeploy //implements ShouldQueue TODO...
      */
     public function handle(RouterCreated $event)
     {
-        dd($event->router->toArray());
+        /** @var Router $router */
+        $router = $event->router;
 
-        try {
+//        try {
             $response = $this->nsxService->post('api/v1/logical-routers', [
-                'resource_type' => 'LogicalRouter',
-                'description' => 'Test Router Made Via API',
-                'display_name' => 'tier-1',
-                'edge_cluster_id' => 'a9dc562c-effd-4225-883d-3f7d2c887c6b',
-                'advanced_config' => [
-                    'external_transit_networks' => [
-                        '100.64.1.0/10'
-                    ],
-                    'internal_transit_network' => '169.254.0.0/28'
+                'json' => [
+                    'resource_type' => 'LogicalRouter',
+                    'description' => $router->name,
+                    'display_name' => $router->id,
+                    'edge_cluster_id' => self::EDGE_CLUSTER_ID,
+                    'router_type' => 'TIER1',
+                    'high_availability_mode' => 'ACTIVE_ACTIVE'
                 ],
-                'allocation_profile' => [
-                    'enable_standby_relocation' => false
-                ],
-                'router_type' => 'TIER0',
-                'high_availability_mode' => 'ACTIVE_ACTIVE'
             ]);
-        } catch (\Exception $exception) {
-            var_dump($exception->getMessage());
-            die();
-        }
+//        } catch (GuzzleException $exception) {
+//            $error = $exception->getResponse()->getBody()->getContents();
+//            dd($error);
+//        }
 
-        $obj = json_decode($response->getBody()->getContents());
-        var_dump($obj);
-        die();
-    }
-
-    public function failed(RouterCreated $event, $exception)
-    {
-        // TODO :- Handle it
+        $router->active = true;
+        $router->save();
     }
 }

@@ -6,10 +6,6 @@ use App\Events\V2\RouterCreated;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -26,6 +22,9 @@ class Router extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
+    public const STATUS_OK = 0;
+    public const STATUS_FAIL = 1;
+
     public const KEY_PREFIX = 'rtr';
     protected $connection = 'ecloud';
     protected $table = 'routers';
@@ -36,18 +35,28 @@ class Router extends Model implements Filterable, Sortable
     public $incrementing = false;
     public $timestamps = true;
 
-    /**
-     * The event map for the model.
-     *
-     * @var array
-     */
     protected $dispatchesEvents = [
         'created' => RouterCreated::class,
     ];
 
+    public function gateways()
+    {
+        return $this->belongsToMany(Gateway::class);
+    }
+
+    public function availabilityZones()
+    {
+        return $this->belongsToMany(AvailabilityZone::class);
+    }
+
+    public function vpns()
+    {
+        return $this->hasOne(Vpn::class, 'id', 'router_id');
+    }
+
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
-     * @return array|\UKFast\DB\Ditto\Filter[]
+     * @param FilterFactory $factory
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
@@ -60,7 +69,7 @@ class Router extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -75,8 +84,9 @@ class Router extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -85,9 +95,6 @@ class Router extends Model implements Filterable, Sortable
         ];
     }
 
-    /**
-     * @return array|string[]
-     */
     public function databaseNames()
     {
         return [
@@ -96,44 +103,5 @@ class Router extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    /**
-     * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
-     */
-    public function properties()
-    {
-        return [
-            IdProperty::create('id', 'id', null, 'uuid'),
-            StringProperty::create('name', 'name'),
-            DateTimeProperty::create('created_at', 'created_at'),
-            DateTimeProperty::create('updated_at', 'updated_at')
-        ];
-    }
-
-    /**
-     * Many to Many with Gateways table
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function gateways()
-    {
-        return $this->belongsToMany(Gateway::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function availabilityZones()
-    {
-        return $this->belongsToMany(AvailabilityZone::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function vpns()
-    {
-        return $this->hasOne(Vpn::class, 'id', 'router_id');
     }
 }
