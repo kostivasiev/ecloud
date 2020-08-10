@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Vpn\AfterCreateEvent;
-use App\Events\V2\Vpn\AfterDeleteEvent;
-use App\Events\V2\Vpn\AfterUpdateEvent;
-use App\Events\V2\Vpn\BeforeCreateEvent;
-use App\Events\V2\Vpn\BeforeDeleteEvent;
-use App\Events\V2\Vpn\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateVpnRequest;
 use App\Http\Requests\V2\UpdateVpnRequest;
 use App\Models\V2\Vpn;

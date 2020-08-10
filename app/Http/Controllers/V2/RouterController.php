@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Router\AfterCreateEvent;
-use App\Events\V2\Router\AfterDeleteEvent;
-use App\Events\V2\Router\AfterUpdateEvent;
-use App\Events\V2\Router\BeforeCreateEvent;
-use App\Events\V2\Router\BeforeDeleteEvent;
-use App\Events\V2\Router\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Models\V2\Gateway;

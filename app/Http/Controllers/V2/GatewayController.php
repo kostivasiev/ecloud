@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Gateway\AfterCreateEvent;
-use App\Events\V2\Gateway\AfterDeleteEvent;
-use App\Events\V2\Gateway\AfterUpdateEvent;
-use App\Events\V2\Gateway\BeforeCreateEvent;
-use App\Events\V2\Gateway\BeforeDeleteEvent;
-use App\Events\V2\Gateway\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateGatewayRequest;
 use App\Http\Requests\V2\UpdateGatewayRequest;
 use App\Models\V2\Gateway;

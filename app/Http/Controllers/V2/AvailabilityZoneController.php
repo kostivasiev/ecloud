@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\AvailabilityZone\AfterCreateEvent;
-use App\Events\V2\AvailabilityZone\AfterDeleteEvent;
-use App\Events\V2\AvailabilityZone\AfterUpdateEvent;
-use App\Events\V2\AvailabilityZone\BeforeCreateEvent;
-use App\Events\V2\AvailabilityZone\BeforeDeleteEvent;
-use App\Events\V2\AvailabilityZone\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Resources\V2\AvailabilityZoneResource;

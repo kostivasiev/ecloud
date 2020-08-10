@@ -1,12 +1,6 @@
 <?php
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\FirewallRule\AfterCreateEvent;
-use App\Events\V2\FirewallRule\AfterDeleteEvent;
-use App\Events\V2\FirewallRule\AfterUpdateEvent;
-use App\Events\V2\FirewallRule\BeforeCreateEvent;
-use App\Events\V2\FirewallRule\BeforeDeleteEvent;
-use App\Events\V2\FirewallRule\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateFirewallRuleRequest;
 use App\Http\Requests\V2\UpdateFirewallRuleRequest;
 use App\Models\V2\FirewallRule;

@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Network\AfterCreateEvent;
-use App\Events\V2\Network\AfterDeleteEvent;
-use App\Events\V2\Network\AfterUpdateEvent;
-use App\Events\V2\Network\BeforeCreateEvent;
-use App\Events\V2\Network\BeforeDeleteEvent;
-use App\Events\V2\Network\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateNetworkRequest;
 use App\Http\Requests\V2\UpdateNetworkRequest;
 use App\Models\V2\Network;

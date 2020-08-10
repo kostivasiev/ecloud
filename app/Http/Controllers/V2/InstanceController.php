@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Instances\AfterCreateEvent;
-use App\Events\V2\Instances\AfterDeleteEvent;
-use App\Events\V2\Instances\AfterUpdateEvent;
-use App\Events\V2\Instances\BeforeCreateEvent;
-use App\Events\V2\Instances\BeforeDeleteEvent;
-use App\Events\V2\Instances\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
 use App\Models\V2\Instance;

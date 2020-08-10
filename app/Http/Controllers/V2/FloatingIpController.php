@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\FloatingIps\AfterCreateEvent;
-use App\Events\V2\FloatingIps\AfterDeleteEvent;
-use App\Events\V2\FloatingIps\AfterUpdateEvent;
-use App\Events\V2\FloatingIps\BeforeCreateEvent;
-use App\Events\V2\FloatingIps\BeforeDeleteEvent;
-use App\Events\V2\FloatingIps\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateFloatingIpRequest;
 use App\Http\Requests\V2\UpdateFloatingIpRequest;
 use App\Models\V2\FloatingIp;

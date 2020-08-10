@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Vpc\AfterCreateEvent;
-use App\Events\V2\Vpc\AfterDeleteEvent;
-use App\Events\V2\Vpc\AfterUpdateEvent;
-use App\Events\V2\Vpc\BeforeCreateEvent;
-use App\Events\V2\Vpc\BeforeDeleteEvent;
-use App\Events\V2\Vpc\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
 use App\Models\V2\Vpc;

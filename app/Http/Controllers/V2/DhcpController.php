@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Dhcp\AfterCreateEvent;
-use App\Events\V2\Dhcp\AfterDeleteEvent;
-use App\Events\V2\Dhcp\AfterUpdateEvent;
-use App\Events\V2\Dhcp\BeforeCreateEvent;
-use App\Events\V2\Dhcp\BeforeDeleteEvent;
-use App\Events\V2\Dhcp\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Models\V2\Dhcp;
