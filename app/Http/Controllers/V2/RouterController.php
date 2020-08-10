@@ -58,11 +58,9 @@ class RouterController extends BaseController
      */
     public function create(CreateRouterRequest $request)
     {
-        event(new BeforeCreateEvent());
         $router = new Router($request->only(['name', 'vpc_id']));
         $router->save();
         $router->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $router->getKey(), 201);
     }
 
@@ -73,11 +71,9 @@ class RouterController extends BaseController
      */
     public function update(UpdateRouterRequest $request, string $routerUuid)
     {
-        event(new BeforeUpdateEvent());
         $router = Router::findOrFail($routerUuid);
         $router->fill($request->only(['name', 'vpc_id']));
         $router->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $router->getKey(), 200);
     }
 
@@ -88,10 +84,8 @@ class RouterController extends BaseController
      */
     public function destroy(Request $request, string $routerUuid)
     {
-        event(new BeforeDeleteEvent());
         $router = Router::findOrFail($routerUuid);
         $router->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 

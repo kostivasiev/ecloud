@@ -55,11 +55,9 @@ class VpnController extends BaseController
      */
     public function create(CreateVpnRequest $request)
     {
-        event(new BeforeCreateEvent());
         $vpns = new Vpn($request->only(['router_id', 'availability_zone_id']));
         $vpns->save();
         $vpns->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $vpns->getKey(), 201);
     }
 
@@ -70,11 +68,9 @@ class VpnController extends BaseController
      */
     public function update(UpdateVpnRequest $request, string $vpnId)
     {
-        event(new BeforeUpdateEvent());
         $vpns = Vpn::findOrFail($vpnId);
         $vpns->fill($request->only(['router_id', 'availability_zone_id']));
         $vpns->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $vpns->getKey(), 200);
     }
 
@@ -84,10 +80,8 @@ class VpnController extends BaseController
      */
     public function destroy(string $vpnId)
     {
-        event(new BeforeDeleteEvent());
         $vpns = Vpn::findOrFail($vpnId);
         $vpns->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

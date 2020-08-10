@@ -57,13 +57,11 @@ class FloatingIpController extends BaseController
      */
     public function store(CreateFloatingIpRequest $request)
     {
-        event(new BeforeCreateEvent());
         $resource = new FloatingIp(
             //$request->only([''])
         );
         $resource->save();
         $resource->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
 
@@ -74,11 +72,9 @@ class FloatingIpController extends BaseController
      */
     public function update(UpdateFloatingIpRequest $request, string $instanceId)
     {
-        event(new BeforeUpdateEvent());
         $resource = FloatingIp::findOrFail($instanceId);
         //$instance->fill($request->only([]));
         $resource->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
 
@@ -89,10 +85,8 @@ class FloatingIpController extends BaseController
      */
     public function destroy(Request $request, string $instanceId)
     {
-        event(new BeforeDeleteEvent());
         $resource = FloatingIp::findOrFail($instanceId);
         $resource->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

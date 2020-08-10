@@ -55,12 +55,10 @@ class FirewallRuleController extends BaseController
      */
     public function store(CreateFirewallRuleRequest $request)
     {
-        event(new BeforeCreateEvent());
         $instance = new FirewallRule();
         $instance->fill($request->only(['name']));
         $instance->save();
         $instance->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
 
@@ -71,11 +69,9 @@ class FirewallRuleController extends BaseController
      */
     public function update(UpdateFirewallRuleRequest $request, string $firewallRuleId)
     {
-        event(new BeforeUpdateEvent());
         $item = FirewallRule::findOrFail($firewallRuleId);
         $item->fill($request->only(['name']));
         $item->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $item->getKey(), 200);
     }
 
@@ -85,10 +81,8 @@ class FirewallRuleController extends BaseController
      */
     public function destroy(string $firewallRuleId)
     {
-        event(new BeforeDeleteEvent());
         $item = FirewallRule::findOrFail($firewallRuleId);
         $item->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

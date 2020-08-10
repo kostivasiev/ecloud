@@ -64,13 +64,11 @@ class VpcController extends BaseController
      */
     public function create(CreateVpcRequest $request)
     {
-        event(new BeforeCreateEvent());
         $request->user = app('request')->user;
         $virtualPrivateClouds = new Vpc($request->only(['name']));
         $virtualPrivateClouds->reseller_id = $request->user->resellerId;
         $virtualPrivateClouds->save();
         $virtualPrivateClouds->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $virtualPrivateClouds->getKey(), 201);
     }
 
@@ -88,13 +86,11 @@ class VpcController extends BaseController
         }
         $virtualPrivateCloud = $vpc->findOrFail($vpcUuid);
 
-        event(new BeforeUpdateEvent());
         $virtualPrivateCloud->fill($request->only(['name']));
         if ($request->user->isAdministrator) {
             $virtualPrivateCloud->reseller_id = $request->input('reseller_id', $virtualPrivateCloud->reseller_id);
         }
         $virtualPrivateCloud->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $virtualPrivateCloud->getKey(), 200);
     }
 
@@ -111,9 +107,7 @@ class VpcController extends BaseController
         }
         $virtualPrivateCloud = $vpc->findOrFail($vdcUuid);
 
-        event(new BeforeDeleteEvent());
         $virtualPrivateCloud->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

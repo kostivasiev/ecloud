@@ -55,13 +55,11 @@ class NetworkController extends BaseController
      */
     public function create(CreateNetworkRequest $request)
     {
-        event(new BeforeCreateEvent());
         $network = new Network($request->only([
             'router_id', 'availability_zone_id',  'name'
         ]));
         $network->save();
         $network->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $network->getKey(), 201);
     }
 
@@ -72,13 +70,11 @@ class NetworkController extends BaseController
      */
     public function update(UpdateNetworkRequest $request, string $networkId)
     {
-        event(new BeforeUpdateEvent());
         $networks = Network::findOrFail($networkId);
         $networks->fill($request->only([
             'router_id', 'availability_zone_id',  'name'
         ]));
         $networks->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $networks->getKey(), 200);
     }
 
@@ -88,10 +84,8 @@ class NetworkController extends BaseController
      */
     public function destroy(string $networkId)
     {
-        event(new BeforeDeleteEvent());
         $networks = Network::findOrFail($networkId);
         $networks->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

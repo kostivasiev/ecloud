@@ -58,13 +58,11 @@ class AvailabilityZoneController extends BaseController
      */
     public function create(CreateAvailabilityZoneRequest $request)
     {
-        event(new BeforeCreateEvent());
         $availabilityZone = new AvailabilityZone($request->only([
             'code', 'name', 'datacentre_site_id', 'is_public',
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 201);
     }
 
@@ -75,13 +73,11 @@ class AvailabilityZoneController extends BaseController
      */
     public function update(UpdateAvailabilityZoneRequest $request, string $zoneId)
     {
-        event(new BeforeUpdateEvent());
         $availabilityZone = AvailabilityZone::findOrFail($zoneId);
         $availabilityZone->fill($request->only([
             'code', 'name', 'datacentre_site_id', 'is_public'
         ]));
         $availabilityZone->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
     }
 
@@ -92,10 +88,8 @@ class AvailabilityZoneController extends BaseController
      */
     public function destroy(Request $request, string $zoneId)
     {
-        event(new BeforeDeleteEvent());
         $availabilityZone = AvailabilityZone::findOrFail($zoneId);
         $availabilityZone->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 
