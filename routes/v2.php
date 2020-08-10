@@ -117,12 +117,22 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
     });
 
+    /** Floating Ips */
     $router->group([], function () use ($router) {
         $router->get('floating-ips', 'FloatingIpController@index');
         $router->get('floating-ips/{fipId}', 'FloatingIpController@show');
         $router->post('floating-ips', 'FloatingIpController@store');
         $router->patch('floating-ips/{fipId}', 'FloatingIpController@update');
         $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
+    });
+
+    /** Firewall Rules */
+    $router->group([], function () use ($router) {
+        $router->get('firewall-rules', 'FirewallRuleController@index');
+        $router->get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
+        $router->post('firewall-rules', 'FirewallRuleController@store');
+        $router->patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
+        $router->delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
     });
 });
 
