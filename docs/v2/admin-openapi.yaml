@@ -21,7 +21,7 @@ components:
       properties:
         id:
           type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
           readOnly: false
         code:
           type: string
@@ -53,7 +53,7 @@ components:
       properties:
         id:
           type: string
-          example: gtw-2b66bb79
+          example: gw-2b66bb79
           readOnly: false
         name:
           type: string
@@ -182,13 +182,13 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: avz-2b66bb79
+                        example: az-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/avz-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/az-2b66bb79'
       requestBody:
         required: true
         content:
@@ -222,7 +222,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
     patch:
       responses:
         200:
@@ -236,13 +236,13 @@ paths:
                     type: object
                     properties:
                       id: string
-                      example: avz-2b66bb79
+                      example: az-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/avz-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/az-2b66bb79'
       requestBody:
         required: true
         content:
@@ -258,7 +258,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
     delete:
       responses:
         204:
@@ -272,7 +272,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
   '/ecloud/v2/availability-zones/{zoneId}/routers/{routerId}':
     put:
       responses:
@@ -287,7 +287,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
         -
           name: routerId
           in: path
@@ -308,7 +308,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
         -
           name: routerId
           in: path
@@ -400,13 +400,13 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: gtw-2b66bb79
+                        example: gw-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gtw-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gw-2b66bb79'
       requestBody:
         required: true
         content:
@@ -440,7 +440,7 @@ paths:
           required: true
           schema:
             type: string
-          example: gtw-2b66bb79
+          example: gw-2b66bb79
     patch:
       responses:
         200:
@@ -454,13 +454,13 @@ paths:
                     type: object
                     properties:
                       id: string
-                      example: gtw-2b66bb79
+                      example: gw-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gtw-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gw-2b66bb79'
       requestBody:
         required: true
         content:
@@ -476,7 +476,7 @@ paths:
           required: true
           schema:
             type: string
-          example: gtw-2b66bb79
+          example: gw-2b66bb79
     delete:
       responses:
         204:
@@ -490,7 +490,7 @@ paths:
           required: true
           schema:
             type: string
-          example: gtw-2b66bb79
+          example: gw-2b66bb79
   '/ecloud/v2/routers':
     get:
       responses:
@@ -687,7 +687,7 @@ paths:
           required: true
           schema:
             type: string
-          example: gtw-2b66bb79
+          example: gw-2b66bb79
     delete:
       responses:
         204:
@@ -708,4 +708,4 @@ paths:
           required: true
           schema:
             type: string
-          example: gtw-2b66bb79
+          example: gw-2b66bb79
