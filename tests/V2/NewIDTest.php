@@ -174,6 +174,7 @@ class NewIDTest extends TestCase
     {
         $router = (factory(Router::class, 1)->create()->first())->refresh();
         $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+
         $this->put(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
             [],

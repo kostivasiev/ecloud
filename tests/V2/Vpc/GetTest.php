@@ -33,7 +33,7 @@ class GetTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testGetCollection()
+    public function testGetCollectionAdmin()
     {
         $virtualPrivateCloud = factory(Vpc::class, 1)->create([
             'name'    => 'Manchester DC',
@@ -81,6 +81,33 @@ class GetTest extends TestCase
             ->seeJson([
                 'id'         => $vpc->getKey(),
                 'name'       => $vpc->name,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testGetCollectionAdminResellerScope()
+    {
+        $vpc1 = factory(Vpc::class, 1)->create([
+            'reseller_id' => 1,
+        ])->first();
+
+        $vpc2 = factory(Vpc::class, 1)->create([
+            'reseller_id' => 2,
+        ])->first();
+
+        $this->get(
+            '/v2/vpcs',
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+                'X-Reseller-Id' => 1
+            ]
+        )
+            ->dontSeeJson([
+                'id'         => $vpc2->getKey(),
+            ])
+            ->seeJson([
+                'id'         => $vpc1->getKey(),
             ])
             ->assertResponseStatus(200);
     }

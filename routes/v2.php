@@ -44,10 +44,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
             $router->post('vpcs', 'VpcController@create');
         });
-        $router->patch('vpcs/{vpcUuid}', 'VpcController@update');
+        $router->patch('vpcs/{vpcId}', 'VpcController@update');
         $router->get('vpcs', 'VpcController@index');
-        $router->get('vpcs/{vpcUuid}', 'VpcController@show');
-        $router->delete('vpcs/{vpcUuid}', 'VpcController@destroy');
+        $router->get('vpcs/{vpcId}', 'VpcController@show');
+        $router->delete('vpcs/{vpcId}', 'VpcController@destroy');
     });
 
 
@@ -79,21 +79,21 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Routers */
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-        $router->get('routers', 'RouterController@index');
-        $router->get('routers/{routerUuid}', 'RouterController@show');
-        $router->post('routers', 'RouterController@create');
-        $router->patch('routers/{routerUuid}', 'RouterController@update');
-        $router->delete('routers/{routerUuid}', 'RouterController@destroy');
+    $router->get('routers', 'RouterController@index');
+    $router->get('routers/{routerId}', 'RouterController@show');
+    $router->post('routers', 'RouterController@create');
+    $router->patch('routers/{routerId}', 'RouterController@update');
+    $router->delete('routers/{routerId}', 'RouterController@destroy');
 
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         /** Routers Gateways */
         $router->group([], function () use ($router) {
             $router->put(
-                'routers/{routerUuid}/gateways/{gatewaysUuid}',
+                'routers/{routerId}/gateways/{gatewayId}',
                 'RouterController@gatewaysCreate'
             );
             $router->delete(
-                'routers/{routerUuid}/gateways/{gatewaysUuid}',
+                'routers/{routerId}/gateways/{gatewayId}',
                 'RouterController@gatewaysDestroy'
             );
         });
