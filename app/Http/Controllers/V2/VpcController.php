@@ -69,7 +69,6 @@ class VpcController extends BaseController
         $virtualPrivateClouds = new Vpc($request->only(['name']));
         $virtualPrivateClouds->reseller_id = $request->user->resellerId;
         $virtualPrivateClouds->save();
-        $virtualPrivateClouds->refresh();
         event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $virtualPrivateClouds->getKey(), 201);
     }

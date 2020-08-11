@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -37,7 +38,7 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsFailed()
+    public function testNullNameDefaultsToId()
     {
         $data = [
             'name'    => '',
@@ -51,13 +52,15 @@ class CreateTest extends TestCase
                 'X-Reseller-Id' => 1,
             ]
         )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The name field is required',
-                'status' => 422,
-                'source' => 'name'
-            ])
-            ->assertResponseStatus(422);
+            ->assertResponseStatus(201);
+
+        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
+        $this->seeJson([
+            'id' => $virtualPrivateCloudId,
+        ]);
+
+        $vpc = Vpc::findOrFail($virtualPrivateCloudId);
+        $this->assertEquals($virtualPrivateCloudId, $vpc->name);
     }
 
     public function testNotScopedFails()
