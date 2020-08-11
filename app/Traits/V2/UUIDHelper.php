@@ -15,13 +15,10 @@ trait UUIDHelper
     public static $keyLength = 4;
 
     /**
-     * Boot the Model.
-     * Create and save UUID on saving a new record
+     * @throws \Exception
      */
-    public static function boot()
+    public static function initializeUUIDHelper()
     {
-        parent::boot();
-
         static::creating(function ($instance) {
             $instance->{$instance->getKeyName()} = static::generateId($instance);
         });

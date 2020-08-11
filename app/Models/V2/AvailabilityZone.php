@@ -5,10 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -25,17 +21,50 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     use UUIDHelper, SoftDeletes;
 
     public const KEY_PREFIX = 'avz';
+
     protected $connection = 'ecloud';
+
     protected $table = 'availability_zones';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'code', 'name', 'datacentre_site_id', 'is_public', 'nsx_manager_endpoint'];
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
+    public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'code',
+        'name',
+        'datacentre_site_id',
+        'is_public',
+        'nsx_manager_endpoint'
+    ];
+
     protected $casts = [
         'is_public' => 'boolean',
         'datacentre_site_id' => 'integer',
     ];
 
-    public $incrementing = false;
-    public $timestamps = true;
+    public function routers()
+    {
+        return $this->belongsToMany(Router::class);
+    }
+
+    public function vpns()
+    {
+        return $this->hasMany(Vpn::class);
+    }
+
+    public function networks()
+    {
+        return $this->hasMany(Network::class);
+    }
+
+    public function gateways()
+    {
+        return $this->hasMany(Gateway::class);
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -75,8 +104,9 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -85,9 +115,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         ];
     }
 
-    /**
-     * @return array|string[]
-     */
     public function databaseNames()
     {
         return [
@@ -100,54 +127,5 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    /**
-     * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
-     */
-    public function properties()
-    {
-        return [
-            IdProperty::create('id', 'id', null, 'uuid'),
-            StringProperty::create('code', 'code'),
-            StringProperty::create('name', 'name'),
-            IntProperty::create('site_id', 'site_id'),
-            StringProperty::create('nsx_manager_endpoint', 'nsx_manager_endpoint'),
-            DateTimeProperty::create('created_at', 'created_at'),
-            DateTimeProperty::create('updated_at', 'updated_at')
-        ];
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function routers()
-    {
-        return $this->belongsToMany(Router::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function vpns()
-    {
-        return $this->hasMany(Vpn::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function networks()
-    {
-        return $this->hasMany(Network::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function gateways()
-    {
-        return $this->hasMany(Gateway::class);
     }
 }
