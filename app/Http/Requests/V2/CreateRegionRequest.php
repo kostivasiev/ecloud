@@ -5,10 +5,10 @@ namespace App\Http\Requests\V2;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateVirtualPrivateCloudsRequest
+ * Class CreateRegionRequest
  * @package App\Http\Requests\V2
  */
-class UpdateVpcRequest extends FormRequest
+class CreateRegionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,9 +28,7 @@ class UpdateVpcRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'sometimes|required|string',
-            'reseller_id' => 'sometimes|required|integer',
-            'region_id' => 'sometimes|required|string|exists:ecloud.regions,id,deleted_at,NULL'
+            'name'    => 'required|string'
         ];
     }
 
@@ -42,9 +40,7 @@ class UpdateVpcRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field, when specified, cannot be null',
-            'reseller_id.required' => 'The :attribute field, when specified, cannot be null',
-            'region_id.required' => 'The :attribute field, when specified, cannot be null',
+            'name.required' => 'The :attribute field is required',
         ];
     }
 }

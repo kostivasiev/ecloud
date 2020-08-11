@@ -50,7 +50,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpcs/{vpcId}', 'VpcController@destroy');
     });
 
-
     /** Dhcps */
     $router->group([], function () use ($router) {
         $router->get('dhcps', 'DhcpController@index');
@@ -133,6 +132,18 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('firewall-rules', 'FirewallRuleController@store');
         $router->patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
         $router->delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
+    });
+
+    /** Regions */
+    $router->group([], function () use ($router) {
+        $router->get('regions', 'RegionController@index');
+        $router->get('regions/{regionId}', 'RegionController@show');
+
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->post('regions', 'RegionController@create');
+            $router->patch('regions/{regionId}', 'RegionController@update');
+            $router->delete('regions/{regionId}', 'RegionController@destroy');
+        });
     });
 });
 

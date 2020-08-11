@@ -28,7 +28,8 @@ class CreateVpcRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'required|string'
+            'name' => 'required|string',
+            'region_id' => 'required|string'
         ];
     }
 
@@ -41,6 +42,7 @@ class CreateVpcRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field is required',
+            'region_id.required' => 'The :attribute field is required',
         ];
     }
 }
