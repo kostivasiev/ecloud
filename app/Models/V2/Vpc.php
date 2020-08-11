@@ -38,7 +38,8 @@ class Vpc extends Model implements Filterable, Sortable
     /**
      * If no name is passed when creating, default the name to the id value
      */
-    public static function boot() {
+    public static function boot()
+    {
         static::UUIDHelperBoot();
         static::creating(function ($instance) {
             if (empty($instance->name)) {
