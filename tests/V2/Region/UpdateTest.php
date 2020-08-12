@@ -49,7 +49,7 @@ class UpdateTest extends TestCase
             'name'    => '',
         ];
         $this->patch(
-            '/v2/regions/' . $this->regions->getKey(),
+            '/v2/regions/' . $this->region->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -71,7 +71,7 @@ class UpdateTest extends TestCase
             'name'    => $this->faker->word(),
         ];
         $this->patch(
-            '/v2/regions/' . $this->regions->getKey(),
+            '/v2/regions/' . $this->region->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -79,13 +79,13 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeInDatabase(
-                'virtual_private_clouds',
+                'regions',
                 $data,
                 'ecloud'
             )
             ->assertResponseStatus(200);
 
-        $region = Region::findOrFail($this->regions->getKey());
+        $region = Region::findOrFail($this->region->getKey());
         $this->assertEquals($data['name'], $region->name);
     }
 }

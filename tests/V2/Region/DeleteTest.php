@@ -51,7 +51,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No region with that ID was found',
+                'detail' => 'No Region with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -60,7 +60,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/regions/' . $this->regions->getKey(),
+            '/v2/regions/' . $this->region->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',

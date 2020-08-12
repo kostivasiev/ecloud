@@ -86,7 +86,7 @@ class UpdateTest extends TestCase
                 'title'  => 'Validation Error',
                 'detail' => 'The region id field, when specified, cannot be null',
                 'status' => 422,
-                'source' => 'name'
+                'source' => 'region_id'
             ])
             ->assertResponseStatus(422);
     }

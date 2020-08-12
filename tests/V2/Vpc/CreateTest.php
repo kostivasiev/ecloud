@@ -42,30 +42,6 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsFailed()
-    {
-        $data = [
-            'name'    => '',
-            'region_id'    => $this->region->getKey(),
-        ];
-        $this->post(
-            '/v2/vpcs',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-                'X-Reseller-Id' => 1,
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The name field is required',
-                'status' => 422,
-                'source' => 'name'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testNullRegionIsFailed()
     {
         $data = [
@@ -82,9 +58,9 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The region_id field is required',
+                'detail' => 'The region id field is required',
                 'status' => 422,
-                'source' => 'name'
+                'source' => 'region_id'
             ])
             ->assertResponseStatus(422);
     }
