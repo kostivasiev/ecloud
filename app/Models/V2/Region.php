@@ -83,4 +83,9 @@ class Region extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
+
+    public function availabilityZones()
+    {
+        return $this->hasMany(AvailabilityZone::class);
+    }
 }

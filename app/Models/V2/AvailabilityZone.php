@@ -28,7 +28,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'availability_zones';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'code', 'name', 'datacentre_site_id', 'is_public'];
+    protected $fillable = ['id', 'code', 'name', 'datacentre_site_id', 'is_public', 'region_id'];
     protected $casts = [
         'is_public' => 'boolean',
         'datacentre_site_id' => 'integer',
@@ -48,6 +48,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('code', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('datacentre_site_id', Filter::$numericDefaults),
+            $factory->create('region_id', Filter::$numericDefaults),
             $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
@@ -66,6 +67,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('code'),
             $factory->create('name'),
             $factory->create('datacentre_site_id'),
+            $factory->create('region_id'),
             $factory->create('is_public'),
             $factory->create('created_at'),
             $factory->create('updated_at')
@@ -93,6 +95,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'code'       => 'code',
             'name'       => 'name',
             'datacentre_site_id'    => 'datacentre_site_id',
+            'region_id'    => 'region_id',
             'is_public'    => 'is_public',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

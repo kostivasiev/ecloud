@@ -40,6 +40,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
+            $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -56,6 +57,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('reseller_id'),
+            $factory->create('region_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -82,6 +84,7 @@ class Vpc extends Model implements Filterable, Sortable
             'id'         => 'id',
             'name'       => 'name',
             'reseller_id' => 'reseller_id',
+            'region_id' => 'region_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

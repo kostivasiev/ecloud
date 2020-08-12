@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -17,6 +18,9 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->region = factory(Region::class, 1)->create([
+            'name'    => 'Manchester',
+        ])->first();
     }
 
     public function testNoPermsIsDenied()
@@ -24,6 +28,7 @@ class UpdateTest extends TestCase
         $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => 'Manchester DC',
+            'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
             '/v2/vpcs/' . $vdc->getKey(),
@@ -43,6 +48,7 @@ class UpdateTest extends TestCase
         $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => '',
+            'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
             '/v2/vpcs/' . $vdc->getKey(),
@@ -61,11 +67,36 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNullRegionIsDenied()
+    {
+        $vdc = $this->createPrivateCloud();
+        $data = [
+            'name'    => $this->faker->word(),
+            'region_id'    => '',
+        ];
+        $this->patch(
+            '/v2/vpcs/' . $vdc->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The region id field, when specified, cannot be null',
+                'status' => 422,
+                'source' => 'name'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testNonMatchingResellerIdFails()
     {
         $vdc = factory(Vpc::class, 1)->create(['reseller_id' => 3])->first();
         $data = [
             'name'    => 'Manchester DC',
+            'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
             '/v2/vpcs/' . $vdc->getKey(),
@@ -88,7 +119,8 @@ class UpdateTest extends TestCase
         $vdc = $this->createPrivateCloud();
         $data = [
             'name'    => $this->faker->word(),
-            'reseller_id' => 2
+            'reseller_id' => 2,
+            'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
             '/v2/vpcs/' . $vdc->getKey(),

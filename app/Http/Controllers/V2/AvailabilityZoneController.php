@@ -60,10 +60,9 @@ class AvailabilityZoneController extends BaseController
     {
         event(new BeforeCreateEvent());
         $availabilityZone = new AvailabilityZone($request->only([
-            'code', 'name', 'datacentre_site_id', 'is_public',
+            'code', 'name', 'datacentre_site_id', 'is_public', 'region_id'
         ]));
         $availabilityZone->save();
-        $availabilityZone->refresh();
         event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 201);
     }
@@ -76,13 +75,15 @@ class AvailabilityZoneController extends BaseController
     public function update(UpdateAvailabilityZoneRequest $request, string $zoneId)
     {
         event(new BeforeUpdateEvent());
-        $availabilityZone = AvailabilityZone::findOrFail($zoneId);
-        $availabilityZone->fill($request->only([
-            'code', 'name', 'datacentre_site_id', 'is_public'
-        ]));
-        $availabilityZone->save();
+        $az = AvailabilityZone::findOrFail($zoneId);
+        $az->code = $request->input('code', $az->code);
+        $az->name = $request->input('name', $az->name);
+        $az->datacentre_site_id = $request->input('datacentre_site_id', $az->datacentre_site_id);
+        $az->is_public = $request->input('is_public', $az->is_public);
+        $az->region_id = $request->input('region_id', $az->region_id);
+        $az->save();
         event(new AfterUpdateEvent());
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
+        return $this->responseIdMeta($request, $az->getKey(), 200);
     }
 
     /**

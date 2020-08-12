@@ -7,6 +7,6 @@ use Faker\Generator as Faker;
 
 $factory->define(Region::class, function (Faker $faker) {
     return [
-        'name' => 'Manchester'
+        'name' => 'United Kingdom'
     ];
 });

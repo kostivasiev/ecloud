@@ -14,6 +14,7 @@ use App\Http\Requests\V2\UpdateRegionRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
+use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RegionResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
@@ -86,5 +87,19 @@ class RegionController extends BaseController
     {
         Region::findOrFail($regionId)->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $regionId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function availabilityZones(Request $request, string $regionId)
+    {
+        $availabilityZones = Region::findOrFail($regionId)->availabilityZones();
+
+        return AvailabilityZoneResource::collection($availabilityZones->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

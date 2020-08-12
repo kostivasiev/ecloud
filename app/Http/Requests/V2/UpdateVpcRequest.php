@@ -45,6 +45,7 @@ class UpdateVpcRequest extends FormRequest
             'name.required' => 'The :attribute field, when specified, cannot be null',
             'reseller_id.required' => 'The :attribute field, when specified, cannot be null',
             'region_id.required' => 'The :attribute field, when specified, cannot be null',
+            'region_id.exists' => 'The specified :attribute was not found'
         ];
     }
 }

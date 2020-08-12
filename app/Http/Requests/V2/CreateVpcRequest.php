@@ -29,7 +29,7 @@ class CreateVpcRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'region_id' => 'required|string'
+            'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL'
         ];
     }
 
@@ -43,6 +43,7 @@ class CreateVpcRequest extends FormRequest
         return [
             'name.required' => 'The :attribute field is required',
             'region_id.required' => 'The :attribute field is required',
+            'region_id.exists' => 'The specified :attribute was not found'
         ];
     }
 }
