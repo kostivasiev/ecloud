@@ -22,10 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Vpc extends Model implements Filterable, Sortable
 {
-    use SoftDeletes;
-    use UUIDHelper {
-        boot as UUIDHelperBoot;
-    }
+    use SoftDeletes, UUIDHelper;
 
     public const KEY_PREFIX = 'vpc';
     protected $connection = 'ecloud';
@@ -41,12 +38,13 @@ class Vpc extends Model implements Filterable, Sortable
      */
     public static function boot()
     {
-        static::UUIDHelperBoot();
-        static::creating(function ($instance) {
+        static::created(function ($instance) {
             if (empty($instance->name)) {
                 $instance->name = $instance->getKey();
+                $instance->save();
             }
         });
+        parent::boot();
     }
 
     /**

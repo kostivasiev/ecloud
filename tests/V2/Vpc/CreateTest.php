@@ -51,8 +51,7 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )
-            ->assertResponseStatus(201);
+        )->assertResponseStatus(201);
 
         $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
