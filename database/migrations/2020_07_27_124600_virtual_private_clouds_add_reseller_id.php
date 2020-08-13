@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-Class VirtualPrivateCloudsAddResellerId extends Migration
+class VirtualPrivateCloudsAddResellerId extends Migration
 {
     public function up()
     {

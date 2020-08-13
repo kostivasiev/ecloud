@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\V2\Router;
+namespace Tests\V2\Region;
 
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use App\Models\V2\Region;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -19,27 +18,41 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->vpc = factory(Vpc::class, 1)->create([
-            'name'    => 'Manchester DC',
+        $this->region = factory(Region::class, 1)->create([
+            'name'    => 'Manchester',
         ])->first();
+    }
 
-        $this->router = factory(Router::class, 1)->create([
-            'name'       => 'Manchester Router 1',
-            'vpc_id' => $this->vpc->getKey()
-        ])->first();
+    public function testNoPermsIsDenied()
+    {
+        $data = [
+            'name'    => 'United Kingdom',
+        ];
+        $this->post(
+            '/v2/regions',
+            $data,
+            []
+        )
+            ->seeJson([
+                'title'  => 'Unauthorised',
+                'detail' => 'Unauthorised',
+                'status' => 401,
+            ])
+            ->assertResponseStatus(401);
     }
 
     public function testNullNameIsFailed()
     {
         $data = [
-            'name' => '',
+            'name'    => '',
         ];
         $this->post(
-            '/v2/routers',
+            '/v2/regions',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => 1,
             ]
         )
             ->seeJson([
@@ -51,49 +64,46 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testInvalidVpcIdIsFailed()
+    public function testNotAdminFails()
     {
         $data = [
-            'name'    => 'Manchester Network',
-            'vpc_id' => $this->faker->uuid(),
+            'name'    => $this->faker->word(),
         ];
-
-        $this->patch(
-            '/v2/routers/' . $this->router->getKey(),
+        $this->post(
+            '/v2/regions',
             $data,
             [
-                'X-consumer-custom-id' => '0-0',
+                'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
+                'title'  => 'Unauthorised',
+                'detail' => 'Unauthorised',
+                'status' => 401,
             ])
-            ->assertResponseStatus(422);
+            ->assertResponseStatus(401);
     }
 
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => 'Manchester Router 1',
-            'vpc_id'    => $this->vpc->getKey()
+            'name'    => $this->faker->word(),
         ];
         $this->post(
-            '/v2/routers',
+            '/v2/regions',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => 1
             ]
         )
+            ->seeInDatabase(
+                'regions',
+                $data,
+                'ecloud'
+            )
             ->assertResponseStatus(201);
-
-        $routerId = (json_decode($this->response->getContent()))->data->id;
-        $router = Router::find($routerId);
-        $this->assertNotNull($router);
     }
-
 }

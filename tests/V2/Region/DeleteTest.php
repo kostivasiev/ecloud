@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\V2\Router;
+namespace Tests\V2\Region;
 
-use App\Models\V2\Router;
+use App\Models\V2\Region;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,12 +18,31 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->region = factory(Region::class, 1)->create()->first();
+    }
+
+    public function testNotAdminIsDenied()
+    {
+        $this->delete(
+            '/v2/regions/' . $this->region->getKey(),
+            [],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write'
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Unauthorised',
+                'detail' => 'Unauthorised',
+                'status' => 401,
+            ])
+            ->assertResponseStatus(401);
     }
 
     public function testFailInvalidId()
     {
         $this->delete(
-            '/v2/routers/' . $this->faker->uuid,
+            '/v2/regions/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -31,7 +51,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Not found',
-                'detail' => 'No Router with that ID was found',
+                'detail' => 'No Region with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -39,10 +59,8 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $router = factory(Router::class, 1)->create()->first();
-        $router->refresh();
         $this->delete(
-            '/v2/routers/' . $router->getKey(),
+            '/v2/regions/' . $this->region->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -50,8 +68,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $routerItem = Router::withTrashed()->findOrFail($router->getKey());
-        $this->assertNotNull($routerItem->deleted_at);
+        $region = Region::withTrashed()->findOrFail($this->region->getKey());
+        $this->assertNotNull($region->deleted_at);
     }
 
 }

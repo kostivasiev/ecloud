@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Models\V2\Region;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,6 +18,10 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+
+        $this->region = factory(Region::class, 1)->create([
+            'name'    => 'Manchester',
+        ])->first();
     }
 
     public function testNoPermsIsDenied()
@@ -37,10 +42,10 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsFailed()
+    public function testNullRegionIsFailed()
     {
         $data = [
-            'name'    => '',
+            'name'    => $this->faker->word(),
         ];
         $this->post(
             '/v2/vpcs',
@@ -53,9 +58,9 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The name field is required',
+                'detail' => 'The region id field is required',
                 'status' => 422,
-                'source' => 'name'
+                'source' => 'region_id'
             ])
             ->assertResponseStatus(422);
     }
@@ -64,7 +69,8 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => $this->faker->word(),
-            'reseller_id' => 1
+            'reseller_id' => 1,
+            'region_id'    => $this->region->getKey()
         ];
         $this->post(
             '/v2/vpcs',
@@ -86,6 +92,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => $this->faker->word(),
+            'region_id' => $this->region->getKey(),
             'reseller_id' => 1
         ];
         $this->post(
