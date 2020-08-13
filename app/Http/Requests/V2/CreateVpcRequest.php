@@ -28,7 +28,7 @@ class CreateVpcRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'required|string'
+            'name'    => 'nullable|string'
         ];
     }
 
@@ -39,8 +39,6 @@ class CreateVpcRequest extends FormRequest
      */
     public function messages()
     {
-        return [
-            'name.required' => 'The :attribute field is required',
-        ];
+        return [];
     }
 }

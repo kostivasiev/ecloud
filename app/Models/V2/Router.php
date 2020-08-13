@@ -17,6 +17,7 @@ use UKFast\DB\Ditto\Sortable;
  * @package App\Models\V2
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
+ * @method static forUser(string $user)
  */
 class Router extends Model implements Filterable, Sortable
 {
@@ -57,6 +58,24 @@ class Router extends Model implements Filterable, Sortable
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!empty($user->resellerId)) {
+            $query->whereHas('vpc', function ($query) use ($user) {
+                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($resellerId)) {
+                    $query->where('reseller_id', '=', $resellerId);
+                }
+            });
+        }
+        return $query;
     }
 
     /**
