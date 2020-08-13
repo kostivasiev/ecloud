@@ -50,6 +50,10 @@ components:
           type: string
           example: 'Manchester Cloud 1'
           readOnly: false
+        region_id:
+          type: string
+          example: 'reg-a63dd78c'
+          readOnly: false
         created_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
@@ -188,6 +192,27 @@ components:
           readOnly: false
       description: 'Availability Zones'
       required: {  }
+    Regions:
+      properties:
+        id:
+          type: string
+          example: reg-2b66bb79
+          readOnly: false
+        name:
+          type: string
+          example: 'United Kingdom'
+          readOnly: false
+        created_at:
+          type: string
+          example: '2020-07-07T10:30:00+01:00'
+          readOnly: true
+        updated_at:
+          type: string
+          example: '2020-07-07T10:30:00+01:00'
+          readOnly: true
+      description: 'Regions'
+      required: {  }
+
 paths:
   '/ecloud/v2/availability-zones':
     get:
@@ -386,6 +411,12 @@ paths:
                   description: Name of the Virtual Private Cloud
                   type: string
                   example: 'My Test VPC'
+                  required: false
+                region_id:
+                  description: Identifier of the region into which the VPC will be created
+                  type: string
+                  example: 'reg-a63dd78c'
+                  required: true
       tags:
         - VirtualPrivateClouds
       parameters: {  }
@@ -445,6 +476,11 @@ paths:
                   description: Name of the Virtual Private Cloud
                   type: string
                   example: 'My Test VPC'
+                region_id:
+                  description: Identifier of the region into which the VPC will reside
+                  type: string
+                  example: 'reg-a63dd78c'
+                  required: true
       tags:
         - VirtualPrivateClouds
       parameters:
@@ -1601,3 +1637,122 @@ paths:
           schema:
             type: string
           example: fwr-2b66bb79
+
+  '/ecloud/v2/regions':
+    get:
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Regions'
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 30
+                          count:
+                            type: integer
+                            example: 10
+                          per_page:
+                            type: integer
+                            example: 10
+                          current_page:
+                            type: integer
+                            example: 2
+                          total_pages:
+                            type: integer
+                            example: 3
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
+                              previous:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
+                              next:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
+                              last:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
+      tags:
+        - Regions
+      parameters:
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 'Number of items to display per page'
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 'Page number to jump to'
+  '/ecloud/v2/regions/{regionId}':
+    get:
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Regions'
+                  meta:
+                    type: object
+      tags:
+        - Regions
+      parameters:
+        -
+          name: regionId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: reg-2b66bb79
+
+  '/ecloud/v2/regions/{regionId}/availability-zones':
+    get:
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AvailabilityZones'
+      parameters:
+        - name: regionId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: reg-2b66bb79
+      tags:
+        - Regions
