@@ -26,10 +26,14 @@ class Router extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'routers';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'vpc_id'];
+    protected $fillable = ['id', 'name', 'vpc_id', 'deployed'];
 
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $casts = [
+        'deployed' => 'boolean',
+    ];
 
     protected $dispatchesEvents = [
         'created' => RouterCreated::class,
@@ -65,6 +69,7 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('deployed', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -81,6 +86,7 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
+            $factory->create('deployed'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -101,9 +107,10 @@ class Router extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
-            'vpc_id'       => 'vpc_id',
+            'id' => 'id',
+            'name' => 'name',
+            'vpc_id' => 'vpc_id',
+            'deployed' => 'deployed',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
