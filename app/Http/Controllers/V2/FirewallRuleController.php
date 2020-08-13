@@ -20,7 +20,6 @@ use UKFast\DB\Ditto\QueryTransformer;
  */
 class FirewallRuleController extends BaseController
 {
-
     /**
      * @param \Illuminate\Http\Request $request
      * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
@@ -57,7 +56,7 @@ class FirewallRuleController extends BaseController
     {
         event(new BeforeCreateEvent());
         $instance = new FirewallRule();
-        $instance->fill($request->only(['name']));
+        $instance->fill($request->only(['name', 'router_id']));
         $instance->save();
         $instance->refresh();
         event(new AfterCreateEvent());
@@ -73,7 +72,7 @@ class FirewallRuleController extends BaseController
     {
         event(new BeforeUpdateEvent());
         $item = FirewallRule::findOrFail($firewallRuleId);
-        $item->fill($request->only(['name']));
+        $item->fill($request->only(['name', 'router_id']));
         $item->save();
         event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $item->getKey(), 200);

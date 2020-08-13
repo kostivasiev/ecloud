@@ -23,8 +23,8 @@ class FirewallRule extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'firewall_rules';
     protected $primaryKey = 'id';
-    protected $fillable = ['name'];
-    protected $visible = ['id', 'name', 'created_at', 'updated_at'];
+    protected $fillable = ['name', 'router_id'];
+    protected $visible = ['id', 'name', 'router_id', 'created_at', 'updated_at'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -38,6 +38,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('router_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -53,6 +54,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('router_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -75,8 +77,9 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'=> 'id',
-            'name'=> 'name',
+            'id' => 'id',
+            'name' => 'name',
+            'router_id' => 'router_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
