@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\V2\Vpc;
+namespace Tests\V2\Region;
 
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
@@ -9,7 +9,6 @@ use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class CreateTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     protected $faker;
@@ -27,10 +26,10 @@ class CreateTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $data = [
-            'name'    => 'Manchester DC',
+            'name'    => 'United Kingdom',
         ];
         $this->post(
-            '/v2/vpcs',
+            '/v2/regions',
             $data,
             []
         )
@@ -42,13 +41,13 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullRegionIsFailed()
+    public function testNullNameIsFailed()
     {
         $data = [
-            'name'    => $this->faker->word(),
+            'name'    => '',
         ];
         $this->post(
-            '/v2/vpcs',
+            '/v2/regions',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -58,45 +57,41 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The region id field is required',
+                'detail' => 'The name field is required',
                 'status' => 422,
-                'source' => 'region_id'
+                'source' => 'name'
             ])
             ->assertResponseStatus(422);
     }
 
-    public function testNotScopedFails()
+    public function testNotAdminFails()
     {
         $data = [
             'name'    => $this->faker->word(),
-            'reseller_id' => 1,
-            'region_id'    => $this->region->getKey()
         ];
         $this->post(
-            '/v2/vpcs',
+            '/v2/regions',
             $data,
             [
-                'X-consumer-custom-id' => '0-0',
+                'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Bad Request',
-                'detail' => 'Missing Reseller scope',
-                'status' => 400,
+                'title'  => 'Unauthorised',
+                'detail' => 'Unauthorised',
+                'status' => 401,
             ])
-            ->assertResponseStatus(400);
+            ->assertResponseStatus(401);
     }
 
     public function testValidDataSucceeds()
     {
         $data = [
             'name'    => $this->faker->word(),
-            'region_id' => $this->region->getKey(),
-            'reseller_id' => 1
         ];
         $this->post(
-            '/v2/vpcs',
+            '/v2/regions',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -105,16 +100,10 @@ class CreateTest extends TestCase
             ]
         )
             ->seeInDatabase(
-                'virtual_private_clouds',
+                'regions',
                 $data,
                 'ecloud'
             )
             ->assertResponseStatus(201);
-
-        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $virtualPrivateCloudId,
-        ]);
     }
-
 }

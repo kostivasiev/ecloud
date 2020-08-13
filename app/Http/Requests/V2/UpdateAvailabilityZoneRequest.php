@@ -27,6 +27,7 @@ class UpdateAvailabilityZoneRequest extends FormRequest
             'name'    => 'sometimes|required|string',
             'datacentre_site_id' => 'sometimes|required|integer',
             'is_public' => 'sometimes|required|boolean',
+            'region_id' => 'sometimes|required|string|exists:ecloud.regions,id,deleted_at,NULL',
         ];
     }
 
@@ -36,6 +37,7 @@ class UpdateAvailabilityZoneRequest extends FormRequest
             'code.required' => 'The :attribute field, when specified, cannot be null',
             'name.required' => 'The :attribute field, when specified, cannot be null',
             'datacentre_site_id.required' => 'The :attribute field, when specified, cannot be null',
+            'region_id.exists' => 'The specified :attribute was not found'
         ];
     }
 }

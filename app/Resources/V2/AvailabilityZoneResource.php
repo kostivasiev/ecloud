@@ -11,6 +11,7 @@ use UKFast\Responses\UKFastResource;
  * @property string code
  * @property string name
  * @property int site_id
+ * @property int region_id
  * @property string created_at
  * @property string updated_at
  */
@@ -27,6 +28,7 @@ class AvailabilityZoneResource extends UKFastResource
             'code'       => $this->code,
             'name'       => $this->name,
             'datacentre_site_id' => $this->datacentre_site_id,
+            'region_id' => $this->region_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
