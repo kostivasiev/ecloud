@@ -49,16 +49,12 @@ class RouterDeploy implements ShouldQueue
                     'tier0_path' => '/infra/tier-0s/T0',
                 ],
             ]);
-//            $this->nsxService->post('api/v1/logical-routers', [
-//                'json' => [
-//                    'resource_type' => 'LogicalRouter',
-//                    'description' => $router->name,
-//                    'display_name' => $router->id,
-//                    'edge_cluster_id' => self::EDGE_CLUSTER_ID,
-//                    'router_type' => 'TIER1',
-//                    //'high_availability_mode' => 'ACTIVE_ACTIVE' // <- Causes it to fail 100% of the time for debugging
-//                ],
-//            ]);
+
+            $this->nsxService->put('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
+                'json' => [
+                    'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . self::EDGE_CLUSTER_ID,
+                ],
+            ]);
         } catch (GuzzleException $exception) {
             $json = json_decode($exception->getResponse()->getBody()->getContents());
             throw new \Exception($json);
