@@ -48,7 +48,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('code', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('datacentre_site_id', Filter::$numericDefaults),
-            $factory->create('region_id', Filter::$numericDefaults),
+            $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
