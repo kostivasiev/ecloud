@@ -22,7 +22,7 @@ components:
         id:
           type: string
           example: avz-2b66bb79
-          readOnly: false
+          readOnly: true
         code:
           type: string
           example: MAN1
