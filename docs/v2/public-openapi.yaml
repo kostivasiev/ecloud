@@ -154,6 +154,10 @@ components:
           type: string
           example: 'Internal FW Rule'
           readOnly: false
+        router_id:
+          type: string
+          example: rtr-2b66bb79
+          readOnly: false
         created_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
@@ -607,7 +611,7 @@ paths:
                   type: string
                   example: 'Network 1'
                 router_id:
-                  description: Identification of the router to assign the network to
+                  description: Identification of the associated router
                   type: string
                   example: rtr-2b66bb79
                 availability_zone_id:
@@ -675,7 +679,7 @@ paths:
                   type: string
                   example: 'Network 1'
                 router_id:
-                  description: Identification of the router to assign the network to
+                  description: Identification of the associated router
                   type: string
                   example: rtr-2b66bb79
                 availability_zone_id:
@@ -1536,6 +1540,9 @@ paths:
                       id:
                         type: string
                         example: fwr-2b66bb79
+                      router_id:
+                        type: string
+                        example: rtr-2b66bb79
                   meta:
                     type: object
                     properties:
@@ -1553,6 +1560,10 @@ paths:
                   description: Name of the firewall rule
                   type: string
                   example: fwr-2b66bb79
+                router_id:
+                  description: Identification of the associated router
+                  type: string
+                  example: rtr-2b66bb79
       tags:
         - FirewallRules
       parameters: {  }
