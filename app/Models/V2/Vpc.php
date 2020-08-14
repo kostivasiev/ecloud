@@ -5,9 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -18,19 +15,34 @@ use UKFast\DB\Ditto\Sortable;
  * Class VirtualPrivateClouds
  * @package App\Models\V2
  * @method static findOrFail(string $vdcUuid)
+ * @method static forUser(string $user)
  */
 class Vpc extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use SoftDeletes, UUIDHelper;
 
     public const KEY_PREFIX = 'vpc';
     protected $connection = 'ecloud';
     protected $table = 'virtual_private_clouds';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'reseller_id'];
+    protected $fillable = ['id', 'name', 'reseller_id', 'region_id'];
 
     public $incrementing = false;
     public $timestamps = true;
+
+    /**
+     * If no name is passed when creating, default the name to the id value
+     */
+    public static function boot()
+    {
+        static::created(function ($instance) {
+            if (empty($instance->name)) {
+                $instance->name = $instance->getKey();
+                $instance->save();
+            }
+        });
+        parent::boot();
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -42,6 +54,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
+            $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -58,6 +71,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('reseller_id'),
+            $factory->create('region_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -84,6 +98,7 @@ class Vpc extends Model implements Filterable, Sortable
             'id'         => 'id',
             'name'       => 'name',
             'reseller_id' => 'reseller_id',
+            'region_id' => 'region_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
@@ -112,5 +127,22 @@ class Vpc extends Model implements Filterable, Sortable
     public function dhcps()
     {
         return $this->belongsTo(Dhcp::class, 'id', 'vpc_id');
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!empty($user->resellerId)) {
+            $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($resellerId)) {
+                $query->where('reseller_id', '=', $resellerId);
+            }
+        }
+
+        return $query;
     }
 }

@@ -6,7 +6,5 @@ use App\Models\V2\Instance;
 use Faker\Generator as Faker;
 
 $factory->define(Instance::class, function (Faker $faker) {
-    return [
-        'id' => Instance::generateId(new Instance())
-    ];
+    return [];
 });

@@ -23,7 +23,7 @@ class RouterController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Router::query();
+        $collection = Router::forUser($request->user);
 
         (new QueryTransformer($request))
             ->config(Router::class)
@@ -36,13 +36,13 @@ class RouterController extends BaseController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param string $routerUuid
+     * @param string $routerId
      * @return RouterResource
      */
-    public function show(Request $request, string $routerUuid)
+    public function show(Request $request, string $routerId)
     {
         return new RouterResource(
-            Router::findOrFail($routerUuid)
+            Router::forUser($request->user)->findOrFail($routerId)
         );
     }
 
@@ -60,12 +60,12 @@ class RouterController extends BaseController
 
     /**
      * @param \App\Http\Requests\V2\UpdateRouterRequest $request
-     * @param string $routerUuid
+     * @param string $routerId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateRouterRequest $request, string $routerUuid)
+    public function update(UpdateRouterRequest $request, string $routerId)
     {
-        $router = Router::findOrFail($routerUuid);
+        $router = Router::forUser(app('request')->user)->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id']));
         $router->save();
         return $this->responseIdMeta($request, $router->getKey(), 200);
@@ -76,24 +76,23 @@ class RouterController extends BaseController
      * @param string $routerUuid
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, string $routerUuid)
+    public function destroy(Request $request, string $routerId)
     {
-        $router = Router::findOrFail($routerUuid);
-        $router->delete();
+        Router::forUser($request->user)->findOrFail($routerId)->delete();
         return response()->json([], 204);
     }
 
     /**
      * Associate a gateway with a router
      * @param \Illuminate\Http\Request $request
-     * @param string $routerUuid
-     * @param string $gatewaysUuid
+     * @param string $routerId
+     * @param string $gatewayId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function gatewaysCreate(Request $request, string $routerUuid, string $gatewaysUuid)
+    public function gatewaysCreate(Request $request, string $routerId, string $gatewayId)
     {
-        $router = Router::findOrFail($routerUuid);
-        $gateway = Gateway::findOrFail($gatewaysUuid);
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+        $gateway = Gateway::findOrFail($gatewayId);
         $router->gateways()->attach($gateway->id);
         return response()->json([], 204);
     }
@@ -107,7 +106,7 @@ class RouterController extends BaseController
      */
     public function gatewaysDestroy(Request $request, string $routerUuid, string $gatewaysUuid)
     {
-        $router = Router::findOrFail($routerUuid);
+        $router = Router::forUser($request->user)->findOrFail($routerUuid);
         $gateway = Gateway::findOrFail($gatewaysUuid);
         $router->gateways()->detach($gateway->id);
         return response()->json([], 204);

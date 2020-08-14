@@ -3,6 +3,7 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Region;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,6 +18,9 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->region = factory(Region::class, 1)->create([
+            'name'    => 'Manchester',
+        ])->first();
     }
 
     public function testNonAdminIsDenied()
@@ -25,6 +29,7 @@ class CreateTest extends TestCase
             'code'    => 'MAN1',
             'name'    => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/availability-zones',
@@ -47,6 +52,7 @@ class CreateTest extends TestCase
         $data = [
             'name'    => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/availability-zones',
@@ -70,6 +76,7 @@ class CreateTest extends TestCase
         $data = [
             'code'    => 'MAN1',
             'datacentre_site_id' => $this->faker->randomDigit(),
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/availability-zones',
@@ -93,6 +100,7 @@ class CreateTest extends TestCase
         $data = [
             'code'    => 'MAN1',
             'name'    => 'Manchester Zone 1',
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/availability-zones',
@@ -111,13 +119,39 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNullRegionIdIsFailed()
+    {
+        $data = [
+            'code'    => 'MAN1',
+            'name'    => 'Manchester Zone 1',
+            'datacentre_site_id' => $this->faker->randomDigit(),
+            'region_id' => ''
+        ];
+        $this->post(
+            '/v2/availability-zones',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The region id field is required',
+                'status' => 422,
+                'source' => 'region_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataSucceeds()
     {
         $data = [
             'code'    => 'MAN1',
             'name'    => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
-            'is_public' => false
+            'is_public' => false,
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/availability-zones',

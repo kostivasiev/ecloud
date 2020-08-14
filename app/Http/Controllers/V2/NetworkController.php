@@ -22,8 +22,7 @@ class NetworkController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Network::query();
-
+        $collection = Network::forUser($request->user);
         $queryTransformer->config(Network::class)
             ->transform($collection);
 
@@ -33,13 +32,14 @@ class NetworkController extends BaseController
     }
 
     /**
+     * @param Request $request
      * @param string $networkId
      * @return \App\Resources\V2\NetworkResource
      */
-    public function show(string $networkId)
+    public function show(Request $request, string $networkId)
     {
         return new NetworkResource(
-            Network::findOrFail($networkId)
+            Network::forUser($request->user)->findOrFail($networkId)
         );
     }
 
@@ -64,22 +64,24 @@ class NetworkController extends BaseController
      */
     public function update(UpdateNetworkRequest $request, string $networkId)
     {
-        $networks = Network::findOrFail($networkId);
-        $networks->fill($request->only([
+        $network = Network::forUser(app('request')->user)->findOrFail($networkId);
+        $network->fill($request->only([
             'router_id', 'availability_zone_id',  'name'
         ]));
-        $networks->save();
-        return $this->responseIdMeta($request, $networks->getKey(), 200);
+        $network->save();
+        return $this->responseIdMeta($request, $network->getKey(), 200);
     }
 
     /**
+     * @param Request $request
      * @param string $networkId
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
-    public function destroy(string $networkId)
+    public function destroy(Request $request, string $networkId)
     {
-        $networks = Network::findOrFail($networkId);
-        $networks->delete();
+        $network = Network::forUser($request->user)->findOrFail($networkId);
+        $network->delete();
         return response()->json([], 204);
     }
 }

@@ -21,11 +21,7 @@ class VpcController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Vpc::query();
-        if (!$request->user->isAdministrator) {
-            $collection = $collection->withReseller($request->user->resellerId);
-        }
-
+        $collection = Vpc::forUser($request->user);
         (new QueryTransformer($request))
             ->config(Vpc::class)
             ->transform($collection);
@@ -37,18 +33,13 @@ class VpcController extends BaseController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param string $vpcUuid
+     * @param string $vpcId
      * @return VpcResource
      */
-    public function show(Request $request, string $vpcUuid)
+    public function show(Request $request, string $vpcId)
     {
-        $vpc = Vpc::query();
-        if (!$request->user->isAdministrator) {
-            $vpc->withReseller($request->user->resellerId);
-        }
-
         return new VpcResource(
-            $vpc->findOrFail($vpcUuid)
+            Vpc::forUser($request->user)->findOrFail($vpcId)
         );
     }
 
@@ -58,50 +49,38 @@ class VpcController extends BaseController
      */
     public function create(CreateVpcRequest $request)
     {
-        $request->user = app('request')->user;
-        $virtualPrivateClouds = new Vpc($request->only(['name']));
-        $virtualPrivateClouds->reseller_id = $request->user->resellerId;
+        $virtualPrivateClouds = new Vpc($request->only(['name', 'region_id']));
+        $virtualPrivateClouds->reseller_id = $this->resellerId;
         $virtualPrivateClouds->save();
-        $virtualPrivateClouds->refresh();
         return $this->responseIdMeta($request, $virtualPrivateClouds->getKey(), 201);
     }
 
     /**
      * @param \App\Http\Requests\V2\UpdateVpcRequest $request
-     * @param string $vpcUuid
+     * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateVpcRequest $request, string $vpcUuid)
+    public function update(UpdateVpcRequest $request, string $vpcId)
     {
-        $vpc = Vpc::query();
-        $request->user = app('request')->user;
-        if (!$request->user->isAdministrator) {
-            $vpc->withReseller($request->user->resellerId);
-        }
-        $virtualPrivateCloud = $vpc->findOrFail($vpcUuid);
+        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        $vpc->name = $request->input('name', $vpc->name);
+        $vpc->region_id = $request->input('region_id', $vpc->region_id);
 
-        $virtualPrivateCloud->fill($request->only(['name']));
-        if ($request->user->isAdministrator) {
-            $virtualPrivateCloud->reseller_id = $request->input('reseller_id', $virtualPrivateCloud->reseller_id);
+        if ($this->isAdmin) {
+            $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
-        $virtualPrivateCloud->save();
-        return $this->responseIdMeta($request, $virtualPrivateCloud->getKey(), 200);
+        $vpc->save();
+        return $this->responseIdMeta($request, $vpc->getKey(), 200);
     }
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param string $vdcUuid
+     * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, string $vdcUuid)
+    public function destroy(Request $request, string $vpcId)
     {
-        $vpc = Vpc::query();
-        if (!$request->user->isAdministrator) {
-            $vpc->withReseller($request->user->resellerId);
-        }
-        $virtualPrivateCloud = $vpc->findOrFail($vdcUuid);
-
-        $virtualPrivateCloud->delete();
+        Vpc::forUser($request->user)->findOrFail($vpcId)->delete();
         return response()->json([], 204);
     }
 }

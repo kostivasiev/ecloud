@@ -10,6 +10,7 @@ class NsxServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        // TODO - We will need to expand this to support NSX Managers on each AZ
         $this->app->bind('App\Services\NsxService', function () {
             $auth = base64_encode(config('nsx.username') . ':' . config('nsx.password'));
             return new NsxService(new Client([

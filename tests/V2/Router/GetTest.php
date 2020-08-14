@@ -28,24 +28,7 @@ class GetTest extends TestCase
             'vpc_id' => $this->vpc->getKey()
         ])->first();
     }
-
-    public function testNonAdminIsDenied()
-    {
-        $this->get(
-            '/v2/routers',
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
+    
     public function testGetCollection()
     {
         $this->get(

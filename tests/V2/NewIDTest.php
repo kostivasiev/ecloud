@@ -4,6 +4,7 @@ namespace Tests\V2;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Gateway;
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -24,10 +25,13 @@ class NewIDTest extends TestCase
 
     public function testFormatOfAvailabilityZoneID()
     {
+        $this->region = factory(Region::class, 1)->create()->first();
+
         $data = [
             'code'    => 'MAN1',
             'name'    => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/availability-zones',
@@ -93,8 +97,11 @@ class NewIDTest extends TestCase
 
     public function testFormatOfVirtualDatacentresId()
     {
+        $this->region = factory(Region::class, 1)->create()->first();
+
         $data = [
             'name'    => 'Manchester DC',
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/vpcs',
@@ -174,6 +181,7 @@ class NewIDTest extends TestCase
     {
         $router = (factory(Router::class, 1)->create()->first())->refresh();
         $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+
         $this->put(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
             [],

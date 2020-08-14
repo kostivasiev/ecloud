@@ -21,7 +21,8 @@ class CreateFirewallRuleRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:50'
+            'name' => 'required|string|max:50',
+            'router_id' => 'required|string|exists:ecloud.routers,id,deleted_at,NULL',
         ];
     }
 
@@ -34,6 +35,8 @@ class CreateFirewallRuleRequest extends FormRequest
             'name.required' => 'The :attribute field is required',
             'name.string' => 'The :attribute field must contain a string',
             'name.max' => 'The :attribute field must be less than 50 characters',
+            'router_id.required' => 'The :attribute field is required',
+            'router_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }
