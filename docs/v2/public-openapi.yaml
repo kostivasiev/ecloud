@@ -68,7 +68,7 @@ components:
       properties:
         id:
           type: string
-          example: 'dhc-2b66bb79'
+          example: 'dhcp-2b66bb79'
           readOnly: false
         vpc_id:
           type: string
@@ -88,7 +88,7 @@ components:
       properties:
         id:
           type: string
-          example: 'dhc-2b66bb79'
+          example: 'dhcp-2b66bb79'
           readOnly: false
         router_id:
           type: string
@@ -96,7 +96,7 @@ components:
           readOnly: false
         availability_zone_id:
           type: string
-          example: 'avz-2b66bb79'
+          example: 'az-2b66bb79'
           readOnly: false
         created_at:
           type: string
@@ -168,7 +168,7 @@ components:
       properties:
         id:
           type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
           readOnly: false
         code:
           type: string
@@ -308,7 +308,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
   '/ecloud/v2/vpcs':
     get:
       responses:
@@ -504,7 +504,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
   '/ecloud/v2/networks':
     get:
       responses:
@@ -613,7 +613,7 @@ paths:
                 availability_zone_id:
                   description: Identification of the availability zone to assign the network to
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Networks
       parameters: {  }
@@ -681,7 +681,7 @@ paths:
                 availability_zone_id:
                   description: Identification of the availability zone to assign the network to
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Networks
       parameters:
@@ -789,13 +789,13 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: dhc-2b66bb79
+                        example: dhcp-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhc-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhcp-2b66bb79'
       requestBody:
         required: true
         content:
@@ -834,7 +834,7 @@ paths:
           required: true
           schema:
             type: string
-          example: dhc-2b66bb79
+          example: dhcp-2b66bb79
     patch:
       responses:
         200:
@@ -848,13 +848,13 @@ paths:
                     type: object
                     properties:
                       id: string
-                      example: dhc-2b66bb79
+                      example: dhcp-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhc-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhcp-2b66bb79'
       requestBody:
         required: true
         content:
@@ -876,7 +876,7 @@ paths:
           required: true
           schema:
             type: string
-          example: dhc-2b66bb79
+          example: dhcp-2b66bb79
     delete:
       responses:
         204:
@@ -890,7 +890,7 @@ paths:
           required: true
           schema:
             type: string
-          example: dhc-2b66bb79
+          example: dhcp-2b66bb79
   '/ecloud/v2/vpns':
     get:
       responses:
@@ -995,7 +995,7 @@ paths:
                 availability_zone_id:
                   description: Identification of the associated availability zone
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Vpns
       parameters: {  }
@@ -1061,7 +1061,7 @@ paths:
                   required: false
                   description: Identification of the associated availability zone
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Vpns
       parameters:

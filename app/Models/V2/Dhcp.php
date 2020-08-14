@@ -20,7 +20,7 @@ class Dhcp extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'dhc';
+    public const KEY_PREFIX = 'dhcp';
     protected $connection = 'ecloud';
     protected $table = 'dhcps';
     protected $primaryKey = 'id';
