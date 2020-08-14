@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Instances\AfterCreateEvent;
-use App\Events\V2\Instances\AfterDeleteEvent;
-use App\Events\V2\Instances\AfterUpdateEvent;
-use App\Events\V2\Instances\BeforeCreateEvent;
-use App\Events\V2\Instances\BeforeDeleteEvent;
-use App\Events\V2\Instances\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
 use App\Models\V2\Instance;
@@ -57,11 +51,9 @@ class InstanceController extends BaseController
      */
     public function store(CreateInstanceRequest $request)
     {
-        event(new BeforeCreateEvent());
         $instance = new Instance($request->only(['network_id']));
         $instance->save();
         $instance->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
 
@@ -72,11 +64,9 @@ class InstanceController extends BaseController
      */
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
-        event(new BeforeUpdateEvent());
         $instance = Instance::findOrFail($instanceId);
         $instance->fill($request->only(['network_id']));
         $instance->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
 
@@ -87,10 +77,8 @@ class InstanceController extends BaseController
      */
     public function destroy(Request $request, string $instanceId)
     {
-        event(new BeforeDeleteEvent());
         $instance = Instance::findOrFail($instanceId);
         $instance->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

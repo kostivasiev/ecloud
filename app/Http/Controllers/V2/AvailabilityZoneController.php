@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\AvailabilityZone\AfterCreateEvent;
-use App\Events\V2\AvailabilityZone\AfterDeleteEvent;
-use App\Events\V2\AvailabilityZone\AfterUpdateEvent;
-use App\Events\V2\AvailabilityZone\BeforeCreateEvent;
-use App\Events\V2\AvailabilityZone\BeforeDeleteEvent;
-use App\Events\V2\AvailabilityZone\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Resources\V2\AvailabilityZoneResource;
@@ -58,12 +52,11 @@ class AvailabilityZoneController extends BaseController
      */
     public function create(CreateAvailabilityZoneRequest $request)
     {
-        event(new BeforeCreateEvent());
         $availabilityZone = new AvailabilityZone($request->only([
             'code', 'name', 'datacentre_site_id', 'is_public', 'region_id', 'nsx_manager_endpoint',
         ]));
         $availabilityZone->save();
-        event(new AfterCreateEvent());
+        $availabilityZone->refresh();
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 201);
     }
 
@@ -74,13 +67,11 @@ class AvailabilityZoneController extends BaseController
      */
     public function update(UpdateAvailabilityZoneRequest $request, string $zoneId)
     {
-        event(new BeforeUpdateEvent());
         $availabilityZone = AvailabilityZone::findOrFail($zoneId);
         $availabilityZone->fill($request->only([
             'code', 'name', 'datacentre_site_id', 'is_public', 'region_id', 'nsx_manager_endpoint'
         ]));
         $availabilityZone->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
     }
 
@@ -91,10 +82,8 @@ class AvailabilityZoneController extends BaseController
      */
     public function destroy(Request $request, string $zoneId)
     {
-        event(new BeforeDeleteEvent());
         $availabilityZone = AvailabilityZone::findOrFail($zoneId);
         $availabilityZone->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 

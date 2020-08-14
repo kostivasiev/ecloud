@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Network\AfterCreateEvent;
-use App\Events\V2\Network\AfterDeleteEvent;
-use App\Events\V2\Network\AfterUpdateEvent;
-use App\Events\V2\Network\BeforeCreateEvent;
-use App\Events\V2\Network\BeforeDeleteEvent;
-use App\Events\V2\Network\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateNetworkRequest;
 use App\Http\Requests\V2\UpdateNetworkRequest;
 use App\Models\V2\Network;
@@ -55,13 +49,11 @@ class NetworkController extends BaseController
      */
     public function create(CreateNetworkRequest $request)
     {
-        event(new BeforeCreateEvent());
         $network = new Network($request->only([
             'router_id', 'availability_zone_id',  'name'
         ]));
         $network->save();
         $network->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $network->getKey(), 201);
     }
 
@@ -72,13 +64,11 @@ class NetworkController extends BaseController
      */
     public function update(UpdateNetworkRequest $request, string $networkId)
     {
-        event(new BeforeUpdateEvent());
         $network = Network::forUser(app('request')->user)->findOrFail($networkId);
         $network->fill($request->only([
             'router_id', 'availability_zone_id',  'name'
         ]));
         $network->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $network->getKey(), 200);
     }
 
@@ -90,10 +80,8 @@ class NetworkController extends BaseController
      */
     public function destroy(Request $request, string $networkId)
     {
-        event(new BeforeDeleteEvent());
         $network = Network::forUser($request->user)->findOrFail($networkId);
         $network->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

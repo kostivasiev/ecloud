@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Gateway\AfterCreateEvent;
-use App\Events\V2\Gateway\AfterDeleteEvent;
-use App\Events\V2\Gateway\AfterUpdateEvent;
-use App\Events\V2\Gateway\BeforeCreateEvent;
-use App\Events\V2\Gateway\BeforeDeleteEvent;
-use App\Events\V2\Gateway\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateGatewayRequest;
 use App\Http\Requests\V2\UpdateGatewayRequest;
 use App\Models\V2\Gateway;
@@ -57,11 +51,9 @@ class GatewayController extends BaseController
      */
     public function create(CreateGatewayRequest $request)
     {
-        event(new BeforeCreateEvent());
         $gateway = new Gateway($request->only(['name', 'availability_zone_id']));
         $gateway->save();
         $gateway->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $gateway->getKey(), 201);
     }
 
@@ -72,11 +64,9 @@ class GatewayController extends BaseController
      */
     public function update(UpdateGatewayRequest $request, string $gatewayUuid)
     {
-        event(new BeforeUpdateEvent());
         $gateway = Gateway::findOrFail($gatewayUuid);
         $gateway->fill($request->only(['name', 'availability_zone_id']));
         $gateway->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $gateway->getKey(), 200);
     }
 
@@ -87,10 +77,8 @@ class GatewayController extends BaseController
      */
     public function destroy(Request $request, string $gatewayUuid)
     {
-        event(new BeforeDeleteEvent());
         $gateway = Gateway::findOrFail($gatewayUuid);
         $gateway->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

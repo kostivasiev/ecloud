@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Router\AfterCreateEvent;
-use App\Events\V2\Router\AfterDeleteEvent;
-use App\Events\V2\Router\AfterUpdateEvent;
-use App\Events\V2\Router\BeforeCreateEvent;
-use App\Events\V2\Router\BeforeDeleteEvent;
-use App\Events\V2\Router\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Models\V2\Gateway;
@@ -58,11 +52,9 @@ class RouterController extends BaseController
      */
     public function create(CreateRouterRequest $request)
     {
-        event(new BeforeCreateEvent());
         $router = new Router($request->only(['name', 'vpc_id']));
         $router->save();
         $router->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $router->getKey(), 201);
     }
 
@@ -73,11 +65,9 @@ class RouterController extends BaseController
      */
     public function update(UpdateRouterRequest $request, string $routerId)
     {
-        event(new BeforeUpdateEvent());
         $router = Router::forUser(app('request')->user)->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id']));
         $router->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $router->getKey(), 200);
     }
 
@@ -88,9 +78,7 @@ class RouterController extends BaseController
      */
     public function destroy(Request $request, string $routerId)
     {
-        event(new BeforeDeleteEvent());
         Router::forUser($request->user)->findOrFail($routerId)->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 

@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Dhcp\AfterCreateEvent;
-use App\Events\V2\Dhcp\AfterDeleteEvent;
-use App\Events\V2\Dhcp\AfterUpdateEvent;
-use App\Events\V2\Dhcp\BeforeCreateEvent;
-use App\Events\V2\Dhcp\BeforeDeleteEvent;
-use App\Events\V2\Dhcp\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Models\V2\Dhcp;
@@ -55,11 +49,9 @@ class DhcpController extends BaseController
      */
     public function create(CreateDhcpRequest $request)
     {
-        event(new BeforeCreateEvent());
         $dhcps = new Dhcp($request->only(['vpc_id']));
         $dhcps->save();
         $dhcps->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $dhcps->getKey(), 201);
     }
 
@@ -70,11 +62,9 @@ class DhcpController extends BaseController
      */
     public function update(UpdateDhcpRequest $request, string $dhcpId)
     {
-        event(new BeforeUpdateEvent());
         $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->fill($request->only(['vpc_id']));
         $dhcp->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $dhcp->getKey(), 200);
     }
 
@@ -84,10 +74,8 @@ class DhcpController extends BaseController
      */
     public function destroy(string $dhcpId)
     {
-        event(new BeforeDeleteEvent());
         $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }
