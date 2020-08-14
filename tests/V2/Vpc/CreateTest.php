@@ -47,6 +47,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => '',
+            'region_id' => $this->region->getKey(),
         ];
         $this->post(
             '/v2/vpcs',

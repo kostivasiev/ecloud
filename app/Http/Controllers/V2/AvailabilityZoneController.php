@@ -76,14 +76,9 @@ class AvailabilityZoneController extends BaseController
     {
         event(new BeforeUpdateEvent());
         $availabilityZone = AvailabilityZone::findOrFail($zoneId);
-        $availabilityZone->fill([
-            'code' => $request->input('code', $availabilityZone->code),
-            'name' => $request->input('name', $availabilityZone->name),
-            'datacentre_site_id' => $request->input('code', $availabilityZone->datacentre_site_id),
-            'region_id' => $request->input('region_id', $availabilityZone->region_id),
-            'is_public' => $request->input('is_public', $availabilityZone->is_public),
-            'nsx_manager_endpoint' => $request->input('nsx_manager_endpoint', $availabilityZone->nsx_manager_endpoint),
-        ]);
+        $availabilityZone->fill($request->only([
+            'code', 'name', 'datacentre_site_id', 'is_public', 'region_id', 'nsx_manager_endpoint'
+        ]));
         $availabilityZone->save();
         event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
