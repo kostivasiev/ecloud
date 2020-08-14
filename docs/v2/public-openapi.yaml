@@ -50,6 +50,10 @@ components:
           type: string
           example: 'Manchester Cloud 1'
           readOnly: false
+        region_id:
+          type: string
+          example: 'reg-a63dd78c'
+          readOnly: false
         created_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
@@ -64,7 +68,7 @@ components:
       properties:
         id:
           type: string
-          example: 'dhc-2b66bb79'
+          example: 'dhcp-2b66bb79'
           readOnly: false
         vpc_id:
           type: string
@@ -84,7 +88,7 @@ components:
       properties:
         id:
           type: string
-          example: 'dhc-2b66bb79'
+          example: 'dhcp-2b66bb79'
           readOnly: false
         router_id:
           type: string
@@ -92,7 +96,7 @@ components:
           readOnly: false
         availability_zone_id:
           type: string
-          example: 'avz-2b66bb79'
+          example: 'az-2b66bb79'
           readOnly: false
         created_at:
           type: string
@@ -150,6 +154,10 @@ components:
           type: string
           example: 'Internal FW Rule'
           readOnly: false
+        router_id:
+          type: string
+          example: rtr-2b66bb79
+          readOnly: false
         created_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
@@ -177,6 +185,27 @@ components:
           example: 999
       description: 'Availability Zones'
       required: {  }
+    Regions:
+      properties:
+        id:
+          type: string
+          example: reg-2b66bb79
+          readOnly: false
+        name:
+          type: string
+          example: 'United Kingdom'
+          readOnly: false
+        created_at:
+          type: string
+          example: '2020-07-07T10:30:00+01:00'
+          readOnly: true
+        updated_at:
+          type: string
+          example: '2020-07-07T10:30:00+01:00'
+          readOnly: true
+      description: 'Regions'
+      required: {  }
+
 paths:
   '/ecloud/v2/availability-zones':
     get:
@@ -272,7 +301,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
   '/ecloud/v2/vpcs':
     get:
       responses:
@@ -375,6 +404,12 @@ paths:
                   description: Name of the Virtual Private Cloud
                   type: string
                   example: 'My Test VPC'
+                  required: false
+                region_id:
+                  description: Identifier of the region into which the VPC will be created
+                  type: string
+                  example: 'reg-a63dd78c'
+                  required: true
       tags:
         - VirtualPrivateClouds
       parameters: {  }
@@ -434,6 +469,11 @@ paths:
                   description: Name of the Virtual Private Cloud
                   type: string
                   example: 'My Test VPC'
+                region_id:
+                  description: Identifier of the region into which the VPC will reside
+                  type: string
+                  example: 'reg-a63dd78c'
+                  required: true
       tags:
         - VirtualPrivateClouds
       parameters:
@@ -457,7 +497,7 @@ paths:
           required: true
           schema:
             type: string
-          example: avz-2b66bb79
+          example: az-2b66bb79
   '/ecloud/v2/networks':
     get:
       responses:
@@ -560,13 +600,13 @@ paths:
                   type: string
                   example: 'Network 1'
                 router_id:
-                  description: Identification of the router to assign the network to
+                  description: Identification of the associated router
                   type: string
                   example: rtr-2b66bb79
                 availability_zone_id:
                   description: Identification of the availability zone to assign the network to
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Networks
       parameters: {  }
@@ -628,13 +668,13 @@ paths:
                   type: string
                   example: 'Network 1'
                 router_id:
-                  description: Identification of the router to assign the network to
+                  description: Identification of the associated router
                   type: string
                   example: rtr-2b66bb79
                 availability_zone_id:
                   description: Identification of the availability zone to assign the network to
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Networks
       parameters:
@@ -742,13 +782,13 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: dhc-2b66bb79
+                        example: dhcp-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhc-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhcp-2b66bb79'
       requestBody:
         required: true
         content:
@@ -787,7 +827,7 @@ paths:
           required: true
           schema:
             type: string
-          example: dhc-2b66bb79
+          example: dhcp-2b66bb79
     patch:
       responses:
         200:
@@ -801,13 +841,13 @@ paths:
                     type: object
                     properties:
                       id: string
-                      example: dhc-2b66bb79
+                      example: dhcp-2b66bb79
                   meta:
                     type: object
                     properties:
                       location:
                         type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhc-2b66bb79'
+                        example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhcp-2b66bb79'
       requestBody:
         required: true
         content:
@@ -829,7 +869,7 @@ paths:
           required: true
           schema:
             type: string
-          example: dhc-2b66bb79
+          example: dhcp-2b66bb79
     delete:
       responses:
         204:
@@ -843,7 +883,7 @@ paths:
           required: true
           schema:
             type: string
-          example: dhc-2b66bb79
+          example: dhcp-2b66bb79
   '/ecloud/v2/vpns':
     get:
       responses:
@@ -948,7 +988,7 @@ paths:
                 availability_zone_id:
                   description: Identification of the associated availability zone
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Vpns
       parameters: {  }
@@ -1014,7 +1054,7 @@ paths:
                   required: false
                   description: Identification of the associated availability zone
                   type: string
-                  example: avz-2b66bb79
+                  example: az-2b66bb79
       tags:
         - Vpns
       parameters:
@@ -1489,6 +1529,9 @@ paths:
                       id:
                         type: string
                         example: fwr-2b66bb79
+                      router_id:
+                        type: string
+                        example: rtr-2b66bb79
                   meta:
                     type: object
                     properties:
@@ -1506,6 +1549,10 @@ paths:
                   description: Name of the firewall rule
                   type: string
                   example: fwr-2b66bb79
+                router_id:
+                  description: Identification of the associated router
+                  type: string
+                  example: rtr-2b66bb79
       tags:
         - FirewallRules
       parameters: {  }
@@ -1590,3 +1637,122 @@ paths:
           schema:
             type: string
           example: fwr-2b66bb79
+
+  '/ecloud/v2/regions':
+    get:
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Regions'
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 30
+                          count:
+                            type: integer
+                            example: 10
+                          per_page:
+                            type: integer
+                            example: 10
+                          current_page:
+                            type: integer
+                            example: 2
+                          total_pages:
+                            type: integer
+                            example: 3
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
+                              previous:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
+                              next:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
+                              last:
+                                type: string
+                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
+      tags:
+        - Regions
+      parameters:
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 'Number of items to display per page'
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 'Page number to jump to'
+  '/ecloud/v2/regions/{regionId}':
+    get:
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Regions'
+                  meta:
+                    type: object
+      tags:
+        - Regions
+      parameters:
+        -
+          name: regionId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: reg-2b66bb79
+
+  '/ecloud/v2/regions/{regionId}/availability-zones':
+    get:
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AvailabilityZones'
+      parameters:
+        - name: regionId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: reg-2b66bb79
+      tags:
+        - Regions

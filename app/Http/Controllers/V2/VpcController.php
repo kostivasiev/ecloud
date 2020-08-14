@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Vpc\AfterCreateEvent;
-use App\Events\V2\Vpc\AfterDeleteEvent;
-use App\Events\V2\Vpc\AfterUpdateEvent;
-use App\Events\V2\Vpc\BeforeCreateEvent;
-use App\Events\V2\Vpc\BeforeDeleteEvent;
-use App\Events\V2\Vpc\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
 use App\Models\V2\Vpc;
@@ -55,11 +49,9 @@ class VpcController extends BaseController
      */
     public function create(CreateVpcRequest $request)
     {
-        event(new BeforeCreateEvent());
-        $virtualPrivateClouds = new Vpc($request->only(['name']));
+        $virtualPrivateClouds = new Vpc($request->only(['name', 'region_id']));
         $virtualPrivateClouds->reseller_id = $this->resellerId;
         $virtualPrivateClouds->save();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $virtualPrivateClouds->getKey(), 201);
     }
 
@@ -71,16 +63,15 @@ class VpcController extends BaseController
     public function update(UpdateVpcRequest $request, string $vpcId)
     {
         $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
-        event(new BeforeUpdateEvent());
-        $vpc->fill($request->only(['name']));
+        $vpc->name = $request->input('name', $vpc->name);
+        $vpc->region_id = $request->input('region_id', $vpc->region_id);
+
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
         $vpc->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $vpc->getKey(), 200);
     }
-
 
     /**
      * @param \Illuminate\Http\Request $request
@@ -89,9 +80,7 @@ class VpcController extends BaseController
      */
     public function destroy(Request $request, string $vpcId)
     {
-        event(new BeforeDeleteEvent());
         Vpc::forUser($request->user)->findOrFail($vpcId)->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Vpn\AfterCreateEvent;
-use App\Events\V2\Vpn\AfterDeleteEvent;
-use App\Events\V2\Vpn\AfterUpdateEvent;
-use App\Events\V2\Vpn\BeforeCreateEvent;
-use App\Events\V2\Vpn\BeforeDeleteEvent;
-use App\Events\V2\Vpn\BeforeUpdateEvent;
 use App\Http\Requests\V2\CreateVpnRequest;
 use App\Http\Requests\V2\UpdateVpnRequest;
 use App\Models\V2\Vpn;
@@ -56,11 +50,9 @@ class VpnController extends BaseController
      */
     public function create(CreateVpnRequest $request)
     {
-        event(new BeforeCreateEvent());
         $vpns = new Vpn($request->only(['router_id', 'availability_zone_id']));
         $vpns->save();
         $vpns->refresh();
-        event(new AfterCreateEvent());
         return $this->responseIdMeta($request, $vpns->getKey(), 201);
     }
 
@@ -74,7 +66,6 @@ class VpnController extends BaseController
         $vpns = Vpn::forUser(app('request')->user)->findOrFail($vpnId);
         $vpns->fill($request->only(['router_id', 'availability_zone_id']));
         $vpns->save();
-        event(new AfterUpdateEvent());
         return $this->responseIdMeta($request, $vpns->getKey(), 200);
     }
 
@@ -85,9 +76,7 @@ class VpnController extends BaseController
      */
     public function destroy(Request $request, string $vpnId)
     {
-        event(new BeforeDeleteEvent());
         Vpn::forUser($request->user)->findOrFail($vpnId)->delete();
-        event(new AfterDeleteEvent());
         return response()->json([], 204);
     }
 }

@@ -8,7 +8,8 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Manchester Router 1"
+  "name": "Manchester Router 1",
+  "vpc_id": "vpc-5def0c32"
 }
 
 > {%

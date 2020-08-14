@@ -3,6 +3,7 @@
 namespace Tests\V2\Vpc;
 
 use App\Models\V2\Vpc;
+use App\Models\V2\Region;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -18,6 +19,10 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+
+        $this->region = factory(Region::class, 1)->create([
+            'name'    => 'Manchester',
+        ])->first();
     }
 
     public function testNoPermsIsDenied()
@@ -42,6 +47,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => '',
+            'region_id' => $this->region->getKey(),
         ];
         $this->post(
             '/v2/vpcs',
@@ -51,8 +57,7 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )
-            ->assertResponseStatus(201);
+        )->assertResponseStatus(201);
 
         $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
@@ -63,11 +68,35 @@ class CreateTest extends TestCase
         $this->assertEquals($virtualPrivateCloudId, $vpc->name);
     }
 
+    public function testNullRegionIsFailed()
+    {
+        $data = [
+            'name'    => $this->faker->word(),
+        ];
+        $this->post(
+            '/v2/vpcs',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => 1,
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The region id field is required',
+                'status' => 422,
+                'source' => 'region_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testNotScopedFails()
     {
         $data = [
             'name'    => $this->faker->word(),
-            'reseller_id' => 1
+            'reseller_id' => 1,
+            'region_id'    => $this->region->getKey()
         ];
         $this->post(
             '/v2/vpcs',
@@ -89,6 +118,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => $this->faker->word(),
+            'region_id' => $this->region->getKey(),
             'reseller_id' => 1
         ];
         $this->post(
