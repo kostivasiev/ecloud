@@ -56,7 +56,7 @@ class VpcController extends BaseController
     public function create(CreateVpcRequest $request)
     {
         event(new BeforeCreateEvent());
-        $virtualPrivateClouds = new Vpc($request->only(['name']));
+        $virtualPrivateClouds = new Vpc($request->only(['name', 'region_id']));
         $virtualPrivateClouds->reseller_id = $this->resellerId;
         $virtualPrivateClouds->save();
         event(new AfterCreateEvent());
@@ -72,7 +72,9 @@ class VpcController extends BaseController
     {
         $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
         event(new BeforeUpdateEvent());
-        $vpc->fill($request->only(['name']));
+        $vpc->name = $request->input('name', $vpc->name);
+        $vpc->region_id = $request->input('region_id', $vpc->region_id);
+
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }

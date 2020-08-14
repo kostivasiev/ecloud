@@ -12,60 +12,23 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class AvailabilityZones
+ * Class Region
  * @package App\Models\V2
- * @method static findOrFail(string $zoneId)
+ * @method static findOrFail(string $vdcUuid)
+ * @method static forUser(string $user)
  */
-class AvailabilityZone extends Model implements Filterable, Sortable
+class Region extends Model implements Filterable, Sortable
 {
     use UUIDHelper, SoftDeletes;
 
-    public const KEY_PREFIX = 'avz';
-
+    public const KEY_PREFIX = 'reg';
     protected $connection = 'ecloud';
-
-    protected $table = 'availability_zones';
-
-    protected $keyType = 'string';
+    protected $table = 'regions';
+    protected $primaryKey = 'id';
+    protected $fillable = ['id', 'name'];
 
     public $incrementing = false;
-
     public $timestamps = true;
-
-    protected $fillable = [
-        'id',
-        'code',
-        'name',
-        'datacentre_site_id',
-        'region_id',
-        'is_public',
-        'nsx_manager_endpoint',
-    ];
-
-    protected $casts = [
-        'is_public' => 'boolean',
-        'datacentre_site_id' => 'integer',
-    ];
-
-    public function routers()
-    {
-        return $this->belongsToMany(Router::class);
-    }
-
-    public function vpns()
-    {
-        return $this->hasMany(Vpn::class);
-    }
-
-    public function networks()
-    {
-        return $this->hasMany(Network::class);
-    }
-
-    public function gateways()
-    {
-        return $this->hasMany(Gateway::class);
-    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -75,12 +38,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('code', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('datacentre_site_id', Filter::$numericDefaults),
-            $factory->create('region_id', Filter::$stringDefaults),
-            $factory->create('is_public', Filter::$numericDefaults),
-            $factory->create('nsx_manager_endpoint', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -95,41 +53,39 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('code'),
             $factory->create('name'),
-            $factory->create('datacentre_site_id'),
-            $factory->create('region_id'),
-            $factory->create('is_public'),
-            $factory->create('nsx_manager_endpoint'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
     }
 
     /**
-     * @param SortFactory $factory
+     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('code', 'asc'),
+            $factory->create('name', 'asc'),
         ];
     }
 
+    /**
+     * @return array|string[]
+     */
     public function databaseNames()
     {
         return [
             'id'         => 'id',
-            'code'       => 'code',
             'name'       => 'name',
-            'datacentre_site_id'    => 'datacentre_site_id',
-            'region_id'    => 'region_id',
-            'is_public'    => 'is_public',
-            'nsx_manager_endpoint'    => 'nsx_manager_endpoint',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
+    }
+
+    public function availabilityZones()
+    {
+        return $this->hasMany(AvailabilityZone::class);
     }
 }

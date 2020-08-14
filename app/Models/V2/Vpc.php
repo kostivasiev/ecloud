@@ -5,9 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -28,7 +25,7 @@ class Vpc extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $table = 'virtual_private_clouds';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'reseller_id'];
+    protected $fillable = ['id', 'name', 'reseller_id', 'region_id'];
 
     public $incrementing = false;
     public $timestamps = true;
@@ -57,6 +54,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
+            $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults)
         ];
@@ -73,6 +71,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('reseller_id'),
+            $factory->create('region_id'),
             $factory->create('created_at'),
             $factory->create('updated_at')
         ];
@@ -99,6 +98,7 @@ class Vpc extends Model implements Filterable, Sortable
             'id'         => 'id',
             'name'       => 'name',
             'reseller_id' => 'reseller_id',
+            'region_id' => 'region_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
