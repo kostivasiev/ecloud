@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,15 +19,36 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Gateway extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'gw';
+    protected $keyPrefix = 'gw';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'gateways';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'availability_zone_id'];
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'name',
+        'availability_zone_id'
+    ];
+
+    /**
+     * Many to Many with Routers table
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function routers()
+    {
+        return $this->belongsToMany(Router::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -83,22 +104,5 @@ class Gateway extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    /**
-     * Many to Many with Routers table
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function routers()
-    {
-        return $this->belongsToMany(Router::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function availabilityZone()
-    {
-        return $this->belongsTo(AvailabilityZone::class);
     }
 }

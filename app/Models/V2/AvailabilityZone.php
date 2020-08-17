@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -18,17 +18,12 @@ use UKFast\DB\Ditto\Sortable;
  */
 class AvailabilityZone extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'az';
-    protected $connection = 'ecloud';
-
-    protected $table = 'availability_zones';
-
+    protected $keyPrefix = 'az';
     protected $keyType = 'string';
-
+    protected $connection = 'ecloud';
     public $incrementing = false;
-
     public $timestamps = true;
 
     protected $fillable = [

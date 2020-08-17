@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -17,16 +17,55 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Network extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'net';
+    protected $keyPrefix = 'az';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'networks';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'router_id', 'availability_zone_id'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'name',
+        'router_id',
+        'availability_zone_id'
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function router()
+    {
+        return $this->belongsTo(Router::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!empty($user->resellerId)) {
+            $query->whereHas('router.vpc', function ($query) use ($user) {
+                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($resellerId)) {
+                    $query->where('reseller_id', '=', $resellerId);
+                }
+            });
+        }
+
+        return $query;
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -85,40 +124,5 @@ class Network extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function router()
-    {
-        return $this->belongsTo(Router::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function availabilityZone()
-    {
-        return $this->belongsTo(AvailabilityZone::class);
-    }
-
-    /**
-     * @param $query
-     * @param $user
-     * @return mixed
-     */
-    public function scopeForUser($query, $user)
-    {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('router.vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
-        }
-
-        return $query;
     }
 }

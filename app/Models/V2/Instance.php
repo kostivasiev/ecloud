@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\DateTimeProperty;
@@ -21,17 +21,33 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Instance extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'i';
+    protected $keyPrefix = 'i';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'instances';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'network_id'];
-    protected $visible = ['id', 'network_id', 'created_at', 'updated_at'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'network_id'
+    ];
+
+    protected $visible = [
+        'id',
+        'network_id',
+        'created_at',
+        'updated_at'
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function network()
+    {
+        return $this->belongsTo(Network::class);
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -84,13 +100,5 @@ class Instance extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function network()
-    {
-        return $this->belongsTo(Network::class);
     }
 }

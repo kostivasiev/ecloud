@@ -3,7 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\RouterCreated;
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -21,16 +21,20 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'rtr';
+    protected $keyPrefix = 'rtr';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'routers';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'vpc_id', 'deployed'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'name',
+        'vpc_id',
+        'deployed'
+    ];
 
     protected $casts = [
         'deployed' => 'boolean',

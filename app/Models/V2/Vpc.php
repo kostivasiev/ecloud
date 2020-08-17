@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,16 +19,20 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Vpc extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, UUIDHelper;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'vpc';
+    protected $keyPrefix = 'az';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'virtual_private_clouds';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'reseller_id', 'region_id'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'name',
+        'reseller_id',
+        'region_id',
+    ];
 
     /**
      * If no name is passed when creating, default the name to the id value
@@ -42,6 +46,45 @@ class Vpc extends Model implements Filterable, Sortable
             }
         });
         parent::boot();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function dhcps()
+    {
+        return $this->belongsTo(Dhcp::class, 'id', 'vpc_id');
+    }
+
+    /**
+     * Scope a query to only include resources for a given reseller
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $resellerId
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeWithReseller($query, $resellerId)
+    {
+        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
+        if (!empty($resellerId)) {
+            $query->where('reseller_id', $resellerId);
+        }
+        return $query;
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!empty($user->resellerId)) {
+            $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($resellerId)) {
+                $query->where('reseller_id', '=', $resellerId);
+            }
+        }
+        return $query;
     }
 
     /**
@@ -102,47 +145,5 @@ class Vpc extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    /**
-     * Scope a query to only include resources for a given reseller
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $resellerId
-     * @return \Illuminate\Database\Eloquent\Builder $query
-     */
-    public function scopeWithReseller($query, $resellerId)
-    {
-        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
-
-        if (!empty($resellerId)) {
-            $query->where('reseller_id', $resellerId);
-        }
-
-        return $query;
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function dhcps()
-    {
-        return $this->belongsTo(Dhcp::class, 'id', 'vpc_id');
-    }
-
-    /**
-     * @param $query
-     * @param $user
-     * @return mixed
-     */
-    public function scopeForUser($query, $user)
-    {
-        if (!empty($user->resellerId)) {
-            $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-            if (!empty($resellerId)) {
-                $query->where('reseller_id', '=', $resellerId);
-            }
-        }
-
-        return $query;
     }
 }

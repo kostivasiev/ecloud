@@ -131,7 +131,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeInDatabase(
-                'virtual_private_clouds',
+                'vpcs',
                 $data,
                 'ecloud'
             )

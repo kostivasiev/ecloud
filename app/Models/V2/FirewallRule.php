@@ -1,7 +1,7 @@
 <?php
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -17,17 +17,28 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallRule extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'fwr';
+    protected $keyPrefix = 'fwr';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'firewall_rules';
-    protected $primaryKey = 'id';
-    protected $fillable = ['name', 'router_id'];
-    protected $visible = ['id', 'name', 'router_id', 'created_at', 'updated_at'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'name',
+        'router_id',
+        'deployed',
+    ];
+
+    protected $visible = [
+        'id',
+        'name',
+        'router_id',
+        'deployed',
+        'created_at',
+        'updated_at'
+    ];
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
