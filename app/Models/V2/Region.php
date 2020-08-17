@@ -21,7 +21,7 @@ class Region extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'az';
+    protected $keyPrefix = 'reg';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
