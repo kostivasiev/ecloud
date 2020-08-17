@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\DateTimeProperty;
@@ -21,17 +21,23 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'fip';
+    protected $keyPrefix = 'fip';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'floating_ips';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id'];
-    protected $visible = ['id', 'created_at', 'updated_at'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id'
+    ];
+
+    protected $visible = [
+        'id',
+        'created_at',
+        'updated_at'
+    ];
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory

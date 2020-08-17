@@ -28,7 +28,7 @@ class UpdateDhcpRequest extends FormRequest
     public function rules()
     {
         return [
-            'vpc_id'    => 'sometimes|required|string|exists:ecloud.virtual_private_clouds,id,deleted_at,NULL',
+            'vpc_id'    => 'sometimes|required|string|exists:ecloud.vpcs,id,deleted_at,NULL',
         ];
     }
 

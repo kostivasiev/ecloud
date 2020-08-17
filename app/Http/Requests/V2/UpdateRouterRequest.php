@@ -24,7 +24,7 @@ class UpdateRouterRequest extends FormRequest
     {
         return [
             'name'    => 'sometimes|required|string',
-            'vpc_id' => 'sometimes|required|string|exists:ecloud.virtual_private_clouds,id,deleted_at,NULL',
+            'vpc_id' => 'sometimes|required|string|exists:ecloud.vpcs,id,deleted_at,NULL',
         ];
     }
 
