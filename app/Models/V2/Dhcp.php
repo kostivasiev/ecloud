@@ -20,7 +20,7 @@ class Dhcp extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'dhcp';
+    public $keyPrefix = 'dhcp';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;

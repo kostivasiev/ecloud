@@ -23,7 +23,7 @@ class Instance extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'i';
+    public $keyPrefix = 'i';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;

@@ -19,7 +19,7 @@ class FirewallRule extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'fwr';
+    public $keyPrefix = 'fwr';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;

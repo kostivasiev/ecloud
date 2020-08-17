@@ -21,7 +21,7 @@ class Vpc extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'az';
+    public $keyPrefix = 'vpc';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
@@ -54,21 +54,6 @@ class Vpc extends Model implements Filterable, Sortable
     public function dhcps()
     {
         return $this->belongsTo(Dhcp::class, 'id', 'vpc_id');
-    }
-
-    /**
-     * Scope a query to only include resources for a given reseller
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $resellerId
-     * @return \Illuminate\Database\Eloquent\Builder $query
-     */
-    public function scopeWithReseller($query, $resellerId)
-    {
-        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
-        if (!empty($resellerId)) {
-            $query->where('reseller_id', $resellerId);
-        }
-        return $query;
     }
 
     /**

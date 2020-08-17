@@ -23,7 +23,7 @@ class Router extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'rtr';
+    public $keyPrefix = 'rtr';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
