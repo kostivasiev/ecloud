@@ -57,21 +57,6 @@ class Vpc extends Model implements Filterable, Sortable
     }
 
     /**
-     * Scope a query to only include resources for a given reseller
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $resellerId
-     * @return \Illuminate\Database\Eloquent\Builder $query
-     */
-    public function scopeWithReseller($query, $resellerId)
-    {
-        $resellerId = filter_var($resellerId, FILTER_SANITIZE_NUMBER_INT);
-        if (!empty($resellerId)) {
-            $query->where('reseller_id', $resellerId);
-        }
-        return $query;
-    }
-
-    /**
      * @param $query
      * @param $user
      * @return mixed
