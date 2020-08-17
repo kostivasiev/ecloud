@@ -15,7 +15,7 @@ trait CustomKey
             }
             do {
                 $instance->id = $instance->keyPrefix . '-' . bin2hex(random_bytes(4));
-            } while(static::find($instance->id));
+            } while (static::find($instance->id));
         });
     }
 }
