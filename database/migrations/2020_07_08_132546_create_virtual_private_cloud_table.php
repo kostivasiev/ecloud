@@ -13,7 +13,7 @@ class CreateVirtualPrivateCloudTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('virtual_private_clouds', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('vpcs', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->timestamps();
@@ -28,6 +28,6 @@ class CreateVirtualPrivateCloudTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('virtual_private_clouds');
+        Schema::connection('ecloud')->dropIfExists('vpcs');
     }
 }

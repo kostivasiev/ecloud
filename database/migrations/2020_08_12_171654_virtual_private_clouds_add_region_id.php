@@ -8,7 +8,7 @@ Class VirtualPrivateCloudsAddRegionId extends Migration
 {
     public function up()
     {
-        Schema::connection('ecloud')->table('virtual_private_clouds', function(Blueprint $table) {
+        Schema::connection('ecloud')->table('vpcs', function(Blueprint $table) {
             $table->string('region_id')->default('');
         });
     }
@@ -16,7 +16,7 @@ Class VirtualPrivateCloudsAddRegionId extends Migration
     public function down()
     {
          //No idea why this isnt working right now...
-//        Schema::connection('ecloud')->table('virtual_private_clouds', function(Blueprint $table) {
+//        Schema::connection('ecloud')->table('vpcs', function(Blueprint $table) {
 //            $table->dropColumn('region_id');
 //        });
     }

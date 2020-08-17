@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,16 +19,23 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Region extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'reg';
+    protected $keyPrefix = 'az';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'regions';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'name'
+    ];
+
+    public function availabilityZones()
+    {
+        return $this->hasMany(AvailabilityZone::class);
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -82,10 +89,5 @@ class Region extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    public function availabilityZones()
-    {
-        return $this->hasMany(AvailabilityZone::class);
     }
 }

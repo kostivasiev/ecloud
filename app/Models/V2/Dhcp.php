@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\UUIDHelper;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -18,17 +18,33 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable
 {
-    use UUIDHelper, SoftDeletes;
+    use CustomKey, SoftDeletes;
 
-    public const KEY_PREFIX = 'dhcp';
+    protected $keyPrefix = 'dhcp';
+    protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'dhcps';
-    protected $primaryKey = 'id';
-    protected $fillable = ['id', 'vpc_id'];
-    protected $visible = ['id', 'vpc_id', 'created_at', 'updated_at'];
-
     public $incrementing = false;
     public $timestamps = true;
+
+    protected $fillable = [
+        'id',
+        'vpc_id'
+    ];
+
+    protected $visible = [
+        'id',
+        'vpc_id',
+        'created_at',
+        'updated_at'
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function vpcs()
+    {
+        return $this->hasOne(Vpc::class, 'id', 'vpc_id');
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
@@ -81,13 +97,5 @@ class Dhcp extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function virtualPrivateClouds()
-    {
-        return $this->hasOne(Vpc::class, 'id', 'vpc_id');
     }
 }
