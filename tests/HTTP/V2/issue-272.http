@@ -8,7 +8,8 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Manchester Data Centre 1"
+  "name": "Manchester Data Centre 1",
+  "region_id": "1"
 }
 
 > {%
