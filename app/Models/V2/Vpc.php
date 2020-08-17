@@ -21,7 +21,7 @@ class Vpc extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'vpc';
+    public $keyPrefix = 'vpc';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;

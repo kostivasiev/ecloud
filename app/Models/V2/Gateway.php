@@ -21,7 +21,7 @@ class Gateway extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'gw';
+    public $keyPrefix = 'gw';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;

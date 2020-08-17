@@ -21,7 +21,7 @@ class Vpn extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'vpn';
+    public $keyPrefix = 'vpn';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;

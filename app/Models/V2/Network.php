@@ -19,7 +19,7 @@ class Network extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'net';
+    public $keyPrefix = 'net';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;

@@ -23,7 +23,7 @@ class FloatingIp extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    protected $keyPrefix = 'fip';
+    public $keyPrefix = 'fip';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
