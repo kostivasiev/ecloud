@@ -243,7 +243,6 @@ class NewIDTest extends TestCase
      */
     public function generateRegExp($model): string
     {
-        return "/^.*$/i";   // TODO - Fix this
-        //return "/^" . $instance::keyPrefix . "\-[a-f0-9]{8}$/i";
+        return "/^" . (new $model())->keyPrefix . "\-[a-f0-9]{8}$/i";
     }
 }
