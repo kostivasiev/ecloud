@@ -1,0 +1,48 @@
+get:
+  parameters:
+    - $ref: '#/components/parameters/PerPage'
+    - $ref: '#/components/parameters/Page'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dhcp'
+              meta:
+                allOf:
+                  - $ref: "#/components/schemas/Meta"
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=2'
+  tags:
+    - Dhcps
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Dhcp'
+  responses:
+    201:
+      $ref: '#/components/responses/DhcpIdResponse'
+  tags:
+    - Dhcps

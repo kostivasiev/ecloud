@@ -1,0 +1,26 @@
+properties:
+  id:
+    type: string
+    example: net-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    required: true
+    example: 'Manchester Network'
+  router_id:
+    type: string
+    required: true
+    example: rtr-4c63cf58
+  availability_zone_id:
+    type: string
+    required: true
+    example: az-8d38sp36
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Networks'

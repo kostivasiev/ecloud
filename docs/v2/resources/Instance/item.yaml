@@ -1,0 +1,41 @@
+get:
+  parameters:
+    - $ref: '#/components/parameters/InstanceId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Instance'
+              meta:
+                type: object
+  tags:
+    - Instances
+patch:
+  parameters:
+    - $ref: '#/components/parameters/InstanceId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "#/components/schemas/Instance"
+  responses:
+    200:
+      $ref: '#/components/responses/InstanceIdResponse'
+  tags:
+    - Instances
+delete:
+  parameters:
+    - $ref: '#/components/parameters/InstanceId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Instances

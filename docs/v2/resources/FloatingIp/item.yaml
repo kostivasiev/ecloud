@@ -1,0 +1,42 @@
+get:
+  parameters:
+    - $ref: '#/components/parameters/InstanceId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/FloatingIP'
+              meta:
+                type: object
+  tags:
+    - Floating IPs
+patch:
+  parameters:
+    - $ref: '#/components/parameters/fipId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "#/components/schemas/FloatingIP"
+  responses:
+    200:
+      $ref: '#/components/responses/FipIdResponse'
+  tags:
+    - Instances
+delete:
+  parameters:
+    - $ref: '#/components/parameters/fipId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Floating IPs
+

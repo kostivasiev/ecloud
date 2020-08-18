@@ -20,181 +20,23 @@ components:
       in: header
       name: Authorization
   schemas:
-    AvailabilityZones:
-      properties:
-        id:
-          type: string
-          example: az-2b66bb79
-          readOnly: true
-        code:
-          type: string
-          example: MAN1
-        name:
-          type: string
-          example: 'Manchester Region 1'
-        datacentre_site_id:
-          type: integer
-          example: 999
-      description: 'Availability Zones'
-      required: {  }
-    VirtualPrivateClouds:
-      properties:
-        id:
-          type: string
-          example: vpc-2b66bb79
-          readOnly: true
-        name:
-          type: string
-          example: 'Manchester Cloud 1'
-        region_id:
-          type: string
-          required: true
-          example: 'reg-a63dd78c'
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-      description: 'Virtual Private Clouds'
-      required: {  }
-    Networks:
-      properties:
-        id:
-          type: string
-          example: net-2b66bb79
-          readOnly: true
-        name:
-          type: string
-          required: true
-          example: 'Manchester Network'
-        router_id:
-          type: string
-          required: true
-          example: rtr-4c63cf58
-        availability_zone_id:
-          type: string
-          required: true
-          example: az-8d38sp36
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-      description: 'Networks'
+    AvailabilityZone:
+      $ref: 'components/schemas/availabilityZone.yaml'
+    VirtualPrivateCloud:
+      $ref: 'components/schemas/vpc.yaml'
+    Network:
+      $ref: 'components/schemas/network.yaml'
+    Dhcp:
+      $ref: 'components/schemas/dhcp.yaml'
+    Vpn:
+      $ref: 'components/schemas/vpn.yaml'
+    Instance:
+      $ref: 'components/schemas/instance.yaml'
+    FloatingIP:
+      $ref: 'components/schemas/floatingIp.yaml'
+    FirewallRule:
+      $ref: 'components/schemas/firewallRule.yaml'
 
-    Dhcps:
-      properties:
-        id:
-          type: string
-          example: 'dhcp-2b66bb79'
-          readOnly: true
-        vpc_id:
-          type: string
-          required: true
-          example: 'vpc-2b66bb79'
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-      description: 'Dhcps'
-      required: {  }
-    Vpns:
-      properties:
-        id:
-          type: string
-          example: 'dhcp-2b66bb79'
-          readOnly: true
-        router_id:
-          type: string
-          required: true
-          example: 'rtr-2b66bb79'
-          readOnly: false
-        availability_zone_id:
-          type: string
-          required: true
-          example: 'az-2b66bb79'
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-      description: 'Vpns'
-      required: {  }
-    Instances:
-      properties:
-        id:
-          type: string
-          example: vdc-2b66bb79
-          readOnly: true
-        network_id:
-          type: string
-          required: false
-          example: net-2b66bb79
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-      description: 'Instances'
-    FloatingIPs:
-      properties:
-        id:
-          type: string
-          example: fip-2b66bb79
-          readOnly: true
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-      description: 'Floating IP addresses'
-      required: {  }
-    FirewallRules:
-      properties:
-        id:
-          type: string
-          example: fwr-2b66bb79
-          readOnly: false
-        name:
-          type: string
-          example: 'Internal FW Rule'
-          readOnly: false
-        router_id:
-          type: string
-          example: rtr-2b66bb79
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-      description: 'FirewallRules'
-      required: {  }
     Regions:
       properties:
         id:
@@ -217,873 +59,97 @@ components:
       required: {  }
 
     Meta:
-      properties:
-        pagination:
-          type: object
-          properties:
-            total:
-              type: integer
-              example: 30
-            count:
-              type: integer
-              example: 10
-            per_page:
-              type: integer
-              example: 10
-            current_page:
-              type: integer
-              example: 2
-            total_pages:
-              type: integer
-              example: 3
-            links:
-              type: object
-              properties:
-                first:
-                  type: string
-                previous:
-                  type: string
-                next:
-                  type: string
-                last:
-                  type: string
+      $ref: 'components/schemas/meta.yaml'
 
-  # Global Parameters
+
   parameters:
     # Query Parameters
     PerPage:
-      in: query
-      name: per_page
-      required: false
-      schema:
-        type: integer
-      description: 'Number of items to display per page'
+      $ref: 'components/parameters/perPage.yaml'
     Page:
-      in: query
-      name: page
-      required: false
-      schema:
-        type: integer
-      description: 'Page number to jump to'
-
+      $ref: 'components/parameters/page.yaml'
     # Path Parameters
     VpcId:
-      in: path
-      name: vpcId
-      required: true
-      schema:
-        type: string
-      example: vpc-2b66bb79
+      $ref: 'resources/Vpc/parameters/vpcId.yaml'
     AvailabilityZoneId:
-      in: path
-      name: AvailabilityZoneId
-      required: true
-      schema:
-        type: string
-      example: az-2b66bb79
+        $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     NetworkId:
-      in: path
-      name: networkId
-      required: true
-      schema:
-        type: string
-      example: net-2b66bb79
+      $ref: 'resources/Network/parameters/networkId.yaml'
     DhcpId:
-      in: path
-      name: DhcpId
-      required: true
-      schema:
-        type: string
-      example: dhcp-2b66bb79
+      $ref: 'resources/Network/parameters/networkId.yaml'
     VpnId:
-      in: path
-      name: vpnId
-      required: true
-      schema:
-        type: string
-      example: vpn-2b66bb79
+      $ref: 'resources/Vpn/parameters/vpnId.yaml'
     InstanceId:
-      in: path
-      name: instanceId
-      required: true
-      schema:
-        type: string
-      example: i-2b66bb79
+      $ref: 'resources/Instance/parameters/instanceId.yaml'
     fipId:
-      in: path
-      name: fipId
-      required: true
-      schema:
-        type: string
-      example: fip-cd226940
+      $ref: 'resources/FloatingIp/parameters/fipId.yaml'
 
-  # Global Responses
+
   responses:
     VirtualPrivateCloudsIdResponse:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: vpc-2b66bb79
-              meta:
-                type: object
-                properties:
-                  location:
-                    type: string
-                    example: 'https://api.ukfast.io/ecloud/v2/vpcs/vpc-2b66bb79'
+      $ref: 'resources/Vpc/responses/idResponse.yaml'
     NetworksIdResponse:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: net-6ui8gt89
-              meta:
-                type: object
-                properties:
-                  location:
-                    type: string
-                    example: 'https://api.ukfast.io/ecloud/v2/networks/net-6ui8gt89'
+      $ref: 'resources/Network/responses/idResponse.yaml'
     DhcpIdResponse:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: dhcp-6ui8gt89
-              meta:
-                type: object
-                properties:
-                  location:
-                    type: string
-                    example: 'https://api.ukfast.io/ecloud/v2/dhcps/dhcp-6ui8gt89'
+      $ref: 'resources/Dhcp/responses/idResponse.yaml'
     VpnIdResponse:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: vpn-6ui8gt89
-              meta:
-                type: object
-                properties:
-                  location:
-                    type: string
-                    example: 'https://api.ukfast.io/ecloud/v2/vpns/vpn-6ui8gt89'
+      $ref: 'resources/Vpn/responses/idResponse.yaml'
     InstanceIdResponse:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: i-6ui8gt89
-              meta:
-                type: object
-                properties:
-                  location:
-                    type: string
-                    example: 'https://api.ukfast.io/ecloud/v2/instances/i-6ui8gt89'
-    FipIpIdResponse:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: fip-cd22694
-              meta:
-                type: object
-                properties:
-                  location:
-                    type: string
-                    example: 'https://api.ukfast.io/ecloud/v2/floating-ips/fip-cd22694'
+      $ref: 'resources/Instance/responses/idResponse.yaml'
+    FipIdResponse:
+      $ref: 'resources/FloatingIp/responses/idResponse.yaml'
+
+
+
+
 ######### PATHS
-
-
 
 
 paths:
   '/ecloud/v2/vpcs':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/PerPage'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/VirtualPrivateClouds'
-                  meta:
-                    allOf:
-                      - $ref: "#/components/schemas/Meta"
-                      - type: object
-                        properties:
-                          pagination:
-                            properties:
-                              links:
-                                type: object
-                                properties:
-                                  first:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=1'
-                                  previous:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=1'
-                                  next:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=2'
-                                  last:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=2'
-      tags:
-        - VirtualPrivateClouds
-    post:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VirtualPrivateClouds'
-      responses:
-        201:
-            $ref: '#/components/responses/VirtualPrivateCloudsIdResponse'
-      tags:
-        - VirtualPrivateClouds
+    $ref: 'resources/Vpc/collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/VpcId'
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/VirtualPrivateClouds'
-                  meta:
-                    type: object
-      tags:
-        - VirtualPrivateClouds
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/VpcId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VirtualPrivateClouds'
-      responses:
-        200:
-          $ref: '#/components/responses/VirtualPrivateCloudsIdResponse'
-      tags:
-        - VirtualPrivateClouds
-    delete:
-      responses:
-        204:
-          description: Success
-      parameters:
-        - $ref: '#/components/parameters/VpcId'
-      tags:
-        - VirtualPrivateClouds
-
-
-#==========================================================
-
+    $ref: 'resources/Vpc/item.yaml'
 
   '/ecloud/v2/availability-zones':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/PerPage'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AvailabilityZones'
-                  meta:
-                    allOf:
-                      - $ref: "#/components/schemas/Meta"
-                      - type: object
-                        properties:
-                          pagination:
-                            properties:
-                              links:
-                                type: object
-                                properties:
-                                  first:
-                                    example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=1'
-                                  previous:
-                                    example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=1'
-                                  next:
-                                    example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=2'
-                                  last:
-                                    example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=2'
-      tags:
-        - AvailabilityZones
-
+    $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/AvailabilityZoneId'
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/AvailabilityZones'
-                  meta:
-                    type: object
-      tags:
-        - AvailabilityZones
+    $ref: 'resources/AvailabilityZone/item.yaml'
 
   '/ecloud/v2/networks':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/PerPage'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Networks'
-                  meta:
-                    allOf:
-                      - $ref: "#/components/schemas/Meta"
-                      - type: object
-                        properties:
-                          pagination:
-                            properties:
-                              links:
-                                type: object
-                                properties:
-                                  first:
-                                    example: 'https://api.ukfast.io/ecloud/v2/networks?page=1'
-                                  previous:
-                                    example: 'https://api.ukfast.io/ecloud/v2/networks?page=1'
-                                  next:
-                                    example: 'https://api.ukfast.io/ecloud/v2/networks?page=2'
-                                  last:
-                                    example: 'https://api.ukfast.io/ecloud/v2/networks?page=2'
-      tags:
-        - Networks
-    post:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Networks'
-      responses:
-        201:
-          $ref: '#/components/responses/NetworksIdResponse'
-      tags:
-        - Networks
-
+    $ref: 'resources/Network/collection.yaml'
   '/ecloud/v2/networks/{networkId}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/NetworkId'
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Networks'
-                  meta:
-                    type: object
-      tags:
-        - Networks
-
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/NetworkId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              allOf:
-                  - $ref: "#/components/schemas/Networks"
-                  - type: object
-                    properties:
-                      name:
-                        required: false
-                      router_id:
-                        required: false
-                      availability_zone_id:
-                        required: false
-      responses:
-        200:
-          $ref: '#/components/responses/NetworksIdResponse'
-      tags:
-        - Networks
-
-    delete:
-      parameters:
-        - $ref: '#/components/parameters/NetworkId'
-      responses:
-        204:
-          description: Success
-      tags:
-        - Networks
-
-
+    $ref: 'resources/Network/item.yaml'
 
   '/ecloud/v2/dhcps':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/PerPage'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Dhcps'
-                  meta:
-                    allOf:
-                      - $ref: "#/components/schemas/Meta"
-                      - type: object
-                        properties:
-                          pagination:
-                            properties:
-                              links:
-                                type: object
-                                properties:
-                                  first:
-                                    example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=1'
-                                  previous:
-                                    example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=1'
-                                  next:
-                                    example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=2'
-                                  last:
-                                    example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=2'
-      tags:
-        - Dhcps
-    post:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Dhcps'
-      responses:
-        201:
-          $ref: '#/components/responses/DhcpIdResponse'
-      tags:
-        - Dhcps
-
+    $ref: 'resources/Dhcp/collection.yaml'
   '/ecloud/v2/vpcs/{dhcpId}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/DhcpId'
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Dhcps'
-                  meta:
-                    type: object
-      tags:
-        - Dhcps
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/DhcpId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              allOf:
-                - $ref: "#/components/schemas/Dhcps"
-                - type: object
-                  properties:
-                    vpc_id:
-                      required: false
-      responses:
-        200:
-          $ref: '#/components/responses/DhcpIdResponse'
-      tags:
-        - Dhcps
-    delete:
-      parameters:
-        - $ref: '#/components/parameters/DhcpId'
-      responses:
-        204:
-          description: Success
-      tags:
-        - Dhcps
-
-
-
-
+    $ref: 'resources/Dhcp/item.yaml'
 
   '/ecloud/v2/vpns':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/PerPage'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Vpns'
-                  meta:
-                    allOf:
-                      - $ref: "#/components/schemas/Meta"
-                      - type: object
-                        properties:
-                          pagination:
-                            properties:
-                              links:
-                                type: object
-                                properties:
-                                  first:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpns?page=1'
-                                  previous:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpns?page=1'
-                                  next:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpns?page=2'
-                                  last:
-                                    example: 'https://api.ukfast.io/ecloud/v2/vpns?page=2'
-      tags:
-        - Vpns
-    post:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Vpns'
-      responses:
-        201:
-          $ref: '#/components/responses/VpnIdResponse'
-      tags:
-        - Vpns
-
+    $ref: 'resources/Vpn/collection.yaml'
   '/ecloud/v2/vpns/{vpnId}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/VpnId'
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Vpns'
-                  meta:
-                    type: object
-      tags:
-        - Vpns
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/VpnId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              allOf:
-                - $ref: "#/components/schemas/Vpns"
-                - type: object
-                  properties:
-                    router_id:
-                      required: false
-                    availability_zone_id:
-                      required: false
-      responses:
-        200:
-          $ref: '#/components/responses/VpnIdResponse'
-      tags:
-        - Vpns
-    delete:
-      parameters:
-        - $ref: '#/components/parameters/VpnId'
-      responses:
-        204:
-          description: Success
-      tags:
-        - Vpns
+    $ref: 'resources/Vpn/item.yaml'
 
   '/ecloud/v2/instances':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/PerPage'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Instances'
-                  meta:
-                    allOf:
-                      - $ref: "#/components/schemas/Meta"
-                      - type: object
-                        properties:
-                          pagination:
-                            properties:
-                              links:
-                                type: object
-                                properties:
-                                  first:
-                                    example: 'https://api.ukfast.io/ecloud/v2/instances?page=1'
-                                  previous:
-                                    example: 'https://api.ukfast.io/ecloud/v2/instances?page=1'
-                                  next:
-                                    example: 'https://api.ukfast.io/ecloud/v2/instances?page=2'
-                                  last:
-                                    example: 'https://api.ukfast.io/ecloud/v2/instances?page=2'
-      tags:
-        - Instances
-    post:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Instances'
-      responses:
-        201:
-          $ref: '#/components/responses/InstanceIdResponse'
-      tags:
-        - Instances
+    $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/InstanceId'
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Instances'
-                  meta:
-                    type: object
-      tags:
-        - Instances
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/InstanceId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              allOf:
-                - $ref: "#/components/schemas/Instances"
-      responses:
-        200:
-          $ref: '#/components/responses/InstanceIdResponse'
-      tags:
-        - Instances
-    delete:
-      parameters:
-        - $ref: '#/components/parameters/InstanceId'
-      responses:
-        204:
-          description: Success
-      tags:
-        - Instances
-
-
-
+    $ref: 'resources/Instance/item.yaml'
 
   '/ecloud/v2/floating-ips':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/PerPage'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/FloatingIPs'
-                  meta:
-                    allOf:
-                      - $ref: "#/components/schemas/Meta"
-                      - type: object
-                        properties:
-                          pagination:
-                            properties:
-                              links:
-                                type: object
-                                properties:
-                                  first:
-                                    example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=1'
-                                  previous:
-                                    example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=1'
-                                  next:
-                                    example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=2'
-                                  last:
-                                    example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=2'
-      tags:
-        - Instances
-    post:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FloatingIPs'
-      responses:
-        201:
-          $ref: '#/components/responses/FipIpIdResponse'
-      tags:
-        - Instances
+    $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{instanceId}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/InstanceId'
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Instances'
-                  meta:
-                    type: object
-      tags:
-        - Instances
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/InstanceId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              allOf:
-                - $ref: "#/components/schemas/Instances"
-      responses:
-        200:
-          $ref: '#/components/responses/InstanceIdResponse'
-      tags:
-        - Instances
-    delete:
-      parameters:
-        - $ref: '#/components/parameters/InstanceId'
-      responses:
-        204:
-          description: Success
-      tags:
-        - Instances
+    $ref: 'resources/FloatingIp/item.yaml'
 
 
-#  '/ecloud/v2/floating-ips':
+  '/ecloud/v2/firewall-rules':
+    $ref: 'resources/FirewallRule/collection.yaml'
+
+
+  #  '/ecloud/v2/firewall-rules/{firewallRuleId}':
+
+
+#  '/ecloud/v2/firewall-rules':
 #    get:
 #      responses:
 #        200:
@@ -1096,7 +162,7 @@ paths:
 #                  data:
 #                    type: array
 #                    items:
-#                      $ref: '#/components/schemas/FloatingIPs'
+#                      $ref: '#/components/schemas/FirewallRules'
 #                  meta:
 #                    type: object
 #                    required:
@@ -1125,18 +191,18 @@ paths:
 #                            properties:
 #                              first:
 #                                type: string
-#                                example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=1'
+#                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=1'
 #                              previous:
 #                                type: string
-#                                example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=1'
+#                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=1'
 #                              next:
 #                                type: string
-#                                example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=2'
+#                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=2'
 #                              last:
 #                                type: string
-#                                example: 'https://api.ukfast.io/ecloud/v2/floating-ips?page=2'
+#                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=2'
 #      tags:
-#        - Floating IPs
+#        - FirewallRules
 #      parameters:
 #        -
 #          name: per_page
@@ -1152,6 +218,7 @@ paths:
 #          schema:
 #            type: integer
 #          description: 'Page number to jump to'
+#
 #    post:
 #      responses:
 #        201:
@@ -1166,294 +233,115 @@ paths:
 #                    properties:
 #                      id:
 #                        type: string
-#                        example: fip-cd226940
+#                        example: fwr-2b66bb79
+#                      router_id:
+#                        type: string
+#                        example: rtr-2b66bb79
 #                  meta:
 #                    type: object
 #                    properties:
 #                      location:
 #                        type: string
-#                        example: 'https://api.ukfast.io/ecloud/v2/floating-ips/fip-cd226940'
+#                        example: 'https://api.ukfast.io/ecloud/v2/firewall-rules/fwr-2b66bb79'
 #      requestBody:
 #        required: true
 #        content:
 #          application/json:
 #            schema:
 #              type: object
-#              properties: {  }
+#              properties:
+#                name:
+#                  description: Name of the firewall rule
+#                  type: string
+#                  example: fwr-2b66bb79
+#                router_id:
+#                  description: Identification of the associated router
+#                  type: string
+#                  example: rtr-2b66bb79
 #      tags:
-#        - Floating IPs
+#        - FirewallRules
 #      parameters: {  }
-#  '/ecloud/v2/floating-ips/{fipId}':
-#      get:
-#        responses:
-#          200:
-#            description: success
-#            content:
-#              application/json:
-#                schema:
-#                  type: object
-#                  properties:
-#                    data:
-#                      $ref: '#/components/schemas/FloatingIPs'
-#                    meta:
-#                      type: object
-#        tags:
-#          - Floating IPs
-#        parameters:
-#          -
-#            name: fipId
-#            in: path
-#            required: true
-#            schema:
-#              type: string
-#            example: fip-cd226940
-#      patch:
-#        responses:
-#          200:
-#            description: Success
-#            content:
-#              application/json:
-#                schema:
-#                  type: object
-#                  properties:
-#                    data:
-#                      type: object
-#                      properties:
-#                        id:
-#                          type: string
-#                          example: fip-cd226940
-#                    meta:
-#                      type: object
-#                      properties:
-#                        location:
-#                          type: string
-#                          example: 'https://api.ukfast.io/ecloud/v2/floating-ips/fip-cd226940'
-#        requestBody:
-#          required: true
+#  '/ecloud/v2/firewall-rules/{firewallRuleId}':
+#    get:
+#      responses:
+#        200:
+#          description: success
 #          content:
 #            application/json:
 #              schema:
 #                type: object
-#                properties: {  }
-#        tags:
-#          - Floating IPs
-#        parameters:
-#          -
-#            name: instanced
-#            in: path
-#            required: true
+#                properties:
+#                  data:
+#                    type: object
+#                    $ref: '#/components/schemas/FirewallRules'
+#                  meta:
+#                    type: object
+#      tags:
+#        - FirewallRules
+#      parameters:
+#        -
+#          name: firewallRuleId
+#          in: path
+#          required: true
+#          schema:
+#            type: string
+#          example: fwr-2b66bb79
+#    patch:
+#      responses:
+#        200:
+#          description: Success
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  data:
+#                    type: object
+#                    properties:
+#                      id:
+#                        type: string
+#                        example: fwr-2b66bb79
+#                  meta:
+#                    type: object
+#                    properties:
+#                      location:
+#                        type: string
+#                        example: 'https://api.ukfast.io/ecloud/v2/firewall-rules/fwr-2b66bb79'
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
 #            schema:
-#              type: string
-#            example: i-cd226940
-#      delete:
-#        responses:
-#          204:
-#            description: Success
-#        tags:
-#          - Floating IPs
-#        parameters:
-#          -
-#            name: fipId
-#            in: path
-#            required: true
-#            schema:
-#              type: string
-#            example: fip-cd226940
-
-
-  '/ecloud/v2/firewall-rules':
-    get:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/FirewallRules'
-                  meta:
-                    type: object
-                    required:
-                      - pagination
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 30
-                          count:
-                            type: integer
-                            example: 10
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 2
-                          total_pages:
-                            type: integer
-                            example: 3
-                          links:
-                            type: object
-                            properties:
-                              first:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=1'
-                              previous:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=1'
-                              next:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=2'
-                              last:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=2'
-      tags:
-        - FirewallRules
-      parameters:
-        -
-          name: per_page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Number of items to display per page'
-        -
-          name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Page number to jump to'
-
-    post:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: fwr-2b66bb79
-                      router_id:
-                        type: string
-                        example: rtr-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/firewall-rules/fwr-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  description: Name of the firewall rule
-                  type: string
-                  example: fwr-2b66bb79
-                router_id:
-                  description: Identification of the associated router
-                  type: string
-                  example: rtr-2b66bb79
-      tags:
-        - FirewallRules
-      parameters: {  }
-  '/ecloud/v2/firewall-rules/{firewallRuleId}':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/FirewallRules'
-                  meta:
-                    type: object
-      tags:
-        - FirewallRules
-      parameters:
-        -
-          name: firewallRuleId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: fwr-2b66bb79
-    patch:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: fwr-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/firewall-rules/fwr-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  description: Name of the firewall rule
-                  type: string
-                  example: fwr-2b66bb79
-      tags:
-        - FirewallRules
-      parameters:
-        -
-          name: firewallRuleId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: fwr-2b66bb79
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - FirewallRules
-      parameters:
-        -
-          name: firewallRuleId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: fwr-2b66bb79
+#              type: object
+#              properties:
+#                name:
+#                  description: Name of the firewall rule
+#                  type: string
+#                  example: fwr-2b66bb79
+#      tags:
+#        - FirewallRules
+#      parameters:
+#        -
+#          name: firewallRuleId
+#          in: path
+#          required: true
+#          schema:
+#            type: string
+#          example: fwr-2b66bb79
+#    delete:
+#      responses:
+#        204:
+#          description: Success
+#      tags:
+#        - FirewallRules
+#      parameters:
+#        -
+#          name: firewallRuleId
+#          in: path
+#          required: true
+#          schema:
+#            type: string
+#          example: fwr-2b66bb79
 
   '/ecloud/v2/regions':
     get:

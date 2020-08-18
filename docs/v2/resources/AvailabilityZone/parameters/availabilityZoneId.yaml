@@ -1,0 +1,6 @@
+in: path
+name: AvailabilityZoneId
+required: true
+schema:
+  type: string
+example: az-2b66bb79
