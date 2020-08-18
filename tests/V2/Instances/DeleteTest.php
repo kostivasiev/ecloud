@@ -14,16 +14,20 @@ class DeleteTest extends TestCase
 
     protected $faker;
 
+    protected $network;
+
+    protected $instance;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class, 1)->create([
+        $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',
-        ])->first();
-        $this->instance = factory(Instance::class, 1)->create([
+        ]);
+        $this->instance = factory(Instance::class)->create([
             'network_id' => $this->network->getKey(),
-        ])->first();
+        ]);
     }
 
     public function testNoPermsIsDenied()

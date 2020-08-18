@@ -22,9 +22,9 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $instance = factory(FirewallRule::class, 1)->create([
+        $instance = factory(FirewallRule::class)->create([
             'name' => 'Demo firewall rule 1',
-        ])->first();
+        ]);
         $this->get(
             '/v2/firewall-rules',
             [
@@ -41,12 +41,9 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $instance = factory(FirewallRule::class, 1)->create([
+        $instance = factory(FirewallRule::class)->create([
             'name' => 'Demo firewall rule 1',
-        ])->first();
-        $instance->save();
-        $instance->refresh();
-
+        ]);
         $this->get(
             '/v2/firewall-rules/' . $instance->getKey(),
             [

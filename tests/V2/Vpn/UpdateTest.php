@@ -23,13 +23,18 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $vpns = $this->createVpn();
+        $router = factory(Router::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $vpn = factory(Vpn::class)->create([
+            'router_id' => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ]);
         $data = [
-            'router_id'            => $this->createRouters()->id,
-            'availability_zone_id' => $this->createAvailabilityZone()->id,
+            'router_id'            => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
         ];
         $this->patch(
-            '/v2/vpns/' . $vpns->getKey(),
+            '/v2/vpns/' . $vpn->getKey(),
             $data,
             []
         )
@@ -43,13 +48,18 @@ class UpdateTest extends TestCase
 
     public function testNullRouterIdIsDenied()
     {
-        $vpns = $this->createVpn();
+        $router = factory(Router::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $vpn = factory(Vpn::class)->create([
+            'router_id' => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ]);
         $data = [
             'router_id'            => '',
-            'availability_zone_id' => $this->createAvailabilityZone()->id,
+            'availability_zone_id' => $availabilityZone->id,
         ];
         $this->patch(
-            '/v2/vpns/' . $vpns->getKey(),
+            '/v2/vpns/' . $vpn->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -67,13 +77,18 @@ class UpdateTest extends TestCase
 
     public function testNullAvailabilityZoneIdIsDenied()
     {
-        $vpns = $this->createVpn();
+        $router = factory(Router::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $vpn = factory(Vpn::class)->create([
+            'router_id' => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ]);
         $data = [
-            'router_id'            => $this->createRouters()->id,
+            'router_id'            => $router->id,
             'availability_zone_id' => '',
         ];
         $this->patch(
-            '/v2/vpns/' . $vpns->getKey(),
+            '/v2/vpns/' . $vpn->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -91,14 +106,18 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $vpns = $this->createVpn();
-
+        $router = factory(Router::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $vpn = factory(Vpn::class)->create([
+            'router_id' => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ]);
         $data = [
-            'router_id'            => $this->createRouters()->id,
-            'availability_zone_id' => $this->createAvailabilityZone()->id,
+            'router_id'            => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
         ];
         $this->patch(
-            '/v2/vpns/' . $vpns->getKey(),
+            '/v2/vpns/' . $vpn->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -106,48 +125,8 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(200);
 
-        $vpnItem = Vpn::findOrFail($vpns->getKey());
+        $vpnItem = Vpn::findOrFail($vpn->getKey());
         $this->assertEquals($data['router_id'], $vpnItem->router_id);
         $this->assertEquals($data['availability_zone_id'], $vpnItem->availability_zone_id);
     }
-
-    /**
-     * Create Vpns
-     * @return \App\Models\V2\Vpn
-     */
-    public function createVpn(): Vpn
-    {
-        $cloud = factory(Vpn::class, 1)->create([
-            'router_id'            => $this->createRouters()->id,
-            'availability_zone_id' => $this->createAvailabilityZone()->id,
-        ])->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
-    }
-
-    /**
-     * Create Availability Zone
-     * @return \App\Models\V2\AvailabilityZone
-     */
-    public function createAvailabilityZone(): AvailabilityZone
-    {
-        $zone = factory(AvailabilityZone::class, 1)->create()->first();
-        $zone->save();
-        $zone->refresh();
-        return $zone;
-    }
-
-    /**
-     * Create Router
-     * @return \App\Models\V2\Router
-     */
-    public function createRouters(): Router
-    {
-        $router = factory(Router::class, 1)->create()->first();
-        $router->save();
-        $router->refresh();
-        return $router;
-    }
-
 }

@@ -35,9 +35,9 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $network = factory(Network::class, 1)->create([
+        $network = factory(Network::class)->create([
             'name'    => 'Manchester Network',
-        ])->first();
+        ]);
         $this->get(
             '/v2/networks',
             [
@@ -54,12 +54,9 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $network = factory(Network::class, 1)->create([
+        $network = factory(Network::class)->create([
             'name'    => 'Manchester Network',
-        ])->first();
-        $network->save();
-        $network->refresh();
-
+        ]);
         $this->get(
             '/v2/networks/' . $network->getKey(),
             [

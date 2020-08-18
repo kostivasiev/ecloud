@@ -14,24 +14,26 @@ class UpdateTest extends TestCase
 
     protected $faker;
 
+    protected $region;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class, 1)->create([
+        $this->region = factory(Region::class)->create([
             'name'    => 'Manchester',
-        ])->first();
+        ]);
     }
 
     public function testNoPermsIsDenied()
     {
-        $vdc = $this->createPrivateCloud();
+        $vpc = factory(Vpc::class)->create();
         $data = [
             'name'    => 'Manchester DC',
             'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             $data,
             []
         )
@@ -45,13 +47,13 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $vdc = $this->createPrivateCloud();
+        $vpc = factory(Vpc::class)->create();
         $data = [
             'name'    => '',
             'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -69,13 +71,13 @@ class UpdateTest extends TestCase
 
     public function testNullRegionIsDenied()
     {
-        $vdc = $this->createPrivateCloud();
+        $vpc = factory(Vpc::class)->create();
         $data = [
             'name'    => $this->faker->word(),
             'region_id'    => '',
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -93,13 +95,13 @@ class UpdateTest extends TestCase
 
     public function testNonMatchingResellerIdFails()
     {
-        $vdc = factory(Vpc::class, 1)->create(['reseller_id' => 3])->first();
+        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
         $data = [
             'name'    => 'Manchester DC',
             'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -116,14 +118,14 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $vdc = $this->createPrivateCloud();
+        $vpc = factory(Vpc::class)->create();
         $data = [
             'name'    => $this->faker->word(),
             'reseller_id' => 2,
             'region_id'    => $this->region->getKey(),
         ];
         $this->patch(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -137,20 +139,7 @@ class UpdateTest extends TestCase
             )
             ->assertResponseStatus(200);
 
-        $virtualPrivateCloud = Vpc::findOrFail($vdc->getKey());
+        $virtualPrivateCloud = Vpc::findOrFail($vpc->getKey());
         $this->assertEquals($data['name'], $virtualPrivateCloud->name);
     }
-
-    /**
-     * Create Private Cloud
-     * @return \App\Models\V2\Vpc
-     */
-    public function createPrivateCloud(): Vpc
-    {
-        $vdc = factory(Vpc::class, 1)->create()->first();
-        $vdc->save();
-        $vdc->refresh();
-        return $vdc;
-    }
-
 }

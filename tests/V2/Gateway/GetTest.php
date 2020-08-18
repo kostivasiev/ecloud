@@ -38,9 +38,9 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $gatewayItem = factory(Gateway::class, 1)->create([
+        $gatewayItem = factory(Gateway::class)->create([
             'name'       => 'Manchester Gateway 1',
-        ])->first();
+        ]);
         $this->get(
             '/v2/gateways',
             [
@@ -57,12 +57,9 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $gateway = factory(Gateway::class, 1)->create([
+        $gateway = factory(Gateway::class)->create([
             'name'       => 'Manchester Gateway 1',
-        ])->first();
-        $gateway->save();
-        $gateway->refresh();
-
+        ]);
         $this->get(
             '/v2/gateways/' . $gateway->getKey(),
             [

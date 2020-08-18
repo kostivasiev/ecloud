@@ -39,8 +39,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $router = factory(Router::class, 1)->create()->first();
-        $router->refresh();
+        $router = factory(Router::class)->create();
         $this->delete(
             '/v2/routers/' . $router->getKey(),
             [],

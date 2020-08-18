@@ -39,8 +39,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $rule = factory(FirewallRule::class, 1)->create()->first();
-        $rule->refresh();
+        $rule = factory(FirewallRule::class)->create();
         $this->delete(
             '/v2/firewall-rules/' . $rule->getKey(),
             [],
