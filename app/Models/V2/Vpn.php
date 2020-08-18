@@ -41,17 +41,11 @@ class Vpn extends Model implements Filterable, Sortable
         'updated_at',
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function router()
     {
         return $this->belongsTo(Router::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);

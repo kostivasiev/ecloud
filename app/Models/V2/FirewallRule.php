@@ -1,6 +1,7 @@
 <?php
 namespace App\Models\V2;
 
+use App\Events\V2\FirewallRuleCreated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -39,6 +40,15 @@ class FirewallRule extends Model implements Filterable, Sortable
         'created_at',
         'updated_at'
     ];
+
+    protected $dispatchesEvents = [
+        'created' => FirewallRuleCreated::class,
+    ];
+
+    public function router()
+    {
+        return $this->belongsTo(Router::class);
+    }
 
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
