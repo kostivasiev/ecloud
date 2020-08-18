@@ -22,13 +22,10 @@ components:
         id:
           type: string
           example: az-2b66bb79
-          readOnly: false
-          example: avz-2b66bb79
           readOnly: true
         code:
           type: string
           example: MAN1
-          readOnly: false
         name:
           type: string
           example: 'Manchester Region 1'
@@ -44,11 +41,11 @@ components:
         created_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
+          readOnly: true
         updated_at:
           type: string
           example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
+          readOnly: true
         is_public:
           type: boolean
           example: 'true'
@@ -221,33 +218,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                code:
-                  description: Short code for the availability zone
-                  type: string
-                  example: 'MAN1'
-                  required: true
-                name:
-                  description: Name of the Availability Zone
-                  type: string
-                  example: 'Manchester Zone 1'
-                  required: true
-                datacentre_site_id:
-                  description: Datacentre site identifier
-                  type: integer
-                  example: 5
-                  required: true
-                region_id:
-                  description: Identifier of the region in which the availability zone belongs
-                  type: string
-                  example: 'reg-a63dd78c'
-                  required: true
-                is_public:
-                  description: Determines whether the availability zone is publicly available
-                  type: boolean
-                  example: true
-                  required: true
+              $ref: '#/components/schemas/AvailabilityZones'
       tags:
         - AvailabilityZones
       parameters: {  }
