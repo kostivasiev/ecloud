@@ -106,8 +106,8 @@ class VpcController extends BaseController
             $instance->name = $instance->id;
             return $instance;
         });
-        $network->router_id = $router->id;
         $network->availability_zone_id = $availabilityZone->id;
+        $network->router()->associate($router);
         $network->save();
 
         return response()->json([], 204);
