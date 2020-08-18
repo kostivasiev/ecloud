@@ -32,7 +32,7 @@ class Region extends Model implements Filterable, Sortable
         'name'
     ];
 
-    public function availabilityZones()
+    public function availabilityZone()
     {
         return $this->hasMany(AvailabilityZone::class);
     }
