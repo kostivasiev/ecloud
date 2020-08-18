@@ -23,8 +23,8 @@ class RelationshipTest extends TestCase
 
     public function testNotAdminIsDenied()
     {
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+        $router = factory(Router::class)->create();
+        $gateway = factory(Gateway::class)->create();
         $this->put(
             '/v2/routers/' . $router->getKey() . '/gateways/' . $gateway->id,
             [],
@@ -43,7 +43,7 @@ class RelationshipTest extends TestCase
 
     public function testInvalidRouterFails()
     {
-        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+        $gateway = factory(Gateway::class)->create();
         $this->put(
             '/v2/routers/' . $this->faker->uuid . '/gateways/' . $gateway->id,
             [],
@@ -61,49 +61,37 @@ class RelationshipTest extends TestCase
 
     public function testInvalidGatewayFails()
     {
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
-        $this->put(
-            '/v2/routers/' . $router->id . '/gateways/' . $this->faker->uuid,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Not found',
-                'detail' => 'No Gateway with that ID was found',
-            ])
-            ->assertResponseStatus(404);
+        $router = factory(Router::class)->create();
+        $this->put('/v2/routers/' . $router->id . '/gateways/' . $this->faker->uuid, [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups'    => 'ecloud.write',
+        ])->seeJson([
+            'title'  => 'Not found',
+            'detail' => 'No Gateway with that ID was found',
+        ])->assertResponseStatus(404);
     }
 
     public function testCreateValidAssociation()
     {
-        $availabilityZone = factory(AvailabilityZone::class, 1)->create()->first();
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateway::class, 1)->create([
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $router = factory(Router::class)->create();
+        $gateway = factory(Gateway::class)->create([
             'availability_zone_id' => $availabilityZone->getKey()
-        ])->first())->refresh();
+        ]);
         $this->put(
-            '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
+        '/v2/routers/' . $router->id . '/gateways/' . $gateway->id, [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups'    => 'ecloud.write',
+        ])->assertResponseStatus(204);
 
-        // test that the association has occurred
-        $router->refresh();
         $associated = $router->gateways()->first();
         $this->assertEquals($associated->getKey(), $gateway->getKey());
     }
 
     public function testRemoveAssociation()
     {
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+        $router = factory(Router::class)->create();
+        $gateway = factory(Gateway::class)->create();
         $router->gateways()->attach($gateway->id);
         $this->delete(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,

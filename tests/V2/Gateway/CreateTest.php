@@ -19,8 +19,7 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->availabilityZone = factory(AvailabilityZone::class, 1)->create([
-        ])->first();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create();
     }
 
     public function testNonAdminIsDenied()

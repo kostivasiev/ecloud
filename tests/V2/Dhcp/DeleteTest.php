@@ -22,12 +22,12 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $dhcps = factory(Dhcp::class, 1)->create([
-            'vpc_id' => $this->createCloud()->id,
-        ])->first();
-        $dhcps->refresh();
+        $vpc = factory(Vpc::class)->create();
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $vpc->id,
+        ]);
         $this->delete(
-            '/v2/dhcps/' . $dhcps->getKey(),
+            '/v2/dhcps/' . $dhcp->getKey(),
             [],
             []
         )
@@ -59,12 +59,12 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $dhcps = factory(Dhcp::class, 1)->create([
-            'vpc_id' => $this->createCloud()->id,
-        ])->first();
-        $dhcps->refresh();
+        $vpc = factory(Vpc::class)->create();
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $vpc->id,
+        ]);
         $this->delete(
-            '/v2/dhcps/' . $dhcps->getKey(),
+            '/v2/dhcps/' . $dhcp->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -72,20 +72,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $network = Dhcp::withTrashed()->findOrFail($dhcps->getKey());
+        $network = Dhcp::withTrashed()->findOrFail($dhcp->getKey());
         $this->assertNotNull($network->deleted_at);
     }
-
-    /**
-     * Create VirtualPrivateClouds
-     * @return \App\Models\V2\Vpc
-     */
-    public function createCloud(): Vpc
-    {
-        $cloud = factory(Vpc::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
-    }
-
 }

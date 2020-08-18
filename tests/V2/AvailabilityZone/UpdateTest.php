@@ -21,7 +21,7 @@ class UpdateTest extends TestCase
 
     public function testNonAdminIsDenied()
     {
-        $zone = $this->createZone();
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
             'code'    => 'MAN2',
             'name'    => 'Manchester Zone 2',
@@ -45,7 +45,7 @@ class UpdateTest extends TestCase
 
     public function testNullCodeIsDenied()
     {
-        $zone = $this->createZone();
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
             'code'    => '',
             'name'    => 'Manchester Zone 2',
@@ -70,7 +70,7 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $zone = $this->createZone();
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
             'code'    => 'MAN2',
             'name'    => '',
@@ -95,7 +95,7 @@ class UpdateTest extends TestCase
 
     public function testNullSiteIdIsDenied()
     {
-        $zone = $this->createZone();
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
             'code'    => 'MAN2',
             'name'    => 'Manchester Zone 2',
@@ -120,7 +120,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $zone = $this->createZone();
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
             'code'    => 'MAN2',
             'name'    => 'Manchester Zone 2',
@@ -141,17 +141,4 @@ class UpdateTest extends TestCase
         $this->assertEquals($data['name'], $availabilityZone->name);
         $this->assertEquals($data['datacentre_site_id'], $availabilityZone->datacentre_site_id);
     }
-
-    /**
-     * Create Availability Zone
-     * @return \App\Models\V2\AvailabilityZone
-     */
-    public function createZone(): AvailabilityZone
-    {
-        $zone = factory(AvailabilityZone::class, 1)->create()->first();
-        $zone->save();
-        $zone->refresh();
-        return $zone;
-    }
-
 }
