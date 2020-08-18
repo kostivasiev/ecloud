@@ -21,10 +21,9 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $vdc = factory(Vpc::class, 1)->create()->first();
-        $vdc->refresh();
+        $vpc = factory(Vpc::class)->create();
         $this->delete(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             [],
             []
         )
@@ -56,9 +55,9 @@ class DeleteTest extends TestCase
 
     public function testNonMatchingResellerIdFails()
     {
-        $vdc = factory(Vpc::class, 1)->create(['reseller_id' => 3])->first();
+        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
         $this->delete(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -75,10 +74,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $vdc = factory(Vpc::class, 1)->create()->first();
-        $vdc->refresh();
+        $vpc = factory(Vpc::class)->create();
+        $vpc->refresh();
         $this->delete(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -86,7 +85,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $virtualPrivateCloud = Vpc::withTrashed()->findOrFail($vdc->getKey());
+        $virtualPrivateCloud = Vpc::withTrashed()->findOrFail($vpc->getKey());
         $this->assertNotNull($virtualPrivateCloud->deleted_at);
     }
 

@@ -14,11 +14,13 @@ class UpdateTest extends TestCase
 
     protected $faker;
 
+    protected $region;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class, 1)->create()->first();
+        $this->region = factory(Region::class)->create();
     }
 
     public function testNotAdminIsDenied()

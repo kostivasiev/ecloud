@@ -35,9 +35,9 @@ class GetTest extends TestCase
 
     public function testGetCollectionAdmin()
     {
-        $virtualPrivateCloud = factory(Vpc::class, 1)->create([
+        $vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
-        ])->first();
+        ]);
         $this->get(
             '/v2/vpcs',
             [
@@ -46,18 +46,17 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $virtualPrivateCloud->id,
-                'name'       => $virtualPrivateCloud->name,
+                'id'         => $vpc->id,
+                'name'       => $vpc->name,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetCollectionResellerScope()
     {
-        $vpc = factory(Vpc::class, 1)->create([
+        $vpc = factory(Vpc::class)->create([
             'reseller_id' => 2,
-        ])->first();
-
+        ]);
         $this->get(
             '/v2/vpcs',
             [
@@ -87,13 +86,13 @@ class GetTest extends TestCase
 
     public function testGetCollectionAdminResellerScope()
     {
-        $vpc1 = factory(Vpc::class, 1)->create([
+        $vpc1 = factory(Vpc::class)->create([
             'reseller_id' => 1,
-        ])->first();
+        ]);
 
-        $vpc2 = factory(Vpc::class, 1)->create([
+        $vpc2 = factory(Vpc::class)->create([
             'reseller_id' => 2,
-        ])->first();
+        ]);
 
         $this->get(
             '/v2/vpcs',
@@ -114,9 +113,9 @@ class GetTest extends TestCase
 
     public function testNonMatchingResellerIdFails()
     {
-        $vdc = factory(Vpc::class, 1)->create(['reseller_id' => 3])->first();
+        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
         $this->get(
-            '/v2/vpcs/' . $vdc->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
@@ -132,22 +131,20 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $virtualPrivateCloud = factory(Vpc::class, 1)->create([
+        $vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
-        ])->first();
-        $virtualPrivateCloud->save();
-        $virtualPrivateCloud->refresh();
+        ]);
 
         $this->get(
-            '/v2/vpcs/' . $virtualPrivateCloud->getKey(),
+            '/v2/vpcs/' . $vpc->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'         => $virtualPrivateCloud->id,
-                'name'       => $virtualPrivateCloud->name,
+                'id'         => $vpc->id,
+                'name'       => $vpc->name,
             ])
             ->assertResponseStatus(200);
     }

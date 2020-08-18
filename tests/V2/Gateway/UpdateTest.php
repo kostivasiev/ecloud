@@ -14,17 +14,21 @@ class UpdateTest extends TestCase
 
     protected $faker;
 
+    protected $availabilityZone;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->availabilityZone = factory(AvailabilityZone::class, 1)->create([
-        ])->first();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        ]);
     }
 
     public function testNonAdminIsDenied()
     {
-        $gateway = $this->createGateway();
+        $gateway = factory(Gateway::class)->create([
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name' => 'Manchester Gateway 2',
             'availability_zone_id'    => $this->availabilityZone->getKey()
@@ -47,7 +51,9 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $gateway = $this->createGateway();
+        $gateway = factory(Gateway::class)->create([
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name' => '',
             'availability_zone_id'    => $this->availabilityZone->getKey()
@@ -71,7 +77,9 @@ class UpdateTest extends TestCase
 
     public function testInvalidAvailabilityZoneIdIsFailed()
     {
-        $gateway = $this->createGateway();
+        $gateway = factory(Gateway::class)->create([
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name'    => 'Manchester Gateway 1',
             'availability_zone_id'    => $this->faker->uuid()
@@ -96,7 +104,9 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $gateway = $this->createGateway();
+        $gateway = factory(Gateway::class)->create([
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name' => 'Manchester Gateway 2',
             'availability_zone_id'    => $this->availabilityZone->getKey()
@@ -114,19 +124,4 @@ class UpdateTest extends TestCase
         $gatewayItem = Gateway::findOrFail($gateway->getKey());
         $this->assertEquals($data['name'], $gatewayItem->name);
     }
-
-    /**
-     * Create Gateway
-     * @return \App\Models\V2\Gateway
-     */
-    public function createGateway(): Gateway
-    {
-        $gateway = factory(Gateway::class, 1)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey()
-        ])->first();
-        $gateway->save();
-        $gateway->refresh();
-        return $gateway;
-    }
-
 }

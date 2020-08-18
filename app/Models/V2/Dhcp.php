@@ -38,10 +38,7 @@ class Dhcp extends Model implements Filterable, Sortable
         'updated_at'
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function vpcs()
+    public function vpc()
     {
         return $this->hasOne(Vpc::class, 'id', 'vpc_id');
     }

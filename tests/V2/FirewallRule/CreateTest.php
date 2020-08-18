@@ -32,14 +32,14 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->vpc = factory(Vpc::class, 1)->create([
+        $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
-        ])->first();
+        ]);
 
-        $this->router = factory(Router::class, 1)->create([
+        $this->router = factory(Router::class)->create([
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
-        ])->first();
+        ]);
     }
 
     public function testNullNameIsFailed()

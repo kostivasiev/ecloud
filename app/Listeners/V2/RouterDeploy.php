@@ -63,7 +63,7 @@ class RouterDeploy implements ShouldQueue
         $router->save();
 
         $firewallRule = app()->make(FirewallRule::class);
-        $firewallRule->router_id = $router->id;
+        $firewallRule->router()->attach($router);
         $firewallRule->save();
     }
 }

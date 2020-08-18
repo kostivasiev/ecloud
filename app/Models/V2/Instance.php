@@ -41,9 +41,6 @@ class Instance extends Model implements Filterable, Sortable
         'updated_at'
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function network()
     {
         return $this->belongsTo(Network::class);

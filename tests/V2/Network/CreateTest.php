@@ -15,22 +15,28 @@ class CreateTest extends TestCase
 
     protected $faker;
 
+    protected $vpc;
+
+    protected $router;
+
+    protected $availabilityZone;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->vpc = factory(Vpc::class, 1)->create([
+        $this->vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
-        ])->first();
+        ]);
 
-        $this->router = factory(Router::class, 1)->create([
+        $this->router = factory(Router::class)->create([
             'name'       => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
-        ])->first();
+        ]);
 
-        $this->availabilityZone = factory(AvailabilityZone::class, 1)->create([
-        ])->first();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        ]);
     }
 
     public function testNoPermsIsDenied()
