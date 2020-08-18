@@ -2,6 +2,9 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Network;
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Faker\Generator;
@@ -40,7 +43,13 @@ class DeployDefaultsTest extends TestCase
 
     public function testValidDeploy()
     {
-        $vpc = factory(Vpc::class, 1)->create()->first();
+        $region = factory(Region::class)->create();
+        $availabilityZones = factory(AvailabilityZone::class)->create([
+            'region_id' => $region->id,
+        ]);
+        $vpc = factory(Vpc::class, 1)->create([
+            'region_id' => $region->id,
+        ])->first();
         $this->post(
             '/v2/vpcs/' . $vpc->id . '/deploy-defaults',
             [],
@@ -48,10 +57,13 @@ class DeployDefaultsTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups'    => 'ecloud.write'
             ]
-        );
-        dd(
-            $this->response->getStatusCode(),
-            json_decode($this->response->getContent(), true)
-        );
+        )
+            ->assertResponseStatus(204);
+
+        // Check the relationships are intact
+        $vpc = Vpc::findOrFail($vpc->id);
+        $router = $vpc->router()->first();
+        $this->assertNotNull($router);
+        $this->assertNotNull(Network::where('router_id', '=', $router->id)->first());
     }
 }
