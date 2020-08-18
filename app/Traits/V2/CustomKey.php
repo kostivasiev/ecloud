@@ -14,8 +14,17 @@ trait CustomKey
                 throw new \Exception('Invalid key prefix');
             }
             do {
-                $instance->id = $instance->keyPrefix . '-' . bin2hex(random_bytes(4));
+                static::addCustomKey($instance);
             } while (static::find($instance->id));
         });
+    }
+
+    /**
+     * @param $instance
+     * @throws \Exception
+     */
+    public static function addCustomKey($instance)
+    {
+        $instance->id = $instance->keyPrefix . '-' . bin2hex(random_bytes(4));
     }
 }
