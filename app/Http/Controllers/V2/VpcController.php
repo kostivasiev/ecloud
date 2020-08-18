@@ -63,7 +63,7 @@ class VpcController extends BaseController
      */
     public function update(UpdateVpcRequest $request, string $vpcId)
     {
-        $vpc = Vpc::forUser($request->user)->findOrFail($vpcId);
+        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
         $vpc->region_id = $request->input('region_id', $vpc->region_id);
 
