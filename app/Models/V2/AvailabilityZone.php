@@ -15,6 +15,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class AvailabilityZones
  * @package App\Models\V2
  * @method static findOrFail(string $zoneId)
+ * @method static withRegion(string $region_id)
  */
 class AvailabilityZone extends Model implements Filterable, Sortable
 {
@@ -59,6 +60,14 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public function gateways()
     {
         return $this->hasMany(Gateway::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
     }
 
     /**
