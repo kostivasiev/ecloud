@@ -90,6 +90,7 @@ class VpcController extends BaseController
      * @param \Illuminate\Http\Request $request
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function deployDefaults(Request $request, string $vpcId)
     {
@@ -97,12 +98,18 @@ class VpcController extends BaseController
 
         // Create a new router
         $router = new Router();
-        $vpc->router()->attach($router);
+        $router->vpc_id = $vpc->id;
+        $router->save();
 
         // Create a new network
-        $network = new Network();
-        $network::flushEventListeners();
-        $vpc->network()->attach($network);
+        $network = Network::withoutEvents(function () {
+            $instance = new Network();
+            $instance::addCustomKey($instance);
+            return $instance;
+        });
+        $network->id = $network->keyPrefix . '-' . bin2hex(random_bytes(4));
+        $network->router()->associate($router);
+        $network->save();
 
         return response()->json([], 204);
     }
