@@ -48,25 +48,16 @@ class Vpc extends Model implements Filterable, Sortable
         parent::boot();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function dhcps()
     {
         return $this->belongsTo(Dhcp::class, 'id', 'vpc_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function router()
     {
         return $this->hasMany(Router::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function region()
     {
         return $this->belongsTo(Region::class);
