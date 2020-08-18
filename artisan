@@ -17,6 +17,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 $app = require __DIR__.'/bootstrap/app.php';
 
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->register(SamAsEnd\ScopeMake\ScopeMakeCommandServiceProvider::class);
+$app->register(Rawveg\MakeTools\MakeToolsServiceProvider::class);
+
 /*
 |--------------------------------------------------------------------------
 | Run The Artisan Application

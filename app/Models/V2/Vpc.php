@@ -57,6 +57,14 @@ class Vpc extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function router()
+    {
+        return $this->hasMany(Router::class);
+    }
+
+    /**
      * @param $query
      * @param $user
      * @return mixed
@@ -131,4 +139,5 @@ class Vpc extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
+
 }

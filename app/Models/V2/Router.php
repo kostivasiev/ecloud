@@ -65,6 +65,14 @@ class Router extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function network()
+    {
+        return $this->hasMany(Network::class);
+    }
+
+    /**
      * @param $query
      * @param $user
      * @return mixed

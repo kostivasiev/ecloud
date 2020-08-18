@@ -4,6 +4,8 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
+use App\Models\V2\Network;
+use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
@@ -62,7 +64,7 @@ class VpcController extends BaseController
      */
     public function update(UpdateVpcRequest $request, string $vpcId)
     {
-        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        $vpc = Vpc::forUser($request->user)->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
         $vpc->region_id = $request->input('region_id', $vpc->region_id);
 
@@ -81,6 +83,27 @@ class VpcController extends BaseController
     public function destroy(Request $request, string $vpcId)
     {
         Vpc::forUser($request->user)->findOrFail($vpcId)->delete();
+        return response()->json([], 204);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param string $vpcId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deployDefaults(Request $request, string $vpcId)
+    {
+        $vpc = Vpc::forUser($request->user)->findOrFail($vpcId);
+
+        // Create a new router
+        $router = new Router();
+        $vpc->router()->attach($router);
+
+        // Create a new network
+        $network = new Network();
+        $network::flushEventListeners();
+        $vpc->network()->attach($network);
+
         return response()->json([], 204);
     }
 }
