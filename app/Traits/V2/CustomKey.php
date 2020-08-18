@@ -10,12 +10,7 @@ trait CustomKey
     public static function initializeCustomKey()
     {
         static::creating(function ($instance) {
-            if (empty($instance->keyPrefix)) {
-                throw new \Exception('Invalid key prefix');
-            }
-            do {
-                static::addCustomKey($instance);
-            } while (static::find($instance->id));
+            static::addCustomKey($instance);
         });
     }
 
@@ -25,6 +20,11 @@ trait CustomKey
      */
     public static function addCustomKey($instance)
     {
-        $instance->id = $instance->keyPrefix . '-' . bin2hex(random_bytes(4));
+        if (empty($instance->keyPrefix)) {
+            throw new \Exception('Invalid key prefix');
+        }
+        do {
+            $instance->id = $instance->keyPrefix . '-' . bin2hex(random_bytes(4));
+        } while (static::find($instance->id));
     }
 }
