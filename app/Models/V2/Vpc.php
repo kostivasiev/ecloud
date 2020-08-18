@@ -65,6 +65,14 @@ class Vpc extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    /**
      * @param $query
      * @param $user
      * @return mixed
