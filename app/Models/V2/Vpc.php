@@ -138,5 +138,4 @@ class Vpc extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
-
 }
