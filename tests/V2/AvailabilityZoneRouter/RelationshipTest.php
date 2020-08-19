@@ -22,8 +22,8 @@ class RelationshipTest extends TestCase
 
     public function testNotAdminIsDenied()
     {
-        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $availabilityZones = factory(AvailabilityZone::class)->create();
+        $router = factory(Router::class)->create();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
             [],
@@ -42,7 +42,7 @@ class RelationshipTest extends TestCase
 
     public function testInvalidAvailabilityZoneFails()
     {
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $router = factory(Router::class)->create();
         $this->put(
             '/v2/availability-zones/' . $this->faker->uuid . '/routers/' . $router->getKey(),
             [],
@@ -60,7 +60,7 @@ class RelationshipTest extends TestCase
 
     public function testInvalidRouterFails()
     {
-        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
+        $availabilityZones = factory(AvailabilityZone::class)->create();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $this->faker->uuid,
             [],
@@ -78,8 +78,8 @@ class RelationshipTest extends TestCase
 
     public function testCreateValidAssociation()
     {
-        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $availabilityZones = factory(AvailabilityZone::class)->create();
+        $router = factory(Router::class)->create();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
             [],
@@ -97,8 +97,8 @@ class RelationshipTest extends TestCase
 
     public function testRemoveAssociation()
     {
-        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $availabilityZones = factory(AvailabilityZone::class)->create();
+        $router = factory(Router::class)->create();
         $availabilityZones->routers()->attach($router->getKey());
         $this->delete(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),

@@ -25,7 +25,7 @@ class NewIDTest extends TestCase
 
     public function testFormatOfAvailabilityZoneID()
     {
-        $this->region = factory(Region::class, 1)->create()->first();
+        $this->region = factory(Region::class)->create();
 
         $data = [
             'code'    => 'MAN1',
@@ -50,7 +50,7 @@ class NewIDTest extends TestCase
 
     public function testFormatOfGatewaysId()
     {
-        $availabilityZone = factory(AvailabilityZone::class, 1)->create()->first();
+        $availabilityZone = factory(AvailabilityZone::class)->create();
         $data = [
             'name'    => 'Manchester Gateway 1',
             'availability_zone_id' => $availabilityZone->getKey()
@@ -72,9 +72,9 @@ class NewIDTest extends TestCase
 
     public function testFormatOfRoutersId()
     {
-        $vpc = factory(Vpc::class, 1)->create([
-            'name'    => 'Manchester DC',
-        ])->first();
+        $vpc = factory(Vpc::class)->create([
+            'name' => 'Manchester DC',
+        ]);
 
         $data = [
             'name'    => 'Manchester Router 1',
@@ -97,7 +97,7 @@ class NewIDTest extends TestCase
 
     public function testFormatOfVirtualDatacentresId()
     {
-        $this->region = factory(Region::class, 1)->create()->first();
+        $this->region = factory(Region::class)->create();
 
         $data = [
             'name'    => 'Manchester DC',
@@ -121,8 +121,8 @@ class NewIDTest extends TestCase
 
     public function testAvailabilityZonesRouterAssociation()
     {
-        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $availabilityZones = factory(AvailabilityZone::class)->create();
+        $router = factory(Router::class)->create();
         $this->put(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
             [],
@@ -151,8 +151,8 @@ class NewIDTest extends TestCase
 
     public function testAvailabilityZonesRouterDisassociation()
     {
-        $availabilityZones = (factory(AvailabilityZone::class, 1)->create()->first())->refresh();
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
+        $availabilityZones = factory(AvailabilityZone::class)->create();
+        $router = factory(Router::class)->create();
         $availabilityZones->routers()->attach($router->getKey());
         $this->delete(
             '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
@@ -179,8 +179,8 @@ class NewIDTest extends TestCase
 
     public function testRoutersGatewaysAssociation()
     {
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+        $router = factory(Router::class)->create();
+        $gateway = factory(Gateway::class)->create();
 
         $this->put(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
@@ -210,8 +210,8 @@ class NewIDTest extends TestCase
 
     public function testRoutersGatewaysDisassociation()
     {
-        $router = (factory(Router::class, 1)->create()->first())->refresh();
-        $gateway = (factory(Gateway::class, 1)->create()->first())->refresh();
+        $router = factory(Router::class)->create();
+        $gateway = factory(Gateway::class)->create();
         $router->gateways()->attach($gateway->id);
         $this->delete(
             '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,

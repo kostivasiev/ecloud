@@ -18,9 +18,9 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class, 1)->create([
-            'name'    => 'Manchester',
-        ])->first();
+        $this->region = factory(Region::class)->create([
+            'name' => 'Manchester',
+        ]);
     }
 
     public function testNonAdminIsDenied()

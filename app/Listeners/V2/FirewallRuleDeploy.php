@@ -37,7 +37,7 @@ class FirewallRuleDeploy implements ShouldQueue
         /** @var FirewallRule $firewallRule */
         $firewallRule = $event->firewallRule;
         try {
-            $this->nsxService->put('policy/api/v1/infra/tier-1s/' . $firewallRule->id, [
+            $this->nsxService->put('policy/api/v1/TODO/' . $firewallRule->id, [
                 'json' => [
                     'tier0_path' => '/infra/tier-0s/T0',
                 ],

@@ -50,4 +50,4 @@
 
 <!--- set initial issue status and weight  -->
 /label ~"To Do" 
-/weight 5
+/weight 1

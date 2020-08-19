@@ -14,16 +14,20 @@ class GetTest extends TestCase
 
     protected $faker;
 
+    protected $network;
+
+    protected $instance;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class, 1)->create([
-            'name'    => 'Manchester Network',
-        ])->first();
-        $this->instance = factory(Instance::class, 1)->create([
-            'network_id'    => $this->network->getKey(),
-        ])->first();
+        $this->network = factory(Network::class)->create([
+            'name' => 'Manchester Network',
+        ]);
+        $this->instance = factory(Instance::class)->create([
+            'network_id' => $this->network->getKey(),
+        ]);
     }
 
     public function testNoPermsIsDenied()

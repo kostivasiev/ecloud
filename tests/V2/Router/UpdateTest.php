@@ -14,19 +14,23 @@ class UpdateTest extends TestCase
 
     protected $faker;
 
+    protected $vpc;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->vpc = factory(Vpc::class, 1)->create([
+        $this->vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
-        ])->first();
+        ]);
     }
 
     public function testNullNameIsDenied()
     {
-        $router = $this->createRouter();
+        $router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey()
+        ]);
         $data = [
             'name'       => '',
             'vpc_id' => $this->vpc->getKey()
@@ -74,7 +78,9 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $router = $this->createRouter();
+        $router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey()
+        ]);
         $data = [
             'name'       => 'Manchester Router 2',
             'vpc_id' => $this->vpc->getKey()
@@ -92,19 +98,4 @@ class UpdateTest extends TestCase
         $routerItem = Router::findOrFail($router->getKey());
         $this->assertEquals($data['name'], $routerItem->name);
     }
-
-    /**
-     * Create Router
-     * @return \App\Models\V2\Router
-     */
-    public function createRouter(): Router
-    {
-        $router = factory(Router::class, 1)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ])->first();
-        $router->save();
-        $router->refresh();
-        return $router;
-    }
-
 }

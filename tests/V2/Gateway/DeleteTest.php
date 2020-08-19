@@ -21,8 +21,7 @@ class DeleteTest extends TestCase
 
     public function testNonAdminIsDenied()
     {
-        $gateway = factory(Gateway::class, 1)->create()->first();
-        $gateway->refresh();
+        $gateway = factory(Gateway::class)->create();
         $this->delete(
             '/v2/gateways/' . $gateway->getKey(),
             [],
@@ -59,7 +58,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $gateway = factory(Gateway::class, 1)->create()->first();
+        $gateway = factory(Gateway::class)->create();
         $gateway->refresh();
         $this->delete(
             '/v2/gateways/' . $gateway->getKey(),

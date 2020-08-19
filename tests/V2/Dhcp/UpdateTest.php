@@ -22,10 +22,12 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $dhcp = $this->createDhcps();
-        $cloud = $this->createCloud();
+        $vpc = factory(Vpc::class)->create();
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $vpc->id,
+        ]);
         $data = [
-            'vpc_id'    => $cloud->id,
+            'vpc_id' => $vpc->id,
         ];
         $this->patch(
             '/v2/dhcps/' . $dhcp->getKey(),
@@ -42,7 +44,10 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $dhcp = $this->createDhcps();
+        $vpc = factory(Vpc::class)->create();
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $vpc->id,
+        ]);
         $data = [
             'vpc_id'    => '',
         ];
@@ -65,10 +70,12 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $dhcp = $this->createDhcps();
-        $cloud = $this->createCloud();
+        $vpc = factory(Vpc::class)->create();
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $vpc->id,
+        ]);
         $data = [
-            'vpc_id'    => $cloud->id,
+            'vpc_id' => $vpc->id,
         ];
         $this->patch(
             '/v2/dhcps/' . $dhcp->getKey(),
@@ -77,36 +84,9 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(200);
+        )->assertResponseStatus(200);
 
-        $dhcps = Dhcp::findOrFail($dhcp->getKey());
-        $this->assertEquals($data['vpc_id'], $dhcps->vpc_id);
+        $dhcp = Dhcp::findOrFail($dhcp->getKey());
+        $this->assertEquals($data['vpc_id'], $dhcp->vpc_id);
     }
-
-    /**
-     * Create VirtualPrivateClouds
-     * @return \App\Models\V2\Vpc
-     */
-    public function createCloud(): Vpc
-    {
-        $cloud = factory(Vpc::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
-    }
-
-    /**
-     * @return \App\Models\V2\Dhcp
-     */
-    public function createDhcps(): Dhcp
-    {
-        $dhcp = factory(Dhcp::class, 1)->create([
-            'vpc_id' => $this->createCloud()->id,
-        ])->first();
-        $dhcp->save();
-        $dhcp->refresh();
-        return $dhcp;
-    }
-
 }
