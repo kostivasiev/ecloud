@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '#/components/parameters/RegionId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Region'
+              meta:
+                type: object
+  tags:
+    - Regions

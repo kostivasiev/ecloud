@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '#/components/parameters/InstanceId'
+    - $ref: '#/components/parameters/FirewallRuleId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '#/components/schemas/FloatingIP'
+                $ref: '#/components/schemas/FirewallRule'
               meta:
                 type: object
   tags:
-    - Floating IPs
+    - Firewall Rules
 patch:
   parameters:
-    - $ref: '#/components/parameters/fipId'
+    - $ref: '#/components/parameters/FirewallRuleId'
   requestBody:
     required: true
     content:
@@ -25,18 +25,24 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "#/components/schemas/FloatingIP"
+            - $ref: "#/components/schemas/FirewallRule"
+            - type: object
+              properties:
+                name:
+                  required: false
+                router_id:
+                  required: false
   responses:
     200:
-      $ref: '#/components/responses/FipIdResponse'
+      $ref: '#/components/responses/FirewallRuleIdResponse'
   tags:
-    - Instances
+    - Firewall Rules
 delete:
   parameters:
-    - $ref: '#/components/parameters/fipId'
+    - $ref: '#/components/parameters/FirewallRuleId'
   responses:
     204:
       description: Success
   tags:
-    - Floating IPs
+    - Firewall Rules
 

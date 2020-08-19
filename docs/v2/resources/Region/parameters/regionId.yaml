@@ -1,0 +1,6 @@
+in: path
+name: regionId
+required: true
+schema:
+  type: string
+example: reg-cd226940

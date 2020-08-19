@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '#/components/parameters/FipId'
+    - $ref: '#/components/parameters/GatewayId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '#/components/schemas/FloatingIP'
+                $ref: '#/components/schemas/Gateway'
               meta:
                 type: object
   tags:
-    - Floating IPs
+    - Gateways
 patch:
   parameters:
-    - $ref: '#/components/parameters/FipId'
+    - $ref: '#/components/parameters/GatewayId'
   requestBody:
     required: true
     content:
@@ -25,18 +25,21 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "#/components/schemas/FloatingIP"
+            - $ref: "#/components/schemas/Gateway"
+            - type: object
+              properties:
+                name:
+                  required: false
   responses:
     200:
-      $ref: '#/components/responses/FipIdResponse'
+      $ref: '#/components/responses/GatewayIdResponse'
   tags:
-    - Instances
+    - Gateways
 delete:
   parameters:
-    - $ref: '#/components/parameters/FipId'
+    - $ref: '#/components/parameters/GatewayId'
   responses:
     204:
       description: Success
   tags:
-    - Floating IPs
-
+    - Gateways

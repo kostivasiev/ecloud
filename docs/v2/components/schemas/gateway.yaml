@@ -1,18 +1,16 @@
 properties:
   id:
     type: string
-    example: fwr-2b66bb79
+    example: 'gw-2b66bb79'
     readOnly: true
   name:
     type: string
     required: true
-    example: 'Internal FW Rule'
-    readOnly: false
-  router_id:
+    example: 'Gateway 1'
+  availability_zone_id:
     type: string
-    required: true
-    example: rtr-2b66bb79
-    readOnly: false
+    required: false
+    example: 'az-2b66bb79'
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
@@ -21,4 +19,4 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
-description: 'FirewallRules'
+description: 'Gateways'

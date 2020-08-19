@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '#/components/parameters/FipId'
+    - $ref: '#/components/parameters/RouterId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '#/components/schemas/FloatingIP'
+                $ref: '#/components/schemas/Router'
               meta:
                 type: object
   tags:
-    - Floating IPs
+    - Routers
 patch:
   parameters:
-    - $ref: '#/components/parameters/FipId'
+    - $ref: '#/components/parameters/RouterId'
   requestBody:
     required: true
     content:
@@ -25,18 +25,23 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "#/components/schemas/FloatingIP"
+            - $ref: "#/components/schemas/Router"
+            - type: object
+              properties:
+                name:
+                  required: false
+                vpc_id:
+                  required: false
   responses:
     200:
-      $ref: '#/components/responses/FipIdResponse'
+      $ref: '#/components/responses/RouterIdResponse'
   tags:
-    - Instances
+    - Routers
 delete:
   parameters:
-    - $ref: '#/components/parameters/FipId'
+    - $ref: '#/components/parameters/RouterId'
   responses:
     204:
       description: Success
   tags:
-    - Floating IPs
-
+    - Routers
