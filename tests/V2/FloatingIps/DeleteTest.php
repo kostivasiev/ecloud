@@ -17,7 +17,7 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->floatingIp = factory(FloatingIp::class, 1)->create()->first();
+        $this->floatingIp = factory(FloatingIp::class)->create();
     }
 
     public function testNoPermsIsDenied()

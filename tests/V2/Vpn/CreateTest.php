@@ -24,9 +24,11 @@ class CreateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
+        $router = factory(Router::class)->create();
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
-            'router_id'            => $this->createRouters()->id,
-            'availability_zone_id' => $this->createAvailabilityZone()->id,
+            'router_id'            => $router->id,
+            'availability_zone_id' => $zone->id,
         ];
         $this->post(
             '/v2/vpns',
@@ -43,8 +45,9 @@ class CreateTest extends TestCase
 
     public function testNullRouterIdIsFailed()
     {
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
-            'availability_zone_id' => $this->createAvailabilityZone()->id,
+            'availability_zone_id' => $zone->id,
         ];
         $this->post(
             '/v2/vpns',
@@ -65,8 +68,9 @@ class CreateTest extends TestCase
 
     public function testNullAvailabilityZoneIdIsFailed()
     {
+        $router = factory(Router::class)->create();
         $data = [
-            'router_id' => $this->createRouters()->id,
+            'router_id' => $router->id,
         ];
         $this->post(
             '/v2/vpns',
@@ -87,8 +91,8 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $router = $this->createRouters();
-        $zone = $this->createAvailabilityZone();
+        $router = factory(Router::class)->create();
+        $zone = factory(AvailabilityZone::class)->create();
         $data = [
             'router_id'            => $router->id,
             'availability_zone_id' => $zone->id,
@@ -108,29 +112,4 @@ class CreateTest extends TestCase
         $this->assertEquals($vpnItem->router_id, $router->id);
         $this->assertEquals($vpnItem->availability_zone_id, $zone->id);
     }
-
-    /**
-     * Create Availability Zone
-     * @return \App\Models\V2\AvailabilityZone
-     */
-    public function createAvailabilityZone(): AvailabilityZone
-    {
-        $zone = factory(AvailabilityZone::class, 1)->create()->first();
-        $zone->save();
-        $zone->refresh();
-        return $zone;
-    }
-
-    /**
-     * Create Router
-     * @return \App\Models\V2\Router
-     */
-    public function createRouters(): Router
-    {
-        $router = factory(Router::class, 1)->create()->first();
-        $router->save();
-        $router->refresh();
-        return $router;
-    }
-
 }

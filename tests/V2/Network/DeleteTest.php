@@ -21,8 +21,7 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $net = factory(Network::class, 1)->create()->first();
-        $net->refresh();
+        $net = factory(Network::class)->create();
         $this->delete(
             '/v2/networks/' . $net->getKey(),
             [],
@@ -56,8 +55,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $net = factory(Network::class, 1)->create()->first();
-        $net->refresh();
+        $net = factory(Network::class)->create();
         $this->delete(
             '/v2/networks/' . $net->getKey(),
             [],

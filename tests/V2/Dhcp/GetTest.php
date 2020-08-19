@@ -36,12 +36,10 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $cloud = factory(Vpc::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        $dhcps = factory(Dhcp::class, 1)->create([
-            'vpc_id'    => $cloud->id,
-        ])->first();
+        $vpc = factory(Vpc::class)->create();
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id'    => $vpc->id,
+        ]);
         $this->get(
             '/v2/dhcps',
             [
@@ -50,33 +48,28 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'     => $dhcps->id,
-                'vpc_id' => $dhcps->vpc_id,
+                'id'     => $dhcp->id,
+                'vpc_id' => $dhcp->vpc_id,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $cloud = factory(Vpc::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        $dhcps = factory(Dhcp::class, 1)->create([
-            'vpc_id'    => $cloud->id,
-        ])->first();
-        $dhcps->save();
-        $dhcps->refresh();
-
+        $vpc = factory(Vpc::class)->create();
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $vpc->id,
+        ]);
         $this->get(
-            '/v2/dhcps/' . $dhcps->getKey(),
+            '/v2/dhcps/' . $dhcp->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'     => $dhcps->id,
-                'vpc_id' => $dhcps->vpc_id,
+                'id'     => $dhcp->id,
+                'vpc_id' => $dhcp->vpc_id,
             ])
             ->assertResponseStatus(200);
     }

@@ -21,11 +21,11 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+        $availabilityZone = factory(AvailabilityZone::class)->create([
             'code'    => 'MAN1',
             'name'    => 'Manchester Region 1',
             'datacentre_site_id' => 1,
-        ])->first();
+        ]);
         $this->get(
             '/v2/availability-zones',
             [
@@ -44,11 +44,11 @@ class GetTest extends TestCase
 
     public function testGetCollectionNonAdminPropertiesHidden()
     {
-        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+        $availabilityZone = factory(AvailabilityZone::class)->create([
             'code'    => 'MAN1',
             'name'    => 'Manchester Region 1',
             'datacentre_site_id' => 1,
-        ])->first();
+        ]);
         $this->get(
             '/v2/availability-zones',
             [
@@ -70,14 +70,11 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+        $availabilityZone = factory(AvailabilityZone::class)->create([
             'code'    => 'MAN1',
             'name'    => 'Manchester Region 1',
             'datacentre_site_id' => 1,
-        ])->first();
-        $availabilityZone->save();
-        $availabilityZone->refresh();
-
+        ]);
         $this->get(
             '/v2/availability-zones/' . $availabilityZone->getKey(),
             [
@@ -96,14 +93,11 @@ class GetTest extends TestCase
 
     public function testGetItemDetailNonAdminPropertiesHidden()
     {
-        $availabilityZone = factory(AvailabilityZone::class, 1)->create([
+        $availabilityZone = factory(AvailabilityZone::class)->create([
             'code'    => 'MAN1',
             'name'    => 'Manchester Region 1',
             'datacentre_site_id' => 1,
-        ])->first();
-        $availabilityZone->save();
-        $availabilityZone->refresh();
-
+        ]);
         $this->get(
             '/v2/availability-zones/' . $availabilityZone->getKey(),
             [

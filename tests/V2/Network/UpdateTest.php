@@ -16,28 +16,36 @@ class UpdateTest extends TestCase
 
     protected $faker;
 
+    protected $vpc;
+
+    protected $router;
+
+    protected $availabilityZone;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $this->faker = Faker::create();
 
-        $this->vpc = factory(Vpc::class, 1)->create([
+        $this->vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
-        ])->first();
+        ]);
 
-        $this->router = factory(Router::class, 1)->create([
+        $this->router = factory(Router::class)->create([
             'name'       => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
-        ])->first();
+        ]);
 
-        $this->availabilityZone = factory(AvailabilityZone::class, 1)->create([
-        ])->first();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create();
     }
 
     public function testNoPermsIsDenied()
     {
-        $net = $this->createNetwork();
+        $net = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name'    => 'Manchester Network',
         ];
@@ -56,7 +64,10 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $net = $this->createNetwork();
+        $net = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name'    => '',
         ];
@@ -80,7 +91,10 @@ class UpdateTest extends TestCase
 
     public function testInvalidRouterIdIsFailed()
     {
-        $net = $this->createNetwork();
+        $net = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name'    => 'Manchester Network',
             'availability_zone_id' => $this->availabilityZone->getKey(),
@@ -106,7 +120,10 @@ class UpdateTest extends TestCase
 
     public function testInvalidAvailabilityZoneIdIsFailed()
     {
-        $net = $this->createNetwork();
+        $net = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name'    => 'Manchester Network',
             'availability_zone_id' => $this->faker->uuid(),
@@ -132,7 +149,10 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $net = $this->createNetwork();
+        $net = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
         $data = [
             'name'    => 'Manchester Network',
             'availability_zone_id' => $this->availabilityZone->getKey(),
@@ -150,20 +170,5 @@ class UpdateTest extends TestCase
 
         $networks = Network::findOrFail($net->getKey());
         $this->assertEquals($data['name'], $networks->name);
-    }
-
-    /**
-     * Create Network
-     * @return \App\Models\V2\Network
-     */
-    public function createNetwork(): Network
-    {
-        $net = factory(Network::class, 1)->create([
-            'router_id' => $this->router->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
-        ])->first();
-        $net->save();
-        $net->refresh();
-        return $net;
     }
 }

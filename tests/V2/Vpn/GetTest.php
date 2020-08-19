@@ -20,9 +20,6 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->vpc = factory(Vpc::class, 1)->create([
-            'name'    => 'Manchester DC',
-        ])->first();
     }
 
     public function testNoPermsIsDenied()
@@ -41,7 +38,12 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $vpns = $this->createVpn();
+        $router = factory(Router::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $vpn = factory(Vpn::class)->create([
+            'router_id' => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ]);
         $this->get(
             '/v2/vpns',
             [
@@ -50,70 +52,33 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'                   => $vpns->id,
-                'router_id'            => $vpns->router_id,
-                'availability_zone_id' => $vpns->availability_zone_id,
+                'id'                   => $vpn->id,
+                'router_id'            => $vpn->router_id,
+                'availability_zone_id' => $vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $vpns = $this->createVpn();
+        $router = factory(Router::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $vpn = factory(Vpn::class)->create([
+            'router_id' => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ]);
         $this->get(
-            '/v2/vpns/' . $vpns->getKey(),
+            '/v2/vpns/' . $vpn->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'                   => $vpns->id,
-                'router_id'            => $vpns->router_id,
-                'availability_zone_id' => $vpns->availability_zone_id,
+                'id'                   => $vpn->id,
+                'router_id'            => $vpn->router_id,
+                'availability_zone_id' => $vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
     }
-
-    /**
-     * Create Vpns
-     * @return \App\Models\V2\Vpn
-     */
-    public function createVpn(): Vpn
-    {
-        $cloud = factory(Vpn::class, 1)->create([
-            'router_id'            => $this->createRouters()->id,
-            'availability_zone_id' => $this->createAvailabilityZone()->id,
-        ])->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
-    }
-
-    /**
-     * Create Availability Zone
-     * @return \App\Models\V2\AvailabilityZone
-     */
-    public function createAvailabilityZone(): AvailabilityZone
-    {
-        $zone = factory(AvailabilityZone::class, 1)->create()->first();
-        $zone->save();
-        $zone->refresh();
-        return $zone;
-    }
-
-    /**
-     * Create Router
-     * @return \App\Models\V2\Router
-     */
-    public function createRouters(): Router
-    {
-        $router = factory(Router::class, 1)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ])->first();
-        $router->save();
-        $router->refresh();
-        return $router;
-    }
-
 }

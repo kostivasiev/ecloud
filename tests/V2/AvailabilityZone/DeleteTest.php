@@ -21,8 +21,7 @@ class DeleteTest extends TestCase
 
     public function testNonAdminIsDenied()
     {
-        $zone = factory(AvailabilityZone::class, 1)->create()->first();
-        $zone->refresh();
+        $zone = factory(AvailabilityZone::class)->create();
         $this->delete(
             '/v2/availability-zones/' . $zone->getKey(),
             [],
@@ -59,8 +58,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $zone = factory(AvailabilityZone::class, 1)->create()->first();
-        $zone->refresh();
+        $zone = factory(AvailabilityZone::class)->create();
         $this->delete(
             '/v2/availability-zones/' . $zone->getKey(),
             [],

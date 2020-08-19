@@ -22,7 +22,7 @@ class CreateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $cloud = $this->createCloud();
+        $cloud = factory(Vpc::class)->create();
         $data = [
             'vpc_id' => $cloud->id,
         ];
@@ -63,7 +63,7 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $cloud = $this->createCloud();
+        $cloud = factory(Vpc::class)->create();
         $data = [
             'vpc_id' => $cloud->id,
         ];
@@ -82,16 +82,4 @@ class CreateTest extends TestCase
             'id' => $dhcpId,
         ]);
     }
-
-    /**
-     * @return \App\Models\V2\Vpc
-     */
-    public function createCloud(): Vpc
-    {
-        $cloud = factory(Vpc::class, 1)->create()->first();
-        $cloud->save();
-        $cloud->refresh();
-        return $cloud;
-    }
-
 }

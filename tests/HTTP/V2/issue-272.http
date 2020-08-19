@@ -9,7 +9,7 @@ Content-Type:  application/json
 
 {
   "name": "Manchester Data Centre 1",
-  "region_id": "1"
+  "region_id": "reg-9afb9143"
 }
 
 > {%
