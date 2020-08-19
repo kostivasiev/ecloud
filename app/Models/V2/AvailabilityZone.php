@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Services\NsxService;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,6 +42,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'datacentre_site_id' => 'integer',
     ];
 
+    /**
+     * @var NsxService
+     */
+    protected $nsxService;
+
     public function routers()
     {
         return $this->belongsToMany(Router::class);
@@ -59,6 +65,16 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public function gateways()
     {
         return $this->hasMany(Gateway::class);
+    }
+
+    public function nsxClient() : NsxService
+    {
+        if (!$this->nsxService) {
+            $this->nsxService = $this->app->makeWith('NsxService', [
+                'endpoint' => $this->nsx_manager_endpoint,
+            ]);
+        }
+        return $this->nsxService;
     }
 
     /**

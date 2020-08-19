@@ -29,6 +29,7 @@ $app->configure('gpu');
 $app->configure('encryption');
 $app->configure('nsx');
 $app->configure('queue');
+$app->configure('erd-generator');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -116,6 +117,9 @@ $app->register(App\Providers\BillingServiceProvider::class);
 
 // NSX service provider
 $app->register(App\Providers\NsxServiceProvider::class);
+
+// ErdGenerator
+$app->register(BeyondCode\ErdGenerator\ErdGeneratorServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
