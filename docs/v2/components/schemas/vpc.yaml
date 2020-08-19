@@ -18,4 +18,4 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
-  description: 'Virtual Private Clouds'
+description: 'Virtual Private Clouds'
