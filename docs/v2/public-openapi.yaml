@@ -54,7 +54,7 @@ components:
     VpcId:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
     AvailabilityZoneId:
-        $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
+      $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     NetworkId:
       $ref: 'resources/Network/parameters/networkId.yaml'
     DhcpId:
