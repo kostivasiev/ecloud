@@ -49,7 +49,6 @@ class RouterDeploy implements ShouldQueue
                     'tier0_path' => '/infra/tier-0s/T0',
                 ],
             ]);
-
             $this->nsxService->put('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
                 'json' => [
                     'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . self::EDGE_CLUSTER_ID,
@@ -63,7 +62,7 @@ class RouterDeploy implements ShouldQueue
         $router->save();
 
         $firewallRule = app()->make(FirewallRule::class);
-        $firewallRule->router()->attach($router);
+        $firewallRule->router()->associate($router);
         $firewallRule->save();
     }
 }
