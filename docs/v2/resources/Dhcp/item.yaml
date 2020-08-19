@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '#/components/parameters/DhcpId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '#/components/schemas/Dhcp'
+                $ref: '../../public-openapi.yaml#/components/schemas/Dhcp'
               meta:
                 type: object
   tags:
     - Dhcps
 patch:
   parameters:
-    - $ref: '#/components/parameters/DhcpId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
   requestBody:
     required: true
     content:
@@ -25,19 +25,19 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "#/components/schemas/Dhcp"
+            - $ref: "../../public-openapi.yaml#/components/schemas/Dhcp"
             - type: object
               properties:
                 vpc_id:
                   required: false
   responses:
     200:
-      $ref: '#/components/responses/DhcpIdResponse'
+      $ref: '../../public-openapi.yaml#/components/responses/DhcpIdResponse'
   tags:
     - Dhcps
 delete:
   parameters:
-    - $ref: '#/components/parameters/DhcpId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
   responses:
     204:
       description: Success

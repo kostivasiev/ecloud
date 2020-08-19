@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '#/components/parameters/GatewayId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/GatewayId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '#/components/schemas/Gateway'
+                $ref: '../../public-openapi.yaml#/components/schemas/Gateway'
               meta:
                 type: object
   tags:
     - Gateways
 patch:
   parameters:
-    - $ref: '#/components/parameters/GatewayId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/GatewayId'
   requestBody:
     required: true
     content:
@@ -25,19 +25,19 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "#/components/schemas/Gateway"
+            - $ref: "../../public-openapi.yaml#/components/schemas/Gateway"
             - type: object
               properties:
                 name:
                   required: false
   responses:
     200:
-      $ref: '#/components/responses/GatewayIdResponse'
+      $ref: '../../public-openapi.yaml#/components/responses/GatewayIdResponse'
   tags:
     - Gateways
 delete:
   parameters:
-    - $ref: '#/components/parameters/GatewayId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/GatewayId'
   responses:
     204:
       description: Success
