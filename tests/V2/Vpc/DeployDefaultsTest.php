@@ -47,9 +47,9 @@ class DeployDefaultsTest extends TestCase
         factory(AvailabilityZone::class)->create([
             'region_id' => $region->id,
         ]);
-        $vpc = factory(Vpc::class, 1)->create([
+        $vpc = factory(Vpc::class)->create([
             'region_id' => $region->id,
-        ])->first();
+        ]);
         $this->post(
             '/v2/vpcs/' . $vpc->id . '/deploy-defaults',
             [],
