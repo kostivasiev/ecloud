@@ -33,14 +33,6 @@ class Vpn extends Model implements Filterable, Sortable
         'availability_zone_id',
     ];
 
-    protected $visible = [
-        'id',
-        'router_id',
-        'availability_zone_id',
-        'created_at',
-        'updated_at',
-    ];
-
     public function router()
     {
         return $this->belongsTo(Router::class);
