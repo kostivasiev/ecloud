@@ -51,8 +51,5 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\V2\RouterCreated' => [
             'App\Listeners\V2\RouterDeploy',
         ],
-        'App\Events\V2\NetworkCreated' => [
-            'App\Listeners\V2\NetworkDeploy',
-        ],
     ];
 }
