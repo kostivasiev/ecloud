@@ -69,9 +69,9 @@ class Router extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
-    public function network()
+    public function networks()
     {
-        return $this->belongsTo(Network::class);
+        return $this->hasMany(Network::class);
     }
 
     /**
