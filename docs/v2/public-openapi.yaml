@@ -512,7 +512,7 @@ paths:
   '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
     get:
       responses:
-        204:
+        202:
           description: Success
       tags:
         - VirtualPrivateClouds
