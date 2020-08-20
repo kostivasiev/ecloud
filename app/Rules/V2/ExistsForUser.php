@@ -3,6 +3,7 @@
 namespace App\Rules\V2;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ExistsForUser implements Rule
 {
@@ -13,7 +14,11 @@ class ExistsForUser implements Rule
 
     public function passes($attribute, $value)
     {
-        $this->model::forUser(app('request')->user)->findOrFail($value);
+        try {
+            $this->model::forUser(app('request')->user)->findOrFail($value);
+        } catch (ModelNotFoundException $exception) {
+            return false;
+        }
         return true;
     }
 
@@ -22,6 +27,6 @@ class ExistsForUser implements Rule
      */
     public function message()
     {
-        return 'The :attribute was not found';
+        return 'The specified :attribute was not found';
     }
 }

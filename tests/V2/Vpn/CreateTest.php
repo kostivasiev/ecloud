@@ -89,6 +89,32 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotUserOwnedRouterIdIsFailed()
+    {
+        $router = factory(Router::class)->create();
+        $zone = factory(AvailabilityZone::class)->create();
+
+        $data = [
+            'router_id' => $router->id,
+            'availability_zone_id' => $zone->id,
+        ];
+        $this->post(
+            '/v2/vpns',
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataSucceeds()
     {
         $router = factory(Router::class)->create();

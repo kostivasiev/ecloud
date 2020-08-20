@@ -4,6 +4,7 @@ namespace Tests\V2\Vpn;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -100,6 +101,40 @@ class UpdateTest extends TestCase
                 'detail' => 'The availability zone id field, when specified, cannot be null',
                 'status' => 422,
                 'source' => 'availability_zone_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testNotOwnedRouterResourceIsFailed()
+    {
+        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
+        $router = factory(Router::class)->create([
+            'vpc_id' => $vpc->getKey()
+        ]);
+
+        $availabilityZone = factory(AvailabilityZone::class)->create();
+        $vpn = factory(Vpn::class)->create([
+            'router_id' => $router->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ]);
+
+        $data = [
+            'router_id'            => $router->getKey(),
+            'availability_zone_id' => $availabilityZone->getKey(),
+        ];
+        $this->patch(
+            '/v2/vpns/' . $vpn->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
             ])
             ->assertResponseStatus(422);
     }

@@ -3,6 +3,8 @@
 namespace Tests\V2\FirewallRule;
 
 use App\Models\V2\FirewallRule;
+use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -38,6 +40,39 @@ class UpdateTest extends TestCase
                 'detail' => 'The name field, when specified, cannot be null',
                 'status' => 422,
                 'source' => 'name'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testNotOwnedRouterIdIsFailed()
+    {
+        $fwr = factory(FirewallRule::class)->create();
+        $vpc = factory(Vpc::class)->create([
+            'name' => 'Manchester DC',
+            'reseller_id' => 3
+        ]);
+        $router = factory(Router::class)->create([
+            'name' => 'Manchester Router 1',
+            'vpc_id' => $vpc->getKey()
+        ]);
+
+        $data = [
+            'name' => $this->faker->word(),
+            'router_id' => $router->getKey()
+        ];
+        $this->patch(
+            '/v2/firewall-rules/' . $fwr->id,
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups'    => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
             ])
             ->assertResponseStatus(422);
     }
