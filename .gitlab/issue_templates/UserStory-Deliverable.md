@@ -1,16 +1,7 @@
 <!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
-
 ### What is the Feature/Change?
 <!-- Enter clear and concise description of what your feature or change request is. -->
-
-
-<!-- Define user stories -->
-
-| As an <type of user> | I want to <perform some task> | so that I can <achieve some goal> |
-|---|---|---|
-| End User | View all VPC's | View an overview of my VPC's |
-
 
 
 ### Assumptions:
@@ -19,10 +10,17 @@
 
 
 ### Prerequisites:
-<!-- Link to any issues that are required for development to begin -->
+<!-- Link to any issues/etc that are required for development to begin -->
+- none
 
 
 ### User Stories
+
+| As an <type of user> | I want to <perform some task> | so that I can <achieve some goal> |
+|---|---|---|
+| End User | View all VPC's | View an overview of my VPC's |
+
+
 | GIVEN | WHEN | THEN |
 |---|---|---|
 | I am on the VPC Summary page | The page loads | I can see all VPCs I have created showing VPC ID, Name, status |
@@ -43,11 +41,14 @@
 
 
 <!--- Set Team label - Delete as appropriate -->
-/label ~PHP ~DevOps
+/label ~PHP ~DevOps 
 
 <!--- set product or project labels - If appropriate  -->
-/label ~eCloud
+/label ~eCloud 
+
+<!--- set product or project milestone - If appropriate  -->
+/milestone %
 
 <!--- set initial issue status and weight  -->
 /label ~"To Do" 
-/weight 1
+/weight 5
