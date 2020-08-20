@@ -3,15 +3,14 @@ namespace Tests\V2\Router\EventTests;
 
 use App\Events\V2\NetworkCreated;
 use App\Events\V2\RouterCreated;
-use App\Listeners\V2\NetworkDeploy;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use Illuminate\Support\Facades\Event;
 use Faker\Factory as Faker;
 use Faker\Generator;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class RouterNetworkCreatedTest extends TestCase
 {
