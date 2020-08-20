@@ -110,6 +110,6 @@ class VpcController extends BaseController
         $network->router()->associate($router);
         $network->save();
 
-        return response()->json([], 204);
+        return response()->json([], 202);
     }
 }
