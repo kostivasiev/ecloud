@@ -63,9 +63,9 @@ class RouterDeploy implements ShouldQueue
         $router->deployed = true;
         $router->save();
 
-        if ($router->network()->count() > 0) {
+        if ($router->networks()->count() > 0) {
             /** @var \App\Models\V2\Network $network */
-            $network = $router->network()->first();
+            $network = $router->networks()->first();
             event(new NetworkCreated($network));
         }
 
