@@ -44,7 +44,7 @@ class DeployDefaultsTest extends TestCase
     public function testValidDeploy()
     {
         $region = factory(Region::class)->create();
-        $availabilityZones = factory(AvailabilityZone::class)->create([
+        factory(AvailabilityZone::class)->create([
             'region_id' => $region->id,
         ]);
         $vpc = factory(Vpc::class, 1)->create([
