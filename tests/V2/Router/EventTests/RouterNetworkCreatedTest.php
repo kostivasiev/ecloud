@@ -45,7 +45,6 @@ class RouterNetworkCreatedTest extends TestCase
     {
         Event::fake();
 
-        $availabilityZone = $this->getAvailabilityZone();
         $router = $this->getRouter();
 
         Event::assertDispatched(RouterCreated::class, function ($event) use ($router) {
