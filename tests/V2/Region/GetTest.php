@@ -63,7 +63,7 @@ class GetTest extends TestCase
 
     public function testGetRegionAvailabilityZones()
     {
-        $availabilityZones = $this->regions->first()->availabilityZone()->get();
+        $availabilityZones = $this->regions->first()->availabilityZones()->get();
 
         $this->get(
             '/v2/regions/' . $this->regions->first()->getKey() . '/availability-zones',

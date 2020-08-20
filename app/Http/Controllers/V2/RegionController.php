@@ -96,7 +96,7 @@ class RegionController extends BaseController
      */
     public function availabilityZones(Request $request, string $regionId)
     {
-        $availabilityZones = Region::findOrFail($regionId)->availabilityZone();
+        $availabilityZones = Region::findOrFail($regionId)->availabilityZones();
 
         return AvailabilityZoneResource::collection($availabilityZones->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
