@@ -58,7 +58,7 @@ class DeployDefaultsTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.write'
             ]
         )
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
 
         // Check the relationships are intact
         $vpc = Vpc::findOrFail($vpc->id);
