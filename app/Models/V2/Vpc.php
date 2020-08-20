@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\VpcCreated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -32,6 +33,10 @@ class Vpc extends Model implements Filterable, Sortable
         'name',
         'reseller_id',
         'region_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => VpcCreated::class
     ];
 
     /**
