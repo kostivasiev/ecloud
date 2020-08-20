@@ -25,7 +25,12 @@ class CreateInstanceRequest extends FormRequest
     public function rules()
     {
         return [
-            'network_id' => ['required', 'string', 'exists:ecloud.networks,id', new ExistsForUser(Network::class)],
+            'network_id' => [
+                'required',
+                'string',
+                'exists:ecloud.networks,id',
+                new ExistsForUser(Network::class)
+            ],
         ];
     }
 

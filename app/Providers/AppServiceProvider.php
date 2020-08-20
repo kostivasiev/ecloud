@@ -36,10 +36,5 @@ class AppServiceProvider extends ServiceProvider
             Cache::put('encryption_key', $key, new \DateInterval('PT120S'));
             return $key;
         });
-
-        Vpn::observe(VpnObserver::class);
-        Router::observe(RouterObserver::class);
-        Network::observe(NetworkObserver::class);
-        Instance::observe(InstanceObserver::class);
     }
 }

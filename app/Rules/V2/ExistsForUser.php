@@ -14,6 +14,7 @@ class ExistsForUser implements Rule
     public function passes($attribute, $value)
     {
         $this->model::forUser(app('request')->user)->findOrFail($value);
+        return true;
     }
 
     /**
