@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkCreated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,6 +31,10 @@ class Network extends Model implements Filterable, Sortable
         'name',
         'router_id',
         'availability_zone_id'
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => NetworkCreated::class,
     ];
 
     public function router()
