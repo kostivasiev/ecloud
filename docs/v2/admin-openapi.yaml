@@ -21,7 +21,7 @@ components:
       name: Authorization
 
   schemas:
-    AvailabilityZone:
+    AvailabilityZones:
       $ref: 'components/schemas/admin/availabilityZone.yaml'
     Gateways:
       $ref: 'components/schemas/admin/gateway.yaml'
