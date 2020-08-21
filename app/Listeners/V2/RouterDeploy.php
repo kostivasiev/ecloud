@@ -32,8 +32,6 @@ class RouterDeploy implements ShouldQueue
         $event->router->each(function ($router) {
             /** @var Router $router */
 
-            dd($router->availabilityZones()->first());
-
             try {
                 $nsxClient = $router->availabilityZones()->first()->nsxClient();
                 $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id, [
