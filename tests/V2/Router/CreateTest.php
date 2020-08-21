@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Router;
 
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -23,8 +24,11 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
+        $this->region = factory(Region::class)->create();
+
         $this->vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
+            'region_id' => $this->region->getKey()
         ]);
 
         $this->router = factory(Router::class)->create([

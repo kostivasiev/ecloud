@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallRule;
 
 use App\Models\V2\FirewallRule;
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -47,9 +48,11 @@ class UpdateTest extends TestCase
     public function testNotOwnedRouterIdIsFailed()
     {
         $fwr = factory(FirewallRule::class)->create();
+        $this->region = factory(Region::class)->create();
         $vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
-            'reseller_id' => 3
+            'reseller_id' => 3,
+            'region_id' => $this->region->getKey()
         ]);
         $router = factory(Router::class)->create([
             'name' => 'Manchester Router 1',

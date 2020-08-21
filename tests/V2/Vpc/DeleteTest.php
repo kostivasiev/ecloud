@@ -74,7 +74,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $vpc = factory(Vpc::class)->create();
+        $this->region = factory(Region::class)->create();
+        $vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         $vpc->refresh();
         $this->delete(
             '/v2/vpcs/' . $vpc->getKey(),

@@ -28,8 +28,10 @@ class UpdateTest extends TestCase
 
         $this->faker = Faker::create();
 
+        $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
+            'region_id' => $this->region->getKey()
         ]);
 
         $this->router = factory(Router::class)->create([

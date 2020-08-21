@@ -3,6 +3,7 @@
 namespace Tests\V2\Dhcp;
 
 use App\Models\V2\Dhcp;
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -22,7 +23,10 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $vpc = factory(Vpc::class)->create();
+        $this->region = factory(Region::class)->create();
+        $vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         $dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $vpc->id,
         ]);
@@ -44,7 +48,10 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $vpc = factory(Vpc::class)->create();
+        $this->region = factory(Region::class)->create();
+        $vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         $dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $vpc->id,
         ]);
@@ -70,8 +77,10 @@ class UpdateTest extends TestCase
 
     public function testNotOwnedVpcIsFailed()
     {
+        $this->region = factory(Region::class)->create();
         $vpc = factory(Vpc::class)->create([
-            'reseller_id' => 1
+            'reseller_id' => 1,
+            'region_id' => $this->region->getKey()
         ]);
         $vpc2 = factory(Vpc::class)->create([
             'reseller_id' => 3
@@ -101,7 +110,11 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $vpc = factory(Vpc::class)->create();
+        $this->region = factory(Region::class)->create();
+        $vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
+
         $dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $vpc->id,
         ]);
