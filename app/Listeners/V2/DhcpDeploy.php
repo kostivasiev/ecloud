@@ -22,17 +22,14 @@ class DhcpDeploy implements ShouldQueue
     {
         $dhcp = $event->dhcp;
 
-        $event->dhcp->vpc->region->availabilityZones()->each(function($availabilityZone) use ($dhcp) {
+        $event->dhcp->vpc->region->availabilityZones()->each(function ($availabilityZone) use ($dhcp) {
             try {
-                $nsxService = $availabilityZone->nsxClient();
-
-                $nsxService->put('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->getKey(), [
-                'json' => [
-                    'lease_time' => '86400',
-                    //'server_addresses' => ['192.168.0.1/24']
-                ]
-            ]);
-
+                $availabilityZone->nsxClient()->put('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->getKey(), [
+                    'json' => [
+                        'lease_time' => '86400',
+                        //'server_addresses' => ['192.168.0.1/24']
+                    ]
+                ]);
             } catch (GuzzleException $exception) {
                 $json = json_decode($exception->getResponse()->getBody()->getContents());
                 throw new \Exception($json);
