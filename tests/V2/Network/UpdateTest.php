@@ -118,6 +118,40 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotOwnedRouterIdIsFailed()
+    {
+        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
+        $router = factory(Router::class)->create([
+            'vpc_id' => $vpc->getKey()
+        ]);
+
+        $net = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
+        $data = [
+            'name'    => 'Manchester Network',
+            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'router_id' => $router->getKey()
+        ];
+
+        $this->patch(
+            '/v2/networks/' . $net->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testInvalidAvailabilityZoneIdIsFailed()
     {
         $net = factory(Network::class)->create([

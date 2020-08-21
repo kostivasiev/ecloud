@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Vpc;
+use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRouterRequest extends FormRequest
@@ -24,7 +26,13 @@ class UpdateRouterRequest extends FormRequest
     {
         return [
             'name'    => 'sometimes|required|string',
-            'vpc_id' => 'sometimes|required|string|exists:ecloud.vpcs,id,deleted_at,NULL',
+            'vpc_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
+                new ExistsForUser(Vpc::class)
+            ],
         ];
     }
 

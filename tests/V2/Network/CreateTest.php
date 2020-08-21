@@ -104,6 +104,31 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotOwnedRouterIdIsFailed()
+    {
+        $data = [
+            'name'    => 'Manchester Network',
+            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'router_id' => $this->faker->uuid()
+        ];
+
+        $this->post(
+            '/v2/networks',
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testInvalidAvailabilityZoneIdIsFailed()
     {
         $data = [
