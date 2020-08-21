@@ -46,16 +46,3 @@ post:
       $ref: '../../admin-openapi.yaml#/components/responses/RegionIdResponse'
   tags:
     - Regions
-
-patch:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          $ref: '../../admin-openapi.yaml#/components/schemas/Regions'
-  responses:
-    201:
-      $ref: '../../admin-openapi.yaml#/components/responses/RegionIdResponse'
-  tags:
-    - Regions

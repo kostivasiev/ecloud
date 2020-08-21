@@ -105,45 +105,8 @@ paths:
     $ref: 'resources/Router/gateways.yaml'
   '/ecloud/v2/regions':
     $ref: 'resources/Region/admin-collection.yaml'
-
   '/ecloud/v2/regions/{regionId}':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Regions'
-                  meta:
-                    type: object
-      parameters:
-        -
-          name: regionId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: reg-2b66bb79
-      tags:
-        - Regions
-    delete:
-      responses:
-        204:
-          description: Success
-      parameters:
-        - name: regionId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: reg-2b66bb79
-      tags:
-        - Regions
+    $ref: 'resources/Region/admin-item.yaml'
 
   '/ecloud/v2/regions/{regionId}/availability-zones':
     get:
