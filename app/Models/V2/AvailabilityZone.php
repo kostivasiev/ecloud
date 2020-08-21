@@ -67,6 +67,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Gateway::class);
     }
 
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
     public function nsxClient() : NsxService
     {
         if (!$this->nsxService) {
@@ -75,11 +80,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             ]);
         }
         return $this->nsxService;
-    }
-
-    public function region()
-    {
-        return $this->belongsTo(Region::class);
     }
 
     /**
