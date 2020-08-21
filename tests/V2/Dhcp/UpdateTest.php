@@ -68,6 +68,37 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotOwnedVpcIsFailed()
+    {
+        $vpc = factory(Vpc::class)->create([
+            'reseller_id' => 1
+        ]);
+        $vpc2 = factory(Vpc::class)->create([
+            'reseller_id' => 3
+        ]);
+        $dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $vpc->id,
+        ]);
+        $data = [
+            'vpc_id'    => $vpc2->getKey(),
+        ];
+        $this->patch(
+            '/v2/dhcps/' . $dhcp->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified vpc id was not found',
+                'status' => 422,
+                'source' => 'vpc_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataIsSuccessful()
     {
         $vpc = factory(Vpc::class)->create();

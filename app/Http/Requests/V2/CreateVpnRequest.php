@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Router;
+use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -28,7 +30,12 @@ class CreateVpnRequest extends FormRequest
     public function rules()
     {
         return [
-            'router_id'            => 'required|string|exists:ecloud.routers,id,deleted_at,NULL',
+            'router_id' => [
+                'required',
+                'string',
+                'exists:ecloud.routers,id,deleted_at,NULL',
+                new ExistsForUser(Router::class)
+            ],
             'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }

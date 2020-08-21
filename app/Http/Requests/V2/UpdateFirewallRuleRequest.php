@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Router;
+use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateFirewallRuleRequest extends FormRequest
@@ -12,7 +14,13 @@ class UpdateFirewallRuleRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:50',
-            'router_id' => 'sometimes|required|string|exists:ecloud.routers,id,deleted_at,NULL',
+            'router_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.routers,id,deleted_at,NULL',
+                new ExistsForUser(Router::class)
+            ],
         ];
     }
 

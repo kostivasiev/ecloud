@@ -28,19 +28,13 @@ class AvailabilityZoneResource extends UKFastResource
             'code'       => $this->code,
             'name'       => $this->name,
             'datacentre_site_id' => $this->datacentre_site_id,
-            'region_id' => $this->region_id,
-            'created_at' => Carbon::parse(
-                $this->created_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
-            'updated_at' => Carbon::parse(
-                $this->updated_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
         ];
 
         if ($request->user->isAdministrator) {
             $data['is_public'] = $this->is_public;
+            $tz = new \DateTimeZone(config('app.timezone'));
+            $data['created_at'] = Carbon::parse($this->created_at, $tz)->toIso8601String();
+            $data['updated_at'] = Carbon::parse($this->updated_at, $tz)->toIso8601String();
         }
 
         return $data;

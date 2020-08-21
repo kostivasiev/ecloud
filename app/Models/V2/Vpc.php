@@ -53,6 +53,16 @@ class Vpc extends Model implements Filterable, Sortable
         return $this->belongsTo(Dhcp::class);
     }
 
+    public function routers()
+    {
+        return $this->hasMany(Router::class);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
     /**
      * @param $query
      * @param $user

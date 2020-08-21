@@ -15,6 +15,8 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * @method static findOrFail(string $networkId)
  * @method static forUser(string $user)
+ * @method static find($id)
+ * @method static where(string $string, string $string1, $id)
  */
 class Network extends Model implements Filterable, Sortable
 {

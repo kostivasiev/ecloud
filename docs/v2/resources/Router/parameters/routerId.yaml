@@ -1,0 +1,6 @@
+in: path
+name: routerId
+required: true
+schema:
+  type: string
+example: rtr-2b66bb79

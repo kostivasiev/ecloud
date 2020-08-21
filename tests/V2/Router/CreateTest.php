@@ -79,6 +79,30 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotOwnedVpcIdIsFailed()
+    {
+        $data = [
+            'name'    => 'Manchester Network',
+            'vpc_id' => $this->vpc->getKey(),
+        ];
+
+        $this->patch(
+            '/v2/routers/' . $this->router->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified vpc id was not found',
+                'status' => 422,
+                'source' => 'vpc_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataSucceeds()
     {
         $data = [

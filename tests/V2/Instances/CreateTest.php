@@ -64,6 +64,28 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotOwnedNetworkIdIsFailed()
+    {
+        $data = [
+            'network_id'    => $this->network->getKey(),
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified network id was not found',
+                'status' => 422,
+                'source' => 'network_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataSucceeds()
     {
         $data = [
