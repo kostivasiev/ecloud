@@ -94,10 +94,11 @@ class VpcController extends BaseController
     public function deployDefaults(Request $request, string $vpcId)
     {
         $vpc = Vpc::forUser($request->user)->findOrFail($vpcId);
+
         $availabilityZone = $vpc->region()->first()->availabilityZones()->first();
 
         // Create a new router
-        $router = $vpc->router()->create();
+        $router = $vpc->routers()->create();
 
         // Create a new network
         $network = Network::withoutEvents(function () {
