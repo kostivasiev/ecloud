@@ -62,6 +62,7 @@ class CreateTest extends TestCase
         )->assertResponseStatus(201);
 
         $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
+
         $this->seeJson([
             'id' => $virtualPrivateCloudId,
         ]);

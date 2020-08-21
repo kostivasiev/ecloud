@@ -83,7 +83,8 @@ class UpdateTest extends TestCase
             'region_id' => $this->region->getKey()
         ]);
         $vpc2 = factory(Vpc::class)->create([
-            'reseller_id' => 3
+            'reseller_id' => 3,
+            'region_id' => $this->region->getKey()
         ]);
         $dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $vpc->id,

@@ -3,7 +3,9 @@
 namespace Tests;
 
 use App\Models\V1\Datastore;
+use App\Models\V2\Dhcp;
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
@@ -25,6 +27,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         // Do not dispatch default ORM events on the following models, otherwise deployments will happen
         Datastore::flushEventListeners();
         Router::flushEventListeners();
+        Vpc::flushEventListeners();
+        Dhcp::flushEventListeners();
     }
 
     /**
