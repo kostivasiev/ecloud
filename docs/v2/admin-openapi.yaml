@@ -99,7 +99,7 @@ paths:
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/admin-item.yaml'
-  '/ecloud/v2/routers/{routerId}/gateways/{gatewayUuid}':
+  '/ecloud/v2/routers/{routerId}/gateways/{gatewayId}':
     $ref: 'resources/Router/gateways.yaml'
 
   '/ecloud/v2/regions':
