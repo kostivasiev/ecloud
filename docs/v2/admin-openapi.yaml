@@ -90,48 +90,7 @@ paths:
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZone/admin-item.yaml'
   '/ecloud/v2/availability-zones/{zoneId}/routers/{routerId}':
-    put:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: zoneId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: az-2b66bb79
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-f1b7d9c6
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: zoneId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: az-2b66bb79
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-f1b7d9c6
+    $ref: 'resources/AvailabilityZone/routers.yaml'
   '/ecloud/v2/gateways':
     get:
       responses:
