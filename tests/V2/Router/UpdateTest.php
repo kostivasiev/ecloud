@@ -76,6 +76,30 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotOwnedVpcIdIdIsFailed()
+    {
+        $data = [
+            'name'    => 'Manchester Router 2',
+            'vpc_id' => $this->faker->uuid()
+        ];
+
+        $this->post(
+            '/v2/routers',
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified vpc id was not found',
+                'status' => 422,
+                'source' => 'vpc_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataIsSuccessful()
     {
         $router = factory(Router::class)->create([

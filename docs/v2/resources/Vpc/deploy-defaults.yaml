@@ -1,0 +1,8 @@
+post:
+  responses:
+    202:
+      description: Success
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+  tags:
+    - VirtualPrivateClouds

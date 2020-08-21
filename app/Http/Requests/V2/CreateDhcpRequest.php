@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Vpc;
+use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -28,7 +30,12 @@ class CreateDhcpRequest extends FormRequest
     public function rules()
     {
         return [
-            'vpc_id'    => 'required|string|exists:ecloud.vpcs,id,deleted_at,NULL',
+            'vpc_id' => [
+                'required',
+                'string',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
+                new ExistsForUser(Vpc::class)
+            ],
         ];
     }
 

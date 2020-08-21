@@ -64,6 +64,29 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNotOwnedRouterIsFailed()
+    {
+        $data = [
+            'name' => 'Demo firewall rule 1',
+            'router_id' => $this->router->getKey()
+        ];
+        $this->post(
+            '/v2/firewall-rules',
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups'    => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataSucceeds()
     {
         $data = [

@@ -8,6 +8,7 @@
     "php": "^7.4",
     "ext-json": "*",
     "ext-pdo": "*",
+    "cebe/php-openapi": "^1.4",
     "guzzlehttp/guzzle": "~6.0",
     "illuminate/mail": "^5.8",
     "illuminate/redis": "5.8.*",
