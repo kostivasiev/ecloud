@@ -22,87 +22,21 @@ class DhcpDeploy implements ShouldQueue
     {
         $dhcp = $event->dhcp;
 
-        $availabilityZone = AvailabilityZone::findOrFail('avz-2b66bb79');
-        $nsx = $availabilityZone->nsxClient();
-        exit(print_r(
-            $nsx
-        ));
+        $event->dhcp->vpc->region->availabilityZones()->each(function($availabilityZone) use ($dhcp) {
+            try {
+                $nsxService = $availabilityZone->nsxClient();
 
+                $nsxService->put('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->getKey(), [
+                'json' => [
+                    'lease_time' => '86400',
+                    //'server_addresses' => ['192.168.0.1/24']
+                ]
+            ]);
 
-//
-//        $event->dhcp->vpc->region->availabilityZones()->each(function($availabilityZone) use ($dhcp) {
-//
-//
-//            exit(print_r(
-//                $availabilityZone->nsxClient()
-//            ));
-//
-//            try {
-//                //$nsxClient = $availabilityZone->nsxClient();
-//
-//
-//            } catch (GuzzleException $exception) {
-//                $json = json_decode($exception->getResponse()->getBody()->getContents());
-//                throw new \Exception($json);
-//            }
-//
-//
-//
-//
-//        });
-
-
-        // Loop over the NSX managers for each availability zone.
-//        exit(print_r(
-//            $event->dhcp->vpc->region->availabilityZones()->get()
-//        ));
-
-        // availability zones nsxClient()
-
-//        try {
-//            // Create the DHCP server profile
-//            $res = $this->nsxService->put('/policy/api/v1/infra/dhcp-server-configs/' . $event->dhcp->getKey(), [
-//                'json' => [
-//                    '_revision' => '0',
-//                    'display_name' => $event->dhcp->getKey(),
-//                    //'edge_cluster_id' => $this->nsxService->getEdgeClusterId()
-//                ]
-//            ]);
-//
-//            exit(print_r(
-//                $res->getBody()->getContents()
-//            ));
-//
-//            $responseData = json_decode($res->response->getBody()->getContents());
-//
-//            exit(print_r(
-//                $responseData
-//            ));
-//        } catch (GuzzleException $exception) {
-//            $json = json_decode($exception->getResponse()->getBody()->getContents());
-//            exit(print_r(
-//                $json
-//            ));
-//            throw new \Exception($json);
-//        }
-
-
-
-//        try {
-//            // Check whether the DHCP exists on the NSX server, the display name will be the resource ID.
-//            $res = $this->nsxService->get('/api/v1/search/query?query=resource_type:DhcpProfile AND display_name:' . $event->dhcp->getKey() . '&page_size=2');
-//
-//            $count = json_decode($res->getBody()->getContents());
-//
-//            exit(print_r(
-//
-//            ));
-//        } catch (GuzzleException $exception) {
-//            $json = json_decode($exception->getResponse()->getBody()->getContents());
-//            exit(print_r(
-//                $json
-//            ));
-//            throw new \Exception($json);
-//        }
+            } catch (GuzzleException $exception) {
+                $json = json_decode($exception->getResponse()->getBody()->getContents());
+                throw new \Exception($json);
+            }
+        });
     }
 }
