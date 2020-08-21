@@ -62,7 +62,7 @@ class DeployDefaultsTest extends TestCase
 
         // Check the relationships are intact
         $vpc = Vpc::findOrFail($vpc->id);
-        $router = $vpc->router()->first();
+        $router = $vpc->routers()->first();
         $this->assertNotNull($router);
         $this->assertNotNull(Network::where('router_id', '=', $router->id)->first());
     }
