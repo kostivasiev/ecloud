@@ -107,27 +107,5 @@ paths:
     $ref: 'resources/Region/admin-collection.yaml'
   '/ecloud/v2/regions/{regionId}':
     $ref: 'resources/Region/admin-item.yaml'
-
   '/ecloud/v2/regions/{regionId}/availability-zones':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AvailabilityZones'
-      parameters:
-        - name: regionId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: reg-2b66bb79
-      tags:
-        - Regions
+    $ref: 'resources/Region/availabilityZones.yaml'
