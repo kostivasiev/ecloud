@@ -99,6 +99,8 @@ class VpcController extends BaseController
 
         // Create a new router
         $router = $vpc->routers()->create();
+        $router->availabilityZones()->attach($availabilityZone);
+        $router->save();
 
         // Create a new network
         $network = Network::withoutEvents(function () {

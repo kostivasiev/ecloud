@@ -9,7 +9,7 @@ Content-Type:  application/json
 
 {
   "name": "Manchester Router 1",
-  "vpc_id": "vpc-d5ba7808"
+  "vpc_id": "vpc-0f822684"
 }
 
 > {%

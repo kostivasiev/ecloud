@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Services\NsxService;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +16,6 @@ use UKFast\DB\Ditto\Sortable;
  * Class AvailabilityZones
  * @package App\Models\V2
  * @method static findOrFail(string $zoneId)
- * @method static withRegion(string $region_id)
  */
 class AvailabilityZone extends Model implements Filterable, Sortable
 {
@@ -42,6 +42,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'datacentre_site_id' => 'integer',
     ];
 
+    /**
+     * @var NsxService
+     */
+    protected $nsxService;
+
     public function routers()
     {
         return $this->belongsToMany(Router::class);
@@ -65,6 +70,16 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public function region()
     {
         return $this->belongsTo(Region::class);
+    }
+
+    public function nsxClient() : NsxService
+    {
+        if (!$this->nsxService) {
+            $this->nsxService = $this->app->makeWith('NsxService', [
+                'endpoint' => $this->nsx_manager_endpoint,
+            ]);
+        }
+        return $this->nsxService;
     }
 
     /**
