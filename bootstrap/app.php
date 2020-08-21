@@ -23,6 +23,7 @@ $app = new Laravel\Lumen\Application(
 
 $app->configure('app');
 $app->configure('database');
+$app->configure('defaults');
 $app->configure('logging');
 $app->configure('mail');
 $app->configure('gpu');
