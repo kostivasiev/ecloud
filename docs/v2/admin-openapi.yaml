@@ -83,6 +83,8 @@ components:
       $ref: 'resources/Router/responses/idResponse.yaml'
     GatewayIdResponse:
       $ref: 'resources/Gateway/responses/idResponse.yaml'
+    RegionIdResponse:
+      $ref: 'resources/Region/responses/idResponse.yaml'
 
 paths:
   '/ecloud/v2/availability-zones':
@@ -101,146 +103,8 @@ paths:
     $ref: 'resources/Router/admin-item.yaml'
   '/ecloud/v2/routers/{routerId}/gateways/{gatewayId}':
     $ref: 'resources/Router/gateways.yaml'
-
   '/ecloud/v2/regions':
-    get:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Regions'
-                  meta:
-                    type: object
-                    required:
-                      - pagination
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 30
-                          count:
-                            type: integer
-                            example: 10
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 2
-                          total_pages:
-                            type: integer
-                            example: 3
-                          links:
-                            type: object
-                            properties:
-                              first:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
-                              previous:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
-                              next:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
-                              last:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
-      tags:
-        - Regions
-      parameters:
-        -
-          name: per_page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Number of items to display per page'
-        -
-          name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Page number to jump to'
-    post:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: reg-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/regions/reg-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  description: Name of the Region
-                  type: string
-                  example: 'United Kingdom'
-                  required: true
-      tags:
-        - Regions
-    patch:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: reg-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/regions/reg-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  description: Name of the Region
-                  type: string
-                  example: 'United Kingdom'
-                  required: false
-      tags:
-        - Regions
+    $ref: 'resources/Region/admin-collection.yaml'
 
   '/ecloud/v2/regions/{regionId}':
     get:
