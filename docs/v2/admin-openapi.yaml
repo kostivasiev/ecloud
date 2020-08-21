@@ -100,48 +100,7 @@ paths:
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/admin-item.yaml'
   '/ecloud/v2/routers/{routerId}/gateways/{gatewayUuid}':
-    put:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-2b66bb79
-        -
-          name: gatewayUuid
-          in: path
-          required: true
-          schema:
-            type: string
-          example: gw-2b66bb79
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-2b66bb79
-        -
-          name: gatewayUuid
-          in: path
-          required: true
-          schema:
-            type: string
-          example: gw-2b66bb79
+    $ref: 'resources/Router/gateways.yaml'
 
   '/ecloud/v2/regions':
     get:
