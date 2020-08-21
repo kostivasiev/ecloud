@@ -29,6 +29,8 @@ components:
       $ref: 'components/schemas/admin/router.yaml'
     Regions:
       $ref: 'components/schemas/admin/region.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
 
   parameters:
     # Query Parameters

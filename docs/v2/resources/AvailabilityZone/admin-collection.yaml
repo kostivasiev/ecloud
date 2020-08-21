@@ -16,7 +16,7 @@ get:
                   $ref: '../../admin-openapi.yaml#/components/schemas/AvailabilityZone'
               meta:
                 allOf:
-                  - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
+                  - $ref: "../../admin-openapi.yaml#/components/schemas/Meta"
                   - type: object
                     properties:
                       pagination:
