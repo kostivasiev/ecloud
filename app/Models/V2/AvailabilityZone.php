@@ -75,7 +75,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public function nsxClient() : NsxService
     {
         if (!$this->nsxService) {
-            $this->nsxService = app()->makeWith('App\Services\NsxService', [
+            $this->nsxService = app()->makeWith(NsxService::class, [
                 'endpoint' => $this->nsx_manager_endpoint,
             ]);
         }
