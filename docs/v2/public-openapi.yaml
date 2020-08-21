@@ -58,7 +58,7 @@ components:
     NetworkId:
       $ref: 'resources/Network/parameters/networkId.yaml'
     DhcpId:
-      $ref: 'resources/Network/parameters/networkId.yaml'
+      $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
     InstanceId:
