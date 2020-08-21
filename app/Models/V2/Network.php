@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkCreated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +15,8 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * @method static findOrFail(string $networkId)
  * @method static forUser(string $user)
+ * @method static find($id)
+ * @method static where(string $string, string $string1, $id)
  */
 class Network extends Model implements Filterable, Sortable
 {
@@ -30,6 +33,10 @@ class Network extends Model implements Filterable, Sortable
         'name',
         'router_id',
         'availability_zone_id'
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => NetworkCreated::class,
     ];
 
     public function router()

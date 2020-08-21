@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
+use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
@@ -82,5 +83,34 @@ class VpcController extends BaseController
     {
         Vpc::forUser($request->user)->findOrFail($vpcId)->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param string $vpcId
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function deployDefaults(Request $request, string $vpcId)
+    {
+        $vpc = Vpc::forUser($request->user)->findOrFail($vpcId);
+
+        $availabilityZone = $vpc->region()->first()->availabilityZones()->first();
+
+        // Create a new router
+        $router = $vpc->routers()->create();
+
+        // Create a new network
+        $network = Network::withoutEvents(function () {
+            $instance = new Network();
+            $instance::addCustomKey($instance);
+            $instance->name = $instance->id;
+            return $instance;
+        });
+        $network->availabilityZone()->associate($availabilityZone);
+        $network->router()->associate($router);
+        $network->save();
+
+        return response()->json([], 202);
     }
 }

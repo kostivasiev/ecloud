@@ -2,6 +2,7 @@
 
 namespace App\Listeners\V2;
 
+use App\Events\V2\NetworkCreated;
 use App\Services\NsxService;
 use App\Events\V2\RouterCreated;
 use App\Models\V2\Router;
@@ -47,6 +48,12 @@ class RouterDeploy implements ShouldQueue
         }
         $router->deployed = true;
         $router->save();
+
+        if ($router->networks()->count() > 0) {
+            /** @var \App\Models\V2\Network $network */
+            $network = $router->networks()->first();
+            event(new NetworkCreated($network));
+        }
 
         $firewallRule = app()->make(FirewallRule::class);
         $firewallRule->router()->attach($router);

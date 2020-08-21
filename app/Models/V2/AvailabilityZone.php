@@ -77,6 +77,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->nsxService;
     }
 
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
