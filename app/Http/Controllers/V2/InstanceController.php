@@ -36,7 +36,7 @@ class InstanceController extends BaseController
     /**
      * @param \Illuminate\Http\Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\Response
+     * @return InstanceResource
      */
     public function show(Request $request, string $instanceId)
     {
@@ -46,7 +46,7 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateRoutersRequest $request
+     * @param \App\Http\Requests\V2\CreateInstanceRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(CreateInstanceRequest $request)

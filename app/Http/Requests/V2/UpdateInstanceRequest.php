@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Network;
+use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateInstanceRequest extends FormRequest
@@ -23,7 +25,13 @@ class UpdateInstanceRequest extends FormRequest
     public function rules()
     {
         return [
-            'network_id' => ['sometimes', 'required', 'string', 'exists:ecloud.networks,id'],
+            'network_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.networks,id',
+                new ExistsForUser(Network::class)
+            ],
         ];
     }
 
