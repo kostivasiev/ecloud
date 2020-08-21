@@ -93,7 +93,7 @@ paths:
     $ref: 'resources/AvailabilityZone/routers.yaml'
   '/ecloud/v2/gateways':
     $ref: 'resources/Gateway/admin-collection.yaml'
-  '/ecloud/v2/gateways/{gatewayUuid}':
+  '/ecloud/v2/gateways/{gatewayId}':
     $ref: 'resources/Gateway/admin-item.yaml'
   '/ecloud/v2/routers':
     get:
