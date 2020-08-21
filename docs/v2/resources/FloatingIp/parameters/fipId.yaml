@@ -1,0 +1,6 @@
+in: path
+name: fipId
+required: true
+schema:
+  type: string
+example: fip-cd226940
