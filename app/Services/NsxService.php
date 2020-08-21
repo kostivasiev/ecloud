@@ -20,4 +20,9 @@ final class NsxService
     {
         return call_user_func_array([$this->client, $name], $arguments);
     }
+
+    public function getEdgeClusterId()
+    {
+        return '8bc61267-583e-4988-b5d9-16b46f7fe900';
+    }
 }

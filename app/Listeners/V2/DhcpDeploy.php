@@ -4,8 +4,6 @@ namespace App\Listeners\V2;
 
 use App\Services\NsxService;
 use App\Events\V2\DhcpCreated;
-use App\Models\V2\Router;
-use App\Models\V2\FirewallRule;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
@@ -13,12 +11,6 @@ use GuzzleHttp\Exception\GuzzleException;
 class DhcpDeploy implements ShouldQueue
 {
     use InteractsWithQueue;
-
-    /**
-     * This needs replacing with a lookup to find the edge cluster for
-     * the VPC this router belongs too
-     */
-    const EDGE_CLUSTER_ID = '8bc61267-583e-4988-b5d9-16b46f7fe900';
 
     /**
      * @var NsxService
@@ -41,34 +33,56 @@ class DhcpDeploy implements ShouldQueue
      */
     public function handle(DhcpCreated $event)
     {
-        exit(print_r(
-            $event->dhcp->vpc->region->availabilityZones()->get()
-        ));
+        // Loop over the NSX managers for each availability zone.
+//        exit(print_r(
+//            $event->dhcp->vpc->region->availabilityZones()->get()
+//        ));
 
 
-//        /** @var Router $router */
-//        $router = $event->router;
+        try {
+            // Create the DHCP server profile
+            $res = $this->nsxService->put('/policy/api/v1/infra/dhcp-server-configs/' . $event->dhcp->getKey(), [
+                'json' => [
+                    '_revision' => '0',
+                    'display_name' => $event->dhcp->getKey(),
+                    //'edge_cluster_id' => $this->nsxService->getEdgeClusterId()
+                ]
+            ]);
+
+            exit(print_r(
+                $res->getBody()->getContents()
+            ));
+
+            $responseData = json_decode($res->response->getBody()->getContents());
+
+            exit(print_r(
+                $responseData
+            ));
+        } catch (GuzzleException $exception) {
+            $json = json_decode($exception->getResponse()->getBody()->getContents());
+            exit(print_r(
+                $json
+            ));
+            throw new \Exception($json);
+        }
+
+
+
 //        try {
-//            $this->nsxService->put('policy/api/v1/infra/tier-1s/' . $router->id, [
-//                'json' => [
-//                    'tier0_path' => '/infra/tier-0s/T0',
-//                ],
-//            ]);
+//            // Check whether the DHCP exists on the NSX server, the display name will be the resource ID.
+//            $res = $this->nsxService->get('/api/v1/search/query?query=resource_type:DhcpProfile AND display_name:' . $event->dhcp->getKey() . '&page_size=2');
 //
-//            $this->nsxService->put('policy/api/v1/in:wfra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
-//                'json' => [
-//                    'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . self::EDGE_CLUSTER_ID,
-//                ],
-//            ]);
+//            $count = json_decode($res->getBody()->getContents());
+//
+//            exit(print_r(
+//
+//            ));
 //        } catch (GuzzleException $exception) {
 //            $json = json_decode($exception->getResponse()->getBody()->getContents());
+//            exit(print_r(
+//                $json
+//            ));
 //            throw new \Exception($json);
 //        }
-//        $router->deployed = true;
-//        $router->save();
-//
-//        $firewallRule = app()->make(FirewallRule::class);
-//        $firewallRule->router()->attach($router);
-//        $firewallRule->save();
     }
 }
