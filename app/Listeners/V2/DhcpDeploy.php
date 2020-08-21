@@ -23,31 +23,33 @@ class DhcpDeploy implements ShouldQueue
         $dhcp = $event->dhcp;
 
         $availabilityZone = AvailabilityZone::findOrFail('avz-2b66bb79');
-
+        $nsx = $availabilityZone->nsxClient();
         exit(print_r(
-            $availabilityZone->nsxClient()
+            $nsx
         ));
 
-        $event->dhcp->vpc->region->availabilityZones()->each(function($availabilityZone) use ($dhcp) {
 
-
-            exit(print_r(
-                $availabilityZone->nsxClient()
-            ));
-
-            try {
-                //$nsxClient = $availabilityZone->nsxClient();
-
-
-            } catch (GuzzleException $exception) {
-                $json = json_decode($exception->getResponse()->getBody()->getContents());
-                throw new \Exception($json);
-            }
-
-
-
-
-        });
+//
+//        $event->dhcp->vpc->region->availabilityZones()->each(function($availabilityZone) use ($dhcp) {
+//
+//
+//            exit(print_r(
+//                $availabilityZone->nsxClient()
+//            ));
+//
+//            try {
+//                //$nsxClient = $availabilityZone->nsxClient();
+//
+//
+//            } catch (GuzzleException $exception) {
+//                $json = json_decode($exception->getResponse()->getBody()->getContents());
+//                throw new \Exception($json);
+//            }
+//
+//
+//
+//
+//        });
 
 
         // Loop over the NSX managers for each availability zone.
