@@ -87,9 +87,9 @@ components:
 paths:
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/admin-collection.yaml'
-  '/ecloud/v2/availability-zones/{zoneId}':
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZone/admin-item.yaml'
-  '/ecloud/v2/availability-zones/{zoneId}/routers/{routerId}':
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers/{routerId}':
     put:
       responses:
         204:
