@@ -4,6 +4,7 @@ namespace Tests\V2\Network;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;

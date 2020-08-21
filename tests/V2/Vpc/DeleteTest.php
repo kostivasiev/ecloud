@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
