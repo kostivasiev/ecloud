@@ -43,6 +43,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
             $router->post('vpcs', 'VpcController@create');
+            $router->post('vpcs/{vpcId}/deploy-defaults', 'VpcController@deployDefaults');
         });
         $router->patch('vpcs/{vpcId}', 'VpcController@update');
         $router->get('vpcs', 'VpcController@index');

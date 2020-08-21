@@ -16,7 +16,7 @@ class CreateRouterTable extends Migration
         Schema::connection('ecloud')->create('router', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('vpc_id');
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
