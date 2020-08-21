@@ -1,4 +1,4 @@
-POST https://ecloud-apio.paul.rnd.ukfast/v2/vpcs
+POST https://{{host}}/{{version}}/vpcs
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

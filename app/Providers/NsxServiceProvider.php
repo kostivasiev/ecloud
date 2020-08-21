@@ -10,10 +10,10 @@ class NsxServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind('App\Services\NsxService', function ($nsxHostname) {
+        $this->app->bind('App\Services\NsxService', function ($app, $data) {
             $auth = base64_encode(config('nsx.username') . ':' . config('nsx.password'));
             return new NsxService(new Client([
-                'base_uri' => $nsxHostname,
+                'base_uri' => $data['endpoint'],
                 'headers' => [
                     'Authorization' => ['Basic ' . $auth],
                 ],
