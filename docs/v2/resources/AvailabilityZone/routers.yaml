@@ -6,7 +6,7 @@ put:
     204:
       description: Success
   tags:
-    - Routers
+    - AvailabilityZones
 delete:
   parameters:
     - $ref: '../../admin-openapi.yaml#/components/parameters/AvailabilityZoneId'
@@ -15,4 +15,4 @@ delete:
     204:
       description: Success
   tags:
-    - Routers
+    - AvailabilityZones
