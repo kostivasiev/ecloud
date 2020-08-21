@@ -2,6 +2,8 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\DhcpCreated;
+use App\Events\V2\VpcCreated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,16 +33,13 @@ class Dhcp extends Model implements Filterable, Sortable
         'vpc_id'
     ];
 
-    protected $visible = [
-        'id',
-        'vpc_id',
-        'created_at',
-        'updated_at'
+    protected $dispatchesEvents = [
+        'created' => DhcpCreated::class
     ];
 
     public function vpc()
     {
-        return $this->hasOne(Vpc::class, 'id', 'vpc_id');
+        return $this->belongsTo(Vpc::class);
     }
 
     /**

@@ -19,7 +19,7 @@ class DhcpCreate implements ShouldQueue
     public function handle(VpcCreated $event)
     {
         $dhcp = app()->make(Dhcp::class);
-        $dhcp->vpc_id = $event->vpc->getKey();
+        $dhcp->vpc()->associate($event->vpc);
         $dhcp->save();
     }
 }

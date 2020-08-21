@@ -2,9 +2,10 @@
 
 namespace App\Providers;
 
-use App\Events\V2\RouterCreated;
+use App\Events\V2\DhcpCreated;
 use App\Events\V2\VpcCreated;
 use App\Listeners\V2\DhcpCreate;
+use App\Listeners\V2\DhcpDeploy;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -54,6 +55,7 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\V2\RouterCreated' => [
             'App\Listeners\V2\RouterDeploy',
         ],
-        VpcCreated::class => [DhcpCreate::class]
+        VpcCreated::class => [DhcpCreate::class],
+        DhcpCreated::class => [DhcpDeploy::class]
     ];
 }

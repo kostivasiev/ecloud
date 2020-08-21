@@ -53,9 +53,9 @@ class Vpc extends Model implements Filterable, Sortable
         parent::boot();
     }
 
-    public function dhcp()
+    public function dhcps()
     {
-        return $this->belongsTo(Dhcp::class);
+        return $this->hasMany(Dhcp::class);
     }
 
     public function routers()
