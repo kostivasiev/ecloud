@@ -31,7 +31,7 @@ patch:
 
 delete:
   parameters:
-    - $ref: '../../admin-openapi.yaml#/components/parameters/Regions'
+    - $ref: '../../admin-openapi.yaml#/components/parameters/RegionId'
   responses:
     204:
       description: Success
