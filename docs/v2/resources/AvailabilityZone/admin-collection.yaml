@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../admin-openapi.yaml#/components/schemas/AvailabilityZone'
+                  $ref: '../../admin-openapi.yaml#/components/schemas/AvailabilityZones'
               meta:
                 allOf:
                   - $ref: "../../admin-openapi.yaml#/components/schemas/Meta"
