@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/AvailabilityZoneId'
+    - $ref: '../../admin-openapi.yaml#/components/parameters/AvailabilityZoneId'
   responses:
     200:
       description: success
@@ -10,8 +10,60 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/admin/AvailabilityZone'
+                $ref: '../../admin-openapi.yaml#/components/schemas/AvailabilityZones'
               meta:
                 type: object
+  tags:
+    - AvailabilityZones
+patch:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/AvailabilityZoneId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../admin-openapi.yaml#/components/schemas/AvailabilityZones"
+            - type: object
+              properties:
+                code:
+                  description: Short code for the availability zone
+                  type: string
+                  example: 'MAN1'
+                  required: false
+                name:
+                  description: Name of the Availability Zone
+                  type: string
+                  example: 'Manchester Zone 1'
+                  required: false
+                datacentre_site_id:
+                  description: Datacentre site identifier
+                  type: integer
+                  example: 5
+                  required: false
+                region_id:
+                  description: Identifier of the region in which the availability zone belongs
+                  type: string
+                  example: 'reg-a63dd78c'
+                  required: false
+                is_public:
+                  description: Determines whether the availability zone is publicly available
+                  type: boolean
+                  example: true
+                  required: false
+  responses:
+    200:
+      $ref: '../../admin-openapi.yaml#/components/responses/AvailabilityZoneResponse'
+  tags:
+    - AvailabilityZones
+
+delete:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/AvailabilityZoneId'
+  responses:
+    204:
+      description: Success
   tags:
     - AvailabilityZones
