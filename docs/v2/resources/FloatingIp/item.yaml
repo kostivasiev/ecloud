@@ -30,7 +30,7 @@ patch:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/FipIdResponse'
   tags:
-    - Instances
+    - Floating IPs
 delete:
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/FipId'

@@ -33,7 +33,7 @@ class Router extends Model implements Filterable, Sortable
         'id',
         'name',
         'vpc_id',
-        'deployed'
+        'deployed',
     ];
 
     protected $casts = [
@@ -104,7 +104,7 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('deployed', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -121,7 +121,7 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('vpc_id'),
             $factory->create('deployed'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

@@ -30,6 +30,7 @@ $app->configure('gpu');
 $app->configure('encryption');
 $app->configure('nsx');
 $app->configure('queue');
+$app->configure('erd-generator');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -117,6 +118,9 @@ $app->register(App\Providers\BillingServiceProvider::class);
 
 // NSX service provider
 $app->register(App\Providers\NsxServiceProvider::class);
+
+// ErdGenerator - Only enable on dev, never release this to live as the package is not installed due to --no-dev
+//$app->register(BeyondCode\ErdGenerator\ErdGeneratorServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

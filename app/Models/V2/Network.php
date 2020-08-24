@@ -32,7 +32,7 @@ class Network extends Model implements Filterable, Sortable
         'id',
         'name',
         'router_id',
-        'availability_zone_id'
+        'availability_zone_id',
     ];
 
     protected $dispatchesEvents = [
@@ -80,7 +80,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('router_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -97,7 +97,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('router_id'),
             $factory->create('availability_zone_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 
