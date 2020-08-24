@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Controllers\Controller;
-
 use Illuminate\Http\Request;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use Illuminate\Support\Facades\URL;
 use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Responses\UKFastResource;
+use UKFast\Api\Resource\Traits\ResponseHelper;
 
 class BaseController extends Controller
 {
