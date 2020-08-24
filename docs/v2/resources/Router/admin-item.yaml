@@ -1,0 +1,47 @@
+get:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/RouterId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../admin-openapi.yaml#/components/schemas/Routers'
+              meta:
+                type: object
+  tags:
+    - Routers
+patch:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/RouterId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../admin-openapi.yaml#/components/schemas/Routers"
+            - type: object
+              properties:
+                name:
+                  required: false
+                vpc_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../admin-openapi.yaml#/components/responses/RouterIdResponse'
+  tags:
+    - Routers
+delete:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/RouterId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Routers

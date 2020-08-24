@@ -2,8 +2,6 @@
 
 namespace App\Listeners\V2;
 
-use App\Models\V2\AvailabilityZone;
-use App\Services\NsxService;
 use App\Events\V2\DhcpCreated;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,7 +25,8 @@ class DhcpDeploy implements ShouldQueue
                 $availabilityZone->nsxClient()->put('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->getKey(), [
                     'json' => [
                         'lease_time' => '86400',
-                        //'server_addresses' => ['192.168.0.1/24']
+                        'server_addresses' => ['192.168.0.1/24'],
+                        'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $availabilityZone->nsxClient()->getEdgeClusterId(),
                     ]
                 ]);
             } catch (GuzzleException $exception) {
