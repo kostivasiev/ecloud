@@ -23,6 +23,7 @@ Content-Type:  application/json
   "code": "MAN1",
   "name": "Test AZ - Pete",
   "datacentre_site_id": 111,
+  "edge_cluster_id": "AAAABBBBCCCCDDDD",
   "region_id": "{{region_id}}"
 }
 

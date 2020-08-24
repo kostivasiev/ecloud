@@ -53,7 +53,13 @@ class AvailabilityZoneController extends BaseController
     public function create(CreateAvailabilityZoneRequest $request)
     {
         $availabilityZone = new AvailabilityZone($request->only([
-            'code', 'name', 'datacentre_site_id', 'is_public', 'region_id', 'nsx_manager_endpoint',
+            'code',
+            'name',
+            'datacentre_site_id',
+            'is_public',
+            'region_id',
+            'nsx_manager_endpoint',
+            'nsx_edge_cluster_id',
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
@@ -69,7 +75,13 @@ class AvailabilityZoneController extends BaseController
     {
         $availabilityZone = AvailabilityZone::findOrFail($zoneId);
         $availabilityZone->fill($request->only([
-            'code', 'name', 'datacentre_site_id', 'is_public', 'region_id', 'nsx_manager_endpoint'
+            'code',
+            'name',
+            'datacentre_site_id',
+            'is_public',
+            'region_id',
+            'nsx_manager_endpoint',
+            'nsx_edge_cluster_id',
         ]));
         $availabilityZone->save();
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);

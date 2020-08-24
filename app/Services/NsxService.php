@@ -11,9 +11,15 @@ final class NsxService
      */
     private $client;
 
-    public function __construct($client)
+    /**
+     * @var string
+     */
+    private $edgeClusterId;
+
+    public function __construct($client, $edgeClusterId)
     {
         $this->client = $client;
+        $this->edgeClusterId = $edgeClusterId;
     }
 
     public function __call($name, $arguments)
@@ -23,6 +29,6 @@ final class NsxService
 
     public function getEdgeClusterId()
     {
-        return '8bc61267-583e-4988-b5d9-16b46f7fe900';
+        return $this->edgeClusterId;
     }
 }
