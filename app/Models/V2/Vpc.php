@@ -36,7 +36,7 @@ class Vpc extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => VpcCreated::class
+        'created' => VpcCreated::class,
     ];
 
     /**
@@ -96,7 +96,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -113,7 +113,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('reseller_id'),
             $factory->create('region_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

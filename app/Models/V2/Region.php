@@ -29,7 +29,7 @@ class Region extends Model implements Filterable, Sortable
 
     protected $fillable = [
         'id',
-        'name'
+        'name',
     ];
 
     public function availabilityZones()
@@ -47,7 +47,7 @@ class Region extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -62,7 +62,7 @@ class Region extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

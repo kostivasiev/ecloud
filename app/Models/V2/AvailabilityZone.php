@@ -76,7 +76,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     {
         if (!$this->nsxService) {
             $this->nsxService = app()->makeWith(NsxService::class, [
-                'endpoint' => $this->nsx_manager_endpoint
+                'endpoint' => $this->nsx_manager_endpoint,
             ]);
         }
         return $this->nsxService;
@@ -97,7 +97,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('nsx_manager_endpoint', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -117,7 +117,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('is_public'),
             $factory->create('nsx_manager_endpoint'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 
