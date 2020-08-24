@@ -20,31 +20,23 @@ class NetworkDeploy implements ShouldQueue
     {
         $network = $event->network;
 
-        //resource_type = Segment
-        //domain_name
-        //subnets = array of SegmentSubnet
-
         try {
-            ///
             // todo: tier-1-id is router id???
 
             $network->availabilityZone->nsxClient()->put(
                 'policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey(), [
                 'json' => [
-                    'domain_name' => '', //??
+                    //'domain_name' => '', //??
                     'resource_type' => 'Segment',
                     'subnets' => [
                         'dhcp_config' => [
-                            'dns_servers'    => [
-                                'primary'   => '81.201.138.244',
-                                'secondary' => '94.229.163.244',
-                            ],
-                            'lease_time' => 604800,
+                            'dns_servers'    => config('defaults.network.dns_servers'),
+                            'lease_time' => config('defaults.network.lease_time'),
                             'resource_type' => 'SegmentDhcpV4Config',
                             'server_address' => '' // DHCP server address? "Second usable address from subnets.0.network"
                         ],
-                        'dhcp_ranges' => ['10.0.0.0/24'],
-                        'gateway_address' => '10.0.0.1', //10.0.0.0/24 ??
+                        'dhcp_ranges' => config('defaults.network.dhcp_ranges'),
+                        'gateway_address' => config('defaults.network.gateway_address'),
                     ]
 
 
