@@ -46,8 +46,10 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-//    public function testNullNameDefaultsToId()
-//    {
+    public function testNullNameDefaultsToId()
+    {
+        return $this->markTestSkipped('Flushing events on VPC prevents the running of this test');
+
 //        $data = [
 //            'name'    => '',
 //            'region_id' => $this->region->getKey(),
@@ -70,7 +72,7 @@ class CreateTest extends TestCase
 //
 //        $vpc = Vpc::findOrFail($virtualPrivateCloudId);
 //        $this->assertEquals($virtualPrivateCloudId, $vpc->name);
-//    }
+    }
 
     public function testNullRegionIsFailed()
     {
