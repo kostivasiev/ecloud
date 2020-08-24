@@ -3,6 +3,7 @@
 namespace Tests\V2\Vpn;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
@@ -26,6 +27,7 @@ class UpdateTest extends TestCase
     {
         $router = factory(Router::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create();
+
         $vpn = factory(Vpn::class)->create([
             'router_id' => $router->id,
             'availability_zone_id' => $availabilityZone->id,

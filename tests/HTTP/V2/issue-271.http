@@ -10,7 +10,8 @@ Content-Type:  application/json
 {
   "code": "MAN1",
   "name": "Manchester Zone 1",
-  "site_id": 111
+  "datacentre_site_id": 111,
+  "region_id": 111
 }
 
 > {%

@@ -10,17 +10,19 @@ class NsxServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        // TODO - We will need to expand this to support NSX Managers on each AZ
-        $this->app->bind('App\Services\NsxService', function () {
+        $this->app->bind('App\Services\NsxService', function ($app, $data) {
             $auth = base64_encode(config('nsx.username') . ':' . config('nsx.password'));
-            return new NsxService(new Client([
-                'base_uri' => config('nsx.hostname'),
-                'headers' => [
-                    'Authorization' => ['Basic ' . $auth],
-                ],
-                'timeout'  => 10,
-                'verify' => $this->app->environment() === 'production',
-            ]));
+            return new NsxService(
+                new Client([
+                    'base_uri' => $data['nsx_manager_endpoint'],
+                    'headers' => [
+                        'Authorization' => ['Basic ' . $auth],
+                    ],
+                    'timeout'  => 10,
+                    'verify' => $this->app->environment() === 'production',
+                ]),
+                $data['nsx_edge_cluster_id']
+            );
         });
     }
 }

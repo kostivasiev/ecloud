@@ -11,5 +11,6 @@ $factory->define(AvailabilityZone::class, function (Faker $faker) {
         'name'    => 'London Zone 1',
         'datacentre_site_id' => 1,
         'nsx_manager_endpoint' => 'https://www.ukfast.co.uk/',
+        'nsx_edge_cluster_id' => '0000-0000-0000-0000-0000',
     ];
 });

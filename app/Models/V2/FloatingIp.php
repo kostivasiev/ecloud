@@ -30,13 +30,13 @@ class FloatingIp extends Model implements Filterable, Sortable
     public $timestamps = true;
 
     protected $fillable = [
-        'id'
+        'id',
     ];
 
     protected $visible = [
         'id',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     /**
@@ -48,7 +48,7 @@ class FloatingIp extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -62,7 +62,7 @@ class FloatingIp extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 
