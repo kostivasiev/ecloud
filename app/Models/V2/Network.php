@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkCreated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +15,8 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * @method static findOrFail(string $networkId)
  * @method static forUser(string $user)
+ * @method static find($id)
+ * @method static where(string $string, string $string1, $id)
  */
 class Network extends Model implements Filterable, Sortable
 {
@@ -29,7 +32,11 @@ class Network extends Model implements Filterable, Sortable
         'id',
         'name',
         'router_id',
-        'availability_zone_id'
+        'availability_zone_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => NetworkCreated::class,
     ];
 
     public function router()
@@ -73,7 +80,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('router_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -90,7 +97,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('router_id'),
             $factory->create('availability_zone_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\VpcCreated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -34,6 +35,10 @@ class Vpc extends Model implements Filterable, Sortable
         'region_id',
     ];
 
+    protected $dispatchesEvents = [
+        'created' => VpcCreated::class,
+    ];
+
     /**
      * If no name is passed when creating, default the name to the id value
      */
@@ -48,9 +53,19 @@ class Vpc extends Model implements Filterable, Sortable
         parent::boot();
     }
 
-    public function dhcp()
+    public function dhcps()
     {
-        return $this->belongsTo(Dhcp::class);
+        return $this->hasMany(Dhcp::class);
+    }
+
+    public function routers()
+    {
+        return $this->hasMany(Router::class);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
     }
 
     /**
@@ -81,7 +96,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -98,7 +113,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('reseller_id'),
             $factory->create('region_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

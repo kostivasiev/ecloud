@@ -31,14 +31,14 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $fillable = [
         'id',
-        'network_id'
+        'network_id',
     ];
 
     protected $visible = [
         'id',
         'network_id',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     public function network()
@@ -56,7 +56,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('network_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -71,7 +71,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('network_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

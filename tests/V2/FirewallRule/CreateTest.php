@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallRule;
 
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -32,8 +33,10 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
+        $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
+            'region_id' => $this->region->getKey()
         ]);
 
         $this->router = factory(Router::class)->create([
@@ -60,6 +63,29 @@ class CreateTest extends TestCase
                 'detail' => 'The name field is required',
                 'status' => 422,
                 'source' => 'name'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testNotOwnedRouterIsFailed()
+    {
+        $data = [
+            'name' => 'Demo firewall rule 1',
+            'router_id' => $this->router->getKey()
+        ];
+        $this->post(
+            '/v2/firewall-rules',
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups'    => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
             ])
             ->assertResponseStatus(422);
     }

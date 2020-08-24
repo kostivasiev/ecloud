@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Services\NsxService;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -34,12 +35,18 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'region_id',
         'is_public',
         'nsx_manager_endpoint',
+        'nsx_edge_cluster_id',
     ];
 
     protected $casts = [
         'is_public' => 'boolean',
         'datacentre_site_id' => 'integer',
     ];
+
+    /**
+     * @var NsxService
+     */
+    protected $nsxService;
 
     public function routers()
     {
@@ -61,6 +68,22 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Gateway::class);
     }
 
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    public function nsxClient() : NsxService
+    {
+        if (!$this->nsxService) {
+            $this->nsxService = app()->makeWith(NsxService::class, [
+                'nsx_manager_endpoint' => $this->nsx_manager_endpoint,
+                'nsx_edge_cluster_id' => $this->nsx_edge_cluster_id,
+            ]);
+        }
+        return $this->nsxService;
+    }
+
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
@@ -75,8 +98,9 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('nsx_manager_endpoint', Filter::$stringDefaults),
+            $factory->create('nsx_edge_cluster_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -95,8 +119,9 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('region_id'),
             $factory->create('is_public'),
             $factory->create('nsx_manager_endpoint'),
+            $factory->create('nsx_edge_cluster_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 
@@ -122,6 +147,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'region_id'    => 'region_id',
             'is_public'    => 'is_public',
             'nsx_manager_endpoint'    => 'nsx_manager_endpoint',
+            'nsx_edge_cluster_id'    => 'nsx_edge_cluster_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

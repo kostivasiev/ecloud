@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -74,7 +75,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $vpc = factory(Vpc::class)->create();
+        $this->region = factory(Region::class)->create();
+        $vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         $vpc->refresh();
         $this->delete(
             '/v2/vpcs/' . $vpc->getKey(),

@@ -4,6 +4,7 @@ namespace Tests\V2\Network;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -28,8 +29,10 @@ class UpdateTest extends TestCase
 
         $this->faker = Faker::create();
 
+        $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
+            'region_id' => $this->region->getKey()
         ]);
 
         $this->router = factory(Router::class)->create([
@@ -106,6 +109,40 @@ class UpdateTest extends TestCase
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified router id was not found',
+                'status' => 422,
+                'source' => 'router_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testNotOwnedRouterIdIsFailed()
+    {
+        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
+        $router = factory(Router::class)->create([
+            'vpc_id' => $vpc->getKey()
+        ]);
+
+        $net = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
+        $data = [
+            'name'    => 'Manchester Network',
+            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'router_id' => $router->getKey()
+        ];
+
+        $this->patch(
+            '/v2/networks/' . $net->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )

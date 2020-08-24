@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/PerPage'
+    - $ref: '../../public-openapi.yaml#/components/parameters/Page'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../admin-openapi.yaml#/components/schemas/AvailabilityZones'
+              meta:
+                allOf:
+                  - $ref: "../../admin-openapi.yaml#/components/schemas/Meta"
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=2'
+  tags:
+    - AvailabilityZones
+
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../admin-openapi.yaml#/components/schemas/AvailabilityZones'
+  responses:
+    201:
+      $ref: '../../admin-openapi.yaml#/components/responses/AvailabilityZoneResponse'
+  tags:
+    - AvailabilityZones

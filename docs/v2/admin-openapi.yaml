@@ -1,14 +1,17 @@
 ---
 
-openapi: 3.0.0
+openapi: '3.0.0'
 info:
   title: 'eCloud Admin API'
   version: '2.0.0'
+
 servers:
   - url: https://api.ukfast.io
+
 security:
   - api_key:
       - api_key
+
 components:
   securitySchemes:
     api_key:
@@ -16,978 +19,93 @@ components:
       description: API key authentication
       in: header
       name: Authorization
+
   schemas:
     AvailabilityZones:
-      properties:
-        id:
-          type: string
-          example: az-2b66bb79
-          readOnly: false
-        code:
-          type: string
-          example: MAN1
-          readOnly: false
-        name:
-          type: string
-          example: 'Manchester Region 1'
-          readOnly: false
-        datacentre_site_id:
-          type: integer
-          example: 999
-          readOnly: false
-        region_id:
-          type: string
-          example: 'reg-a63dd78c'
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        is_public:
-          type: boolean
-          example: 'true'
-          readOnly: false
-      description: 'Availability Zones'
-      required: {  }
+      $ref: 'components/schemas/admin/availabilityZone.yaml'
     Gateways:
-      properties:
-        id:
-          type: string
-          example: gw-2b66bb79
-          readOnly: false
-        name:
-          type: string
-          example: 'Primary Gateway'
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        deleted_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-      description: 'Gateways'
-      required: {  }
+      $ref: 'components/schemas/admin/gateway.yaml'
     Routers:
-      properties:
-        id:
-          type: string
-          example: rtr-2b66bb79
-          readOnly: false
-        name:
-          type: string
-          example: 'Primary Router'
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-        deleted_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: false
-      description: 'Routers'
-      required: {  }
+      $ref: 'components/schemas/admin/router.yaml'
     Regions:
-      properties:
-        id:
-          type: string
-          example: reg-2b66bb79
-          readOnly: false
-        name:
-          type: string
-          example: 'United Kingdom'
-          readOnly: false
-        created_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-        updated_at:
-          type: string
-          example: '2020-07-07T10:30:00+01:00'
-          readOnly: true
-      description: 'Regions'
-      required: {  }
+      $ref: 'components/schemas/admin/region.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
+
+  parameters:
+    # Query Parameters
+    PerPage:
+      $ref: 'components/parameters/perPage.yaml'
+    Page:
+      $ref: 'components/parameters/page.yaml'
+    # Path Parameters
+    VpcId:
+      $ref: 'resources/Vpc/parameters/vpcId.yaml'
+    AvailabilityZoneId:
+      $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
+    NetworkId:
+      $ref: 'resources/Network/parameters/networkId.yaml'
+    DhcpId:
+      $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
+    VpnId:
+      $ref: 'resources/Vpn/parameters/vpnId.yaml'
+    InstanceId:
+      $ref: 'resources/Instance/parameters/instanceId.yaml'
+    FipId:
+      $ref: 'resources/FloatingIp/parameters/fipId.yaml'
+    FirewallRuleId:
+      $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    RegionId:
+      $ref: 'resources/Region/parameters/regionId.yaml'
+    RouterId:
+      $ref: 'resources/Router/parameters/routerId.yaml'
+    GatewayId:
+      $ref: 'resources/Gateway/parameters/gatewayId.yaml'
+
+  responses:
+    AvailabilityZoneResponse:
+      $ref: 'resources/AvailabilityZone/responses/idResponse.yaml'
+    VirtualPrivateCloudsIdResponse:
+      $ref: 'resources/Vpc/responses/idResponse.yaml'
+    NetworksIdResponse:
+      $ref: 'resources/Network/responses/idResponse.yaml'
+    DhcpIdResponse:
+      $ref: 'resources/Dhcp/responses/idResponse.yaml'
+    VpnIdResponse:
+      $ref: 'resources/Vpn/responses/idResponse.yaml'
+    InstanceIdResponse:
+      $ref: 'resources/Instance/responses/idResponse.yaml'
+    FipIdResponse:
+      $ref: 'resources/FloatingIp/responses/idResponse.yaml'
+    FirewallRuleIdResponse:
+      $ref: 'resources/FirewallRule/responses/idResponse.yaml'
+    RouterIdResponse:
+      $ref: 'resources/Router/responses/idResponse.yaml'
+    GatewayIdResponse:
+      $ref: 'resources/Gateway/responses/idResponse.yaml'
+    RegionIdResponse:
+      $ref: 'resources/Region/responses/idResponse.yaml'
 
 paths:
   '/ecloud/v2/availability-zones':
-    get:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AvailabilityZones'
-                  meta:
-                    type: object
-                    required:
-                      - pagination
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 30
-                          count:
-                            type: integer
-                            example: 10
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 2
-                          total_pages:
-                            type: integer
-                            example: 3
-                          links:
-                            type: object
-                            properties:
-                              first:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=1'
-                              previous:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=1'
-                              next:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=2'
-                              last:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=2'
-      tags:
-        - AvailabilityZones
-      parameters:
-        -
-          name: per_page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Number of items to display per page'
-        -
-          name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Page number to jump to'
-
-    post:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: az-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/az-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                code:
-                  description: Short code for the availability zone
-                  type: string
-                  example: 'MAN1'
-                  required: true
-                name:
-                  description: Name of the Availability Zone
-                  type: string
-                  example: 'Manchester Zone 1'
-                  required: true
-                datacentre_site_id:
-                  description: Datacentre site identifier
-                  type: integer
-                  example: 5
-                  required: true
-                region_id:
-                  description: Identifier of the region in which the availability zone belongs
-                  type: string
-                  example: 'reg-a63dd78c'
-                  required: true
-                is_public:
-                  description: Determines whether the availability zone is publicly available
-                  type: boolean
-                  example: true
-                  required: true
-      tags:
-        - AvailabilityZones
-      parameters: {  }
-  '/ecloud/v2/availability-zones/{zoneId}':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/AvailabilityZones'
-                  meta:
-                    type: object
-      tags:
-        - AvailabilityZones
-      parameters:
-        -
-          name: zoneId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: az-2b66bb79
-    patch:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id: string
-                      example: az-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/availability-zones/az-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                code:
-                  description: Short code for the availability zone
-                  type: string
-                  example: 'MAN1'
-                  required: false
-                name:
-                  description: Name of the Availability Zone
-                  type: string
-                  example: 'Manchester Zone 1'
-                  required: false
-                datacentre_site_id:
-                  description: Datacentre site identifier
-                  type: integer
-                  example: 5
-                  required: false
-                region_id:
-                  description: Identifier of the region in which the availability zone belongs
-                  type: string
-                  example: 'reg-a63dd78c'
-                  required: false
-                is_public:
-                  description: Determines whether the availability zone is publicly available
-                  type: boolean
-                  example: true
-                  required: false
-      tags:
-        - AvailabilityZones
-      parameters:
-        -
-          name: zoneId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: az-2b66bb79
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - AvailabilityZones
-      parameters:
-        -
-          name: zoneId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: az-2b66bb79
-  '/ecloud/v2/availability-zones/{zoneId}/routers/{routerId}':
-    put:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: zoneId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: az-2b66bb79
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-f1b7d9c6
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: zoneId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: az-2b66bb79
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-f1b7d9c6
+    $ref: 'resources/AvailabilityZone/admin-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
+    $ref: 'resources/AvailabilityZone/admin-item.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers/{routerId}':
+    $ref: 'resources/AvailabilityZone/routers.yaml'
   '/ecloud/v2/gateways':
-    get:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Gateways'
-                  meta:
-                    type: object
-                    required:
-                      - pagination
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 30
-                          count:
-                            type: integer
-                            example: 10
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 2
-                          total_pages:
-                            type: integer
-                            example: 3
-                          links:
-                            type: object
-                            properties:
-                              first:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/gateways?page=1'
-                              previous:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/gateways?page=1'
-                              next:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/gateways?page=2'
-                              last:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/gateways?page=2'
-      tags:
-        - Gateways
-      parameters:
-        -
-          name: per_page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Number of items to display per page'
-        -
-          name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Page number to jump to'
-
-    post:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: gw-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gw-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Gateways'
-      tags:
-        - Gateways
-      parameters: {  }
-  '/ecloud/v2/gateways/{gatewayUuid}':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Gateways'
-                  meta:
-                    type: object
-      tags:
-        - Gateways
-      parameters:
-        -
-          name: gatewayUuid
-          in: path
-          required: true
-          schema:
-            type: string
-          example: gw-2b66bb79
-    patch:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id: string
-                      example: gw-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/gateways/gw-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Gateways'
-      tags:
-        - Gateways
-      parameters:
-        -
-          name: gatewayUuid
-          in: path
-          required: true
-          schema:
-            type: string
-          example: gw-2b66bb79
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Gateways
-      parameters:
-        -
-          name: gatewayUuid
-          in: path
-          required: true
-          schema:
-            type: string
-          example: gw-2b66bb79
+    $ref: 'resources/Gateway/admin-collection.yaml'
+  '/ecloud/v2/gateways/{gatewayId}':
+    $ref: 'resources/Gateway/admin-item.yaml'
   '/ecloud/v2/routers':
-    get:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Routers'
-                  meta:
-                    type: object
-                    required:
-                      - pagination
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 30
-                          count:
-                            type: integer
-                            example: 10
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 2
-                          total_pages:
-                            type: integer
-                            example: 3
-                          links:
-                            type: object
-                            properties:
-                              first:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/routers?page=1'
-                              previous:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/routers?page=1'
-                              next:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/routers?page=2'
-                              last:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/routers?page=2'
-      tags:
-        - Routers
-      parameters:
-        -
-          name: per_page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Number of items to display per page'
-        -
-          name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Page number to jump to'
-
-    post:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: rtr-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/routers/rtr-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Routers'
-      tags:
-        - Routers
-      parameters: {  }
+    $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Routers'
-                  meta:
-                    type: object
-      tags:
-        - Routers
-      parameters:
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-2b66bb79
-    patch:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id: string
-                      example: rtr-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/routers/rtr-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Routers'
-      tags:
-        - Routers
-      parameters:
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-2b66bb79
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-2b66bb79
-  '/ecloud/v2/routers/{routerId}/gateways/{gatewayUuid}':
-    put:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-2b66bb79
-        -
-          name: gatewayUuid
-          in: path
-          required: true
-          schema:
-            type: string
-          example: gw-2b66bb79
-    delete:
-      responses:
-        204:
-          description: Success
-      tags:
-        - Routers
-      parameters:
-        -
-          name: routerId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: rtr-2b66bb79
-        -
-          name: gatewayUuid
-          in: path
-          required: true
-          schema:
-            type: string
-          example: gw-2b66bb79
-
-
-
+    $ref: 'resources/Router/admin-item.yaml'
+  '/ecloud/v2/routers/{routerId}/gateways/{gatewayId}':
+    $ref: 'resources/Router/gateways.yaml'
   '/ecloud/v2/regions':
-    get:
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Regions'
-                  meta:
-                    type: object
-                    required:
-                      - pagination
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 30
-                          count:
-                            type: integer
-                            example: 10
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 2
-                          total_pages:
-                            type: integer
-                            example: 3
-                          links:
-                            type: object
-                            properties:
-                              first:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
-                              previous:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=1'
-                              next:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
-                              last:
-                                type: string
-                                example: 'https://api.ukfast.io/ecloud/v2/regions?page=2'
-      tags:
-        - Regions
-      parameters:
-        -
-          name: per_page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Number of items to display per page'
-        -
-          name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: 'Page number to jump to'
-    post:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: reg-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/regions/reg-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  description: Name of the Region
-                  type: string
-                  example: 'United Kingdom'
-                  required: true
-      tags:
-        - Regions
-    patch:
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: reg-2b66bb79
-                  meta:
-                    type: object
-                    properties:
-                      location:
-                        type: string
-                        example: 'https://api.ukfast.io/ecloud/v2/regions/reg-2b66bb79'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  description: Name of the Region
-                  type: string
-                  example: 'United Kingdom'
-                  required: false
-      tags:
-        - Regions
-
+    $ref: 'resources/Region/admin-collection.yaml'
   '/ecloud/v2/regions/{regionId}':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Regions'
-                  meta:
-                    type: object
-      parameters:
-        -
-          name: regionId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: reg-2b66bb79
-      tags:
-        - Regions
-    delete:
-      responses:
-        204:
-          description: Success
-      parameters:
-        - name: regionId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: reg-2b66bb79
-      tags:
-        - Regions
-
+    $ref: 'resources/Region/admin-item.yaml'
   '/ecloud/v2/regions/{regionId}/availability-zones':
-    get:
-      responses:
-        200:
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AvailabilityZones'
-      parameters:
-        - name: regionId
-          in: path
-          required: true
-          schema:
-            type: string
-          example: reg-2b66bb79
-      tags:
-        - Regions
+    $ref: 'resources/Region/availabilityZones.yaml'

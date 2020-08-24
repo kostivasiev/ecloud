@@ -38,7 +38,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         'router_id',
         'deployed',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $dispatchesEvents = [
@@ -61,7 +61,7 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -77,7 +77,7 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('router_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

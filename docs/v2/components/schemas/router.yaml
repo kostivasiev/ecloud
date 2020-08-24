@@ -1,0 +1,26 @@
+properties:
+  id:
+    type: string
+    example: 'rtr-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    required: true
+    example: 'rtr-2b66bb79'
+  vpc_id:
+    type: string
+    required: true
+    example: 'vpc-2b66bb79'
+  deployed:
+    type: boolean
+    readOnly: true
+    example: true
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Routers'

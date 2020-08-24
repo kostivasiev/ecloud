@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Router;
 
+use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -23,8 +24,11 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
+        $this->region = factory(Region::class)->create();
+
         $this->vpc = factory(Vpc::class)->create([
             'name'    => 'Manchester DC',
+            'region_id' => $this->region->getKey()
         ]);
 
         $this->router = factory(Router::class)->create([
@@ -67,6 +71,30 @@ class CreateTest extends TestCase
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The specified vpc id was not found',
+                'status' => 422,
+                'source' => 'vpc_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testNotOwnedVpcIdIsFailed()
+    {
+        $data = [
+            'name'    => 'Manchester Network',
+            'vpc_id' => $this->vpc->getKey(),
+        ];
+
+        $this->patch(
+            '/v2/routers/' . $this->router->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
