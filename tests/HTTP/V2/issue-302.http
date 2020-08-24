@@ -21,23 +21,8 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 ###
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/dhcps/dhcp-e67929e0
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
 
-
-
-
-
-
-
-###
-
-
-GET https://ecloud-apio.paul.rnd.ukfast/v2/dhcps
+GET https://ecloud-apio.paul.rnd.ukfast/v2/dhcps/dhcp-87473679
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -45,15 +30,3 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 ###
 
-
-
-POST https://ecloud-apio.paul.rnd.ukfast/v2/dhcps
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-   "vpc_id" : "vpc-312a08ce"
-}
