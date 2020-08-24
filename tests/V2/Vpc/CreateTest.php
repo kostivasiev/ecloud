@@ -2,6 +2,9 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Events\V2\DhcpCreated;
+use App\Events\V2\VpcCreated;
+use App\Models\V2\Dhcp;
 use App\Models\V2\Vpc;
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
@@ -149,4 +152,25 @@ class CreateTest extends TestCase
         ]);
     }
 
+    public function testCreateTriggersDhcpDispatch()
+    {
+        Event::fake();
+
+        $vpc = factory(Vpc::class)->create([
+            'id' => 'vpc-abc123'
+        ]);
+
+        Event::assertDispatched(VpcCreated::class, function ($event) use ($vpc) {
+            return $event->vpc->id === $vpc->id;
+        });
+
+        $dhcp = factory(Dhcp::class)->create([
+            'id' => 'dhcp-abc123',
+            'vpc_id' => 'vpc-abc123'
+        ]);
+
+        Event::assertDispatched(DhcpCreated::class, function ($event) use ($dhcp) {
+            return $event->dhcp->id === $dhcp->id;
+        });
+    }
 }

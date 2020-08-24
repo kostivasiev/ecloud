@@ -15,9 +15,8 @@ return [
         'gateway'        => '10.0.0.1',
     ],
     'dhcp'               => [
-        'internal_address' => '192.168.0.0/20', // this value needs review/removal
+        'server_addresses' => ['192.168.0.0/20'],
         'lease_time'       => 604800,
-        'profile'          => 'edge-cluster', // is this correct?
     ],
     'vpn'                => [],
     'instance'           => [],
