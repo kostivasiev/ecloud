@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
 
@@ -51,7 +52,7 @@ class BaseController extends Controller
                     'id' => $id,
                 ],
                 'meta' => [
-                    'location' => sprintf('%s/%s', $request->url(), $id),
+                    'location' => sprintf('%s/%s', URL::current(), $id),
                 ],
             ],
             $statusCode
