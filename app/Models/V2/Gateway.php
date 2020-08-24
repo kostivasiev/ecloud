@@ -30,7 +30,7 @@ class Gateway extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
-        'availability_zone_id'
+        'availability_zone_id',
     ];
 
     public function routers()
@@ -54,7 +54,7 @@ class Gateway extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -70,7 +70,7 @@ class Gateway extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('availability_zone_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

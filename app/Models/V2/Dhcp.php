@@ -30,11 +30,11 @@ class Dhcp extends Model implements Filterable, Sortable
 
     protected $fillable = [
         'id',
-        'vpc_id'
+        'vpc_id',
     ];
 
     protected $dispatchesEvents = [
-        'created' => DhcpCreated::class
+        'created' => DhcpCreated::class,
     ];
 
     public function vpc()
@@ -52,7 +52,7 @@ class Dhcp extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -67,7 +67,7 @@ class Dhcp extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('vpc_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 

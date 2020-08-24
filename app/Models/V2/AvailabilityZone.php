@@ -35,6 +35,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'region_id',
         'is_public',
         'nsx_manager_endpoint',
+        'nsx_edge_cluster_id',
     ];
 
     protected $casts = [
@@ -76,7 +77,8 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     {
         if (!$this->nsxService) {
             $this->nsxService = app()->makeWith(NsxService::class, [
-                'endpoint' => $this->nsx_manager_endpoint
+                'nsx_manager_endpoint' => $this->nsx_manager_endpoint,
+                'nsx_edge_cluster_id' => $this->nsx_edge_cluster_id,
             ]);
         }
         return $this->nsxService;
@@ -96,8 +98,9 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('nsx_manager_endpoint', Filter::$stringDefaults),
+            $factory->create('nsx_edge_cluster_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults)
+            $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
@@ -116,8 +119,9 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('region_id'),
             $factory->create('is_public'),
             $factory->create('nsx_manager_endpoint'),
+            $factory->create('nsx_edge_cluster_id'),
             $factory->create('created_at'),
-            $factory->create('updated_at')
+            $factory->create('updated_at'),
         ];
     }
 
@@ -143,6 +147,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'region_id'    => 'region_id',
             'is_public'    => 'is_public',
             'nsx_manager_endpoint'    => 'nsx_manager_endpoint',
+            'nsx_edge_cluster_id'    => 'nsx_edge_cluster_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
