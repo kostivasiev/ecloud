@@ -99,7 +99,7 @@ class RouterController extends BaseController
     {
         $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
         $router = Router::forUser($request->user)->findOrFail($routerId);
-        $router->avilabilityZones()->attach($availabilityZone);
+        $router->availabilityZones()->attach($availabilityZone);
         event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
         return response()->json([], 204);
     }
@@ -108,7 +108,7 @@ class RouterController extends BaseController
     {
         $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
         $router = Router::forUser($request->user)->findOrFail($routerUuid);
-        $router->avilabilityZones()->detach($availabilityZone);
+        $router->availabilityZones()->detach($availabilityZone);
         event(new RouterAvailabilityZoneDetach($router, $availabilityZone));
         return response()->json([], 204);
     }
