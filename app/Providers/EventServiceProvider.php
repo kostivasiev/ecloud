@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\V2\NetworkCreated;
+use App\Listeners\V2\NetworkDeploy;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -51,5 +53,7 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\V2\RouterCreated' => [
             'App\Listeners\V2\RouterDeploy',
         ],
+
+        NetworkCreated::class => [NetworkDeploy::class]
     ];
 }

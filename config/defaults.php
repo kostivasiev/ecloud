@@ -4,7 +4,7 @@ return [
     'availability_zones' => [],
     'vpc'                => [],
     'network'            => [
-        'range'        => '10.0.0.0/24',
+        'range'        => '10.0.0.0/24', //dhcp_ranges??
         'type'           => 'local',
         'lease_time'     => 604800,
         'dns_servers'    => [

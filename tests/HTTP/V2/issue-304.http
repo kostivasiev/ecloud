@@ -1,0 +1,15 @@
+POST https://ecloud-apio.paul.rnd.ukfast/v2/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test network",
+  "router_id": "rtr-111c26db",
+  "availability_zone_id": "avz-2b66bb79"
+}
+
+###
+
