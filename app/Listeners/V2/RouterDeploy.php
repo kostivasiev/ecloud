@@ -46,11 +46,8 @@ class RouterDeploy implements ShouldQueue
             throw new \Exception($json);
         }
         $router->deployed = true;
+        $router->firewallRules()->create();
         $router->save();
-
-        $firewallRule = app()->make(FirewallRule::class);
-        $firewallRule->router()->attach($router);
-        $firewallRule->save();
 
         $router->networks()->each(function ($network) {
             /** @var Network $network */
