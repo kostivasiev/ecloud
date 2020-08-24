@@ -7,7 +7,6 @@ use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use App\Models\V2\FirewallRule;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
