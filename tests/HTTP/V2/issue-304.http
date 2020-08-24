@@ -1,3 +1,26 @@
+POST https://ecloud-apio.paul.rnd.ukfast/v2/routers
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test router",
+  "vpc_id": "vpc-c2c14510"
+}
+
+###
+
+PUT https://ecloud-apio.paul.rnd.ukfast/v2/routers/rtr-1abd3b5c/availability-zones/avz-2b66bb79
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+
 POST https://ecloud-apio.paul.rnd.ukfast/v2/networks
 Accept: */*
 Cache-Control: no-cache
@@ -7,7 +30,7 @@ Content-Type: application/json
 
 {
   "name": "test network",
-  "router_id": "rtr-111c26db",
+  "router_id": "rtr-1abd3b5c",
   "availability_zone_id": "avz-2b66bb79"
 }
 

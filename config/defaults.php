@@ -5,15 +5,15 @@ return [
     'vpc'                => [],
 
     'network'            => [
-        'dhcp_ranges'        => '10.0.0.0/24',
+        'dhcp_ranges'        => ['10.0.0.0/24'],
         'lease_time'     => 604800,
         'dns_servers'    => [
-            'primary'   => '81.201.138.244',
-            'secondary' => '94.229.163.244',
+            '81.201.138.244',
+            '94.229.163.244',
         ],
 
         'server_address' => '10.0.0.2',
-        'gateway_address' => '10.0.0.1',
+        'gateway_address' => '10.0.0.1/24',
     ],
 
 
