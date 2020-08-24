@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Events\V2\RouterAvailabilityZoneAttach;
+use App\Events\V2\RouterAvailabilityZoneDetach;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Gateway;
 use App\Models\V2\Router;
+use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -82,6 +86,33 @@ class RouterController extends BaseController
         return response()->json([], 204);
     }
 
+    public function availabilityZones(Request $request, string $routerId, QueryTransformer $queryTransformer)
+    {
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->availabilityZones()->query();
+        $queryTransformer->config(AvailabilityZone::class)->transform($collection);
+        return AvailabilityZoneResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function availabilityZonesAttach(Request $request, string $routerId, string $availabilityZonesId)
+    {
+        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+        $router->avilabilityZones()->attach($availabilityZone);
+        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
+        return response()->json([], 204);
+    }
+
+    public function availabilityZonesDetach(Request $request, string $routerUuid, string $availabilityZonesId)
+    {
+        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
+        $router = Router::forUser($request->user)->findOrFail($routerUuid);
+        $router->avilabilityZones()->detach($availabilityZone);
+        event(new RouterAvailabilityZoneDetach($router, $availabilityZone));
+        return response()->json([], 204);
+    }
+
     /**
      * Associate a gateway with a router
      * @param \Illuminate\Http\Request $request
@@ -89,7 +120,7 @@ class RouterController extends BaseController
      * @param string $gatewayId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function gatewaysCreate(Request $request, string $routerId, string $gatewayId)
+    public function gatewaysAttach(Request $request, string $routerId, string $gatewayId)
     {
         $router = Router::forUser($request->user)->findOrFail($routerId);
         $gateway = Gateway::findOrFail($gatewayId);
@@ -104,7 +135,7 @@ class RouterController extends BaseController
      * @param string $gatewaysUuid
      * @return \Illuminate\Http\JsonResponse
      */
-    public function gatewaysDestroy(Request $request, string $routerUuid, string $gatewaysUuid)
+    public function gatewaysDetach(Request $request, string $routerUuid, string $gatewaysUuid)
     {
         $router = Router::forUser($request->user)->findOrFail($routerUuid);
         $gateway = Gateway::findOrFail($gatewaysUuid);

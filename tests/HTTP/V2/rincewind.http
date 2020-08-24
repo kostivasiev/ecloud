@@ -65,3 +65,9 @@ Content-Type:  application/json
 client.global.set('router_id', response.body.data.id);
 client.log('Router UUID: ' + response.body.data.id);
 %}
+
+###
+PUT https://{{host}}/{{version}}/routers/{{router_id}}/availability-zones/{{availability_zone_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

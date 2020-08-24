@@ -85,18 +85,29 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->patch('routers/{routerId}', 'RouterController@update');
     $router->delete('routers/{routerId}', 'RouterController@destroy');
 
+    $router->get(
+        'routers/{routerId}/availability-zones',
+        'RouterController@availabilityZones'
+    );
+    $router->put(
+        'routers/{routerId}/availability-zones/{availabilityZonesId}',
+        'RouterController@availabilityZonesAttach'
+    );
+    $router->delete(
+        'routers/{routerId}/availability-zones/{availabilityZonesId}',
+        'RouterController@availabilityZonesDetach'
+    );
+
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         /** Routers Gateways */
-        $router->group([], function () use ($router) {
-            $router->put(
-                'routers/{routerId}/gateways/{gatewayId}',
-                'RouterController@gatewaysCreate'
-            );
-            $router->delete(
-                'routers/{routerId}/gateways/{gatewayId}',
-                'RouterController@gatewaysDestroy'
-            );
-        });
+        $router->put(
+            'routers/{routerId}/gateways/{gatewayId}',
+            'RouterController@gatewaysAttach'
+        );
+        $router->delete(
+            'routers/{routerId}/gateways/{gatewayId}',
+            'RouterController@gatewaysDetach'
+        );
     });
 
     /** Gateways */
