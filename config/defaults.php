@@ -3,21 +3,20 @@
 return [
     'availability_zones' => [],
     'vpc'                => [],
-
     'network'            => [
-        'dhcp_ranges'        => ['10.0.0.0/24'],
-        'lease_time'     => 604800,
-        'dns_servers'    => [
-            '81.201.138.244',
-            '94.229.163.244',
+        'subnets' => [
+            'gateway_address' => '10.0.0.1/24',
+            'dhcp_config' => [
+                'server_address' => '10.0.0.2',
+                'lease_time'     => 604800,
+                'dns_servers' => [
+                    '81.201.138.244',
+                    '94.229.163.244'
+                ]
+            ],
         ],
-
-        'server_address' => '10.0.0.2',
-        'gateway_address' => '10.0.0.1/24',
+        'domain_name' => 'ecloud.ukfast'
     ],
-
-
-
     'dhcp'               => [
         'server_addresses' => ['192.168.0.0/20'],
         'lease_time'       => 604800,

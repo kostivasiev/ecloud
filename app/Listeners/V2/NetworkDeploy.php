@@ -20,55 +20,37 @@ class NetworkDeploy implements ShouldQueue
     {
         $network = $event->network;
 
-        try {
-            // todo: tier-1-id is router id???
+        if (empty($network->router)) {
+            throw new \Exception('Failed to load network\'s router');
+        }
 
+        if (empty($network->router->vpc->dhcp)) {
+            throw new \Exception('Failed to load DHCP for VPC');
+        }
+
+        try {
             $network->availabilityZone->nsxClient()->put(
                 'policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey(), [
                 'json' => [
-                    //'domain_name' => '', //??
                     'resource_type' => 'Segment',
                     'subnets' => [
                         [
+                            'gateway_address' => config('defaults.network.subnets.gateway_address'),
                             'dhcp_config' => [
-                                'dns_servers' => [
-                                    '81.201.138.244',
-                                    '94.229.163.244',
-                                ],
-                                'lease_time' => 604800,
                                 'resource_type' => 'SegmentDhcpV4Config',
-                                'server_address' => '10.0.0.1/24' // DHCP server address? "Second usable address from subnets.0.network"
-                            ],
-                            'dhcp_ranges' => config('defaults.network.dhcp_ranges'),
-                            'gateway_address' => '10.0.0.1/24',
+                                'server_address' =>  config('defaults.network.subnets.dhcp_config.server_address'),
+                                'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
+                                'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
+                            ]
                         ]
-                    ]
+                    ],
+                    'domain_name' => config('defaults.network.domain_name'),
+                    "dhcp_config_path" => "/infra/dhcp-server-configs/" . $network->router->vpc->dhcp->getKey()
                 ]
             ]);
         } catch (GuzzleException $exception) {
             $json = json_decode($exception->getResponse()->getBody()->getContents());
-            exit(print_r(
-                $json
-            ));
             throw new \Exception($json);
         }
     }
 }
-
-/**
- *
- *                 'json' => [
- * //'domain_name' => '', //??
- * 'resource_type' => 'Segment',
- * 'subnets' => [
- * 'dhcp_config' => [
- * 'dns_servers'    => config('defaults.network.dns_servers'),
- * 'lease_time' => config('defaults.network.lease_time'),
- * 'resource_type' => 'SegmentDhcpV4Config',
- * 'server_address' => config('defaults.network.server_address') // DHCP server address? "Second usable address from subnets.0.network"
- * ],
- * 'dhcp_ranges' => config('defaults.network.dhcp_ranges'),
- * 'gateway_address' => config('defaults.network.gateway_address'),
- * ]
- * ]
- */
