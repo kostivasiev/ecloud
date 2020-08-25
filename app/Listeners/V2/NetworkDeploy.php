@@ -38,19 +38,19 @@ class NetworkDeploy implements ShouldQueue
                             'gateway_address' => config('defaults.network.subnets.gateway_address'),
                             'dhcp_config' => [
                                 'resource_type' => 'SegmentDhcpV4Config',
-                                'server_address' =>  config('defaults.network.subnets.dhcp_config.server_address'),
+                                'server_address' => config('defaults.network.subnets.dhcp_config.server_address'),
                                 'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
                                 'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
                             ]
                         ]
                     ],
                     'domain_name' => config('defaults.network.domain_name'),
+                    'transport_zone_path' => config('defaults.network.transport_zone_path'),
                     "dhcp_config_path" => "/infra/dhcp-server-configs/" . $network->router->vpc->dhcp->getKey()
                 ]
             ]);
         } catch (GuzzleException $exception) {
-            $json = json_decode($exception->getResponse()->getBody()->getContents());
-            throw new \Exception($json);
+            throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
     }
 }
