@@ -30,7 +30,8 @@ class NetworkDeploy implements ShouldQueue
 
         try {
             $network->availabilityZone->nsxClient()->put(
-                'policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey(), [
+                'policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey(),
+                [
                 'json' => [
                     'resource_type' => 'Segment',
                     'subnets' => [
@@ -48,7 +49,8 @@ class NetworkDeploy implements ShouldQueue
                     'transport_zone_path' => config('defaults.network.transport_zone_path'),
                     "dhcp_config_path" => "/infra/dhcp-server-configs/" . $network->router->vpc->dhcp->getKey()
                 ]
-            ]);
+            ]
+            );
         } catch (GuzzleException $exception) {
             throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
