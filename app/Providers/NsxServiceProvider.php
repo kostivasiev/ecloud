@@ -19,7 +19,7 @@ class NsxServiceProvider extends ServiceProvider
                         'Authorization' => ['Basic ' . $auth],
                     ],
                     'timeout'  => 10,
-                    'verify' => $this->app->environment() === 'production',
+                    'verify' => false, //$this->app->environment() === 'production',
                 ]),
                 $data['nsx_edge_cluster_id']
             );
