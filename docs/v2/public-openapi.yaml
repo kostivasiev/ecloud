@@ -127,7 +127,7 @@ paths:
 
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
-  '/ecloud/v2/floating-ips/{instanceId}':
+  '/ecloud/v2/floating-ips/{fipId}':
     $ref: 'resources/FloatingIp/item.yaml'
 
   '/ecloud/v2/firewall-rules':
