@@ -2,6 +2,9 @@
 
 namespace Tests\V2\Network;
 
+use App\Events\V2\NetworkCreated;
+use App\Models\V2\Network;
+use Illuminate\Support\Facades\Event;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -148,5 +151,20 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(201);
+    }
+
+    public function testCreateDispatchesEvent()
+    {
+        Event::fake();
+
+        $network = factory(Network::class)->create([
+            'id' => 'net-abc123',
+            'router_id' => $this->faker->uuid(),
+            'availability_zone_id' => $this->faker->uuid()
+        ]);
+
+        Event::assertDispatched(NetworkCreated::class, function ($event) use ($network) {
+            return $event->network->id === $network->id;
+        });
     }
 }

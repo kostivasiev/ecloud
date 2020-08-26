@@ -7,6 +7,7 @@ use App\Models\V1\Datastore;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Models\V2\Network;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
@@ -34,6 +35,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         $vpcDispatcher = Vpc::getEventDispatcher();
         $vpcDispatcher->forget(DhcpCreate::class);
         Vpc::setEventDispatcher($vpcDispatcher);
+        Network::flushEventListeners();
     }
 
     /**
