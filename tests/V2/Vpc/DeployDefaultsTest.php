@@ -2,12 +2,14 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Faker\Generator;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -50,6 +52,11 @@ class DeployDefaultsTest extends TestCase
         $vpc = factory(Vpc::class)->create([
             'region_id' => $region->id,
         ]);
+
+        Event::fake([
+            RouterAvailabilityZoneAttach::class,
+        ]);
+
         $this->post(
             '/v2/vpcs/' . $vpc->id . '/deploy-defaults',
             [],
