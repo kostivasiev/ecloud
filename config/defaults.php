@@ -19,7 +19,6 @@ return [
         'transport_zone_path' => '/infra/sites/default/enforcement-points/default/transport-zones/a6b45631-b6b2-4d9e-9d92-105bc9289930'
     ],
     'dhcp'               => [
-        'server_addresses' => ['192.168.0.0/20'],
         'lease_time'       => 604800,
     ],
     'vpn'                => [],
