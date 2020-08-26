@@ -4,15 +4,19 @@ return [
     'availability_zones' => [],
     'vpc'                => [],
     'network'            => [
-        'range'        => '10.0.0.0/24',
-        'type'           => 'local',
-        'lease_time'     => 604800,
-        'dns_servers'    => [
-            'primary'   => '81.201.138.244',
-            'secondary' => '94.229.163.244',
+        'subnets' => [
+            'gateway_address' => '10.0.0.1/24',
+            'dhcp_config' => [
+                'server_address' => '10.0.0.2/24',
+                'lease_time'     => 604800,
+                'dns_servers' => [
+                    '81.201.138.244',
+                    '94.229.163.244'
+                ]
+            ],
         ],
-        'second_address' => '10.0.0.2',
-        'gateway'        => '10.0.0.1',
+        'domain_name' => 'ecloud.ukfast',
+        'transport_zone_path' => '/infra/sites/default/enforcement-points/default/transport-zones/a6b45631-b6b2-4d9e-9d92-105bc9289930'
     ],
     'dhcp'               => [
         'server_addresses' => ['192.168.0.0/20'],

@@ -255,8 +255,8 @@ class Solution extends Model implements Filterable, Sortable
             StringProperty::create('ucs_reseller_source', 'source'),
             BooleanProperty::create('ucs_reseller_can_move_between_luns', 'can_move_between_luns', null, 'Yes', 'No'),
             IntProperty::create('ucs_reseller_saleorder_id', 'saleorder_id'),
-            BooleanProperty::create('ucs_reseller_encryption_enabled', 'encryption_enabled', null, 'Yes', 'No'),
             BooleanProperty::create('ucs_reseller_can_move_between_luns', 'can_move_between_luns', null, 'Yes', 'No'),
+            BooleanProperty::create('ucs_reseller_encryption_enabled', 'encryption_enabled', null, 'Yes', 'No'),
             BooleanProperty::create('ucs_reseller_encryption_default', 'encryption_default', null, 'Yes', 'No'),
             StringProperty::create('ucs_reseller_encryption_billing_type', 'encryption_billing_type'),
         ];
@@ -631,5 +631,14 @@ class Solution extends Model implements Filterable, Sortable
     public function getResellerIdAttribute()
     {
         return $this->ucs_reseller_reseller_id;
+    }
+
+    public function getUcsResellerEncryptionEnabledAttribute($value)
+    {
+        return empty($value) ? 'No' : $value;
+    }
+    public function getUcsResellerEncryptionDefaultAttribute($value)
+    {
+        return empty($value) ? 'No' : $value;
     }
 }

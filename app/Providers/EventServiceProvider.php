@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\V2\NetworkCreated;
+use App\Listeners\V2\NetworkDeploy;
 use App\Events\V2\DhcpCreated;
 use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Events\V2\VpcCreated;
@@ -63,5 +65,7 @@ class EventServiceProvider extends ServiceProvider
         DhcpCreated::class => [
             DhcpDeploy::class,
         ],
+
+        NetworkCreated::class => [NetworkDeploy::class]
     ];
 }
