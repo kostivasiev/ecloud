@@ -9,7 +9,7 @@ class NetworkCreated
 {
     use SerializesModels;
 
-    public Network $network;
+    public $network;
 
     /**
      * @param Network $network
