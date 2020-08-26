@@ -52,7 +52,7 @@ class CreateTest extends TestCase
     public function testNullNameDefaultsToId()
     {
         return $this->markTestSkipped('Flushing events on VPC prevents the running of this test');
-
+//
 //        $data = [
 //            'name'    => '',
 //            'region_id' => $this->region->getKey(),

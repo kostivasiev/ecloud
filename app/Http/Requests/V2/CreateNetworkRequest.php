@@ -30,7 +30,7 @@ class CreateNetworkRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'required|string',
+            'name'    => 'nullable|string',
             'router_id'    => [
                 'required',
                 'string',
@@ -49,7 +49,6 @@ class CreateNetworkRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field is required',
             'router_id.required' => 'The :attribute field is required',
             'router_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.required' => 'The :attribute field is required',

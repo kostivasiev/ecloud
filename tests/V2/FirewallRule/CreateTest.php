@@ -45,28 +45,6 @@ class CreateTest extends TestCase
         ]);
     }
 
-    public function testNullNameIsFailed()
-    {
-        $data = [
-            'name' => '',
-        ];
-        $this->post(
-            '/v2/firewall-rules',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The name field is required',
-                'status' => 422,
-                'source' => 'name'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testNotOwnedRouterIsFailed()
     {
         $data = [

@@ -23,7 +23,7 @@ class CreateFirewallRuleRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:50',
+            'name' => 'nullable|string|max:50',
             'router_id' => [
                 'required',
                 'string',
@@ -39,7 +39,6 @@ class CreateFirewallRuleRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field is required',
             'name.string' => 'The :attribute field must contain a string',
             'name.max' => 'The :attribute field must be less than 50 characters',
             'router_id.required' => 'The :attribute field is required',

@@ -44,29 +44,6 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsFailed()
-    {
-        $data = [
-            'name' => '',
-            'availability_zone_id'    => $this->availabilityZone->getKey()
-        ];
-        $this->post(
-            '/v2/gateways',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The name field is required',
-                'status' => 422,
-                'source' => 'name'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testInvalidAvailabilityZoneIdUndefinedIsFailed()
     {
         $data = [
