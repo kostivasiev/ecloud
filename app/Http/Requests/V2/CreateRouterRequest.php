@@ -25,7 +25,7 @@ class CreateRouterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
+            'name' => 'nullable|string',
             'vpc_id' => [
                 'required',
                 'string',
@@ -43,7 +43,6 @@ class CreateRouterRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field is required',
             'vpc_id.required' => 'The :attribute field is required',
             'vpc_id.exists' => 'The specified :attribute was not found'
         ];

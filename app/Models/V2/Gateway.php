@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Gateway extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'gw';
     protected $keyType = 'string';
