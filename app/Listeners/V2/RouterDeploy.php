@@ -41,8 +41,7 @@ class RouterDeploy implements ShouldQueue
                 ],
             ]);
         } catch (GuzzleException $exception) {
-            $json = json_decode($exception->getResponse()->getBody()->getContents());
-            throw new \Exception($json);
+            throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
         $router->deployed = true;
         $router->firewallRules()->create();
