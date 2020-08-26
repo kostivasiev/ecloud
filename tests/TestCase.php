@@ -30,7 +30,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         Router::flushEventListeners();
         Dhcp::flushEventListeners();
 
-        // Forget event listeners
+        // Forget Vpc event listeners
         $vpcDispatcher = Vpc::getEventDispatcher();
         $vpcDispatcher->forget(DhcpCreate::class);
         Vpc::setEventDispatcher($vpcDispatcher);
