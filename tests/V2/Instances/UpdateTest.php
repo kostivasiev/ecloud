@@ -49,30 +49,6 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsDenied()
-    {
-        $data = [
-            'network_id' => ''
-        ];
-
-        $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The network id field, when specified, cannot be null',
-                'status' => 422,
-                'source' => 'network_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
-
     public function testNonExistentNetworkId()
     {
         $data = [
