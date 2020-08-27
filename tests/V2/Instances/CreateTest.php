@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -104,9 +105,16 @@ class CreateTest extends TestCase
 
         $id = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
-            'id' => $id,
-            'name' => $id
-        ]);
+            'id' => $id
+        ])
+            ->seeInDatabase(
+            'instances',
+            [
+                'id' => $id,
+                'name' => $id,
+            ],
+            'ecloud'
+        );
 
         // Name defined
         $name = $this->faker->word();
@@ -128,7 +136,14 @@ class CreateTest extends TestCase
         $id = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
             'id' => $id,
-            'name' => $name
-        ]);
+        ])
+            ->seeInDatabase(
+                'instances',
+                [
+                    'id' => $id,
+                    'name' => $name,
+                ],
+                'ecloud'
+            );
     }
 }
