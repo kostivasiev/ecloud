@@ -109,9 +109,10 @@ class CreateTest extends TestCase
         ]);
 
         // Name defined
+        $name = $this->faker->word();
         $data = [
             'network_id' => $this->network->getKey(),
-            'name' => $this->faker->word()
+            'name' => $name
         ];
 
         $this->post(
@@ -127,7 +128,7 @@ class CreateTest extends TestCase
         $id = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
             'id' => $id,
-            'name' => $this->faker->word()
+            'name' => $name
         ]);
     }
 }

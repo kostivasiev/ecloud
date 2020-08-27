@@ -15,7 +15,7 @@ class UpdateInstancesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->string('name');
+//            $table->string('name');
         });
     }
 }
