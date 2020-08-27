@@ -22,6 +22,7 @@ class InstanceResource extends UKFastResource
     {
         return [
             'id'         => $this->id,
+            'name' => $this->name,
             'network_id'       => $this->network_id,
             'created_at' => Carbon::parse(
                 $this->created_at,

@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\DateTimeProperty;
@@ -21,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'i';
     protected $keyType = 'string';
@@ -31,14 +32,8 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $fillable = [
         'id',
+        'name',
         'network_id',
-    ];
-
-    protected $visible = [
-        'id',
-        'network_id',
-        'created_at',
-        'updated_at',
     ];
 
     public function network()
@@ -54,6 +49,7 @@ class Instance extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('name', Filter::$stringDefaults),
             $factory->create('network_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -69,6 +65,7 @@ class Instance extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('name'),
             $factory->create('network_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -82,7 +79,7 @@ class Instance extends Model implements Filterable, Sortable
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('id', 'asc'),
+            $factory->create('created_at', 'desc'),
         ];
     }
 
@@ -93,6 +90,7 @@ class Instance extends Model implements Filterable, Sortable
     {
         return [
             'id'         => 'id',
+            'name'         => 'name',
             'network_id' => 'network_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

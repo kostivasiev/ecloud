@@ -25,6 +25,7 @@ class UpdateInstanceRequest extends FormRequest
     public function rules()
     {
         return [
+            'name'    => 'sometimes|required|string',
             'network_id' => [
                 'sometimes',
                 'required',
@@ -43,6 +44,7 @@ class UpdateInstanceRequest extends FormRequest
     public function messages()
     {
         return [
+            'name.required' => 'The :attribute field, when specified, cannot be null',
             'network_id.required' => 'The :attribute field, when specified, cannot be null',
             'network_id.exists' => 'The specified network was not found',
         ];

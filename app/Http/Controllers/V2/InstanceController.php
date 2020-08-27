@@ -51,7 +51,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateInstanceRequest $request)
     {
-        $instance = new Instance($request->only(['network_id']));
+        $instance = new Instance($request->only(['network_id', 'name']));
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
@@ -65,7 +65,7 @@ class InstanceController extends BaseController
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
         $instance = Instance::findOrFail($instanceId);
-        $instance->fill($request->only(['network_id']));
+        $instance->fill($request->only(['network_id', 'name']));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
