@@ -2,13 +2,13 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\Vpc;
+use App\Models\V2\LoadBalancerCluster;
 use Faker\Generator as Faker;
 
-$factory->define(Vpc::class, function (Faker $faker) {
+$factory->define(LoadBalancerCluster::class, function (Faker $faker) {
     return [
-        'name' => 'Virtual Private Cloud Name',
-        'reseller_id' => 1,
-
+        'name' => 'Load Balancer Cluster 1',
+        'nodes' => 3
     ];
 });
+

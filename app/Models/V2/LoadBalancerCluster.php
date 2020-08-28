@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\VpcCreated;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -14,9 +13,9 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class VirtualPrivateClouds
+ * Class LoadBalancerCluster
  * @package App\Models\V2
- * @method static findOrFail(string $vdcUuid)
+ * @method static findOrFail(string $lbcId)
  * @method static forUser(string $user)
  */
 class LoadBalancerCluster extends Model implements Filterable, Sortable
@@ -28,6 +27,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
+    public $table = 'lbcs';
 
     protected $fillable = [
         'id',
@@ -36,6 +36,11 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
         'vpc_id',
         'nodes'
     ];
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
 
     /**
      * @param $query

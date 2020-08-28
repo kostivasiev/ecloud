@@ -158,6 +158,15 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->delete('regions/{regionId}', 'RegionController@destroy');
         });
     });
+
+    /** Load balancer clusters */
+    $router->group([], function () use ($router) {
+        $router->get('lbcs', 'LoadBalancerClusterController@index');
+        $router->get('lbcs/{lbcId}', 'LoadBalancerClusterController@show');
+        $router->post('lbcs', 'LoadBalancerClusterController@store');
+        $router->patch('lbcs/{lbcId}', 'LoadBalancerClusterController@update');
+        $router->delete('lbcs/{lbcId}', 'LoadBalancerClusterController@destroy');
+    });
 });
 
 
