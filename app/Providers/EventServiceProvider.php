@@ -65,7 +65,8 @@ class EventServiceProvider extends ServiceProvider
         DhcpCreated::class => [
             DhcpDeploy::class,
         ],
-
-        NetworkCreated::class => [NetworkDeploy::class]
+        NetworkCreated::class => [
+            NetworkDeploy::class
+        ],
     ];
 }

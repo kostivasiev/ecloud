@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
 use App\Models\V2\Network;
@@ -112,6 +113,9 @@ class VpcController extends BaseController
         $network->availabilityZone()->associate($availabilityZone);
         $network->router()->associate($router);
         $network->save();
+
+        // Deploy router and network
+        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
 
         return response()->json([], 202);
     }
