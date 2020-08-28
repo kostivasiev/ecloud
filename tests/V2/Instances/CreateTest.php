@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -42,7 +43,7 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameIsFailed()
+    public function testNullNetworkIdIsFailed()
     {
         $data = [
             'network_id'    => '',
@@ -88,8 +89,9 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        // No name defined - defaults to ID
         $data = [
-            'network_id'    => $this->network->getKey(),
+            'network_id' => $this->network->getKey(),
         ];
         $this->post(
             '/v2/instances',
@@ -103,7 +105,45 @@ class CreateTest extends TestCase
 
         $id = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
+            'id' => $id
+        ])
+            ->seeInDatabase(
+            'instances',
+            [
+                'id' => $id,
+                'name' => $id,
+            ],
+            'ecloud'
+        );
+
+        // Name defined
+        $name = $this->faker->word();
+        $data = [
+            'network_id' => $this->network->getKey(),
+            'name' => $name
+        ];
+
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->assertResponseStatus(201);
+
+        $id = (json_decode($this->response->getContent()))->data->id;
+        $this->seeJson([
             'id' => $id,
-        ]);
+        ])
+            ->seeInDatabase(
+                'instances',
+                [
+                    'id' => $id,
+                    'name' => $name,
+                ],
+                'ecloud'
+            );
     }
 }

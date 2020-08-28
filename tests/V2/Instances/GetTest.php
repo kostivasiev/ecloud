@@ -55,6 +55,7 @@ class GetTest extends TestCase
         )
             ->seeJson([
                 'id' => $this->instance->getKey(),
+                'name' => $this->instance->name,
                 'network_id' => $this->instance->network_id,
             ])
             ->assertResponseStatus(200);
@@ -71,6 +72,7 @@ class GetTest extends TestCase
         )
             ->seeJson([
                 'id' => $this->instance->getKey(),
+                'name' => $this->instance->name,
                 'network_id' => $this->instance->network_id,
             ])
             ->assertResponseStatus(200);

@@ -25,6 +25,7 @@ class CreateInstanceRequest extends FormRequest
     public function rules()
     {
         return [
+            'name'    => 'nullable|string',
             'network_id' => [
                 'required',
                 'string',
