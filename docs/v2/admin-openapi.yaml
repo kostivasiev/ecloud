@@ -29,6 +29,8 @@ components:
       $ref: 'components/schemas/admin/router.yaml'
     Regions:
       $ref: 'components/schemas/admin/region.yaml'
+    LoadBalancerCluster:
+      $ref: 'components/schemas/lbc.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
 
@@ -109,3 +111,8 @@ paths:
     $ref: 'resources/Region/admin-item.yaml'
   '/ecloud/v2/regions/{regionId}/availability-zones':
     $ref: 'resources/Region/availabilityZones.yaml'
+
+  '/ecloud/v2/lbcs':
+    $ref: 'resources/LoadBalancerCluster/collection.yaml'
+  '/ecloud/v2/lbcs/{lbcId}':
+    $ref: 'resources/LoadBalancerCluster/item.yaml'
