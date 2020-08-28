@@ -13,6 +13,7 @@ use UKFast\Responses\UKFastResource;
  * @property string availability_zone_id
  * @property string vpc_id
  * @property string nodes
+ * @property string config_id
  * @property string created_at
  * @property string updated_at
  */
@@ -30,6 +31,7 @@ class LoadBalancerClusterResource extends UKFastResource
             'availability_zone_id' => $this->availability_zone_id,
             'vpc_id' => $this->vpc_id,
             'nodes' => $this->nodes,
+            'config_id' => $this->config_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

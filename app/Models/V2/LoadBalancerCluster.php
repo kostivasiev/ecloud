@@ -76,6 +76,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('nodes', Filter::$numericDefaults),
+            $factory->create('config_id', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -94,6 +95,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('vpc_id'),
             $factory->create('nodes'),
+            $factory->create('config_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -121,6 +123,8 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             'name'       => 'name',
             'availability_zone_id' => 'availability_zone_id',
             'vpc_id'       => 'vpc_id',
+            'nodes'       => 'nodes',
+            'config_id'       => 'config_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
