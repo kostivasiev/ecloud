@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        \App\Console\Commands\Nsx\TestAuth::class,
+        \App\Console\Commands\Nsx\TestFirewallRuleDeploy::class,
     ];
 
     /**

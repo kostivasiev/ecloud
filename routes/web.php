@@ -11,4 +11,20 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 |
 */
 
+// api docs
+$router->get('{apiVersion}/docs.yaml', function ($apiVersion) {
+    if (!preg_match('/v[0-9]+/si', $apiVersion)) {
+        return 'Invalid version';
+    }
+
+    $filePath = base_path() . '/docs/' . $apiVersion . '/public-openapi.yaml';
+    if (!file_exists($filePath)) {
+        return 'Version not found';
+    }
+
+    return \cebe\openapi\Writer::writeToYaml(\cebe\openapi\Reader::readFromYamlFile($filePath));
+});
+
+// api endpoints
 require('v1.php');
+require('v2.php');

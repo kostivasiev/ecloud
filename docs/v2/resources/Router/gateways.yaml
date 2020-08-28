@@ -1,0 +1,18 @@
+put:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/RouterId'
+    - $ref: '../../admin-openapi.yaml#/components/parameters/GatewayId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Routers
+delete:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/RouterId'
+    - $ref: '../../admin-openapi.yaml#/components/parameters/GatewayId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Routers

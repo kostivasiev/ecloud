@@ -303,7 +303,7 @@ class VirtualMachineController extends BaseController
                 $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
             }
 
-            if ($request->input('environment') != 'Burst') {
+            if (!in_array($request->input('environment'), ['Burst', 'GPU'])) {
                 // get available compute
                 $maxRam = min($maxRam, $solution->ramAvailable());
                 if ($maxRam < 1) {
@@ -454,6 +454,7 @@ class VirtualMachineController extends BaseController
             $appliance = ApplianceController::getApplianceById($request, $request->input('appliance_id'));
 
             $applianceVersion = $appliance->getLatestVersion();
+            $applianceVersionData = $applianceVersion->getDataArray();
 
             // Load the VM template from the appliance version specification
             if (empty($applianceVersion->vm_template)) {
@@ -780,6 +781,10 @@ class VirtualMachineController extends BaseController
             if (!empty($applianceScript)) {
                 $post_data['appliance_bootstrap_script'] = base64_encode($applianceScript);
             }
+
+            if (in_array('ukfast.license.legacy-cp-id', array_keys($applianceVersionData))) {
+                $post_data['control_panel_id'] = $applianceVersionData['ukfast.license.legacy-cp-id'];
+            }
         }
 
         //set bootstrap script
@@ -803,7 +808,7 @@ class VirtualMachineController extends BaseController
             $post_data['billing_period'] = 'Month';
         }
 
-        // remove debugging when ready to retest
+        // todo remove debugging when ready to retest
 //        print_r($post_data);
 //        exit;
         // ---

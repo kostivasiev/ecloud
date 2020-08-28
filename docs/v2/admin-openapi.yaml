@@ -1,0 +1,118 @@
+---
+
+openapi: '3.0.0'
+info:
+  title: 'eCloud Admin API'
+  version: '2.0.0'
+
+servers:
+  - url: https://api.ukfast.io
+
+security:
+  - api_key:
+      - api_key
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: API key authentication
+      in: header
+      name: Authorization
+
+  schemas:
+    AvailabilityZones:
+      $ref: 'components/schemas/admin/availabilityZone.yaml'
+    Gateways:
+      $ref: 'components/schemas/admin/gateway.yaml'
+    Routers:
+      $ref: 'components/schemas/admin/router.yaml'
+    Regions:
+      $ref: 'components/schemas/admin/region.yaml'
+    LoadBalancerCluster:
+      $ref: 'components/schemas/lbc.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
+
+  parameters:
+    # Query Parameters
+    PerPage:
+      $ref: 'components/parameters/perPage.yaml'
+    Page:
+      $ref: 'components/parameters/page.yaml'
+    # Path Parameters
+    VpcId:
+      $ref: 'resources/Vpc/parameters/vpcId.yaml'
+    AvailabilityZoneId:
+      $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
+    NetworkId:
+      $ref: 'resources/Network/parameters/networkId.yaml'
+    DhcpId:
+      $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
+    VpnId:
+      $ref: 'resources/Vpn/parameters/vpnId.yaml'
+    InstanceId:
+      $ref: 'resources/Instance/parameters/instanceId.yaml'
+    FipId:
+      $ref: 'resources/FloatingIp/parameters/fipId.yaml'
+    FirewallRuleId:
+      $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    RegionId:
+      $ref: 'resources/Region/parameters/regionId.yaml'
+    RouterId:
+      $ref: 'resources/Router/parameters/routerId.yaml'
+    GatewayId:
+      $ref: 'resources/Gateway/parameters/gatewayId.yaml'
+
+  responses:
+    AvailabilityZoneResponse:
+      $ref: 'resources/AvailabilityZone/responses/idResponse.yaml'
+    VirtualPrivateCloudsIdResponse:
+      $ref: 'resources/Vpc/responses/idResponse.yaml'
+    NetworksIdResponse:
+      $ref: 'resources/Network/responses/idResponse.yaml'
+    DhcpIdResponse:
+      $ref: 'resources/Dhcp/responses/idResponse.yaml'
+    VpnIdResponse:
+      $ref: 'resources/Vpn/responses/idResponse.yaml'
+    InstanceIdResponse:
+      $ref: 'resources/Instance/responses/idResponse.yaml'
+    FipIdResponse:
+      $ref: 'resources/FloatingIp/responses/idResponse.yaml'
+    FirewallRuleIdResponse:
+      $ref: 'resources/FirewallRule/responses/idResponse.yaml'
+    RouterIdResponse:
+      $ref: 'resources/Router/responses/idResponse.yaml'
+    GatewayIdResponse:
+      $ref: 'resources/Gateway/responses/idResponse.yaml'
+    RegionIdResponse:
+      $ref: 'resources/Region/responses/idResponse.yaml'
+
+paths:
+  '/ecloud/v2/availability-zones':
+    $ref: 'resources/AvailabilityZone/admin-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
+    $ref: 'resources/AvailabilityZone/admin-item.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers/{routerId}':
+    $ref: 'resources/AvailabilityZone/routers.yaml'
+  '/ecloud/v2/gateways':
+    $ref: 'resources/Gateway/admin-collection.yaml'
+  '/ecloud/v2/gateways/{gatewayId}':
+    $ref: 'resources/Gateway/admin-item.yaml'
+  '/ecloud/v2/routers':
+    $ref: 'resources/Router/admin-collection.yaml'
+  '/ecloud/v2/routers/{routerId}':
+    $ref: 'resources/Router/admin-item.yaml'
+  '/ecloud/v2/routers/{routerId}/gateways/{gatewayId}':
+    $ref: 'resources/Router/gateways.yaml'
+  '/ecloud/v2/regions':
+    $ref: 'resources/Region/admin-collection.yaml'
+  '/ecloud/v2/regions/{regionId}':
+    $ref: 'resources/Region/admin-item.yaml'
+  '/ecloud/v2/regions/{regionId}/availability-zones':
+    $ref: 'resources/Region/availabilityZones.yaml'
+
+  '/ecloud/v2/lbcs':
+    $ref: 'resources/LoadBalancerCluster/collection.yaml'
+  '/ecloud/v2/lbcs/{lbcId}':
+    $ref: 'resources/LoadBalancerCluster/item.yaml'
