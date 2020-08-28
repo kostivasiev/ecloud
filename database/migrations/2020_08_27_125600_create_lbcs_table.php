@@ -17,7 +17,8 @@ class CreateLbcsTable extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('availability_zone_id');
-            $table->integer('nodes');
+            $table->string('vpc_id');
+            $table->integer('nodes')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

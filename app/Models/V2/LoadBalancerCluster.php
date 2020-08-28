@@ -37,6 +37,10 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
         'nodes'
     ];
 
+    protected $casts = [
+        'nodes' => 'integer',
+    ];
+
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
