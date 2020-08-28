@@ -15,6 +15,14 @@ properties:
     type: string
     required: true
     example: 'az-2b66bb79'
+  nodes:
+    type: integer
+    required: true
+    example: 3
+  config_id:
+    type: string
+    readOnly: true
+    example: "8fe5c0e3-dca9-4f8b-8f40-39512eab650a"
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

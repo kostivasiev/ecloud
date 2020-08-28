@@ -28,9 +28,9 @@ patch:
             - $ref: "../../public-openapi.yaml#/components/schemas/LoadBalancerCluster"
             - type: object
               properties:
-                name:
-                  required: false
                 vpc_id:
+                  required: false
+                nodes:
                   required: false
   responses:
     200:
