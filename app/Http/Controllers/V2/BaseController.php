@@ -45,13 +45,14 @@ class BaseController extends Controller
      */
     public function responseIdMeta($request, $id, $statusCode)
     {
+        $location = $request->fullUrlIs("*/$id") ? URL::current() : sprintf('%s/%s', URL::current(), $id);
         return response()->json(
             [
                 'data' => [
                     'id' => $id,
                 ],
                 'meta' => [
-                    'location' => sprintf('%s/%s', URL::current(), $id),
+                    'location' => $location,
                 ],
             ],
             $statusCode
