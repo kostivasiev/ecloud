@@ -18,9 +18,10 @@ class FirewallRuleResource extends UKFastResource
     {
         // @todo Return value below
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
-            'router_id'  => $this->router_id,
+            'id' => $this->id,
+            'name' => $this->name,
+            'router_id' => $this->router_id,
+            'deployed' => $this->deployed,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
