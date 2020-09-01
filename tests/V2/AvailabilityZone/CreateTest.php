@@ -164,9 +164,13 @@ class CreateTest extends TestCase
             ->assertResponseStatus(201);
 
         $availabilityZoneId = (json_decode($this->response->getContent()))->data->id;
+        $metaLocation = (json_decode($this->response->getContent()))->meta->location;
         $this->seeJson([
             'id' => $availabilityZoneId,
         ]);
+
+        // Check that the id is in the returned meta location
+        $this->assertTrue((substr_count($metaLocation, $availabilityZoneId) == 1));
 
         $resource = AvailabilityZone::findOrFail($availabilityZoneId);
         $this->assertFalse($resource->is_public);
