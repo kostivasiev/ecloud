@@ -140,5 +140,10 @@ class UpdateTest extends TestCase
         $this->assertEquals($data['code'], $availabilityZone->code);
         $this->assertEquals($data['name'], $availabilityZone->name);
         $this->assertEquals($data['datacentre_site_id'], $availabilityZone->datacentre_site_id);
+
+        // Check for single occurence of id in the meta location
+        $availabilityZoneId = (json_decode($this->response->getContent()))->data->id;
+        $metaLocation = (json_decode($this->response->getContent()))->meta->location;
+        $this->assertTrue((substr_count($metaLocation, $availabilityZoneId) == 1));
     }
 }
