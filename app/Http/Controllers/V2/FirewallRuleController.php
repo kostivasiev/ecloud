@@ -49,7 +49,7 @@ class FirewallRuleController extends BaseController
     public function store(CreateFirewallRuleRequest $request)
     {
         $instance = new FirewallRule();
-        $instance->fill($request->only(['name', 'router_id']));
+        $instance->fill($request->only(['name', 'router_id', 'deployed']));
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
@@ -63,7 +63,7 @@ class FirewallRuleController extends BaseController
     public function update(UpdateFirewallRuleRequest $request, string $firewallRuleId)
     {
         $item = FirewallRule::findOrFail($firewallRuleId);
-        $item->fill($request->only(['name', 'router_id']));
+        $item->fill($request->only(['name', 'router_id', 'deployed']));
         $item->save();
         return $this->responseIdMeta($request, $item->getKey(), 200);
     }

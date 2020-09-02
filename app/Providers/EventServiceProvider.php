@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\V2\FirewallRuleCreated;
 use App\Events\V2\NetworkCreated;
+use App\Listeners\V2\FirewallRuleDeploy;
 use App\Listeners\V2\NetworkDeploy;
 use App\Events\V2\DhcpCreated;
 use App\Events\V2\RouterAvailabilityZoneAttach;
@@ -67,6 +69,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         NetworkCreated::class => [
             NetworkDeploy::class
+        ],
+        FirewallRuleCreated::class => [
+            FirewallRuleDeploy::class
         ],
     ];
 }
