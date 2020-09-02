@@ -31,11 +31,6 @@ class RouterDeploy implements ShouldQueue
         try {
             $nsxClient = $availabilityZone->nsxClient();
 
-            $vpcTag =  [
-                'scope' => config('defaults.tag.scope'),
-                'tag' => $router->vpc_id
-            ];
-
             // Get the routers T0 path
             $response = $nsxClient->get('policy/api/v1/infra/tier-0s');
             $response = json_decode($response->getBody()->getContents(), true);
@@ -51,6 +46,11 @@ class RouterDeploy implements ShouldQueue
             if (empty($path)) {
                 throw new \Exception('No tagged T0 could be found');
             }
+
+            $vpcTag =  [
+                'scope' => config('defaults.tag.scope'),
+                'tag' => $router->vpc_id
+            ];
 
             // Deploy the router
             $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id, [
