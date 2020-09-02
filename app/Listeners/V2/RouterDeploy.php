@@ -31,11 +31,7 @@ class RouterDeploy implements ShouldQueue
         try {
             $nsxClient = $availabilityZone->nsxClient();
 
-            $vpcTag =  [
-                'scope' => config('defaults.tag.scope'),
-                'tag' => $router->vpc_id
-            ];
-
+            // Get the routers T0 path
             $response = $nsxClient->get('policy/api/v1/infra/tier-0s');
             $response = json_decode($response->getBody()->getContents(), true);
             $path = null;
@@ -51,23 +47,41 @@ class RouterDeploy implements ShouldQueue
                 throw new \Exception('No tagged T0 could be found');
             }
 
+            $vpcTag =  [
+                'scope' => config('defaults.tag.scope'),
+                'tag' => $router->vpc_id
+            ];
+
+            // Deploy the router
             $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id, [
                 'json' => [
                     'tier0_path' => $path,
                     'tags' => [$vpcTag]
                 ],
             ]);
+
+            // Deploy the router locale
             $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
                 'json' => [
                     'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $nsxClient->getEdgeClusterId(),
                     'tags' => [$vpcTag]
                 ],
             ]);
+
+            // Update the routers default firewall rule to Reject
+            $response = $nsxClient->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule');
+            $original = json_decode($response->getBody()->getContents(), true);
+            $original['action'] = 'REJECT';
+            $original = array_filter($original, function ($key) {
+                return strpos($key, '_') !== 0;
+            }, ARRAY_FILTER_USE_KEY);
+            $nsxClient->patch('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule', [
+                'json' => $original
+            ]);
         } catch (GuzzleException $exception) {
             throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
         $router->deployed = true;
-        $router->firewallRules()->create();
         $router->save();
 
         $router->networks()->each(function ($network) {
