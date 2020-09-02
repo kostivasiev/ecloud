@@ -27,7 +27,13 @@ class DhcpDeploy implements ShouldQueue
                         'lease_time' => config('defaults.dhcp.lease_time'),
                         'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/'
                             . $availabilityZone->nsxClient()->getEdgeClusterId(),
-                        'resource_type' => 'DhcpServerConfig'
+                        'resource_type' => 'DhcpServerConfig',
+                        'tags' => [
+                            [
+                                'scope' => config('defaults.tag.scope'),
+                                'tag' => $dhcp->vpc->getKey()
+                            ]
+                        ]
                     ]
                 ]);
             } catch (GuzzleException $exception) {

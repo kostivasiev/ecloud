@@ -30,14 +30,22 @@ class RouterDeploy implements ShouldQueue
 
         try {
             $nsxClient = $availabilityZone->nsxClient();
+
+            $tag =  [
+                'scope' => config('defaults.tag.scope'),
+                'tag' => $router->vpc_id
+            ];
+
             $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id, [
                 'json' => [
                     'tier0_path' => '/infra/tier-0s/T0',
+                    'tags' => [$tag]
                 ],
             ]);
             $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
                 'json' => [
                     'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $nsxClient->getEdgeClusterId(),
+                    'tags' => [$tag]
                 ],
             ]);
         } catch (GuzzleException $exception) {
