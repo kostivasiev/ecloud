@@ -15,20 +15,6 @@ class FirewallRuleDeploy implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @var NsxService
-     */
-    private $nsxService;
-
-    /**
-     * @param NsxService $nsxService
-     * @return void
-     */
-    public function __construct(NsxService $nsxService)
-    {
-        $this->nsxService = $nsxService;
-    }
-
-    /**
      * @param FirewallRuleCreated $event
      * @return void
      * @throws \Exception
@@ -44,7 +30,6 @@ class FirewallRuleDeploy implements ShouldQueue
             $response = $nsxClient->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule');
             $original = json_decode($response->getBody()->getContents(), true);
             $original['action'] = 'REJECT';
-            $original['ip_protocol'] = 'IPV4_IPV6';
             $original = array_filter($original, function ($key) {
                 return strpos($key, '_') !== 0;
             }, ARRAY_FILTER_USE_KEY);
