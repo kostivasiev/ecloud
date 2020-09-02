@@ -14,7 +14,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Nsx\TestAuth::class,
-        \App\Console\Commands\Nsx\TestFirewallRuleDeploy::class,
     ];
 
     /**

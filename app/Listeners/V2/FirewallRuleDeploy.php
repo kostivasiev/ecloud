@@ -2,30 +2,17 @@
 
 namespace App\Listeners\V2;
 
+use App\Models\V2\Router;
 use App\Services\NsxService;
 use App\Events\V2\FirewallRuleCreated;
 use App\Models\V2\FirewallRule;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use GuzzleHttp\Exception\GuzzleException;
 
 class FirewallRuleDeploy implements ShouldQueue
 {
     use InteractsWithQueue;
-
-    /**
-     * @var NsxService
-     */
-    private $nsxService;
-
-    /**
-     * @param NsxService $nsxService
-     * @return void
-     */
-    public function __construct(NsxService $nsxService)
-    {
-        $this->nsxService = $nsxService;
-    }
 
     /**
      * @param FirewallRuleCreated $event
@@ -34,21 +21,26 @@ class FirewallRuleDeploy implements ShouldQueue
      */
     public function handle(FirewallRuleCreated $event)
     {
-//        /** @var FirewallRule $firewallRule */
-//        $firewallRule = $event->firewallRule;
-//        try {
-//            $response = $this->nsxService->get('policy/api/v1/infra/tier-1s/' . $firewallRule->router->id . '/gateway-firewall');
-//dd($response->getBody()->getContents());
-//
-//            $this->nsxService->put('policy/api/v1/TODO/' . $firewallRule->id, [
-//                'json' => [
-//                    'tier0_path' => '/infra/tier-0s/T0',
-//                ],
-//            ]);
-//        } catch (GuzzleException $exception) {
-//            throw new \Exception($exception->getResponse()->getBody()->getContents());
-//        }
-//        $firewallRule->deployed = true;
-//        $firewallRule->save();
+        /** @var FirewallRule $firewallRule */
+        $firewallRule = $event->firewallRule;
+        $router = Router::findOrFail($firewallRule->router->id);
+        $nsxClient = $router->vpc->region->availabilityZones()->first()->nsxClient();
+
+        try {
+            $response = $nsxClient->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule');
+            $original = json_decode($response->getBody()->getContents(), true);
+            $original['action'] = 'REJECT';
+            $original = array_filter($original, function ($key) {
+                return strpos($key, '_') !== 0;
+            }, ARRAY_FILTER_USE_KEY);
+            $nsxClient->patch('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule', [
+                'json' => $original
+            ]);
+        } catch (RequestException $exception) {
+            throw new \Exception($exception->getResponse()->getBody()->getContents());
+        }
+
+        $firewallRule->deployed = true;
+        $firewallRule->save();
     }
 }
