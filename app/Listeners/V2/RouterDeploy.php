@@ -31,6 +31,11 @@ class RouterDeploy implements ShouldQueue
         try {
             $nsxClient = $availabilityZone->nsxClient();
 
+            $vpcTag =  [
+                'scope' => config('defaults.tag.scope'),
+                'tag' => $router->vpc_id
+            ];
+
             $response = $nsxClient->get('policy/api/v1/infra/tier-0s');
             $response = json_decode($response->getBody()->getContents(), true);
             $path = null;
@@ -49,11 +54,13 @@ class RouterDeploy implements ShouldQueue
             $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id, [
                 'json' => [
                     'tier0_path' => $path,
+                    'tags' => [$vpcTag]
                 ],
             ]);
             $nsxClient->put('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
                 'json' => [
                     'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $nsxClient->getEdgeClusterId(),
+                    'tags' => [$vpcTag]
                 ],
             ]);
         } catch (GuzzleException $exception) {
