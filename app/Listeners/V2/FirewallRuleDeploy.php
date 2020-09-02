@@ -30,6 +30,7 @@ class FirewallRuleDeploy implements ShouldQueue
             $response = $nsxClient->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule');
             $original = json_decode($response->getBody()->getContents(), true);
             $original['action'] = 'REJECT';
+            $original['display_name'] = $firewallRule->id;
             $original = array_filter($original, function ($key) {
                 return strpos($key, '_') !== 0;
             }, ARRAY_FILTER_USE_KEY);
