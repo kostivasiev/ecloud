@@ -9,7 +9,7 @@ class UpdateFirewallRulesTable2 extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('firewall_rules', function($table) {
-            $table->bool('deployed')->default(false);
+            $table->boolean('deployed')->default(false);
         });
     }
 
