@@ -36,7 +36,7 @@ class RouterDeploy implements ShouldQueue
             $path = null;
             foreach ($response['results'] as $tier0) {
                 foreach ($tier0['tags'] as $tag) {
-                    if ($tag['scope'] == 'ukfast' && $tag['tag'] == 'az-p0') {
+                    if ($tag['scope'] == 'ukfast' && $tag['tag'] == 'az-default') {
                         $path = $tier0['path'];
                         break 2;
                     }
