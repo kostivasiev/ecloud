@@ -40,7 +40,7 @@ class Vpc extends Model implements Filterable, Sortable
         'created' => VpcCreated::class,
     ];
 
-    public function dhcps()
+    public function dhcp()
     {
         return $this->hasOne(Dhcp::class);
     }

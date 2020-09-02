@@ -34,4 +34,7 @@ return [
         'policy' => '20/20',
     ],
     'gateway'            => [],
+    'tag' => [
+        'scope' => 'ukfast'
+    ]
 ];

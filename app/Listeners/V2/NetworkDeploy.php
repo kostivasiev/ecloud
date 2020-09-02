@@ -50,6 +50,12 @@ class NetworkDeploy implements ShouldQueue
                         'dhcp_config_path' => '/infra/dhcp-server-configs/' . $network->router->vpc->dhcp->getKey(),
                         'advanced_config' => [
                             'connectivity' => 'ON'
+                        ],
+                        'tags' => [
+                            [
+                                'scope' => config('defaults.tag.scope'),
+                                'tag' => $network->router->vpc->getKey()
+                            ]
                         ]
                     ]
                 ]
