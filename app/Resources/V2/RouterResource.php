@@ -9,7 +9,6 @@ use UKFast\Responses\UKFastResource;
  * @package App\Http\Resources\V2
  * @property string id
  * @property string vpc_id
- * @property bool $available
  * @property string created_at
  * @property string updated_at
  */
