@@ -95,7 +95,7 @@ class Router extends Model implements Filterable, Sortable
             $response = json_decode($response->getBody()->getContents());
             return $response->tier1_state->state == 'success';
         } catch (GuzzleException $exception) {
-            throw new \Exception($exception->getMessage());
+            return false;
         }
     }
 
