@@ -3,6 +3,7 @@
 namespace App\Listeners\V2;
 
 use App\Events\V2\NetworkCreated;
+use Elastica\Log;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
@@ -25,7 +26,12 @@ class NetworkDeploy implements ShouldQueue
         }
 
         if (!$network->router->available) {
-            throw new \Exception('Router not available for network deployment');
+            // Give the router a chance to become available
+            if ($this->attempts() < 10) {
+                $this->release(5);
+            } else {
+                throw new \Exception('Router not available for network deployment');
+            }
         }
 
         if (empty($network->router->vpc->dhcp)) {
