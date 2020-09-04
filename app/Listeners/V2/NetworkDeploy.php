@@ -24,6 +24,10 @@ class NetworkDeploy implements ShouldQueue
             throw new \Exception('Failed to load network\'s router');
         }
 
+        if (!$network->router->available) {
+            throw new \Exception('Router not available for network deployment');
+        }
+
         if (empty($network->router->vpc->dhcp)) {
             throw new \Exception('Failed to load DHCP for VPC');
         }
