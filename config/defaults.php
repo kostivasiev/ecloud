@@ -15,8 +15,7 @@ return [
                 ]
             ],
         ],
-        'domain_name' => 'ecloud.ukfast',
-        'transport_zone_path' => '/infra/sites/default/enforcement-points/default/transport-zones/a6b45631-b6b2-4d9e-9d92-105bc9289930'
+        'domain_name' => 'ecloud.ukfast'
     ],
     'dhcp'               => [
         'lease_time'       => 604800,
