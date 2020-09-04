@@ -46,7 +46,6 @@ class NetworkDeploy implements ShouldQueue
                             ]
                         ],
                         'domain_name' => config('defaults.network.domain_name'),
-                        'transport_zone_path' => config('defaults.network.transport_zone_path'),
                         'dhcp_config_path' => '/infra/dhcp-server-configs/' . $network->router->vpc->dhcp->getKey(),
                         'advanced_config' => [
                             'connectivity' => 'ON'
