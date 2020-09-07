@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Datastores;
+namespace Tests\V1\Datastores;
 
 use App\Datastore\Status;
 use App\Models\V1\Datastore;

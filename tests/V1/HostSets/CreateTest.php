@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Hostsets;
+namespace Tests\V1\HostSets;
 
 use App\Models\V1\Storage;
 use Tests\TestCase;

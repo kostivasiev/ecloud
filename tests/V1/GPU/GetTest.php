@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\GPU;
+namespace Tests\V1\GPU;
 
 use App\Models\V1\GpuProfile;
 use App\Models\V1\VirtualMachine;
