@@ -30,8 +30,7 @@ class NetworkDeploy implements ShouldQueue
             if ($this->attempts() <= static::ROUTER_RETRY_ATTEMPTS) {
                 $this->release(static::ROUTER_RETRY_DELAY);
                 Log::info('Attempted to create Network (' . $network->getKey() .
-                    ') but Router (' . $router->getKey() . ') was not available, will retry shortly'
-                );
+                    ') but Router (' . $router->getKey() . ') was not available, will retry shortly');
                 return;
             } else {
                 $this->fail(new \Exception('Timed out waiting for Router (' . $router->getKey() .
