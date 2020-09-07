@@ -14,7 +14,7 @@ class NetworkDeploy implements ShouldQueue
 
     const ROUTER_RETRY_ATTEMPTS = 10;
 
-    const ROUTER_RETRY_DELAY = 5;
+    const ROUTER_RETRY_DELAY = 10;
 
     /**
      * @param NetworkCreated $event
@@ -24,28 +24,23 @@ class NetworkDeploy implements ShouldQueue
     public function handle(NetworkCreated $event)
     {
         $network = $event->network;
+        $router = $network->router;
 
-        if (empty($network->router)) {
-            $this->fail(new \Exception('Failed to load network\'s router'));
-        }
-
-        if (!$network->router->available) {
+        if (!$router->available) {
             if ($this->attempts() <= static::ROUTER_RETRY_ATTEMPTS) {
                 $this->release(static::ROUTER_RETRY_DELAY);
-                Log::info('Attempted to create Network but Router was not available');
+                Log::info('Attempted to create Network (' . $network->getKey() .
+                    ') but Router (' . $router->getKey() . ') was not available, will retry shortly');
                 return;
             } else {
-                $this->fail(new \Exception('Timed out waiting for Router to become available for network deployment'));
+                $this->fail(new \Exception('Timed out waiting for Router (' . $router->getKey() .
+                    ') to become available for Network (' . $network->getKey() . ') deployment'));
             }
-        }
-
-        if (empty($network->router->vpc->dhcp)) {
-            $this->fail(new \Exception('Failed to load DHCP for VPC'));
         }
 
         try {
             $network->availabilityZone->nsxClient()->put(
-                'policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey(),
+                'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
                 [
                     'json' => [
                         'resource_type' => 'Segment',
@@ -61,14 +56,14 @@ class NetworkDeploy implements ShouldQueue
                             ]
                         ],
                         'domain_name' => config('defaults.network.domain_name'),
-                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $network->router->vpc->dhcp->getKey(),
+                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->getKey(),
                         'advanced_config' => [
                             'connectivity' => 'ON'
                         ],
                         'tags' => [
                             [
                                 'scope' => config('defaults.tag.scope'),
-                                'tag' => $network->router->vpc->getKey()
+                                'tag' => $router->vpc->getKey()
                             ]
                         ]
                     ]
