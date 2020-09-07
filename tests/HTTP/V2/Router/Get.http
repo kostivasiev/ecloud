@@ -1,0 +1,12 @@
+GET https://{{host}}/{{version}}/routers
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+#
+####
+GET https://{{host}}/{{version}}/routers/rtr-8240e9e5
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
