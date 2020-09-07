@@ -41,6 +41,11 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
         'nodes' => 'integer',
     ];
 
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
+
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
