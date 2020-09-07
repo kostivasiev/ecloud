@@ -2,6 +2,16 @@
 
 namespace App\Providers;
 
+use App\Events\V2\FirewallRuleCreated;
+use App\Events\V2\NetworkCreated;
+use App\Listeners\V2\FirewallRuleDeploy;
+use App\Listeners\V2\NetworkDeploy;
+use App\Events\V2\DhcpCreated;
+use App\Events\V2\RouterAvailabilityZoneAttach;
+use App\Events\V2\VpcCreated;
+use App\Listeners\V2\DhcpCreate;
+use App\Listeners\V2\DhcpDeploy;
+use App\Listeners\V2\RouterDeploy;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -15,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\ExampleEvent' => [
             'App\Listeners\ExampleListener',
         ],
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // V1
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         'App\Events\V1\ApplianceParameterDeletedEvent' => [
             'App\Listeners\V1\ApplianceParameterDeletedListener',
         ],
@@ -41,6 +54,24 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\V1\VolumeSetIopsUpdatedEvent' => [
             'App\Listeners\V1\VolumeSetIopsUpdatedListener',
-        ]
+        ],
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // V2
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        RouterAvailabilityZoneAttach::class => [
+            RouterDeploy::class,
+        ],
+        VpcCreated::class => [
+            DhcpCreate::class,
+        ],
+        DhcpCreated::class => [
+            DhcpDeploy::class,
+        ],
+        NetworkCreated::class => [
+            NetworkDeploy::class
+        ],
+        FirewallRuleCreated::class => [
+            FirewallRuleDeploy::class
+        ],
     ];
 }

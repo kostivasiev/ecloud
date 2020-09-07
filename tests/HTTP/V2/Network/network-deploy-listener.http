@@ -1,0 +1,67 @@
+POST https://ecloud-apio.paul.rnd.ukfast/v2/vpcs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "region_id": "reg-b49ar89h"
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC ID: ' + response.body.data.id);
+%}
+###
+# vpc-7dd2d8df
+# dhcp-8f7679e5
+
+POST https://ecloud-apio.paul.rnd.ukfast/v2/routers
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test router",
+  "vpc_id": "{{vpc_id}}"
+}
+
+> {%
+client.global.set('router_id', response.body.data.id);
+client.log('Router ID: ' + response.body.data.id);
+%}
+
+###
+
+PUT https://ecloud-apio.paul.rnd.ukfast/v2/routers/{{router_id}}/availability-zones/avz-716d7f96
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+
+POST https://ecloud-apio.paul.rnd.ukfast/v2/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test network",
+  "router_id": "{{router_id}}",
+  "availability_zone_id": "avz-716d7f96"
+}
+
+> {%
+client.global.set('network_id', response.body.data.id);
+client.log('Network ID: ' + response.body.data.id);
+%}
+
+###
+

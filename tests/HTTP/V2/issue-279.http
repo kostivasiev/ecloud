@@ -1,0 +1,63 @@
+###
+# Run these steps one by one
+###
+# 1. First Create a Gateway
+POST https://{{host}}/{{version}}/gateways
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Manchester Gateway 1"
+}
+
+> {%
+client.global.set('gateway_id', response.body.data.id);
+client.log('Gateway UUID: ' + response.body.data.id);
+%}
+
+###
+# 2. View the gateway collection
+GET https://{{host}}/{{version}}/gateways
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 3. Get detail on the gateway we created
+GET https://{{host}}/{{version}}/gateways/{{gateway_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 4. Update the gateway we created
+PATCH https://{{host}}/{{version}}/gateways/{{gateway_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Manchester Region Gateway 1"
+}
+
+###
+# 5. Verify the name and gateway_id has changed
+GET https://{{host}}/{{version}}/gateways/{{gateway_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 6. Now delete the gateway
+DELETE https://{{host}}/{{version}}/gateways/{{gateway_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 7. And verify that the gateway is deleted
+GET https://{{host}}/{{version}}/gateways/{{gateway_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

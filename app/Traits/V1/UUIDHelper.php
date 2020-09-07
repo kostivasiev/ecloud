@@ -24,4 +24,12 @@ trait UUIDHelper
             $instance->{$instance->getKeyName()} = Uuid::uuid4()->toString();
         });
     }
+
+    // The better way to do it, just not enabled yet...
+//    public static function initializeUUIDHelper()
+//    {
+//        static::creating(function ($instance) {
+//            $instance->{$instance->getKeyName()} = Uuid::uuid4()->toString();
+//        });
+//    }
 }

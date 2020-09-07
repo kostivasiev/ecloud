@@ -1,0 +1,51 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/Network'
+              meta:
+                type: object
+  tags:
+    - Networks
+
+patch:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../public-openapi.yaml#/components/schemas/Network"
+            - type: object
+              properties:
+                name:
+                  required: false
+                router_id:
+                  required: false
+                availability_zone_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../public-openapi.yaml#/components/responses/NetworksIdResponse'
+  tags:
+    - Networks
+
+delete:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Networks

@@ -128,6 +128,7 @@ class HardwareTest extends TestCase
                 'name' => 'name',
                 'powerState' => 'powerState',
                 'specification' => 'specification',
+                "hardwareVersion" => "M4",
             ])));
 
         // Finally hit the UCS Info endpoint and check the expected result matches
@@ -153,6 +154,7 @@ class HardwareTest extends TestCase
                 'name' => 'name',
                 'power_state' => 'powerState',
                 'specification' => 'specification',
+                "hardwareVersion" => "M4",
             ],
             'meta' => [],
         ]);

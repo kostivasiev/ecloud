@@ -41,6 +41,8 @@ class Datastore extends Model implements Filterable, Sortable
         'created' => DatastoreCreatedEvent::class,
     ];
 
+    public static $maxDatastoreSizeGb = 16000;
+
     // Validation Rules
     public static function getRules()
     {
@@ -48,11 +50,19 @@ class Datastore extends Model implements Filterable, Sortable
             'solution_id' => ['required_without:site_id', 'integer'],
             'name' => ['sometimes', 'max:255'],
             'type' => ['sometimes', 'in:Hybrid,Private'],
-            'capacity' => ['required', 'numeric'],
+            'capacity' => ['required', 'numeric', 'min:1', 'max:' . static::$maxDatastoreSizeGb],
             'lun_type' => ['sometimes', 'in:DATA,CLUSTER,QRM'],
             'site_id' => ['sometimes', 'integer'],
             'san_id' => ['sometimes', 'integer'],
             'status' => ['sometimes', Rule::in(Status::all())]
+        ];
+    }
+
+    // Validation rules for expansion
+    public static function getExpandRules()
+    {
+        return [
+            'capacity' => 'required|integer|min:2|max:' . static::$maxDatastoreSizeGb
         ];
     }
 
@@ -92,6 +102,8 @@ class Datastore extends Model implements Filterable, Sortable
             $factory->create('capacity', Filter::$numericDefaults),
             $factory->create('solution_id', Filter::$numericDefaults),
             $factory->create('site_id', Filter::$numericDefaults),
+            $factory->create('lun_type', Filter::$stringDefaults),
+            $factory->create('status', Filter::$stringDefaults),
         ];
     }
 
@@ -456,6 +468,7 @@ class Datastore extends Model implements Filterable, Sortable
             20 => 0,
             21 => 3,
             22 => 8,
+            23 => 'X',
         ];
 
         $podId = $pod->getKey();

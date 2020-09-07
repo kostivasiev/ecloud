@@ -1,0 +1,141 @@
+POST https://{{host}}/{{version}}/regions
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test"
+}
+
+<> 2020-07-16T124959.201.json
+<> 2020-07-16T104330.201.json
+
+###
+
+GET https://{{host}}/{{version}}/regions/reg-a63dd78c
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+
+<> 2020-07-16T124959.200.json
+
+###
+
+GET https://{{host}}/{{version}}/regions/reg-a63dd78c
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+<> 2020-07-16T125000.200.json
+
+###
+
+GET https://{{host}}/{{version}}/regions/reg-a63dd78c/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+<> 2020-07-16T125000.200.json
+
+###
+
+# Update
+PATCH https://{{host}}/{{version}}/regions/reg-a63dd78c
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test - Updated"
+}
+
+<> 2020-07-16T125000-1.200.json
+
+###
+
+# Delete
+DELETE https://{{host}}/{{version}}/regions/reg-a63dd78c
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+
+
+###
+
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+X-Reseller-Id: 1
+
+{
+  "name": "Test",
+  "region_id": "reg-a63dd78"
+}
+
+###
+
+GET https://{{host}}/{{version}}/vpcs/vpc-46257a6f
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+
+PATCH https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+X-Reseller-Id: 1
+
+{
+  "name": "Test",
+  "region_id": "reg-a63dd78"
+}
+
+###
+
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "code": "Test",
+  "name": "test",
+  "datacentre_site_id": 123,
+  "region_id": "reg-a63dd78c"
+}
+
+###
+
+GET https://{{host}}/{{version}}/availability-zones/avz-c14024d2
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+
+PATCH https://{{host}}/{{version}}/availability-zones/avz-c14024d2
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "code": "Test - Updated",
+  "name": "test - Updated",
+  "datacentre_site_id": 321,
+  "region_id": "reg-b49ar89h"
+}
+
+###
+
+GET https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

@@ -6,6 +6,7 @@ Short description of the change, what the desired outcome is.
 
 Link to the parent issue here in the description, or add as a related issue if relevant
 
+
 ### Statement of Requirements
 
 checklist of the tasks required to determine this issue as done
@@ -13,7 +14,13 @@ checklist of the tasks required to determine this issue as done
 - [ ] Must do A for this to be complete
 - [ ] Must do B for this to be complete
 
+
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~dotNET ~DevOps
 
 <!--- set product or project labels if available  -->
+
+
+<!--- set initial issue status and weight  -->
+/label ~"To Do" 
+/weight 5

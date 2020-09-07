@@ -23,7 +23,6 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
-        Datastore::flushEventListeners();
         $count = 2;
         factory(Datastore::class, $count)->create();
 
@@ -82,8 +81,6 @@ class GetTest extends TestCase
      */
     public function testCanLoadPublicDefault()
     {
-        Datastore::flushEventListeners();
-
         $pod = factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 123,
         ])->first();
@@ -118,8 +115,6 @@ class GetTest extends TestCase
      */
     public function testCanLoadPublicPod1NonBackup()
     {
-        Datastore::flushEventListeners();
-
         $pod = factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 14,
         ])->first();
