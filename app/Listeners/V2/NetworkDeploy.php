@@ -3,14 +3,18 @@
 namespace App\Listeners\V2;
 
 use App\Events\V2\NetworkCreated;
-use Elastica\Log;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 class NetworkDeploy implements ShouldQueue
 {
     use InteractsWithQueue;
+
+    const ROUTER_RETRY_ATTEMPTS = 10;
+
+    const ROUTER_RETRY_DELAY = 5;
 
     /**
      * @param NetworkCreated $event
@@ -22,20 +26,21 @@ class NetworkDeploy implements ShouldQueue
         $network = $event->network;
 
         if (empty($network->router)) {
-            throw new \Exception('Failed to load network\'s router');
+            $this->fail(new \Exception('Failed to load network\'s router'));
         }
 
         if (!$network->router->available) {
-            // Give the router a chance to become available
-            if ($this->attempts() < 10) {
-                $this->release(5);
+            if ($this->attempts() <= static::ROUTER_RETRY_ATTEMPTS) {
+                $this->release(static::ROUTER_RETRY_DELAY);
+                Log::info('Attempted to create Network but Router was not available');
+                return;
             } else {
-                throw new \Exception('Router not available for network deployment');
+                $this->fail(new \Exception('Timed out waiting for Router to become available for network deployment'));
             }
         }
 
         if (empty($network->router->vpc->dhcp)) {
-            throw new \Exception('Failed to load DHCP for VPC');
+            $this->fail(new \Exception('Failed to load DHCP for VPC'));
         }
 
         try {
@@ -70,7 +75,7 @@ class NetworkDeploy implements ShouldQueue
                 ]
             );
         } catch (GuzzleException $exception) {
-            throw new \Exception($exception->getResponse()->getBody()->getContents());
+            $this->fail(new \Exception($exception->getResponse()->getBody()->getContents()));
         }
     }
 }
