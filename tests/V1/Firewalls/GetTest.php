@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Firewalls;
+namespace Tests\V1\Firewalls;
 
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Appliances\Appliances;
+namespace Tests\V1\Appliances\Appliances;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\AppliancePodAvailability;

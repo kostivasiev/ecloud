@@ -93,7 +93,7 @@ class Router extends Model implements Filterable, Sortable
                 'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
-            return $response->tier1_state->state == 'success';
+            return $response->tier1_state->state == 'in_sync';
         } catch (GuzzleException $exception) {
             return false;
         }

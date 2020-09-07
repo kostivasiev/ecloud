@@ -3,14 +3,18 @@
 namespace App\Listeners\V2;
 
 use App\Events\V2\NetworkCreated;
-use Elastica\Log;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 class NetworkDeploy implements ShouldQueue
 {
     use InteractsWithQueue;
+
+    const ROUTER_RETRY_ATTEMPTS = 10;
+
+    const ROUTER_RETRY_DELAY = 10;
 
     /**
      * @param NetworkCreated $event
@@ -20,27 +24,23 @@ class NetworkDeploy implements ShouldQueue
     public function handle(NetworkCreated $event)
     {
         $network = $event->network;
+        $router = $network->router;
 
-        if (empty($network->router)) {
-            throw new \Exception('Failed to load network\'s router');
-        }
-
-        if (!$network->router->available) {
-            // Give the router a chance to become available
-            if ($this->attempts() < 10) {
-                $this->release(5);
+        if (!$router->available) {
+            if ($this->attempts() <= static::ROUTER_RETRY_ATTEMPTS) {
+                $this->release(static::ROUTER_RETRY_DELAY);
+                Log::info('Attempted to create Network (' . $network->getKey() .
+                    ') but Router (' . $router->getKey() . ') was not available, will retry shortly');
+                return;
             } else {
-                throw new \Exception('Router not available for network deployment');
+                $this->fail(new \Exception('Timed out waiting for Router (' . $router->getKey() .
+                    ') to become available for Network (' . $network->getKey() . ') deployment'));
             }
-        }
-
-        if (empty($network->router->vpc->dhcp)) {
-            throw new \Exception('Failed to load DHCP for VPC');
         }
 
         try {
             $network->availabilityZone->nsxClient()->put(
-                'policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey(),
+                'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
                 [
                     'json' => [
                         'resource_type' => 'Segment',
@@ -56,21 +56,21 @@ class NetworkDeploy implements ShouldQueue
                             ]
                         ],
                         'domain_name' => config('defaults.network.domain_name'),
-                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $network->router->vpc->dhcp->getKey(),
+                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->getKey(),
                         'advanced_config' => [
                             'connectivity' => 'ON'
                         ],
                         'tags' => [
                             [
                                 'scope' => config('defaults.tag.scope'),
-                                'tag' => $network->router->vpc->getKey()
+                                'tag' => $router->vpc->getKey()
                             ]
                         ]
                     ]
                 ]
             );
         } catch (GuzzleException $exception) {
-            throw new \Exception($exception->getResponse()->getBody()->getContents());
+            $this->fail(new \Exception($exception->getResponse()->getBody()->getContents()));
         }
     }
 }

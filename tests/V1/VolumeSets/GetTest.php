@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\VolumeSets;
+namespace Tests\V1\VolumeSets;
 
 use App\Models\V1\IopsTier;
 use App\Models\V1\VolumeSet;

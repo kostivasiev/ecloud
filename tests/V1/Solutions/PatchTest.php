@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Solutions;
+namespace Tests\V1\Solutions;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
 use Illuminate\Support\Facades\Event;

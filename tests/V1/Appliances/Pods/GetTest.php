@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Appliances\Pods;
+namespace Tests\V1\Appliances\Pods;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
