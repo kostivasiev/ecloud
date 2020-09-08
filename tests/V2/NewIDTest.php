@@ -119,64 +119,6 @@ class NewIDTest extends TestCase
         );
     }
 
-    public function testAvailabilityZonesRouterAssociation()
-    {
-        $availabilityZones = factory(AvailabilityZone::class)->create();
-        $router = factory(Router::class)->create();
-        $this->put(
-            '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
-
-        // test that the association has occurred
-        $router->refresh();
-        $associated = $availabilityZones->routers()->first();
-        $this->assertEquals($associated->getKey(), $router->getKey());
-
-        // Test IDs
-        $this->assertRegExp(
-            $this->generateRegExp(AvailabilityZone::class),
-            $availabilityZones->id
-        );
-        $this->assertRegExp(
-            $this->generateRegExp(Router::class),
-            $router->id
-        );
-    }
-
-    public function testAvailabilityZonesRouterDisassociation()
-    {
-        $availabilityZones = factory(AvailabilityZone::class)->create();
-        $router = factory(Router::class)->create();
-        $availabilityZones->routers()->attach($router->getKey());
-        $this->delete(
-            '/v2/availability-zones/' . $availabilityZones->getKey() . '/routers/' . $router->getKey(),
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
-        $router->refresh();
-        $this->assertEquals(0, $availabilityZones->routers()->count());
-
-        // Test IDs
-        $this->assertRegExp(
-            $this->generateRegExp(AvailabilityZone::class),
-            $availabilityZones->id
-        );
-        $this->assertRegExp(
-            $this->generateRegExp(Router::class),
-            $router->id
-        );
-    }
-
     public function testRoutersGatewaysAssociation()
     {
         $router = factory(Router::class)->create();

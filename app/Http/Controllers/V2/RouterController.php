@@ -86,33 +86,6 @@ class RouterController extends BaseController
         return response()->json([], 204);
     }
 
-    public function availabilityZones(Request $request, string $routerId, QueryTransformer $queryTransformer)
-    {
-        $collection = Router::forUser($request->user)->findOrFail($routerId)->availabilityZones()->query();
-        $queryTransformer->config(AvailabilityZone::class)->transform($collection);
-        return AvailabilityZoneResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
-    }
-
-    public function availabilityZonesAttach(Request $request, string $routerId, string $availabilityZonesId)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
-        $router = Router::forUser($request->user)->findOrFail($routerId);
-        $router->availabilityZones()->attach($availabilityZone->id);
-        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
-        return response()->json([], 204);
-    }
-
-    public function availabilityZonesDetach(Request $request, string $routerUuid, string $availabilityZonesId)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
-        $router = Router::forUser($request->user)->findOrFail($routerUuid);
-        $router->availabilityZones()->detach($availabilityZone->id);
-        event(new RouterAvailabilityZoneDetach($router, $availabilityZone));
-        return response()->json([], 204);
-    }
-
     /**
      * Associate a gateway with a router
      * @param \Illuminate\Http\Request $request

@@ -98,32 +98,4 @@ class AvailabilityZoneController extends BaseController
         $availabilityZone->delete();
         return response()->json([], 204);
     }
-
-    /**
-     * Associate a router with an availability_zone
-     * @param string $zoneId
-     * @param string $routerUuid
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function routersCreate(string $zoneId, string $routerUuid)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($zoneId);
-        $router = Router::findOrFail($routerUuid);
-        $availabilityZone->routers()->attach($router->id);
-        return response()->json([], 204);
-    }
-
-    /**
-     * Disassociate a route with an availability_zone
-     * @param string $zoneId
-     * @param string $routerUuid
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function routersDestroy(string $zoneId, string $routerUuid)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($zoneId);
-        $router = Router::findOrFail($routerUuid);
-        $availabilityZone->routers()->detach($router->id);
-        return response()->json([], 204);
-    }
 }
