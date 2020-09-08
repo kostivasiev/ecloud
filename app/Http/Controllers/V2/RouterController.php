@@ -7,7 +7,6 @@ use App\Events\V2\RouterAvailabilityZoneDetach;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Gateway;
 use App\Models\V2\Router;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RouterResource;
@@ -110,36 +109,6 @@ class RouterController extends BaseController
         $router = Router::forUser($request->user)->findOrFail($routerUuid);
         $router->availabilityZones()->detach($availabilityZone->id);
         event(new RouterAvailabilityZoneDetach($router, $availabilityZone));
-        return response()->json([], 204);
-    }
-
-    /**
-     * Associate a gateway with a router
-     * @param \Illuminate\Http\Request $request
-     * @param string $routerId
-     * @param string $gatewayId
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function gatewaysAttach(Request $request, string $routerId, string $gatewayId)
-    {
-        $router = Router::forUser($request->user)->findOrFail($routerId);
-        $gateway = Gateway::findOrFail($gatewayId);
-        $router->gateways()->attach($gateway->id);
-        return response()->json([], 204);
-    }
-
-    /**
-     * Remove Association between Gateway and Router
-     * @param \Illuminate\Http\Request $request
-     * @param string $routerUuid
-     * @param string $gatewaysUuid
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function gatewaysDetach(Request $request, string $routerUuid, string $gatewaysUuid)
-    {
-        $router = Router::forUser($request->user)->findOrFail($routerUuid);
-        $gateway = Gateway::findOrFail($gatewaysUuid);
-        $router->gateways()->detach($gateway->id);
         return response()->json([], 204);
     }
 }

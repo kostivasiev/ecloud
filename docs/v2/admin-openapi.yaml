@@ -23,8 +23,6 @@ components:
   schemas:
     AvailabilityZones:
       $ref: 'components/schemas/admin/availabilityZone.yaml'
-    Gateways:
-      $ref: 'components/schemas/admin/gateway.yaml'
     Routers:
       $ref: 'components/schemas/admin/router.yaml'
     Regions:
@@ -61,8 +59,6 @@ components:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
-    GatewayId:
-      $ref: 'resources/Gateway/parameters/gatewayId.yaml'
 
   responses:
     AvailabilityZoneResponse:
@@ -83,8 +79,6 @@ components:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
-    GatewayIdResponse:
-      $ref: 'resources/Gateway/responses/idResponse.yaml'
     RegionIdResponse:
       $ref: 'resources/Region/responses/idResponse.yaml'
 
@@ -95,16 +89,10 @@ paths:
     $ref: 'resources/AvailabilityZone/admin-item.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers/{routerId}':
     $ref: 'resources/AvailabilityZone/routers.yaml'
-  '/ecloud/v2/gateways':
-    $ref: 'resources/Gateway/admin-collection.yaml'
-  '/ecloud/v2/gateways/{gatewayId}':
-    $ref: 'resources/Gateway/admin-item.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/admin-item.yaml'
-  '/ecloud/v2/routers/{routerId}/gateways/{gatewayId}':
-    $ref: 'resources/Router/gateways.yaml'
   '/ecloud/v2/regions':
     $ref: 'resources/Region/admin-collection.yaml'
   '/ecloud/v2/regions/{regionId}':
