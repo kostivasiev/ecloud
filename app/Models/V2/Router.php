@@ -51,11 +51,6 @@ class Router extends Model implements Filterable, Sortable
         'created' => RouterCreated::class,
     ];
 
-    public function gateways()
-    {
-        return $this->belongsToMany(Gateway::class);
-    }
-
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);

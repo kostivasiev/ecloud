@@ -63,11 +63,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Network::class);
     }
 
-    public function gateways()
-    {
-        return $this->hasMany(Gateway::class);
-    }
-
     public function region()
     {
         return $this->belongsTo(Region::class);

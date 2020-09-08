@@ -3,7 +3,6 @@
 namespace Tests\V2;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Gateway;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -44,28 +43,6 @@ class NewIDTest extends TestCase
             ->assertResponseStatus(201);
         $this->assertRegExp(
             $this->generateRegExp(AvailabilityZone::class),
-            (json_decode($this->response->getContent()))->data->id
-        );
-    }
-
-    public function testFormatOfGatewaysId()
-    {
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $data = [
-            'name'    => 'Manchester Gateway 1',
-            'availability_zone_id' => $availabilityZone->getKey()
-        ];
-        $this->post(
-            '/v2/gateways',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(201);
-        $this->assertRegExp(
-            $this->generateRegExp(Gateway::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -116,65 +93,6 @@ class NewIDTest extends TestCase
         $this->assertRegExp(
             $this->generateRegExp(Vpc::class),
             (json_decode($this->response->getContent()))->data->id
-        );
-    }
-
-    public function testRoutersGatewaysAssociation()
-    {
-        $router = factory(Router::class)->create();
-        $gateway = factory(Gateway::class)->create();
-
-        $this->put(
-            '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
-
-        // test that the association has occurred
-        $router->refresh();
-        $associated = $router->gateways()->first();
-        $this->assertEquals($associated->getKey(), $gateway->getKey());
-
-        // Test IDs
-        $this->assertRegExp(
-            $this->generateRegExp(Router::class),
-            $router->id
-        );
-        $this->assertRegExp(
-            $this->generateRegExp(Gateway::class),
-            $gateway->id
-        );
-    }
-
-    public function testRoutersGatewaysDisassociation()
-    {
-        $router = factory(Router::class)->create();
-        $gateway = factory(Gateway::class)->create();
-        $router->gateways()->attach($gateway->id);
-        $this->delete(
-            '/v2/routers/' . $router->id . '/gateways/' . $gateway->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
-        $router->refresh();
-        $this->assertEquals(0, $router->gateways()->count());
-
-        // Test IDs
-        $this->assertRegExp(
-            $this->generateRegExp(Router::class),
-            $router->id
-        );
-        $this->assertRegExp(
-            $this->generateRegExp(Gateway::class),
-            $gateway->id
         );
     }
 
