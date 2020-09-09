@@ -4,6 +4,7 @@ namespace Tests\V2\Network;
 
 use App\Events\V2\NetworkCreated;
 use App\Models\V2\Network;
+use App\Models\V2\Region;
 use Illuminate\Support\Facades\Event;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
@@ -16,9 +17,11 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    /** @var Region */
+    private $region;
 
-    protected $vpc;
+    /** @var Vpc */
+    private $vpc;
 
     protected $router;
 
@@ -27,19 +30,16 @@ class CreateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
+        $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'name'    => 'Manchester DC',
+            'region_id' => $this->region->getKey(),
         ]);
-
         $this->router = factory(Router::class)->create([
-            'name'       => 'Manchester Router 1',
+            'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
         ]);
-
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-        ]);
+        $this->availabilityZone = factory(AvailabilityZone::class)->create();
     }
 
     public function testNoPermsIsDenied()
