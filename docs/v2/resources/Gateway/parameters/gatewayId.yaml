@@ -1,6 +1,0 @@
-in: path
-name: gatewayId
-required: true
-schema:
-  type: string
-example: gw-2b66bb79

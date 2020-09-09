@@ -40,8 +40,6 @@ components:
       $ref: 'components/schemas/region.yaml'
     Router:
       $ref: 'components/schemas/router.yaml'
-    Gateway:
-      $ref: 'components/schemas/gateway.yaml'
     LoadBalancerCluster:
       $ref: 'components/schemas/lbc.yaml'
     Meta:
@@ -73,8 +71,6 @@ components:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
-    GatewayId:
-      $ref: 'resources/Gateway/parameters/gatewayId.yaml'
     LbcId:
       $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
   responses:
@@ -94,8 +90,6 @@ components:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
-    GatewayIdResponse:
-      $ref: 'resources/Gateway/responses/idResponse.yaml'
     LbcIdResponse:
       $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
 paths:
@@ -150,11 +144,6 @@ paths:
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/item.yaml'
-
-  '/ecloud/v2/gateways':
-    $ref: 'resources/Gateway/collection.yaml'
-  '/ecloud/v2/gateways/{gatewayId}':
-    $ref: 'resources/Gateway/item.yaml'
 
   '/ecloud/v2/lbcs':
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
