@@ -12,12 +12,16 @@ class RevertCreateRouterGatewaysTable extends Migration
         Schema::connection('ecloud')->table('router_gateways', function (Blueprint $table) {
             $table->renameColumn('gateway_id', 'gateways_id');
         });
+
+        require_once(app()->basePath('database/migrations/2020_07_10_085908_create_router_gateways_table.php'));
         (new CreateRouterGatewaysTable())->down();
     }
 
     public function down()
     {
+        require_once(app()->basePath('database/migrations/2020_07_10_085908_create_router_gateways_table.php'));
         (new CreateRouterGatewaysTable())->up();
+
         Schema::connection('ecloud')->rename('router_gateways', 'gateway_router');
         Schema::connection('ecloud')->table('gateway_router', function (Blueprint $table) {
             $table->renameColumn('gateways_id', 'gateway_id');
