@@ -6,7 +6,6 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,86 +13,61 @@ class NewIDTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    /** @var Region */
+    private $region;
+
+    /** @var Vpc */
+    private $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
+        $this->region = factory(Region::class)->create();
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
     }
 
     public function testFormatOfAvailabilityZoneID()
     {
-        $this->region = factory(Region::class)->create();
-
-        $data = [
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Zone 1',
-            'datacentre_site_id' => $this->faker->randomDigit(),
+        $this->post('/v2/availability-zones', [
+            'code' => 'MAN1',
+            'name' => 'Manchester Zone 1',
+            'datacentre_site_id' => 1,
             'region_id' => $this->region->getKey()
-        ];
-        $this->post(
-            '/v2/availability-zones',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(201);
-        $this->assertRegExp(
-            $this->generateRegExp(AvailabilityZone::class),
-            (json_decode($this->response->getContent()))->data->id
-        );
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(201);
+        $this->assertRegExp($this->generateRegExp(AvailabilityZone::class),
+            (json_decode($this->response->getContent()))->data->id);
     }
 
     public function testFormatOfRoutersId()
     {
-        $vpc = factory(Vpc::class)->create([
-            'name' => 'Manchester DC',
-        ]);
-
-        $data = [
-            'name'    => 'Manchester Router 1',
-            'vpc_id' => $vpc->getKey()
-        ];
-        $this->post(
-            '/v2/routers',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(201);
-        $this->assertRegExp(
-            $this->generateRegExp(Router::class),
-            (json_decode($this->response->getContent()))->data->id
-        );
+        $this->post('/v2/routers', [
+            'name' => 'Manchester Router 1',
+            'vpc_id' => $this->vpc->getKey()
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(201);
+        $this->assertRegExp($this->generateRegExp(Router::class),
+            (json_decode($this->response->getContent()))->data->id);
     }
 
-    public function testFormatOfVirtualDatacentresId()
+    public function testFormatOfVpcId()
     {
-        $this->region = factory(Region::class)->create();
-
-        $data = [
-            'name'    => 'Manchester DC',
-            'region_id' => $this->region->getKey()
-        ];
-        $this->post(
-            '/v2/vpcs',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-                'X-Reseller-Id' => 1
-            ]
-        )
-            ->assertResponseStatus(201);
-        $this->assertRegExp(
-            $this->generateRegExp(Vpc::class),
-            (json_decode($this->response->getContent()))->data->id
-        );
+        $this->post('/v2/vpcs', [
+            'name' => 'Manchester DC',
+            'region_id' => $this->region->getKey(),
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+            'X-Reseller-Id' => 1
+        ])->assertResponseStatus(201);
+        $this->assertRegExp($this->generateRegExp(Vpc::class),
+            (json_decode($this->response->getContent()))->data->id);
     }
 
     /**

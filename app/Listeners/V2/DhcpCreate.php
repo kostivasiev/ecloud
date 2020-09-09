@@ -20,8 +20,8 @@ class DhcpCreate implements ShouldQueue
     {
         $event->vpc->region->availabilityZones()->each(function ($availabilityZone) use ($event) {
             $dhcp = app()->make(Dhcp::class);
-            $dhcp->vpc->associate($event->vpc);
-            $dhcp->availability_zone->associate($availabilityZone);
+            $dhcp->vpc()->associate($event->vpc);
+            $dhcp->availabilityZone()->associate($availabilityZone);
             $dhcp->save();
         });
     }

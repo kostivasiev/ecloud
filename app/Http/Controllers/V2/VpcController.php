@@ -51,10 +51,10 @@ class VpcController extends BaseController
      */
     public function create(CreateVpcRequest $request)
     {
-        $virtualPrivateClouds = new Vpc($request->only(['name', 'region_id']));
-        $virtualPrivateClouds->reseller_id = $this->resellerId;
-        $virtualPrivateClouds->save();
-        return $this->responseIdMeta($request, $virtualPrivateClouds->getKey(), 201);
+        $vpc = new Vpc($request->only(['name', 'region_id']));
+        $vpc->reseller_id = $this->resellerId;
+        $vpc->save();
+        return $this->responseIdMeta($request, $vpc->getKey(), 201);
     }
 
     /**
