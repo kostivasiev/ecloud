@@ -33,7 +33,6 @@ class Network extends Model implements Filterable, Sortable
         'id',
         'name',
         'router_id',
-        'availability_zone_id',
     ];
 
     protected $dispatchesEvents = [
@@ -43,11 +42,6 @@ class Network extends Model implements Filterable, Sortable
     public function router()
     {
         return $this->belongsTo(Router::class);
-    }
-
-    public function availabilityZone()
-    {
-        return $this->belongsTo(AvailabilityZone::class);
     }
 
     /**
@@ -79,7 +73,6 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
-            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -96,7 +89,6 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_id'),
-            $factory->create('availability_zone_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -119,10 +111,9 @@ class Network extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
-            'router_id'       => 'router_id',
-            'availability_zone_id'       => 'availability_zone_id',
+            'id' => 'id',
+            'name' => 'name',
+            'router_id' => 'router_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
