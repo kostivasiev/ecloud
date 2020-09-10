@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Event;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 

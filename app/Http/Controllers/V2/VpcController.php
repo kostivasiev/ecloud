@@ -104,15 +104,14 @@ class VpcController extends BaseController
         $router->save();
 
         // Create a new network
-        $network = Network::withoutEvents(function () {
+        Network::withoutEvents(function () use ($availabilityZone, $router) {
             $instance = new Network();
             $instance::addCustomKey($instance);
             $instance->name = $instance->id;
-            return $instance;
+            $instance->availabilityZone()->associate($availabilityZone);
+            $instance->router()->associate($router);
+            $instance->save();
         });
-        $network->availabilityZone()->associate($availabilityZone);
-        $network->router()->associate($router);
-        $network->save();
 
         // Deploy router and network
         event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
