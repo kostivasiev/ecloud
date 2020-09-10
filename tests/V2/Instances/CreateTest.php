@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -16,6 +17,8 @@ class CreateTest extends TestCase
 
     protected $network;
 
+    protected $vpc;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -23,12 +26,16 @@ class CreateTest extends TestCase
         $this->network = factory(Network::class)->create([
             'name'    => 'Manchester Network',
         ]);
+        $this->vpc = factory(Vpc::class)->create([
+            'name' => 'Manchester VPC',
+        ]);
     }
 
     public function testNoPermsIsDenied()
     {
         $data = [
             'network_id' => $this->network->getKey(),
+            'vpc_id' => $this->vpc->getKey(),
         ];
         $this->post(
             '/v2/instances',
@@ -46,7 +53,7 @@ class CreateTest extends TestCase
     public function testNullNetworkIdIsFailed()
     {
         $data = [
-            'network_id'    => '',
+            'network_id' => '',
         ];
         $this->post(
             '/v2/instances',
@@ -58,11 +65,31 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The network id field is required',
+                'detail' => 'The network id field is required if the vpc_id is not specified',
                 'status' => 422,
                 'source' => 'network_id'
             ])
             ->assertResponseStatus(422);
+    }
+
+    public function testNullNetworkIdAllowedIfVpcIdSpecified()
+    {
+        $vpc = factory(Vpc::class)->create();
+        $data = [
+            'vpc_id' => $vpc->getKey(),
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        );
+
+        $instanceId = (json_decode($this->response->getContent()))->data->id;
+        $instance = Instance::findOrFail($instanceId);
+        $this->assertNull($instance->network_id);
     }
 
     public function testNotOwnedNetworkIdIsFailed()
@@ -87,6 +114,36 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNullVpcIsNotFailed()
+    {
+        $data = [
+            'network_id' => $this->network->getKey(),
+            'vpc_id' => '',
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups'    => 'ecloud.write',
+            ]
+        )
+            ->assertResponseStatus(201);
+
+        $id = (json_decode($this->response->getContent()))->data->id;
+        $this->seeJson([
+            'id' => $id
+        ])
+            ->seeInDatabase(
+                'instances',
+                [
+                    'id' => $id,
+                    'name' => $id,
+                ],
+                'ecloud'
+            );
+    }
+
     public function testValidDataSucceeds()
     {
         // No name defined - defaults to ID
@@ -108,13 +165,13 @@ class CreateTest extends TestCase
             'id' => $id
         ])
             ->seeInDatabase(
-            'instances',
-            [
+                'instances',
+                [
                 'id' => $id,
                 'name' => $id,
-            ],
-            'ecloud'
-        );
+                ],
+                'ecloud'
+            );
 
         // Name defined
         $name = $this->faker->word();

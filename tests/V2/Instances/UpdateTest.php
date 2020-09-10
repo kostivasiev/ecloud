@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -27,6 +28,7 @@ class UpdateTest extends TestCase
         ]);
         $this->instance = factory(Instance::class)->create([
             'network_id' => $this->network->getKey(),
+            'vpc_id' => null,
         ]);
     }
 
@@ -93,7 +95,6 @@ class UpdateTest extends TestCase
             ])
             ->assertResponseStatus(422);
     }
-
 
     public function testValidDataIsSuccessful()
     {
