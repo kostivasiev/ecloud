@@ -65,7 +65,7 @@ class CreateTest extends TestCase
         $data = [
             'name'    => 'Manchester Network',
             'availability_zone_id' => $this->availabilityZone->getKey(),
-            'router_id' => $this->faker->uuid()
+            'router_id' => 'x',
         ];
 
         $this->post(
@@ -88,9 +88,9 @@ class CreateTest extends TestCase
     public function testNotOwnedRouterIdIsFailed()
     {
         $data = [
-            'name'    => 'Manchester Network',
+            'name' => 'Manchester Network',
             'availability_zone_id' => $this->availabilityZone->getKey(),
-            'router_id' => $this->faker->uuid()
+            'router_id' => 'x',
         ];
 
         $this->post(
@@ -114,8 +114,8 @@ class CreateTest extends TestCase
     {
         $data = [
             'name'    => 'Manchester Network',
-            'availability_zone_id' => $this->faker->uuid(),
-            'router_id' => $this->router->getKey()
+            'availability_zone_id' => 'x',
+            'router_id' => 'x',
         ];
 
         $this->post(
@@ -159,8 +159,8 @@ class CreateTest extends TestCase
 
         $network = factory(Network::class)->create([
             'id' => 'net-abc123',
-            'router_id' => $this->faker->uuid(),
-            'availability_zone_id' => $this->faker->uuid()
+            'router_id' => 'x',
+            'availability_zone_id' => 'x',
         ]);
 
         Event::assertDispatched(NetworkCreated::class, function ($event) use ($network) {

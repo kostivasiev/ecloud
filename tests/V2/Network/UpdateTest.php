@@ -136,6 +136,6 @@ class UpdateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(200);
-        $this->assertEquals('expected', Network::findOrFail($this->network->getKey()->name));
+        $this->assertEquals('expected', Network::findOrFail($this->network->getKey())->name);
     }
 }

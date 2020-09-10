@@ -7,7 +7,6 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
-use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,12 +14,36 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    /** @var Region */
+    private $region;
+
+    /** @var Vpc */
+    private $vpc;
+
+    /** @var AvailabilityZone */
+    private $availabilityZone;
+
+    /** @var Router */
+    private $router;
+
+    /** @var Vpn */
+    private $vpn;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
+        $this->region = factory(Region::class)->create();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create();
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey()
+        ]);
+        $this->vpn = factory(Vpn::class)->create([
+            'router_id' => $this->router->id,
+            'availability_zone_id' => $this->availabilityZone->id,
+        ]);
     }
 
     public function testNoPermsIsDenied()
@@ -109,36 +132,20 @@ class UpdateTest extends TestCase
 
     public function testNotOwnedRouterResourceIsFailed()
     {
-        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
-        $router = factory(Router::class)->create([
-            'vpc_id' => $vpc->getKey()
-        ]);
-
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
-        ]);
-
-        $data = [
-            'router_id'            => $router->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
-        ];
-        $this->patch(
-            '/v2/vpns/' . $vpn->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The specified router id was not found',
-                'status' => 422,
-                'source' => 'router_id'
-            ])
-            ->assertResponseStatus(422);
+        $this->vpc->reseller_id = 3;
+        $this->vpc->save();
+        $this->patch('/v2/vpns/' . $this->vpn->getKey(), [
+            'router_id' => $this->router->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey(),
+        ], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeJson([
+            'title'  => 'Validation Error',
+            'detail' => 'The specified router id was not found',
+            'status' => 422,
+            'source' => 'router_id'
+        ])->assertResponseStatus(422);
     }
 
     public function testValidDataIsSuccessful()
