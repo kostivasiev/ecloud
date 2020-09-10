@@ -9,6 +9,8 @@ use UKFast\Responses\UKFastResource;
  * @package App\Http\Resources\V2
  * @property string id
  * @property string name
+ * @property string network_id
+ * @property string vpc_id
  * @property string created_at
  * @property string updated_at
  */
@@ -22,8 +24,9 @@ class InstanceResource extends UKFastResource
     {
         return [
             'id'         => $this->id,
-            'name' => $this->name,
-            'network_id'       => $this->network_id,
+            'name'       => $this->name,
+            'network_id' => $this->network_id,
+            'vpc_id'     => $this->vpc_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
