@@ -23,9 +23,6 @@ class UpdateTest extends TestCase
     /** @var Router */
     private $router;
 
-    /** @var AvailabilityZone */
-    private $availabilityZone;
-
     /** @var Network */
     private $network;
 
@@ -33,16 +30,14 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create();
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->getKey(),
         ]);
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
         ]);
     }
 
@@ -77,7 +72,6 @@ class UpdateTest extends TestCase
     {
         $this->patch('/v2/networks/' . $this->network->getKey(), [
             'name' => 'Manchester Network',
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'router_id' => 'x'
         ], [
             'X-consumer-custom-id' => '0-0',
@@ -96,7 +90,6 @@ class UpdateTest extends TestCase
         $this->vpc->save();
         $this->patch('/v2/networks/' . $this->network->getKey(),[
             'name' => 'Manchester Network',
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'router_id' => $this->router->getKey()
         ], [
             'X-consumer-custom-id' => '1-0',
@@ -109,28 +102,10 @@ class UpdateTest extends TestCase
         ])->assertResponseStatus(422);
     }
 
-    public function testInvalidAvailabilityZoneIdIsFailed()
-    {
-        $this->patch('/v2/networks/' . $this->network->getKey(), [
-            'name'    => 'Manchester Network',
-            'availability_zone_id' => 'x',
-            'router_id' => $this->router->getKey()
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title'  => 'Validation Error',
-            'detail' => 'The specified availability zone id was not found',
-            'status' => 422,
-            'source' => 'availability_zone_id'
-        ])->assertResponseStatus(422);
-    }
-
     public function testValidDataIsSuccessful()
     {
         $this->patch('/v2/networks/' . $this->network->getKey(), [
             'name' => 'expected',
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'router_id' => $this->router->getKey()
         ], [
             'X-consumer-custom-id' => '0-0',

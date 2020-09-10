@@ -2,7 +2,9 @@
 
 namespace Tests\V2\Dhcp;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
+use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -14,15 +16,28 @@ class CreateTest extends TestCase
     /** @var Region */
     private $region;
 
+    /** @var AvailabilityZone */
+    private $availabilityZone;
+
     /** @var Vpc */
     private $vpc;
+
+    /** @var Router */
+    private $router;
 
     public function setUp(): void
     {
         parent::setUp();
+
         $this->region = factory(Region::class)->create();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->getKey()
+        ]);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey()
         ]);
     }
 
@@ -73,6 +88,7 @@ class CreateTest extends TestCase
     {
         $this->post('/v2/dhcps', [
             'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->getKey(),
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',

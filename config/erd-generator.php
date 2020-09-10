@@ -72,7 +72,7 @@ return [
         'concentrate' => true,
         'splines' => 'polyline',
         'overlap' => false,
-        'nodesep' => 1,
+        'nodesep' => 0.5,
         'rankdir' => 'LR',
         'pad' => 0.5,
         'ranksep' => 2,

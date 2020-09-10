@@ -108,7 +108,6 @@ class VpcController extends BaseController
             $instance = new Network();
             $instance::addCustomKey($instance);
             $instance->name = $instance->id;
-            $instance->availabilityZone()->associate($availabilityZone);
             $instance->router()->associate($router);
             $instance->save();
         });

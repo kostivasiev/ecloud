@@ -30,14 +30,13 @@ class CreateNetworkRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'nullable|string',
-            'router_id'    => [
+            'name' => 'nullable|string',
+            'router_id' => [
                 'required',
                 'string',
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class)
             ],
-            'availability_zone_id'    => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
 
@@ -50,9 +49,6 @@ class CreateNetworkRequest extends FormRequest
     {
         return [
             'router_id.required' => 'The :attribute field is required',
-            'router_id.exists' => 'The specified :attribute was not found',
-            'availability_zone_id.required' => 'The :attribute field is required',
-            'availability_zone_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }

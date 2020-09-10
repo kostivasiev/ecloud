@@ -50,7 +50,7 @@ class VpnController extends BaseController
      */
     public function create(CreateVpnRequest $request)
     {
-        $vpns = new Vpn($request->only(['router_id', 'availability_zone_id']));
+        $vpns = new Vpn($request->only(['router_id']));
         $vpns->save();
         $vpns->refresh();
         return $this->responseIdMeta($request, $vpns->getKey(), 201);
@@ -64,7 +64,7 @@ class VpnController extends BaseController
     public function update(UpdateVpnRequest $request, string $vpnId)
     {
         $vpns = Vpn::forUser(app('request')->user)->findOrFail($vpnId);
-        $vpns->fill($request->only(['router_id', 'availability_zone_id']));
+        $vpns->fill($request->only(['router_id']));
         $vpns->save();
         return $this->responseIdMeta($request, $vpns->getKey(), 200);
     }
