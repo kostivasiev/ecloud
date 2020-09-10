@@ -41,6 +41,11 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(Network::class);
     }
 
+    public function instance()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
+
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
