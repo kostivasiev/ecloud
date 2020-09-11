@@ -33,7 +33,7 @@ class Instance extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
-        'network_id',
+        'vpc_id',
     ];
 
     public function network()
@@ -55,7 +55,7 @@ class Instance extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -71,7 +71,7 @@ class Instance extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('network_id'),
+            $factory->create('vpc_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
