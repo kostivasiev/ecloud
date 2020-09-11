@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
+use App\Jobs\InstanceDeployNetwork;
 use App\Models\V2\Instance;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\Request;
@@ -80,5 +81,17 @@ class InstanceController extends BaseController
         $instance = Instance::findOrFail($instanceId);
         $instance->delete();
         return response()->json([], 204);
+    }
+
+    public function deploy(Request $request, string $instanceId)
+    {
+        $instance = Instance::findOrFail($instanceId);  // TODO :- User scope
+
+        // Create the jobs for deployment
+        //InstanceDeployVolume::dispatch($request);
+        InstanceDeployNetwork::dispatch($request);
+        //InstanceDeployAppliance::dispatch($request);
+
+        return response()->json([], 200);
     }
 }
