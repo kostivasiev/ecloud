@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
 use App\Models\V2\Instance;
+use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -51,7 +52,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateInstanceRequest $request)
     {
-        $instance = new Instance($request->only(['network_id', 'name', 'vpc_id']));
+        $instance = new Instance($request->only(['name', 'vpc_id']));
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
@@ -65,7 +66,7 @@ class InstanceController extends BaseController
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
         $instance = Instance::findOrFail($instanceId);
-        $instance->fill($request->only(['network_id', 'name', 'vpc_id']));
+        $instance->fill($request->only(['name', 'vpc_id']));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
