@@ -26,7 +26,6 @@ class NetworkResource extends UKFastResource
             'id'         => $this->id,
             'name'       => $this->name,
             'router_id' => $this->router_id,
-            'availability_zone_id' => $this->availability_zone_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

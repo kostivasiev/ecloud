@@ -50,17 +50,12 @@ class AvailabilityZone extends Model implements Filterable, Sortable
 
     public function routers()
     {
-        return $this->belongsToMany(Router::class);
+        return $this->hasMany(Router::class);
     }
 
-    public function vpns()
+    public function dhcps()
     {
-        return $this->hasMany(Vpn::class);
-    }
-
-    public function networks()
-    {
-        return $this->hasMany(Network::class);
+        return $this->hasMany(Dhcp::class);
     }
 
     public function region()

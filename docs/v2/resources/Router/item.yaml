@@ -32,6 +32,8 @@ patch:
                   required: false
                 vpc_id:
                   required: false
+                availability_zone_id:
+                  required: false
   responses:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/RouterIdResponse'

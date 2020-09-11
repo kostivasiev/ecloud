@@ -25,18 +25,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
-
-        /** Availability Zones Routers */
-        $router->group([], function () use ($router) {
-            $router->put(
-                'availability-zones/{zoneId}/routers/{routerUuid}',
-                'AvailabilityZoneController@routersCreate'
-            );
-            $router->delete(
-                'availability-zones/{zoneId}/routers/{routerUuid}',
-                'AvailabilityZoneController@routersDestroy'
-            );
-        });
     });
 
     /** Virtual Private Clouds */
@@ -84,19 +72,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->post('routers', 'RouterController@create');
     $router->patch('routers/{routerId}', 'RouterController@update');
     $router->delete('routers/{routerId}', 'RouterController@destroy');
-
-    $router->get(
-        'routers/{routerId}/availability-zones',
-        'RouterController@availabilityZones'
-    );
-    $router->put(
-        'routers/{routerId}/availability-zones/{availabilityZonesId}',
-        'RouterController@availabilityZonesAttach'
-    );
-    $router->delete(
-        'routers/{routerId}/availability-zones/{availabilityZonesId}',
-        'RouterController@availabilityZonesDetach'
-    );
 
     /** Instances */
     $router->group([], function () use ($router) {

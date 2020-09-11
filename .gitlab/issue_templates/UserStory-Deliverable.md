@@ -20,6 +20,7 @@
 |---|---|---|
 | End User | View all VPC's | View an overview of my VPC's |
 
+### Acceptance Criteria
 
 | GIVEN | WHEN | THEN |
 |---|---|---|

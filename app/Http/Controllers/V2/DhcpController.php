@@ -49,7 +49,7 @@ class DhcpController extends BaseController
      */
     public function create(CreateDhcpRequest $request)
     {
-        $dhcps = new Dhcp($request->only(['vpc_id']));
+        $dhcps = new Dhcp($request->only(['vpc_id', 'availability_zone_id']));
         $dhcps->save();
         $dhcps->refresh();
         return $this->responseIdMeta($request, $dhcps->getKey(), 201);
@@ -63,7 +63,7 @@ class DhcpController extends BaseController
     public function update(UpdateDhcpRequest $request, string $dhcpId)
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
-        $dhcp->fill($request->only(['vpc_id']));
+        $dhcp->fill($request->only(['vpc_id', 'availability_zone_id']));
         $dhcp->save();
         return $this->responseIdMeta($request, $dhcp->getKey(), 200);
     }

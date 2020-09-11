@@ -55,7 +55,7 @@ class RouterController extends BaseController
      */
     public function create(CreateRouterRequest $request)
     {
-        $router = new Router($request->only(['name', 'vpc_id']));
+        $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $router->save();
         $router->refresh();
         return $this->responseIdMeta($request, $router->getKey(), 201);
@@ -69,7 +69,7 @@ class RouterController extends BaseController
     public function update(UpdateRouterRequest $request, string $routerId)
     {
         $router = Router::forUser(app('request')->user)->findOrFail($routerId);
-        $router->fill($request->only(['name', 'vpc_id']));
+        $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $router->save();
         return $this->responseIdMeta($request, $router->getKey(), 200);
     }
@@ -82,33 +82,6 @@ class RouterController extends BaseController
     public function destroy(Request $request, string $routerId)
     {
         Router::forUser($request->user)->findOrFail($routerId)->delete();
-        return response()->json([], 204);
-    }
-
-    public function availabilityZones(Request $request, string $routerId, QueryTransformer $queryTransformer)
-    {
-        $collection = Router::forUser($request->user)->findOrFail($routerId)->availabilityZones()->query();
-        $queryTransformer->config(AvailabilityZone::class)->transform($collection);
-        return AvailabilityZoneResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
-    }
-
-    public function availabilityZonesAttach(Request $request, string $routerId, string $availabilityZonesId)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
-        $router = Router::forUser($request->user)->findOrFail($routerId);
-        $router->availabilityZones()->attach($availabilityZone->id);
-        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
-        return response()->json([], 204);
-    }
-
-    public function availabilityZonesDetach(Request $request, string $routerUuid, string $availabilityZonesId)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
-        $router = Router::forUser($request->user)->findOrFail($routerUuid);
-        $router->availabilityZones()->detach($availabilityZone->id);
-        event(new RouterAvailabilityZoneDetach($router, $availabilityZone));
         return response()->json([], 204);
     }
 }

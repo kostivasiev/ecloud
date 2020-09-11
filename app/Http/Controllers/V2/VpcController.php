@@ -51,10 +51,10 @@ class VpcController extends BaseController
      */
     public function create(CreateVpcRequest $request)
     {
-        $virtualPrivateClouds = new Vpc($request->only(['name', 'region_id']));
-        $virtualPrivateClouds->reseller_id = $this->resellerId;
-        $virtualPrivateClouds->save();
-        return $this->responseIdMeta($request, $virtualPrivateClouds->getKey(), 201);
+        $vpc = new Vpc($request->only(['name', 'region_id']));
+        $vpc->reseller_id = $this->resellerId;
+        $vpc->save();
+        return $this->responseIdMeta($request, $vpc->getKey(), 201);
     }
 
     /**
@@ -100,19 +100,17 @@ class VpcController extends BaseController
 
         // Create a new router
         $router = $vpc->routers()->create();
-        $router->availabilityZones()->attach($availabilityZone);
+        $router->availabilityZone()->associate($availabilityZone);
         $router->save();
 
         // Create a new network
-        $network = Network::withoutEvents(function () {
+        Network::withoutEvents(function () use ($availabilityZone, $router) {
             $instance = new Network();
             $instance::addCustomKey($instance);
             $instance->name = $instance->id;
-            return $instance;
+            $instance->router()->associate($router);
+            $instance->save();
         });
-        $network->availabilityZone()->associate($availabilityZone);
-        $network->router()->associate($router);
-        $network->save();
 
         // Deploy router and network
         event(new RouterAvailabilityZoneAttach($router, $availabilityZone));

@@ -4,11 +4,10 @@ namespace Tests\V2\Network;
 
 use App\Events\V2\NetworkCreated;
 use App\Models\V2\Network;
+use App\Models\V2\Region;
 use Illuminate\Support\Facades\Event;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -16,29 +15,25 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    /** @var Region */
+    private $region;
 
-    protected $vpc;
+    /** @var Vpc */
+    private $vpc;
 
     protected $router;
-
-    protected $availabilityZone;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
+        $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'name'    => 'Manchester DC',
+            'region_id' => $this->region->getKey(),
         ]);
-
         $this->router = factory(Router::class)->create([
-            'name'       => 'Manchester Router 1',
+            'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
-        ]);
-
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
         ]);
     }
 
@@ -63,9 +58,8 @@ class CreateTest extends TestCase
     public function testInvalidRouterIdIsFailed()
     {
         $data = [
-            'name'    => 'Manchester Network',
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'router_id' => $this->faker->uuid()
+            'name' => 'Manchester Network',
+            'router_id' => 'x',
         ];
 
         $this->post(
@@ -88,9 +82,8 @@ class CreateTest extends TestCase
     public function testNotOwnedRouterIdIsFailed()
     {
         $data = [
-            'name'    => 'Manchester Network',
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'router_id' => $this->faker->uuid()
+            'name' => 'Manchester Network',
+            'router_id' => 'x',
         ];
 
         $this->post(
@@ -110,36 +103,10 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testInvalidAvailabilityZoneIdIsFailed()
-    {
-        $data = [
-            'name'    => 'Manchester Network',
-            'availability_zone_id' => $this->faker->uuid(),
-            'router_id' => $this->router->getKey()
-        ];
-
-        $this->post(
-            '/v2/networks',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The specified availability zone id was not found',
-                'status' => 422,
-                'source' => 'availability_zone_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => 'Manchester Network',
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'name' => 'Manchester Network',
             'router_id' => $this->router->getKey()
         ];
 
@@ -159,8 +126,7 @@ class CreateTest extends TestCase
 
         $network = factory(Network::class)->create([
             'id' => 'net-abc123',
-            'router_id' => $this->faker->uuid(),
-            'availability_zone_id' => $this->faker->uuid()
+            'router_id' => 'x',
         ]);
 
         Event::assertDispatched(NetworkCreated::class, function ($event) use ($network) {

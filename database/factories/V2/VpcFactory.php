@@ -9,6 +9,5 @@ $factory->define(Vpc::class, function (Faker $faker) {
     return [
         'name' => 'Virtual Private Cloud Name',
         'reseller_id' => 1,
-
     ];
 });

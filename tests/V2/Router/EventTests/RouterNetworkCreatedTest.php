@@ -28,9 +28,8 @@ class RouterNetworkCreatedTest extends TestCase
     {
         Event::fake();
 
-        $availabilityZone = $this->getAvailabilityZone();
         $router = $this->getRouter();
-        $network = $this->getNetwork($availabilityZone, $router);
+        $network = $this->getNetwork($router);
 
         Event::assertDispatched(RouterCreated::class, function ($event) use ($router) {
             return $event->router->id === $router->id;
@@ -80,16 +79,14 @@ class RouterNetworkCreatedTest extends TestCase
     }
 
     /**
-     * @param \App\Models\V2\AvailabilityZone $availabilityZone
      * @param \App\Models\V2\Router|null $router
      * @return \App\Models\V2\Network
      */
-    public function getNetwork(AvailabilityZone $availabilityZone, ?Router $router = null): Network
+    public function getNetwork(?Router $router = null): Network
     {
         $network = factory(Network::class, 1)->create([
             'id'   => 'net-1234abcd',
             'name' => 'net-1234abcd',
-            'availability_zone_id' => $availabilityZone->id,
         ])
             ->first();
         if (!is_null($router)) {

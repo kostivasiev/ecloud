@@ -19,26 +19,23 @@ class DhcpDeploy implements ShouldQueue
     public function handle(DhcpCreated $event)
     {
         $dhcp = $event->dhcp;
-
-        $event->dhcp->vpc->region->availabilityZones()->each(function ($availabilityZone) use ($dhcp) {
-            try {
-                $availabilityZone->nsxClient()->put('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->getKey(), [
-                    'json' => [
-                        'lease_time' => config('defaults.dhcp.lease_time'),
-                        'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/'
-                            . $availabilityZone->nsxClient()->getEdgeClusterId(),
-                        'resource_type' => 'DhcpServerConfig',
-                        'tags' => [
-                            [
-                                'scope' => config('defaults.tag.scope'),
-                                'tag' => $dhcp->vpc->getKey()
-                            ]
+        try {
+            $dhcp->availabilityZone->nsxClient()->put('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->getKey(), [
+                'json' => [
+                    'lease_time' => config('defaults.dhcp.lease_time'),
+                    'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/'
+                        . $dhcp->availabilityZone->nsxClient()->getEdgeClusterId(),
+                    'resource_type' => 'DhcpServerConfig',
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $dhcp->vpc->getKey()
                         ]
                     ]
-                ]);
-            } catch (GuzzleException $exception) {
-                throw new \Exception($exception->getResponse()->getBody()->getContents());
-            }
-        });
+                ]
+            ]);
+        } catch (GuzzleException $exception) {
+            throw new \Exception($exception->getResponse()->getBody()->getContents());
+        }
     }
 }
