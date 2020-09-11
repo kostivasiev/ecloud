@@ -50,7 +50,7 @@ class NetworkController extends BaseController
     public function create(CreateNetworkRequest $request)
     {
         $network = new Network($request->only([
-            'router_id', 'availability_zone_id',  'name'
+            'router_id', 'name'
         ]));
         $network->save();
         $network->refresh();
@@ -66,7 +66,7 @@ class NetworkController extends BaseController
     {
         $network = Network::forUser(app('request')->user)->findOrFail($networkId);
         $network->fill($request->only([
-            'router_id', 'availability_zone_id',  'name'
+            'router_id', 'name'
         ]));
         $network->save();
         return $this->responseIdMeta($request, $network->getKey(), 200);

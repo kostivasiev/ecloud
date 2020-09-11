@@ -32,6 +32,7 @@ class CreateRouterRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
+            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
 
@@ -44,7 +45,9 @@ class CreateRouterRequest extends FormRequest
     {
         return [
             'vpc_id.required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'The specified :attribute was not found'
+            'vpc_id.exists' => 'The specified :attribute was not found',
+            'availability_zone_id.required' => 'The :attribute field is required',
+            'availability_zone_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }

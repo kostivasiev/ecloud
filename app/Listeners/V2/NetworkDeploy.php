@@ -33,13 +33,16 @@ class NetworkDeploy implements ShouldQueue
                     ') but Router (' . $router->getKey() . ') was not available, will retry shortly');
                 return;
             } else {
-                $this->fail(new \Exception('Timed out waiting for Router (' . $router->getKey() .
-                    ') to become available for Network (' . $network->getKey() . ') deployment'));
+                $message = 'Timed out waiting for Router (' . $router->getKey() .
+                    ') to become available for Network (' . $network->getKey() . ') deployment';
+                Log::error($message);
+                $this->fail(new \Exception($message));
+                return;
             }
         }
 
         try {
-            $network->availabilityZone->nsxClient()->put(
+            $router->availabilityZone->nsxClient()->put(
                 'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
                 [
                     'json' => [
@@ -70,7 +73,10 @@ class NetworkDeploy implements ShouldQueue
                 ]
             );
         } catch (GuzzleException $exception) {
-            $this->fail(new \Exception($exception->getResponse()->getBody()->getContents()));
+            $message = 'NetworkDeploy failed with : ' .  $exception->getResponse()->getBody()->getContents();
+            Log::error($message);
+            $this->fail(new \Exception($message));
+            return;
         }
     }
 }

@@ -24,10 +24,8 @@ class DeleteTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
         $vpn = factory(Vpn::class)->create([
             'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
         ]);
         $this->delete(
             '/v2/vpns/' . $vpn->getKey(),
@@ -63,10 +61,8 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
         $vpn = factory(Vpn::class)->create([
             'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
         ]);
         $this->delete(
             '/v2/vpns/' . $vpn->getKey(),

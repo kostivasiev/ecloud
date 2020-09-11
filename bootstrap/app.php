@@ -119,8 +119,10 @@ $app->register(App\Providers\BillingServiceProvider::class);
 // NSX service provider
 $app->register(App\Providers\NsxServiceProvider::class);
 
-// ErdGenerator - Only enable on dev, never release this to live as the package is not installed due to --no-dev
-//$app->register(BeyondCode\ErdGenerator\ErdGeneratorServiceProvider::class);
+// ErdGenerator - Only enable on dev
+if (is_dir($app->basePath('vendor/beyondcode/laravel-er-diagram-generator'))) {
+    $app->register(BeyondCode\ErdGenerator\ErdGeneratorServiceProvider::class);
+}
 
 /*
 |--------------------------------------------------------------------------

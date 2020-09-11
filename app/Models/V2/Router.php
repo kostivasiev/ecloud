@@ -35,6 +35,7 @@ class Router extends Model implements Filterable, Sortable
         'id',
         'name',
         'vpc_id',
+        'availability_zone_id',
         'deployed',
     ];
 
@@ -50,9 +51,9 @@ class Router extends Model implements Filterable, Sortable
         'created' => RouterCreated::class,
     ];
 
-    public function availabilityZones()
+    public function availabilityZone()
     {
-        return $this->belongsToMany(AvailabilityZone::class);
+        return $this->belongsTo(AvailabilityZone::class);
     }
 
     public function vpns()
@@ -84,7 +85,7 @@ class Router extends Model implements Filterable, Sortable
     public function getAvailableAttribute()
     {
         try {
-            $response = $this->availabilityZones()->first()->nsxClient()->get(
+            $response = $this->availabilityZone->nsxClient()->get(
                 'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
@@ -122,6 +123,7 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('deployed', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -139,6 +141,7 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
+            $factory->create('availability_zone_id'),
             $factory->create('deployed'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -163,6 +166,7 @@ class Router extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'vpc_id' => 'vpc_id',
+            'availability_zone_id' => 'availability_zone_id',
             'deployed' => 'deployed',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

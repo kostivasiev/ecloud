@@ -2,10 +2,10 @@
 
 namespace Tests\V2\Router;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -13,26 +13,30 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    /** @var Region */
+    private $region;
 
-    protected $vpc;
+    /** @var AvailabilityZone */
+    private $availabilityZone;
 
-    protected $router;
+    /** @var Vpc */
+    private $vpc;
+
+    /** @var Router */
+    private $router;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create();
-
-        $this->vpc = factory(Vpc::class)->create([
-            'name'    => 'Manchester DC',
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         $this->router = factory(Router::class)->create([
-            'name'       => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
         ]);
     }
@@ -40,8 +44,8 @@ class CreateTest extends TestCase
     public function testInvalidVpcIdIsFailed()
     {
         $data = [
-            'name'    => 'Manchester Network',
-            'vpc_id' => $this->faker->uuid(),
+            'name' => 'Manchester Network',
+            'vpc_id' => 'x',
         ];
 
         $this->patch(
@@ -88,8 +92,9 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => 'Manchester Router 1',
-            'vpc_id'    => $this->vpc->getKey()
+            'name' => 'Manchester Router 1',
+            'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey(),
         ];
         $this->post(
             '/v2/routers',

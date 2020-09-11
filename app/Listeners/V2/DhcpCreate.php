@@ -18,8 +18,11 @@ class DhcpCreate implements ShouldQueue
      */
     public function handle(VpcCreated $event)
     {
-        $dhcp = app()->make(Dhcp::class);
-        $dhcp->vpc()->associate($event->vpc);
-        $dhcp->save();
+        $event->vpc->region->availabilityZones()->each(function ($availabilityZone) use ($event) {
+            $dhcp = app()->make(Dhcp::class);
+            $dhcp->vpc()->associate($event->vpc);
+            $dhcp->availabilityZone()->associate($availabilityZone);
+            $dhcp->save();
+        });
     }
 }

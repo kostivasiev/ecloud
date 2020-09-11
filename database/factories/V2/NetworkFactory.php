@@ -9,6 +9,5 @@ $factory->define(Network::class, function (Faker $faker) {
     return [
         'name' => 'My Gateway 1',
         'router_id' => 'rtr-62827a58',
-        'availability_zone_id' => 'az-c0ca27e8'
     ];
 });

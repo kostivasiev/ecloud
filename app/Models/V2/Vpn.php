@@ -30,17 +30,11 @@ class Vpn extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'router_id',
-        'availability_zone_id',
     ];
 
     public function router()
     {
         return $this->belongsTo(Router::class);
-    }
-
-    public function availabilityZone()
-    {
-        return $this->belongsTo(AvailabilityZone::class);
     }
 
     /**
@@ -71,7 +65,6 @@ class Vpn extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
-            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -87,7 +80,6 @@ class Vpn extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('router_id'),
-            $factory->create('availability_zone_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -110,11 +102,10 @@ class Vpn extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'                   => 'id',
-            'router_id'            => 'router_id',
-            'availability_zone_id' => 'availability_zone_id',
-            'created_at'           => 'created_at',
-            'updated_at'           => 'updated_at',
+            'id' => 'id',
+            'router_id' => 'router_id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 }
