@@ -23,6 +23,7 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
+        Vpc::flushEventListeners();
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester Vpc',
         ]);
