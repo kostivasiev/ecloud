@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -14,7 +15,7 @@ class DeleteTest extends TestCase
 
     protected $faker;
 
-    protected $network;
+    protected $vpc;
 
     protected $instance;
 
@@ -22,11 +23,11 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
+        $this->vpc = factory(Vpc::class)->create([
+            'name' => 'Manchester VPC',
         ]);
         $this->instance = factory(Instance::class)->create([
-            'network_id' => $this->network->getKey(),
+            'vpc_id' => $this->vpc->getKey(),
         ]);
     }
 

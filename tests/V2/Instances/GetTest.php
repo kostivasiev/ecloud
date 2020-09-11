@@ -15,8 +15,6 @@ class GetTest extends TestCase
 
     protected $faker;
 
-    protected $network;
-
     protected $instance;
 
     protected $vpc;
@@ -25,14 +23,10 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
-        ]);
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);
         $this->instance = factory(Instance::class)->create([
-            'network_id' => $this->network->getKey(),
             'vpc_id' => $this->vpc->getKey(),
         ]);
     }
@@ -63,7 +57,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->instance->getKey(),
                 'name' => $this->instance->name,
-                'network_id' => $this->instance->network_id,
                 'vpc_id' => $this->instance->vpc_id,
             ])
             ->assertResponseStatus(200);
@@ -81,7 +74,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->instance->getKey(),
                 'name' => $this->instance->name,
-                'network_id' => $this->instance->network_id,
                 'vpc_id' => $this->instance->vpc_id,
             ])
             ->assertResponseStatus(200);
