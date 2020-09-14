@@ -4,7 +4,14 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
-use App\Jobs\InstanceDeployNetwork;
+use App\Jobs\InstanceDeploy\OsCustomisation;
+use App\Jobs\InstanceDeploy\PowerOn;
+use App\Jobs\InstanceDeploy\PrepareOsDisk;
+use App\Jobs\InstanceDeploy\PrepareOsUsers;
+use App\Jobs\InstanceDeploy\RunApplianceBootstrap;
+use App\Jobs\InstanceDeploy\RunBootstrapScript;
+use App\Jobs\InstanceDeploy\UpdateNetworkAdapter;
+use App\Jobs\InstanceDeploy\WaitOsCustomisation;
 use App\Models\V2\Instance;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\Request;
@@ -87,10 +94,18 @@ class InstanceController extends BaseController
     {
         $instance = Instance::findOrFail($instanceId);  // TODO :- User scope
 
+        $data = [];
+
         // Create the jobs for deployment
-        //InstanceDeployVolume::dispatch($request);
-        InstanceDeployNetwork::dispatch($request);
-        //InstanceDeployAppliance::dispatch($request);
+        $this->dispatch((new UpdateNetworkAdapter($data))->chain([
+            new PowerOn($data),
+            new WaitOsCustomisation($data),
+            new PrepareOsUsers($data),
+            new OsCustomisation($data),
+            new PrepareOsDisk($data),
+            new RunApplianceBootstrap($data),
+            new RunBootstrapScript($data),
+        ]));
 
         return response()->json([], 200);
     }

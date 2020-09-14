@@ -117,10 +117,3 @@ Content-Type:  application/json
 {
   "blah": "Test"
 }
-
-> {%
-
-client.test("Request executed successfully", function() {
-  client.assert(response.body.data.name === 'Test', "Default name was not set to ID");
-});
-%}
