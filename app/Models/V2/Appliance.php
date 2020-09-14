@@ -18,6 +18,10 @@ class Appliance extends Model
     public $incrementing = false;
     public $timestamps = true;
 
+    const CREATED_AT = 'appliance_created_at';
+    const UPDATED_AT = 'appliance_updated_at';
+    const DELETED_AT = 'appliance_deleted_at';
+
     protected $appends = [
         'version'
     ];
@@ -39,7 +43,6 @@ class Appliance extends Model
     public function getLatestVersion()
     {
         $version = $this->versions()->orderBy('appliance_version_version', 'DESC')->limit(1);
-
         if ($version->get()->count() > 0) {
             return $version->first();
         }

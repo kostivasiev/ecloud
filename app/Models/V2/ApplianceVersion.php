@@ -17,6 +17,10 @@ class ApplianceVersion extends Model
     public $incrementing = false;
     public $timestamps = true;
 
+    const CREATED_AT = 'appliance_version_created_at';
+    const UPDATED_AT = 'appliance_version_updated_at';
+    const DELETED_AT = 'appliance_version_deleted_at';
+
     protected $appends = [
         'appliance_uuid'
     ];
