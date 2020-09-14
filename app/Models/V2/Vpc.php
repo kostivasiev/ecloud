@@ -55,6 +55,11 @@ class Vpc extends Model implements Filterable, Sortable
         return $this->belongsTo(Region::class);
     }
 
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
+    }
+
     /**
      * @param $query
      * @param $user

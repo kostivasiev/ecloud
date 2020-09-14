@@ -3,10 +3,10 @@ properties:
     type: string
     example: vdc-2b66bb79
     readOnly: true
-  network_id:
+  vpc_id:
     type: string
     required: false
-    example: net-2b66bb79
+    example: vpc-2b66bb79
     readOnly: false
   name:
     type: string
