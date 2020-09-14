@@ -6,6 +6,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -34,6 +35,10 @@ class Instance extends Model implements Filterable, Sortable
         'id',
         'name',
         'vpc_id',
+        'appliance_id',
+        'vcpu_tier',
+        'vcpu_count',
+        'ram_capacity',
     ];
 
     public function network()
@@ -69,6 +74,10 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('appliance_id', Filter::$stringDefaults),
+            $factory->create('vcpu_tier', Filter::$stringDefaults),
+            $factory->create('vcpu_count', Filter::$stringDefaults),
+            $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -85,6 +94,10 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
+            $factory->create('appliance_id'),
+            $factory->create('vcpu_tier'),
+            $factory->create('vcpu_count'),
+            $factory->create('ram_capacity'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -107,11 +120,25 @@ class Instance extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
-            'vpc_id'     => 'vpc_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
+            'id'           => 'id',
+            'name'         => 'name',
+            'vpc_id'       => 'vpc_id',
+            'appliance_id' => 'appliance_id',
+            'vcpu_tier'    => 'vcpu_tier',
+            'vcpu_count'   => 'vcpu_count',
+            'ram_capacity' => 'ram_capacity',
+            'created_at'   => 'created_at',
+            'updated_at'   => 'updated_at',
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getFillableMinusKey(): array
+    {
+        return Arr::where($this->getFillable(), function ($key, $value) {
+            return ($value != $this->getKeyName());
+        });
     }
 }
