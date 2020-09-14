@@ -52,7 +52,8 @@ class InstanceController extends BaseController
      */
     public function store(CreateInstanceRequest $request)
     {
-        $instance = new Instance($request->only(['network_id', 'name']));
+        $instance = new Instance();
+        $instance->fill($request->only($instance->getFillableMinusKey()));
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
@@ -66,7 +67,7 @@ class InstanceController extends BaseController
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        $instance->fill($request->only(['vpc_id', 'name']));
+        $instance->fill($request->only($instance->getFillableMinusKey()));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
