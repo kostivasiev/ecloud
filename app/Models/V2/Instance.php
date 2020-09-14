@@ -109,7 +109,7 @@ class Instance extends Model implements Filterable, Sortable
         return [
             'id'         => 'id',
             'name'       => 'name',
-            'network_id' => 'network_id',
+            'vpc_id'     => 'vpc_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
