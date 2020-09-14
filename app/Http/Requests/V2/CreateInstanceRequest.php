@@ -29,15 +29,14 @@ class CreateInstanceRequest extends FormRequest
             'vpc_id' => [
                 'sometimes',
                 'required',
-                'nullable',
                 'string',
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
             ],
-            'appliance_id' => 'required|uuid|exists:ecloud.appliance_version,appliance_version_id',
+            'appliance_id' => 'required|uuid|exists:ecloud.appliance_version,appliance_version_uuid',
             'vcpu_tier' => 'required|string', # needs exists: adding once tier has been added to db
             'vcpu_count' => 'required|numeric|min:1',
-            'ram_capacity' => 'required|numeric',
+            'ram_capacity' => 'required|numeric|min:1024',
         ];
     }
 
@@ -51,6 +50,13 @@ class CreateInstanceRequest extends FormRequest
         return [
             'vpc_id.required' => 'The :attribute field is required',
             'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
+            'appliance_id.required' => 'The :attribute field is required',
+            'appliance_id.exists' => 'The :attribute is not a valid Appliance',
+            'vcpu_tier.required' => 'The :attribute field is required',
+            'vcpu_count.required' => 'The :attribute field is required',
+            'vcpu_count.min' => 'The :attribute field must be greater than or equal to one',
+            'ram_capacity.required' => 'The :attribute field is required',
+            'ram_capacity.min' => 'The :attribute field must be greater than or equal to 1024 megabytes',
         ];
     }
 }
