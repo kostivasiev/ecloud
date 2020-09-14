@@ -16,10 +16,8 @@ trait UUIDHelper
      * Boot the Model.
      * Create and save UUID on saving a new record
      */
-    public static function boot()
+    public static function initializeUUIDHelper()
     {
-        parent::boot();
-
         static::creating(function ($instance) {
             $instance->{$instance->getKeyName()} = Uuid::uuid4()->toString();
         });
