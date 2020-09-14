@@ -49,7 +49,11 @@ class UpdateInstanceRequest extends FormRequest
                 'string',
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
-            ]
+            ],
+            'appliance_id' => 'sometimes|required|string',
+            'vcpu_tier' => 'sometimes|required|string', # needs exists: adding once tier has been added to db
+            'vcpu_count' => 'sometimes|required|numeric|min:1',
+            'ram_capacity' => 'sometimes|required|numeric',
         ];
 
         return $rules;

@@ -33,7 +33,11 @@ class CreateInstanceRequest extends FormRequest
                 'string',
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
-            ]
+            ],
+            'appliance_id' => 'required|uuid|exists:ecloud.appliance_version,appliance_version_id',
+            'vcpu_tier' => 'required|string', # needs exists: adding once tier has been added to db
+            'vcpu_count' => 'required|numeric|min:1',
+            'ram_capacity' => 'required|numeric',
         ];
     }
 
