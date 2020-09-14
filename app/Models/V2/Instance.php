@@ -41,9 +41,15 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(Network::class);
     }
 
-    public function instance()
+    public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    public function byReseller()
+    {
+        $resellerId = app('request')->user->resellerId;
+        return $this->belongsTo(Vpc::class)->where('reseller_id', '=', $resellerId);
     }
 
     /**
@@ -95,7 +101,7 @@ class Instance extends Model implements Filterable, Sortable
     {
         return [
             'id'         => 'id',
-            'name'         => 'name',
+            'name'       => 'name',
             'network_id' => 'network_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
