@@ -2,12 +2,12 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -17,6 +17,10 @@ class CreateTest extends TestCase
 
     protected $vpc;
 
+    protected $appliance;
+
+    protected $appliance_version;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -25,6 +29,12 @@ class CreateTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);
+        $this->appliance = factory(Appliance::class)->create([
+            'appliance_name' => 'Test Appliance',
+        ])->refresh();
+        $this->appliance_version = factory(ApplianceVersion::class)->create([
+            'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ])->refresh();
     }
 
     public function testNoPermsIsDenied()
@@ -45,10 +55,14 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNotOwnedNetworkIdIsFailed()
+    public function testNotOwnedVpcIdIsFailed()
     {
         $data = [
             'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->appliance_version->getKey(),
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_count' => 1,
+            'ram_capacity' => 1024,
         ];
         $this->post(
             '/v2/instances',
@@ -67,11 +81,93 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+    public function testNonExistentApplianceIsFailed()
+    {
+        $data = [
+            'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->faker->uuid,
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_count' => 1,
+            'ram_capacity' => 1024,
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The appliance id is not a valid Appliance',
+                'status' => 422,
+                'source' => 'appliance_id'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testInvalidVcpuCountFails()
+    {
+        $data = [
+            'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->appliance_version->getKey(),
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_count' => 0,
+            'ram_capacity' => 1024,
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The vcpu count field must be greater than or equal to one',
+                'status' => 422,
+                'source' => 'vcpu_count'
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testRamCapacityLessThan1024Fails()
+    {
+        $data = [
+            'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->appliance_version->getKey(),
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_count' => 1,
+            'ram_capacity' => 1,
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Validation Error',
+                'detail' => 'The ram capacity field must be greater than or equal to 1024 megabytes',
+                'status' => 422,
+                'source' => 'ram_capacity'
+            ])
+            ->assertResponseStatus(422);
+    }
+
     public function testValidDataSucceeds()
     {
         // No name defined - defaults to ID
         $data = [
             'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->appliance_version->getKey(),
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_count' => 1,
+            'ram_capacity' => 1024,
         ];
         $this->post(
             '/v2/instances',
@@ -100,7 +196,11 @@ class CreateTest extends TestCase
         $name = $this->faker->word();
         $data = [
             'vpc_id' => $this->vpc->getKey(),
-            'name' => $name
+            'name' => $name,
+            'appliance_id' => $this->appliance_version->getKey(),
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_count' => 1,
+            'ram_capacity' => 1024,
         ];
 
         $this->post(

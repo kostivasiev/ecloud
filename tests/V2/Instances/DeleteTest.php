@@ -2,6 +2,8 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
@@ -17,6 +19,10 @@ class DeleteTest extends TestCase
 
     protected $vpc;
 
+    protected $appliance;
+
+    protected $appliance_version;
+
     protected $instance;
 
     public function setUp(): void
@@ -27,8 +33,19 @@ class DeleteTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);
+        $this->appliance = factory(Appliance::class)->create([
+            'appliance_name' => 'Test Appliance',
+        ])->refresh();
+        $this->appliance_version = factory(ApplianceVersion::class)->create([
+            'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ])->refresh();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
+            'name' => 'DeleteTest Default',
+            'appliance_id' => $this->appliance_version->getKey(),
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_count' => 1,
+            'ram_capacity' => 1024,
         ]);
     }
 
