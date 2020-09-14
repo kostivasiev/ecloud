@@ -46,10 +46,17 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
-    public function byReseller()
+    public function scopeForUser($query, $user)
     {
-        $resellerId = app('request')->user->resellerId;
-        return $this->belongsTo(Vpc::class)->where('reseller_id', '=', $resellerId);
+        if (!empty($user->resellerId)) {
+            $query->whereHas('vpc', function ($query) use ($user) {
+                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($resellerId)) {
+                    $query->where('reseller_id', '=', $resellerId);
+                }
+            });
+        }
+        return $query;
     }
 
     /**
