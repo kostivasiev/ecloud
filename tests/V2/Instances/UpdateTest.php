@@ -3,7 +3,6 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
-use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
