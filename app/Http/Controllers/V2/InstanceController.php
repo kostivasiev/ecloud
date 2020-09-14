@@ -66,7 +66,7 @@ class InstanceController extends BaseController
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        $instance->fill($request->only(['network_id', 'name', 'vpc_id']));
+        $instance->fill($request->only(['vpc_id', 'name']));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
