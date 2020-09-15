@@ -44,25 +44,6 @@ class Volume extends Model implements Filterable, Sortable
     }
 
     /**
-     * @return bool
-     * @throws \Exception
-     * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/9e1c6bcc-85db-46b6-bc38-d6d2431e7c17/30af91b5-3a91-4d5d-8ed5-a7d806764a16/api_includes/types_LogicalRouterState.html
-     * When the configuration is actually in effect, the state will change to "success".
-     */
-    public function getAvailableAttribute()
-    {
-        try {
-            $response = $this->availabilityZone->nsxClient()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
-            );
-            $response = json_decode($response->getBody()->getContents());
-            return $response->tier1_state->state == 'in_sync';
-        } catch (GuzzleException $exception) {
-            return false;
-        }
-    }
-
-    /**
      * @param $query
      * @param $user
      * @return mixed
