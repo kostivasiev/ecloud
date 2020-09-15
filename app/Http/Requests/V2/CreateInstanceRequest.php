@@ -53,8 +53,8 @@ class CreateInstanceRequest extends FormRequest
             'appliance_id.required' => 'The :attribute field is required',
             'appliance_id.exists' => 'The :attribute is not a valid Appliance',
             'vcpu_tier.required' => 'The :attribute field is required',
-            'vcpu_count.required' => 'The :attribute field is required',
-            'vcpu_count.min' => 'The :attribute field must be greater than or equal to one',
+            'vcpu_cores.required' => 'The :attribute field is required',
+            'vcpu_cores.min' => 'The :attribute field must be greater than or equal to one',
             'ram_capacity.required' => 'The :attribute field is required',
             'ram_capacity.min' => 'The :attribute field must be greater than or equal to 1024 megabytes',
         ];
