@@ -10,6 +10,10 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string vpc_id
+ * @property string appliance_id
+ * @property string vcpu_tier
+ * @property integer vcpu_count
+ * @property integer ram_capacity
  * @property string created_at
  * @property string updated_at
  */
@@ -22,14 +26,18 @@ class InstanceResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
-            'vpc_id'     => $this->vpc_id,
-            'created_at' => Carbon::parse(
+            'id'           => $this->id,
+            'name'         => $this->name,
+            'vpc_id'       => $this->vpc_id,
+            'appliance_id' => $this->appliance_id,
+            'vcpu_tier'    => $this->vcpu_tier,
+            'vcpu_count'   => $this->vcpu_count,
+            'ram_capacity' => $this->ram_capacity,
+            'created_at'   => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            'updated_at'   => Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
