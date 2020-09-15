@@ -121,6 +121,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('lbcs/{lbcId}', 'LoadBalancerClusterController@update');
         $router->delete('lbcs/{lbcId}', 'LoadBalancerClusterController@destroy');
     });
+
+    /** Nics */
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('nics', 'NicController@index');
+        $router->get('nics/{nicId}', 'NicController@show');
+        $router->post('nics', 'NicController@create');
+        $router->patch('nics/{nicId}', 'NicController@update');
+        $router->delete('nics/{nicId}', 'NicController@destroy');
+    });
 });
 
 
