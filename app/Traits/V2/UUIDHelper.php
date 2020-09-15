@@ -22,5 +22,4 @@ trait UUIDHelper
             $instance->{$instance->getKeyName()} = Uuid::uuid4()->toString();
         });
     }
-
 }
