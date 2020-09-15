@@ -33,12 +33,30 @@ class Instance extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
-        'network_id',
+        'vpc_id',
     ];
 
     public function network()
     {
         return $this->belongsTo(Network::class);
+    }
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
+
+    public function scopeForUser($query, $user)
+    {
+        if (!empty($user->resellerId)) {
+            $query->whereHas('vpc', function ($query) use ($user) {
+                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($resellerId)) {
+                    $query->where('reseller_id', '=', $resellerId);
+                }
+            });
+        }
+        return $query;
     }
 
     /**
@@ -50,7 +68,7 @@ class Instance extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -66,7 +84,7 @@ class Instance extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('network_id'),
+            $factory->create('vpc_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -90,8 +108,8 @@ class Instance extends Model implements Filterable, Sortable
     {
         return [
             'id'         => 'id',
-            'name'         => 'name',
-            'network_id' => 'network_id',
+            'name'       => 'name',
+            'vpc_id'     => 'vpc_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

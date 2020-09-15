@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -14,21 +15,22 @@ class CreateTest extends TestCase
 
     protected $faker;
 
-    protected $network;
+    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->network = factory(Network::class)->create([
-            'name'    => 'Manchester Network',
+        Vpc::flushEventListeners();
+        $this->vpc = factory(Vpc::class)->create([
+            'name' => 'Manchester VPC',
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
         $data = [
-            'network_id' => $this->network->getKey(),
+            'vpc_id' => $this->vpc->getKey(),
         ];
         $this->post(
             '/v2/instances',
@@ -43,32 +45,10 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNetworkIdIsFailed()
-    {
-        $data = [
-            'network_id'    => '',
-        ];
-        $this->post(
-            '/v2/instances',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The network id field is required',
-                'status' => 422,
-                'source' => 'network_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testNotOwnedNetworkIdIsFailed()
     {
         $data = [
-            'network_id'    => $this->network->getKey(),
+            'vpc_id' => $this->vpc->getKey(),
         ];
         $this->post(
             '/v2/instances',
@@ -80,9 +60,9 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The specified network id was not found',
+                'detail' => 'The specified vpc id was not found',
                 'status' => 422,
-                'source' => 'network_id'
+                'source' => 'vpc_id'
             ])
             ->assertResponseStatus(422);
     }
@@ -91,7 +71,7 @@ class CreateTest extends TestCase
     {
         // No name defined - defaults to ID
         $data = [
-            'network_id' => $this->network->getKey(),
+            'vpc_id' => $this->vpc->getKey(),
         ];
         $this->post(
             '/v2/instances',
@@ -108,18 +88,18 @@ class CreateTest extends TestCase
             'id' => $id
         ])
             ->seeInDatabase(
-            'instances',
-            [
+                'instances',
+                [
                 'id' => $id,
                 'name' => $id,
-            ],
-            'ecloud'
-        );
+                ],
+                'ecloud'
+            );
 
         // Name defined
         $name = $this->faker->word();
         $data = [
-            'network_id' => $this->network->getKey(),
+            'vpc_id' => $this->vpc->getKey(),
             'name' => $name
         ];
 

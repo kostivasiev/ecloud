@@ -3,27 +3,10 @@ namespace App\Http\Requests\V2;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
-class UpdateInstanceRequest extends FormRequest
+class CreateVolumeRequest extends FormRequest
 {
-
-    protected $instanceId;
-
-    public function __construct(
-        array $query = [],
-        array $request = [],
-        array $attributes = [],
-        array $cookies = [],
-        array $files = [],
-        array $server = [],
-        $content = null
-    ) {
-        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
-        $this->instanceId = Request::route('instanceId');
-    }
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -41,18 +24,21 @@ class UpdateInstanceRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
-            'name'    => 'nullable|string',
+        return [
+            'name' => ['nullable', 'string'],
             'vpc_id' => [
-                'sometimes',
-                'nullable',
+                'required',
                 'string',
-                'exists:ecloud.vpcs,id',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
-            ]
+            ],
+            'capacity' => [
+                'required',
+                'integer',
+                'min:' . config('volume.capacity.min'),
+                'max:' . config('volume.capacity.max')
+            ],
         ];
-
-        return $rules;
     }
 
     /**
@@ -64,7 +50,9 @@ class UpdateInstanceRequest extends FormRequest
     {
         return [
             'vpc_id.required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
+            'vpc_id.exists' => 'The specified :attribute was not found',
+            'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
+            'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
         ];
     }
 }

@@ -31,7 +31,8 @@ class InstanceController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Instance::query();
+
+        $collection = Instance::forUser($request->user);
 
         $queryTransformer->config(Instance::class)
             ->transform($collection);
@@ -49,7 +50,7 @@ class InstanceController extends BaseController
     public function show(Request $request, string $instanceId)
     {
         return new InstanceResource(
-            Instance::findOrFail($instanceId)
+            Instance::forUser($request->user)->findOrFail($instanceId)
         );
     }
 
@@ -72,8 +73,8 @@ class InstanceController extends BaseController
      */
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
-        $instance = Instance::findOrFail($instanceId);
-        $instance->fill($request->only(['network_id', 'name']));
+        $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
+        $instance->fill($request->only(['vpc_id', 'name']));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
@@ -85,7 +86,7 @@ class InstanceController extends BaseController
      */
     public function destroy(Request $request, string $instanceId)
     {
-        $instance = Instance::findOrFail($instanceId);
+        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
         $instance->delete();
         return response()->json([], 204);
     }

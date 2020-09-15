@@ -8,7 +8,7 @@ class VirtualPrivateCloudsAddResellerId extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('vpcs', function($table) {
-            $table->bigInteger('reseller_id')->default('');
+            $table->bigInteger('reseller_id')->default(0);
         });
     }
 
