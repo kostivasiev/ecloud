@@ -29,6 +29,8 @@ components:
       $ref: 'components/schemas/admin/region.yaml'
     LoadBalancerCluster:
       $ref: 'components/schemas/lbc.yaml'
+    Nics:
+      $ref: 'components/schemas/nic.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
 
@@ -55,6 +57,8 @@ components:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallRuleId:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    NicId:
+      $ref: 'resources/Nic/parameters/nicId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
@@ -77,6 +81,8 @@ components:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
+    NicIdResponse:
+      $ref: 'resources/Nic/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
     RegionIdResponse:
@@ -101,3 +107,7 @@ paths:
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
     $ref: 'resources/LoadBalancerCluster/item.yaml'
+  '/ecloud/v2/nics':
+    $ref: 'resources/Nic/collection.yaml'
+  '/ecloud/v2/nics/{nicId}':
+    $ref: 'resources/Nic/item.yaml'
