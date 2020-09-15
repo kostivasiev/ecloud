@@ -43,7 +43,7 @@ class UpdateTest extends TestCase
             'name' => 'UpdateTest Default',
             'appliance_id' => $this->appliance_version->getKey(),
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 1,
+            'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ]);
     }
@@ -115,7 +115,7 @@ class UpdateTest extends TestCase
     public function testInvalidVcpuCountFails()
     {
         $data = [
-            'vcpu_count' => 0,
+            'vcpu_cores' => 0,
         ];
         $this->patch(
             '/v2/instances/' . $this->instance->getKey(),
@@ -127,9 +127,9 @@ class UpdateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The vcpu count field must be greater than or equal to one',
+                'detail' => 'The vcpu cores field must be greater than or equal to one',
                 'status' => 422,
-                'source' => 'vcpu_count'
+                'source' => 'vcpu_cores'
             ])
             ->assertResponseStatus(422);
     }

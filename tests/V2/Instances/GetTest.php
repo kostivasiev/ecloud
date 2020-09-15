@@ -44,7 +44,7 @@ class GetTest extends TestCase
             'name' => 'GetTest Default',
             'appliance_id' => $this->appliance_version->getKey(),
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 1,
+            'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ]);
     }

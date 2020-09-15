@@ -61,7 +61,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance_version->getKey(),
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 1,
+            'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
         $this->post(
@@ -87,7 +87,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->faker->uuid,
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 1,
+            'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
         $this->post(
@@ -113,7 +113,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance_version->getKey(),
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 0,
+            'vcpu_cores' => 0,
             'ram_capacity' => 1024,
         ];
         $this->post(
@@ -126,9 +126,9 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The vcpu count field must be greater than or equal to one',
+                'detail' => 'The vcpu cores field must be greater than or equal to one',
                 'status' => 422,
-                'source' => 'vcpu_count'
+                'source' => 'vcpu_cores'
             ])
             ->assertResponseStatus(422);
     }
@@ -139,7 +139,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance_version->getKey(),
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 1,
+            'vcpu_cores' => 1,
             'ram_capacity' => 1,
         ];
         $this->post(
@@ -166,7 +166,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance_version->getKey(),
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 1,
+            'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
         $this->post(
@@ -199,7 +199,7 @@ class CreateTest extends TestCase
             'name' => $name,
             'appliance_id' => $this->appliance_version->getKey(),
             'vcpu_tier' => $this->faker->uuid,
-            'vcpu_count' => 1,
+            'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
 

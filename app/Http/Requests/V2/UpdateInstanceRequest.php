@@ -52,7 +52,7 @@ class UpdateInstanceRequest extends FormRequest
             ],
             'appliance_id' => 'sometimes|required|uuid|exists:ecloud.appliance_version,appliance_version_uuid',
             'vcpu_tier' => 'sometimes|required|string', # needs exists: adding once tier has been added to db
-            'vcpu_count' => 'sometimes|required|numeric|min:1',
+            'vcpu_cores' => 'sometimes|required|numeric|min:1',
             'ram_capacity' => 'sometimes|required|numeric|min:1024',
         ];
 

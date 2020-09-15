@@ -12,7 +12,7 @@ use UKFast\Responses\UKFastResource;
  * @property string vpc_id
  * @property string appliance_id
  * @property string vcpu_tier
- * @property integer vcpu_count
+ * @property integer vcpu_cores
  * @property integer ram_capacity
  * @property string created_at
  * @property string updated_at
@@ -31,7 +31,7 @@ class InstanceResource extends UKFastResource
             'vpc_id'       => $this->vpc_id,
             'appliance_id' => $this->appliance_id,
             'vcpu_tier'    => $this->vcpu_tier,
-            'vcpu_count'   => $this->vcpu_count,
+            'vcpu_cores'   => $this->vcpu_count,
             'ram_capacity' => $this->ram_capacity,
             'created_at'   => Carbon::parse(
                 $this->created_at,
