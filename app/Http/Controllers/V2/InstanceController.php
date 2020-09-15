@@ -13,6 +13,7 @@ use App\Jobs\InstanceDeploy\RunBootstrapScript;
 use App\Jobs\InstanceDeploy\UpdateNetworkAdapter;
 use App\Jobs\InstanceDeploy\WaitOsCustomisation;
 use App\Models\V2\Instance;
+use App\Models\V2\Volume;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -93,9 +94,32 @@ class InstanceController extends BaseController
 
     public function deploy(Request $request, string $instanceId)
     {
-        $instance = Instance::findOrFail($instanceId);  // TODO :- User scope
+        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        if (!$instance) {
+            return response()->json([], 404);
+        }
 
-        $data = [];
+        if ($request->volume_id) {
+            $volume = Volume::forUser($request->user)->findOrFail($request->volume_id);
+            if (!$volume) {
+                return response()->json([], 404);
+            }
+        } else {
+            $volume = Volume::withoutEvents(function () use ($instance) {
+                $volume = new Volume();
+                $volume::addCustomKey($volume);
+                $volume->name = $volume->id;
+                $volume->vpc()->associate($instance->vpc);
+                $volume->save();
+                return $volume;
+            });
+        }
+
+        $data = [
+            'instance_id' => $instance->id,
+            'volume_id' => $volume->id,
+            'vpc_id' => $instance->vpc->id,
+        ];
 
         // Create the jobs for deployment
         $this->dispatch((new UpdateNetworkAdapter($data))->chain([
