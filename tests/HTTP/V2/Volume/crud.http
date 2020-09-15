@@ -31,6 +31,23 @@ client.log('VPC UUID: ' + response.body.data.id);
 %}
 ###
 
+POST https://{{host}}/{{version}}/vpcs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+X-Reseller-Id: 1
+
+{
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.global.set('vpc_id2', response.body.data.id);
+client.log('VPC 2 UUID: ' + response.body.data.id);
+%}
+###
 
 ## Test Resource CRUD
 
@@ -44,9 +61,8 @@ Content-Type: application/json
 
 {
   "name": "Test",
-  "availability_zone_id": "{{availability_zone_id}}",
   "vpc_id": "{{vpc_id}}",
-  "nodes": 3
+  "capacity": 25
 }
 
 > {%
@@ -54,13 +70,13 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 201, "Response status is not 200");
 });
 
-client.global.set('lbc_id', response.body.data.id);
-client.log('LBC ID: ' + response.body.data.id);
+client.global.set('volume_id', response.body.data.id);
+client.log('Volume ID: ' + response.body.data.id);
 %}
 
 ###
 
-GET https://{{host}}/{{version}}/lbcs
+GET https://{{host}}/{{version}}/volumes
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -74,7 +90,7 @@ client.test("Request executed successfully", function() {
 %}
 ###
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+GET https://ecloud-apio.paul.rnd.ukfast/v2/volumes/{{volume_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -84,13 +100,13 @@ Content-Type: application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.id === client.global.get('lbc_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
 });
 %}
 
 ###
 
-PATCH https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+PATCH https://ecloud-apio.paul.rnd.ukfast/v2/volumes/{{volume_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -99,21 +115,20 @@ Content-Type: application/json
 
 {
   "name": "Test - updated",
-  "availability_zone_id": "{{availability_zone_id_2}}",
-  "vpc_id": "{{vpc_id}}",
-  "nodes": 4
+  "vpc_id": "{{vpc_id2}}",
+  "capacity": 50
 }
 
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.id === client.global.get('lbc_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
 });
 %}
 ###
 
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+GET https://ecloud-apio.paul.rnd.ukfast/v2/volumes/{{volume_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -124,14 +139,14 @@ Content-Type: application/json
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.name === "Test - updated", "name property was not updated");
-  client.assert(response.body.data.nodes === 4, "nodes property was not updated");
-  client.assert(response.body.data.availability_zone_id === client.global.get('availability_zone_id_2'), "availability_zone_id property was not updated");
+  client.assert(response.body.data.capacity === 50, "capacity property was not updated");
+  client.assert(response.body.data.vpc_id === client.global.get('vpc_id2'), "vpc_id property was not updated");
 });
 %}
 
 ###
 
-DELETE https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+DELETE https://ecloud-apio.paul.rnd.ukfast/v2/volumes/{{volume_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -146,7 +161,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+GET https://ecloud-apio.paul.rnd.ukfast/v2/volumes/{{volume_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -170,21 +185,14 @@ X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 ###
-DELETE https://ecloud-apio.paul.rnd.ukfast/v2/availability_zones/{{availability_zone_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://ecloud-apio.paul.rnd.ukfast/v2/availability_zones/{{availability_zone_id_2}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
 DELETE https://ecloud-apio.paul.rnd.ukfast/v2/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+###
+DELETE https://ecloud-apio.paul.rnd.ukfast/v2/vpcs/{{vpc_id2}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

@@ -31,6 +31,7 @@ $app->configure('encryption');
 $app->configure('nsx');
 $app->configure('queue');
 $app->configure('erd-generator');
+$app->configure('volume');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
