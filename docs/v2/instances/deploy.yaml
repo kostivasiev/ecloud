@@ -1,0 +1,38 @@
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: string
+post:
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            volume_id:
+              required: false
+              type: string
+              example: 'vol-912345'
+            volume_capacity:
+              required: false
+              type: integer
+              example: 1
+            network_id:
+              required: false
+              type: string
+              example: 'net-912345'
+            floating_ip_id:
+              required: false
+              type: string
+              example: 'fip-912345'
+            appliance_data:
+              required: false
+              type: json
+              example: '{"key":"value"}'
+  responses:
+    202:
+      description: Success
+  tags:
+    - Instances
