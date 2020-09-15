@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../admin-openapi.yaml#/components/schemas/Nic'
+                $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
               meta:
                 type: object
   tags:
@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../admin-openapi.yaml#/components/schemas/Nic"
+            - $ref: "../../admin-openapi.yaml#/components/schemas/Nics"
   responses:
     200:
       $ref: '../../admin-openapi.yaml#/components/responses/NicIdResponse'

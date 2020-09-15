@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../admin-openapi.yaml#/components/schemas/Nic'
+                  $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
               meta:
                 allOf:
                   - $ref: "../../admin-openapi.yaml#/components/schemas/Meta"
@@ -40,7 +40,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../admin-openapi.yaml#/components/schemas/Nic'
+          $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
   responses:
     201:
       $ref: '../../admin-openapi.yaml#/components/responses/NicIdResponse'
