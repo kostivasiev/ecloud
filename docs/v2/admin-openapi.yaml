@@ -114,11 +114,10 @@ paths:
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
     $ref: 'resources/LoadBalancerCluster/item.yaml'
-
   '/ecloud/v2/volumes':
-    $ref: 'resources/Volume/collection.yaml'
+    $ref: 'resources/Volume/admin-collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
-    $ref: 'resources/Volume/item.yaml'
+    $ref: 'resources/Volume/admin-item.yaml'
 
 
 
