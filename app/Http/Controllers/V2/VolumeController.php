@@ -51,10 +51,11 @@ class VolumeController extends BaseController
      */
     public function store(CreateVolumeRequest $request)
     {
-        $router = new Volume($request->only(['name', 'vpc_id', 'capacity']));
-        $router->save();
-        $router->refresh();
-        return $this->responseIdMeta($request, $router->getKey(), 201);
+
+        $volume = new Volume($request->only(['name', 'vpc_id', 'capacity']));
+        $volume->save();
+        $volume->refresh();
+        return $this->responseIdMeta($request, $volume->getKey(), 201);
     }
 
     /**
