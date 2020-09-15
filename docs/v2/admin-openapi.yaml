@@ -29,7 +29,7 @@ components:
       $ref: 'components/schemas/admin/region.yaml'
     LoadBalancerCluster:
       $ref: 'components/schemas/lbc.yaml'
-    Nics:
+    Nic:
       $ref: 'components/schemas/nic.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
