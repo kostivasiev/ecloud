@@ -17,6 +17,7 @@ class CreateVolumesTable extends Migration
             $table->uuid('id')->primary();
             $table->string('name')->nullable();
             $table->uuid('vpc_id');
+            $table->uuid('availability_zone_id');
             $table->integer('capacity');
             $table->uuid('vmware_uuid')->nullable();
             $table->timestamps();

@@ -10,6 +10,7 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string vpc_id
+ * @property string availability_zone_id
  * @property string capacity
  * @property string vmware_uuid
  * @property string created_at
@@ -27,6 +28,7 @@ class VolumeResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
+            'availability_zone_id' => $this->availability_zone_id,
             'capacity' => $this->capacity,
             'created_at' => Carbon::parse(
                 $this->created_at,

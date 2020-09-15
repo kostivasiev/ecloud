@@ -1,8 +1,11 @@
 <?php
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\ExistsForVpc;
+use App\Rules\V2\IsValidAvailabilityZoneId;
 use UKFast\FormRequests\FormRequest;
 
 class CreateVolumeRequest extends FormRequest
@@ -31,6 +34,11 @@ class CreateVolumeRequest extends FormRequest
                 'string',
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
+            ],
+            'availability_zone_id' => [
+                'required',
+                'string',
+                'exists:ecloud.availability_zones,id,deleted_at,NULL',
             ],
             'capacity' => [
                 'required',

@@ -33,6 +33,12 @@ class UpdateVolumeRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
+            'availability_zone_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.availability_zones,id,deleted_at,NULL',
+            ],
             'capacity' => [
                 'sometimes',
                 'required',
