@@ -1,0 +1,29 @@
+properties:
+  id:
+    type: string
+    example: 'nic-2b66bb79'
+    readOnly: true
+  mac_address:
+    type: string
+    required: true
+    example: '3D:F2:C9:A6:B3:4F'
+    readOnly: false
+  instance_id:
+    type: string
+    required: true
+    example: 'i-2b66bb79'
+    readOnly: false
+  network_id:
+    type: string
+    required: true
+    example: 'net-2b66bb79'
+    readOnly: false
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Nics'
