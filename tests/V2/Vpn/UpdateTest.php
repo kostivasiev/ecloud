@@ -33,6 +33,12 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'code'               => 'TIM1',
+            'name'               => 'Tims Region 1',
+            'datacentre_site_id' => 1,
+            'region_id'          => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
@@ -46,7 +52,9 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $router = factory(Router::class)->create();
+        $router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+        ]);
 
         $vpn = factory(Vpn::class)->create([
             'router_id' => $router->id,
@@ -69,7 +77,9 @@ class UpdateTest extends TestCase
 
     public function testNullRouterIdIsDenied()
     {
-        $router = factory(Router::class)->create();
+        $router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+        ]);
         $vpn = factory(Vpn::class)->create([
             'router_id' => $router->id,
         ]);
@@ -112,7 +122,9 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $router = factory(Router::class)->create();
+        $router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+        ]);
         $vpn = factory(Vpn::class)->create([
             'router_id' => $router->id,
         ]);
