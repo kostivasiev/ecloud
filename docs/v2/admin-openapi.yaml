@@ -29,6 +29,17 @@ components:
       $ref: 'components/schemas/admin/region.yaml'
     LoadBalancerCluster:
       $ref: 'components/schemas/lbc.yaml'
+    Volume:
+      allOf:
+        - $ref: 'components/schemas/volume.yaml'
+        - type: object
+          properties:
+            vmware_uuid:
+              required: false
+              type: string
+              example: '03747ccf-d56b-45a9-b589-177f3cb9936e'
+    Nics:
+      $ref: 'components/schemas/nic.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
 
@@ -55,10 +66,14 @@ components:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallRuleId:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    NicId:
+      $ref: 'resources/Nic/parameters/nicId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
+    VolumeId:
+      $ref: 'resources/Volume/parameters/volumeId.yaml'
 
   responses:
     AvailabilityZoneResponse:
@@ -77,10 +92,14 @@ components:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
+    NicIdResponse:
+      $ref: 'resources/Nic/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
     RegionIdResponse:
       $ref: 'resources/Region/responses/idResponse.yaml'
+    VolumeIdResponse:
+      $ref: 'resources/Volume/responses/idResponse.yaml'
 
 paths:
   '/ecloud/v2/availability-zones':
@@ -101,3 +120,11 @@ paths:
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
     $ref: 'resources/LoadBalancerCluster/item.yaml'
+  '/ecloud/v2/volumes':
+    $ref: 'resources/Volume/admin-collection.yaml'
+  '/ecloud/v2/volumes/{volumeId}':
+    $ref: 'resources/Volume/admin-item.yaml'
+  '/ecloud/v2/nics':
+    $ref: 'resources/Nic/collection.yaml'
+  '/ecloud/v2/nics/{nicId}':
+    $ref: 'resources/Nic/item.yaml'
