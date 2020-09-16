@@ -3,6 +3,7 @@
 namespace Tests\V2\Network;
 
 use App\Events\V2\NetworkCreated;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
 use Illuminate\Support\Facades\Event;
@@ -22,12 +23,19 @@ class CreateTest extends TestCase
     private $vpc;
 
     protected $router;
+    protected $availability_zone;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'code'               => 'TIM1',
+            'name'               => 'Tims Region 1',
+            'datacentre_site_id' => 1,
+            'region_id'          => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
