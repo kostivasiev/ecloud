@@ -26,6 +26,14 @@ patch:
           type: object
           allOf:
             - $ref: "../../admin-openapi.yaml#/components/schemas/Nics"
+            - type: object
+              properties:
+                mac_address:
+                  required: false
+                instance_id:
+                  required: false
+                network_id:
+                  required: false
   responses:
     200:
       $ref: '../../admin-openapi.yaml#/components/responses/NicIdResponse'
