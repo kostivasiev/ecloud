@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/AvailabilityZoneId.yaml'
+    - $ref: '../../public-openapi.yaml#/components/parameters/AvailabilityZoneId'
   responses:
     200:
       description: success
@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: 'schemas/AvailabilityZone.yaml'
+                $ref: '../../public-openapi.yaml#/components/schemas/AvailabilityZone'
               meta:
                 type: object
   tags:

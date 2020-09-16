@@ -1,7 +1,7 @@
 get:
   parameters:
-    - $ref: 'parameters/PerPage.yaml'
-    - $ref: 'parameters/Page.yaml'
+    - $ref: '../../public-openapi.yaml#/components/parameters/PerPage'
+    - $ref: '../../public-openapi.yaml#/components/parameters/Page'
   responses:
     200:
       description: Success
@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: 'schemas/Dhcp.yaml'
+                  $ref: '../../public-openapi.yaml#/components/schemas/Dhcp'
               meta:
                 allOf:
                   - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
@@ -40,9 +40,9 @@ post:
     content:
       application/json:
         schema:
-          $ref: 'schemas/Dhcp.yaml'
+          $ref: '../../public-openapi.yaml#/components/schemas/Dhcp'
   responses:
     201:
-      $ref: 'responses/DhcpIdResponse.yaml'
+      $ref: '../../public-openapi.yaml#/components/responses/DhcpIdResponse'
   tags:
     - Dhcps

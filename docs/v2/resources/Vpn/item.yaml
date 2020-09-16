@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/VpnId.yaml'
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: 'schemas/Vpn.yaml'
+                $ref: '../../public-openapi.yaml#/components/schemas/Vpn'
               meta:
                 type: object
   tags:
     - Vpns
 patch:
   parameters:
-    - $ref: 'parameters/VpnId.yaml'
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnId'
   requestBody:
     required: true
     content:
@@ -32,12 +32,12 @@ patch:
                   required: false
   responses:
     200:
-      $ref: 'responses/VpnIdResponse.yaml'
+      $ref: '../../public-openapi.yaml#/components/responses/VpnIdResponse'
   tags:
     - Vpns
 delete:
   parameters:
-    - $ref: 'parameters/VpnId.yaml'
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnId'
   responses:
     204:
       description: Success

@@ -1,7 +1,7 @@
 get:
   parameters:
-    - $ref: 'parameters/PerPage.yaml'
-    - $ref: 'parameters/Page.yaml'
+    - $ref: '../../public-openapi.yaml#/components/parameters/PerPage'
+    - $ref: '../../public-openapi.yaml#/components/parameters/Page'
   responses:
     200:
       description: Success
