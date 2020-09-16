@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Router;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -25,6 +26,12 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
+        factory(AvailabilityZone::class)->create([
+            'code'               => 'TIM1',
+            'name'               => 'Tims Region 1',
+            'datacentre_site_id' => 1,
+            'region_id'          => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);

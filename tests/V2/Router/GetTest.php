@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Router;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -25,6 +26,12 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create();
+        factory(AvailabilityZone::class)->create([
+            'code'               => 'TIM1',
+            'name'               => 'Tims Region 1',
+            'datacentre_site_id' => 1,
+            'region_id'          => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
