@@ -49,7 +49,7 @@ class UpdateTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $this->patch('/v2/networks/' . $this->network->getKey(),[
+        $this->patch('/v2/networks/' . $this->network->getKey(), [
             'name' => 'Manchester Network',
         ])->seeJson([
             'title'  => 'Unauthorised',
@@ -94,7 +94,7 @@ class UpdateTest extends TestCase
     {
         $this->vpc->reseller_id = 3;
         $this->vpc->save();
-        $this->patch('/v2/networks/' . $this->network->getKey(),[
+        $this->patch('/v2/networks/' . $this->network->getKey(), [
             'name' => 'Manchester Network',
             'router_id' => $this->router->getKey()
         ], [
