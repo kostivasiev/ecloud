@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/VpcId'
+    - $ref: 'parameters/VpcId.yaml'
   responses:
     200:
       description: success
@@ -10,23 +10,23 @@ get:
             type: object
             properties:
               data:
-                $ref: 'schemas/VirtualPrivateCloud'
+                $ref: 'schemas/VirtualPrivateCloud.yaml'
               meta:
                 type: object
   tags:
     - VirtualPrivateClouds
 patch:
   parameters:
-    - $ref: 'parameters/VpcId'
+    - $ref: 'parameters/VpcId.yaml'
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: 'schemas/VirtualPrivateCloud'
+          $ref: 'schemas/VirtualPrivateCloud.yaml'
   responses:
     200:
-      $ref: 'responses/VirtualPrivateCloudsIdResponse'
+      $ref: 'responses/VirtualPrivateCloudsIdResponse.yaml'
   tags:
     - VirtualPrivateClouds
 delete:
@@ -34,6 +34,6 @@ delete:
     204:
       description: Success
   parameters:
-    - $ref: 'parameters/VpcId'
+    - $ref: 'parameters/VpcId.yaml'
   tags:
     - VirtualPrivateClouds

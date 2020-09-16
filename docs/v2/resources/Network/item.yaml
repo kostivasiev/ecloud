@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/NetworkId'
+    - $ref: 'parameters/NetworkId.yaml'
   responses:
     200:
       description: success
@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: 'schemas/Network'
+                $ref: 'schemas/Network.yaml'
               meta:
                 type: object
   tags:
@@ -18,7 +18,7 @@ get:
 
 patch:
   parameters:
-    - $ref: 'parameters/NetworkId'
+    - $ref: 'parameters/NetworkId.yaml'
   requestBody:
     required: true
     content:
@@ -26,7 +26,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "schemas/Network"
+            - $ref: "../../public-openapi.yaml#/components/schemas/Network"
             - type: object
               properties:
                 name:
@@ -35,13 +35,13 @@ patch:
                   required: false
   responses:
     200:
-      $ref: 'responses/NetworksIdResponse'
+      $ref: 'responses/NetworksIdResponse.yaml'
   tags:
     - Networks
 
 delete:
   parameters:
-    - $ref: 'parameters/NetworkId'
+    - $ref: 'parameters/NetworkId.yaml'
   responses:
     204:
       description: Success

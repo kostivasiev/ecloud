@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/InstanceId'
+    - $ref: 'parameters/InstanceId.yaml'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: 'schemas/Instance'
+                $ref: 'schemas/Instance.yaml'
               meta:
                 type: object
   tags:
     - Instances
 patch:
   parameters:
-    - $ref: 'parameters/InstanceId'
+    - $ref: 'parameters/InstanceId.yaml'
   requestBody:
     required: true
     content:
@@ -25,15 +25,15 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "schemas/Instance"
+            - $ref: "../../public-openapi.yaml#/components/schemas/Instance"
   responses:
     200:
-      $ref: 'responses/InstanceIdResponse'
+      $ref: 'responses/InstanceIdResponse.yaml'
   tags:
     - Instances
 delete:
   parameters:
-    - $ref: 'parameters/InstanceId'
+    - $ref: 'parameters/InstanceId.yaml'
   responses:
     204:
       description: Success

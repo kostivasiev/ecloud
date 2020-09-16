@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/RouterId'
+    - $ref: 'parameters/RouterId.yaml'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: 'schemas/Router'
+                $ref: 'schemas/Router.yaml'
               meta:
                 type: object
   tags:
     - Routers
 patch:
   parameters:
-    - $ref: 'parameters/RouterId'
+    - $ref: 'parameters/RouterId.yaml'
   requestBody:
     required: true
     content:
@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "schemas/Router"
+            - $ref: "../../public-openapi.yaml#/components/schemas/Router"
             - type: object
               properties:
                 name:
@@ -36,12 +36,12 @@ patch:
                   required: false
   responses:
     200:
-      $ref: 'responses/RouterIdResponse'
+      $ref: 'responses/RouterIdResponse.yaml'
   tags:
     - Routers
 delete:
   parameters:
-    - $ref: 'parameters/RouterId'
+    - $ref: 'parameters/RouterId.yaml'
   responses:
     204:
       description: Success

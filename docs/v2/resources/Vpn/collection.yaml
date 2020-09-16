@@ -1,7 +1,7 @@
 get:
   parameters:
-    - $ref: 'parameters/PerPage'
-    - $ref: 'parameters/Page'
+    - $ref: 'parameters/PerPage.yaml'
+    - $ref: 'parameters/Page.yaml'
   responses:
     200:
       description: Success
@@ -13,10 +13,10 @@ get:
               data:
                 type: array
                 items:
-                  $ref: 'schemas/Vpn'
+                  $ref: 'schemas/Vpn.yaml'
               meta:
                 allOf:
-                  - $ref: "schemas/Meta"
+                  - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
                   - type: object
                     properties:
                       pagination:
@@ -40,9 +40,9 @@ post:
     content:
       application/json:
         schema:
-          $ref: 'schemas/Vpn'
+          $ref: 'schemas/Vpn.yaml'
   responses:
     201:
-      $ref: 'responses/VpnIdResponse'
+      $ref: 'responses/VpnIdResponse.yaml'
   tags:
     - Vpns
