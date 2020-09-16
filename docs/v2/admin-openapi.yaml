@@ -38,6 +38,8 @@ components:
               required: false
               type: string
               example: '03747ccf-d56b-45a9-b589-177f3cb9936e'
+    Nics:
+      $ref: 'components/schemas/nic.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
 
@@ -64,6 +66,8 @@ components:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallRuleId:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    NicId:
+      $ref: 'resources/Nic/parameters/nicId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
@@ -88,6 +92,8 @@ components:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
+    NicIdResponse:
+      $ref: 'resources/Nic/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
     RegionIdResponse:
@@ -118,6 +124,7 @@ paths:
     $ref: 'resources/Volume/admin-collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/admin-item.yaml'
-
-
-
+  '/ecloud/v2/nics':
+    $ref: 'resources/Nic/collection.yaml'
+  '/ecloud/v2/nics/{nicId}':
+    $ref: 'resources/Nic/item.yaml'
