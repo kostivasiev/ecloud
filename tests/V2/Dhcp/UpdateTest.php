@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Dhcp;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -14,24 +15,35 @@ class UpdateTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
+    protected $availability_zone;
+    protected $region;
+    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->region = factory(Region::class)->create([
+            'name' => $this->faker->country(),
+        ]);
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'code'               => 'TIM1',
+            'name'               => 'Tims Region 1',
+            'datacentre_site_id' => 1,
+            'region_id'          => $this->region->getKey(),
+        ]);
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey(),
+        ])->refresh();
     }
 
     public function testNoPermsIsDenied()
     {
-        $this->region = factory(Region::class)->create();
-        $vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
         $dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $vpc->id,
+            'vpc_id' => $this->vpc->id,
         ]);
         $data = [
-            'vpc_id' => $vpc->id,
+            'vpc_id' => $this->vpc->id,
         ];
         $this->patch(
             '/v2/dhcps/' . $dhcp->getKey(),
@@ -48,12 +60,8 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $this->region = factory(Region::class)->create();
-        $vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
         $dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $vpc->id,
+            'vpc_id' => $this->vpc->id,
         ]);
         $data = [
             'vpc_id'    => '',
@@ -77,17 +85,12 @@ class UpdateTest extends TestCase
 
     public function testNotOwnedVpcIsFailed()
     {
-        $this->region = factory(Region::class)->create();
-        $vpc = factory(Vpc::class)->create([
-            'reseller_id' => 1,
-            'region_id' => $this->region->getKey()
-        ]);
         $vpc2 = factory(Vpc::class)->create([
             'reseller_id' => 3,
             'region_id' => $this->region->getKey()
         ]);
         $dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $vpc->id,
+            'vpc_id' => $this->vpc->id,
         ]);
         $data = [
             'vpc_id'    => $vpc2->getKey(),
@@ -111,16 +114,11 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $this->region = factory(Region::class)->create();
-        $vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-
         $dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $vpc->id,
+            'vpc_id' => $this->vpc->id,
         ]);
         $data = [
-            'vpc_id' => $vpc->id,
+            'vpc_id' => $this->vpc->id,
         ];
         $this->patch(
             '/v2/dhcps/' . $dhcp->getKey(),

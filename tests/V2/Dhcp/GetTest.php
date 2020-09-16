@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Dhcp;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -21,12 +22,20 @@ class GetTest extends TestCase
     /** @var Dhcp */
     private $dhcp;
 
+    protected $availability_zone;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
+        ]);
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'code'               => 'TIM1',
+            'name'               => 'Tims Region 1',
+            'datacentre_site_id' => 1,
+            'region_id'          => $this->region->getKey(),
         ]);
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
