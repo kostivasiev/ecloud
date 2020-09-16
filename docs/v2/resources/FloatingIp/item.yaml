@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FipId'
+    - $ref: 'parameters/FipId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/FloatingIP'
+                $ref: 'schemas/FloatingIP'
               meta:
                 type: object
   tags:
     - Floating IPs
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FipId'
+    - $ref: 'parameters/FipId'
   requestBody:
     required: true
     content:
@@ -25,15 +25,15 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/FloatingIP"
+            - $ref: "schemas/FloatingIP"
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/FipIdResponse'
+      $ref: 'responses/FipIdResponse'
   tags:
     - Floating IPs
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FipId'
+    - $ref: 'parameters/FipId'
   responses:
     204:
       description: Success

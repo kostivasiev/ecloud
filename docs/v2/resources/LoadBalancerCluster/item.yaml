@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/LbcId'
+    - $ref: 'parameters/LbcId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancerCluster'
+                $ref: 'schemas/LoadBalancerCluster'
               meta:
                 type: object
   tags:
     - Load Balancer Clusters
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/LbcId'
+    - $ref: 'parameters/LbcId'
   requestBody:
     required: true
     content:
@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/LoadBalancerCluster"
+            - $ref: "schemas/LoadBalancerCluster"
             - type: object
               properties:
                 vpc_id:
@@ -34,12 +34,12 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/LbcIdResponse'
+      $ref: 'responses/LbcIdResponse'
   tags:
     - Load Balancer Clusters
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/LbcId'
+    - $ref: 'parameters/LbcId'
   responses:
     204:
       description: Success

@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/volumeId.yaml'
+    - $ref: 'parameters/VolumeId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/Volume'
+                $ref: 'schemas/Volume'
               meta:
                 type: object
   tags:
     - Volumes
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: 'parameters/VolumeId'
   requestBody:
     required: true
     content:
@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/Volume"
+            - $ref: "schemas/Volume"
             - type: object
               properties:
                 vpc_id:
@@ -34,12 +34,12 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/VolumeIdResponse'
+      $ref: 'responses/VolumeIdResponse'
   tags:
     - Volumes
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: 'parameters/VolumeId'
   responses:
     204:
       description: Success

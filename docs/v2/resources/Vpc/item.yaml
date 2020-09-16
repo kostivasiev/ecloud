@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+    - $ref: 'parameters/VpcId'
   responses:
     200:
       description: success
@@ -10,23 +10,23 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/VirtualPrivateCloud'
+                $ref: 'schemas/VirtualPrivateCloud'
               meta:
                 type: object
   tags:
     - VirtualPrivateClouds
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+    - $ref: 'parameters/VpcId'
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../../public-openapi.yaml#/components/schemas/VirtualPrivateCloud'
+          $ref: 'schemas/VirtualPrivateCloud'
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/VirtualPrivateCloudsIdResponse'
+      $ref: 'responses/VirtualPrivateCloudsIdResponse'
   tags:
     - VirtualPrivateClouds
 delete:
@@ -34,6 +34,6 @@ delete:
     204:
       description: Success
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+    - $ref: 'parameters/VpcId'
   tags:
     - VirtualPrivateClouds

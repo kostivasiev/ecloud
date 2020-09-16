@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallRuleId'
+    - $ref: 'parameters/FirewallRuleId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/FirewallRule'
+                $ref: 'schemas/FirewallRule'
               meta:
                 type: object
   tags:
     - Firewall Rules
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallRuleId'
+    - $ref: 'parameters/FirewallRuleId'
   requestBody:
     required: true
     content:
@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/FirewallRule"
+            - $ref: "schemas/FirewallRule"
             - type: object
               properties:
                 name:
@@ -34,12 +34,12 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/FirewallRuleIdResponse'
+      $ref: 'responses/FirewallRuleIdResponse'
   tags:
     - Firewall Rules
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallRuleId'
+    - $ref: 'parameters/FirewallRuleId'
   responses:
     204:
       description: Success

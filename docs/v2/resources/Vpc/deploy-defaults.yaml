@@ -3,6 +3,6 @@ post:
     202:
       description: Success
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+    - $ref: 'parameters/VpcId'
   tags:
     - VirtualPrivateClouds
