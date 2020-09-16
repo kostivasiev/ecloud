@@ -99,8 +99,16 @@ class InstanceController extends BaseController
             return response()->json([], 404);
         }
 
-        if ($request->volume_id) {
-            $volume = Volume::forUser($request->user)->findOrFail($request->volume_id);
+        {
+            "volume_id": "vol-912345",
+  "volume_capacity": 1,
+  "network_id": "net-912345",
+  "floating_ip_id": "fip-912345",
+  "appliance_data": "{\"key\":\"value\"}"
+}
+
+        if ($request->input('volume_id')) {
+            $volume = Volume::forUser($request->user)->findOrFail($request->input('volume_id'));
             if (!$volume) {
                 return response()->json([], 404);
             }
@@ -119,6 +127,7 @@ class InstanceController extends BaseController
             'instance_id' => $instance->id,
             'volume_id' => $volume->id,
             'vpc_id' => $instance->vpc->id,
+            $request->input('blah')
         ];
 
         // Create the jobs for deployment
