@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallRule;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -22,6 +23,7 @@ class CreateTest extends TestCase
      * @var Router
      */
     private $router;
+    protected $availability_zone;
 
     /**
      * @var \Faker\Generator
@@ -34,6 +36,12 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'code'               => 'TIM1',
+            'name'               => 'Tims Region 1',
+            'datacentre_site_id' => 1,
+            'region_id'          => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
