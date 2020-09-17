@@ -139,6 +139,16 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('nics/{nicId}', 'NicController@update');
         $router->delete('nics/{nicId}', 'NicController@destroy');
     });
+
+    /** Credentials */
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('credentials', 'CredentialsController@index');
+        $router->get('credentials/{credentialsId}', 'CredentialsController@show');
+        $router->post('credentials', 'CredentialsController@store');
+        $router->patch('credentials/{credentialsId}', 'CredentialsController@update');
+        $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
+
+    });
 });
 
 
