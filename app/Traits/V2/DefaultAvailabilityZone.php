@@ -21,12 +21,13 @@ trait DefaultAvailabilityZone
         if (empty($instance->availability_zone_id)) {
             $availabilityZone = Vpc::forUser(app('request')->user)
                 ->findOrFail($instance->vpc_id)
-                ->region()
-                ->first()
-                ->availabilityZones()
+                ->region
+                ->availabilityZones
                 ->first();
-            $instance->availability_zone_id = $availabilityZone->getKey();
-            $instance->save();
+            if ($availabilityZone) {
+                $instance->availability_zone_id = $availabilityZone->getKey();
+                $instance->save();
+            }
         }
     }
 }
