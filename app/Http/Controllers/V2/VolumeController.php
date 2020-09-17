@@ -5,8 +5,10 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
 use App\Models\V2\Volume;
+use App\Models\V2\Vpc;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -47,12 +49,30 @@ class VolumeController extends BaseController
 
     /**
      * @param CreateVolumeRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|Response
      */
     public function store(CreateVolumeRequest $request)
     {
+        $availabilityZone = Vpc::forUser(app('request')->user)
+            ->findOrFail($request->vpc_id)
+            ->region
+            ->availabilityZones
+            ->first(function ($availabilityZone) use ($request) {
+                return $availabilityZone->id == $request->availability_zone_id;
+            });
 
-        $volume = new Volume($request->only(['name', 'vpc_id', 'capacity']));
+        if (!$availabilityZone) {
+            return Response::create([
+                'errors' => [
+                    'title' => 'Not Found',
+                    'detail' => 'The specified availability zone is not available to that VPC',
+                    'status' => 404,
+                    'source' => 'availability_zone_id'
+                ]
+            ], 404);
+        }
+
+        $volume = new Volume($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity']));
         $volume->save();
         $volume->refresh();
         return $this->responseIdMeta($request, $volume->getKey(), 201);
@@ -61,18 +81,39 @@ class VolumeController extends BaseController
     /**
      * @param UpdateVolumeRequest $request
      * @param string $volumeId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|Response
      */
     public function update(UpdateVolumeRequest $request, string $volumeId)
     {
-        $router = Volume::forUser(app('request')->user)->findOrFail($volumeId);
-        $only = ['name', 'vpc_id', 'capacity'];
+        $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
+        if ($request->has('availability_zone_id')) {
+            $availabilityZone = Vpc::forUser(app('request')->user)
+                ->findOrFail($request->input('vpc_id', $volume->vpc_id))
+                ->region
+                ->availabilityZones
+                ->first(function ($availabilityZone) use ($request) {
+                    return $availabilityZone->id == $request->availability_zone_id;
+                });
+
+            if (!$availabilityZone) {
+                return Response::create([
+                    'errors' => [
+                        'title' => 'Not Found',
+                        'detail' => 'The specified availability zone is not available to that VPC',
+                        'status' => 404,
+                        'source' => 'availability_zone_id'
+                    ]
+                ], 404);
+            }
+        }
+
+        $only = ['name', 'vpc_id', 'capacity', 'availability_zone_id'];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }
-        $router->fill($request->only($only));
-        $router->save();
-        return $this->responseIdMeta($request, $router->getKey(), 200);
+        $volume->fill($request->only($only));
+        $volume->save();
+        return $this->responseIdMeta($request, $volume->getKey(), 200);
     }
 
     /**

@@ -13,6 +13,27 @@ client.global.set('region_id', response.body.data.id);
 client.log('Region ID: ' + response.body.data.id);
 %}
 ###
+
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "code": "MAN1",
+  "name": "Test availability zone (v)",
+  "datacentre_site_id": 111,
+  "nsx_manager_endpoint": "https://185.197.63.88/",
+  "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.global.set('availability_zone_id', response.body.data.id);
+client.log('Availability Zone ID: ' + response.body.data.id);
+%}
+
+###
 POST https://{{host}}/{{version}}/vpcs
 Accept: */*
 Cache-Control: no-cache
@@ -62,7 +83,8 @@ Content-Type: application/json
 {
   "name": "Test",
   "vpc_id": "{{vpc_id}}",
-  "capacity": 25
+  "capacity": 25,
+  "availability_zone_id": "{{availability_zone_id}}"
 }
 
 > {%

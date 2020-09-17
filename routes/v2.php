@@ -123,7 +123,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('lbcs/{lbcId}', 'LoadBalancerClusterController@destroy');
     });
 
-
     /** Volumes */
     $router->group([], function () use ($router) {
         $router->get('volumes', 'VolumeController@index');
@@ -131,6 +130,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('volumes', 'VolumeController@store');
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
+    });
+    
+    /** Nics */
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('nics', 'NicController@index');
+        $router->get('nics/{nicId}', 'NicController@show');
+        $router->post('nics', 'NicController@create');
+        $router->patch('nics/{nicId}', 'NicController@update');
+        $router->delete('nics/{nicId}', 'NicController@destroy');
     });
 });
 

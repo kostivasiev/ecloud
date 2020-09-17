@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Volume;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -17,7 +18,15 @@ class GetTest extends TestCase
 
     protected $vpc;
 
-    protected $router;
+    /**
+     * @var AvailabilityZone
+     */
+    private $availabilityZone;
+
+    /**
+     * @var Volume
+     */
+    protected $volume;
 
     public function setUp(): void
     {
@@ -25,6 +34,11 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create();
+
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
+
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
@@ -32,7 +46,8 @@ class GetTest extends TestCase
 
         $this->volume = factory(Volume::class)->create([
             'name'       => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
         ]);
     }
     
@@ -49,6 +64,7 @@ class GetTest extends TestCase
                 'id'         => $this->volume->getKey(),
                 'name'       => $this->volume->name,
                 'vpc_id'       => $this->volume->vpc_id,
+                'availability_zone_id' => $this->volume->availability_zone_id,
                 'capacity'       => $this->volume->capacity,
             ])
             ->assertResponseStatus(200);
@@ -66,7 +82,8 @@ class GetTest extends TestCase
             ->seeJson([
                 'id'         => $this->volume->id,
                 'name'       => $this->volume->name,
-                'vpc_id'       => $this->volume->vpc_id
+                'vpc_id'       => $this->volume->vpc_id,
+                'availability_zone_id' => $this->volume->availability_zone_id
             ])
             ->dontSeeJson(
                 [
@@ -89,6 +106,7 @@ class GetTest extends TestCase
                 'id'         => $this->volume->id,
                 'name'       => $this->volume->name,
                 'vpc_id'       => $this->volume->vpc_id,
+                'availability_zone_id' => $this->volume->availability_zone_id,
                 'vmware_uuid' => '03747ccf-d56b-45a9-b589-177f3cb9936e'
             ])
             ->assertResponseStatus(200);

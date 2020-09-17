@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Volume;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -15,6 +16,11 @@ class CreateTest extends TestCase
     /** @var Region */
     private $region;
 
+    /**
+     * @var AvailabilityZone
+     */
+    private $availabilityZone;
+
     /** @var Vpc */
     private $vpc;
 
@@ -26,6 +32,9 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -39,6 +48,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Volume 1',
             'vpc_id' => 'x',
+            'availability_zone_id' => $this->availabilityZone->getKey()
         ];
 
         $this->post(
@@ -63,6 +73,7 @@ class CreateTest extends TestCase
         $data = [
             'name'    => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
         ];
 
         $this->post(
@@ -82,11 +93,44 @@ class CreateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
+
+    public function testInvalidAzIsFailed()
+    {
+        $region = factory(Region::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $region->getKey()
+        ]);
+
+        $data = [
+            'name'    => 'Volume 1',
+            'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $availabilityZone->getKey(),
+            'capacity' => (config('volume.capacity.min')+1),
+        ];
+
+        $this->post(
+            '/v2/volumes',
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title'  => 'Not Found',
+                'detail' => 'The specified availability zone is not available to that VPC',
+                'status' => 404,
+                'source' => 'availability_zone_id'
+            ])
+            ->assertResponseStatus(404);
+    }
+
     public function testMinCapacityValidation()
     {
         $data = [
             'name'    => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.min')-1),
         ];
 
@@ -112,6 +156,7 @@ class CreateTest extends TestCase
         $data = [
             'name'    => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.max')+1),
         ];
 
@@ -137,6 +182,7 @@ class CreateTest extends TestCase
         $data = [
             'name'    => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.min')+1),
         ];
 
