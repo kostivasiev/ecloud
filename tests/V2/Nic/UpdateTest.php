@@ -2,9 +2,11 @@
 
 namespace Tests\V2\Nic;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -14,11 +16,13 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    protected \Faker\Generator $faker;
+    protected $availability_zone;
     protected $instance;
-    protected $network;
     protected $macAddress;
+    protected $network;
     protected $nic;
+    protected $region;
     protected $vpc;
 
     public function setUp(): void
@@ -26,9 +30,13 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
         $this->macAddress = $this->faker->macAddress;
+        $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         Vpc::flushEventListeners();
         $this->vpc = factory(Vpc::class)->create([
-            'name' => 'Manchester VPC',
+            'region_id' => $this->region->getKey()
         ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
@@ -43,80 +51,13 @@ class UpdateTest extends TestCase
         ])->refresh();
     }
 
-    public function testNoPermIsDenied()
-    {
-        $data = [
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance->getKey(),
-            'network_id'  => $this->network->getKey(),
-        ];
-        $this->patch(
-            '/v2/nics/' . $this->nic->getKey(),
-            $data,
-            []
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
-    public function testNoWritePermIsDenied()
-    {
-        $data = [
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance->getKey(),
-            'network_id'  => $this->network->getKey(),
-        ];
-        $this->patch(
-            '/v2/nics/' . $this->nic->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups'    => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Forbidden',
-                'detail' => 'Forbidden',
-                'status' => 403,
-            ])
-            ->assertResponseStatus(403);
-    }
-
-    public function testNoAdminIsDenied()
-    {
-        $data = [
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance->getKey(),
-            'network_id'  => $this->network->getKey(),
-        ];
-        $this->patch(
-            '/v2/nics/' . $this->nic->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
     public function testInvalidMacAddressFails()
     {
-        $data = [
-            'mac_address' => 'INVALID_MAC_ADDRESS',
-        ];
         $this->patch(
             '/v2/nics/' . $this->nic->getKey(),
-            $data,
+            [
+                'mac_address' => 'INVALID_MAC_ADDRESS',
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.write',
@@ -132,12 +73,11 @@ class UpdateTest extends TestCase
 
     public function testInvalidInstanceIdFails()
     {
-        $data = [
-            'instance_id' => 'INVALID_INSTANCE_ID',
-        ];
         $this->patch(
             '/v2/nics/' . $this->nic->getKey(),
-            $data,
+            [
+                'instance_id' => 'INVALID_INSTANCE_ID',
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.write',
@@ -153,12 +93,11 @@ class UpdateTest extends TestCase
 
     public function testInvalidNetworkIdFails()
     {
-        $data = [
-            'network_id'  => 'INVALID_NETWORK_ID',
-        ];
         $this->patch(
             '/v2/nics/' . $this->nic->getKey(),
-            $data,
+            [
+                'network_id' => 'INVALID_NETWORK_ID',
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.write',
@@ -174,20 +113,13 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $newInstance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-        ])->refresh();
-        $newNetwork = factory(Network::class)->create([
-            'name' => 'Manchester Network',
-        ])->refresh();
-        $data = [
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $newInstance->getKey(),
-            'network_id'  => $newNetwork->getKey(),
-        ];
         $this->post(
             '/v2/nics',
-            $data,
+            [
+                'mac_address' => $this->macAddress,
+                'instance_id' => $this->instance->getKey(),
+                'network_id'  => $this->network->getKey(),
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.write',
