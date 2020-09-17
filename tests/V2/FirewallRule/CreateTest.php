@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallRule;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -13,20 +14,11 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /**
-     * @var Vpc
-     */
-    private $vpc;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    /**
-     * @var \Faker\Generator
-     */
     protected $faker;
+    protected $vpc;
+    protected $router;
+    protected $availability_zone;
+    protected $region;
 
     public function setUp(): void
     {
@@ -34,26 +26,26 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'region_id'          => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
-            'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
         ]);
 
         $this->router = factory(Router::class)->create([
-            'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
         ]);
     }
 
     public function testNotOwnedRouterIsFailed()
     {
-        $data = [
-            'name' => 'Demo firewall rule 1',
-            'router_id' => $this->router->getKey()
-        ];
         $this->post(
             '/v2/firewall-rules',
-            $data,
+            [
+                'name' => 'Demo firewall rule 1',
+                'router_id' => $this->router->getKey()
+            ],
             [
                 'X-consumer-custom-id' => '2-0',
                 'X-consumer-groups'    => 'ecloud.write',
@@ -70,13 +62,12 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $data = [
-            'name' => 'Demo firewall rule 1',
-            'router_id' => $this->router->getKey()
-        ];
         $this->post(
             '/v2/firewall-rules',
-            $data,
+            [
+                'name' => 'Demo firewall rule 1',
+                'router_id' => $this->router->getKey()
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.write',
