@@ -46,14 +46,13 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $data = [
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance->getKey(),
-            'network_id'  => $this->network->getKey(),
-        ];
         $this->post(
             '/v2/nics',
-            $data,
+            [
+                'mac_address' => $this->faker->macAddress,
+                'instance_id' => $this->instance->getKey(),
+                'network_id'  => $this->network->getKey(),
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.write',
