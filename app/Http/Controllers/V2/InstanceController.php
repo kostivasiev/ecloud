@@ -52,7 +52,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateInstanceRequest $request)
     {
-        $instance = new Instance($request->only(['network_id', 'name']));
+        $instance = new Instance($request->only(['network_id', 'name', 'vpc_id', 'availability_zone_id']));
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
