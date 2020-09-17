@@ -27,9 +27,6 @@ class DefaultAvailabilityZoneTest extends TestCase
             'name'    => $this->faker->country(),
         ]);
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'code'               => 'TIM1',
-            'name'               => 'Tims Region 1',
-            'datacentre_site_id' => 1,
             'region_id'          => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
@@ -39,19 +36,12 @@ class DefaultAvailabilityZoneTest extends TestCase
 
     public function testCreateDhcpWithAvailabilityZone()
     {
-        $az = factory(AvailabilityZone::class)->create([
-            'code'               => 'UTEST-1',
-            'name'               => 'Unit Test Region 1',
-            'datacentre_site_id' => 1,
-            'region_id'          => $this->region->getKey(),
-        ])->refresh();
-        $data = [
-            'vpc_id'               => $this->vpc->getKey(),
-            'availability_zone_id' => $az->getKey(),
-        ];
         $this->post(
             '/v2/dhcps',
-            $data,
+            [
+                'vpc_id'               => $this->vpc->getKey(),
+                'availability_zone_id' => $this->availability_zone->getKey(),
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
@@ -61,17 +51,16 @@ class DefaultAvailabilityZoneTest extends TestCase
         $id = json_decode($this->response->getContent())->data->id;
         $dhcp = Dhcp::findOrFail($id);
         // verify that the availability_zone_id equals the one in the data array
-        $this->assertEquals($dhcp->availability_zone_id, $az->getKey());
+        $this->assertEquals($dhcp->availability_zone_id, $this->availability_zone->getKey());
     }
 
     public function testCreateDhcpWithNoAvailabilityZone()
     {
-        $data = [
-            'vpc_id' => $this->vpc->getKey(),
-        ];
         $this->post(
             '/v2/dhcps',
-            $data,
+            [
+                'vpc_id' => $this->vpc->getKey(),
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',

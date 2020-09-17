@@ -14,11 +14,10 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
-
-    protected $vpc;
-
+    protected \Faker\Generator $faker;
+    protected $region;
     protected $router;
+    protected $vpc;
 
     public function setUp(): void
     {
@@ -27,35 +26,29 @@ class GetTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'code'               => 'TIM1',
-            'name'               => 'Tims Region 1',
-            'datacentre_site_id' => 1,
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
         ]);
-
         $this->router = factory(Router::class)->create([
-            'name'       => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey()
         ]);
     }
-    
+
     public function testGetCollection()
     {
         $this->get(
             '/v2/routers',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
+                'X-consumer-groups'    => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'         => $this->router->getKey(),
-                'name'       => $this->router->name,
-                'vpc_id'       => $this->router->vpc_id,
+                'id'     => $this->router->getKey(),
+                'name'   => $this->router->name,
+                'vpc_id' => $this->router->vpc_id,
             ])
             ->assertResponseStatus(200);
     }
@@ -66,13 +59,13 @@ class GetTest extends TestCase
             '/v2/routers/' . $this->router->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
+                'X-consumer-groups'    => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'         => $this->router->id,
-                'name'       => $this->router->name,
-                'vpc_id'       => $this->router->vpc_id
+                'id'     => $this->router->id,
+                'name'   => $this->router->name,
+                'vpc_id' => $this->router->vpc_id
             ])
             ->assertResponseStatus(200);
     }

@@ -15,64 +15,38 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    protected \Faker\Generator $faker;
+    protected $firewall_rule;
+    protected $region;
+    protected $vpc;
+    protected $router;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-    }
-
-    public function testNullNameIsFailed()
-    {
-        $fwr = factory(FirewallRule::class)->create();
-        $data = [
-            'name' => '',
-        ];
-        $this->patch(
-            '/v2/firewall-rules/' . $fwr->id,
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The name field, when specified, cannot be null',
-                'status' => 422,
-                'source' => 'name'
-            ])
-            ->assertResponseStatus(422);
+        $this->firewall_rule = factory(FirewallRule::class)->create();
+        $this->region = factory(Region::class)->create();
+        factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->vpc = factory(Vpc::class)->create([
+            'reseller_id' => 3,
+            'region_id'   => $this->region->getKey()
+        ]);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey()
+        ]);
     }
 
     public function testNotOwnedRouterIdIsFailed()
     {
-        $fwr = factory(FirewallRule::class)->create();
-        $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
-            'code'               => 'TIM1',
-            'name'               => 'Tims Region 1',
-            'datacentre_site_id' => 1,
-            'region_id'          => $this->region->getKey(),
-        ]);
-        $vpc = factory(Vpc::class)->create([
-            'name' => 'Manchester DC',
-            'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
-        ]);
-        $router = factory(Router::class)->create([
-            'name' => 'Manchester Router 1',
-            'vpc_id' => $vpc->getKey()
-        ]);
-
-        $data = [
-            'name' => $this->faker->word(),
-            'router_id' => $router->getKey()
-        ];
         $this->patch(
-            '/v2/firewall-rules/' . $fwr->id,
-            $data,
+            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            [
+                'name'      => $this->faker->word(),
+                'router_id' => $this->router->getKey()
+            ],
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups'    => 'ecloud.write',
@@ -89,13 +63,11 @@ class UpdateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $fwr = factory(FirewallRule::class)->create();
-        $data = [
-            'name' => 'Demo firewall rule 1',
-        ];
         $this->patch(
-            '/v2/firewall-rules/' . $fwr->id,
-            $data,
+            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            [
+                'name' => 'Demo firewall rule 1',
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.write',

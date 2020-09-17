@@ -13,19 +13,10 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @var Region */
-    private $region;
-
-    /**
-     * @var AvailabilityZone
-     */
-    private $availabilityZone;
-
-    /** @var Vpc */
-    private $vpc;
-
-    /** @var Volume */
-    private $volume;
+    protected $availabilityZone;
+    protected $region;
+    protected $volume;
+    protected $vpc;
 
     public function setUp(): void
     {
@@ -43,42 +34,15 @@ class CreateTest extends TestCase
         ]);
     }
 
-    public function testInvalidVpcIdIsFailed()
-    {
-        $data = [
-            'name' => 'Volume 1',
-            'vpc_id' => 'x',
-            'availability_zone_id' => $this->availabilityZone->getKey()
-        ];
-
-        $this->post(
-            '/v2/volumes',
-            $data,
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testNotOwnedVpcIdIsFailed()
     {
-        $data = [
-            'name'    => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
-        ];
-
         $this->post(
             '/v2/volumes',
-            $data,
+            [
+                'name'    => 'Volume 1',
+                'vpc_id' => $this->vpc->getKey(),
+                'availability_zone_id' => $this->availabilityZone->getKey()
+            ],
             [
                 'X-consumer-custom-id' => '2-0',
                 'X-consumer-groups' => 'ecloud.write',
@@ -101,16 +65,14 @@ class CreateTest extends TestCase
             'region_id' => $region->getKey()
         ]);
 
-        $data = [
-            'name'    => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.min')+1),
-        ];
-
         $this->post(
             '/v2/volumes',
-            $data,
+            [
+                'name'    => 'Volume 1',
+                'vpc_id' => $this->vpc->getKey(),
+                'availability_zone_id' => $availabilityZone->getKey(),
+                'capacity' => (config('volume.capacity.min')+1),
+            ],
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
@@ -125,70 +87,16 @@ class CreateTest extends TestCase
             ->assertResponseStatus(404);
     }
 
-    public function testMinCapacityValidation()
-    {
-        $data = [
-            'name'    => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.min')-1),
-        ];
-
-        $this->post(
-            '/v2/volumes',
-            $data,
-            [
-                'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'specified capacity is below the minimum of ' . config('volume.capacity.min'),
-                'status' => 422,
-                'source' => 'capacity'
-            ])
-            ->assertResponseStatus(422);
-    }
-
-    public function testMaxCapacityValidation()
-    {
-        $data = [
-            'name'    => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.max')+1),
-        ];
-
-        $this->post(
-            '/v2/volumes',
-            $data,
-            [
-                'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'specified capacity is above the maximum of ' . config('volume.capacity.max'),
-                'status' => 422,
-                'source' => 'capacity'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testValidDataSucceeds()
     {
-        $data = [
-            'name'    => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.min')+1),
-        ];
-
         $this->post(
             '/v2/volumes',
-            $data,
+            [
+                'name'    => 'Volume 1',
+                'vpc_id' => $this->vpc->getKey(),
+                'availability_zone_id' => $this->availabilityZone->getKey(),
+                'capacity' => (config('volume.capacity.min')+1),
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
@@ -203,15 +111,13 @@ class CreateTest extends TestCase
 
     public function testAzIsOptionalParameter()
     {
-        $data = [
-            'name'    => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'capacity' => (config('volume.capacity.min')+1),
-        ];
-
         $this->post(
             '/v2/volumes',
-            $data,
+            [
+                'name'    => 'Volume 1',
+                'vpc_id' => $this->vpc->getKey(),
+                'capacity' => (config('volume.capacity.min')+1),
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',

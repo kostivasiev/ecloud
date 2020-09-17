@@ -32,9 +32,6 @@ class GetTest extends TestCase
             'region_id' => $this->region->getKey(),
         ]);
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'code'               => 'TIM1',
-            'name'               => 'Tims Region 1',
-            'datacentre_site_id' => 1,
             'region_id'          => $this->region->getKey(),
         ]);
         $this->dhcp = factory(Dhcp::class)->create([

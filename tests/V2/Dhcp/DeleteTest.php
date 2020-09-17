@@ -29,9 +29,6 @@ class DeleteTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'code'               => 'TIM1',
-            'name'               => 'Tims Region 1',
-            'datacentre_site_id' => 1,
             'region_id'          => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([

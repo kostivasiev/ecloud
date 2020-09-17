@@ -16,9 +16,11 @@ class GetTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
-    protected $region;
     protected $availability_zone;
+    protected $region;
+    protected $router;
     protected $vpc;
+    protected $vpn;
 
     public function setUp(): void
     {
@@ -26,38 +28,21 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'code'               => 'TIM1',
-            'name'               => 'Tims Region 1',
-            'datacentre_site_id' => 1,
             'region_id'          => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
-    }
-
-    public function testNoPermsIsDenied()
-    {
-        $this->get(
-            '/v2/vpns',
-            []
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+        ]);
+        $this->vpn = factory(Vpn::class)->create([
+            'router_id' => $this->router->id,
+        ]);
     }
 
     public function testGetCollection()
     {
-        $router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-        ]);
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-        ]);
         $this->get(
             '/v2/vpns',
             [
@@ -66,32 +51,26 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'                   => $vpn->id,
-                'router_id'            => $vpn->router_id,
-                'availability_zone_id' => $vpn->availability_zone_id,
+                'id'                   => $this->vpn->getKey(),
+                'router_id'            => $this->vpn->router_id,
+                'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-        ]);
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-        ]);
         $this->get(
-            '/v2/vpns/' . $vpn->getKey(),
+            '/v2/vpns/' . $this->vpn->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'                   => $vpn->id,
-                'router_id'            => $vpn->router_id,
-                'availability_zone_id' => $vpn->availability_zone_id,
+                'id'                   => $this->vpn->getKey(),
+                'router_id'            => $this->vpn->router_id,
+                'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
     }
