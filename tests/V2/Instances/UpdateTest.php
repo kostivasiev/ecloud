@@ -96,6 +96,27 @@ class UpdateTest extends TestCase
         $this->assertEquals($data['vpc_id'], $instance->vpc_id);
     }
 
+    public function testAdminInstanceLocking()
+    {
+        // Lock the instance
+        $this->instance->locked = true;
+        $this->instance->save();
+        $data = [
+            'name' => 'Testing Locked Instance',
+        ];
+        $this->patch(
+            '/v2/instances/'.$this->instance->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups'    => 'ecloud.write',
+            ]
+        )
+            ->assertResponseStatus(200);
+        $this->instance->refresh();
+        $this->assertEquals($data['name'], $this->instance->name);
+    }
+
     public function testInstanceLocking()
     {
         // Lock the instance
@@ -107,7 +128,7 @@ class UpdateTest extends TestCase
                 'name' => 'Testing Locked Instance',
             ],
             [
-                'X-consumer-custom-id' => '0-0',
+                'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups'    => 'ecloud.write',
             ]
         )
@@ -129,7 +150,7 @@ class UpdateTest extends TestCase
             '/v2/instances/'.$this->instance->getKey(),
             $data,
             [
-                'X-consumer-custom-id' => '0-0',
+                'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups'    => 'ecloud.write',
             ]
         )
