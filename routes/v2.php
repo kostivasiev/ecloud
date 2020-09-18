@@ -77,6 +77,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('instances', 'InstanceController@index');
         $router->get('instances/{instanceId}', 'InstanceController@show');
+        $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
         $router->post('instances', 'InstanceController@store');
         $router->patch('instances/{instanceId}', 'InstanceController@update');
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');

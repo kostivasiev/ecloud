@@ -25,22 +25,22 @@ class CredentialResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'resource_id' => $this->resource_id,
             'host' => $this->host,
             'user' => $this->user,
             'password' => $this->password,
-            'port' => $this->port,
-            'created_at' => Carbon::parse(
-                $this->created_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
-            'updated_at' => Carbon::parse(
-                $this->updated_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
+            'port' => $this->port
         ];
+
+        if ($request->user->isAdministrator) {
+            $tz = new \DateTimeZone(config('app.timezone'));
+            $data['created_at'] = Carbon::parse($this->created_at, $tz)->toIso8601String();
+            $data['updated_at'] = Carbon::parse($this->updated_at, $tz)->toIso8601String();
+        }
+
+        return $data;
     }
 }

@@ -22,10 +22,15 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            //TODO: This will need updating when we're encrypting the password in the database.
             ->seeInDatabase(
                 'credentials',
                 collect($credential)->except('password')->toArray(),
+                'ecloud'
+            )
+            // Assert that we're not storing the plain text password in the db
+            ->missingFromDatabase(
+                'credentials',
+                ['password' => $credential->password],
                 'ecloud'
             )
             ->assertResponseStatus(201);

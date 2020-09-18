@@ -49,6 +49,11 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
+    public function credentials()
+    {
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
+    }
+
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
