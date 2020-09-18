@@ -43,6 +43,16 @@ class Credential extends Model implements Filterable, Sortable
         'port' => 'integer'
     ];
 
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = encrypt($value);
+    }
+
+    public function getPasswordAttribute($value)
+    {
+        return decrypt($value);
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]

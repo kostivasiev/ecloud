@@ -25,7 +25,7 @@ class CreateTest extends TestCase
             //TODO: This will need updating when we're encrypting the password in the database.
             ->seeInDatabase(
                 'credentials',
-                $credential->toArray(),
+                collect($credential)->except('password')->toArray(),
                 'ecloud'
             )
             ->assertResponseStatus(201);

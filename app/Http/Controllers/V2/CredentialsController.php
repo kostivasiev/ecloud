@@ -29,7 +29,7 @@ class CredentialsController extends BaseController
             ->transform($collection);
 
         return CredentialResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
+            $request->input('per_page', env('PAGINATION_LIMIT')),
         ));
     }
 
@@ -53,7 +53,6 @@ class CredentialsController extends BaseController
     {
         $credential = new Credential($request->only(['name', 'resource_id', 'host', 'user', 'password', 'port']));
         $credential->save();
-        $credential->refresh();
         return $this->responseIdMeta($request, $credential->getKey(), 201);
     }
 

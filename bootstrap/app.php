@@ -107,6 +107,8 @@ $app->register(UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider
 $app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
+$app->register(\App\Providers\EncryptionServiceProvider::class);
+
 
 // ecloud service providers
 $app->register(App\Providers\KingpinServiceProvider::class);

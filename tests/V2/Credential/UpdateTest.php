@@ -34,8 +34,14 @@ class UpdateTest extends TestCase
         )
         ->seeInDatabase(
             'credentials',
-            array_merge(['id' => $this->credential->getKey()], $newCredential->toArray()),
+            array_merge(
+                ['id' => $this->credential->getKey()],
+                collect($newCredential)->except('password')->toArray()
+            ),
             'ecloud'
         )->assertResponseStatus(200);
+
+        $resource = Credential::find($this->credential->getKey());
+        $this->assertEquals($resource->password, $newCredential->password);
     }
 }

@@ -24,7 +24,7 @@ class CreateCredentialRequest extends FormRequest
     {
         return [
             'name' => ['nullable', 'string'],
-            'resource_id' => ['nullable', 'string'],
+            'resource_id' => ['required', 'string'],
             'host' => ['nullable', 'string'],
             'user' => ['required', 'string'],
             'password' => ['required', 'string'],
@@ -41,6 +41,7 @@ class CreateCredentialRequest extends FormRequest
     {
         return [
             'user.required' => 'The :attribute field is required',
+            'resource_id.required' => 'The :attribute field is required',
             'password.required' => 'The :attribute field is required',
         ];
     }

@@ -44,7 +44,7 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson($this->formatDates($this->credential->toArray()))
+            ->seeJson($this->formatDates(collect($this->credential)->except('password')->toArray()))
             ->assertResponseStatus(200);
     }
 
