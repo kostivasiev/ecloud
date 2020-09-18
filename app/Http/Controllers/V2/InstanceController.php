@@ -68,7 +68,9 @@ class InstanceController extends BaseController
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        if ((!$request->has('locked') || $request->get('locked') !== false) &&
+        if (
+            !$this->isAdmin &&
+            (!$request->has('locked') || $request->get('locked') !== false) &&
             (bool) $instance->locked === true) {
             return $this->isLocked();
         }
@@ -85,7 +87,7 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-        if ((bool) $instance->locked === true) {
+        if (!$this->isAdmin && (bool) $instance->locked === true) {
             return $this->isLocked();
         }
         $instance->delete();
