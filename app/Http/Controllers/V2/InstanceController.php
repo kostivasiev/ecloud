@@ -6,6 +6,7 @@ use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
 use App\Models\V2\Instance;
 use App\Resources\V2\InstanceResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -52,7 +53,10 @@ class InstanceController extends BaseController
      */
     public function store(CreateInstanceRequest $request)
     {
-        $instance = new Instance($request->only(['network_id', 'name']));
+        $instance = new Instance($request->only(['name', 'vpc_id', 'locked']));
+        if (!$request->has('locked')) {
+            $instance->locked = false;
+        }
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
@@ -66,7 +70,12 @@ class InstanceController extends BaseController
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        $instance->fill($request->only(['vpc_id', 'name']));
+        if (!$this->isAdmin &&
+            (!$request->has('locked') || $request->get('locked') !== false) &&
+            $instance->locked === true) {
+            return $this->isLocked();
+        }
+        $instance->fill($request->only(['name', 'vpc_id', 'locked']));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
@@ -79,7 +88,24 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        if (!$this->isAdmin && $instance->locked === true) {
+            return $this->isLocked();
+        }
         $instance->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function isLocked(): JsonResponse
+    {
+        return JsonResponse::create([
+            'errors' => [
+                'title'  => 'Forbidden',
+                'detail' => 'The specified instance is locked',
+                'status' => 403,
+            ]
+        ], 403);
     }
 }

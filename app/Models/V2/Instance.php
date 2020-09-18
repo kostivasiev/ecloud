@@ -6,8 +6,6 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -34,6 +32,11 @@ class Instance extends Model implements Filterable, Sortable
         'id',
         'name',
         'vpc_id',
+        'locked',
+    ];
+
+    protected $casts = [
+        'locked' => 'boolean',
     ];
 
     public function network()
@@ -69,6 +72,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('locked', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -85,6 +89,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
+            $factory->create('locked'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -110,6 +115,7 @@ class Instance extends Model implements Filterable, Sortable
             'id'         => 'id',
             'name'       => 'name',
             'vpc_id'     => 'vpc_id',
+            'locked'     => 'locked',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
