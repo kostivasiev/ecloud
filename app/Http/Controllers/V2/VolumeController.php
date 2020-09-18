@@ -53,23 +53,25 @@ class VolumeController extends BaseController
      */
     public function store(CreateVolumeRequest $request)
     {
-        $availabilityZone = Vpc::forUser(app('request')->user)
-            ->findOrFail($request->vpc_id)
-            ->region
-            ->availabilityZones
-            ->first(function ($availabilityZone) use ($request) {
-                return $availabilityZone->id == $request->availability_zone_id;
-            });
+        if ($request->has('availability_zone_id')) {
+            $availabilityZone = Vpc::forUser(app('request')->user)
+                ->findOrFail($request->vpc_id)
+                ->region
+                ->availabilityZones
+                ->first(function ($availabilityZone) use ($request) {
+                    return $availabilityZone->id == $request->availability_zone_id;
+                });
 
-        if (!$availabilityZone) {
-            return Response::create([
-                'errors' => [
-                    'title' => 'Not Found',
-                    'detail' => 'The specified availability zone is not available to that VPC',
-                    'status' => 404,
-                    'source' => 'availability_zone_id'
-                ]
-            ], 404);
+            if (!$availabilityZone) {
+                return Response::create([
+                    'errors' => [
+                        'title'  => 'Not Found',
+                        'detail' => 'The specified availability zone is not available to that VPC',
+                        'status' => 404,
+                        'source' => 'availability_zone_id'
+                    ]
+                ], 404);
+            }
         }
 
         $volume = new Volume($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity']));
