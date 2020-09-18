@@ -52,8 +52,20 @@ class UpdateInstanceRequest extends FormRequest
             ],
             'appliance_id' => 'sometimes|required|uuid|exists:ecloud.appliance_version,appliance_version_uuid',
             'vcpu_tier' => 'sometimes|required|string', # needs exists: adding once tier has been added to db
-            'vcpu_cores' => 'sometimes|required|numeric|min:1',
-            'ram_capacity' => 'sometimes|required|numeric|min:1024',
+            'vcpu_cores' => [
+                'sometimes',
+                'required',
+                'numeric',
+                'min:' . config('cpu.cores.min'),
+                'max:' . config('cpu.cores.max'),
+            ],
+            'ram_capacity' => [
+                'sometimes',
+                'required',
+                'numeric',
+                'min:' . config('ram.capacity.min'),
+                'max:' . config('ram.capacity.max'),
+            ],
         ];
 
         return $rules;
@@ -73,9 +85,11 @@ class UpdateInstanceRequest extends FormRequest
             'appliance_id.exists' => 'The :attribute is not a valid Appliance',
             'vcpu_tier.required' => 'The :attribute field is required',
             'vcpu_cores.required' => 'The :attribute field is required',
-            'vcpu_cores.min' => 'The :attribute field must be greater than or equal to one',
+            'vcpu_cores.min' => 'Specified :attribute is below the minimum of ' . config('cpu.cores.min'),
+            'vcpu_cores.max' => 'Specified :attribute is above the maximum of ' . config('cpu.cores.max'),
             'ram_capacity.required' => 'The :attribute field is required',
-            'ram_capacity.min' => 'The :attribute field must be greater than or equal to 1024 megabytes',
+            'ram_capacity.min' => 'Specified :attribute is below the minimum of ' . config('ram.capacity.min'),
+            'ram_capacity.max' => 'Specified :attribute is above the maximum of ' . config('ram.capacity.max'),
         ];
     }
 }
