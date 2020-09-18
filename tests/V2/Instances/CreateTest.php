@@ -14,11 +14,8 @@ class CreateTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
-
     protected $vpc;
-
     protected $appliance;
-
     protected $appliance_version;
 
     public function setUp(): void
@@ -126,7 +123,7 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The vcpu cores field must be greater than or equal to one',
+                'detail' => 'Specified vcpu cores is below the minimum of ' . config('cpu.cores.min'),
                 'status' => 422,
                 'source' => 'vcpu_cores'
             ])
@@ -152,7 +149,7 @@ class CreateTest extends TestCase
         )
             ->seeJson([
                 'title'  => 'Validation Error',
-                'detail' => 'The ram capacity field must be greater than or equal to 1024 megabytes',
+                'detail' => 'Specified ram capacity is below the minimum of ' . config('ram.capacity.min'),
                 'status' => 422,
                 'source' => 'ram_capacity'
             ])
