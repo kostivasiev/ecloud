@@ -33,11 +33,11 @@ class EncryptionServiceProvider extends ServiceProvider
             return Cache::get(md5('encryption-key'));
         }
 
-        $client = app(Client::class, ['config' => [
+        $client = new Client([
             'base_uri' => config('encryption.keystore_host'),
             'timeout'  => 2,
-            'verify'   => app()->environment('production'),
-        ]]);
+            'verify' => app()->environment('production'),
+        ]);
 
         $key = (new RemoteKeyStore($client))
             ->getKey(config('encryption.keystore_host_key'));
