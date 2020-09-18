@@ -70,8 +70,7 @@ class InstanceController extends BaseController
     public function update(UpdateInstanceRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        if (
-            !$this->isAdmin &&
+        if (!$this->isAdmin &&
             (!$request->has('locked') || $request->get('locked') !== false) &&
             $instance->locked === true) {
             return $this->isLocked();
