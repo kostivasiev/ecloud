@@ -76,7 +76,7 @@ class InstanceController extends BaseController
             (bool) $instance->locked === true) {
             return $this->isLocked();
         }
-        $instance->fill($request->only(['vpc_id', 'name', 'vpc_id', 'locked']));
+        $instance->fill($request->only(['name', 'vpc_id', 'locked']));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
