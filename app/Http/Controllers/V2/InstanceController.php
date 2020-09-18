@@ -73,7 +73,7 @@ class InstanceController extends BaseController
         if (
             !$this->isAdmin &&
             (!$request->has('locked') || $request->get('locked') !== false) &&
-            (bool) $instance->locked === true) {
+            $instance->locked === true) {
             return $this->isLocked();
         }
         $instance->fill($request->only(['name', 'vpc_id', 'locked']));
@@ -89,7 +89,7 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-        if (!$this->isAdmin && (bool) $instance->locked === true) {
+        if (!$this->isAdmin && $instance->locked === true) {
             return $this->isLocked();
         }
         $instance->delete();

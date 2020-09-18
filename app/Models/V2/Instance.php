@@ -35,6 +35,10 @@ class Instance extends Model implements Filterable, Sortable
         'locked',
     ];
 
+    protected $casts = [
+        'locked' => 'boolean',
+    ];
+
     public function network()
     {
         return $this->belongsTo(Network::class);
