@@ -98,7 +98,7 @@ class DeleteTest extends TestCase
         $this->assertNotNull($instance->deleted_at);
     }
 
-    public function testLockingMechanism()
+    public function testNonAdminInstanceLocking()
     {
         // First lock the instance
         $this->instance->locked = true;
