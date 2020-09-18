@@ -53,7 +53,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateInstanceRequest $request)
     {
-        $instance = new Instance($request->only(['vpc_id', 'name', 'vpc_id', 'locked']));
+        $instance = new Instance($request->only(['name', 'vpc_id', 'locked']));
         if (!$request->has('locked')) {
             $instance->locked = false;
         }
