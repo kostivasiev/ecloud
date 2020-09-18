@@ -54,7 +54,9 @@ class InstanceController extends BaseController
     public function store(CreateInstanceRequest $request)
     {
         $instance = new Instance($request->only(['vpc_id', 'name', 'vpc_id', 'locked']));
-        $instance->locked = false;
+        if (!$request->has('locked')) {
+            $instance->locked = false;
+        }
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
