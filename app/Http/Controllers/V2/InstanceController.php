@@ -85,7 +85,7 @@ class InstanceController extends BaseController
 
     public function deploy(DeployRequest $request, string $instanceId)
     {
-        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
         if (!$instance) {
             return response()->json([], 404);
         }
