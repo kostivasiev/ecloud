@@ -12,6 +12,7 @@ use UKFast\Responses\UKFastResource;
  * @property string name
  * @property string vpc_id
  * @property string appliance_id
+ * @property string appliance_version_id
  * @property string vcpu_tier
  * @property integer vcpu_cores
  * @property integer ram_capacity
@@ -27,7 +28,7 @@ class InstanceResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $response = [
             'id'           => $this->id,
             'name'         => $this->name,
             'vpc_id'       => $this->vpc_id,
@@ -45,5 +46,9 @@ class InstanceResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+        if ($request->user->isAdministrator) {
+            $response['appliance_version_id'] = $this->appliance_version_id;
+        }
+        return $response;
     }
 }
