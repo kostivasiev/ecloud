@@ -95,7 +95,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "network_id": "{{network_id}}",
+  "vpc_id": "{{vpc_id}}",
   "name": "Test"
 }
 
