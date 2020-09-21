@@ -33,7 +33,7 @@ class InstanceResource extends UKFastResource
             'vpc_id'       => $this->vpc_id,
             'appliance_id' => $this->appliance_id,
             'vcpu_tier'    => $this->vcpu_tier,
-            'vcpu_cores'   => $this->vcpu_count,
+            'vcpu_cores'   => $this->vcpu_cores,
             'ram_capacity' => $this->ram_capacity,
             'locked'       => $this->locked,
             'created_at'   => Carbon::parse(
