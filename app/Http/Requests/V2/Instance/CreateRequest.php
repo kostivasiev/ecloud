@@ -33,7 +33,8 @@ class CreateRequest extends FormRequest
                 'string',
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
-            ]
+            ],
+            'locked' => 'sometimes|required|boolean',
         ];
     }
 

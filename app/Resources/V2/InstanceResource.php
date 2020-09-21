@@ -10,6 +10,7 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string vpc_id
+ * @property boolean locked
  * @property string created_at
  * @property string updated_at
  */
@@ -25,6 +26,7 @@ class InstanceResource extends UKFastResource
             'id'         => $this->id,
             'name'       => $this->name,
             'vpc_id'     => $this->vpc_id,
+            'locked'     => $this->locked,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

@@ -14,22 +14,18 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @var Region */
-    private $region;
-
-    /** @var Vpc */
-    private $vpc;
-
-    /** @var Router */
-    private $router;
-
-    /** @var Network */
-    private $network;
+    protected $region;
+    protected $vpc;
+    protected $router;
+    protected $network;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
+        factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
@@ -41,60 +37,20 @@ class UpdateTest extends TestCase
         ]);
     }
 
-    public function testNoPermsIsDenied()
-    {
-        $this->patch('/v2/networks/' . $this->network->getKey(),[
-            'name' => 'Manchester Network',
-        ])->seeJson([
-            'title'  => 'Unauthorised',
-            'detail' => 'Unauthorised',
-            'status' => 401,
-        ])->assertResponseStatus(401);
-    }
-
-    public function testNullNameIsDenied()
-    {
-        $this->patch('/v2/networks/' . $this->network->getKey(), [
-            'name' => '',
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title'  => 'Validation Error',
-            'detail' => 'The name field, when specified, cannot be null',
-            'status' => 422,
-            'source' => 'name'
-        ])->assertResponseStatus(422);
-    }
-
-
-    public function testInvalidRouterIdIsFailed()
-    {
-        $this->patch('/v2/networks/' . $this->network->getKey(), [
-            'name' => 'Manchester Network',
-            'router_id' => 'x'
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title'  => 'Validation Error',
-            'detail' => 'The specified router id was not found',
-            'status' => 422,
-            'source' => 'router_id'
-        ])->assertResponseStatus(422);
-    }
-
     public function testNotOwnedRouterIdIsFailed()
     {
         $this->vpc->reseller_id = 3;
         $this->vpc->save();
-        $this->patch('/v2/networks/' . $this->network->getKey(),[
-            'name' => 'Manchester Network',
-            'router_id' => $this->router->getKey()
-        ], [
-            'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        $this->patch(
+            '/v2/networks/' . $this->network->getKey(),
+            [
+                'name'      => 'Manchester Network',
+                'router_id' => $this->router->getKey()
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups'    => 'ecloud.write',
+            ])->seeJson([
             'title'  => 'Validation Error',
             'detail' => 'The specified router id was not found',
             'status' => 422,
@@ -104,13 +60,16 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $this->patch('/v2/networks/' . $this->network->getKey(), [
-            'name' => 'expected',
-            'router_id' => $this->router->getKey()
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(200);
+        $this->patch(
+            '/v2/networks/' . $this->network->getKey(),
+            [
+                'name'      => 'expected',
+                'router_id' => $this->router->getKey()
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups'    => 'ecloud.write',
+            ])->assertResponseStatus(200);
         $this->assertEquals('expected', Network::findOrFail($this->network->getKey())->name);
     }
 }
