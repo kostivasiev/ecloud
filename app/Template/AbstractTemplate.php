@@ -86,18 +86,9 @@ abstract class AbstractTemplate
             return $serverLicense->first();
         }
 
-        $similarText = [];
         foreach ($ecloudLicenses as $availableLicence) {
-            similar_text($availableLicence->friendly_name, $this->guest_os, $percent);
-
-            // Increase the confidence required. We need it.
-            if ($percent > 50) {
-                $similarText[$availableLicence->friendly_name] = $percent;
-            }
-            if (!empty($similarText)) {
-                $mostLikelyLicence = array_keys($similarText, max($similarText));
-                $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
-
+            if ($availableLicence->friendly_name == $this->guest_os) {
+                $serverLicense = ServerLicense::withFriendlyName($availableLicence->friendly_name);
                 if ($serverLicense->count() > 0) {
                     return $serverLicense->first();
                 }
@@ -106,21 +97,12 @@ abstract class AbstractTemplate
 
         //If still no match found
         $serverLicenses = ServerLicense::withType('OS')->get();
-
-        $similarText = [];
         foreach ($serverLicenses as $availableLicence) {
-            similar_text($availableLicence->friendly_name, $this->guest_os, $percent);
-            // Increase the confidence required. We need it.
-            if ($percent > 50) {
-                $similarText[$availableLicence->id] = $percent;
-            }
-        }
-
-        if (!empty($similarText)) {
-            $mostLikelyLicence = array_keys($similarText, max($similarText));
-            $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
-            if ($serverLicense->count() > 0) {
-                return $serverLicense->first();
+            if ($availableLicence->friendly_name == $this->guest_os) {
+                $serverLicense = ServerLicense::withFriendlyName($availableLicence->friendly_name);
+                if ($serverLicense->count() > 0) {
+                    return $serverLicense->first();
+                }
             }
         }
 
