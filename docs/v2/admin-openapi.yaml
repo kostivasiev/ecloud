@@ -42,6 +42,8 @@ components:
       $ref: 'components/schemas/nic.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
+    Credentials:
+      $ref: 'components/schemas/credential.yaml'
 
   parameters:
     # Query Parameters
@@ -128,3 +130,7 @@ paths:
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':
     $ref: 'resources/Nic/item.yaml'
+  '/ecloud/v2/credentials':
+    $ref: 'resources/Credential/collection.yaml'
+  '/ecloud/v2/credentials/{credentialId}':
+    $ref: 'resources/Credential/item.yaml'

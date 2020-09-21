@@ -147,3 +147,4 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
+
