@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
+use App\Jobs\InstanceDeploy\Deploy;
 use App\Jobs\InstanceDeploy\OsCustomisation;
 use App\Jobs\InstanceDeploy\PowerOn;
 use App\Jobs\InstanceDeploy\PrepareOsDisk;
@@ -13,7 +14,6 @@ use App\Jobs\InstanceDeploy\RunBootstrapScript;
 use App\Jobs\InstanceDeploy\UpdateNetworkAdapter;
 use App\Jobs\InstanceDeploy\WaitOsCustomisation;
 use App\Models\V2\Instance;
-use App\Models\V2\Volume;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -99,39 +99,18 @@ class InstanceController extends BaseController
             return response()->json([], 404);
         }
 
-        {
-            "volume_id": "vol-912345",
-  "volume_capacity": 1,
-  "network_id": "net-912345",
-  "floating_ip_id": "fip-912345",
-  "appliance_data": "{\"key\":\"value\"}"
-}
-
-        if ($request->input('volume_id')) {
-            $volume = Volume::forUser($request->user)->findOrFail($request->input('volume_id'));
-            if (!$volume) {
-                return response()->json([], 404);
-            }
-        } else {
-            $volume = Volume::withoutEvents(function () use ($instance) {
-                $volume = new Volume();
-                $volume::addCustomKey($volume);
-                $volume->name = $volume->id;
-                $volume->vpc()->associate($instance->vpc);
-                $volume->save();
-                return $volume;
-            });
-        }
-
         $data = [
             'instance_id' => $instance->id,
-            'volume_id' => $volume->id,
             'vpc_id' => $instance->vpc->id,
-            $request->input('blah')
+            'volume_capacity' => $request->input('volume_capacity'),
+            'network_id' => $request->input('network_id'),
+            'floating_ip_id' => $request->input('floating_ip_id'),
+            'appliance_data' => $request->input('appliance_data'),
         ];
 
         // Create the jobs for deployment
-        $this->dispatch((new UpdateNetworkAdapter($data))->chain([
+        $this->dispatch((new Deploy($data))->chain([
+            new UpdateNetworkAdapter($data),
             new PowerOn($data),
             new WaitOsCustomisation($data),
             new PrepareOsUsers($data),

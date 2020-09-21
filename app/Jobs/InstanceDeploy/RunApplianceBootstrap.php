@@ -14,6 +14,9 @@ class RunApplianceBootstrap extends Job
         $this->data = $data;
     }
 
+    /**
+     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/333
+     */
     public function handle()
     {
         Log::info('RunApplianceBootstrap');

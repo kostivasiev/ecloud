@@ -14,6 +14,9 @@ class PrepareOsUsers extends Job
         $this->data = $data;
     }
 
+    /**
+     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/330
+     */
     public function handle()
     {
         Log::info('PrepareOsUsers');

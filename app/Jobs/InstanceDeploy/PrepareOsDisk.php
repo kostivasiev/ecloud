@@ -14,6 +14,9 @@ class PrepareOsDisk extends Job
         $this->data = $data;
     }
 
+    /**
+     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/332
+     */
     public function handle()
     {
         Log::info('PrepareOsDisk');
