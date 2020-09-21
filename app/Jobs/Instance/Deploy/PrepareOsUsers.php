@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Jobs\InstanceDeploy;
+namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use Illuminate\Support\Facades\Log;
 
-class PrepareOsDisk extends Job
+class PrepareOsUsers extends Job
 {
     private $data;
 
@@ -15,10 +15,10 @@ class PrepareOsDisk extends Job
     }
 
     /**
-     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/332
+     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/330
      */
     public function handle()
     {
-        Log::info('PrepareOsDisk');
+        Log::info('PrepareOsUsers');
     }
 }

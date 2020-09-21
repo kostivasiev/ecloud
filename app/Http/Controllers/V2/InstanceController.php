@@ -2,20 +2,12 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateInstanceRequest;
-use App\Http\Requests\V2\UpdateInstanceRequest;
-use App\Jobs\InstanceDeploy\Deploy;
-use App\Jobs\InstanceDeploy\OsCustomisation;
-use App\Jobs\InstanceDeploy\PowerOn;
-use App\Jobs\InstanceDeploy\PrepareOsDisk;
-use App\Jobs\InstanceDeploy\PrepareOsUsers;
-use App\Jobs\InstanceDeploy\RunApplianceBootstrap;
-use App\Jobs\InstanceDeploy\RunBootstrapScript;
-use App\Jobs\InstanceDeploy\UpdateNetworkAdapter;
-use App\Jobs\InstanceDeploy\WaitOsCustomisation;
+use Illuminate\Http\Request;
+use App\Http\Requests\V2\Instance\CreateRequest;
+use App\Http\Requests\V2\Instance\DeployRequest;
+use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Models\V2\Instance;
 use App\Resources\V2\InstanceResource;
-use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -32,7 +24,6 @@ class InstanceController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-
         $collection = Instance::forUser($request->user);
 
         $queryTransformer->config(Instance::class)
@@ -56,10 +47,10 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateInstanceRequest $request
+     * @param  CreateRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateInstanceRequest $request)
+    public function store(CreateRequest $request)
     {
         $instance = new Instance($request->only(['network_id', 'name']));
         $instance->save();
@@ -68,11 +59,11 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param UpdateInstanceRequest $request
+     * @param UpdateRequest $request
      * @param string $instanceId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateInstanceRequest $request, string $instanceId)
+    public function update(UpdateRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
         $instance->fill($request->only(['vpc_id', 'name']));
@@ -92,7 +83,7 @@ class InstanceController extends BaseController
         return response()->json([], 204);
     }
 
-    public function deploy(Request $request, string $instanceId)
+    public function deploy(DeployRequest $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
         if (!$instance) {
@@ -102,22 +93,22 @@ class InstanceController extends BaseController
         $data = [
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id,
-            'volume_capacity' => $request->input('volume_capacity'),
+            'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.min')),
             'network_id' => $request->input('network_id'),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'appliance_data' => $request->input('appliance_data'),
         ];
 
-        // Create the jobs for deployment
-        $this->dispatch((new Deploy($data))->chain([
-            new UpdateNetworkAdapter($data),
-            new PowerOn($data),
-            new WaitOsCustomisation($data),
-            new PrepareOsUsers($data),
-            new OsCustomisation($data),
-            new PrepareOsDisk($data),
-            new RunApplianceBootstrap($data),
-            new RunBootstrapScript($data),
+        // Create the chained jobs for deployment
+        $this->dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
+            new \App\Jobs\Instance\Deploy\UpdateNetworkAdapter($data),
+            new \App\Jobs\Instance\Deploy\PowerOn($data),
+            new \App\Jobs\Instance\Deploy\WaitOsCustomisation($data),
+            new \App\Jobs\Instance\Deploy\PrepareOsUsers($data),
+            new \App\Jobs\Instance\Deploy\OsCustomisation($data),
+            new \App\Jobs\Instance\Deploy\PrepareOsDisk($data),
+            new \App\Jobs\Instance\Deploy\RunApplianceBootstrap($data),
+            new \App\Jobs\Instance\Deploy\RunBootstrapScript($data),
         ]));
 
         return response()->json([], 200);

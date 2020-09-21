@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\InstanceDeploy;
+namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use Illuminate\Support\Facades\Log;

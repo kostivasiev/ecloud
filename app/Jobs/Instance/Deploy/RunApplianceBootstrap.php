@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Jobs\InstanceDeploy;
+namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use Illuminate\Support\Facades\Log;
 
-class WaitOsCustomisation extends Job
+class RunApplianceBootstrap extends Job
 {
     private $data;
 
@@ -15,10 +15,10 @@ class WaitOsCustomisation extends Job
     }
 
     /**
-     * @see Missing Issue?
+     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/333
      */
     public function handle()
     {
-        Log::info('WaitOsCustomisation');
+        Log::info('RunApplianceBootstrap');
     }
 }

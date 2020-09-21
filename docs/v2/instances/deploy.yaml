@@ -11,10 +11,6 @@ post:
         schema:
           type: object
           properties:
-            volume_id:
-              required: false
-              type: string
-              example: 'vol-912345'
             volume_capacity:
               required: false
               type: integer
@@ -32,7 +28,7 @@ post:
               type: json
               example: '{"key":"value"}'
   responses:
-    202:
-      description: Success
+    200:
+      description: Accepted
   tags:
     - Instances

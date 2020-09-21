@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Jobs\InstanceDeploy;
+namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use Illuminate\Support\Facades\Log;
 
-class RunApplianceBootstrap extends Job
+class PowerOn extends Job
 {
     private $data;
 
@@ -15,10 +15,10 @@ class RunApplianceBootstrap extends Job
     }
 
     /**
-     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/333
+     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/328
      */
     public function handle()
     {
-        Log::info('RunApplianceBootstrap');
+        Log::info('PowerOn');
     }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Jobs\InstanceDeploy;
+namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use Illuminate\Support\Facades\Log;
 
-class PowerOn extends Job
+class PrepareOsDisk extends Job
 {
     private $data;
 
@@ -15,10 +15,10 @@ class PowerOn extends Job
     }
 
     /**
-     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/328
+     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/332
      */
     public function handle()
     {
-        Log::info('PowerOn');
+        Log::info('PrepareOsDisk');
     }
 }
