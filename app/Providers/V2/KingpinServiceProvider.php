@@ -12,8 +12,7 @@ class KingpinServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind(KingpinService::class, function ($app, $data)
-        {
+        $this->app->bind(KingpinService::class, function ($app, $data) {
             if (!is_a($data[0], AvailabilityZone::class)) {
                 $message = 'Invalid AvailabilityZone Object';
                 Log::error($message);
