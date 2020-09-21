@@ -155,6 +155,6 @@ class InstanceController extends BaseController
             new \App\Jobs\Instance\Deploy\RunBootstrapScript($data),
         ]));
 
-        return response()->json([], 200);
+        return response()->json([], 202);
     }
 }
