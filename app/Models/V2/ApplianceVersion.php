@@ -57,4 +57,14 @@ class ApplianceVersion extends Model
             'appliance_version_appliance_id'
         );
     }
+
+    public function getLatest(string $applianceUuid)
+    {
+        return $this->select('appliance_version_uuid')
+            ->join('appliance', 'appliance.appliance_id', '=', 'appliance_version.appliance_version_appliance_id')
+            ->where('appliance.appliance_uuid', '=', $applianceUuid)
+            ->orderBy('appliance_version_version', 'desc')
+            ->first()
+            ->appliance_version_uuid;
+    }
 }
