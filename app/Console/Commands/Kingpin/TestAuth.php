@@ -23,7 +23,8 @@ class TestAuth extends Command
         /** @var  $availabilityZone
          * Kingpin credentials have been stored against this resource
          */
-        $availabilityZone = AvailabilityZone::findOrFail('avz-2b66bb79');
+        //$availabilityZone = AvailabilityZone::findOrFail('avz-2b66bb79');
+        $availabilityZone = AvailabilityZone::firstOrFail();
 
         try {
             /** @var Response $response */
