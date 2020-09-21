@@ -33,11 +33,19 @@ class Instance extends Model implements Filterable, Sortable
         'id',
         'name',
         'vpc_id',
-        'appliance_id',
+        'appliance_version_id',
         'vcpu_tier',
         'vcpu_cores',
         'ram_capacity',
         'locked',
+    ];
+
+    protected $hidden = [
+        'appliance_version_id'
+    ];
+
+    protected $appends = [
+        'appliance_id'
     ];
 
     protected $casts = [
@@ -54,6 +62,15 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
+    public function applianceVersions()
+    {
+        return $this->belongsTo(
+            ApplianceVersion::class,
+            'appliance_version_id',
+            'appliance_version_uuid'
+        );
+    }
+
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
@@ -67,6 +84,20 @@ class Instance extends Model implements Filterable, Sortable
         return $query;
     }
 
+    public function getApplianceIdAttribute()
+    {
+        return $this->applianceVersions()
+            ->first()
+            ->appliance
+            ->appliance_uuid;
+    }
+
+    public function setApplianceVersionId(string $applianceUuid)
+    {
+        $version = (new ApplianceVersion)->getLatest($applianceUuid);
+        $this->attributes['appliance_version_id'] = $version;
+    }
+
     /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
@@ -77,7 +108,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('appliance_id', Filter::$stringDefaults),
+            $factory->create('appliance_version_id', Filter::$stringDefaults),
             $factory->create('vcpu_tier', Filter::$stringDefaults),
             $factory->create('vcpu_cores', Filter::$stringDefaults),
             $factory->create('ram_capacity', Filter::$stringDefaults),
@@ -98,7 +129,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
-            $factory->create('appliance_id'),
+            $factory->create('appliance_version_id'),
             $factory->create('vcpu_tier'),
             $factory->create('vcpu_cores'),
             $factory->create('ram_capacity'),
@@ -126,16 +157,16 @@ class Instance extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'           => 'id',
-            'name'         => 'name',
-            'vpc_id'       => 'vpc_id',
-            'appliance_id' => 'appliance_id',
-            'vcpu_tier'    => 'vcpu_tier',
-            'vcpu_cores'   => 'vcpu_cores',
-            'ram_capacity' => 'ram_capacity',
-            'locked'       => 'locked',
-            'created_at'   => 'created_at',
-            'updated_at'   => 'updated_at',
+            'id'                   => 'id',
+            'name'                 => 'name',
+            'vpc_id'               => 'vpc_id',
+            'appliance_version_id' => 'appliance_version_id',
+            'vcpu_tier'            => 'vcpu_tier',
+            'vcpu_cores'           => 'vcpu_cores',
+            'ram_capacity'         => 'ram_capacity',
+            'locked'               => 'locked',
+            'created_at'           => 'created_at',
+            'updated_at'           => 'updated_at',
         ];
     }
 
