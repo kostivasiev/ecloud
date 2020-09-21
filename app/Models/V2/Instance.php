@@ -24,11 +24,10 @@ class Instance extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'i';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'name',
@@ -62,13 +61,9 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
-    public function applianceVersions()
+    public function credentials()
     {
-        return $this->belongsTo(
-            ApplianceVersion::class,
-            'appliance_version_id',
-            'appliance_version_uuid'
-        );
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
     }
 
     public function scopeForUser($query, $user)
@@ -92,6 +87,15 @@ class Instance extends Model implements Filterable, Sortable
             ->appliance_uuid;
     }
 
+    public function applianceVersions()
+    {
+        return $this->belongsTo(
+            ApplianceVersion::class,
+            'appliance_version_id',
+            'appliance_version_uuid'
+        );
+    }
+
     public function setApplianceVersionId(string $applianceUuid)
     {
         $version = (new ApplianceVersion)->getLatest($applianceUuid);
@@ -99,7 +103,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\FilterFactory  $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
@@ -119,7 +123,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\SortFactory  $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */

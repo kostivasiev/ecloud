@@ -5,9 +5,11 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateInstanceRequest;
 use App\Http\Requests\V2\UpdateInstanceRequest;
 use App\Models\V2\Instance;
+use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -118,5 +120,21 @@ class InstanceController extends BaseController
                 'status' => 403,
             ]
         ], 403);
+    }
+
+    /**
+     * @param  Request  $request
+     * @param  string  $instanceId
+     *
+     * @return AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function credentials(Request $request, string $instanceId)
+    {
+        return CredentialResource::collection(
+            Instance::forUser($request->user)
+                ->findOrFail($instanceId)
+                ->credentials()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
     }
 }

@@ -77,6 +77,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('instances', 'InstanceController@index');
         $router->get('instances/{instanceId}', 'InstanceController@show');
+        $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
         $router->post('instances', 'InstanceController@store');
         $router->patch('instances/{instanceId}', 'InstanceController@update');
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
@@ -138,6 +139,16 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('nics', 'NicController@create');
         $router->patch('nics/{nicId}', 'NicController@update');
         $router->delete('nics/{nicId}', 'NicController@destroy');
+    });
+
+    /** Credentials */
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('credentials', 'CredentialsController@index');
+        $router->get('credentials/{credentialsId}', 'CredentialsController@show');
+        $router->post('credentials', 'CredentialsController@store');
+        $router->patch('credentials/{credentialsId}', 'CredentialsController@update');
+        $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
+
     });
 });
 
