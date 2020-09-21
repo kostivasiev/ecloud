@@ -10,7 +10,6 @@ use App\Models\V2\Instance;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
 
