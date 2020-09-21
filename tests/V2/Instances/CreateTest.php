@@ -62,7 +62,6 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance_version->getKey(),
-            'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
@@ -88,7 +87,6 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->faker->uuid,
-            'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
@@ -114,7 +112,6 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance_version->getKey(),
-            'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 0,
             'ram_capacity' => 1024,
         ];
@@ -140,7 +137,6 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance_version->getKey(),
-            'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1,
         ];
@@ -167,7 +163,6 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance->appliance_uuid,
-            'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
@@ -200,7 +195,6 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'name' => $name,
             'appliance_id' => $this->appliance->appliance_uuid,
-            'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
@@ -235,7 +229,6 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance->appliance_uuid,
-            'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];

@@ -52,7 +52,6 @@ class UpdateInstanceRequest extends FormRequest
                 new ExistsForUser(Vpc::class)
             ],
             'appliance_id' => 'sometimes|required|uuid|exists:ecloud.appliance_version,appliance_version_uuid',
-            'vcpu_tier'    => 'sometimes|required|string', # needs exists: adding once tier has been added to db
             'vcpu_cores'   => [
                 'sometimes',
                 'required',
