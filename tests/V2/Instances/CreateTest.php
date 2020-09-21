@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
+use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,6 +18,7 @@ class CreateTest extends TestCase
     protected $vpc;
     protected $appliance;
     protected $appliance_version;
+    protected $instance;
 
     public function setUp(): void
     {
@@ -31,6 +33,9 @@ class CreateTest extends TestCase
         ])->refresh();
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ])->refresh();
+        $this->instance = factory(Instance::class)->create([
+            'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
         ])->refresh();
     }
 
@@ -161,7 +166,7 @@ class CreateTest extends TestCase
         // No name defined - defaults to ID
         $data = [
             'vpc_id' => $this->vpc->getKey(),
-            'appliance_id' => $this->appliance_version->getKey(),
+            'appliance_id' => $this->appliance->appliance_uuid,
             'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
@@ -194,7 +199,7 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'name' => $name,
-            'appliance_id' => $this->appliance_version->getKey(),
+            'appliance_id' => $this->appliance->appliance_uuid,
             'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
@@ -222,5 +227,31 @@ class CreateTest extends TestCase
                 ],
                 'ecloud'
             );
+    }
+
+    public function testSettingApplianceVersionId()
+    {
+        // No name defined - defaults to ID
+        $data = [
+            'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->appliance->appliance_uuid,
+            'vcpu_tier' => $this->faker->uuid,
+            'vcpu_cores' => 1,
+            'ram_capacity' => 1024,
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->assertResponseStatus(201);
+
+        $id = json_decode($this->response->getContent())->data->id;
+        $instance = Instance::findOrFail($id);
+        // Check that the appliance id has been converted to the appliance version id
+        $this->assertEquals($this->appliance_version->appliance_version_uuid, $instance->appliance_version_id);
     }
 }

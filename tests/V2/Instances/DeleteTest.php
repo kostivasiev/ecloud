@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'DeleteTest Default',
-            'appliance_id' => $this->appliance_version->getKey(),
+            'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
             'vcpu_tier' => $this->faker->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
