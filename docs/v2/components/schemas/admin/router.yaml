@@ -13,7 +13,7 @@ properties:
     example: 'vpc-2b66bb79'
   availability_zone_id:
     type: string
-    required: true
+    required: false
     example: 'az-2b66bb79'
   created_at:
     type: string

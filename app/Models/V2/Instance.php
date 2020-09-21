@@ -7,8 +7,6 @@ use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -39,6 +37,11 @@ class Instance extends Model implements Filterable, Sortable
         'vcpu_tier',
         'vcpu_cores',
         'ram_capacity',
+        'locked',
+    ];
+
+    protected $casts = [
+        'locked' => 'boolean',
     ];
 
     public function network()
@@ -78,6 +81,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('vcpu_tier', Filter::$stringDefaults),
             $factory->create('vcpu_cores', Filter::$stringDefaults),
             $factory->create('ram_capacity', Filter::$stringDefaults),
+            $factory->create('locked', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -98,14 +102,16 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('vcpu_tier'),
             $factory->create('vcpu_cores'),
             $factory->create('ram_capacity'),
+            $factory->create('locked'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\SortFactory  $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -127,6 +133,7 @@ class Instance extends Model implements Filterable, Sortable
             'vcpu_tier'    => 'vcpu_tier',
             'vcpu_cores'   => 'vcpu_cores',
             'ram_capacity' => 'ram_capacity',
+            'locked'       => 'locked',
             'created_at'   => 'created_at',
             'updated_at'   => 'updated_at',
         ];

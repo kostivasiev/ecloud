@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -14,13 +15,14 @@ use UKFast\Responses\UKFastResource;
  * @property string vcpu_tier
  * @property integer vcpu_cores
  * @property integer ram_capacity
+ * @property boolean locked
  * @property string created_at
  * @property string updated_at
  */
 class InstanceResource extends UKFastResource
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
@@ -33,6 +35,7 @@ class InstanceResource extends UKFastResource
             'vcpu_tier'    => $this->vcpu_tier,
             'vcpu_cores'   => $this->vcpu_count,
             'ram_capacity' => $this->ram_capacity,
+            'locked'       => $this->locked,
             'created_at'   => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

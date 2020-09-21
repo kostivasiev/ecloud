@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Dhcp;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -21,10 +22,15 @@ class DeleteTest extends TestCase
     /** @var Dhcp */
     private $dhcp;
 
+    protected $availability_zone;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'region_id'          => $this->region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);

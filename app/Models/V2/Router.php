@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\RouterCreated;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'rtr';
     protected $keyType = 'string';
