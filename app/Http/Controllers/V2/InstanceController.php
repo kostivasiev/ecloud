@@ -42,8 +42,12 @@ class InstanceController extends BaseController
      */
     public function show(Request $request, string $instanceId)
     {
+        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        if ($this->isAdmin) {
+            $instance->makeVisible('appliance_version_id');
+        }
         return new InstanceResource(
-            Instance::forUser($request->user)->findOrFail($instanceId)
+            $instance
         );
     }
 
@@ -57,6 +61,9 @@ class InstanceController extends BaseController
         $instance->fill($request->only($instance->getFillableMinusKey()));
         if (!$request->has('locked')) {
             $instance->locked = false;
+        }
+        if ($request->has('appliance_id')) {
+            $instance->setApplianceVersionId($request->get('appliance_id'));
         }
         $instance->save();
         $instance->refresh();
@@ -77,6 +84,9 @@ class InstanceController extends BaseController
             return $this->isLocked();
         }
         $instance->fill($request->only($instance->getFillableMinusKey()));
+        if ($request->has('appliance_id')) {
+            $instance->setApplianceVersionId($request->get('appliance_id'));
+        }
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
