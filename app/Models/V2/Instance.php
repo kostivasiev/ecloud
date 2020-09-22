@@ -40,11 +40,6 @@ class Instance extends Model implements Filterable, Sortable
         'locked' => 'boolean',
     ];
 
-    public function network()
-    {
-        return $this->belongsTo(Network::class);
-    }
-
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
