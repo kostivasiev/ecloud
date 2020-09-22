@@ -20,7 +20,7 @@ class CreateCredentialsTable extends Migration
             $table->string('host');
             $table->string('user');
             $table->string('password');
-            $table->string('port');
+            $table->string('port')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
