@@ -13,9 +13,9 @@ class RemoveVcpuTiersFromInstancesTable extends Migration
      */
     public function up()
     {
-        if (Schema::connection('ecloud')->hasColumn('instances', 'vcpu_tiers')) {
+        if (Schema::connection('ecloud')->hasColumn('instances', 'vcpu_tier')) {
             Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-                $table->dropColumn('vcpu_tiers');
+                $table->dropColumn('vcpu_tier');
             });
         }
     }
@@ -27,7 +27,7 @@ class RemoveVcpuTiersFromInstancesTable extends Migration
      */
     public function down()
     {
-        if (!Schema::connection('ecloud')->hasColumn('instances', 'vcpu_tiers')) {
+        if (!Schema::connection('ecloud')->hasColumn('instances', 'vcpu_tier')) {
             Schema::table('instances', function (Blueprint $table) {
                 $table->uuid('vcpu_tier')->after('appliance_id')->default('');
             });
