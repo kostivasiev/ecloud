@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Vpc;
@@ -25,14 +26,20 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'nullable|string',
+            'name' => 'nullable|string',
             'vpc_id' => [
                 'sometimes',
                 'required',
                 'nullable',
                 'string',
-                'exists:ecloud.vpcs,id',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
+            ],
+            'availability_zone_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.availability_zones,id,deleted_at,NULL'
             ],
             'locked' => 'sometimes|required|boolean',
         ];
@@ -46,8 +53,9 @@ class CreateRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
+            'vpc_id.required'             => 'The :attribute field is required',
+            'vpc_id.exists'               => 'No valid Vpc record found for specified :attribute',
+            'availability_zone_id.exists' => 'No valid Availability Zone exists for :attribute',
         ];
     }
 }

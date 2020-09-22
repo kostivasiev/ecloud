@@ -55,7 +55,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $instance = new Instance($request->only(['name', 'vpc_id', 'locked']));
+        $instance = new Instance($request->only(['name', 'vpc_id', 'availability_zone_id', 'locked']));
         if (!$request->has('locked')) {
             $instance->locked = false;
         }
@@ -77,7 +77,7 @@ class InstanceController extends BaseController
             $instance->locked === true) {
             return $this->isLocked();
         }
-        $instance->fill($request->only(['name', 'vpc_id', 'locked']));
+        $instance->fill($request->only(['name', 'vpc_id', 'locked', 'availability_zone_id']));
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
