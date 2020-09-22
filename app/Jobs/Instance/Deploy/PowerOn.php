@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Models\V2\Vpc;
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
@@ -23,28 +24,25 @@ class PowerOn extends Job
      */
     public function handle()
     {
-        $instance = Instance::find($this->data['instance_id']);
-
-        Log::info('Attempted to PowerOn '.$instance->id);
-
+        Log::info('Attempting to PowerOn instance '.$this->data['instance_id']);
+        $instance = Instance::findOrFail($this->data['instance_id']);
+        $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $kingpinService = app()->make(KingpinService::class, $instance->availabilityZone);
         try {
             /** @var Response $response */
-            $response = $kingpinService->post(
-                '/api/v2/vpc/'.$this->data['vpc_id'].'/instance/'.$instance->id.'/power'
-            );
+            $response = $kingpinService->post('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/power');
             if ($response->getStatusCode() == 200) {
-                Log::info('PowerOn job fin'.$instance->id);
+                Log::info('PowerOn finished successfully for instance '.$instance->id);
                 return;
             }
-            $message = 'Failed to PowerOn '.$instance->id.' with : '.$response->getReasonPhrase();
-            Log::error($message);
-            $this->fail(new \Exception($message));
+            $this->fail(new \Exception(
+                'Failed to PowerOn '.$instance->id.', Kingpin status was '.$response->getStatusCode()
+            ));
+            return;
         } catch (GuzzleException $exception) {
-            $message = 'PowerOn job for instance '.$this->data['vpc_id'].' failed with : '.
-                $exception->getResponse()->getBody()->getContents();
-            Log::error($message);
-            $this->fail(new \Exception($message));
+            $this->fail(new \Exception(
+                'Failed to PowerOn '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
+            ));
             return;
         }
     }
