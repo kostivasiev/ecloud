@@ -1,0 +1,104 @@
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test AZ (Not public) - PMC 1",
+  "code": "MAN1",
+  "datacentre_site_id": 111,
+  "is_public": false
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('availability_zone_id', response.body.data.id);
+client.log('Availability Zone ID: ' + response.body.data.id);
+%}
+
+<> 2020-07-24T043711.401.json
+<> 2020-07-24T034803.401.json
+<> 2020-07-24T034600.201.json
+<> 2020-07-24T034224.201.json
+<> 2020-07-24T033910.201.json
+<> 2020-07-16T124959.201.json
+<> 2020-07-16T104330.201.json
+
+###
+
+GET https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+<> 2020-08-19T105422.200.json
+<> 2020-08-19T105151.200.json
+<> 2020-08-13T044431.500.json
+<> 2020-08-13T044332.500.json
+<> 2020-08-13T044220.500.json
+<> 2020-08-13T044207.500.json
+<> 2020-08-13T044141.200.json
+<> 2020-07-29T094105.200.json
+<> 2020-07-29T093831.200.json
+<> 2020-07-27T094141.200.json
+<> 2020-07-27T093955.200.json
+<> 2020-07-27T092823.200.json
+<> 2020-07-27T092107.200.json
+<> 2020-07-27T091715.200.json
+<> 2020-07-27T091617.200.json
+<> 2020-07-24T034257.200.json
+<> 2020-07-24T033914.200.json
+
+###
+
+
+
+GET https://{{host}}/{{version}}/availability-zones/avz-716d7f96
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+<> 2020-07-24T035214.200.json
+<> 2020-07-24T035150.404.json
+<> 2020-07-24T034500.200.json
+<> 2020-07-24T034356.200.json
+<> 2020-07-24T034123.200.json
+<> 2020-07-24T034111.200.json
+<> 2020-07-24T033954.200.json
+
+
+###
+
+# Update
+PATCH https://{{host}}/{{version}}/availability-zones/avz-716d7f96
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test AZ (UPDATED) - PMC 1",
+  "code": "LON1",
+  "datacentre_site_id": 112,
+  "is_public": true
+}
+
+<> 2020-07-24T034437.200.json
+<> 2020-07-24T034120.200.json
+<> 2020-07-24T034107.200.json
+
+###
+
+# Delete
+DELETE https://{{host}}/{{version}}/availability-zones/avz-716d7f96
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id:0-0
+X-consumer-groups: ecloud.read, ecloud.write
+
+<> 2020-07-24T035018.401.json
+
