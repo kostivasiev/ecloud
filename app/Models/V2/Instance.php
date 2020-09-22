@@ -50,7 +50,7 @@ class Instance extends Model implements Filterable, Sortable
         return $this->hasMany(Credential::class, 'resource_id', 'id');
     }
 
-    public function availabilityZone()
+    public function availabilityZones()
     {
         return $this->belongsTo(AvailabilityZone::class);
     }
