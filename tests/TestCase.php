@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Listeners\V2\DhcpCreate;
 use App\Models\V1\Datastore;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\Router;
@@ -32,11 +33,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         Router::flushEventListeners();
         Dhcp::flushEventListeners();
         FirewallRule::flushEventListeners();
-
-        // Forget Vpc event listeners
-        $vpcDispatcher = Vpc::getEventDispatcher();
-        $vpcDispatcher->forget(DhcpCreate::class);
-        Vpc::setEventDispatcher($vpcDispatcher);
+        Vpc::flushEventListeners();
         Network::flushEventListeners();
     }
 
