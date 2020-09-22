@@ -31,7 +31,7 @@ class KingpinServiceProvider extends ServiceProvider
                     'base_uri' => empty($credentials->port) ?
                         $credentials->host :
                         $credentials->host . ':' . $credentials->port,
-                    'auth' => [config('kingpin.user'), $credentials->password],
+                    'auth' => [$credentials->user, $credentials->password],
                     'timeout'  => 10,
                     'verify' => $this->app->environment() === 'production'
                 ])
