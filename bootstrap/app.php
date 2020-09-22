@@ -32,6 +32,7 @@ $app->configure('nsx');
 $app->configure('queue');
 $app->configure('erd-generator');
 $app->configure('volume');
+$app->configure('kingpin');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -108,9 +109,13 @@ $app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider
 $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
 
+
 // ecloud service providers
 $app->register(App\Providers\KingpinServiceProvider::class);
 $app->register(App\Providers\ArtisanServiceProvider::class);
+$app->register(\App\Providers\EncryptionServiceProvider::class);
+$app->register(App\Providers\V2\KingpinServiceProvider::class);
+
 
 // apio service providers
 $app->register(App\Providers\NetworkingServiceProvider::class);

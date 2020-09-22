@@ -63,8 +63,6 @@ components:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
-    InstanceId:
-      $ref: 'resources/Instance/parameters/instanceId.yaml'
     FipId:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallRuleId:
@@ -86,8 +84,6 @@ components:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
-    InstanceIdResponse:
-      $ref: 'resources/Instance/responses/idResponse.yaml'
     FipIdResponse:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
@@ -115,7 +111,7 @@ paths:
     $ref: 'resources/Network/item.yaml'
   '/ecloud/v2/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
-  '/ecloud/v2/vpcs/{dhcpId}':
+  '/ecloud/v2/dhcps/{dhcpId}':
     $ref: 'resources/Dhcp/item.yaml'
   '/ecloud/v2/vpns':
     $ref: 'resources/Vpn/collection.yaml'
@@ -125,6 +121,8 @@ paths:
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
     $ref: 'resources/Instance/item.yaml'
+  '/ecloud/v2/instances/{instanceId}/credentials':
+    $ref: 'resources/Instance/credentials.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
@@ -149,3 +147,6 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
+
+  '/ecloud/v2/instances/{instanceId}/deploy':
+    $ref: 'instances/deploy.yaml'

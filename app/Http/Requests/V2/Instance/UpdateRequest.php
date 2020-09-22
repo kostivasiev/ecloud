@@ -1,12 +1,12 @@
 <?php
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
-class UpdateInstanceRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
 
     protected $instanceId;
@@ -49,7 +49,8 @@ class UpdateInstanceRequest extends FormRequest
                 'string',
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
-            ]
+            ],
+            'locked' => 'sometimes|required|boolean',
         ];
 
         return $rules;

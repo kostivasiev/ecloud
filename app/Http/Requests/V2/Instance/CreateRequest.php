@@ -1,11 +1,12 @@
 <?php
-namespace App\Http\Requests\V2;
+
+namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
-class CreateInstanceRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +26,7 @@ class CreateInstanceRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'nullable|string',
+            'name' => 'nullable|string',
             'vpc_id' => [
                 'sometimes',
                 'required',
@@ -39,7 +40,8 @@ class CreateInstanceRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL'
-            ]
+            ],
+            'locked' => 'sometimes|required|boolean',
         ];
     }
 
@@ -51,8 +53,9 @@ class CreateInstanceRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
+            'vpc_id.required'             => 'The :attribute field is required',
+            'vpc_id.exists'               => 'No valid Vpc record found for specified :attribute',
+            'availability_zone_id.exists' => 'No valid Availability Zone exists for :attribute',
         ];
     }
 }

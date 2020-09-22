@@ -33,16 +33,26 @@ class Instance extends Model implements Filterable, Sortable
         'name',
         'vpc_id',
         'availability_zone_id',
+        'locked',
     ];
 
-    public function network()
-    {
-        return $this->belongsTo(Network::class);
-    }
+    protected $casts = [
+        'locked' => 'boolean',
+    ];
 
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    public function credentials()
+    {
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
+    }
+
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
     }
 
     public function scopeForUser($query, $user)
@@ -69,6 +79,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
+            $factory->create('locked', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -86,6 +97,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
+            $factory->create('locked'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -112,8 +124,9 @@ class Instance extends Model implements Filterable, Sortable
             'name'                 => 'name',
             'vpc_id'               => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
-            'created_at'           => 'created_at',
-            'updated_at'           => 'updated_at',
+            'locked'     => 'locked',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 }
