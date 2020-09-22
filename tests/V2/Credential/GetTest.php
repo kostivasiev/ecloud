@@ -31,7 +31,13 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson($this->formatDates($this->credential->toArray()))
+            ->seeJson([
+                    'resource_id' => 'abc-abc132',
+                    'host' => 'https://127.0.0.1',
+                    'user' => 'someuser',
+                    'password' => 'somepassword',
+                    'port' => 8080
+            ])
             ->assertResponseStatus(200);
     }
 
@@ -44,17 +50,13 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson($this->formatDates(collect($this->credential)->except('password')->toArray()))
+            ->seeJson([
+                'resource_id' => 'abc-abc132',
+                'host' => 'https://127.0.0.1',
+                'user' => 'someuser',
+                'password' => 'somepassword',
+                'port' => 8080
+            ])
             ->assertResponseStatus(200);
-    }
-
-    protected function formatDates(array $resource)
-    {
-        $resource['created_at'] = Carbon::parse($resource['created_at'])
-            ->toIso8601String();
-        $resource['updated_at'] = Carbon::parse($resource['updated_at'])
-            ->toIso8601String();
-
-        return $resource;
     }
 }
