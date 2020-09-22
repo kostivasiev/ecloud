@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Console\Commands\Nsx;
+namespace App\Console\Commands\Kingpin;
 
-use App\Services\NsxService;
-use GuzzleHttp\Exception\RequestException;
+use App\Models\V2\AvailabilityZone;
+use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
 
 class TestAuth extends Command
 {
-    protected $signature = 'nsx:test-auth';
+    protected $signature = 'kingpin:test-auth';
 
-    protected $description = 'Performs auth against the configured NSX instance';
+    protected $description = 'Performs Kingpin auth';
 
     public function __construct()
     {
@@ -20,15 +20,21 @@ class TestAuth extends Command
 
     public function handle()
     {
+        /** @var  $availabilityZone
+         * Kingpin credentials have been stored against this resource
+         */
+        //$availabilityZone = AvailabilityZone::findOrFail('avz-2b66bb79');
+        $availabilityZone = AvailabilityZone::firstOrFail();
+
         try {
             /** @var Response $response */
-            app()->make(NsxService::class)->get('policy/api/v1');
-        } catch (RequestException $exception) {
-            if ($exception->getCode() == 404) {
-                $this->info('Auth test passed');
+            app()->make(KingpinService::class, [$availabilityZone])->get('/api/v1/application/version');
+        } catch (\Exception $exception) {
+            if ($exception->getCode() == 401) {
+                $this->error('Auth test failed');
                 return;
             }
         }
-        $this->error('Auth test failed');
+        $this->info('Auth test passed');
     }
 }

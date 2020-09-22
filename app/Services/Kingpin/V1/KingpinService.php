@@ -496,6 +496,11 @@ class KingpinService
             if (!empty($this->responseData) && is_array($this->responseData)) {
                 foreach ($this->responseData as $template) {
                     $Template = new PodTemplate($template, $this->pod);
+
+                    if (empty($Template->serverLicense->name)) {
+                        continue; // no license name, means license not available to customers
+                    }
+
                     $templates[] = $Template;
                 }
             }

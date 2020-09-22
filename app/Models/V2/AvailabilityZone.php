@@ -3,7 +3,6 @@
 namespace App\Models\V2;
 
 use App\Services\NsxService;
-use App\Traits\V2\Credentials;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class AvailabilityZone extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, Credentials;
+    use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'az';
     protected $keyType = 'string';
@@ -62,6 +61,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public function region()
     {
         return $this->belongsTo(Region::class);
+    }
+
+    public function credentials()
+    {
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
     }
 
     public function nsxClient() : NsxService

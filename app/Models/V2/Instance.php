@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\Credentials;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Credentials;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'i';
     protected $keyType = 'string';
@@ -43,6 +42,11 @@ class Instance extends Model implements Filterable, Sortable
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    public function credentials()
+    {
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
     }
 
     public function scopeForUser($query, $user)

@@ -12,13 +12,10 @@ class KingpinServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind(KingpinService::class, function ($app, $data)
-        {
+        $this->app->bind(KingpinService::class, function ($app, $data) {
             if (!is_a($data[0], AvailabilityZone::class)) {
                 $message = 'Invalid AvailabilityZone Object';
-                Log::error($message, [
-                    typeOf($data[0])
-                ]);
+                Log::error($message);
                 throw new \Exception('Failed to create Kingpin connection: ' . $message);
             }
 
@@ -29,38 +26,15 @@ class KingpinServiceProvider extends ServiceProvider
                 ->where('user', '=', config('kingpin.user'))
                 ->firstOrFail();
 
-
-
-
-
-//            if (!empty($credentials->port)) {
-//                $baseUri .= ':' . $serverDetail->server_detail_login_port;
-//            }
-//
-
-//            exit(print_r(
-//                [
-//                    $credentials->host,
-//                    $credentials->password,
-//                    $credentials->port
-//                ]
-//            ));
-
-
-
-            $auth = base64_encode(config('kingpin.user') . ':' . $credentials->password);
-
-
             return new KingpinService(
                 new Client([
-                    'base_uri' => $credentials->host,
-                    'headers' => [
-                        'Authorization' => ['Basic ' . $auth],
-                    ],
+                    'base_uri' => empty($credentials->port) ?
+                        $credentials->host :
+                        $credentials->host . ':' . $credentials->port,
+                    'auth' => [$credentials->user, $credentials->password],
                     'timeout'  => 10,
-                    'verify' => false, //$this->app->environment() === 'production',
-                ]),
-                $data['nsx_edge_cluster_id']
+                    'verify' => $this->app->environment() === 'production'
+                ])
             );
         });
     }
