@@ -3,6 +3,7 @@
 namespace Tests\V2\Credential;
 
 use App\Models\V2\Credential;
+use App\Providers\EncryptionServiceProvider;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -10,13 +11,29 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind('encrypter', function() use ($mockEncryptionServiceProvider) {
+            return $mockEncryptionServiceProvider;
+        });
+        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+    }
+
     public function testValidDataSucceeds()
     {
-        $credential = factory(Credential::class)->make();
-
         $this->post(
             '/v2/credentials',
-            $credential->toArray(),
+            [
+                'resource_id' => 'abc-abc132',
+                'host' => 'https://127.0.0.1',
+                'user' => 'someuser',
+                'password' => 'somepassword',
+                'port' => 8080
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
@@ -24,13 +41,18 @@ class CreateTest extends TestCase
         )
             ->seeInDatabase(
                 'credentials',
-                collect($credential)->except('password')->toArray(),
+                [
+                    'resource_id' => 'abc-abc132',
+                    'host' => 'https://127.0.0.1',
+                    'user' => 'someuser',
+                    'port' => 8080
+                ],
                 'ecloud'
             )
             // Assert that we're not storing the plain text password in the db
             ->missingFromDatabase(
                 'credentials',
-                ['password' => $credential->password],
+                ['password' => 'somepassword'],
                 'ecloud'
             )
             ->assertResponseStatus(201);

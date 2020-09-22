@@ -63,6 +63,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->belongsTo(Region::class);
     }
 
+    public function credentials()
+    {
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
+    }
+
     public function nsxClient() : NsxService
     {
         if (!$this->nsxService) {

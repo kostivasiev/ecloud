@@ -13,10 +13,8 @@ class EncryptionServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $key = $this->registerEncryptionKey();
-
-        $this->app->singleton('encrypter', function () use ($key) {
-            return new Encrypter($key, config('app.cipher'));
+        $this->app->singleton('encrypter', function () {
+            return new Encrypter($this->registerEncryptionKey(), config('app.cipher'));
         });
     }
 

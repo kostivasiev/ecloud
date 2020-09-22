@@ -111,7 +111,7 @@ paths:
     $ref: 'resources/Network/item.yaml'
   '/ecloud/v2/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
-  '/ecloud/v2/vpcs/{dhcpId}':
+  '/ecloud/v2/dhcps/{dhcpId}':
     $ref: 'resources/Dhcp/item.yaml'
   '/ecloud/v2/vpns':
     $ref: 'resources/Vpn/collection.yaml'
@@ -148,3 +148,5 @@ paths:
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
 
+  '/ecloud/v2/instances/{instanceId}/deploy':
+    $ref: 'instances/deploy.yaml'

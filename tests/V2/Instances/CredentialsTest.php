@@ -5,6 +5,7 @@ namespace Tests\V2\Instances;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
 use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -23,7 +24,15 @@ class CredentialsTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Vpc::flushEventListeners();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind('encrypter', function() use ($mockEncryptionServiceProvider) {
+            return $mockEncryptionServiceProvider;
+        });
+        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);

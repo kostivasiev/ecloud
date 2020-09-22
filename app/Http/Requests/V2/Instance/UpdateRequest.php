@@ -1,13 +1,12 @@
 <?php
-
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
-class UpdateInstanceRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
 
     protected $instanceId;
@@ -51,7 +50,12 @@ class UpdateInstanceRequest extends FormRequest
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
             ],
-            'appliance_id' => 'sometimes|required|uuid|exists:ecloud.appliance_version,appliance_version_uuid',
+            'appliance_id' => [
+                'sometimes',
+                'required',
+                'uuid',
+                'exists:ecloud.appliance,appliance_uuid'
+            ],
             'vcpu_cores'   => [
                 'sometimes',
                 'required',
