@@ -42,15 +42,35 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name'    => 'nullable|string',
-            'vpc_id' => [
+            'name'         => 'nullable|string',
+            'vpc_id'       => [
                 'sometimes',
-                'nullable',
+                'required',
                 'string',
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
             ],
-            'locked' => 'sometimes|required|boolean',
+            'appliance_id' => [
+                'sometimes',
+                'required',
+                'uuid',
+                'exists:ecloud.appliance,appliance_uuid'
+            ],
+            'vcpu_cores'   => [
+                'sometimes',
+                'required',
+                'numeric',
+                'min:'.config('instance.cpu_cores.min'),
+                'max:'.config('instance.cpu_cores.max'),
+            ],
+            'ram_capacity' => [
+                'sometimes',
+                'required',
+                'numeric',
+                'min:'.config('instance.ram_capacity.min'),
+                'max:'.config('instance.ram_capacity.max'),
+            ],
+            'locked'       => 'sometimes|required|boolean',
         ];
 
         return $rules;
@@ -64,8 +84,21 @@ class UpdateRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
+            'vpc_id.required'       => 'The :attribute field is required',
+            'vpc_id.exists'         => 'No valid Vpc record found for specified :attribute',
+            'appliance_id.required' => 'The :attribute field is required',
+            'appliance_id.exists'   => 'The :attribute is not a valid Appliance',
+            'vcpu_tier.required'    => 'The :attribute field is required',
+            'vcpu_cores.required'   => 'The :attribute field is required',
+            'vcpu_cores.min'        => 'Specified :attribute is below the minimum of '
+                .config('instance.cpu_cores.min'),
+            'vcpu_cores.max'        => 'Specified :attribute is above the maximum of '
+                .config('instance.cpu_cores.max'),
+            'ram_capacity.required' => 'The :attribute field is required',
+            'ram_capacity.min'      => 'Specified :attribute is below the minimum of '
+                .config('instance.ram_capacity.min'),
+            'ram_capacity.max'      => 'Specified :attribute is above the maximum of '
+                .config('instance.ram_capacity.max'),
         ];
     }
 }
