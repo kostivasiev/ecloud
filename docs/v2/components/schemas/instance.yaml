@@ -16,7 +16,7 @@ properties:
   appliance_id:
     type: string
     required: true
-    example: app-abc123xyz
+    example: 'cf7c54c2-ef77-45bc-b700-e00d66044f3c'
     readOnly: false
   vcpu_tier:
     type: string
