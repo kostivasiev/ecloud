@@ -23,7 +23,13 @@ patch:
     content:
       application/json:
         schema:
-          $ref: '../../public-openapi.yaml#/components/schemas/VirtualPrivateCloud'
+          type: object
+          allOf:
+            - $ref: '../../public-openapi.yaml#/components/schemas/VirtualPrivateCloud'
+            - type: object
+              properties:
+                region_id:
+                  required: false
   responses:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/VirtualPrivateCloudsIdResponse'
