@@ -174,14 +174,4 @@ class Instance extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
-
-    /**
-     * @return array
-     */
-    public function getFillableMinusKey(): array
-    {
-        return Arr::where($this->getFillable(), function ($key, $value) {
-            return ($value != $this->getKeyName());
-        });
-    }
 }
