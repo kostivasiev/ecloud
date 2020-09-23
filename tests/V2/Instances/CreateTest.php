@@ -38,14 +38,14 @@ class CreateTest extends TestCase
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
-        ])->refresh();
+        ]);
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
+        ]);
         $this->instance = factory(Instance::class)->create([
             'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),
-        ])->refresh();
+        ]);
     }
 
     public function testValidDataSucceeds()

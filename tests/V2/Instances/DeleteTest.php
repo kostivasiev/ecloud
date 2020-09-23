@@ -38,10 +38,10 @@ class DeleteTest extends TestCase
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
-        ])->refresh();
+        ]);
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
+        ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'DeleteTest Default',
