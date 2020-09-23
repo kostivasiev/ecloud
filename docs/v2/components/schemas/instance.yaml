@@ -18,11 +18,6 @@ properties:
     required: true
     example: 'cf7c54c2-ef77-45bc-b700-e00d66044f3c'
     readOnly: false
-  vcpu_tier:
-    type: string
-    required: true
-    example: tier-abc123xyz
-    readOnly: false
   vcpu_cores:
     type: integer
     required: true
