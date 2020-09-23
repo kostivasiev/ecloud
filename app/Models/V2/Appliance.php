@@ -2,11 +2,11 @@
 
 namespace App\Models\V2;
 
-use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Exceptions\NotFoundException;
 
 class Appliance extends Model
 {
@@ -37,8 +37,8 @@ class Appliance extends Model
 
     /**
      * Get the latest version of the appliance.
-     * @return Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
-     * @throws ApplianceVersionNotFoundException
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
+     * @throws \UKFast\Api\Exceptions\NotFoundException
      */
     public function getLatestVersion()
     {
@@ -47,7 +47,7 @@ class Appliance extends Model
             return $version->first();
         }
 
-        throw new ApplianceVersionNotFoundException(
+        throw new NotFoundException(
             'Unable to load latest version of the appliance. No versions were found.'
         );
     }
@@ -61,7 +61,7 @@ class Appliance extends Model
         try {
             $version = $this->getLatestVersion();
             return $version->version;
-        } catch (ApplianceVersionNotFoundException $exception) {
+        } catch (NotFoundException $exception) {
             return 0;
         }
     }
