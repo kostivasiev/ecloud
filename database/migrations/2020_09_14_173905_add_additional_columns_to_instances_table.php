@@ -17,6 +17,7 @@ class AddAdditionalColumnsToInstancesTable extends Migration
             $table->uuid('appliance_version_id')->after('vpc_id')->default('');
             $table->integer('vcpu_cores')->after('appliance_version_id')->default('');
             $table->integer('ram_capacity')->after('vcpu_count')->default(1024);
+            $table->boolean('locked')->default(false);
         });
     }
 
@@ -28,7 +29,7 @@ class AddAdditionalColumnsToInstancesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->dropColumn(['appliance_version_id', 'vcpu_cores', 'ram_capacity']);
+            $table->dropColumn(['appliance_version_id', 'vcpu_cores', 'ram_capacity', 'locked']);
         });
     }
 }
