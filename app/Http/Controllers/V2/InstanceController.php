@@ -59,8 +59,14 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $instance = new Instance();
-        $instance->fill($request->only($instance->getFillableMinusKey()));
+        $instance = new Instance($request->only([
+            'name',
+            'vpc_id',
+            'availability_zone_id',
+            'vcpu_cores',
+            'ram_capacity',
+            'locked'
+        ]));
         if (!$request->has('locked')) {
             $instance->locked = false;
         }
@@ -85,7 +91,14 @@ class InstanceController extends BaseController
             $instance->locked === true) {
             return $this->isLocked();
         }
-        $instance->fill($request->only($instance->getFillableMinusKey()));
+        $instance->fill($request->only([
+            'name',
+            'vpc_id',
+            'availability_zone_id',
+            'vcpu_cores',
+            'ram_capacity',
+            'locked'
+        ]));
         if ($request->has('appliance_id')) {
             $instance->setApplianceVersionId($request->get('appliance_id'));
         }

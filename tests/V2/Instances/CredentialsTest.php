@@ -2,8 +2,10 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use Tests\TestCase;
@@ -27,17 +29,22 @@ class CredentialsTest extends TestCase
 
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
             ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function() use ($mockEncryptionServiceProvider) {
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
             return $mockEncryptionServiceProvider;
         });
         $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
         $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
 
+        $region = factory(Region::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $availabilityZone->getKey(),
         ]);
 
         $this->credential = factory(Credential::class)->create([

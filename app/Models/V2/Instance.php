@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
@@ -35,6 +36,7 @@ class Instance extends Model implements Filterable, Sortable
         'appliance_version_id',
         'vcpu_cores',
         'ram_capacity',
+        'availability_zone_id',
         'locked',
     ];
 
@@ -58,6 +60,11 @@ class Instance extends Model implements Filterable, Sortable
     public function credentials()
     {
         return $this->hasMany(Credential::class, 'resource_id', 'id');
+    }
+
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
     }
 
     public function scopeForUser($query, $user)
@@ -109,6 +116,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('appliance_version_id', Filter::$stringDefaults),
             $factory->create('vcpu_cores', Filter::$stringDefaults),
             $factory->create('ram_capacity', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -129,6 +137,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('appliance_version_id'),
             $factory->create('vcpu_cores'),
             $factory->create('ram_capacity'),
+            $factory->create('availability_zone_id'),
             $factory->create('locked'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -159,9 +168,10 @@ class Instance extends Model implements Filterable, Sortable
             'appliance_version_id' => 'appliance_version_id',
             'vcpu_cores'           => 'vcpu_cores',
             'ram_capacity'         => 'ram_capacity',
-            'locked'               => 'locked',
-            'created_at'           => 'created_at',
-            'updated_at'           => 'updated_at',
+            'availability_zone_id' => 'availability_zone_id',
+            'locked'     => 'locked',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 

@@ -33,6 +33,10 @@ properties:
     required: true
     example: 1024
     readOnly: false
+  availability_zone_id:
+    type: string
+    required: false
+    example: 'az-2b66bb79'
   locked:
     type: boolean
     required: false

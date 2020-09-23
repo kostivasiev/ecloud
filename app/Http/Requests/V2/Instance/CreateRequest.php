@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Vpc;
@@ -25,12 +26,12 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'         => 'nullable|string',
-            'vpc_id'       => [
+            'name' => 'nullable|string',
+            'vpc_id' => [
                 'sometimes',
                 'required',
                 'string',
-                'exists:ecloud.vpcs,id',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
             'appliance_id' => [
@@ -50,7 +51,13 @@ class CreateRequest extends FormRequest
                 'min:'.config('ram.capacity.min'),
                 'max:'.config('ram.capacity.max'),
             ],
-            'locked'       => 'sometimes|required|boolean',
+            'availability_zone_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.availability_zones,id,deleted_at,NULL'
+            ],
+            'locked' => 'sometimes|required|boolean',
         ];
     }
 
@@ -73,6 +80,7 @@ class CreateRequest extends FormRequest
             'ram_capacity.required' => 'The :attribute field is required',
             'ram_capacity.min'      => 'Specified :attribute is below the minimum of '.config('ram.capacity.min'),
             'ram_capacity.max'      => 'Specified :attribute is above the maximum of '.config('ram.capacity.max'),
+            'availability_zone_id.exists' => 'No valid Availability Zone exists for :attribute',
         ];
     }
 }
