@@ -60,15 +60,15 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'numeric',
-                'min:'.config('cpu.cores.min'),
-                'max:'.config('cpu.cores.max'),
+                'min:'.config('instance.cpu_cores.min'),
+                'max:'.config('instance.cpu_cores.max'),
             ],
             'ram_capacity' => [
                 'sometimes',
                 'required',
                 'numeric',
-                'min:'.config('ram.capacity.min'),
-                'max:'.config('ram.capacity.max'),
+                'min:'.config('instance.ram_capacity.min'),
+                'max:'.config('instance.ram_capacity.max'),
             ],
             'locked'       => 'sometimes|required|boolean',
         ];
@@ -90,11 +90,15 @@ class UpdateRequest extends FormRequest
             'appliance_id.exists'   => 'The :attribute is not a valid Appliance',
             'vcpu_tier.required'    => 'The :attribute field is required',
             'vcpu_cores.required'   => 'The :attribute field is required',
-            'vcpu_cores.min'        => 'Specified :attribute is below the minimum of '.config('cpu.cores.min'),
-            'vcpu_cores.max'        => 'Specified :attribute is above the maximum of '.config('cpu.cores.max'),
+            'vcpu_cores.min'        => 'Specified :attribute is below the minimum of '
+                .config('instance.cpu_cores.min'),
+            'vcpu_cores.max'        => 'Specified :attribute is above the maximum of '
+                .config('instance.cpu_cores.max'),
             'ram_capacity.required' => 'The :attribute field is required',
-            'ram_capacity.min'      => 'Specified :attribute is below the minimum of '.config('ram.capacity.min'),
-            'ram_capacity.max'      => 'Specified :attribute is above the maximum of '.config('ram.capacity.max'),
+            'ram_capacity.min'      => 'Specified :attribute is below the minimum of '
+                .config('instance.ram_capacity.min'),
+            'ram_capacity.max'      => 'Specified :attribute is above the maximum of '
+                .config('instance.ram_capacity.max'),
         ];
     }
 }

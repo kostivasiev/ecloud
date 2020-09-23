@@ -31,8 +31,7 @@ $app->configure('encryption');
 $app->configure('nsx');
 $app->configure('queue');
 $app->configure('erd-generator');
-$app->configure('cpu');
-$app->configure('ram');
+$app->configure('instance');
 $app->configure('volume');
 $app->configure('kingpin');
 
