@@ -3,16 +3,35 @@ properties:
     type: string
     example: vdc-2b66bb79
     readOnly: true
-  vpc_id:
-    type: string
-    required: false
-    example: vpc-2b66bb79
-    readOnly: false
   name:
     type: string
     required: false
     example: 'My Instance'
     readOnly: false
+  vpc_id:
+    type: string
+    required: true
+    example: vpc-2b66bb79
+    readOnly: false
+  appliance_id:
+    type: string
+    required: true
+    example: 'cf7c54c2-ef77-45bc-b700-e00d66044f3c'
+    readOnly: false
+  vcpu_cores:
+    type: integer
+    required: true
+    example: 1
+    readOnly: false
+  ram_capacity:
+    type: integer
+    required: true
+    example: 1024
+    readOnly: false
+  availability_zone_id:
+    type: string
+    required: false
+    example: 'az-2b66bb79'
   locked:
     type: boolean
     required: false

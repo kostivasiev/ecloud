@@ -2,9 +2,11 @@
 
 namespace Tests\V2\Nic;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -14,23 +16,30 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
-    protected $nic;
+    protected \Faker\Generator $faker;
+    protected $availability_zone;
     protected $instance;
-    protected $network;
     protected $macAddress;
+    protected $network;
+    protected $nic;
+    protected $region;
+    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
         $this->macAddress = $this->faker->macAddress;
+        $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
         Vpc::flushEventListeners();
-        $vpc = factory(Vpc::class)->create([
-            'name' => 'Manchester VPC',
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
         ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $vpc->getKey(),
+            'vpc_id' => $this->vpc->getKey(),
         ]);
         $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',
@@ -40,37 +49,6 @@ class GetTest extends TestCase
             'instance_id' => $this->instance->getKey(),
             'network_id'  => $this->network->getKey(),
         ]);
-    }
-
-    public function testNoPermIsDenied()
-    {
-        $this->get(
-            '/v2/nics',
-            []
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
-    public function testNoAdminIsDenied()
-    {
-        $this->get(
-            '/v2/nics',
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups'    => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
     }
 
     public function testGetCollection()
@@ -85,7 +63,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getkey(),
-                'network_id' => $this->network->getKey(),
+                'network_id'  => $this->network->getKey(),
             ])
             ->assertResponseStatus(200);
     }
@@ -102,7 +80,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getkey(),
-                'network_id' => $this->network->getKey(),
+                'network_id'  => $this->network->getKey(),
             ])
             ->assertResponseStatus(200);
     }

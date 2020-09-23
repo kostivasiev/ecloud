@@ -3,9 +3,11 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -14,19 +16,30 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'i';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'name',
         'vpc_id',
+        'appliance_version_id',
+        'vcpu_cores',
+        'ram_capacity',
+        'availability_zone_id',
         'locked',
+    ];
+
+    protected $hidden = [
+        'appliance_version_id'
+    ];
+
+    protected $appends = [
+        'appliance_id'
     ];
 
     protected $casts = [
@@ -43,6 +56,11 @@ class Instance extends Model implements Filterable, Sortable
         return $this->hasMany(Credential::class, 'resource_id', 'id');
     }
 
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
+
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
@@ -56,8 +74,34 @@ class Instance extends Model implements Filterable, Sortable
         return $query;
     }
 
+    public function getApplianceIdAttribute()
+    {
+        $versions = $this->applianceVersions()
+            ->first();
+        if (!$versions) {
+            return;
+        }
+        return $versions->appliance
+            ->appliance_uuid;
+    }
+
+    public function applianceVersions()
+    {
+        return $this->belongsTo(
+            ApplianceVersion::class,
+            'appliance_version_id',
+            'appliance_version_uuid'
+        );
+    }
+
+    public function setApplianceVersionId(string $applianceUuid)
+    {
+        $version = (new ApplianceVersion)->getLatest($applianceUuid);
+        $this->attributes['appliance_version_id'] = $version;
+    }
+
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\FilterFactory  $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
@@ -66,6 +110,10 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('appliance_version_id', Filter::$stringDefaults),
+            $factory->create('vcpu_cores', Filter::$stringDefaults),
+            $factory->create('ram_capacity', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -73,7 +121,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\SortFactory  $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -83,6 +131,10 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
+            $factory->create('appliance_version_id'),
+            $factory->create('vcpu_cores'),
+            $factory->create('ram_capacity'),
+            $factory->create('availability_zone_id'),
             $factory->create('locked'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -90,8 +142,9 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\SortFactory  $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -106,9 +159,13 @@ class Instance extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
-            'vpc_id'     => 'vpc_id',
+            'id'                   => 'id',
+            'name'                 => 'name',
+            'vpc_id'               => 'vpc_id',
+            'appliance_version_id' => 'appliance_version_id',
+            'vcpu_cores'           => 'vcpu_cores',
+            'ram_capacity'         => 'ram_capacity',
+            'availability_zone_id' => 'availability_zone_id',
             'locked'     => 'locked',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

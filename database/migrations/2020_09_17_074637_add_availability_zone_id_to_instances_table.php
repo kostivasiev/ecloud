@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLockedColumnToInstancesTable extends Migration
+class AddAvailabilityZoneIdToInstancesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class AddLockedColumnToInstancesTable extends Migration
      */
     public function up()
     {
-        if (
-            Schema::connection('ecloud')->hasTable('instances') &&
-            !Schema::connection('ecloud')->hasColumn('instances', 'locked')
-        ) {
+        if (Schema::connection('ecloud')->hasTable('instances')) {
             Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-                $table->boolean('locked')->default(false);
+                if (!Schema::connection('ecloud')->hasColumn('instances', 'availability_zone_id')) {
+                    $table->uuid('availability_zone_id')->after('vpc_id')->nullable();
+                }
             });
         }
     }
@@ -30,12 +29,11 @@ class AddLockedColumnToInstancesTable extends Migration
      */
     public function down()
     {
-        if (
-            Schema::connection('ecloud')->hasTable('instances') &&
-            Schema::connection('ecloud')->hasColumn('instances', 'locked')
-        ) {
+        if (Schema::connection('ecloud')->hasTable('instances')) {
             Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-                $table->dropColumn('locked');
+                if (!Schema::connection('ecloud')->hasColumn('instances', 'availability_zone_id')) {
+                    $table->dropColumn('vpc_id');
+                }
             });
         }
     }
