@@ -38,14 +38,14 @@ class CreateTest extends TestCase
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
-        ]);
+        ])->refresh();
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ]);
+        ])->refresh();
         $this->instance = factory(Instance::class)->create([
-            'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
+            'appliance_version_id' => $this->appliance_version->uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),
-        ]);
+        ])->refresh();
     }
 
     public function testValidDataSucceeds()
@@ -56,7 +56,7 @@ class CreateTest extends TestCase
             [
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
-                'appliance_id' => $this->appliance->getKey(),
+                'appliance_id' => $this->appliance->uuid,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
             ],
@@ -89,7 +89,7 @@ class CreateTest extends TestCase
                 'name'   => $name,
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
-                'appliance_id' => $this->appliance->getKey(),
+                'appliance_id' => $this->appliance->uuid,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
             ],
@@ -117,7 +117,7 @@ class CreateTest extends TestCase
             '/v2/instances',
             [
                 'vpc_id' => $this->vpc->getKey(),
-                'appliance_id' => $this->appliance->getKey(),
+                'appliance_id' => $this->appliance->uuid,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
             ],
@@ -138,7 +138,7 @@ class CreateTest extends TestCase
         // No name defined - defaults to ID
         $data = [
             'vpc_id' => $this->vpc->getKey(),
-            'appliance_id' => $this->appliance->appliance_uuid,
+            'appliance_id' => $this->appliance->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];
@@ -155,6 +155,6 @@ class CreateTest extends TestCase
         $id = json_decode($this->response->getContent())->data->id;
         $instance = Instance::findOrFail($id);
         // Check that the appliance id has been converted to the appliance version id
-        $this->assertEquals($this->appliance_version->appliance_version_uuid, $instance->appliance_version_id);
+        $this->assertEquals($this->appliance_version->uuid, $instance->appliance_version_id);
     }
 }
