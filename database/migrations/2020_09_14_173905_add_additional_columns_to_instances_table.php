@@ -15,8 +15,8 @@ class AddAdditionalColumnsToInstancesTable extends Migration
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
             $table->uuid('appliance_version_id')->after('vpc_id')->default('');
-            $table->integer('vcpu_cores')->after('appliance_version_id')->default(0);
-            $table->integer('ram_capacity')->after('vcpu_cores')->default(1024);
+            $table->integer('vcpu_cores')->after('appliance_version_id')->nullable();
+            $table->integer('ram_capacity')->after('vcpu_cores')->nullable();
             $table->boolean('locked')->default(false);
         });
     }
