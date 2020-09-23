@@ -45,7 +45,7 @@ class CreateTest extends TestCase
         $this->instance = factory(Instance::class)->create([
             'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),
-        ])->refresh();
+        ]);
     }
 
     public function testValidDataSucceeds()
