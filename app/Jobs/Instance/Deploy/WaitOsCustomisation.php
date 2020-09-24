@@ -42,7 +42,7 @@ class WaitOsCustomisation extends Job
                 return;
             }
 
-            $data = json_decode($response->getBody());
+            $data = json_decode($response->getBody()->getContents());
             if (!$data) {
                 $this->fail(new \Exception('WaitOsCustomisation failed for '.$instance->id.', could not decode response'));
                 return;
