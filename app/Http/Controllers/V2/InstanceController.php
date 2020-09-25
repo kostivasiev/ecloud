@@ -200,6 +200,5 @@ class InstanceController extends BaseController
         // @todo - trigger power-off event
 
         return response()->json([], 202);
-
     }
 }
