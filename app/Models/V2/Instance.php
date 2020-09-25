@@ -9,6 +9,7 @@ use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -75,7 +76,11 @@ class Instance extends Model implements Filterable, Sortable
             $response = app()->make(KingpinService::class, [$this->availabilityZone])
                 ->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            Log::info('Failed to get power state', [
+                'vpc_id' => $this->vpc_id,
+                'instance_id' . $this->getKey(),
+                'message' => $e->getMessage()
+            ]);
             return;
         }
         return json_decode($response)->powerState;
