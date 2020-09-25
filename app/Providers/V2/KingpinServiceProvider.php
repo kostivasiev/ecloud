@@ -32,7 +32,7 @@ class KingpinServiceProvider extends ServiceProvider
                         $credentials->host :
                         $credentials->host . ':' . $credentials->port,
                     'auth' => [$credentials->user, $credentials->password],
-                    'timeout'  => 10,
+                    'timeout'  => config('kingpin.timeout'),
                     'verify' => $this->app->environment() === 'production'
                 ])
             );
