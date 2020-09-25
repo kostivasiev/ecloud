@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Class DeleteInstance
+ * Class Delete
  * Delete an instance from vmware
  * @package App\Console\Commands\Kingpin\Instance
  * @param string instanceId
