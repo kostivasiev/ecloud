@@ -82,16 +82,10 @@ class Instance extends Model implements Filterable, Sortable
 
     public function getApplianceIdAttribute()
     {
-        $versions = $this->applianceVersions()
-            ->first();
-        if (!$versions) {
-            return;
-        }
-        return $versions->appliance
-            ->appliance_uuid;
+        return !empty($this->applianceVersion) ? $this->applianceVersion->appliance_uuid : null;
     }
 
-    public function applianceVersions()
+    public function applianceVersion()
     {
         return $this->belongsTo(
             ApplianceVersion::class,
