@@ -54,26 +54,7 @@ class PowerStateTest extends TestCase
         ]);
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(json_encode([
-            'id' => 'string',
             'powerState' => 'string',
-            'hostname' => 'string',
-            'toolsStatus' => 'string',
-            'toolsRunningStatus' => 'string',
-            'toolsVersionStatus' => 'string',
-            'connectionState' => 'string',
-            'guestOperationsReady' => true,
-            'nics' => [
-                [
-                    'macAddress' => 'string',
-                ]
-            ],
-            'volumes' => [
-                [
-                    'uuid' => 'string',
-                    'createdAt' => '2020-09-16T13:19:20.041Z',
-                    'volumeId' => 'string',
-                ]
-            ]
         ]));
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
