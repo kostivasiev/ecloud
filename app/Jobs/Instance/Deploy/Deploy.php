@@ -103,7 +103,7 @@ class Deploy extends Job
                 ]);
                 $nic->network()->associate($this->data['network_id']);
                 $nic->save();
-                Log::info('Created NIC resource' . $nic->getKey());
+                Log::info('Created NIC resource ' . $nic->getKey());
             }
         } catch (GuzzleException $exception) {
             $error = $exception->getResponse()->getBody()->getContents();
