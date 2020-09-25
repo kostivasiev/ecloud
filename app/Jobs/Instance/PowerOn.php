@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Instance\Deploy;
+namespace App\Jobs\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
