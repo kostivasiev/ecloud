@@ -1,23 +1,14 @@
-POST https://{{host}}/{{version}}/instances
+GET https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
-{
-  "name": "Test",
-  "vpc_id": "vpc-f7495118",
-  "availability_zone_id": "az-8ec58cb3",
-  "appliance_id": "eed603bf-d40e-47d7-bb98-66d2940e0dc2",
-  "vcpu_cores": 1,
-  "ram_capacity": 1024
-}
-
 > {%
-client.global.set("instance_id", response.body.data.id);
-client.log("Instance ID: " + response.body.data.id);
+client.global.set("instance_id", response.body.data[0].id);
+client.log("Instance ID: " + response.body.data[0].id);
 
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 201 Created");
+  client.assert(response.status === 200, "Response status is not 201 Created");
 });
 %}
 
@@ -31,7 +22,7 @@ Content-Type:  application/json
 > {%
 
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Instance was not powered on");
+  client.assert(response.status === 202, "Instance was not powered on");
 });
 %}
 
@@ -45,6 +36,6 @@ Content-Type:  application/json
 > {%
 
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Instance was not powered off");
+  client.assert(response.status === 202, "Instance was not powered off");
 });
 %}
