@@ -27,12 +27,23 @@ class OsCustomisation extends Job
         Log::info('Starting OsCustomisation for instance '.$this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $kingpinService = app()->make(KingpinService::class, $instance->availabilityZone);
+        $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
         $devicesAdminClient = app()->make(AdminClient::class);
         $license = $devicesAdminClient->licenses()->getById(
             $instance->applianceVersions->appliance_version_server_license_id
         );
-        dd($license);
+
+/*
+^ UKFast\Admin\Devices\Entities\License^ {#1970
+#attributes: array:4 [
+    "id" => 258
+    "name" => "CentOS 7 64-bit"
+    "type" => "OS"
+    "category" => "Linux"
+  ]
+  #dates: []
+}
+*/
 
         try {
             /** @var Response $response */
