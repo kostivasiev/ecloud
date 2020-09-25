@@ -48,7 +48,7 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $appends = [
         'appliance_id',
-        'power_state',
+        'online',
     ];
 
     protected $casts = [
@@ -70,7 +70,7 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(AvailabilityZone::class);
     }
 
-    public function getPowerStateAttribute()
+    public function getOnlineAttribute()
     {
         try {
             $response = app()->make(KingpinService::class, [$this->availabilityZone])
@@ -83,7 +83,7 @@ class Instance extends Model implements Filterable, Sortable
             ]);
             return;
         }
-        return json_decode($response)->powerState;
+        return json_decode($response->getBody()->getContents())->powerState == 'poweredOn';
     }
 
     public function scopeForUser($query, $user)
