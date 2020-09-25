@@ -181,4 +181,25 @@ class InstanceController extends BaseController
 
         return response()->json([], 202);
     }
+
+    public function powerOn(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        // @todo - trigger power-onff event
+
+        return response()->json([], 202);
+    }
+
+    public function powerOff(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        // @todo - trigger power-off event
+
+        return response()->json([], 202);
+
+    }
 }
