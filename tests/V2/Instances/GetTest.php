@@ -8,7 +8,10 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
+use GuzzleHttp\Client;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -27,6 +30,14 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+//        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+//            ->shouldAllowMockingProtectedMethods();
+//        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+//            return $mockEncryptionServiceProvider;
+//        });
+//        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+//        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
@@ -49,6 +60,14 @@ class GetTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ]);
+
+        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+        $mockKingpinService->shouldReceive('get')->andReturn(json_encode([
+            'powerState' => 'string',
+        ]));
+        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
+            return $mockKingpinService;
+        });
     }
 
     public function testGetCollection()
