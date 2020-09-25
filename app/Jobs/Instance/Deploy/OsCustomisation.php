@@ -30,7 +30,7 @@ class OsCustomisation extends Job
         $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
         $devicesAdminClient = app()->make(AdminClient::class);
         $license = $devicesAdminClient->licenses()->getById(
-            $instance->applianceVersions->appliance_version_server_license_id
+            $instance->applianceVersion->appliance_version_server_license_id
         );
 
         $credential = $instance->credentials()
@@ -43,10 +43,12 @@ class OsCustomisation extends Job
 
         try {
             /** @var Response $response */
-            $response = $kingpinService->PUT('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization', [
-                'platform' => $license['category'],
-                'password' => $credential->password,
-                'hostname' => $instance->id,
+            $response = $kingpinService->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization', [
+                'json' => [
+                    'platform' => $license['category'],
+                    'password' => $credential->password,
+                    'hostname' => $instance->id,
+                ],
             ]);
             if ($response->getStatusCode() == 200) {
                 Log::info('OsCustomisation finished successfully for instance '.$instance->id);
