@@ -81,7 +81,7 @@ class Deploy extends Job
 
                 Log::info('Created volume resource ' . $volume->getKey() . ' for volume '. $volume->vmware_uuid);
 
-                // Send created Volume ID's to Kinpin using their UUID's (Keep in this job or?)
+                // Send created Volume ID's to Kinpin
                 $res = $kingpinService->put('/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid', [
                     'json' => [
                         'volumeId' => $volume->getKey()
