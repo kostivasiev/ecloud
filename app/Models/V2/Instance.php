@@ -76,12 +76,11 @@ class Instance extends Model implements Filterable, Sortable
             $response = app()->make(KingpinService::class, [$this->availabilityZone])
                 ->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
         } catch (\Exception $e) {
-            Log::info('Failed to get power state: '.
-                json_encode([
-                    'vpc_id'  => $this->vpc_id,
-                    'instance_id' => $this->getKey(),
-                    'message' => $e->getMessage()
-                ]));
+            Log::info('Failed to get power state', [
+                'vpc_id' => $this->vpc_id,
+                'instance_id' => $this->getKey(),
+                'message' => $e->getMessage()
+            ]);
             return;
         }
         return json_decode($response->getBody()->getContents())->powerState == 'poweredOn';
