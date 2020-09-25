@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use App\Models\V2\Instance;
 use App\Services\V2\KingpinService;
 
-
 class Deploy extends Job
 {
     private $data;
@@ -83,7 +82,7 @@ class Deploy extends Job
                 Log::info('Created volume resource ' . $volume->getKey() . ' for volume '. $volume->vmware_uuid);
 
                 // Send created Volume ID's to Kinpin using their UUID's (Keep in this job or?)
-                $res = $kingpinService->put('/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid',[
+                $res = $kingpinService->put('/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid', [
                     'json' => [
                         'volumeId' => $volume->getKey()
                     ]
