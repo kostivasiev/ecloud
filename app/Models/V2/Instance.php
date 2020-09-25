@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -45,7 +46,8 @@ class Instance extends Model implements Filterable, Sortable
     ];
 
     protected $appends = [
-        'appliance_id'
+        'appliance_id',
+        'power_state',
     ];
 
     protected $casts = [
@@ -65,6 +67,18 @@ class Instance extends Model implements Filterable, Sortable
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    public function getPowerStateAttribute()
+    {
+        try {
+            $response = app()->make(KingpinService::class, [$this->availabilityZone])
+                ->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            return;
+        }
+        return json_decode($response)->powerState;
     }
 
     public function scopeForUser($query, $user)
