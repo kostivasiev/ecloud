@@ -33,32 +33,32 @@ class OsCustomisation extends Job
             $instance->applianceVersions->appliance_version_server_license_id
         );
 
-/*
-^ UKFast\Admin\Devices\Entities\License^ {#1970
-#attributes: array:4 [
-    "id" => 258
-    "name" => "CentOS 7 64-bit"
-    "type" => "OS"
-    "category" => "Linux"
-  ]
-  #dates: []
-}
-*/
+        $credential = $instance->credentials()
+            ->where('user', ($license['category'] == 'Linux') ? 'root' : 'administrator')
+            ->firstOrFail();
+        if (!$credential) {
+            $this->fail(new \Exception('OsCustomisation failed for '.$instance->id.', no credentials found'));
+            return;
+        }
 
         try {
             /** @var Response $response */
-            $response = $kingpinService->post('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/power');
+            $response = $kingpinService->PUT('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization', [
+                'platform' => $license['category'],
+                'password' => $credential->password,
+                'hostname' => $instance->id,
+            ]);
             if ($response->getStatusCode() == 200) {
-                Log::info('PowerOn finished successfully for instance '.$instance->id);
+                Log::info('OsCustomisation finished successfully for instance '.$instance->id);
                 return;
             }
             $this->fail(new \Exception(
-                'Failed to PowerOn '.$instance->id.', Kingpin status was '.$response->getStatusCode()
+                'Failed OsCustomisation for '.$instance->id.', Kingpin status was '.$response->getStatusCode()
             ));
             return;
         } catch (GuzzleException $exception) {
             $this->fail(new \Exception(
-                'Failed to PowerOn '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
+                'Failed OsCustomisation for '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
             ));
             return;
         }
