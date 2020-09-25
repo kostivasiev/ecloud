@@ -1,5 +1,6 @@
 <?php
 
 return [
-    'user' => 'kingpinapi'
+    'user' => 'kingpinapi',
+    'timeout' => env('KINGPIN_TIMEOUT', 100)
 ];
