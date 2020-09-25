@@ -11,10 +11,11 @@ use App\Models\V2\Vpc;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class PowerStateTest extends TestCase
+class OnlineTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -53,19 +54,21 @@ class PowerStateTest extends TestCase
             'ram_capacity'         => 1024,
         ]);
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('get')->andReturn(json_encode([
-            'powerState' => 'string',
-        ]));
+        $mockKingpinService->shouldReceive('get')->andReturn(
+            new Response(200, [], json_encode(['powerState' => 'poweredOn']))
+        );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
         });
     }
 
-    public function testGetPowerState()
+    /**
+     * Test power state is not returned on the collection
+     */
+    public function testGetOnlineStateInCollection()
     {
-        $this->assertNotEmpty($this->instance->power_state);
+        $this->assertNotEmpty($this->instance->online);
 
-        // Test power state is not returned on the collection
         $this->get(
             '/v2/instances',
             [
@@ -74,11 +77,16 @@ class PowerStateTest extends TestCase
             ]
         )
             ->dontSeeJson([
-                'power_state' => 'string',
+                'online' => true,
             ])
             ->assertResponseStatus(200);
+    }
 
-        // Test power state is returned on the model
+    /**
+     * Test power state is returned on the model
+     */
+    public function testGetOnlineStateInItem()
+    {
         $this->get(
             '/v2/instances/' . $this->instance->getKey(),
             [
@@ -87,7 +95,7 @@ class PowerStateTest extends TestCase
             ]
         )
             ->seeJson([
-                'power_state' => 'string',
+                'online' => true,
             ])
             ->assertResponseStatus(200);
     }
