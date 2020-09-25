@@ -26,6 +26,7 @@ class Deploy extends Job
     public function handle()
     {
         Log::info('Performing Deploy for instance '. $this->data['instance_id']);
+        $logMessage = 'Deploy instance ' . $this->data['instance_id'] . ' : ';
 
         $instance = Instance::findOrFail($this->data['instance_id']);
 
@@ -36,17 +37,10 @@ class Deploy extends Job
             return;
         }
 
-        if (empty($instance->applianceVersion->appliance_version_vm_template)) {
-            $this->fail(new \Exception(
-                'Deploy failed for ' . $instance->id . ', Failed to load appliance version vm template'
-            ));
-            return;
-        }
-
         $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
         try {
-            /** @var Response $response */
-            $response = $kingpinService->post('/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/fromtemplate', [
+            /** @var Response $deployResponse */
+            $deployResponse = $kingpinService->post('/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/fromtemplate', [
                 'json' => [
                     'templateName' => $instance->applianceVersion->appliance_version_vm_template,
                     'instanceId' => $instance->getKey(),
@@ -56,17 +50,20 @@ class Deploy extends Job
                 ]
             ]);
 
-            if ($response->getStatusCode() != 200) {
-                throw new \Exception('Invalid response status code: ' . $response->getStatusCode());
+            if ($deployResponse->getStatusCode() != 200) {
+                throw new \Exception('Invalid response status code: ' . $deployResponse->getStatusCode());
             }
 
-            $response = json_decode($response->getBody()->getContents());
+            $deployResponse = json_decode($deployResponse->getBody()->getContents());
+            if (!$deployResponse) {
+                new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+            }
 
-            Log::info('Instance was deployed');
+            Log::info($logMessage . 'Instance was deployed');
 
-            Log::info(count($response->volumes) . ' volume(s) found');
+            Log::info($logMessage . count($deployResponse->volumes) . ' volume(s) found');
             // Create Volumes from kingpin
-            foreach ($response->volumes as $volumeData) {
+            foreach ($deployResponse->volumes as $volumeData) {
                 $volume = Volume::withoutEvents(function () use ($instance, $volumeData) {
                     $volume = new Volume();
                     $volume::addCustomKey($volume);
@@ -79,39 +76,39 @@ class Deploy extends Job
                     return $volume;
                 });
 
-                Log::info('Created volume resource ' . $volume->getKey() . ' for volume '. $volume->vmware_uuid);
+                Log::info($logMessage . 'Created volume resource ' . $volume->getKey() . ' for volume '. $volume->vmware_uuid);
 
                 // Send created Volume ID's to Kinpin
-                $res = $kingpinService->put('/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid', [
+                $volumeResponse = $kingpinService->put('/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid', [
                     'json' => [
                         'volumeId' => $volume->getKey()
                     ]
                 ]);
 
-                if ($res->getStatusCode() != 200) {
-                    throw new \Exception('Invalid response status code ' . $response->getStatusCode() .' whilst updating volume ' . $volume->vmware_uuid);
+                if ($volumeResponse->getStatusCode() != 200) {
+                    throw new \Exception('Invalid response status code ' . $volumeResponse->getStatusCode() .' whilst updating volume ' . $volume->vmware_uuid);
                 }
-                Log::info('Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
+                Log::info($logMessage . 'Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
             }
 
             // Create NIC's
-            Log::info(count($response->nics) . ' NIC\'s found');
-            foreach ($response->nics as $nicData) {
+            Log::info($logMessage . count($deployResponse->nics) . ' NIC\'s found');
+            foreach ($deployResponse->nics as $nicData) {
                 $nic = new Nic([
                     'mac_address' => $nicData->macAddress,
                     'instance_id' => $instance->id,
                 ]);
                 $nic->network()->associate($this->data['network_id']);
                 $nic->save();
-                Log::info('Created NIC resource ' . $nic->getKey());
+                Log::info($logMessage . 'Created NIC resource ' . $nic->getKey());
             }
         } catch (GuzzleException $exception) {
             $error = $exception->getResponse()->getBody()->getContents();
-            Log::info($error);
+            Log::info($logMessage . $error);
             $this->fail(new \Exception('Deploy failed for ' . $instance->id .' : '. $error));
             return;
         } catch (\Exception $exception) {
-            Log::info($exception->getMessage());
+            Log::info($logMessage . $exception->getMessage());
             $this->fail(new \Exception('Deploy failed for ' . $instance->id .' : ' . $exception->getMessage()));
             return;
         }
