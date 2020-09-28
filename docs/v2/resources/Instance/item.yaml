@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../components/schemas/instance.yaml'
+                $ref: '../../components/schemas/instanceItem.yaml'
               meta:
                 type: object
   tags:

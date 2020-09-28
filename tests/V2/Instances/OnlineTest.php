@@ -8,7 +8,6 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
@@ -16,7 +15,7 @@ use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class GetTest extends TestCase
+class OnlineTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -25,20 +24,13 @@ class GetTest extends TestCase
     protected $instance;
     protected $appliance;
     protected $appliance_version;
+    protected $credentials;
     protected $region;
     protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
-//        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-//            ->shouldAllowMockingProtectedMethods();
-//        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-//            return $mockEncryptionServiceProvider;
-//        });
-//        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-//        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
@@ -55,13 +47,12 @@ class GetTest extends TestCase
             'appliance_version_appliance_id' => $this->appliance->id,
         ])->refresh();
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'name' => 'GetTest Default',
+            'vpc_id'               => $this->vpc->getKey(),
+            'name'                 => 'GetTest Default',
             'appliance_version_id' => $this->appliance_version->uuid,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
+            'vcpu_cores'           => 1,
+            'ram_capacity'         => 1024,
         ]);
-
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode(['powerState' => 'poweredOn']))
@@ -71,8 +62,13 @@ class GetTest extends TestCase
         });
     }
 
-    public function testGetCollection()
+    /**
+     * Test power state is not returned on the collection
+     */
+    public function testGetOnlineStateInCollection()
     {
+        $this->assertNotEmpty($this->instance->online);
+
         $this->get(
             '/v2/instances',
             [
@@ -80,15 +76,16 @@ class GetTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
-                'id'     => $this->instance->getKey(),
-                'name'   => $this->instance->name,
-                'vpc_id' => $this->instance->vpc_id,
+            ->dontSeeJson([
+                'online' => true,
             ])
             ->assertResponseStatus(200);
     }
 
-    public function testGetResource()
+    /**
+     * Test power state is returned on the model
+     */
+    public function testGetOnlineStateInItem()
     {
         $this->get(
             '/v2/instances/' . $this->instance->getKey(),
@@ -98,16 +95,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'     => $this->instance->getKey(),
-                'name'   => $this->instance->name,
-                'vpc_id' => $this->instance->vpc_id,
-                'appliance_version_id' => $this->appliance_version->uuid,
+                'online' => true,
             ])
             ->assertResponseStatus(200);
-
-        $result = json_decode($this->response->getContent());
-
-        // Test to ensure appliance_id as a UUID is in the returned result
-        $this->assertEquals($this->appliance->uuid, $result->data->appliance_id);
     }
 }

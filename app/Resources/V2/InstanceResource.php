@@ -17,6 +17,7 @@ use UKFast\Responses\UKFastResource;
  * @property integer ram_capacity
  * @property string availability_zone_id
  * @property boolean locked
+ * @property string online
  * @property string created_at
  * @property string updated_at
  */
@@ -48,6 +49,9 @@ class InstanceResource extends UKFastResource
         ];
         if ($request->user->isAdministrator) {
             $response['appliance_version_id'] = $this->appliance_version_id;
+        }
+        if ($request->route('instanceId')) {
+            $response['online'] = $this->online;
         }
         return $response;
     }

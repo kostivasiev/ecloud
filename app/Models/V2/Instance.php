@@ -2,12 +2,14 @@
 
 namespace App\Models\V2;
 
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -39,7 +41,8 @@ class Instance extends Model implements Filterable, Sortable
     ];
 
     protected $appends = [
-        'appliance_id'
+        'appliance_id',
+        'online',
     ];
 
     protected $casts = [
@@ -59,6 +62,22 @@ class Instance extends Model implements Filterable, Sortable
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    public function getOnlineAttribute()
+    {
+        try {
+            $response = app()->make(KingpinService::class, [$this->availabilityZone])
+                ->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
+        } catch (\Exception $e) {
+            Log::info('Failed to get power state', [
+                'vpc_id' => $this->vpc_id,
+                'instance_id' => $this->getKey(),
+                'message' => $e->getMessage()
+            ]);
+            return;
+        }
+        return json_decode($response->getBody()->getContents())->powerState == 'poweredOn';
     }
 
     public function scopeForUser($query, $user)
