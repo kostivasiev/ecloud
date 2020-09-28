@@ -14,12 +14,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class Instance
- * @package App\Models\V2
- * @method static find(string $routerId)
- * @method static findOrFail(string $routerUuid)
- */
 class Instance extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;

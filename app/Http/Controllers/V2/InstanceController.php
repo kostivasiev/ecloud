@@ -170,7 +170,7 @@ class InstanceController extends BaseController
         // Create the chained jobs for deployment
         $this->dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
             new \App\Jobs\Instance\Deploy\UpdateNetworkAdapter($data),
-            new \App\Jobs\Instance\Deploy\PowerOn($data),
+            new \App\Jobs\Instance\PowerOn($data),
             new \App\Jobs\Instance\Deploy\WaitOsCustomisation($data),
             new \App\Jobs\Instance\Deploy\PrepareOsUsers($data),
             new \App\Jobs\Instance\Deploy\OsCustomisation($data),
