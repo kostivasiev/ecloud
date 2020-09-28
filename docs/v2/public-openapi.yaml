@@ -123,6 +123,10 @@ paths:
     $ref: 'resources/Instance/item.yaml'
   '/ecloud/v2/instances/{instanceId}/credentials':
     $ref: 'resources/Instance/credentials.yaml'
+  '/ecloud/v2/instances/{instanceId}/power-on':
+    $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/power-off':
+    $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
