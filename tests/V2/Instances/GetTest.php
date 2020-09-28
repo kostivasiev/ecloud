@@ -12,6 +12,7 @@ use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -62,9 +63,9 @@ class GetTest extends TestCase
         ]);
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('get')->andReturn(json_encode([
-            'powerState' => 'string',
-        ]));
+        $mockKingpinService->shouldReceive('get')->andReturn(
+            new Response(200, [], json_encode(['powerState' => 'poweredOn']))
+        );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
         });
