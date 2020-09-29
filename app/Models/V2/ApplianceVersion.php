@@ -72,7 +72,7 @@ class ApplianceVersion extends Model
             return $license;
         } catch (\Exception $e) {
             Log::info($e->getMessage(), [
-                'instance_id' => $this->getKey(),
+                'appliance_version' => $this->getKey(),
             ]);
         }
         return;

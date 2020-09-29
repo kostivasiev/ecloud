@@ -1,6 +1,8 @@
 <?php
 namespace App\Traits\V2;
 
+use Illuminate\Support\Facades\Log;
+
 trait DefaultPlatform
 {
     /**
@@ -25,6 +27,7 @@ trait DefaultPlatform
                 $this->save();
             } catch (\Exception $e) {
                 // There is no platform, do nothing
+                Log::info("No platform found: " . $e->getMessage());
             }
         }
     }
