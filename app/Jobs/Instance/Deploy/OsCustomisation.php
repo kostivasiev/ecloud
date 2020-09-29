@@ -29,10 +29,7 @@ class OsCustomisation extends Job
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
-        $devicesAdminClient = app()->make(AdminClient::class);
-        $license = $devicesAdminClient->licenses()->getById(
-            $instance->applianceVersion->appliance_version_server_license_id
-        );
+        $license = $instance->applianceVersion->getLicense();
 
         $credential = $instance->credentials()
             ->where('user', ($license['category'] == 'Linux') ? 'root' : 'administrator')
