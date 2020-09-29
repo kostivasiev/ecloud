@@ -58,6 +58,7 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.availability_zones,id,deleted_at,NULL'
             ],
             'locked' => 'sometimes|required|boolean',
+            'platform' => 'sometimes|required|in:Windows,Linux',
         ];
     }
 

@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Admin\Devices\AdminClient;
 
 class GetTest extends TestCase
 {
@@ -31,14 +32,6 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-//        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-//            ->shouldAllowMockingProtectedMethods();
-//        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-//            return $mockEncryptionServiceProvider;
-//        });
-//        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-//        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
@@ -60,6 +53,7 @@ class GetTest extends TestCase
             'appliance_version_id' => $this->appliance_version->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'platform' => 'Linux',
         ]);
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
@@ -86,6 +80,11 @@ class GetTest extends TestCase
                 'vpc_id' => $this->instance->vpc_id,
             ])
             ->assertResponseStatus(200);
+
+        // Test to ensure you don't see platform attribute
+        $this->dontSeeJson([
+            'platform' => 'Linux',
+        ]);
     }
 
     public function testGetResource()
@@ -109,5 +108,10 @@ class GetTest extends TestCase
 
         // Test to ensure appliance_id as a UUID is in the returned result
         $this->assertEquals($this->appliance->uuid, $result->data->appliance_id);
+
+        // Test to ensure that platform attribute is present
+        $this->seeJson([
+            'platform' => 'Linux',
+        ]);
     }
 }

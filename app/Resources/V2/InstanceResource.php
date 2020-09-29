@@ -18,6 +18,7 @@ use UKFast\Responses\UKFastResource;
  * @property string availability_zone_id
  * @property boolean locked
  * @property string online
+ * @property string platform
  * @property string created_at
  * @property string updated_at
  */
@@ -52,6 +53,7 @@ class InstanceResource extends UKFastResource
         }
         if ($request->route('instanceId')) {
             $response['online'] = $this->online;
+            $response['platform'] = $this->platform;
         }
         return $response;
     }
