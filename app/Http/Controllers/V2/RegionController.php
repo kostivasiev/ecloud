@@ -22,7 +22,7 @@ class RegionController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Region::query();
+        $collection = Region::forUser($request->user);
         (new QueryTransformer($request))
             ->config(Region::class)
             ->transform($collection);
@@ -40,7 +40,7 @@ class RegionController extends BaseController
     public function show(Request $request, string $regionId)
     {
         return new RegionResource(
-            Region::findOrFail($regionId)
+            Region::forUser($request->user)->findOrFail($regionId)
         );
     }
 
@@ -50,7 +50,7 @@ class RegionController extends BaseController
      */
     public function create(CreateRegionRequest $request)
     {
-        $region = new Region($request->only(['name']));
+        $region = new Region($request->only(['name','is_public']));
         $region->save();
         return $this->responseIdMeta($request, $region->getKey(), 201);
     }
@@ -63,7 +63,7 @@ class RegionController extends BaseController
     public function update(UpdateRegionRequest $request, string $regionId)
     {
         $region = Region::findOrFail($regionId);
-        $region->fill($request->only(['name']))->save();
+        $region->fill($request->only(['name','is_public']))->save();
         return $this->responseIdMeta($request, $region->getKey(), 200);
     }
 
@@ -86,7 +86,7 @@ class RegionController extends BaseController
      */
     public function availabilityZones(Request $request, string $regionId)
     {
-        $availabilityZones = Region::findOrFail($regionId)->availabilityZones();
+        $availabilityZones = Region::forUser($request->user)->findOrFail($regionId)->availabilityZones();
 
         return AvailabilityZoneResource::collection($availabilityZones->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))

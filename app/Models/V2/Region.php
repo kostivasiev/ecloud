@@ -30,11 +30,30 @@ class Region extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
+        'is_public',
+    ];
+
+    protected $casts = [
+        'is_public' => 'boolean',
     ];
 
     public function availabilityZones()
     {
         return $this->hasMany(AvailabilityZone::class);
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!$user->isAdministrator) {
+            $query->where('is_public', '=', 1);
+        }
+
+        return $query;
     }
 
     /**
@@ -46,6 +65,7 @@ class Region extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -61,6 +81,7 @@ class Region extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('is_public'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -86,6 +107,7 @@ class Region extends Model implements Filterable, Sortable
         return [
             'id'         => 'id',
             'name'       => 'name',
+            'is_public'  => 'is_public',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
