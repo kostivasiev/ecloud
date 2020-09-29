@@ -28,8 +28,6 @@ class OsCustomisation extends Job
         Log::info('Starting OsCustomisation for instance '.$this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
-
         $credential = $instance->credentials()
             ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
             ->firstOrFail();
@@ -39,6 +37,7 @@ class OsCustomisation extends Job
         }
 
         try {
+            $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
             /** @var Response $response */
             $response = $kingpinService->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization', [
                 'json' => [
