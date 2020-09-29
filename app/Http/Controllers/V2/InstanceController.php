@@ -101,7 +101,6 @@ class InstanceController extends BaseController
         ]));
         if ($request->has('appliance_id')) {
             $instance->setApplianceVersionId($request->get('appliance_id'));
-            $instance->setDefaultPlatform();
         }
         $instance->save();
         return $this->responseIdMeta($request, $instance->getKey(), 200);
