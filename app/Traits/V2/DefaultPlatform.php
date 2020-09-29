@@ -11,6 +11,10 @@ trait DefaultPlatform
         static::created(function ($instance) {
             $instance->setDefaultPlatform();
         });
+
+        static::updated(function ($instance) {
+            $instance->setDefaultPlatform();
+        });
     }
 
     public function setDefaultPlatform()
