@@ -46,7 +46,7 @@ class NicController extends BaseController
     public function create(CreateNicRequest $request)
     {
         $nic = new Nic($request->only([
-            'mac_address', 'instance_id', 'network_id',
+            'mac_address', 'instance_id', 'network_id', 'ip_address'
         ]));
         $nic->save();
         $nic->refresh();
@@ -62,7 +62,7 @@ class NicController extends BaseController
     {
         $nic = Nic::forUser(app('request')->user)->findOrFail($nicId);
         $nic->fill($request->only([
-            'mac_address', 'instance_id', 'network_id',
+            'mac_address', 'instance_id', 'network_id', 'ip_address'
         ]));
         $nic->save();
         return $this->responseIdMeta($request, $nic->getKey(), 200);

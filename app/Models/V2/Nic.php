@@ -29,6 +29,7 @@ class Nic extends Model
         'mac_address',
         'instance_id',
         'network_id',
+        'ip_address'
     ];
 
     public function instance()
@@ -70,8 +71,10 @@ class Nic extends Model
             $factory->create('mac_address', Filter::$stringDefaults),
             $factory->create('instance_id', Filter::$stringDefaults),
             $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('ip_address', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
+            $factory->create('ip_address', Filter::$stringDefaults),
         ];
     }
 
@@ -86,6 +89,7 @@ class Nic extends Model
             $factory->create('id'),
             $factory->create('mac_address'),
             $factory->create('instance_id'),
+            $factory->create('ip_address'),
             $factory->create('network_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -113,6 +117,7 @@ class Nic extends Model
             'mac_address' => 'mac_address',
             'instance_id' => 'instance_id',
             'network_id'  => 'network_id',
+            'ip_address'  => 'ip_address',
             'created_at'  => 'created_at',
             'updated_at'  => 'updated_at',
         ];

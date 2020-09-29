@@ -48,6 +48,7 @@ class GetTest extends TestCase
             'mac_address' => $this->macAddress,
             'instance_id' => $this->instance->getKey(),
             'network_id'  => $this->network->getKey(),
+            'ip_address' => '10.0.0.5'
         ]);
     }
 
@@ -63,7 +64,8 @@ class GetTest extends TestCase
             ->seeJson([
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getkey(),
-                'network_id'  => $this->network->getKey(),
+                'network_id' => $this->network->getKey(),
+                'ip_address' => '10.0.0.5'
             ])
             ->assertResponseStatus(200);
     }
@@ -81,6 +83,7 @@ class GetTest extends TestCase
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getkey(),
                 'network_id'  => $this->network->getKey(),
+                'ip_address' => '10.0.0.5'
             ])
             ->assertResponseStatus(200);
     }

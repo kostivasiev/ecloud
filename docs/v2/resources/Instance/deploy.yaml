@@ -1,9 +1,5 @@
 parameters:
-  - name: id
-    in: path
-    required: true
-    schema:
-      type: string
+  - $ref: '../../resources/Instance/parameters/instanceId.yaml'
 post:
   requestBody:
     content:

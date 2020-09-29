@@ -33,6 +33,7 @@ class UpdateNicRequest extends FormRequest
             ],
             'instance_id' => 'sometimes|required|string|exists:ecloud.instances,id',
             'network_id'  => 'sometimes|required|string|exists:ecloud.networks,id',
+            'ip_address' => ['sometimes', 'nullable', 'ip']
         ];
     }
 

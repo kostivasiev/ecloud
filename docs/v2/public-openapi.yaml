@@ -123,6 +123,8 @@ paths:
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-off':
     $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/deploy':
+    $ref: 'resources/Instance/deploy.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
@@ -147,6 +149,3 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
-
-  '/ecloud/v2/instances/{instanceId}/deploy':
-    $ref: 'instances/deploy.yaml'

@@ -32,6 +32,7 @@ class CreateNicRequest extends FormRequest
             ],
             'instance_id' => 'required|string|exists:ecloud.instances,id',
             'network_id'  => 'required|string|exists:ecloud.networks,id',
+            'ip_address' => ['sometimes', 'nullable', 'ip']
         ];
     }
 
