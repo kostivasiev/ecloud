@@ -51,14 +51,6 @@ Production: auto deployment via Gitlab + gitoverhere, triggered on Tag from mast
 - https://api.ukfast.io/ecloud/ (public facing)
 
 
-### Docker development
-
-This repository includes two docker-compose files, and 2 docker files:
-
-* `docker-compose.dev.yml` file, which bind-mounts the project files into each of the application components (`app`, `queue` and `scheduler`). This compose file uses the corresponding `Dockerfile.dev`
-* `docker-compose.yml` file, which uses the baked-in project files from `Dockerfile`
-
-
 ### Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on the process for submitting pull requests.
