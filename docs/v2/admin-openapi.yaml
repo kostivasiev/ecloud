@@ -26,7 +26,14 @@ components:
     Routers:
       $ref: 'components/schemas/admin/router.yaml'
     Regions:
-      $ref: 'components/schemas/admin/region.yaml'
+      allOf:
+        - $ref: 'components/schemas/region.yaml'
+        - type: object
+          properties:
+            is_public:
+              required: false
+              type: boolean
+              example: 'true'
     LoadBalancerCluster:
       $ref: 'components/schemas/lbc.yaml'
     Volume:
