@@ -6,9 +6,9 @@ use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -18,7 +18,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DefaultPlatform;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
@@ -34,6 +34,7 @@ class Instance extends Model implements Filterable, Sortable
         'ram_capacity',
         'availability_zone_id',
         'locked',
+        'platform',
     ];
 
     protected $hidden = [
@@ -128,6 +129,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
+            $factory->create('platform', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -149,6 +151,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('ram_capacity'),
             $factory->create('availability_zone_id'),
             $factory->create('locked'),
+            $factory->create('platform'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -180,6 +183,7 @@ class Instance extends Model implements Filterable, Sortable
             'ram_capacity'         => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',
             'locked'     => 'locked',
+            'platform'   => 'platform',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
