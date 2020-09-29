@@ -15,7 +15,7 @@ trait DefaultPlatform
 
     public function setDefaultPlatform()
     {
-        if (empty($this->platform)) {
+        if (empty($this->platform) && $this->applianceVersion) {
             try {
                 $this->platform = $this->applianceVersion->serverLicense()->category;
                 $this->save();
