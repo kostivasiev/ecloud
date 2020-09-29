@@ -33,7 +33,31 @@ Content-Type:  application/json
 > {%
 
 client.test("Request executed successfully", function() {
-  client.assert(response.body.data.name === "Test", "Default name was not set to ID");
   client.assert(response.body.data.platform === "Linux", "Platform for appliance was not Linux");
+});
+%}
+
+###
+
+PATCH https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "appliance_id": "ced9e02a-b3fa-4324-9ebc-42250a462e9a"
+}
+
+###
+
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.platform === "Windows", "Platform for appliance was not Windows");
 });
 %}
