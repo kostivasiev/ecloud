@@ -71,6 +71,7 @@ class UpdateRequest extends FormRequest
                 'max:'.config('instance.ram_capacity.max'),
             ],
             'locked'       => 'sometimes|required|boolean',
+            'platform'     => 'sometimes|required|in:Windows,Linux',
         ];
 
         return $rules;
