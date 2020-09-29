@@ -5,6 +5,7 @@ return [
     'vpc'                => [],
     'network'            => [
         'subnets' => [
+            'range' => '10.0.0.0/24',
             'gateway_address' => '10.0.0.1/24',
             'dhcp_config' => [
                 'server_address' => '10.0.0.2/24',

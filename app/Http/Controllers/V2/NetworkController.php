@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateNetworkRequest;
-use App\Http\Requests\V2\UpdateNetworkRequest;
+use App\Http\Requests\V2\Network\CreateRequest;
+use App\Http\Requests\V2\Network\UpdateRequest;
 use App\Models\V2\Network;
 use App\Resources\V2\NetworkResource;
 use Illuminate\Http\Request;
@@ -44,13 +44,14 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateNetworkRequest $request
+     * @param CreateRequest  $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateNetworkRequest $request)
+    public function create(CreateRequest $request)
     {
         $network = new Network($request->only([
-            'router_id', 'name'
+            'router_id', 'name', 'subnet_range'
         ]));
         $network->save();
         $network->refresh();
@@ -58,15 +59,16 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateNetworkRequest $request
+     * @param UpdateRequest  $request
      * @param string $networkId
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateNetworkRequest $request, string $networkId)
+    public function update(UpdateRequest $request, string $networkId)
     {
         $network = Network::forUser(app('request')->user)->findOrFail($networkId);
         $network->fill($request->only([
-            'router_id', 'name'
+            'router_id', 'name', 'subnet_range'
         ]));
         $network->save();
         return $this->responseIdMeta($request, $network->getKey(), 200);

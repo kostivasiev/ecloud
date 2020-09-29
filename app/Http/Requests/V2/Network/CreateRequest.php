@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Network;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\ValidCidrSubnetRange;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateNetworksRequest
+ * Class CreateNetworkRequest
  * @package App\Http\Requests\V2
  */
-class UpdateNetworkRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,14 +31,16 @@ class UpdateNetworkRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'sometimes|required|string',
-            'router_id'    => [
-                'sometimes',
+            'name' => 'nullable|string',
+            'router_id' => [
                 'required',
                 'string',
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class)
             ],
+            'subnet_range' => [
+                'sometimes', 'nullable', 'string', new ValidCidrSubnetRange()
+            ]
         ];
     }
 
@@ -49,9 +52,7 @@ class UpdateNetworkRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field, when specified, cannot be null',
-            'router_id.required' => 'The :attribute field, when specified, cannot be null',
-            'router_id.exists' => 'The specified :attribute was not found',
+            'router_id.required' => 'The :attribute field is required',
         ];
     }
 }

@@ -10,6 +10,7 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string router_id
+ * @property string subnet_range
  * @property string availability_zone_id
  * @property string created_at
  * @property string updated_at
@@ -26,6 +27,7 @@ class NetworkResource extends UKFastResource
             'id'         => $this->id,
             'name'       => $this->name,
             'router_id' => $this->router_id,
+            'subnet_range' => $this->subnet_range,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

@@ -11,6 +11,11 @@ properties:
     type: string
     required: true
     example: rtr-4c63cf58
+  subnet_range:
+    type: string
+    description: CIDR format subnet range with mask
+    required: false
+    example: 10.0.0.0/24
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

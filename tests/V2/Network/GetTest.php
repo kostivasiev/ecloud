@@ -36,7 +36,7 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $network = factory(Network::class)->create([
-            'name'    => 'Manchester Network',
+            'name' => 'Manchester Network',
         ]);
         $this->get(
             '/v2/networks',
@@ -46,8 +46,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $network->id,
-                'name'       => $network->name,
+                'id' => $network->id,
+                'name' => $network->name,
+                'subnet_range' => '10.0.0.0/24'
             ])
             ->assertResponseStatus(200);
     }
@@ -67,6 +68,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id'         => $network->id,
                 'name'       => $network->name,
+                'subnet_range' => '10.0.0.0/24'
             ])
             ->assertResponseStatus(200);
     }

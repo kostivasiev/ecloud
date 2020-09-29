@@ -33,6 +33,7 @@ class Network extends Model implements Filterable, Sortable
         'id',
         'name',
         'router_id',
+        'subnet_range'
     ];
 
     protected $dispatchesEvents = [
@@ -64,6 +65,15 @@ class Network extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return \Laravel\Lumen\Application|mixed
+     */
+    public function getSubnetRangeAttribute()
+    {
+        return $this->attributes['subnet_range'] ??
+            config('defaults.network.subnets.range');
+    }
+
+    /**
      * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
      */
@@ -73,6 +83,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
+            $factory->create('subnet_range', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -89,6 +100,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_id'),
+            $factory->create('subnet_range'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -114,6 +126,7 @@ class Network extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'router_id' => 'router_id',
+            'subnet_range' => 'subnet_range',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
