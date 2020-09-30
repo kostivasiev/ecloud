@@ -42,7 +42,7 @@ class NetworkDeploy implements ShouldQueue
         }
 
         try {
-            $router->availabilityZone->nsxClient()->put(
+            $router->availabilityZone->nsxService()->put(
                 'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
                 [
                     'json' => [
