@@ -5,7 +5,7 @@ FROM php:7.4-apache AS apio
 RUN pecl install redis-5.1.1 \
     && docker-php-ext-enable redis
 RUN docker-php-ext-install pdo_mysql \
-    opcache
+                           opcache
 
 FROM apio AS composer-builder
 RUN apt update && \
@@ -33,10 +33,10 @@ COPY database /build/database/
 
 ARG APP_ENV=dev
 RUN if [ ${APP_ENV} = "dev" ]; then \
-    composer install; \
-    else \
-    composer install --no-dev; \
-    fi
+composer install; \
+else \
+composer install --no-dev; \
+fi
 
 #################################################################################
 ## Final image stage - builds final image from project and builder stage files ##
