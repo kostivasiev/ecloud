@@ -174,7 +174,7 @@ class InstanceController extends BaseController
         if (!$request->has('network_id')) {
             $routers = $instance->vpc->routers;
             if (count($routers) == 1) {
-                $networks = $routers->networks;
+                $networks = $routers->first()->networks;
                 if (count($networks) == 1) {
                     $defaultNetwork = $networks->first();
                 }
