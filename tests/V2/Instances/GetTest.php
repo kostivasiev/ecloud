@@ -24,8 +24,6 @@ class GetTest extends TestCase
     protected \Faker\Generator $faker;
     protected $availability_zone;
     protected $instance;
-    protected $appliance;
-    protected $appliance_version;
     protected $region;
     protected $vpc;
 
@@ -41,13 +39,6 @@ class GetTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->id,
-        ])->refresh();
-        Instance::flushEventListeners();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'GetTest Default',

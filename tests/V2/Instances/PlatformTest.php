@@ -2,10 +2,8 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
-use App\Models\V2\Instance;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -21,8 +19,6 @@ class PlatformTest extends TestCase
     protected $availability_zone;
     protected $region;
     protected $vpc;
-    protected $appliance;
-    protected $appliance_version;
 
     public function setUp(): void
     {
@@ -36,12 +32,6 @@ class PlatformTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
         $mockAdminDevices = \Mockery::mock(AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
         app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
@@ -50,6 +40,7 @@ class PlatformTest extends TestCase
             $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
             return $mockAdminDevices;
         });
+        Instance::boot();
     }
 
     public function testSettingPlatform()
