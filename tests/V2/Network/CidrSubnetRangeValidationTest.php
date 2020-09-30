@@ -23,6 +23,8 @@ class CidrSubnetRangeValidationTest extends TestCase
         $this->assertFalse($this->validator->passes('', '10.0.0.0'));
         //Invalid mask
         $this->assertFalse($this->validator->passes('', '10.0.0.0/33'));
+        //Invalid mask - too small range (min we allow is /29)
+        $this->assertFalse($this->validator->passes('', '10.0.0.0/30'));
     }
 
     public function testValidSubnetRange()

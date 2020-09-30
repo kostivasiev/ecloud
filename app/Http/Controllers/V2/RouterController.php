@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\V2;
 
 use App\Events\V2\RouterAvailabilityZoneAttach;
-use App\Events\V2\RouterAvailabilityZoneDetach;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
-use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -57,7 +55,9 @@ class RouterController extends BaseController
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $router->save();
-        $router->refresh();
+        //TODO: Deploy router - This is a temporary fix to trigger router deployment as the event is not being called currently.
+        //TODO: see: https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/467
+        event(new RouterAvailabilityZoneAttach($router, AvailabilityZone::findOrFail($request->availability_zone_id)));
         return $this->responseIdMeta($request, $router->getKey(), 201);
     }
 

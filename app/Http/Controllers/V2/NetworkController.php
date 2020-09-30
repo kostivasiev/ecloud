@@ -50,6 +50,38 @@ class NetworkController extends BaseController
      */
     public function create(CreateRequest $request)
     {
+
+//        $subnetRange = "10.0.0.0/24";
+//
+//        $range = \IPLib\Range\Subnet::fromString($subnetRange);
+//
+//        //The first address is the network identification and the last one is the broadcast, they cannot be used as regular addresses.
+//        // We also want to reserve the next 2 Ip's for future use.
+//        $networkAddress = $range->getStartAddress();
+//        $gatewayAddress = $networkAddress->getNextAddress();
+//        $dhcpServer = $gatewayAddress->getNextAddress();
+//
+//        var_dump([
+//            $gatewayAddress->toString() . '/' . $range->getNetworkPrefix(),
+//            $dhcpServer->toString() . '/' . $range->getNetworkPrefix(),
+//        ]);
+//
+//        $ip = $dhcpServer;
+//        $reserved = 2;
+//        $iterator = 0;
+//
+//        while ($ip = $ip->getNextAddress()) {
+//            $iterator++;
+//            if ($ip->toString() === $range->getEndAddress()->toString() || !$range->contains($ip)) {
+//                break;
+//            }
+//            if ($iterator <= $reserved) {
+//                var_dump('reserved ' . $iterator);
+//                continue;
+//            }
+//            var_dump($ip->toString());
+//        }
+
         $network = new Network($request->only([
             'router_id', 'name', 'subnet_range'
         ]));

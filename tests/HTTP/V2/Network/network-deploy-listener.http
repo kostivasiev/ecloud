@@ -1,4 +1,41 @@
-POST https://ecloud-apio.paul.rnd.ukfast/v2/vpcs
+POST https://{{host}}/{{version}}/regions
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test Region"
+}
+
+> {%
+client.global.set('region_id', response.body.data.id);
+client.log('Region UUID: ' + response.body.data.id);
+%}
+
+###
+
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "code": "MAN1",
+  "name": "Test AZ",
+  "datacentre_site_id": 111,
+  "nsx_manager_endpoint": "https://185.197.63.88/",
+  "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.global.set('availability_zone_id', response.body.data.id);
+client.log('Availability Zone UUID: ' + response.body.data.id);
+%}
+
+###
+
+POST https://{{host}}/{{version}}/vpcs
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -6,7 +43,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "region_id": "reg-b49ar89h"
+  "region_id": "{{region_id}}"
 }
 
 > {%
@@ -17,7 +54,7 @@ client.log('VPC ID: ' + response.body.data.id);
 # vpc-7dd2d8df
 # dhcp-8f7679e5
 
-POST https://ecloud-apio.paul.rnd.ukfast/v2/routers
+POST https://{{host}}/{{version}}/routers
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -26,7 +63,8 @@ Content-Type: application/json
 
 {
   "name": "test router",
-  "vpc_id": "{{vpc_id}}"
+  "vpc_id": "{{vpc_id}}",
+  "availability_zone_id" : "{{availability_zone_id}}"
 }
 
 > {%
@@ -36,16 +74,7 @@ client.log('Router ID: ' + response.body.data.id);
 
 ###
 
-PUT https://ecloud-apio.paul.rnd.ukfast/v2/routers/{{router_id}}/availability-zones/avz-716d7f96
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-###
-
-POST https://ecloud-apio.paul.rnd.ukfast/v2/networks
+POST https://{{host}}/{{version}}/networks
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -55,7 +84,7 @@ Content-Type: application/json
 {
   "name": "test network",
   "router_id": "{{router_id}}",
-  "availability_zone_id": "avz-716d7f96"
+  "availability_zone_id": "{{availability_zone_id}}"
 }
 
 > {%

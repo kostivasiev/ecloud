@@ -7,15 +7,17 @@ use IPLib\Range\Subnet;
 
 /**
  * Class ValidCidrSubnetRange
- * Validates that the value is a CIDR subnet range with /mask e.g.
- * 10.0.0.0/24
+ * Validates that the value is a CIDR subnet range with /mask e.g. 10.0.0.0/24
+ * Validates that the smallest subnet mask allowed is /29. A mask number > 29
+ * would not leave enough usable IP's
  * @package App\Rules\V2
  */
 class ValidCidrSubnetRange implements Rule
 {
     public function passes($attribute, $value)
     {
-        return !is_null(Subnet::fromString($value));
+        $range = Subnet::fromString($value);
+        return !is_null($range) && $range->getNetworkPrefix() < 30;
     }
 
     /**

@@ -42,6 +42,15 @@ class NetworkDeploy implements ShouldQueue
         }
 
         try {
+            $range = \IPLib\Range\Subnet::fromString($network->subnet_range);
+            //The first address is the network identification and the last one is the broadcast, they cannot be used as regular addresses.
+            $networkAddress = $range->getStartAddress();
+            $gatewayAddress = $networkAddress->getNextAddress();
+            $dhcpServerAddress = $gatewayAddress->getNextAddress();
+            $message = 'Deploying Network: ' . $network->id . ': ';
+            Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $range->getNetworkPrefix());
+            Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $range->getNetworkPrefix());
+
             $router->availabilityZone->nsxClient()->put(
                 'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
                 [
@@ -49,10 +58,10 @@ class NetworkDeploy implements ShouldQueue
                         'resource_type' => 'Segment',
                         'subnets' => [
                             [
-                                'gateway_address' => config('defaults.network.subnets.gateway_address'),
+                                'gateway_address' => $gatewayAddress->toString() . '/' . $range->getNetworkPrefix(),
                                 'dhcp_config' => [
                                     'resource_type' => 'SegmentDhcpV4Config',
-                                    'server_address' => config('defaults.network.subnets.dhcp_config.server_address'),
+                                    'server_address' => $dhcpServerAddress->toString() . '/' . $range->getNetworkPrefix(),
                                     'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
                                     'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
                                 ]
