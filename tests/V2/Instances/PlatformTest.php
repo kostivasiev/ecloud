@@ -50,6 +50,7 @@ class PlatformTest extends TestCase
             $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
             return $mockAdminDevices;
         });
+        Instance::boot();
     }
 
     public function testSettingPlatform()
