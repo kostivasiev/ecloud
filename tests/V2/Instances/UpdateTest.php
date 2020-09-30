@@ -51,12 +51,6 @@ class UpdateTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ]);
-        $this->no_appliance_instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'name' => 'UpdateTest Default',
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-        ]);
         $mockAdminDevices = \Mockery::mock(AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
         app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
@@ -150,9 +144,15 @@ class UpdateTest extends TestCase
 
     public function testPlatformIsSetWhenApplianceAttached()
     {
-        $this->assertNull($this->no_appliance_instance->platform);
+        $no_appliance_instance = factory(Instance::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+            'name' => 'UpdateTest Default',
+            'vcpu_cores' => 1,
+            'ram_capacity' => 1024,
+        ]);
+        $this->assertNull($no_appliance_instance->platform);
         $this->patch(
-            '/v2/instances/' . $this->no_appliance_instance->getKey(),
+            '/v2/instances/' . $no_appliance_instance->getKey(),
             [
                 'appliance_id' => $this->appliance->uuid,
             ],
@@ -163,7 +163,7 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(200);
 
-        $instance = Instance::findOrFail($this->no_appliance_instance->getKey());
+        $instance = Instance::findOrFail($no_appliance_instance->getKey());
         $this->assertNotNull($instance->platform);
         $this->assertEquals('Linux', $instance->platform);
     }
