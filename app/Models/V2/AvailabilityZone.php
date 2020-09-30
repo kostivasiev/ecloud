@@ -2,7 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Services\NsxService;
+use App\Services\V2\KingpinService;
+use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,11 +23,10 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'az';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'code',
@@ -34,7 +34,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'datacentre_site_id',
         'region_id',
         'is_public',
-        'nsx_manager_endpoint',
         'nsx_edge_cluster_id',
     ];
 
@@ -47,6 +46,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      * @var NsxService
      */
     protected $nsxService;
+
+    /**
+     * @var KingpinService
+     */
+    protected $kingpinService;
 
     public function routers()
     {
@@ -68,19 +72,24 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Credential::class, 'resource_id', 'id');
     }
 
-    public function nsxClient() : NsxService
+    public function nsxService()
     {
         if (!$this->nsxService) {
-            $this->nsxService = app()->makeWith(NsxService::class, [
-                'nsx_manager_endpoint' => $this->nsx_manager_endpoint,
-                'nsx_edge_cluster_id' => $this->nsx_edge_cluster_id,
-            ]);
+            $this->nsxService = app()->makeWith(NsxService::class, [$this]);
         }
         return $this->nsxService;
     }
 
+    public function kingpinService()
+    {
+        if (!$this->kingpinService) {
+            $this->kingpinService = app()->makeWith(KingpinService::class, [$this]);
+        }
+        return $this->kingpinService;
+    }
+
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\FilterFactory  $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
@@ -92,7 +101,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('datacentre_site_id', Filter::$numericDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('is_public', Filter::$numericDefaults),
-            $factory->create('nsx_manager_endpoint', Filter::$stringDefaults),
             $factory->create('nsx_edge_cluster_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -100,7 +108,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param  \UKFast\DB\Ditto\Factories\SortFactory  $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -113,7 +121,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('datacentre_site_id'),
             $factory->create('region_id'),
             $factory->create('is_public'),
-            $factory->create('nsx_manager_endpoint'),
             $factory->create('nsx_edge_cluster_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -121,7 +128,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param SortFactory $factory
+     * @param  SortFactory  $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -135,14 +142,13 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'code'       => 'code',
-            'name'       => 'name',
-            'datacentre_site_id'    => 'datacentre_site_id',
-            'region_id'    => 'region_id',
-            'is_public'    => 'is_public',
-            'nsx_manager_endpoint'    => 'nsx_manager_endpoint',
-            'nsx_edge_cluster_id'    => 'nsx_edge_cluster_id',
+            'id' => 'id',
+            'code' => 'code',
+            'name' => 'name',
+            'datacentre_site_id' => 'datacentre_site_id',
+            'region_id' => 'region_id',
+            'is_public' => 'is_public',
+            'nsx_edge_cluster_id' => 'nsx_edge_cluster_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

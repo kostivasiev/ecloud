@@ -3,7 +3,6 @@
 namespace App\Console\Commands\Kingpin;
 
 use App\Models\V2\AvailabilityZone;
-use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
 
@@ -28,7 +27,7 @@ class TestAuth extends Command
 
         try {
             /** @var Response $response */
-            app()->make(KingpinService::class, [$availabilityZone])->get('/api/v1/application/version');
+            $availabilityZone->kingpinService()->get('/api/v1/application/version');
         } catch (\Exception $exception) {
             if ($exception->getCode() == 401) {
                 $this->error('Auth test failed');
