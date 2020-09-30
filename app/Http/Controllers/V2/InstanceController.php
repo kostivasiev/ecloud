@@ -169,11 +169,23 @@ class InstanceController extends BaseController
             return response()->json([], 404);
         }
 
+        // Use the default network if there is only one
+        $defaultNetwork = null;
+        if (!$request->has('network_id')) {
+            $routers = $instance->vpc->routers;
+            if (count($routers) == 1) {
+                $networks = $routers->networks;
+                if (count($networks) == 1) {
+                    $defaultNetwork = $networks->first();
+                }
+            }
+        }
+
         $data = [
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id,
             'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.min')),
-            'network_id' => $request->input('network_id'),
+            'network_id' => $request->input('network_id', $defaultNetwork),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'appliance_data' => $request->input('appliance_data'),
         ];
