@@ -22,7 +22,7 @@ class NsxServiceProvider extends ServiceProvider
             $auth = base64_encode($credentials->user.':'.$credentials->password);
             return new NsxService(
                 new Client([
-                    'base_uri' => $credentials->host.empty($credentials->port) ? '' : ':'.$credentials->port,
+                    'base_uri' => $credentials->host.(empty($credentials->port) ? '' : ':'.$credentials->port),
                     'headers' => [
                         'Authorization' => ['Basic '.$auth],
                     ],
