@@ -28,7 +28,6 @@ $app->configure('logging');
 $app->configure('mail');
 $app->configure('gpu');
 $app->configure('encryption');
-$app->configure('nsx');
 $app->configure('queue');
 $app->configure('erd-generator');
 $app->configure('instance');
