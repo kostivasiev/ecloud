@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Nsx;
 
-use App\Services\V2\NsxService;
+use App\Models\V2\AvailabilityZone;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
@@ -21,8 +21,9 @@ class TestAuth extends Command
     public function handle()
     {
         try {
+            $availabilityZone = AvailabilityZone::firstOrFail();
             /** @var Response $response */
-            app()->make(NsxService::class)->get('policy/api/v1');
+            $availabilityZone->nsxService()->get('policy/api/v1');
         } catch (RequestException $exception) {
             if ($exception->getCode() == 404) {
                 $this->info('Auth test passed');
