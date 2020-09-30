@@ -73,6 +73,7 @@ class Deploy extends Job
                     $volume->availability_zone_id = $instance->availability_zone_id;
                     $volume->capacity = $volumeData->sizeGiB;
                     $volume->vmware_uuid = $volumeData->uuid;
+                    $volume->instances()->attach($instance);
                     $volume->save();
                     return $volume;
                 });

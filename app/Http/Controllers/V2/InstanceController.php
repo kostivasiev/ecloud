@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\DeployRequest;
@@ -147,6 +148,16 @@ class InstanceController extends BaseController
             Instance::forUser($request->user)
                 ->findOrFail($instanceId)
                 ->credentials()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
+    }
+
+    public function volumes(Request $request, string $instanceId)
+    {
+        return VolumeResource::collection(
+            Instance::forUser($request->user)
+                ->findOrFail($instanceId)
+                ->volumes()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
     }
