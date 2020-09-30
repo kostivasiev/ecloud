@@ -42,6 +42,7 @@ class CredentialsTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);
+        Instance::flushEventListeners();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $availabilityZone->getKey(),

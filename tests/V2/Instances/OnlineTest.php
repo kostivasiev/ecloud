@@ -46,6 +46,7 @@ class OnlineTest extends TestCase
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->id,
         ])->refresh();
+        Instance::flushEventListeners();
         $this->instance = factory(Instance::class)->create([
             'vpc_id'               => $this->vpc->getKey(),
             'name'                 => 'GetTest Default',
