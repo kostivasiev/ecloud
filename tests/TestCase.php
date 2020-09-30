@@ -4,9 +4,12 @@ namespace Tests;
 
 use App\Listeners\V2\DhcpCreate;
 use App\Models\V1\Datastore;
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FirewallRule;
+use App\Models\V2\Instance;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Models\V2\Network;
@@ -35,6 +38,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         FirewallRule::flushEventListeners();
         Vpc::flushEventListeners();
         Network::flushEventListeners();
+        Instance::flushEventListeners();
     }
 
     /**

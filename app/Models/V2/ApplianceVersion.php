@@ -64,18 +64,10 @@ class ApplianceVersion extends Model
 
     public function serverLicense()
     {
-        try {
-            $devicesAdminClient = app()->make(AdminClient::class);
-            $license = $devicesAdminClient->licenses()->getById(
-                $this->appliance_version_server_license_id
-            );
-            return $license;
-        } catch (\Exception $e) {
-            Log::info($e->getMessage(), [
-                'appliance_version' => $this->getKey(),
-            ]);
-        }
-        return;
+        $devicesAdminClient = app()->make(AdminClient::class);
+        return $devicesAdminClient->licenses()->getById(
+            $this->appliance_version_server_license_id
+        );
     }
 
     public function getLatest(string $applianceUuid)

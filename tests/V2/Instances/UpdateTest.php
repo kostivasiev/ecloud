@@ -22,7 +22,6 @@ class UpdateTest extends TestCase
     protected $appliance;
     protected $appliance_version;
     protected $instance;
-    protected $no_appliance_instance;
     protected $region;
     protected $availability_zone;
 
@@ -51,20 +50,6 @@ class UpdateTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ]);
-        $this->no_appliance_instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'name' => 'UpdateTest Default',
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-        ]);
-        $mockAdminDevices = \Mockery::mock(AdminClient::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
-            $mockedResponse = new \stdClass();
-            $mockedResponse->category = "Linux";
-            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
-            return $mockAdminDevices;
-        });
     }
 
     public function testValidDataIsSuccessful()
@@ -146,25 +131,5 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(200);
         $this->instance->refresh();
         $this->assertEquals($data['name'], $this->instance->name);
-    }
-
-    public function testPlatformIsSetWhenApplianceAttached()
-    {
-        $this->assertNull($this->no_appliance_instance->platform);
-        $this->patch(
-            '/v2/instances/' . $this->no_appliance_instance->getKey(),
-            [
-                'appliance_id' => $this->appliance->uuid,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(200);
-
-        $instance = Instance::findOrFail($this->no_appliance_instance->getKey());
-        $this->assertNotNull($instance->platform);
-        $this->assertEquals('Linux', $instance->platform);
     }
 }

@@ -78,13 +78,9 @@ class GetTest extends TestCase
                 'id'     => $this->instance->getKey(),
                 'name'   => $this->instance->name,
                 'vpc_id' => $this->instance->vpc_id,
+                'platform' => 'Linux',
             ])
             ->assertResponseStatus(200);
-
-        // Test to ensure you don't see platform attribute
-        $this->dontSeeJson([
-            'platform' => 'Linux',
-        ]);
     }
 
     public function testGetResource()
