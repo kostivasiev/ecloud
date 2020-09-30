@@ -101,8 +101,8 @@ class Deploy extends Job
                 $nic = new Nic([
                     'mac_address' => $nicData->macAddress,
                     'instance_id' => $instance->id,
+                    'network_id' => $this->data['network_id'],
                 ]);
-                $nic->network()->associate($this->data['network_id']);
                 $nic->save();
                 Log::info($logMessage.'Created NIC resource '.$nic->getKey());
             }
