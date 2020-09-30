@@ -17,9 +17,6 @@ use App\Models\V2\Network;
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
 
-    protected $appliance;
-    protected $appliance_version;
-
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',
@@ -41,12 +38,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         FirewallRule::flushEventListeners();
         Vpc::flushEventListeners();
         Network::flushEventListeners();
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
         Instance::flushEventListeners();
     }
 
