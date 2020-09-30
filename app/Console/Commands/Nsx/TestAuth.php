@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Nsx;
 
-use App\Services\NsxService;
+use App\Services\V2\NsxService;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;

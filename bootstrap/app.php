@@ -124,7 +124,7 @@ $app->register(App\Providers\AccountsServiceProvider::class);
 $app->register(App\Providers\BillingServiceProvider::class);
 
 // NSX service provider
-$app->register(App\Providers\NsxServiceProvider::class);
+$app->register(App\Providers\V2\NsxServiceProvider::class);
 
 // ErdGenerator - Only enable on dev
 if (is_dir($app->basePath('vendor/beyondcode/laravel-er-diagram-generator'))) {
