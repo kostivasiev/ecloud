@@ -39,6 +39,7 @@ class InstanceResource extends UKFastResource
             'vcpu_cores'   => $this->vcpu_cores,
             'ram_capacity' => $this->ram_capacity,
             'locked'       => $this->locked,
+            'platform'     => $this->platform,
             'created_at'   => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
@@ -53,7 +54,6 @@ class InstanceResource extends UKFastResource
         }
         if ($request->route('instanceId')) {
             $response['online'] = $this->online;
-            $response['platform'] = $this->platform;
         }
         return $response;
     }
