@@ -130,13 +130,8 @@ class Instance extends Model implements Filterable, Sortable
     public function setDefaultPlatform()
     {
         if (empty($this->platform) && $this->applianceVersion) {
-            try {
                 $this->platform = $this->applianceVersion->serverLicense()->category;
                 $this->save();
-            } catch (\Exception $e) {
-                // There is no platform, do nothing
-                Log::info("No platform found: " . $e->getMessage());
-            }
         }
     }
 
