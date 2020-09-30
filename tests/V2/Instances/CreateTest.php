@@ -43,6 +43,7 @@ class CreateTest extends TestCase
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();
+        Instance::flushEventListeners();
         $this->instance = factory(Instance::class)->create([
             'appliance_version_id' => $this->appliance_version->uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),
