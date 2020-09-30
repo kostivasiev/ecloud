@@ -52,11 +52,13 @@ class Instance extends Model implements Filterable, Sortable
 
     protected static function boot()
     {
-        static::created(function ($instance) {
+        parent::boot();
+
+        static::created(function (Instance $instance) {
             $instance->setDefaultPlatform();
         });
 
-        static::updated(function ($instance) {
+        static::updated(function (Instance $instance) {
             $instance->setDefaultPlatform();
         });
     }
