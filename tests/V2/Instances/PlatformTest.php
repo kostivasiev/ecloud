@@ -4,25 +4,25 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Admin\Devices\AdminClient;
 
-class PutTest extends TestCase
+class PlatformTest extends TestCase
 {
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
     protected $availability_zone;
-    protected $instance;
-    protected $appliance;
-    protected $appliance_version;
     protected $region;
     protected $vpc;
+    protected $appliance;
+    protected $appliance_version;
 
     public function setUp(): void
     {
@@ -40,42 +40,39 @@ class PutTest extends TestCase
             'appliance_name' => 'Test Appliance',
         ])->refresh();
         $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->id,
+            'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();
-        Instance::flushEventListeners();
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id'               => $this->vpc->getKey(),
-            'name'                 => 'GetTest Default',
-            'appliance_version_id' => $this->appliance_version->uuid,
-            'vcpu_cores'           => 1,
-            'ram_capacity'         => 1024,
-        ]);
+        $mockAdminDevices = \Mockery::mock(AdminClient::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
+            $mockedResponse = new \stdClass();
+            $mockedResponse->category = "Linux";
+            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
+            return $mockAdminDevices;
+        });
     }
 
-    public function testPowerOn()
+    public function testSettingPlatform()
     {
-        $this->put(
-            '/v2/instances/' . $this->instance->getKey() . '/power-on',
-            [],
+        $data = [
+            'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->appliance->uuid,
+            'vcpu_cores' => 1,
+            'ram_capacity' => 1024,
+        ];
+        $this->post(
+            '/v2/instances',
+            $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(202);
-    }
+            ->assertResponseStatus(201);
 
-    public function testPowerOff()
-    {
-        $this->put(
-            '/v2/instances/' . $this->instance->getKey() . '/power-off',
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(202);
+        $id = json_decode($this->response->getContent())->data->id;
+        $instance = Instance::findOrFail($id);
+        // Check that the platform id has been populated
+        $this->assertEquals('Linux', $instance->platform);
     }
-
 }

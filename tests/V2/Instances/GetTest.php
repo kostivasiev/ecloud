@@ -47,6 +47,7 @@ class GetTest extends TestCase
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->id,
         ])->refresh();
+        Instance::flushEventListeners();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'GetTest Default',
@@ -78,13 +79,9 @@ class GetTest extends TestCase
                 'id'     => $this->instance->getKey(),
                 'name'   => $this->instance->name,
                 'vpc_id' => $this->instance->vpc_id,
+                'platform' => 'Linux',
             ])
             ->assertResponseStatus(200);
-
-        // Test to ensure you don't see platform attribute
-        $this->dontSeeJson([
-            'platform' => 'Linux',
-        ]);
     }
 
     public function testGetResource()
