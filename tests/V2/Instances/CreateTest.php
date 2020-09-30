@@ -21,6 +21,8 @@ class CreateTest extends TestCase
     protected $instance;
     protected $region;
     protected $vpc;
+    protected $appliance;
+    protected $appliance_version;
 
     public function setUp(): void
     {
@@ -34,6 +36,13 @@ class CreateTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
+        $this->appliance = factory(Appliance::class)->create([
+            'appliance_name' => 'Test Appliance',
+        ])->refresh();
+        $this->appliance_version = factory(ApplianceVersion::class)->create([
+            'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ])->refresh();
+        Instance::flushEventListeners();
         $this->instance = factory(Instance::class)->create([
             'appliance_version_id' => $this->appliance_version->uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),

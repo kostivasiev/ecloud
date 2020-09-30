@@ -2,6 +2,8 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
@@ -9,6 +11,7 @@ use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Admin\Devices\AdminClient;
 
 class UpdateTest extends TestCase
 {
@@ -16,6 +19,8 @@ class UpdateTest extends TestCase
 
     protected \Faker\Generator $faker;
     protected $vpc;
+    protected $appliance;
+    protected $appliance_version;
     protected $instance;
     protected $region;
     protected $availability_zone;
@@ -32,6 +37,13 @@ class UpdateTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
+        $this->appliance = factory(Appliance::class)->create([
+            'appliance_name' => 'Test Appliance',
+        ])->refresh();
+        $this->appliance_version = factory(ApplianceVersion::class)->create([
+            'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ])->refresh();
+        Instance::flushEventListeners();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'UpdateTest Default',
