@@ -18,7 +18,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DefaultPlatform;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
@@ -49,6 +49,17 @@ class Instance extends Model implements Filterable, Sortable
     protected $casts = [
         'locked' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        static::created(function ($instance) {
+            $instance->setDefaultPlatform();
+        });
+
+        static::updated(function ($instance) {
+            $instance->setDefaultPlatform();
+        });
+    }
 
     public function vpc()
     {
@@ -112,6 +123,19 @@ class Instance extends Model implements Filterable, Sortable
     {
         $version = (new ApplianceVersion)->getLatest($applianceUuid);
         $this->attributes['appliance_version_id'] = $version;
+    }
+
+    public function setDefaultPlatform()
+    {
+        if (empty($this->platform) && $this->applianceVersion) {
+            try {
+                $this->platform = $this->applianceVersion->serverLicense()->category;
+                $this->save();
+            } catch (\Exception $e) {
+                // There is no platform, do nothing
+                Log::info("No platform found: " . $e->getMessage());
+            }
+        }
     }
 
     /**
