@@ -42,6 +42,32 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
+  "name": "NSX",
+  "resource_id": "{{availability_zone_id}}",
+  "host": "https://185.197.63.88",
+  "user": "ecloud.api@ecloudgov.dev",
+  "password": "a5hfysIVpUND"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('nsx_credential_id', response.body.data.id);
+client.log('NSX Credential ID: ' + response.body.data.id);
+%}
+
+###
+
+POST https://{{host}}/{{version}}/credentials
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
   "name": "Kingpin (G0)",
   "resource_id": "{{availability_zone_id}}",
   "host": "https://mgmt-20.ecloud-service.ukfast.co.uk",
@@ -60,6 +86,7 @@ client.log('Credential ID: ' + response.body.data.id);
 %}
 
 ###
+
 
 ###
 POST https://{{host}}/{{version}}/vpcs

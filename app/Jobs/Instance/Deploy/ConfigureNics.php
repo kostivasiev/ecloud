@@ -17,19 +17,17 @@ class ConfigureNics extends Job
         $this->data = $data;
     }
 
-    /**
-     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/327
-     */
     public function handle()
     {
         Log::info('Performing ConfigureNics for instance '. $this->data['instance_id']);
 
         $instance = Instance::findOrFail($this->data['instance_id']);
-        $nsxClient = $instance->availabilityZone->nsxClient();
-
+        $nsxService = $instance->availabilityZone->nsxService();
         $logMessage = 'ConfigureNics for instance ' . $instance->getKey() . ': ';
 
-
+        /**
+         * @see https://laravel.com/docs/8.x/queries#pessimistic-locking
+         */
         $database = app('db')->connection('ecloud');
         $database->beginTransaction();
 
@@ -40,7 +38,7 @@ class ConfigureNics extends Job
             ->get();
 
         $nicsByNetwork = $instanceNics->groupBy('network_id');
-        $nicsByNetwork->each(function ($nics, $networkId) use ($nsxClient, $logMessage, $database) {
+        $nicsByNetwork->each(function ($nics, $networkId) use ($nsxService, $logMessage, $database) {
             $network = Network::findOrFail($networkId);
             $subnet = \IPLib\Range\Subnet::fromString($network->subnet_range);
 
@@ -50,12 +48,12 @@ class ConfigureNics extends Job
              */
             try {
                 $cursor = null;
-                $assignedNsxIps = collect();
+                $assignedIpsNsx = collect();
                 do {
-                    $response = $nsxClient->get('/policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs?cursor=' . $cursor);
+                    $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs?cursor=' . $cursor);
                     $response = json_decode($response->getBody()->getContents());
                     foreach ($response->results as $dhcpStaticBindingConfig) {
-                        $assignedNsxIps->push($dhcpStaticBindingConfig->ip_address);
+                        $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
                     }
                     $cursor = $response->cursor ?? null;
                 } while (!empty($cursor));
@@ -66,57 +64,71 @@ class ConfigureNics extends Job
                 return;
             }
 
+            $assignedIpsDb = $nics->pluck('ip_address')
+                ->filter(function ($value) {
+                    return !is_null($value);
+                });
 
-            //Loop over nics (skip if no network_id) get the next available Ip in the range,
-            //Check the ip isn't assigned to any nics resources already
+            foreach ($nics as $nic) {
+                // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
+                $reserved = 4;
+                $iterator = 0;
 
-            $nics->each(function ($nic) use ($database) {
+                $ip = $subnet->getStartAddress();
+                while ($ip = $ip->getNextAddress()) {
+                    $iterator++;
+                    if ($iterator <= $reserved) {
+                        continue;
+                    }
+                    if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
+                        $error = 'Insufficient available IP\'s in subnet to assign to NICs';
+                        Log::info($error);
+                        $database->rollback();
+                        $this->fail(new \Exception($error));
+                        return;
+                    }
 
-                if (!$nic->save()) {
-                    $database->rollback();
-                    Log::info($error);
-                    $this->fail(new \Exception($error));
-                    return;
+                    $checkIp = $ip->toString();
+
+                    if ($assignedIpsDb->contains($checkIp)) {
+                        continue;
+                    }
+
+                    //check NSX that the IP isn't in use.
+                    if ($assignedIpsNsx->contains($checkIp)) {
+                        continue;
+                    }
+
+                    $nic->ip_address = $checkIp;
+                    $nic->save();
+                    break;
                 }
-            });
-
-
-
-            //check via NSX that the IP isn't in use.
-
-
-
-            //Create dhcp lease for the ip to the nic's mac address on NSX
-            //https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
-            //Update the nic resource with the IP address.
+            }
         });
 
-        if (!$applianceParameter->save()) {
-            $database->rollback();
-            throw new DatabaseException(
-                'Failed to save Appliance version. Invalid parameter \''.$parameter['name'].'\''
-            );
-        }
-
-
         $database->commit();
-            exit(print_r(
-                'tets'
-            ));
 
-
-
-
-
-
-
-
-
-
-
-
-        /**
-         * We need to reserve the first 4 IPs of a range, and the last (for broadcast).
-         */
+        //Create dhcp lease for the ip to the nic's mac address on NSX
+        //https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
+        $instanceNics->each(function ($nic) use ($nsxService, $logMessage) {
+            try {
+                $nsxService->put('/policy/api/v1/infra/tier-1s/'
+                    .$nic->network->router->getKey().'/segments/'.$nic->network->getKey()
+                    .'/dhcp-static-binding-configs/'.$nic->getKey(),
+                    [
+                        'json' => [
+                            'resource_type' => 'DhcpV4StaticBindingConfig',
+                            'mac_address' => $nic->mac_address,
+                            'ip_address' => $nic->ip_address
+                        ]
+                    ]);
+            } catch (GuzzleException $exception) {
+                $error = $logMessage.'Failed: '.$exception->getResponse()
+                        ->getBody()->getContents();
+                Log::info($error);
+                $this->fail(new \Exception($error));
+                return;
+            }
+        });
     }
 }
