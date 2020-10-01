@@ -112,8 +112,8 @@ class ConfigureNics extends Job
         //https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
         $instanceNics->each(function ($nic) use ($nsxService, $logMessage) {
             try {
-                $nsxService->put('/policy/api/v1/infra/tier-1s/'
-                    .$nic->network->router->getKey().'/segments/'.$nic->network->getKey()
+                $nsxService->put(
+                    '/policy/api/v1/infra/tier-1s/'.$nic->network->router->getKey().'/segments/'.$nic->network->getKey()
                     .'/dhcp-static-binding-configs/'.$nic->getKey(),
                     [
                         'json' => [
@@ -121,7 +121,8 @@ class ConfigureNics extends Job
                             'mac_address' => $nic->mac_address,
                             'ip_address' => $nic->ip_address
                         ]
-                    ]);
+                    ]
+                );
             } catch (GuzzleException $exception) {
                 $error = $logMessage.'Failed: '.$exception->getResponse()
                         ->getBody()->getContents();
