@@ -15,10 +15,10 @@ class MemoryChanged
     public $instance;
 
     /**
-     * @param Instance $instance
+     * @param $instance
      * @return void
      */
-    public function __construct(Instance $instance)
+    public function __construct($instance)
     {
         $this->instance = $instance;
     }
