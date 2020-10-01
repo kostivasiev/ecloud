@@ -25,7 +25,7 @@ class RunBootstrapScript extends Job
     {
         Log::info('Starting RunBootstrapScript for instance '.$this->data['instance_id']);
 
-        if (empty($this->data['user_data'])) {
+        if (empty($this->data['user_script'])) {
             Log::info('RunBootstrapScript for '.$this->data['instance_id'].', no data passed so nothing to do');
             return;
         }
@@ -45,7 +45,7 @@ class RunBootstrapScript extends Job
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->post('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
                 'json' => [
-                    'encodedScript' => base64_encode($this->data['user_data']),
+                    'encodedScript' => base64_encode($this->data['user_script']),
                     'username' => $credential->user,
                     'password' => $credential->password,
                 ],

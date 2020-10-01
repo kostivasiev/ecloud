@@ -35,6 +35,11 @@ class DeployRequest extends FormRequest
                 'required',
                 'string',
             ],
+            'user_script' => [
+                'sometimes',
+                'required',
+                'string',
+            ],
             'volume_capacity' => [
                 'sometimes',
                 'required',
@@ -58,6 +63,7 @@ class DeployRequest extends FormRequest
             'floating_ip_id.required' => 'The :attribute field, when specified, cannot be null',
             'floating_ip_id.exists' => 'The specified :attribute was not found',
             'appliance_data.required' => 'The :attribute field, when specified, cannot be null',
+            'user_script.required' => 'The :attribute field, when specified, cannot be null',
             'volume_capacity.required' => 'The :attribute field, when specified, cannot be null',
             'volume_capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'volume_capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
