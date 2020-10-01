@@ -41,7 +41,10 @@ class RunBootstrapScript extends Job
             /** @var Response $response */
             $response = $kingpinService->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
                 'json' => [
-                    'encodedScript' => $script,
+                    'encodedScript' => base64_encode(
+                        (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
+                            ->render($this->data['appliance_data'])
+                    ),
                     'username' => $credential->username,
                     'password' => $credential->password,
                 ],
