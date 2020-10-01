@@ -38,9 +38,8 @@ class PrepareOsDisk extends Job
 
         $endpoint = ($instance->platform == 'Linux') ? 'linux/lvm/extend' : 'windows/disk/expandall';
         try {
-            $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
             /** @var Response $response */
-            $response = $kingpinService->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
+            $response = $instance->availabilityZone->kingpinService()->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
                 'json' => [
                     'username' => $credential->username,
                     'password' => $credential->password,

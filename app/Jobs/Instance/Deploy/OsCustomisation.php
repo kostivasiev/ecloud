@@ -36,16 +36,13 @@ class OsCustomisation extends Job
 
         try {
             /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization',
-                [
-                    'json' => [
-                        'platform' => $instance->platform,
-                        'password' => $credential->password,
-                        'hostname' => $instance->id,
-                    ],
-                ]
-            );
+            $response = $instance->availabilityZone->kingpinService()->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization', [
+                'json' => [
+                    'platform' => $instance->platform,
+                    'password' => $credential->password,
+                    'hostname' => $instance->id,
+                ],
+            ]);
             if ($response->getStatusCode() == 200) {
                 Log::info('OsCustomisation finished successfully for instance '.$instance->id);
                 return;
