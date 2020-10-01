@@ -40,7 +40,7 @@ class ConfigureNics extends Job
             ->get();
 
         $nicsByNetwork = $instanceNics->groupBy('network_id');
-        $nicsByNetwork->each(function($nics, $networkId) use ($nsxClient, $logMessage, $database) {
+        $nicsByNetwork->each(function ($nics, $networkId) use ($nsxClient, $logMessage, $database) {
             $network = Network::findOrFail($networkId);
             $subnet = \IPLib\Range\Subnet::fromString($network->subnet_range);
 
@@ -78,8 +78,6 @@ class ConfigureNics extends Job
                     $this->fail(new \Exception($error));
                     return;
                 }
-
-
             });
 
 
@@ -91,10 +89,6 @@ class ConfigureNics extends Job
             //Create dhcp lease for the ip to the nic's mac address on NSX
             //https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
             //Update the nic resource with the IP address.
-
-
-
-
         });
 
         if (!$applianceParameter->save()) {

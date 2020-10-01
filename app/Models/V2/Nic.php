@@ -74,7 +74,6 @@ class Nic extends Model
             $factory->create('ip_address', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
-            $factory->create('ip_address', Filter::$stringDefaults),
         ];
     }
 

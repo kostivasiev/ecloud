@@ -55,14 +55,6 @@ class NetworkController extends BaseController
     public function create(CreateRequest $request)
     {
 
-        $ips = collect();
-        $ips->push('10.0.0.2');
-
-        exit(var_dump(
-            $ips->contains('10.0.0.2')
-        ));
-
-
         exit('here');
 //        $instance = Instance::findOrFail('i-3967e72c');
 //
