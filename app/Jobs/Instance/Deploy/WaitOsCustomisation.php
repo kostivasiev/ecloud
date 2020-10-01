@@ -74,9 +74,4 @@ class WaitOsCustomisation extends Job
             return;
         }
     }
-
-    public function failed(\Exception $exception)
-    {
-        Log::info($exception->getMessage());
-    }
 }
