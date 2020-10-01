@@ -213,7 +213,7 @@ class InstanceController extends BaseController
         return response('', 202);
     }
 
-    public function shutdownGuest(Request $request, $instanceId)
+    public function guestShutdown(Request $request, $instanceId)
     {
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
