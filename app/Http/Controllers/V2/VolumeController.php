@@ -4,8 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
+use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -116,6 +118,16 @@ class VolumeController extends BaseController
         $volume->fill($request->only($only));
         $volume->save();
         return $this->responseIdMeta($request, $volume->getKey(), 200);
+    }
+
+    public function instances(Request $request, string $volumeId)
+    {
+        return InstanceResource::collection(
+            Volume::forUser($request->user)
+                ->findOrFail($volumeId)
+                ->instances()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
     }
 
     /**

@@ -5,11 +5,11 @@ use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
 /**
- * Class VirtualPrivateCloudResource
+ * Class RegionResource
  * @package App\Http\Resources\V2
  * @property string id
  * @property string name
- * @property string reseller_id
+ * @property bool   is_public
  * @property string created_at
  * @property string updated_at
  */
@@ -27,6 +27,7 @@ class RegionResource extends UKFastResource
         ];
 
         if ($request->user->isAdministrator) {
+            $data['is_public'] = $this->is_public;
             $tz = new \DateTimeZone(config('app.timezone'));
             $data['created_at'] = Carbon::parse($this->created_at, $tz)->toIso8601String();
             $data['updated_at'] = Carbon::parse($this->updated_at, $tz)->toIso8601String();

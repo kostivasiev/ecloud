@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -74,11 +73,17 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(AvailabilityZone::class);
     }
 
+    public function volumes()
+    {
+        return $this->belongsToMany(Volume::class);
+    }
+
     public function getOnlineAttribute()
     {
         try {
-            $response = app()->make(KingpinService::class, [$this->availabilityZone])
-                ->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
+            $response = $this->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/'.$this->vpc_id.'/instance/'.$this->getKey()
+            );
         } catch (\Exception $e) {
             Log::info('Failed to get power state', [
                 'vpc_id' => $this->vpc_id,
@@ -192,12 +197,12 @@ class Instance extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'                   => 'id',
-            'name'                 => 'name',
-            'vpc_id'               => 'vpc_id',
+            'id' => 'id',
+            'name' => 'name',
+            'vpc_id' => 'vpc_id',
             'appliance_version_id' => 'appliance_version_id',
-            'vcpu_cores'           => 'vcpu_cores',
-            'ram_capacity'         => 'ram_capacity',
+            'vcpu_cores' => 'vcpu_cores',
+            'ram_capacity' => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',
             'locked'     => 'locked',
             'platform'   => 'platform',
