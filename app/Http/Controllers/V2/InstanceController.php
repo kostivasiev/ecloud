@@ -188,6 +188,7 @@ class InstanceController extends BaseController
             'network_id' => $request->input('network_id', $defaultNetwork),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'appliance_data' => $request->input('appliance_data'),
+            'user_script' => $request->input('user_script'),
         ];
 
         // Create the chained jobs for deployment

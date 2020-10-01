@@ -24,6 +24,12 @@ class RunBootstrapScript extends Job
     public function handle()
     {
         Log::info('Starting RunBootstrapScript for instance '.$this->data['instance_id']);
+
+        if (empty($this->data['user_script'])) {
+            Log::info('RunBootstrapScript for '.$this->data['instance_id'].', no data passed so nothing to do');
+            return;
+        }
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $credential = $instance->credentials()
@@ -39,10 +45,7 @@ class RunBootstrapScript extends Job
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->post('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
                 'json' => [
-                    'encodedScript' => base64_encode(
-                        (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
-                            ->render($this->data['appliance_data'])
-                    ),
+                    'encodedScript' => base64_encode($this->data['user_script']),
                     'username' => $credential->user,
                     'password' => $credential->password,
                 ],

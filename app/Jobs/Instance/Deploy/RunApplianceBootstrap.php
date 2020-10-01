@@ -45,7 +45,7 @@ class RunApplianceBootstrap extends Job
                 'json' => [
                     'encodedScript' => base64_encode(
                         (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
-                            ->render($this->data['appliance_data'])
+                            ->render(json_decode($this->data['appliance_data']))
                     ),
                     'username' => $credential->user,
                     'password' => $credential->password,
