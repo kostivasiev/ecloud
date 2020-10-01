@@ -24,7 +24,7 @@
         <env name="APP_ENV" value="testing" force="true"/>
         <env name="CACHE_DRIVER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
-        <env name="LOG_CHANNEL" value="stderr" force="true"/>
+<!--        <env name="LOG_CHANNEL" value="stderr" force="true"/>-->
 
         <env name="APP_NAME" value="ecloud" force="true"/>
         <env name="PAGINATION_LIMIT" value="100" force="true"/>
