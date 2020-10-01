@@ -1,15 +1,18 @@
 <?php
 namespace Tests\V2\Instances;
 
+use App\Events\V2\MemoryChanged;
+use App\Listeners\V2\MemoryChange;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
-use App\Models\V2\ServerLicense;
 use App\Models\V2\Vpc;
+use App\Services\NsxService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Devices\AdminClient;
@@ -19,47 +22,87 @@ class MemoryCpuChangeTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected $appliance;
-    protected $applianceVersion;
+    protected AvailabilityZone $availability_zone;
+    protected $event;
     protected $instance;
-    protected $region;
-    protected $vpc;
+    protected $listener;
+    protected Region $region;
+    protected ?string $capturedUri = null;
+    protected ?array $capturedParams = null;
+
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->appliance = (factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ]))->refresh();
-        $this->applianceVersion = (factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->getKey(),
-            'appliance_version_server_license_id' => 2,
-        ]))->refresh();
         $this->region = factory(Region::class)->create();
-        $this->vpc = factory(Vpc::class)->create([
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
-        $this->instance = factory(Instance::class)->create([
-            'appliance_version_id' => $this->applianceVersion->appliance_version_uuid,
-            'vpc_id' => $this->vpc->getKey(),
-        ]);
-        $mockAdminDevices = \Mockery::mock(AdminClient::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
-            $mockedResponse = new \stdClass();
-            $mockedResponse->category = "Linux";
-            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
-            return $mockAdminDevices;
-        });
+        $this->instance = \Mockery::mock(Instance::class)
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $this->instance->shouldReceive('getOnlineAttribute')
+            ->andReturnTrue();
+        $this->instance->availabilityZone = $this->availability_zone;
+        $this->instance->id = 'i-abc123xyz';
+        $this->instance->vpc_id = 'vpc-abc123xyz';
+
+        $this->event = new MemoryChanged($this->instance);
+
+        $this->listener = \Mockery::mock(MemoryChange::class)
+            ->makePartial();
+        $this->listener->shouldReceive('put')
+            ->with(
+                \Mockery::capture($this->capturedUri),
+                \Mockery::capture($this->capturedParams)
+            )
+            ->andReturnTrue();
     }
 
-    public function testServerLicense()
+    public function testMemoryChangeRamCapacity()
     {
-        dd(
-            $this->instance->applianceVersion->serverLicense()->category,
-            $this->instance->platform
-        );
-        $this->assertTrue(true);
+        // First check Linux 2Gb change (no reboot)
+        $this->instance->platform = 'Linux';
+        $this->instance->ram_capacity = 2048;
+        $this->instance->vcpu_cores = 1;
+
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
+        $this->assertFalse($this->capturedParams['guestShutdown']);
+
+        // Now check Linux 4Gb change (reboot required)
+        $this->instance->ram_capacity = 4096;
+        $this->instance->vcpu_cores = 2;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
+        $this->assertTrue($this->capturedParams['guestShutdown']);
+
+        // Now check Windows 2Gb change
+        $this->instance->platform = 'Windows';
+        $this->instance->ram_capacity = 2048;
+        $this->instance->vcpu_cores = 1;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
+        $this->assertFalse($this->capturedParams['guestShutdown']);
+
+        // Now check Windows 4Gb change (no reboot)
+        $this->instance->ram_capacity = 4096;
+        $this->instance->vcpu_cores = 2;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
+        $this->assertFalse($this->capturedParams['guestShutdown']);
+
+        // Now check Windows 17Gb change (reboot required)
+        $this->instance->ram_capacity = 17408;
+        $this->instance->vcpu_cores = 4;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
+        $this->assertTrue($this->capturedParams['guestShutdown']);
     }
 }
