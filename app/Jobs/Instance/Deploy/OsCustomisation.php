@@ -5,7 +5,6 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Exception\GuzzleException;
@@ -36,7 +35,6 @@ class OsCustomisation extends Job
         }
 
         try {
-            $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->put(
                 '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization',
