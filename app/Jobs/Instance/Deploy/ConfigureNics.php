@@ -59,6 +59,7 @@ class ConfigureNics extends Job
                 } while (!empty($cursor));
             } catch (GuzzleException $exception) {
                 $error = $logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents();
+                $database->rollback();
                 Log::info($error);
                 $this->fail(new \Exception($error));
                 return;
