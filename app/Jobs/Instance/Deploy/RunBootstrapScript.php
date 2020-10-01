@@ -5,7 +5,6 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
@@ -38,13 +37,13 @@ class RunBootstrapScript extends Job
         $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         try {
             /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
+            $response = $instance->availabilityZone->kingpinService()->post('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
                 'json' => [
                     'encodedScript' => base64_encode(
                         (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
                             ->render($this->data['appliance_data'])
                     ),
-                    'username' => $credential->username,
+                    'username' => $credential->user,
                     'password' => $credential->password,
                 ],
             ]);
