@@ -215,7 +215,6 @@ class InstanceController extends BaseController
 
     public function shutdownGuest(Request $request, $instanceId)
     {
-        echo "test";
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
