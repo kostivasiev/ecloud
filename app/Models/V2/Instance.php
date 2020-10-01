@@ -64,6 +64,11 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(AvailabilityZone::class);
     }
 
+    public function nics()
+    {
+        return $this->hasMany(Nic::class);
+    }
+
     public function getOnlineAttribute()
     {
         try {

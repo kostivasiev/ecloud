@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Jobs\Instance\Deploy\ConfigureNics;
 use Illuminate\Http\Request;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\DeployRequest;
@@ -169,6 +170,7 @@ class InstanceController extends BaseController
 
         // Create the chained jobs for deployment
         $this->dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
+            new \App\Jobs\Instance\Deploy\ConfigureNics($data),
             new \App\Jobs\Instance\Deploy\UpdateNetworkAdapter($data),
             new \App\Jobs\Instance\PowerOn($data),
             new \App\Jobs\Instance\Deploy\WaitOsCustomisation($data),

@@ -82,6 +82,11 @@ class NetworkDeploy implements ShouldQueue
                 ]
             );
         } catch (GuzzleException $exception) {
+            //Segment already exists. Hacky fix, as the listener is fired twice due to rincewind
+            if (json_decode($exception->getResponse()->getBody()->getContents())->error_code == 500127) {
+                Log::info('Attempted to create network segment ' . $network->getKey() . ' but it already exists.');
+                return;
+            }
             $message = 'NetworkDeploy failed with : ' .  $exception->getResponse()->getBody()->getContents();
             Log::error($message);
             $this->fail(new \Exception($message));

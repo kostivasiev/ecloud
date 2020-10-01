@@ -4,9 +4,13 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
+use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Resources\V2\NetworkResource;
+use App\Services\V2\KingpinService;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -50,6 +54,75 @@ class NetworkController extends BaseController
      */
     public function create(CreateRequest $request)
     {
+
+        $ips = collect();
+        $ips->push('10.0.0.2');
+
+        exit(var_dump(
+            $ips->contains('10.0.0.2')
+        ));
+
+
+        exit('here');
+//        $instance = Instance::findOrFail('i-3967e72c');
+//
+//        $logMessage = 'Deploy instance ' . $instance->getKey() . ' : ';
+////      GET
+//
+//        $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
+//
+//        // Group NIC's by subnet so we can compare with available IP's from subnet on NSX
+//        $nicsByNetwork = $instance->nics()->whereNotNull('network_id')->where('network_id', '!=', '')->get()->groupBy('network_id');
+//
+//
+//        $nicsByNetwork->each(function($nics, $networkId) use ($kingpinService) {
+//            $network = $nics->first()->network;
+//            $subnet = \IPLib\Range\Subnet::fromString($network->subnet_range);
+//
+//            exit(var_dump('/policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs'));
+//
+//            try {
+//                $response = $kingpinService->get('/policy/api/v1/infra/tier-1s/' . $network->router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs');
+//                if ($response->getStatusCode() != 200) {
+//                    throw new \Exception('Invalid response status code: ' . $response->getStatusCode());
+//                }
+//
+//                $response = json_decode($response->getBody()->getContents());
+//                if (!$response) {
+//                    throw new \Exception('Could not decode response');
+//                }
+//
+//
+//                exit(print_r(
+//                    $response
+//                ));
+//
+//
+//
+//            } catch (GuzzleException $exception) {
+//                $error = $exception->getResponse()->getBody()->getContents();
+//                exit(print_r(
+//                    $error
+//                ));
+//            } catch (\Exception $exception) {
+//                exit('e');
+//                exit(print_r(
+//                    $exception->getMessage()
+//                ));
+//            }
+//        });
+//
+//
+//
+//
+//
+//            exit(print_r(
+//                'tets'
+//            ));
+//
+//            //$range = \IPLib\Range\Subnet::fromString($nic->network->subnet_range);
+//exit('banana');
+
 
 //        $subnetRange = "10.0.0.0/24";
 //

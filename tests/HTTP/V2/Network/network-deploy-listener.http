@@ -63,7 +63,8 @@ Content-Type: application/json
 
 {
   "name": "test router",
-  "vpc_id": "{{vpc_id}}"
+  "vpc_id": "{{vpc_id}}",
+  "availability_zone_id" : "{{availability_zone_id}}"
 }
 
 > {%

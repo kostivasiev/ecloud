@@ -56,7 +56,7 @@ class Deploy extends Job
 
             $deployResponse = json_decode($deployResponse->getBody()->getContents());
             if (!$deployResponse) {
-                new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+                throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
             }
 
             Log::info($logMessage . 'Instance was deployed');
