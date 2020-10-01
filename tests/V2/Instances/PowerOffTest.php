@@ -40,10 +40,11 @@ class PowerOffTest extends TestCase
             'name' => 'GetTest Default',
         ]);
 
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
         $mockKingpinService->shouldReceive('delete')->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey().'/power'])->andReturn(
             new Response(200)
         );
+
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
         });
