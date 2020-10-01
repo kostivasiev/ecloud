@@ -8,6 +8,8 @@ use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use UKFast\Admin\Devices\AdminClient;
 
 class ApplianceVersion extends Model
 {
@@ -57,6 +59,14 @@ class ApplianceVersion extends Model
             'App\Models\V2\Appliance',
             'appliance_id',
             'appliance_version_appliance_id'
+        );
+    }
+
+    public function serverLicense()
+    {
+        $devicesAdminClient = app()->make(AdminClient::class);
+        return $devicesAdminClient->licenses()->getById(
+            $this->appliance_version_server_license_id
         );
     }
 

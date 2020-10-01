@@ -18,6 +18,7 @@ use UKFast\Responses\UKFastResource;
  * @property string availability_zone_id
  * @property boolean locked
  * @property string online
+ * @property string platform
  * @property string created_at
  * @property string updated_at
  */
@@ -38,6 +39,7 @@ class InstanceResource extends UKFastResource
             'vcpu_cores'   => $this->vcpu_cores,
             'ram_capacity' => $this->ram_capacity,
             'locked'       => $this->locked,
+            'platform'     => $this->platform,
             'created_at'   => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

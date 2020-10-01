@@ -2,13 +2,12 @@
 
 namespace App\Models\V2;
 
-use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -34,6 +33,7 @@ class Instance extends Model implements Filterable, Sortable
         'ram_capacity',
         'availability_zone_id',
         'locked',
+        'platform',
     ];
 
     protected $hidden = [
@@ -48,6 +48,15 @@ class Instance extends Model implements Filterable, Sortable
     protected $casts = [
         'locked' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function (Instance $instance) {
+            $instance->setDefaultPlatform();
+        });
+    }
 
     public function vpc()
     {
@@ -69,11 +78,17 @@ class Instance extends Model implements Filterable, Sortable
         return $this->hasMany(Nic::class);
     }
 
+    public function volumes()
+    {
+        return $this->belongsToMany(Volume::class);
+    }
+
     public function getOnlineAttribute()
     {
         try {
-            $response = app()->make(KingpinService::class, [$this->availabilityZone])
-                ->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
+            $response = $this->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/'.$this->vpc_id.'/instance/'.$this->getKey()
+            );
         } catch (\Exception $e) {
             Log::info('Failed to get power state', [
                 'vpc_id' => $this->vpc_id,
@@ -118,6 +133,14 @@ class Instance extends Model implements Filterable, Sortable
         $this->attributes['appliance_version_id'] = $version;
     }
 
+    public function setDefaultPlatform()
+    {
+        if (empty($this->platform) && $this->applianceVersion) {
+                $this->platform = $this->applianceVersion->serverLicense()->category;
+                $this->save();
+        }
+    }
+
     /**
      * @param  \UKFast\DB\Ditto\Factories\FilterFactory  $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
@@ -133,6 +156,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
+            $factory->create('platform', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -154,6 +178,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('ram_capacity'),
             $factory->create('availability_zone_id'),
             $factory->create('locked'),
+            $factory->create('platform'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -177,14 +202,15 @@ class Instance extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'                   => 'id',
-            'name'                 => 'name',
-            'vpc_id'               => 'vpc_id',
+            'id' => 'id',
+            'name' => 'name',
+            'vpc_id' => 'vpc_id',
             'appliance_version_id' => 'appliance_version_id',
-            'vcpu_cores'           => 'vcpu_cores',
-            'ram_capacity'         => 'ram_capacity',
+            'vcpu_cores' => 'vcpu_cores',
+            'ram_capacity' => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',
             'locked'     => 'locked',
+            'platform'   => 'platform',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

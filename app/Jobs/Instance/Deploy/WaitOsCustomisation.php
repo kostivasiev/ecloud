@@ -5,7 +5,6 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
@@ -31,10 +30,11 @@ class WaitOsCustomisation extends Job
         Log::info('Performing WaitOsCustomisation for instance '.$this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
         try {
             /** @var Response $response */
-            $response = $kingpinService->get('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization/status');
+            $response = $instance->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization/status'
+            );
             if ($response->getStatusCode() != 200) {
                 $this->fail(new \Exception(
                     'WaitOsCustomisation failed for '.$instance->id.', Kingpin status was '.$response->getStatusCode()

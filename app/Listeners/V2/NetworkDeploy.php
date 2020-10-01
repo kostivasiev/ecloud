@@ -51,7 +51,7 @@ class NetworkDeploy implements ShouldQueue
             Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $range->getNetworkPrefix());
             Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $range->getNetworkPrefix());
 
-            $router->availabilityZone->nsxClient()->put(
+            $router->availabilityZone->nsxService()->put(
                 'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
                 [
                     'json' => [

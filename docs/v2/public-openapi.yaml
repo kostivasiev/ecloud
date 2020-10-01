@@ -119,6 +119,8 @@ paths:
     $ref: 'resources/Instance/item.yaml'
   '/ecloud/v2/instances/{instanceId}/credentials':
     $ref: 'resources/Instance/credentials.yaml'
+  '/ecloud/v2/instances/{instanceId}/volumes':
+    $ref: 'resources/Instance/volumes.yaml'
   '/ecloud/v2/instances/{instanceId}/power-on':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-off':
@@ -149,3 +151,5 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
+  '/ecloud/v2/volumes/{volumeId}/instances':
+    $ref: 'resources/Volume/instance.yaml'
