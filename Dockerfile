@@ -44,6 +44,9 @@ fi
 FROM apio
 RUN a2enmod rewrite
 
+COPY .docker/ca-certificates/ /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
 COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
 COPY .docker/start.sh /start.sh
 
