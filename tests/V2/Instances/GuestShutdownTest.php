@@ -13,7 +13,7 @@ use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class ShutdownGuestTest extends TestCase
+class GuestShutdownTest extends TestCase
 {
     use DatabaseMigrations;
 
