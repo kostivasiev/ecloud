@@ -56,10 +56,6 @@ class Instance extends Model implements Filterable, Sortable
         static::created(function (Instance $instance) {
             $instance->setDefaultPlatform();
         });
-
-        static::updated(function (Instance $instance) {
-            $instance->setDefaultPlatform();
-        });
     }
 
     public function vpc()
