@@ -3,7 +3,7 @@
 namespace App\Listeners\V2;
 
 use App\Models\V2\Router;
-use App\Services\NsxService;
+use App\Services\V2\NsxService;
 use App\Events\V2\FirewallRuleCreated;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Exception\RequestException;
@@ -24,7 +24,7 @@ class FirewallRuleDeploy implements ShouldQueue
         /** @var FirewallRule $firewallRule */
         $firewallRule = $event->firewallRule;
         $router = Router::findOrFail($firewallRule->router->id);
-        $nsxClient = $router->vpc->region->availabilityZones()->first()->nsxClient();
+        $nsxService = $router->vpc->region->availabilityZones()->first()->nsxService();
 
         try {
             // TODO
