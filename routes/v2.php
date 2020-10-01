@@ -78,6 +78,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances', 'InstanceController@index');
         $router->get('instances/{instanceId}', 'InstanceController@show');
         $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
+        $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
         $router->post('instances', 'InstanceController@store');
         $router->patch('instances/{instanceId}', 'InstanceController@update');
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
@@ -130,6 +131,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('volumes', 'VolumeController@index');
         $router->get('volumes/{volumeId}', 'VolumeController@show');
+        $router->get('volumes/{volumeId}/instances', 'VolumeController@instances');
         $router->post('volumes', 'VolumeController@store');
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
