@@ -20,7 +20,7 @@ class PowerOff extends Job
 
     public function handle()
     {
-        Log::info('Attempting to PowerOn instance '.$this->data['instance_id']);
+        Log::info('Attempting to PowerOff instance '.$this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         try {
