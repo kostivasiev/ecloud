@@ -7,7 +7,6 @@ use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
-use UKFast\Admin\Devices\AdminClient;
 use GuzzleHttp\Exception\GuzzleException;
 
 class OsCustomisation extends Job
