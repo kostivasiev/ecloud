@@ -110,7 +110,7 @@ class InstanceController extends BaseController
     /**
      * @param \Illuminate\Http\Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, string $instanceId)
     {
@@ -119,7 +119,7 @@ class InstanceController extends BaseController
             return $this->isLocked();
         }
         $instance->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 
     /**
@@ -190,7 +190,7 @@ class InstanceController extends BaseController
             new \App\Jobs\Instance\Deploy\RunBootstrapScript($data),
         ]));
 
-        return response()->json([], 202);
+        return response('', 202);
     }
 
     public function powerOn(Request $request, $instanceId)
@@ -200,7 +200,7 @@ class InstanceController extends BaseController
 
         // @todo - trigger power-onff event
 
-        return response()->json([], 202);
+        return response('', 202);
     }
 
     public function powerOff(Request $request, $instanceId)
@@ -210,6 +210,20 @@ class InstanceController extends BaseController
 
         // @todo - trigger power-off event
 
-        return response()->json([], 202);
+        return response('', 202);
+    }
+
+    public function shutdownGuest(Request $request, $instanceId)
+    {
+        echo "test";
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        $this->dispatch(new \App\Jobs\Instance\GuestShutdown([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
+
+        return response('', 202);
     }
 }
