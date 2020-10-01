@@ -37,9 +37,8 @@ class RunBootstrapScript extends Job
 
         $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         try {
-            $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
             /** @var Response $response */
-            $response = $kingpinService->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
+            $response = $instance->availabilityZone->kingpinService()->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/'.$endpoint, [
                 'json' => [
                     'encodedScript' => base64_encode(
                         (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)

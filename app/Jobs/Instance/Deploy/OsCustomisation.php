@@ -36,9 +36,8 @@ class OsCustomisation extends Job
         }
 
         try {
-            $kingpinService = app()->make(KingpinService::class, [$instance->availabilityZone]);
             /** @var Response $response */
-            $response = $kingpinService->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization', [
+            $response = $instance->availabilityZone->kingpinService()->put('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization', [
                 'json' => [
                     'platform' => $instance->platform,
                     'password' => $credential->password,
