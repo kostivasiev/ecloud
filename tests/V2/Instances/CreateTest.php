@@ -4,8 +4,8 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
-use App\Models\V2\Instance;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
