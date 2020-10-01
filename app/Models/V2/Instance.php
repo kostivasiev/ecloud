@@ -73,9 +73,9 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(AvailabilityZone::class);
     }
 
-    public function nic()
+    public function nics()
     {
-        return $this->hasOne(Nic::class);
+        return $this->hasMany(Nic::class);
     }
 
     public function volumes()
