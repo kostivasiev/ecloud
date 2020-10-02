@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Events\V2\FirewallRuleCreated;
+use App\Events\V2\InstanceDeployEvent;
 use App\Events\V2\NetworkCreated;
+use App\Events\V2\RouterCreated;
 use App\Listeners\V2\FirewallRuleDeploy;
+use App\Listeners\V2\InstanceDeploy;
 use App\Listeners\V2\NetworkDeploy;
 use App\Events\V2\DhcpCreated;
-use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Events\V2\VpcCreated;
 use App\Listeners\V2\DhcpCreate;
 use App\Listeners\V2\DhcpDeploy;
@@ -58,7 +60,7 @@ class EventServiceProvider extends ServiceProvider
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // V2
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        RouterAvailabilityZoneAttach::class => [
+        RouterCreated::class => [
             RouterDeploy::class,
         ],
         VpcCreated::class => [
@@ -72,6 +74,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         FirewallRuleCreated::class => [
             FirewallRuleDeploy::class
+        ],
+        InstanceDeployEvent::class => [
+            InstanceDeploy::class
         ],
     ];
 }

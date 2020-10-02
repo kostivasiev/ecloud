@@ -4,8 +4,9 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
-use App\Models\V2\Instance;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -19,6 +20,7 @@ class CreateTest extends TestCase
     protected \Faker\Generator $faker;
     protected $availability_zone;
     protected $instance;
+    protected $network;
     protected $region;
     protected $vpc;
     protected $appliance;
@@ -46,6 +48,7 @@ class CreateTest extends TestCase
             'appliance_version_id' => $this->appliance_version->uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),
         ])->refresh();
+        $this->network = factory(Network::class)->create();
     }
 
     public function testValidDataSucceeds()
@@ -57,6 +60,7 @@ class CreateTest extends TestCase
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
                 'appliance_id' => $this->appliance->uuid,
+                'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
             ],
@@ -90,6 +94,7 @@ class CreateTest extends TestCase
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
                 'appliance_id' => $this->appliance->uuid,
+                'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
             ],
@@ -118,6 +123,7 @@ class CreateTest extends TestCase
             [
                 'vpc_id' => $this->vpc->getKey(),
                 'appliance_id' => $this->appliance->uuid,
+                'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
             ],
@@ -139,6 +145,7 @@ class CreateTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance->uuid,
+            'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];

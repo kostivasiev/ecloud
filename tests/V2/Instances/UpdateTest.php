@@ -11,6 +11,7 @@ use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Admin\Devices\AdminClient;
 
 class UpdateTest extends TestCase
 {

@@ -24,7 +24,7 @@ class FirewallRuleDeploy implements ShouldQueue
         /** @var FirewallRule $firewallRule */
         $firewallRule = $event->firewallRule;
         $router = Router::findOrFail($firewallRule->router->id);
-        $nsxClient = $router->vpc->region->availabilityZones()->first()->nsxClient();
+        $nsxService = $router->vpc->region->availabilityZones()->first()->nsxService();
 
         try {
             // TODO

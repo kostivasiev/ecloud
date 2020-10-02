@@ -4,6 +4,7 @@ namespace App\Listeners\V2;
 
 use App\Events\V2\NetworkCreated;
 use App\Events\V2\RouterAvailabilityZoneAttach;
+use App\Events\V2\RouterCreated;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -16,17 +17,17 @@ class RouterDeploy implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @param RouterAvailabilityZoneAttach $event
+     * @param RouterCreated $event
      * @return void
      * @throws \Exception
      */
-    public function handle(RouterAvailabilityZoneAttach $event)
+    public function handle(RouterCreated $event)
     {
         /** @var Router $router */
         $router = $event->router;
 
         /** @var AvailabilityZone $availabilityZone */
-        $availabilityZone = $event->availabilityZone;
+        $availabilityZone = $router->availabilityZone;
 
         try {
             $nsxService = $availabilityZone->nsxService();

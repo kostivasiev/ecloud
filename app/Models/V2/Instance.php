@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +33,7 @@ class Instance extends Model implements Filterable, Sortable
         'ram_capacity',
         'availability_zone_id',
         'locked',
+        'platform',
     ];
 
     protected $hidden = [
@@ -47,6 +49,15 @@ class Instance extends Model implements Filterable, Sortable
         'locked' => 'boolean',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function (Instance $instance) {
+            $instance->setDefaultPlatform();
+        });
+    }
+
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
@@ -60,6 +71,11 @@ class Instance extends Model implements Filterable, Sortable
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    public function nics()
+    {
+        return $this->hasMany(Nic::class);
     }
 
     public function volumes()
@@ -117,6 +133,14 @@ class Instance extends Model implements Filterable, Sortable
         $this->attributes['appliance_version_id'] = $version;
     }
 
+    public function setDefaultPlatform()
+    {
+        if (empty($this->platform) && $this->applianceVersion) {
+                $this->platform = $this->applianceVersion->serverLicense()->category;
+                $this->save();
+        }
+    }
+
     /**
      * @param  \UKFast\DB\Ditto\Factories\FilterFactory  $factory
      * @return array|\UKFast\DB\Ditto\Filter[]
@@ -132,6 +156,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
+            $factory->create('platform', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -153,6 +178,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('ram_capacity'),
             $factory->create('availability_zone_id'),
             $factory->create('locked'),
+            $factory->create('platform'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -184,6 +210,7 @@ class Instance extends Model implements Filterable, Sortable
             'ram_capacity' => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',
             'locked' => 'locked',
+            'platform' => 'platform',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
