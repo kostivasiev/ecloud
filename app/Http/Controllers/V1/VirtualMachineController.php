@@ -1502,8 +1502,10 @@ class VirtualMachineController extends BaseController
             $unchangedDisks = $existingDisks;
             if (!empty($automationData['hdd'])) {
                 // Add any unspecified disks to our automation data as we want to send the complete required Storage state
-                $unchangedDisks = array_diff_key($existingDisks,
-                    array_flip(array_column($automationData['hdd'], 'uuid')));
+                $unchangedDisks = array_diff_key(
+                    $existingDisks,
+                    array_flip(array_column($automationData['hdd'], 'uuid'))
+                );
             }
 
             foreach ($unchangedDisks as $disk) {
@@ -1635,8 +1637,10 @@ class VirtualMachineController extends BaseController
             }
 
             try {
-                $existingTemplate = PodTemplate::withFriendlyName($virtualMachine->pod,
-                    $request->input('template_name'));
+                $existingTemplate = PodTemplate::withFriendlyName(
+                    $virtualMachine->pod,
+                    $request->input('template_name')
+                );
             } catch (TemplateNotFoundException $exception) {
                 // Do nothing
             }

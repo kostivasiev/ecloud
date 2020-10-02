@@ -37,13 +37,15 @@ class PrepareOsDisk extends Job
         $endpoint = ($instance->platform == 'Linux') ? 'linux/lvm/extend' : 'windows/disk/expandall';
         try {
             /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->put('/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
+            $response = $instance->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
                 [
                     'json' => [
                         'username' => $credential->username,
                         'password' => $credential->password,
                     ],
-                ]);
+                ]
+            );
             if ($response->getStatusCode() == 200) {
                 Log::info('PrepareOsDisk finished successfully for instance ' . $instance->id);
                 return;

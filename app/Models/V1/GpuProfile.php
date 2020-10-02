@@ -181,8 +181,10 @@ class GpuProfile extends Model implements Filterable, Sortable
         $cardProfiles = config('gpu.card_profiles');
 
         foreach ($vms as $vmId => $profileUuid) {
-            if (!in_array($profileUuid, array_keys($profiles)) || !in_array($profiles[$profileUuid],
-                    array_keys($cardProfiles))) {
+            if (!in_array($profileUuid, array_keys($profiles)) || !in_array(
+                    $profiles[$profileUuid],
+                    array_keys($cardProfiles)
+                )) {
                 Log::error(
                     'Unrecognised GPU profile \'' . $profileUuid . '\' found on Virtual Machine # ' . $vmId . ' when calculating GPU pool availability'
                 );

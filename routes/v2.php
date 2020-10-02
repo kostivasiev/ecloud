@@ -6,7 +6,7 @@
 
 $middleware = [
     'auth',
-    'paginator-limit:'.env('PAGINATION_LIMIT')
+    'paginator-limit:' . env('PAGINATION_LIMIT')
 ];
 
 $baseRouteParameters = [
@@ -137,7 +137,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
     });
-    
+
     /** Nics */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('nics', 'NicController@index');

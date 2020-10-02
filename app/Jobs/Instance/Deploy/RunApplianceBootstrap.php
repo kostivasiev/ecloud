@@ -41,7 +41,8 @@ class RunApplianceBootstrap extends Job
 
         try {
             /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->post('/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/script',
+            $response = $instance->availabilityZone->kingpinService()->post(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/script',
                 [
                     'json' => [
                         'encodedScript' => base64_encode(
@@ -51,7 +52,8 @@ class RunApplianceBootstrap extends Job
                         'username' => $credential->user,
                         'password' => $credential->password,
                     ],
-                ]);
+                ]
+            );
             if ($response->getStatusCode() == 200) {
                 Log::info('RunApplianceBootstrap finished successfully for instance ' . $instance->id);
                 return;

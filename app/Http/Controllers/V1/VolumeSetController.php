@@ -118,8 +118,10 @@ class VolumeSetController extends BaseController
 
         $identifier = VolumeSet::getNextIdentifier($solution);
 
-        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService',
-            [['solution' => $solution, 'san' => $san]]);
+        $artisan = app()->makeWith(
+            'App\Services\Artisan\V1\ArtisanService',
+            [['solution' => $solution, 'san' => $san]]
+        );
 
         $artisanResponse = $artisan->createVolumeSet($identifier);
 
@@ -431,8 +433,12 @@ class VolumeSetController extends BaseController
     {
         $query = self::$model::query();
         if ($request->user->resellerId != 0) {
-            $query->join('ucs_reseller', (new self::$model)->getTable() . '.ucs_reseller_id', '=',
-                'ucs_reseller.ucs_reseller_id')
+            $query->join(
+                'ucs_reseller',
+                (new self::$model)->getTable() . '.ucs_reseller_id',
+                '=',
+                'ucs_reseller.ucs_reseller_id'
+            )
                 ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
         }
 

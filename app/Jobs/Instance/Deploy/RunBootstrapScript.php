@@ -43,14 +43,16 @@ class RunBootstrapScript extends Job
         $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         try {
             /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->post('/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
+            $response = $instance->availabilityZone->kingpinService()->post(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
                 [
                     'json' => [
                         'encodedScript' => base64_encode($this->data['user_script']),
                         'username' => $credential->user,
                         'password' => $credential->password,
                     ],
-                ]);
+                ]
+            );
             if ($response->getStatusCode() == 200) {
                 Log::info('RunBootstrapScript finished successfully for instance ' . $instance->id);
                 return;

@@ -75,10 +75,12 @@ class RouterDeploy implements ShouldQueue
             $original = array_filter($original, function ($key) {
                 return strpos($key, '_') !== 0;
             }, ARRAY_FILTER_USE_KEY);
-            $nsxService->patch('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule',
+            $nsxService->patch(
+                'policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule',
                 [
                     'json' => $original
-                ]);
+                ]
+            );
         } catch (GuzzleException $exception) {
             throw new \Exception($exception->getResponse()->getBody()->getContents());
         }

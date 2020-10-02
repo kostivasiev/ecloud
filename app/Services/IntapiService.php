@@ -117,8 +117,11 @@ class IntapiService
     {
         Log::error('IntAPI error: ' . $error);
         switch ($error) {
-            case (preg_match('/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/', $error,
-                    $matches) == true):
+            case (preg_match(
+                    '/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/',
+                    $error,
+                    $matches
+                ) == true):
                 $ip_type = $matches[1];
 //                $vlan = $matches[2];
 
