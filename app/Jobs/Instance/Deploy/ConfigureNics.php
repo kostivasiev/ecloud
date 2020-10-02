@@ -100,6 +100,7 @@ class ConfigureNics extends Job
 
                     $nic->ip_address = $checkIp;
                     $nic->save();
+                    $assignedIpsDb->push($checkIp);
                     break;
                 }
             }
