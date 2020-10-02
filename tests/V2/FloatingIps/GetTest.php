@@ -4,8 +4,8 @@ namespace Tests\V2\FloatingIps;
 
 use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -27,7 +27,7 @@ class GetTest extends TestCase
             []
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])

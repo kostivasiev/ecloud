@@ -78,7 +78,7 @@ class VolumeSetController extends BaseController
     public function create(Request $request)
     {
         $rules = [
-            'solution_id' =>['required_without:site_id', 'integer'],
+            'solution_id' => ['required_without:site_id', 'integer'],
             'site_id' => ['required_without:solution_id', 'integer'],
             'san_id' => ['sometimes', 'integer']
         ];
@@ -118,7 +118,8 @@ class VolumeSetController extends BaseController
 
         $identifier = VolumeSet::getNextIdentifier($solution);
 
-        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['solution'=>$solution, 'san' => $san]]);
+        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService',
+            [['solution' => $solution, 'san' => $san]]);
 
         $artisanResponse = $artisan->createVolumeSet($identifier);
 
@@ -176,7 +177,7 @@ class VolumeSetController extends BaseController
             ArtisanService::class,
             [
                 [
-                    'solution'=>$volumeSet->solution,
+                    'solution' => $volumeSet->solution,
                     'san' => $san
                 ]
             ]
@@ -190,7 +191,7 @@ class VolumeSetController extends BaseController
             if (strpos($error, 'Invalid QOS target object') !== false) {
                 $errorMessage .= ' The volume set is not valid.';
             }
-            throw new ArtisanException($errorMessage. ' ' . $error);
+            throw new ArtisanException($errorMessage . ' ' . $error);
         }
 
         $volumeSet->max_iops = $request->input('max_iops');
@@ -293,7 +294,7 @@ class VolumeSetController extends BaseController
             ArtisanService::class,
             [
                 [
-                    'solution'=>$volumeSet->solution,
+                    'solution' => $volumeSet->solution,
                     'san' => $san
                 ]
             ]
@@ -360,7 +361,7 @@ class VolumeSetController extends BaseController
             throw new ArtisanException('Failed to load volume set: ' . $error);
         }
 
-        $errorMessage = 'Failed to delete volume set: ' ;
+        $errorMessage = 'Failed to delete volume set: ';
 
         if (!empty($artisanResponse->volumes)) {
             throw new ArtisanException($errorMessage . 'The volume set is not empty.');
@@ -430,8 +431,9 @@ class VolumeSetController extends BaseController
     {
         $query = self::$model::query();
         if ($request->user->resellerId != 0) {
-            $query->join('ucs_reseller', (new self::$model)->getTable() . '.ucs_reseller_id', '=', 'ucs_reseller.ucs_reseller_id')
-            ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
+            $query->join('ucs_reseller', (new self::$model)->getTable() . '.ucs_reseller_id', '=',
+                'ucs_reseller.ucs_reseller_id')
+                ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
         }
 
         return $query;

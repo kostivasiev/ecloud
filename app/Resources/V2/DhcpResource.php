@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -21,8 +22,8 @@ class DhcpResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'vpc_id'     => $this->vpc_id,
+            'id' => $this->id,
+            'vpc_id' => $this->vpc_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

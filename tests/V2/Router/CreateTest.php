@@ -6,8 +6,8 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -57,7 +57,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -68,7 +68,7 @@ class CreateTest extends TestCase
     public function testNotOwnedVpcIdIsFailed()
     {
         $data = [
-            'name'    => 'Manchester Network',
+            'name' => 'Manchester Network',
             'vpc_id' => $this->vpc->getKey(),
         ];
 
@@ -81,7 +81,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'

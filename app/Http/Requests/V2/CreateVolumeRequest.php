@@ -1,7 +1,7 @@
 <?php
+
 namespace App\Http\Requests\V2;
 
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\ExistsForVpc;

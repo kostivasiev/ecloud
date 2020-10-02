@@ -81,7 +81,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'=> 'id',
+            'id' => 'id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

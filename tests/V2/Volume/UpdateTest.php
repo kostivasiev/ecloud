@@ -6,8 +6,8 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
@@ -60,7 +60,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -77,10 +77,10 @@ class UpdateTest extends TestCase
         ]);
 
         $data = [
-            'name'    => 'Volume 1',
+            'name' => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.min')+1),
+            'capacity' => (config('volume.capacity.min') + 1),
         ];
 
         $this->patch(
@@ -92,7 +92,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Not Found',
+                'title' => 'Not Found',
                 'detail' => 'The specified availability zone is not available to that VPC',
                 'status' => 404,
                 'source' => 'availability_zone_id'
@@ -103,7 +103,7 @@ class UpdateTest extends TestCase
     public function testNotOwnedVpcIdIsFailed()
     {
         $data = [
-            'name'    => 'Volume 1',
+            'name' => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey()
         ];
@@ -117,7 +117,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -128,10 +128,10 @@ class UpdateTest extends TestCase
     public function testMinCapacityValidation()
     {
         $data = [
-            'name'    => 'Volume 1',
+            'name' => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.min')-1),
+            'capacity' => (config('volume.capacity.min') - 1),
         ];
 
         $this->patch(
@@ -143,7 +143,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'specified capacity is below the minimum of ' . config('volume.capacity.min'),
                 'status' => 422,
                 'source' => 'capacity'
@@ -154,10 +154,10 @@ class UpdateTest extends TestCase
     public function testMaxCapacityValidation()
     {
         $data = [
-            'name'    => 'Volume 1',
+            'name' => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.max')+1),
+            'capacity' => (config('volume.capacity.max') + 1),
         ];
 
         $this->patch(
@@ -169,7 +169,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'specified capacity is above the maximum of ' . config('volume.capacity.max'),
                 'status' => 422,
                 'source' => 'capacity'
@@ -180,10 +180,10 @@ class UpdateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => 'Volume 1',
+            'name' => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.min')+1),
+            'capacity' => (config('volume.capacity.min') + 1),
         ];
 
         $this->patch(

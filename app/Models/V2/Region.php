@@ -105,9 +105,9 @@ class Region extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
-            'is_public'  => 'is_public',
+            'id' => 'id',
+            'name' => 'name',
+            'is_public' => 'is_public',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

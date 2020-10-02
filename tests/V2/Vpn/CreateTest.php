@@ -43,16 +43,16 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/vpns',
             [
-                'router_id'            => $this->router->getKey(),
+                'router_id' => $this->router->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
             ],
             [
                 'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified router id was not found',
                 'status' => 422,
                 'source' => 'router_id'
@@ -69,7 +69,7 @@ class CreateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ])
             ->assertResponseStatus(201);
         $vpnId = (json_decode($this->response->getContent()))->data->id;

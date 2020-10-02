@@ -4,7 +4,6 @@ namespace App\Models\V1;
 
 use App\Services\Artisan\V1\ArtisanService;
 use App\Traits\V1\UUIDHelper;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -14,9 +13,9 @@ use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class VolumeSet extends Model implements Filterable, Sortable
 {
@@ -199,7 +198,7 @@ class VolumeSet extends Model implements Filterable, Sortable
      * @param Solution $solution
      * @return int|mixed
      */
-    public static function getNextIdentifier(Solution $solution) : int
+    public static function getNextIdentifier(Solution $solution): int
     {
         if ($solution->volumeSets()->withTrashed()->count() == 0) {
             return 1;
@@ -207,9 +206,9 @@ class VolumeSet extends Model implements Filterable, Sortable
 
         $index = 0;
         $solution->volumeSets()->withTrashed()->get()->map(function ($item) use (&$index, $solution) {
-            if (preg_match('/\w+('.$solution->getKey().')_?(\d+)*$/', $item->name, $matches) == true) {
+            if (preg_match('/\w+(' . $solution->getKey() . ')_?(\d+)*$/', $item->name, $matches) == true) {
                 $numeric = $matches[2] ?? 1;
-                $index = ($numeric > $index) ? (int) $numeric : $index;
+                $index = ($numeric > $index) ? (int)$numeric : $index;
             }
         });
 

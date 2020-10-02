@@ -66,7 +66,7 @@ class CreateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(201);
@@ -78,7 +78,7 @@ class CreateTest extends TestCase
             ->seeInDatabase(
                 'instances',
                 [
-                    'id'   => $id,
+                    'id' => $id,
                     'name' => $id,
                 ],
                 'ecloud'
@@ -90,7 +90,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/instances',
             [
-                'name'   => $name,
+                'name' => $name,
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
                 'appliance_id' => $this->appliance->uuid,
@@ -100,7 +100,7 @@ class CreateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(201);
@@ -109,9 +109,9 @@ class CreateTest extends TestCase
         $this->seeInDatabase(
             'instances',
             [
-                    'id'   => $id,
-                    'name' => $name,
-                ],
+                'id' => $id,
+                'name' => $name,
+            ],
             'ecloud'
         );
     }
@@ -129,7 +129,7 @@ class CreateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(201);

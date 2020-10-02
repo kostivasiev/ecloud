@@ -44,14 +44,14 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/networks/' . $this->network->getKey(),
             [
-                'name'      => 'Manchester Network',
+                'name' => 'Manchester Network',
                 'router_id' => $this->router->getKey()
             ],
             [
                 'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ])->seeJson([
-            'title'  => 'Validation Error',
+            'title' => 'Validation Error',
             'detail' => 'The specified router id was not found',
             'status' => 422,
             'source' => 'router_id'
@@ -63,12 +63,12 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/networks/' . $this->network->getKey(),
             [
-                'name'      => 'expected',
+                'name' => 'expected',
                 'router_id' => $this->router->getKey()
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ])->assertResponseStatus(200);
         $this->assertEquals('expected', Network::findOrFail($this->network->getKey())->name);
     }

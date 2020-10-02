@@ -87,7 +87,7 @@ class Instance extends Model implements Filterable, Sortable
     {
         try {
             $response = $this->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/'.$this->vpc_id.'/instance/'.$this->getKey()
+                '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
             );
         } catch (\Exception $e) {
             Log::info('Failed to get power state', [
@@ -136,8 +136,8 @@ class Instance extends Model implements Filterable, Sortable
     public function setDefaultPlatform()
     {
         if (empty($this->platform) && $this->applianceVersion) {
-                $this->platform = $this->applianceVersion->serverLicense()->category;
-                $this->save();
+            $this->platform = $this->applianceVersion->serverLicense()->category;
+            $this->save();
         }
     }
 

@@ -174,8 +174,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  Request  $request
-     * @param  string  $instanceId
+     * @param Request $request
+     * @param string $instanceId
      *
      * @return AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */

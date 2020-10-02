@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -22,14 +23,14 @@ class VpnResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'                   => $this->id,
-            'router_id'            => $this->router_id,
+            'id' => $this->id,
+            'router_id' => $this->router_id,
             'availability_zone_id' => $this->availability_zone_id,
-            'created_at'           => Carbon::parse(
+            'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at'           => Carbon::parse(
+            'updated_at' => Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

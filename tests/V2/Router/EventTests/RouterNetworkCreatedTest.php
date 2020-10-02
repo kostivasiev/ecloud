@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\V2\Router\EventTests;
 
 use App\Events\V2\NetworkCreated;
@@ -61,8 +62,8 @@ class RouterNetworkCreatedTest extends TestCase
     {
         return factory(AvailabilityZone::class, 1)
             ->create([
-            'id' => 'az-1234abcd',
-        ])
+                'id' => 'az-1234abcd',
+            ])
             ->first();
     }
 
@@ -85,7 +86,7 @@ class RouterNetworkCreatedTest extends TestCase
     public function getNetwork(?Router $router = null): Network
     {
         $network = factory(Network::class, 1)->create([
-            'id'   => 'net-1234abcd',
+            'id' => 'net-1234abcd',
             'name' => 'net-1234abcd',
         ])
             ->first();

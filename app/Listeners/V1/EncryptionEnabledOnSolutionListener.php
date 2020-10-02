@@ -3,12 +3,12 @@
 namespace App\Listeners\V1;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
+use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\ServiceResponseException;
 use App\Exceptions\V1\ServiceUnavailableException;
+use App\Services\IntapiService;
 use Illuminate\Http\Request;
 use Log;
-use App\Services\IntapiService;
-use App\Exceptions\V1\IntapiServiceException;
 
 /**
  * Class EncryptionEnabledOnSolutionListener

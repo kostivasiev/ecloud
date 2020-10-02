@@ -52,7 +52,7 @@ class FloatingIpController extends BaseController
     public function store(CreateFloatingIpRequest $request)
     {
         $resource = new FloatingIp(
-            //$request->only([''])
+        //$request->only([''])
         );
         $resource->save();
         $resource->refresh();

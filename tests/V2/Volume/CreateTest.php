@@ -6,8 +6,8 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -39,7 +39,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/volumes',
             [
-                'name'    => 'Volume 1',
+                'name' => 'Volume 1',
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availabilityZone->getKey()
             ],
@@ -49,7 +49,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -68,10 +68,10 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/volumes',
             [
-                'name'    => 'Volume 1',
+                'name' => 'Volume 1',
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $availabilityZone->getKey(),
-                'capacity' => (config('volume.capacity.min')+1),
+                'capacity' => (config('volume.capacity.min') + 1),
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -79,7 +79,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Not Found',
+                'title' => 'Not Found',
                 'detail' => 'The specified availability zone is not available to that VPC',
                 'status' => 404,
                 'source' => 'availability_zone_id'
@@ -92,10 +92,10 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/volumes',
             [
-                'name'    => 'Volume 1',
+                'name' => 'Volume 1',
                 'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availabilityZone->getKey(),
-                'capacity' => (config('volume.capacity.min')+1),
+                'capacity' => (config('volume.capacity.min') + 1),
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -114,9 +114,9 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/volumes',
             [
-                'name'    => 'Volume 1',
+                'name' => 'Volume 1',
                 'vpc_id' => $this->vpc->getKey(),
-                'capacity' => (config('volume.capacity.min')+1),
+                'capacity' => (config('volume.capacity.min') + 1),
             ],
             [
                 'X-consumer-custom-id' => '0-0',

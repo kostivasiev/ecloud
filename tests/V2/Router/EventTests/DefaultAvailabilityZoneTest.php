@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\V2\Router\EventTests;
 
 use App\Models\V2\AvailabilityZone;
@@ -24,10 +25,10 @@ class DefaultAvailabilityZoneTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create([
-            'name'    => $this->faker->country(),
+            'name' => $this->faker->country(),
         ]);
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
@@ -39,8 +40,8 @@ class DefaultAvailabilityZoneTest extends TestCase
         $this->post(
             '/v2/routers',
             [
-                'name'                 => 'Manchester Network',
-                'vpc_id'               => $this->vpc->getKey(),
+                'name' => 'Manchester Network',
+                'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
             ],
             [
@@ -60,7 +61,7 @@ class DefaultAvailabilityZoneTest extends TestCase
         $this->post(
             '/v2/routers',
             [
-                'name'   => 'Manchester Network',
+                'name' => 'Manchester Network',
                 'vpc_id' => $this->vpc->getKey(),
             ],
             [

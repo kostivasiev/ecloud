@@ -26,8 +26,8 @@ class LoadBalancerClusterResource extends UKFastResource
     public function toArray($request)
     {
         $data = [
-            'id'         => $this->id,
-            'name'       => $this->name,
+            'id' => $this->id,
+            'name' => $this->name,
             'availability_zone_id' => $this->availability_zone_id,
             'vpc_id' => $this->vpc_id,
             'nodes' => $this->nodes,

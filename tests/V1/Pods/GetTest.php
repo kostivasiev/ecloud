@@ -2,10 +2,9 @@
 
 namespace Tests\V1\Pods;
 
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use App\Models\V1\Pod;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -133,14 +132,14 @@ class GetTest extends TestCase
     public function testVclVceServerIdNotAdmin()
     {
         $pod = factory(Pod::class, 1)->create([
-            'ucs_datacentre_id'            => 123,
+            'ucs_datacentre_id' => 123,
             'ucs_datacentre_vcl_server_id' => 12345,
             'ucs_datacentre_vce_server_id' => 54321,
         ])->first();
 
         $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups'    => 'ecloud.read',
+            'X-consumer-groups' => 'ecloud.read',
         ])
             ->seeStatusCode(200)
             ->dontSeeJson([
@@ -197,13 +196,13 @@ class GetTest extends TestCase
     public function testVmwareApiUrlNotAdmin()
     {
         $pod = factory(Pod::class, 1)->create([
-            'ucs_datacentre_id'            => 123,
+            'ucs_datacentre_id' => 123,
             'ucs_datacentre_vmware_api_url' => 'http://example.com'
         ])->first();
 
         $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups'    => 'ecloud.read',
+            'X-consumer-groups' => 'ecloud.read',
         ])
             ->seeStatusCode(200)
             ->dontSeeJson([

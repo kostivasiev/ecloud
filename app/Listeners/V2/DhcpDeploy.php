@@ -3,9 +3,9 @@
 namespace App\Listeners\V2;
 
 use App\Events\V2\DhcpCreated;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
 class DhcpDeploy implements ShouldQueue
 {

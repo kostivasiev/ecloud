@@ -2,12 +2,11 @@
 
 namespace Tests\V1\Hosts;
 
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use App\Models\V1\Host;
-use App\Models\V1\Solution;
 use App\Models\V1\Pod;
+use App\Models\V1\Solution;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
@@ -30,12 +29,12 @@ class DeleteTest extends TestCase
             'ucs_node_internal_name' => 'Test Host 1'
         ])->first();
 
-       $this->json('POST', '/v1/hosts/' . $host->getKey() . '/delete', [], [
+        $this->json('POST', '/v1/hosts/' . $host->getKey() . '/delete', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeStatusCode(404)->seeJson([
-           'title' => 'SAN not found',
-           'detail' => "No SANS are found on the solution's pod"
-       ]);
+            'title' => 'SAN not found',
+            'detail' => "No SANS are found on the solution's pod"
+        ]);
     }
 }

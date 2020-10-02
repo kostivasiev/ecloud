@@ -66,7 +66,7 @@ class VolumeController extends BaseController
             if (!$availabilityZone) {
                 return Response::create([
                     'errors' => [
-                        'title'  => 'Not Found',
+                        'title' => 'Not Found',
                         'detail' => 'The specified availability zone is not available to that VPC',
                         'status' => 404,
                         'source' => 'availability_zone_id'

@@ -125,12 +125,12 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
+            'id' => 'id',
+            'name' => 'name',
             'availability_zone_id' => 'availability_zone_id',
-            'vpc_id'       => 'vpc_id',
-            'nodes'       => 'nodes',
-            'config_id'       => 'config_id',
+            'vpc_id' => 'vpc_id',
+            'nodes' => 'nodes',
+            'config_id' => 'config_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

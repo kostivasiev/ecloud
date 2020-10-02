@@ -3,16 +3,14 @@
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
-
 use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
-
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class Firewall extends Model implements Filterable, Sortable
 {

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -9,7 +10,7 @@ use UKFast\Responses\UKFastResource;
  * @package App\Http\Resources\V2
  * @property string id
  * @property string name
- * @property bool   is_public
+ * @property bool is_public
  * @property string created_at
  * @property string updated_at
  */
@@ -22,8 +23,8 @@ class RegionResource extends UKFastResource
     public function toArray($request)
     {
         $data = [
-            'id'         => $this->id,
-            'name'       => $this->name
+            'id' => $this->id,
+            'name' => $this->name
         ];
 
         if ($request->user->isAdministrator) {

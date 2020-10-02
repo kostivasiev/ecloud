@@ -79,7 +79,7 @@ class HostSetController extends BaseController
         }
 
         $solution->pod->sans->each(function ($san) use ($solution, $identifier, &$hostSetName) {
-            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
 
             $artisanResponse = $artisan->createHostSet($identifier);
 
@@ -130,7 +130,7 @@ class HostSetController extends BaseController
         }
 
         $solution->pod->sans->each(function ($san) use ($solution, $hostSet, $host) {
-            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
 
             $artisaResponse = $artisan->addHostToHostSet($hostSet->name, $host->ucs_node_internal_name);
             if (!$artisaResponse) {
@@ -176,7 +176,7 @@ class HostSetController extends BaseController
         }
 
         $solution->pod->sans->each(function ($san) use ($solution, $hostSet, $host) {
-            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
 
             $artisaResponse = $artisan->removeHostFromHostSet($hostSet->name, $host->ucs_node_internal_name);
 
@@ -204,9 +204,9 @@ class HostSetController extends BaseController
         }
 
         $solution->hostSets->each(function ($item) use (&$index, $solution) {
-            if (preg_match('/\w+SET_'. $solution->getKey() . '_?(\d+)?/', $item->name, $matches) == true) {
+            if (preg_match('/\w+SET_' . $solution->getKey() . '_?(\d+)?/', $item->name, $matches) == true) {
                 $numeric = $matches[1] ?? 1;
-                $index = ($numeric > $index) ? (int) $numeric : $index;
+                $index = ($numeric > $index) ? (int)$numeric : $index;
             }
         });
 
@@ -233,8 +233,9 @@ class HostSetController extends BaseController
     {
         $query = self::$model::query();
         if ($request->user->resellerId != 0) {
-            $query->join('ucs_reseller', (new self::$model)->getTable() . '.ucs_reseller_id', '=', 'ucs_reseller.ucs_reseller_id')
-            ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
+            $query->join('ucs_reseller', (new self::$model)->getTable() . '.ucs_reseller_id', '=',
+                'ucs_reseller.ucs_reseller_id')
+                ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
         }
 
         return $query;

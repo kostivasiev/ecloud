@@ -106,7 +106,7 @@ class HostController extends BaseController
         }
 
         $solution->pod->sans->each(function ($san) use ($host, $solution, $fcwwns, &$hostInternalName) {
-            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
 
             // Create host on san
             $artisanResponse = $artisan->createHost($host->getKey(), $fcwwns);
@@ -201,7 +201,7 @@ class HostController extends BaseController
         }
 
         $solution->pod->sans->each(function ($san) use ($host, $solution) {
-            $artisan = app()->makeWith(ArtisanService::class, [['solution'=>$solution, 'san' => $san]]);
+            $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
 
             // Delete host on san
             $artisanResponse = $artisan->removeHost($host->ucs_node_internal_name);
@@ -287,10 +287,8 @@ class HostController extends BaseController
         $query = Host::withReseller($request->user->resellerId)
             ->where('ucs_node_status', '!=', 'Cancelled')
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'ucs_node_ucs_reseller_id')
-
             ->join('ucs_specification', 'ucs_specification_id', '=', 'ucs_node_specification_id')
-            ->where('ucs_specification_active', '=', 'Yes')
-        ;
+            ->where('ucs_specification_active', '=', 'Yes');
 
         if (!$request->user->isAdministrator) {
             $query->where('ucs_reseller_active', 'Yes');

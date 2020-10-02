@@ -103,10 +103,10 @@ class FirewallController extends BaseController
         }
 
         return new Response([
-            'data' => (object) [
+            'data' => (object)[
                 'config' => $firewallConfig
             ],
-            'meta' => (object) []
+            'meta' => (object)[]
         ], 200);
     }
 

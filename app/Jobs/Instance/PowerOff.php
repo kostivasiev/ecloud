@@ -20,25 +20,25 @@ class PowerOff extends Job
 
     public function handle()
     {
-        Log::info('Attempting to PowerOff instance '.$this->data['instance_id']);
+        Log::info('Attempting to PowerOff instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->delete(
-                '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/power'
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
             );
             if ($response->getStatusCode() == 200) {
-                Log::info('PowerOff finished successfully for instance '.$instance->id);
+                Log::info('PowerOff finished successfully for instance ' . $instance->id);
                 return;
             }
             $this->fail(new \Exception(
-                'Failed to PowerOff '.$instance->id.', Kingpin status was '.$response->getStatusCode()
+                'Failed to PowerOff ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
             ));
             return;
         } catch (GuzzleException $exception) {
             $this->fail(new \Exception(
-                'Failed to PowerOff '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
+                'Failed to PowerOff ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
             ));
             return;
         }

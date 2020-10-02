@@ -7,8 +7,8 @@ use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -28,7 +28,7 @@ class GetTest extends TestCase
         $this->region = factory(Region::class)->create();
 
         $this->vpc = factory(Vpc::class)->create([
-            'name'    => 'Manchester DC',
+            'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
         ]);
 
@@ -41,7 +41,7 @@ class GetTest extends TestCase
             'vpc_id' => $this->vpc->getKey()
         ]);
     }
-    
+
     public function testGetCollection()
     {
         $this->get(
@@ -52,10 +52,10 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $this->lbc->getKey(),
-                'name'       => $this->lbc->name,
-                'vpc_id'       => $this->lbc->vpc_id,
-                'nodes'       => $this->lbc->nodes,
+                'id' => $this->lbc->getKey(),
+                'name' => $this->lbc->name,
+                'vpc_id' => $this->lbc->vpc_id,
+                'nodes' => $this->lbc->nodes,
             ])
             ->assertResponseStatus(200);
     }
@@ -70,9 +70,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $this->lbc->id,
-                'name'       => $this->lbc->name,
-                'vpc_id'       => $this->lbc->vpc_id
+                'id' => $this->lbc->id,
+                'name' => $this->lbc->name,
+                'vpc_id' => $this->lbc->vpc_id
             ])
             ->assertResponseStatus(200);
     }

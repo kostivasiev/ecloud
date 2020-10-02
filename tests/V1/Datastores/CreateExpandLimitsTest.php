@@ -23,7 +23,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 1,
+            'capacity' => 1,
         ]);
         $validator = $this->getValidationFactory()
             ->make(
@@ -37,7 +37,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 0,
+            'capacity' => 0,
         ]);
         $validator = $this->getValidationFactory()
             ->make(
@@ -51,7 +51,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 16000,
+            'capacity' => 16000,
         ]);
         $validator = $this->getValidationFactory()
             ->make(
@@ -65,7 +65,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 16001,
+            'capacity' => 16001,
         ]);
         $validator = $this->getValidationFactory()
             ->make(

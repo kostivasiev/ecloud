@@ -3,14 +3,11 @@
 namespace Tests\V1\VirtualMachines;
 
 use App\Models\V1\Solution;
-use App\Rules\V1\IsValidSSHPublicKey;
-use Mockery;
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use App\Models\V1\VirtualMachine;
-
+use App\Rules\V1\IsValidSSHPublicKey;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class PostTest extends TestCase
 {

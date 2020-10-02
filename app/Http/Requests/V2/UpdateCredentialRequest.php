@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\V2;
 
 use UKFast\FormRequests\FormRequest;
@@ -23,11 +24,11 @@ class UpdateCredentialRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['sometimes','required', 'string'],
-            'resource_id' => ['sometimes','nullable', 'string'],
+            'name' => ['sometimes', 'required', 'string'],
+            'resource_id' => ['sometimes', 'nullable', 'string'],
             'host' => ['sometimes', 'nullable', 'string'],
-            'user' => ['sometimes' ,'required', 'string'],
-            'password' => ['sometimes','required', 'string'],
+            'user' => ['sometimes', 'required', 'string'],
+            'password' => ['sometimes', 'required', 'string'],
             'port' => ['sometimes', 'nullable', 'integer'],
         ];
     }

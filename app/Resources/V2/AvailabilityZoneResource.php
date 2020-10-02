@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -24,9 +25,9 @@ class AvailabilityZoneResource extends UKFastResource
     public function toArray($request)
     {
         $data = [
-            'id'         => $this->id,
-            'code'       => $this->code,
-            'name'       => $this->name,
+            'id' => $this->id,
+            'code' => $this->code,
+            'name' => $this->name,
             'datacentre_site_id' => $this->datacentre_site_id,
             'region_id' => $this->region_id
         ];

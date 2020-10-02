@@ -4,9 +4,8 @@ namespace Tests\V2\Credential;
 
 use App\Models\V2\Credential;
 use App\Providers\EncryptionServiceProvider;
-use Illuminate\Support\Carbon;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -23,7 +22,7 @@ class GetTest extends TestCase
 
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
             ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function() use ($mockEncryptionServiceProvider) {
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
             return $mockEncryptionServiceProvider;
         });
         $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
@@ -31,7 +30,7 @@ class GetTest extends TestCase
 
         $this->credential = factory(Credential::class)->create();
     }
-    
+
     public function testGetCollection()
     {
         $this->get(
@@ -42,11 +41,11 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                    'resource_id' => 'abc-abc132',
-                    'host' => 'https://127.0.0.1',
-                    'user' => 'someuser',
-                    'password' => 'somepassword',
-                    'port' => 8080
+                'resource_id' => 'abc-abc132',
+                'host' => 'https://127.0.0.1',
+                'user' => 'someuser',
+                'password' => 'somepassword',
+                'port' => 8080
             ])
             ->assertResponseStatus(200);
     }

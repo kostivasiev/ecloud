@@ -2,11 +2,10 @@
 
 namespace App\Template;
 
-use App\Exceptions\V1\TemplateNotFoundException;
 use App\Models\V1\GpuProfile;
 use App\Models\V1\Pod;
-use App\Models\V1\ServerLicense;
 use App\Models\V1\PodTemplate as PodTemplateModel;
+use App\Models\V1\ServerLicense;
 
 class PodTemplate extends AbstractTemplate
 {
@@ -21,7 +20,8 @@ class PodTemplate extends AbstractTemplate
         }
 
         // GPU Base template
-        if (($this->isGpuTemplate() && substr($this->name, 0, strpos($this->name, '-gpu-')) == $this->serverLicense->name)) {
+        if (($this->isGpuTemplate() && substr($this->name, 0,
+                strpos($this->name, '-gpu-')) == $this->serverLicense->name)) {
             $this->subType = 'Base';
         }
     }
@@ -69,7 +69,7 @@ class PodTemplate extends AbstractTemplate
      * Return the template's friendly name based off the server license
      * @return mixed
      */
-    public function getFriendlyName() : string
+    public function getFriendlyName(): string
     {
         return ($this->isUKFastBaseTemplate()) ? $this->serverLicense->friendly_name : $this->name;
     }
@@ -80,7 +80,7 @@ class PodTemplate extends AbstractTemplate
      * @return PodTemplate
      * @throws \Exception
      */
-    public function getGpuVersion(GpuProfile $gpuProfile) : PodTemplate
+    public function getGpuVersion(GpuProfile $gpuProfile): PodTemplate
     {
         if (empty($gpuProfile->card_type)) {
             throw new \Exception('Unable to determine GPU card type');

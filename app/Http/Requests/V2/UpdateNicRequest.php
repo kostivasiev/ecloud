@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\V2;
 
-use UKFast\FormRequests\FormRequest;
 use App\Rules\V2\ValidMacAddress;
+use UKFast\FormRequests\FormRequest;
 
 class UpdateNicRequest extends FormRequest
 {
@@ -32,7 +32,7 @@ class UpdateNicRequest extends FormRequest
                 new ValidMacAddress()
             ],
             'instance_id' => 'sometimes|required|string|exists:ecloud.instances,id',
-            'network_id'  => 'sometimes|required|string|exists:ecloud.networks,id',
+            'network_id' => 'sometimes|required|string|exists:ecloud.networks,id',
         ];
     }
 

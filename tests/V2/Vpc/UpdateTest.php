@@ -4,9 +4,8 @@ namespace Tests\V2\Vpc;
 
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {

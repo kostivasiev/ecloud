@@ -6,8 +6,8 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
@@ -37,15 +37,15 @@ class UpdateTest extends TestCase
         $this->post(
             '/v2/routers',
             [
-                'name'   => 'Manchester Router 2',
+                'name' => 'Manchester Router 2',
                 'vpc_id' => 'x',
             ],
             [
                 'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ])
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -58,12 +58,12 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/routers/' . $this->router->getKey(),
             [
-                'name'   => 'expected',
+                'name' => 'expected',
                 'vpc_id' => $this->vpc->getKey()
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ])
             ->assertResponseStatus(200);
         $this->assertEquals('expected', Router::findOrFail($this->router->getKey())->name);

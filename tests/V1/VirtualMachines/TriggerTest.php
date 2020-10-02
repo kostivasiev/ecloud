@@ -2,11 +2,10 @@
 
 namespace Tests\V1\VirtualMachines;
 
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
-use App\Models\V1\VirtualMachine;
 use App\Models\V1\Trigger;
+use App\Models\V1\VirtualMachine;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class TriggerTest extends TestCase
 {
@@ -24,8 +23,8 @@ class TriggerTest extends TestCase
 
         // trigger wording can be in different formats depending on where its created from
         $descriptionFormats = [
-            'eCloud VM #'.$serverId.': RAM: 4GB',
-            'eCloud VM #'.$serverId.': RAM: 4GB - PG12345',
+            'eCloud VM #' . $serverId . ': RAM: 4GB',
+            'eCloud VM #' . $serverId . ': RAM: 4GB - PG12345',
             '1 X RAM: 4GB - PG12345'
         ];
 

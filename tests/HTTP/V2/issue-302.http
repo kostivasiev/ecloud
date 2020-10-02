@@ -19,6 +19,7 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 
 
@@ -28,5 +29,6 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 

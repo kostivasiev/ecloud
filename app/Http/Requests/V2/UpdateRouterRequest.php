@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\V2;
 
 use App\Models\V2\Vpc;
@@ -25,7 +26,7 @@ class UpdateRouterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'sometimes|required|string',
+            'name' => 'sometimes|required|string',
             'vpc_id' => [
                 'sometimes',
                 'required',

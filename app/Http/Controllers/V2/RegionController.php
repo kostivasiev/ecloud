@@ -50,7 +50,7 @@ class RegionController extends BaseController
      */
     public function create(CreateRegionRequest $request)
     {
-        $region = new Region($request->only(['name','is_public']));
+        $region = new Region($request->only(['name', 'is_public']));
         $region->save();
         return $this->responseIdMeta($request, $region->getKey(), 201);
     }
@@ -63,7 +63,7 @@ class RegionController extends BaseController
     public function update(UpdateRegionRequest $request, string $regionId)
     {
         $region = Region::findOrFail($regionId);
-        $region->fill($request->only(['name','is_public']))->save();
+        $region->fill($request->only(['name', 'is_public']))->save();
         return $this->responseIdMeta($request, $region->getKey(), 200);
     }
 

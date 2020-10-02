@@ -127,8 +127,8 @@ class Vpc extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
+            'id' => 'id',
+            'name' => 'name',
             'reseller_id' => 'reseller_id',
             'region_id' => 'region_id',
             'created_at' => 'created_at',

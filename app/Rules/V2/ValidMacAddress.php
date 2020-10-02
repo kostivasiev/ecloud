@@ -3,7 +3,6 @@
 namespace App\Rules\V2;
 
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * Class ValidMacAddress
@@ -14,7 +13,7 @@ class ValidMacAddress implements Rule
 
     public function passes($attribute, $value)
     {
-        return (bool) preg_match(
+        return (bool)preg_match(
             "/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/",
             $value
         );

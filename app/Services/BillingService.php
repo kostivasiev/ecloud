@@ -29,7 +29,7 @@ class BillingService extends AbstractApioService
         try {
             $response = $this->makeRequest('GET', 'v1/cards?primary_card:eq=true');
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('unexpected response ('.$response->getStatusCode().') from accounts apio');
+                throw new \Exception('unexpected response (' . $response->getStatusCode() . ') from accounts apio');
             }
 
             $defaultCard = $this->parseResponseData($response->getBody()->getContents())->data[0];

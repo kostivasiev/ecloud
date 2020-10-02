@@ -28,7 +28,7 @@ class UpdateVpcRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'sometimes|required|string',
+            'name' => 'sometimes|required|string',
             'reseller_id' => 'sometimes|required|integer',
             'region_id' => 'sometimes|required|string|exists:ecloud.regions,id,deleted_at,NULL'
         ];

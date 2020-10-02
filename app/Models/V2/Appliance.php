@@ -2,6 +2,7 @@
 /**
  * V1Refactor - Brought in from V1 namespace
  */
+
 namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;

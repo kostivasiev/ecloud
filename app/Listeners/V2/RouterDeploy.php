@@ -3,14 +3,13 @@
 namespace App\Listeners\V2;
 
 use App\Events\V2\NetworkCreated;
-use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Events\V2\RouterCreated;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
 class RouterDeploy implements ShouldQueue
 {
@@ -48,7 +47,7 @@ class RouterDeploy implements ShouldQueue
                 throw new \Exception('No tagged T0 could be found');
             }
 
-            $vpcTag =  [
+            $vpcTag = [
                 'scope' => config('defaults.tag.scope'),
                 'tag' => $router->vpc_id
             ];
@@ -76,9 +75,10 @@ class RouterDeploy implements ShouldQueue
             $original = array_filter($original, function ($key) {
                 return strpos($key, '_') !== 0;
             }, ARRAY_FILTER_USE_KEY);
-            $nsxService->patch('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule', [
-                'json' => $original
-            ]);
+            $nsxService->patch('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule',
+                [
+                    'json' => $original
+                ]);
         } catch (GuzzleException $exception) {
             throw new \Exception($exception->getResponse()->getBody()->getContents());
         }

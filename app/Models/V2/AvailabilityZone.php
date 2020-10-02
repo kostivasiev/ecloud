@@ -128,7 +128,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */

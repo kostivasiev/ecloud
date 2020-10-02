@@ -3,10 +3,8 @@
 namespace Tests\V1\Iops;
 
 use App\Models\V1\IopsTier;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
-use Mockery;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {

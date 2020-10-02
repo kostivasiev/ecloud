@@ -2,9 +2,9 @@
 
 namespace App\Resources\V1;
 
+use App\Models\V1\Datastore;
 use Illuminate\Support\Facades\Log;
 use UKFast\Api\Resource\CustomResource;
-use App\Models\V1\Datastore;
 
 class DatastoreResource extends CustomResource
 {

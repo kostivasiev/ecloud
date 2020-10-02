@@ -3,7 +3,6 @@
 namespace Tests\V1\Appliances\Appliances;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use Tests\ApplianceTestCase;
 
 class PatchTest extends ApplianceTestCase
@@ -75,13 +74,13 @@ class PatchTest extends ApplianceTestCase
 
         $uuid = $this->appliances->first()->uuid;
 
-            $this->json('PATCH', '/v1/appliances/' . $uuid, [
-                'name' => $testString,
-            ], [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.read',
-            ]);
+        $this->json('PATCH', '/v1/appliances/' . $uuid, [
+            'name' => $testString,
+        ], [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.read',
+        ]);
 
-            $this->assertResponseStatus(403);
+        $this->assertResponseStatus(403);
     }
 }

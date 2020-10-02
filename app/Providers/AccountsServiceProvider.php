@@ -30,8 +30,8 @@ class AccountsServiceProvider extends ServiceProvider
     {
         return new GuzzleClient([
             'base_uri' => env('APIO_ACCOUNT_HOST'),
-            'timeout'  => 2,
-            'verify'   => $this->app->environment() === 'production',
+            'timeout' => 2,
+            'verify' => $this->app->environment() === 'production',
         ]);
     }
 }

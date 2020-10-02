@@ -174,7 +174,7 @@ class SolutionController extends BaseController
             $this->paginateDrsRuleData($rules)
         );
     }
-    
+
     /**
      * Paginate template data
      * @param $rules

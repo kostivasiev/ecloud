@@ -109,12 +109,12 @@ class Nic extends Model
     public function databaseNames()
     {
         return [
-            'id'          => 'id',
+            'id' => 'id',
             'mac_address' => 'mac_address',
             'instance_id' => 'instance_id',
-            'network_id'  => 'network_id',
-            'created_at'  => 'created_at',
-            'updated_at'  => 'updated_at',
+            'network_id' => 'network_id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
         ];
     }
 }

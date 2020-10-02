@@ -5,8 +5,8 @@ namespace Tests\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -26,8 +26,8 @@ class CreateTest extends TestCase
     public function testNonAdminIsDenied()
     {
         $data = [
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Zone 1',
+            'code' => 'MAN1',
+            'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
             'region_id' => $this->region->getKey()
         ];
@@ -40,7 +40,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -50,7 +50,7 @@ class CreateTest extends TestCase
     public function testNullCodeIsFailed()
     {
         $data = [
-            'name'    => 'Manchester Zone 1',
+            'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
             'region_id' => $this->region->getKey()
         ];
@@ -63,7 +63,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The code field is required',
                 'status' => 422,
                 'source' => 'code'
@@ -74,7 +74,7 @@ class CreateTest extends TestCase
     public function testNullNameIsFailed()
     {
         $data = [
-            'code'    => 'MAN1',
+            'code' => 'MAN1',
             'datacentre_site_id' => $this->faker->randomDigit(),
             'region_id' => $this->region->getKey()
         ];
@@ -87,7 +87,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The name field is required',
                 'status' => 422,
                 'source' => 'name'
@@ -98,8 +98,8 @@ class CreateTest extends TestCase
     public function testNullSiteIdIsFailed()
     {
         $data = [
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Zone 1',
+            'code' => 'MAN1',
+            'name' => 'Manchester Zone 1',
             'region_id' => $this->region->getKey()
         ];
         $this->post(
@@ -111,7 +111,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The datacentre site id field is required',
                 'status' => 422,
                 'source' => 'datacentre_site_id'
@@ -122,8 +122,8 @@ class CreateTest extends TestCase
     public function testNullRegionIdIsFailed()
     {
         $data = [
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Zone 1',
+            'code' => 'MAN1',
+            'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
             'region_id' => ''
         ];
@@ -136,7 +136,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The region id field is required',
                 'status' => 422,
                 'source' => 'region_id'
@@ -147,8 +147,8 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Zone 1',
+            'code' => 'MAN1',
+            'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
             'is_public' => false,
             'region_id' => $this->region->getKey()

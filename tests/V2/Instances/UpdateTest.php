@@ -11,7 +11,6 @@ use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
-use UKFast\Admin\Devices\AdminClient;
 
 class UpdateTest extends TestCase
 {
@@ -79,11 +78,11 @@ class UpdateTest extends TestCase
             'name' => 'Testing Locked Instance',
         ];
         $this->patch(
-            '/v2/instances/'.$this->instance->getKey(),
+            '/v2/instances/' . $this->instance->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(200);
@@ -97,17 +96,17 @@ class UpdateTest extends TestCase
         $this->instance->locked = true;
         $this->instance->save();
         $this->patch(
-            '/v2/instances/'.$this->instance->getKey(),
+            '/v2/instances/' . $this->instance->getKey(),
             [
                 'name' => 'Testing Locked Instance',
             ],
             [
                 'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Forbidden',
+                'title' => 'Forbidden',
                 'detail' => 'The specified instance is locked',
                 'status' => 403,
             ])
@@ -121,11 +120,11 @@ class UpdateTest extends TestCase
             'name' => 'Testing Locked Instance',
         ];
         $this->patch(
-            '/v2/instances/'.$this->instance->getKey(),
+            '/v2/instances/' . $this->instance->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(200);

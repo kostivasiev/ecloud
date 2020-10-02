@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models\V2;
 
 use App\Events\V2\FirewallRuleCreated;

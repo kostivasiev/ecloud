@@ -10,18 +10,16 @@ use App\Exceptions\V1\KingpinException;
 use App\Http\Controllers\V1\VolumeSetController;
 use App\Services\Artisan\V1\ArtisanService;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
-
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class Datastore extends Model implements Filterable, Sortable
 {
@@ -476,7 +474,7 @@ class Datastore extends Model implements Filterable, Sortable
             $podId = $podMapping[$pod->getKey()];
         }
 
-        $clusterName = 'MCS_P'.$podId.'_VV_VMPUBLICSTORE_SSD_' . ($backupRequired?'BACKUP':'NONBACKUP');
+        $clusterName = 'MCS_P' . $podId . '_VV_VMPUBLICSTORE_SSD_' . ($backupRequired ? 'BACKUP' : 'NONBACKUP');
 
         // temp fudge until infra fix the cluster name
         if ($podId === 1 && $backupRequired == false) {
@@ -523,7 +521,7 @@ class Datastore extends Model implements Filterable, Sortable
         $datastores->get()->map(function ($item) use (&$index) {
             if (preg_match('/\w+(DATA|CLUSTER|QRM)_?(\d+)*/', $item->reseller_lun_name, $matches) == true) {
                 $numeric = $matches[2] ?? 1;
-                $index = ($numeric > $index) ? (int) $numeric : $index;
+                $index = ($numeric > $index) ? (int)$numeric : $index;
             }
         });
 
@@ -582,7 +580,7 @@ class Datastore extends Model implements Filterable, Sortable
         // Update the volume properties
         $this->reseller_lun_name = $artisanResult->name;
         $this->reseller_lun_wwn = $artisanResult->wwn;
-        $this->reseller_lun_size_gb = $artisanResult->sizeMiB/1024;
+        $this->reseller_lun_size_gb = $artisanResult->sizeMiB / 1024;
 
         $this->save();
 
@@ -620,8 +618,8 @@ class Datastore extends Model implements Filterable, Sortable
     public function expand()
     {
         $kingpin = app()->makeWith('App\Services\Kingpin\V1\KingpinService', [
-                $this->storage->pod,
-                $this->reseller_lun_type
+            $this->storage->pod,
+            $this->reseller_lun_type
         ]);
 
         if (!$kingpin->expandDatastore($this->reseller_lun_ucs_reseller_id, $this->reseller_lun_name)) {
@@ -685,7 +683,8 @@ class Datastore extends Model implements Filterable, Sortable
                     );
                 }
 
-                if (!empty($artisanResponse->volumes) && in_array($this->reseller_lun_name, $artisanResponse->volumes)) {
+                if (!empty($artisanResponse->volumes) && in_array($this->reseller_lun_name,
+                        $artisanResponse->volumes)) {
                     return $volumeSet;
                 }
             }
