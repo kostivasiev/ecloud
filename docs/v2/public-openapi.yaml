@@ -155,6 +155,3 @@ paths:
     $ref: 'resources/Volume/item.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
-
-  '/ecloud/v2/instances/{instanceId}/deploy':
-    $ref: 'instances/deploy.yaml'
