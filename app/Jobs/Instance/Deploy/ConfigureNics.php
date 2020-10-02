@@ -83,7 +83,7 @@ class ConfigureNics extends Job
                     }
                     if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
                         $database->rollback();
-                        $this->fail(new \Exception( 'Insufficient available IP\'s in subnet to assign to NICs'));
+                        $this->fail(new \Exception('Insufficient available IP\'s in subnet to assign to NICs'));
                         return;
                     }
 
