@@ -7,7 +7,6 @@ use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
@@ -15,10 +14,9 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Faker\Generator;
 use Illuminate\Support\Facades\Queue;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateNetworkAdapterTest extends TestCase
 {
