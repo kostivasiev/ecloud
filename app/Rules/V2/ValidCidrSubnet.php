@@ -25,6 +25,6 @@ class ValidCidrSubnet implements Rule
      */
     public function message()
     {
-        return 'The :attribute must be a valid CIDR subnet range';
+        return 'The :attribute must be a valid CIDR subnet';
     }
 }
