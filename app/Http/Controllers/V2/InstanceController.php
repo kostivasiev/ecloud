@@ -4,15 +4,16 @@ namespace App\Http\Controllers\V2;
 
 use App\Events\V2\Data\InstanceDeployEventData;
 use App\Events\V2\InstanceDeployEvent;
-use App\Resources\V2\VolumeResource;
-use Illuminate\Http\Request;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\DeployRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -24,8 +25,8 @@ class InstanceController extends BaseController
 {
     /**
      * Get instance collection
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
+     * @param  \Illuminate\Http\Request  $request
+     * @param  QueryTransformer  $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -41,8 +42,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $instanceId
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $instanceId
      * @return InstanceResource
      */
     public function show(Request $request, string $instanceId)
@@ -86,7 +87,7 @@ class InstanceController extends BaseController
             if (count($routers) == 1) {
                 $networks = $routers->first()->networks;
                 if (count($networks) == 1) {
-                    $defaultNetwork = $networks->first();
+                    $defaultNetwork = Network::forUser(app('request')->user)->findOrFail($networks->first()->id);
                 }
             }
         }
@@ -95,9 +96,7 @@ class InstanceController extends BaseController
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
-        // TODO :- Check network_id belongs to user, covered in another issue
-        $instanceDeployData->network_id = $request->input('network_id', $defaultNetwork);
-        // TODO :- Check floating_ip_id belongs to user, covered in another issue
+        $instanceDeployData->network_id = $request->input('network_id', $defaultNetwork->id);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
@@ -107,8 +106,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param UpdateRequest $request
-     * @param string $instanceId
+     * @param  UpdateRequest  $request
+     * @param  string  $instanceId
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateRequest $request, string $instanceId)
@@ -135,8 +134,22 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $instanceId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function isLocked(): JsonResponse
+    {
+        return JsonResponse::create([
+            'errors' => [
+                'title' => 'Forbidden',
+                'detail' => 'The specified instance is locked',
+                'status' => 403,
+            ]
+        ], 403);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $instanceId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $instanceId)
@@ -147,20 +160,6 @@ class InstanceController extends BaseController
         }
         $instance->delete();
         return response()->json([], 204);
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function isLocked(): JsonResponse
-    {
-        return JsonResponse::create([
-            'errors' => [
-                'title'  => 'Forbidden',
-                'detail' => 'The specified instance is locked',
-                'status' => 403,
-            ]
-        ], 403);
     }
 
     /**
