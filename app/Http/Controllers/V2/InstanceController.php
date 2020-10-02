@@ -204,7 +204,10 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        // @todo - trigger power-onff event
+        $this->dispatch(new \App\Jobs\Instance\PowerOn([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
 
         return response('', 202);
     }
