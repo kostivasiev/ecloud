@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Events\V2\Data\InstanceDeployEventData;
+use App\Events\V2\InstanceDeployEvent;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\V2\Instance\CreateRequest;
@@ -76,6 +78,31 @@ class InstanceController extends BaseController
         }
         $instance->save();
         $instance->refresh();
+
+        // Use the default network if there is only one
+        $defaultNetwork = null;
+        if (!$request->has('network_id')) {
+            $routers = $instance->vpc->routers;
+            if (count($routers) == 1) {
+                $networks = $routers->first()->networks;
+                if (count($networks) == 1) {
+                    $defaultNetwork = $networks->first();
+                }
+            }
+        }
+
+        $instanceDeployData = new InstanceDeployEventData();
+        $instanceDeployData->instance_id = $instance->id;
+        $instanceDeployData->vpc_id = $instance->vpc->id;
+        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
+        // TODO :- Check network_id belongs to user, covered in another issue
+        $instanceDeployData->network_id = $request->input('network_id', $defaultNetwork);
+        // TODO :- Check floating_ip_id belongs to user, covered in another issue
+        $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
+        $instanceDeployData->appliance_data = $request->input('appliance_data');
+        $instanceDeployData->user_script = $request->input('user_script');
+        $this->dispatch(new InstanceDeployEvent($instanceDeployData));
+
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
 
@@ -160,50 +187,6 @@ class InstanceController extends BaseController
                 ->volumes()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
-    }
-
-    public function deploy(DeployRequest $request, string $instanceId)
-    {
-        $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        if (!$instance) {
-            return response()->json([], 404);
-        }
-
-        // Use the default network if there is only one
-        $defaultNetwork = null;
-        if (!$request->has('network_id')) {
-            $routers = $instance->vpc->routers;
-            if (count($routers) == 1) {
-                $networks = $routers->first()->networks;
-                if (count($networks) == 1) {
-                    $defaultNetwork = $networks->first();
-                }
-            }
-        }
-
-        $data = [
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id,
-            'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.min')),
-            'network_id' => $request->input('network_id', $defaultNetwork),
-            'floating_ip_id' => $request->input('floating_ip_id'),
-            'appliance_data' => $request->input('appliance_data'),
-            'user_script' => $request->input('user_script'),
-        ];
-
-        // Create the chained jobs for deployment
-        $this->dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
-            new \App\Jobs\Instance\Deploy\UpdateNetworkAdapter($data),
-            new \App\Jobs\Instance\Deploy\OsCustomisation($data),
-            new \App\Jobs\Instance\PowerOn($data),
-            new \App\Jobs\Instance\Deploy\WaitOsCustomisation($data),
-            new \App\Jobs\Instance\Deploy\PrepareOsUsers($data),
-            new \App\Jobs\Instance\Deploy\PrepareOsDisk($data),
-            new \App\Jobs\Instance\Deploy\RunApplianceBootstrap($data),
-            new \App\Jobs\Instance\Deploy\RunBootstrapScript($data),
-        ]));
-
-        return response()->json([], 202);
     }
 
     public function powerOn(Request $request, $instanceId)

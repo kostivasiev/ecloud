@@ -82,7 +82,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('instances', 'InstanceController@store');
         $router->patch('instances/{instanceId}', 'InstanceController@update');
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
-        $router->post('instances/{instanceId}/deploy', 'InstanceController@deploy');
         $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
         $router->put('instances/{instanceId}/power-off', 'InstanceController@powerOff');
     });
