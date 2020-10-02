@@ -101,7 +101,7 @@ class InstanceController extends BaseController
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
-        $this->dispatch(new InstanceDeployEvent($instanceDeployData));
+        event(new InstanceDeployEvent($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
