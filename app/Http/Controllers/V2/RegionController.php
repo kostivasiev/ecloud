@@ -17,7 +17,7 @@ use UKFast\DB\Ditto\QueryTransformer;
 class RegionController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -33,7 +33,7 @@ class RegionController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $regionId
      * @return RegionResource
      */
@@ -45,7 +45,7 @@ class RegionController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateRegionRequest $request
+     * @param CreateRegionRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateRegionRequest $request)
@@ -56,7 +56,7 @@ class RegionController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateRegionRequest $request
+     * @param UpdateRegionRequest $request
      * @param string $regionId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -69,7 +69,7 @@ class RegionController extends BaseController
 
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $regionId
      * @return \Illuminate\Http\JsonResponse
      */

@@ -16,8 +16,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class NetworkController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -34,7 +34,7 @@ class NetworkController extends BaseController
     /**
      * @param Request $request
      * @param string $networkId
-     * @return \App\Resources\V2\NetworkResource
+     * @return NetworkResource
      */
     public function show(Request $request, string $networkId)
     {
@@ -44,7 +44,7 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateNetworkRequest $request
+     * @param CreateNetworkRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateNetworkRequest $request)
@@ -58,7 +58,7 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateNetworkRequest $request
+     * @param UpdateNetworkRequest $request
      * @param string $networkId
      * @return \Illuminate\Http\JsonResponse
      */

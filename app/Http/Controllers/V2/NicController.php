@@ -12,8 +12,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class NicController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -28,7 +28,7 @@ class NicController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $nicId
      * @return \App\Http\Resources\NicResource
      */
@@ -40,7 +40,7 @@ class NicController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateNicRequest $request
+     * @param CreateNicRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateNicRequest $request)
@@ -54,7 +54,7 @@ class NicController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateNicRequest $request
+     * @param UpdateNicRequest $request
      * @param string $nicId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -69,7 +69,7 @@ class NicController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $nicId
      * @return \Illuminate\Http\JsonResponse
      */

@@ -2,20 +2,16 @@
 
 namespace App\Http\Controllers\V1;
 
-use UKFast\DB\Ditto\QueryTransformer;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-
-use App\Services\IntapiService;
+use App\Exceptions\V1\FirewallNotFoundException;
 use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\ServiceUnavailableException;
-
 use App\Models\V1\Firewall;
-use App\Exceptions\V1\FirewallNotFoundException;
+use App\Services\IntapiService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallController extends BaseController
 {
@@ -25,7 +21,7 @@ class FirewallController extends BaseController
      * List all firewalls
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -48,7 +44,7 @@ class FirewallController extends BaseController
      *
      * @param Request $request
      * @param $firewallId
-     * @return \Illuminate\http\Response
+     * @return Response
      * @throws FirewallNotFoundException
      */
     public function show(Request $request, $firewallId)

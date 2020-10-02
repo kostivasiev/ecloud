@@ -55,7 +55,7 @@ class RouterNetworkCreatedTest extends TestCase
     }
 
     /**
-     * @return \App\Models\V2\AvailabilityZone
+     * @return AvailabilityZone
      */
     public function getAvailabilityZone(): AvailabilityZone
     {
@@ -67,7 +67,7 @@ class RouterNetworkCreatedTest extends TestCase
     }
 
     /**
-     * @return \App\Models\V2\Router
+     * @return Router
      */
     public function getRouter(): Router
     {
@@ -79,8 +79,8 @@ class RouterNetworkCreatedTest extends TestCase
     }
 
     /**
-     * @param \App\Models\V2\Router|null $router
-     * @return \App\Models\V2\Network
+     * @param Router|null $router
+     * @return Network
      */
     public function getNetwork(?Router $router = null): Network
     {

@@ -3,25 +3,22 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ArtisanException;
+use App\Exceptions\V1\HostNotFoundException;
 use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\KingpinException;
 use App\Exceptions\V1\SanNotFoundException;
 use App\Exceptions\V1\ServiceUnavailableException;
-use App\Services\Artisan\V1\ArtisanService;
-use App\Services\IntapiService;
-use Illuminate\Http\Response;
-use UKFast\Api\Exceptions\BadRequestException;
-use UKFast\DB\Ditto\QueryTransformer;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-use Log;
-
 use App\Models\V1\Host;
 use App\Resources\V1\HostResource;
-use App\Exceptions\V1\HostNotFoundException;
+use App\Services\Artisan\V1\ArtisanService;
+use App\Services\IntapiService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Log;
+use UKFast\Api\Exceptions\BadRequestException;
+use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class HostController extends BaseController
 {
@@ -31,7 +28,7 @@ class HostController extends BaseController
      * List Collection
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -52,7 +49,7 @@ class HostController extends BaseController
      *
      * @param Request $request
      * @param $hostId
-     * @return \Illuminate\http\Response
+     * @return Response
      * @throws HostNotFoundException
      */
     public function show(Request $request, $hostId)
@@ -85,7 +82,7 @@ class HostController extends BaseController
      *
      * @param Request $request
      * @param $hostId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws BadRequestException
      * @throws HostNotFoundException
      * @throws SanNotFoundException
@@ -132,7 +129,7 @@ class HostController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @param $hostId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws HostNotFoundException
      * @throws ServiceUnavailableException
      */
@@ -183,7 +180,7 @@ class HostController extends BaseController
      * Delete a host from the SAN (actually all SAN's associated with the Pod for the reseller's solution)
      * @param Request $request
      * @param $hostId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws BadRequestException
      * @throws HostNotFoundException
      * @throws SanNotFoundException
@@ -228,7 +225,7 @@ class HostController extends BaseController
      * @url http://conjurer.rnd.ukfast:8443/swagger/ui/index#/Compute_v1/Compute_v1_RetrieveSolutionNode
      * @param Request $request
      * @param $hostId
-     * @return \Illuminate\http\Response
+     * @return Response
      */
     public function hardware(Request $request, $hostId)
     {
@@ -264,7 +261,7 @@ class HostController extends BaseController
      * Rescan the host's cluster on VMWare
      * @param Request $request
      * @param $hostId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws HostNotFoundException
      * @throws KingpinException
      */
@@ -324,7 +321,7 @@ class HostController extends BaseController
      * List Solution Hosts
      * @param Request $request
      * @param $solutionId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      */
     public function indexSolution(Request $request, $solutionId)

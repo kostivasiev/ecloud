@@ -142,7 +142,7 @@ class CreateExpandLimitsTest extends TestCase
 
     /**
      * This time valid minimum of 2, but we'll make that less than the current datastore's lun value.
-     * @throws \UKFast\Api\Exceptions\ForbiddenException
+     * @throws ForbiddenException
      */
     public function testExpandInvalidMinCapacityReturnsException()
     {
@@ -170,7 +170,7 @@ class CreateExpandLimitsTest extends TestCase
      * Create a request object
      * @param string $method
      * @param array $params
-     * @return \Illuminate\Http\Request
+     * @return Request
      */
     public function getRequest(string $method, array $params)
     {

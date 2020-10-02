@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
-use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
@@ -21,8 +20,8 @@ class VolumeController extends BaseController
 {
     /**
      * Get volumes collection
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -38,7 +37,7 @@ class VolumeController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $volumeId
      * @return VolumeResource
      */
@@ -131,7 +130,7 @@ class VolumeController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $routerUuid
      * @return \Illuminate\Http\JsonResponse
      */

@@ -52,8 +52,8 @@ class FirewallRule extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
-     * @return array|\UKFast\DB\Ditto\Filter[]
+     * @param FilterFactory $factory
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
@@ -67,7 +67,7 @@ class FirewallRule extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -83,7 +83,7 @@ class FirewallRule extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      */
     public function defaultSort(SortFactory $factory)

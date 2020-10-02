@@ -8,19 +8,17 @@ use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\SanNotFoundException;
 use App\Models\V1\IopsTier;
 use App\Models\V1\San;
-use App\Models\V1\Solution;
 use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
-use UKFast\DB\Ditto\QueryTransformer;
-use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class VolumeSetController extends BaseController
 {
@@ -32,7 +30,7 @@ class VolumeSetController extends BaseController
      * Show collection
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -55,7 +53,7 @@ class VolumeSetController extends BaseController
      *
      * @param Request $request
      * @param $id
-     * @return \Illuminate\http\Response
+     * @return Response
      */
     public function show(Request $request, $id)
     {
@@ -66,7 +64,7 @@ class VolumeSetController extends BaseController
     /**
      * Create a volume set o the SAN
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws SanNotFoundException
      * @throws UnprocessableEntityException
@@ -145,7 +143,7 @@ class VolumeSetController extends BaseController
      *
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws UnprocessableEntityException
      * @throws \Illuminate\Validation\ValidationException
@@ -206,7 +204,7 @@ class VolumeSetController extends BaseController
      * Add a datastore volume to a volumeset
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws DatastoreNotFoundException
      */
@@ -237,7 +235,7 @@ class VolumeSetController extends BaseController
      * @param Request $request
      * @param $volumeSetId
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws DatastoreNotFoundException
      */
@@ -267,7 +265,7 @@ class VolumeSetController extends BaseController
      * Export a volume set to a host set
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws NotFoundException
      */
@@ -315,7 +313,7 @@ class VolumeSetController extends BaseController
      * Delete volume set record.
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function delete(Request $request, $volumeSetId)
     {
@@ -335,7 +333,7 @@ class VolumeSetController extends BaseController
      * Delete a volume set from the SAN
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws DatastoreNotFoundException
      */
