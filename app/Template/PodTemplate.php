@@ -20,11 +20,12 @@ class PodTemplate extends AbstractTemplate
         }
 
         // GPU Base template
-        if (($this->isGpuTemplate() && substr(
-                $this->name,
-                0,
-                strpos($this->name, '-gpu-')
-            ) == $this->serverLicense->name)) {
+        $substringResult = substr(
+            $this->name,
+            0,
+            strpos($this->name, '-gpu-')
+        );
+        if (($this->isGpuTemplate() && $substringResult == $this->serverLicense->name)) {
             $this->subType = 'Base';
         }
     }

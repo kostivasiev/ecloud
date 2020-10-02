@@ -494,14 +494,14 @@ class Solution extends Model implements Filterable, Sortable
      */
     public function isMultiSite()
     {
-        return $this->hasMany(
-                'App\Models\V1\SolutionSite',
-                'ucs_site_ucs_reseller_id',
-                'ucs_reseller_id'
-            )
-                ->where('ucs_site_state', '=', 'Active')
-                ->limit(2)
-                ->count() > 1;
+        $result = $this->hasMany(
+            'App\Models\V1\SolutionSite',
+            'ucs_site_ucs_reseller_id',
+            'ucs_reseller_id'
+        )
+            ->where('ucs_site_state', '=', 'Active')
+            ->limit(2);
+        return $result->count() > 1;
     }
 
     public function isMultiNetwork()

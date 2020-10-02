@@ -116,12 +116,13 @@ class IntapiService
     public function getFriendlyError($error)
     {
         Log::error('IntAPI error: ' . $error);
+        $pregResult = preg_match(
+            '/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/',
+            $error,
+            $matches
+        );
         switch ($error) {
-            case (preg_match(
-                    '/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/',
-                    $error,
-                    $matches
-                ) == true):
+            case ($pregResult == true):
                 $ip_type = $matches[1];
 //                $vlan = $matches[2];
 

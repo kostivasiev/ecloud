@@ -683,10 +683,11 @@ class Datastore extends Model implements Filterable, Sortable
                     );
                 }
 
-                if (!empty($artisanResponse->volumes) && in_array(
-                        $this->reseller_lun_name,
-                        $artisanResponse->volumes
-                    )) {
+                $arrayResult = in_array(
+                    $this->reseller_lun_name,
+                    $artisanResponse->volumes
+                );
+                if (!empty($artisanResponse->volumes) && $arrayResult) {
                     return $volumeSet;
                 }
             }
