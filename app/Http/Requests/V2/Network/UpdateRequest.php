@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\Network;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidCidrSubnetRange;
+use App\Rules\V2\ValidCidrSubnet;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -40,7 +40,7 @@ class UpdateRequest extends FormRequest
                 new ExistsForUser(Router::class)
             ],
             'subnet' => [
-                'sometimes', 'nullable', 'string', new ValidCidrSubnetRange()
+                'sometimes', 'nullable', 'string', new ValidCidrSubnet()
             ]
         ];
     }

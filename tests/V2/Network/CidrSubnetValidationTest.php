@@ -2,10 +2,10 @@
 
 namespace Tests\V2\Network;
 
-use App\Rules\V2\ValidCidrSubnetRange;
+use App\Rules\V2\ValidCidrSubnet;
 use Tests\TestCase;
 
-class CidrSubnetRangeValidationTest extends TestCase
+class CidrSubnetValidationTest extends TestCase
 {
     protected $faker;
     protected $validator;
@@ -13,7 +13,7 @@ class CidrSubnetRangeValidationTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->validator = new ValidCidrSubnetRange();
+        $this->validator = new ValidCidrSubnet();
     }
 
     public function testInvalidSubnetRange()

@@ -12,7 +12,7 @@ use IPLib\Range\Subnet;
  * would not leave enough usable IP's
  * @package App\Rules\V2
  */
-class ValidCidrSubnetRange implements Rule
+class ValidCidrSubnet implements Rule
 {
     public function passes($attribute, $value)
     {
