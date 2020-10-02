@@ -58,10 +58,10 @@ class ConfigureNics extends Job
                     $cursor = $response->cursor ?? null;
                 } while (!empty($cursor));
             } catch (GuzzleException $exception) {
-                $error = $logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents();
                 $database->rollback();
-                Log::info($error);
-                $this->fail(new \Exception($error));
+                $this->fail(
+                    new \Exception($logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents())
+                );
                 return;
             }
 
@@ -125,10 +125,9 @@ class ConfigureNics extends Job
                     ]
                 );
             } catch (GuzzleException $exception) {
-                $error = $logMessage.'Failed: '.$exception->getResponse()
-                        ->getBody()->getContents();
-                Log::info($error);
-                $this->fail(new \Exception($error));
+                $this->fail(new \Exception(
+                    $logMessage.'Failed: '.$exception->getResponse()->getBody()->getContents()
+                ));
                 return;
             }
         });
