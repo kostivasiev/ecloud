@@ -222,4 +222,17 @@ class InstanceController extends BaseController
 
         return response("", 202);
     }
+
+    public function guestRestart(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        $this->dispatch(new \App\Jobs\Instance\GuestRestart([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
+
+        return response('', 202);
+    }
 }

@@ -84,6 +84,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
         $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
         $router->put('instances/{instanceId}/power-off', 'InstanceController@powerOff');
+        $router->put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
     });
 
     /** Floating Ips */
