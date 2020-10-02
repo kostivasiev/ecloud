@@ -23,7 +23,6 @@ Content-Type:  application/json
   "code": "MAN1",
   "name": "Test AZ - Pete",
   "datacentre_site_id": 111,
-  "nsx_manager_endpoint": "https://185.197.63.88/",
   "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
   "region_id": "{{region_id}}"
 }
@@ -74,6 +73,22 @@ Content-Type: application/json
   "user": "kingpinapi",
   "password": "tKm?c7?Ov!of",
   "port": 8443
+}
+
+###
+POST https://{{host}}/{{version}}/credentials
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "NSX",
+  "resource_id": "{{availability_zone_id}}",
+  "host": "https://185.197.63.88",
+  "user": "ecloud.api@ecloudgov.dev",
+  "password": "a5hfysIVpUND"
 }
 
 > {%

@@ -209,8 +209,8 @@ class Instance extends Model implements Filterable, Sortable
             'vcpu_cores' => 'vcpu_cores',
             'ram_capacity' => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',
-            'locked'     => 'locked',
-            'platform'   => 'platform',
+            'locked' => 'locked',
+            'platform' => 'platform',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

@@ -48,6 +48,11 @@ class WaitOsCustomisation extends Job
                 return;
             }
 
+            if ($data->status === 'Failed') {
+                $this->fail(new \Exception('WaitOsCustomisation failed for '.$instance->id));
+                return;
+            }
+
             if ($data->status !== 'Succeeded') {
                 if ($this->attempts() <= static::RETRY_ATTEMPTS) {
                     $this->release(static::RETRY_DELAY);
@@ -68,10 +73,5 @@ class WaitOsCustomisation extends Job
             ));
             return;
         }
-    }
-
-    public function failed(\Exception $exception)
-    {
-        Log::info($exception->getMessage());
     }
 }

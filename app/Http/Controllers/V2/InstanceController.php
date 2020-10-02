@@ -189,16 +189,17 @@ class InstanceController extends BaseController
             'network_id' => $request->input('network_id', $defaultNetwork),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'appliance_data' => $request->input('appliance_data'),
+            'user_script' => $request->input('user_script'),
         ];
 
         // Create the chained jobs for deployment
         $this->dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
             new \App\Jobs\Instance\Deploy\ConfigureNics($data),
             new \App\Jobs\Instance\Deploy\UpdateNetworkAdapter($data),
+            new \App\Jobs\Instance\Deploy\OsCustomisation($data),
             new \App\Jobs\Instance\PowerOn($data),
             new \App\Jobs\Instance\Deploy\WaitOsCustomisation($data),
             new \App\Jobs\Instance\Deploy\PrepareOsUsers($data),
-            new \App\Jobs\Instance\Deploy\OsCustomisation($data),
             new \App\Jobs\Instance\Deploy\PrepareOsDisk($data),
             new \App\Jobs\Instance\Deploy\RunApplianceBootstrap($data),
             new \App\Jobs\Instance\Deploy\RunBootstrapScript($data),

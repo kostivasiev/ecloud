@@ -23,6 +23,10 @@ post:
               required: false
               type: json
               example: '{"key":"value"}'
+            user_script:
+              required: false
+              type: string
+              example: ''
   responses:
     200:
       description: Accepted
