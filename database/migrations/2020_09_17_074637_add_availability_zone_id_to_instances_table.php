@@ -16,7 +16,7 @@ class AddAvailabilityZoneIdToInstancesTable extends Migration
         if (Schema::connection('ecloud')->hasTable('instances')) {
             Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
                 if (!Schema::connection('ecloud')->hasColumn('instances', 'availability_zone_id')) {
-                    $table->ipAddress('availability_zone_id')->after('vpc_id')->nullable();
+                    $table->uuid('availability_zone_id')->after('vpc_id')->nullable();
                 }
             });
         }
