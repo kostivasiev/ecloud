@@ -48,7 +48,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $network->id,
                 'name' => $network->name,
-                'subnet_range' => '10.0.0.0/24'
+                'subnet' => '10.0.0.0/24'
             ])
             ->assertResponseStatus(200);
     }
@@ -68,7 +68,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id'         => $network->id,
                 'name'       => $network->name,
-                'subnet_range' => '10.0.0.0/24'
+                'subnet' => '10.0.0.0/24'
             ])
             ->assertResponseStatus(200);
     }

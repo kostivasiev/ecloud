@@ -11,7 +11,7 @@ properties:
     type: string
     required: true
     example: rtr-4c63cf58
-  subnet_range:
+  subnet:
     type: string
     description: CIDR format subnet range with mask. Minimum network prefix is /29.
     required: false

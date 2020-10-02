@@ -39,7 +39,7 @@ class UpdateRequest extends FormRequest
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class)
             ],
-            'subnet_range' => [
+            'subnet' => [
                 'sometimes', 'nullable', 'string', new ValidCidrSubnetRange()
             ]
         ];

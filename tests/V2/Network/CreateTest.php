@@ -44,7 +44,7 @@ class CreateTest extends TestCase
             [
                 'name' => 'Manchester Network',
                 'router_id' => $this->router->getKey(),
-                'subnet_range' => '10.0.0.0/24'
+                'subnet' => '10.0.0.0/24'
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -55,7 +55,7 @@ class CreateTest extends TestCase
             [
                 'name' => 'Manchester Network',
                 'router_id' => $this->router->getKey(),
-                'subnet_range' => '10.0.0.0/24'
+                'subnet' => '10.0.0.0/24'
             ],
             'ecloud'
         )

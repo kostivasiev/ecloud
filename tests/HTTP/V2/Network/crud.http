@@ -90,7 +90,7 @@ Content-Type: application/json
 
 {
   "router_id": "{{router_id}}",
-  "subnet_range": "10.0.0.0/24"
+  "subnet": "10.0.0.0/24"
 }
 
 > {%
@@ -130,7 +130,7 @@ Content-Type: application/json
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.id === client.global.get('network_id'), "Incorrect resource ID returned");
-  client.assert(response.body.data.subnet_range === "10.0.0.0/24");
+  client.assert(response.body.data.subnet === "10.0.0.0/24");
 });
 %}
 
@@ -144,7 +144,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "subnet_range": "192.168.0.0/24"
+  "subnet": "192.168.0.0/24"
 }
 
 > {%
@@ -165,7 +165,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.body.data.subnet_range === "192.168.0.0/24");
+  client.assert(response.body.data.subnet === "192.168.0.0/24");
 
 });
 %}

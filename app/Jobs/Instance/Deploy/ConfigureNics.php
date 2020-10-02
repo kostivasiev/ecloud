@@ -40,7 +40,7 @@ class ConfigureNics extends Job
         $nicsByNetwork = $instanceNics->groupBy('network_id');
         $nicsByNetwork->each(function ($nics, $networkId) use ($nsxService, $logMessage, $database) {
             $network = Network::findOrFail($networkId);
-            $subnet = \IPLib\Range\Subnet::fromString($network->subnet_range);
+            $subnet = \IPLib\Range\Subnet::fromString($network->subnet);
 
             /**
              * Get DHCP static bindings to determine used IP addresses on the network
@@ -72,7 +72,7 @@ class ConfigureNics extends Job
 
             foreach ($nics as $nic) {
                 // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
-                $reserved = 4;
+                $reserved = 3;
                 $iterator = 0;
 
                 $ip = $subnet->getStartAddress();

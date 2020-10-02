@@ -84,7 +84,7 @@ Content-Type: application/json
 
 {
   "router_id": "{{router_id}}",
-  "subnet_range": "10.0.0.0/24"
+  "subnet": "10.0.0.0/24"
 }
 
 > {%
@@ -131,7 +131,7 @@ Content-Type: application/json
 
 {
   "router_id": "{{router_id}}",
-  "subnet_range": "10.0.0.0/24"
+  "subnet": "10.0.0.0/24"
 }
 
 

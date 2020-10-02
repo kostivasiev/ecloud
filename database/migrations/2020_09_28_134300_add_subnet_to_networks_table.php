@@ -14,7 +14,7 @@ class AddSubnetToNetworksTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('networks', function (Blueprint $table) {
-            $table->ipAddress('subnet_range')->after('router_id')->nullable();
+            $table->ipAddress('subnet')->after('router_id')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddSubnetToNetworksTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('networks', function (Blueprint $table) {
-            $table->dropColumn('subnet_range');
+            $table->dropColumn('subnet');
         });
     }
 }
