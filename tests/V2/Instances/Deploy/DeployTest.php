@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\V2\Instances;
+namespace Tests\V2\Instances\Deploy;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
