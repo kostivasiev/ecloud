@@ -1,14 +1,12 @@
 <?php
 namespace Tests\V2\Router\EventTests;
 
-use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Faker\Generator;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
