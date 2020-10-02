@@ -45,4 +45,24 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
+  volume_capacity:
+    required: false
+    type: integer
+    example: 1
+  network_id:
+    required: false
+    type: string
+    example: 'net-912345'
+  floating_ip_id:
+    required: false
+    type: string
+    example: 'fip-912345'
+  appliance_data:
+    required: false
+    type: json
+    example: '{"key":"value"}'
+  user_script:
+    required: false
+    type: string
+    example: ''
 description: 'Instances'
