@@ -251,4 +251,17 @@ class InstanceController extends BaseController
 
         return response('', 202);
     }
+
+    public function powerReset(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        $this->dispatch(new \App\Jobs\Instance\PowerReset([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
+
+        return response('', 202);
+    }
 }
