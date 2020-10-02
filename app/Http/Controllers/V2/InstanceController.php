@@ -81,17 +81,17 @@ class InstanceController extends BaseController
         $instance->refresh();
 
         // Use the default network if there is only one and no network_id was passed in
-        $defaultNetwork = null;
+        $defaultNetworkId = null;
         if (!$request->has('network_id')) {
             $routers = $instance->vpc->routers;
             if (count($routers) == 1) {
                 $networks = $routers->first()->networks;
                 if (count($networks) == 1) {
                     // This could be done better, but deadlines. Should check all routers/networks for owned Networks
-                    $defaultNetwork = Network::forUser(app('request')->user)->findOrFail($networks->first()->id);
+                    $defaultNetworkId = Network::forUser(app('request')->user)->findOrFail($networks->first()->id)->id;
                 }
             }
-            if (!$defaultNetwork) {
+            if (!$defaultNetworkId) {
                 return JsonResponse::create([
                     'errors' => [
                         'title' => 'Not Found',
@@ -107,7 +107,7 @@ class InstanceController extends BaseController
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
-        $instanceDeployData->network_id = $request->input('network_id', $defaultNetwork->id);
+        $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
