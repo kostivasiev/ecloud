@@ -80,15 +80,26 @@ class InstanceController extends BaseController
         $instance->save();
         $instance->refresh();
 
-        // Use the default network if there is only one
+        // Use the default network if there is only one and no network_id was passed in
         $defaultNetwork = null;
         if (!$request->has('network_id')) {
             $routers = $instance->vpc->routers;
             if (count($routers) == 1) {
                 $networks = $routers->first()->networks;
                 if (count($networks) == 1) {
+                    // This could be done better, but deadlines. Should check all routers/networks for owned Networks
                     $defaultNetwork = Network::forUser(app('request')->user)->findOrFail($networks->first()->id);
                 }
+            }
+            if (!$defaultNetwork) {
+                return JsonResponse::create([
+                    'errors' => [
+                        'title' => 'Not Found',
+                        'detail' => 'No network_id provided and could not find a default network',
+                        'status' => 404,
+                        'source' => 'availability_zone_id'
+                    ]
+                ], 404);
             }
         }
 
