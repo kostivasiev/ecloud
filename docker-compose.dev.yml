@@ -7,6 +7,11 @@ services:
     image: apio-ecloud-dev
     env_file:
     - .env
+    environment:
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_DB: "0"
     volumes:
     - ./:/var/www/html
     depends_on:
@@ -19,6 +24,11 @@ services:
     command: queue
     env_file:
     - .env
+    environment:
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_DB: "0"
     volumes:
       - ./:/var/www/html
     depends_on:
@@ -31,6 +41,11 @@ services:
     command: scheduler
     env_file:
     - .env
+    environment:
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_DB: "0"
     volumes:
       - ./:/var/www/html
     depends_on:

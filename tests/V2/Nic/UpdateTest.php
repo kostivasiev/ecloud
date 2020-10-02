@@ -48,7 +48,6 @@ class UpdateTest extends TestCase
             'mac_address' => $this->macAddress,
             'instance_id' => $this->instance->getKey(),
             'network_id'  => $this->network->getKey(),
-            'ip_address' => '10.0.0.5'
         ])->refresh();
     }
 
