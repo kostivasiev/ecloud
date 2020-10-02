@@ -86,11 +86,13 @@ class NewIDTest extends TestCase
 
     /**
      * Generates a regular expression based on the specified model's prefix
+     *
      * @param $model
+     *
      * @return string
      */
     public function generateRegExp($model): string
     {
-        return "/^" . (new $model())->keyPrefix . "\-[a-f0-9]{8}$/i";
+        return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}$/i";
     }
 }
