@@ -38,10 +38,6 @@ class DefaultAvailabilityZoneTest extends TestCase
 
     public function testCreateRouterWithAvailabilityZone()
     {
-        //TODO: Added as part of the temporary event fire on router creation, to be removed
-        Event::fake([
-            RouterAvailabilityZoneAttach::class,
-        ]);
         $this->post(
             '/v2/routers',
             [

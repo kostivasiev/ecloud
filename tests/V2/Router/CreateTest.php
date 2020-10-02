@@ -93,10 +93,6 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        //TODO: Added as part of the temporary event fire on router creation, to be removed
-        Event::fake([
-            RouterAvailabilityZoneAttach::class,
-        ]);
         $data = [
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey(),

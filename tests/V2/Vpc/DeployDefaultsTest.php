@@ -50,10 +50,6 @@ class DeployDefaultsTest extends TestCase
 
     public function testValidDeploy()
     {
-        Event::fake([
-            RouterAvailabilityZoneAttach::class,
-        ]);
-
         $this->post('/v2/vpcs/' . $this->vpc->getKey() . '/deploy-defaults', [], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups'    => 'ecloud.write'

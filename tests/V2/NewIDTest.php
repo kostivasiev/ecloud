@@ -60,10 +60,6 @@ class NewIDTest extends TestCase
 
     public function testFormatOfRoutersId()
     {
-        //TODO: Added as part of the temporary event fire on router creation, to be removed
-        Event::fake([
-            RouterAvailabilityZoneAttach::class,
-        ]);
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey(),
