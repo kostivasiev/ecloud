@@ -7,6 +7,7 @@ use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\DeployRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
+use App\Jobs\Instance\DeleteInstance;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
@@ -169,6 +170,9 @@ class InstanceController extends BaseController
         if (!$this->isAdmin && $instance->locked === true) {
             return $this->isLocked();
         }
+        $this->dispatch(new DeleteInstance([
+            'instance_id' => $instance->id,
+        ]));
         $instance->delete();
         return response('', 204);
     }
