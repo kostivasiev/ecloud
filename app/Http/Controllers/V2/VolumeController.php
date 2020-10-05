@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Events\V2\VolumeCapacityUpdate;
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
 use App\Models\V2\Volume;
@@ -89,6 +90,7 @@ class VolumeController extends BaseController
     public function update(UpdateVolumeRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
+        $originalCapacity = $volume->capacity;
         if ($request->has('availability_zone_id')) {
             $availabilityZone = Vpc::forUser(app('request')->user)
                 ->findOrFail($request->input('vpc_id', $volume->vpc_id))
@@ -115,6 +117,9 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
+        if ($volume->capacity > $originalCapacity) {
+            event(VolumeCapacityUpdate::class, $volume);
+        }
         $volume->save();
         return $this->responseIdMeta($request, $volume->getKey(), 200);
     }
