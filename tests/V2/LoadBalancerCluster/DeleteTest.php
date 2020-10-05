@@ -7,8 +7,8 @@ use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
@@ -28,7 +28,7 @@ class DeleteTest extends TestCase
         $this->region = factory(Region::class)->create();
 
         $this->vpc = factory(Vpc::class)->create([
-            'name'    => 'Manchester DC',
+            'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
         ]);
 
@@ -53,7 +53,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Not found',
+                'title' => 'Not found',
                 'detail' => 'No Load Balancer Cluster with that ID was found',
                 'status' => 404,
             ])

@@ -3,9 +3,9 @@
 namespace App\Listeners\V2;
 
 use App\Events\V2\NetworkCreated;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
 class NetworkDeploy implements ShouldQueue
@@ -73,7 +73,7 @@ class NetworkDeploy implements ShouldQueue
                 ]
             );
         } catch (GuzzleException $exception) {
-            $message = 'NetworkDeploy failed with : ' .  $exception->getResponse()->getBody()->getContents();
+            $message = 'NetworkDeploy failed with : ' . $exception->getResponse()->getBody()->getContents();
             Log::error($message);
             $this->fail(new \Exception($message));
             return;

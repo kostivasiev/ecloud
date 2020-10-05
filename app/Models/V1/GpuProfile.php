@@ -3,7 +3,6 @@
 namespace App\Models\V1;
 
 use App\Traits\V1\UUIDHelper;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -13,9 +12,9 @@ use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class GpuProfile extends Model implements Filterable, Sortable
 {
@@ -182,9 +181,13 @@ class GpuProfile extends Model implements Filterable, Sortable
         $cardProfiles = config('gpu.card_profiles');
 
         foreach ($vms as $vmId => $profileUuid) {
-            if (!in_array($profileUuid, array_keys($profiles)) || !in_array($profiles[$profileUuid], array_keys($cardProfiles))) {
+            $arrayResult = in_array(
+                $profiles[$profileUuid],
+                array_keys($cardProfiles)
+            );
+            if (!in_array($profileUuid, array_keys($profiles)) || !$arrayResult) {
                 Log::error(
-                    'Unrecognised GPU profile \'' . $profileUuid . '\' found on Virtual Machine # ' . $vmId .' when calculating GPU pool availability'
+                    'Unrecognised GPU profile \'' . $profileUuid . '\' found on Virtual Machine # ' . $vmId . ' when calculating GPU pool availability'
                 );
                 continue;
             }

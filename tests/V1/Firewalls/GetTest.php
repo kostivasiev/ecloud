@@ -2,10 +2,9 @@
 
 namespace Tests\V1\Firewalls;
 
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use App\Models\V1\Firewall;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {

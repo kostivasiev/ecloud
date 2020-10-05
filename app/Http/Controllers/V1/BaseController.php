@@ -3,14 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-
 use Illuminate\Http\Request;
-use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\TransformsQueries;
-
-use App\Services\IntapiService;
-use App\Exceptions\V1\IntapiServiceException;
 
 class BaseController extends Controller
 {
@@ -27,7 +23,7 @@ class BaseController extends Controller
     // Customers Reseller ID
     protected $resellerId;
 
-    
+
     /**
      * Controller constructor.
      * @param Request $request

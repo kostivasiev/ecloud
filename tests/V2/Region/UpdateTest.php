@@ -3,10 +3,9 @@
 namespace Tests\V2\Region;
 
 use App\Models\V2\Region;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
@@ -26,7 +25,7 @@ class UpdateTest extends TestCase
     public function testNotAdminIsDenied()
     {
         $data = [
-            'name'    => 'United Kingdom',
+            'name' => 'United Kingdom',
         ];
 
         $this->patch(
@@ -38,7 +37,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -48,7 +47,7 @@ class UpdateTest extends TestCase
     public function testNullNameIsDenied()
     {
         $data = [
-            'name'    => '',
+            'name' => '',
         ];
         $this->patch(
             '/v2/regions/' . $this->region->getKey(),
@@ -59,7 +58,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The name field, when specified, cannot be null',
                 'status' => 422,
                 'source' => 'name'
@@ -70,7 +69,7 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $data = [
-            'name'    => $this->faker->word(),
+            'name' => $this->faker->word(),
         ];
         $this->patch(
             '/v2/regions/' . $this->region->getKey(),

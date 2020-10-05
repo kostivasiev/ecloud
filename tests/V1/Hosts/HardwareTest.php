@@ -2,13 +2,13 @@
 
 namespace Tests\V1\Hosts;
 
+use App\Models\V1\Host;
+use App\Models\V1\Pod;
+use App\Models\V1\Solution;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use App\Models\V1\Pod;
-use App\Models\V1\Host;
-use App\Models\V1\Solution;
+use Tests\TestCase;
 
 class HardwareTest extends TestCase
 {
@@ -18,17 +18,21 @@ class HardwareTest extends TestCase
     {
         return [
             'get_credentials_with_login_port' => [
-                'get_items_response' => [0 => (object)[
-                    'id' => 1,
-                    'loginPort' => 80,
-                    'password' => 'password'
-                ]],
+                'get_items_response' => [
+                    0 => (object)[
+                        'id' => 1,
+                        'loginPort' => 80,
+                        'password' => 'password'
+                    ]
+                ],
             ],
             'get_credentials_without_login_port' => [
-                'get_items_response' => [0 => (object)[
-                    'id' => 1,
-                    'password' => 'password'
-                ]],
+                'get_items_response' => [
+                    0 => (object)[
+                        'id' => 1,
+                        'password' => 'password'
+                    ]
+                ],
             ],
         ];
     }
@@ -89,7 +93,7 @@ class HardwareTest extends TestCase
 
         // Mock the Conjurer API
         $client = \Mockery::mock(Client::class);
-        app()->bind(Client::class, function($app, $args) use ($client, $getItemsResponse) {
+        app()->bind(Client::class, function ($app, $args) use ($client, $getItemsResponse) {
             $expectedUri = empty($getItemsResponse[0]->loginPort) ?
                 'http://localhost' :
                 'http://localhost:' . $getItemsResponse[0]->loginPort;
@@ -102,8 +106,8 @@ class HardwareTest extends TestCase
             ->withArgs([
                 'GET',
                 '/api/v1/compute/' . urlencode($host->location->ucs_datacentre_location_name) .
-                    '/solution/' . (int)$host->ucs_node_ucs_reseller_id .
-                    '/node/' . urlencode($host->ucs_node_profile_id),
+                '/solution/' . (int)$host->ucs_node_ucs_reseller_id .
+                '/node/' . urlencode($host->ucs_node_profile_id),
                 [
                     'auth' => ['conjurerapi', 'password'],
                     'headers' => [
@@ -174,7 +178,7 @@ class HardwareTest extends TestCase
         $mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
         $mockAdminDeviceClient = \Mockery::mock(\UKFast\Admin\Devices\AdminDeviceClient::class);
         $mockCredentials = \Mockery::mock(\UKFast\Admin\Devices\Entities\Credentials::class);
-        app()->bind(\UKFast\Admin\Devices\AdminClient::class, function() use ($mockAdminClient) {
+        app()->bind(\UKFast\Admin\Devices\AdminClient::class, function () use ($mockAdminClient) {
             return $mockAdminClient;
         });
 
@@ -225,7 +229,7 @@ class HardwareTest extends TestCase
         $mockAdminDeviceClient = \Mockery::mock(\UKFast\Admin\Devices\AdminDeviceClient::class);
         $mockCredentials = \Mockery::mock(\UKFast\Admin\Devices\Entities\Credentials::class);
         $mockAdminCredentialsClient = \Mockery::mock(\UKFast\Admin\Devices\AdminCredentialsClient::class);
-        app()->bind(\UKFast\Admin\Devices\AdminClient::class, function() use ($mockAdminClient) {
+        app()->bind(\UKFast\Admin\Devices\AdminClient::class, function () use ($mockAdminClient) {
             return $mockAdminClient;
         });
 
@@ -329,7 +333,7 @@ class HardwareTest extends TestCase
 
         // Mock the Conjurer API
         $client = \Mockery::mock(Client::class);
-        app()->bind(Client::class, function($app, $args) use ($client, $getItemsResponse) {
+        app()->bind(Client::class, function ($app, $args) use ($client, $getItemsResponse) {
             $expectedUri = empty($getItemsResponse[0]->loginPort) ?
                 'http://localhost' :
                 'http://localhost:' . $getItemsResponse[0]->loginPort;

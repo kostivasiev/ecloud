@@ -19,8 +19,8 @@ trait EnumHelper
     public static function getEnumValues($name)
     {
         try {
-            $type = \Illuminate\Support\Facades\DB::select(
-                \Illuminate\Support\Facades\DB::raw('SHOW COLUMNS FROM ' . (new static)->getTable() . ' WHERE Field = "' . $name . '"')
+            $type = DB::select(
+                DB::raw('SHOW COLUMNS FROM ' . (new static)->getTable() . ' WHERE Field = "' . $name . '"')
             )[0]->Type;
         } catch (\Illuminate\Database\QueryException $exception) {
             Log::error(

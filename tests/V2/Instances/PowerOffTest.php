@@ -41,7 +41,7 @@ class PowerOffTest extends TestCase
         ]);
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
-        $mockKingpinService->shouldReceive('delete')->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey().'/power'])->andReturn(
+        $mockKingpinService->shouldReceive('delete')->withArgs(['/api/v2/vpc/' . $this->vpc->getKey() . '/instance/' . $this->instance->getKey() . '/power'])->andReturn(
             new Response(200)
         );
 
@@ -53,11 +53,11 @@ class PowerOffTest extends TestCase
     public function testPowerOff()
     {
         $this->put(
-            '/v2/instances/' . $this->instance->getKey().'/power-off',
+            '/v2/instances/' . $this->instance->getKey() . '/power-off',
             [],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(202);

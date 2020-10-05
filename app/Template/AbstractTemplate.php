@@ -140,28 +140,28 @@ abstract class AbstractTemplate
         if (!$this->isGpuTemplate()) {
             throw new \Exception('Template is not a GPU template');
         }
-        return substr($this->name, strrpos($this->name, '-gpu-')+5);
+        return substr($this->name, strrpos($this->name, '-gpu-') + 5);
     }
 
     /**
-    * Formats the Solution and Pod templates for return by the API
-    * @return \stdClass
-    */
+     * Formats the Solution and Pod templates for return by the API
+     * @return \stdClass
+     */
     public function convertToPublicTemplate()
     {
         $tmp_template = new \stdClass;
         $tmp_template->type = $this->type;
         $tmp_template->name = $this->name;
 
-        $tmp_template->cpu = (int) $this->cpu;
-        $tmp_template->ram = (int) $this->ram;
-        $tmp_template->hdd = (int) $this->size_gb;
+        $tmp_template->cpu = (int)$this->cpu;
+        $tmp_template->ram = (int)$this->ram;
+        $tmp_template->hdd = (int)$this->size_gb;
 
         $tmp_template->license = 'Unknown';
         $tmp_template->encrypted = $this->encrypted ?? false;
 
         foreach ($this->hard_drives as $hard_drive) {
-            $tmp_template->hdd_disks[] = (object) array(
+            $tmp_template->hdd_disks[] = (object)array(
                 'name' => $hard_drive->name,
                 'capacity' => $hard_drive->capacitygb,
             );

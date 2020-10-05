@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\RouterAvailabilityZoneAttach;
-use App\Events\V2\RouterAvailabilityZoneDetach;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
-use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -21,7 +17,7 @@ class RouterController extends BaseController
 {
     /**
      * Get routers collection
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -38,7 +34,7 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $routerId
      * @return RouterResource
      */
@@ -50,7 +46,7 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateRouterRequest $request
+     * @param CreateRouterRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateRouterRequest $request)
@@ -62,7 +58,7 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateRouterRequest $request
+     * @param UpdateRouterRequest $request
      * @param string $routerId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -75,7 +71,7 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $routerUuid
      * @return \Illuminate\Http\JsonResponse
      */

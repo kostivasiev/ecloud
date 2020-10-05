@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\V2;
 
 use UKFast\FormRequests\FormRequest;

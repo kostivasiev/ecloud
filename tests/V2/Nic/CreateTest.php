@@ -51,11 +51,11 @@ class CreateTest extends TestCase
             [
                 'mac_address' => $this->faker->macAddress,
                 'instance_id' => $this->instance->getKey(),
-                'network_id'  => $this->network->getKey(),
+                'network_id' => $this->network->getKey(),
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(201);

@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Services\Kingpin\V1\KingpinService;
-
-use GuzzleHttp\Client;
-use Log;
 use App\Models\V1\VirtualMachine;
+use App\Services\Kingpin\V1\KingpinService;
+use GuzzleHttp\Client;
+use Illuminate\Support\ServiceProvider;
+use Log;
 
 /**
  * @SuppressWarnings(PHPMD.UnusedFormalParameter)

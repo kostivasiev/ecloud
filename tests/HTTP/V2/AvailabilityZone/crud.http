@@ -84,6 +84,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+
 ###
 
 GET https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
@@ -102,6 +103,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.region_id === client.global.get('region_id'), "Incorrect resource region_id returned");
 });
 %}
+
 ###
 
 # Update
@@ -127,6 +129,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.id === client.global.get('availability_zone_id'), "Incorrect resource ID returned");
 });
 %}
+
 ###
 
 
@@ -146,6 +149,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.region_id === client.global.get('region_id_2'), "Incorrect resource region_id returned");
 });
 %}
+
 ###
 
 
@@ -165,10 +169,12 @@ Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id:0-0
 X-consumer-groups: ecloud.read, ecloud.write
+
 ###
 DELETE https://{{host}}/{{version}}/regions/{{region_id_2}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id:0-0
 X-consumer-groups: ecloud.read, ecloud.write
+
 ###

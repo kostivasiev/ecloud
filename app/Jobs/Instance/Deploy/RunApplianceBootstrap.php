@@ -23,45 +23,48 @@ class RunApplianceBootstrap extends Job
      */
     public function handle()
     {
-        Log::info('Starting RunApplianceBootstrap for instance '.$this->data['instance_id']);
+        Log::info('Starting RunApplianceBootstrap for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $credential = $instance->credentials()
             ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
             ->firstOrFail();
         if (!$credential) {
-            $this->fail(new \Exception('RunApplianceBootstrap failed for '.$instance->id.', no credentials found'));
+            $this->fail(new \Exception('RunApplianceBootstrap failed for ' . $instance->id . ', no credentials found'));
             return;
         }
 
         if ($instance->platform !== 'Linux') {
-            Log::info('RunApplianceBootstrap for '.$instance->id.', nothing to do for non-Linux platforms');
+            Log::info('RunApplianceBootstrap for ' . $instance->id . ', nothing to do for non-Linux platforms');
             return;
         }
 
         try {
             /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->post('/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/guest/linux/script', [
-                'json' => [
-                    'encodedScript' => base64_encode(
-                        (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
-                            ->render(json_decode($this->data['appliance_data']))
-                    ),
-                    'username' => $credential->user,
-                    'password' => $credential->password,
-                ],
-            ]);
+            $response = $instance->availabilityZone->kingpinService()->post(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/script',
+                [
+                    'json' => [
+                        'encodedScript' => base64_encode(
+                            (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
+                                ->render(json_decode($this->data['appliance_data']))
+                        ),
+                        'username' => $credential->user,
+                        'password' => $credential->password,
+                    ],
+                ]
+            );
             if ($response->getStatusCode() == 200) {
-                Log::info('RunApplianceBootstrap finished successfully for instance '.$instance->id);
+                Log::info('RunApplianceBootstrap finished successfully for instance ' . $instance->id);
                 return;
             }
             $this->fail(new \Exception(
-                'Failed RunApplianceBootstrap for '.$instance->id.', Kingpin status was '.$response->getStatusCode()
+                'Failed RunApplianceBootstrap for ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
             ));
             return;
         } catch (GuzzleException $exception) {
             $this->fail(new \Exception(
-                'Failed RunApplianceBootstrap for '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
+                'Failed RunApplianceBootstrap for ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
             ));
             return;
         }

@@ -20,10 +20,12 @@ class AppServiceProvider extends ServiceProvider
             if (Cache::has('encryption_key')) {
                 return Cache::get('encryption_key');
             }
-            $client = $this->app->makeWith(Client::class, ['config' => [
-                'base_uri' => config('encryption.keystore_host'),
-                'timeout'  => 2
-            ]]);
+            $client = $this->app->makeWith(Client::class, [
+                'config' => [
+                    'base_uri' => config('encryption.keystore_host'),
+                    'timeout' => 2
+                ]
+            ]);
             $key = (new RemoteKeyStore($client))->getKey(config('encryption.keystore_host_key'));
             Cache::put('encryption_key', $key, new \DateInterval('PT120S'));
             return $key;

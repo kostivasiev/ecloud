@@ -3,9 +3,9 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 abstract class Job implements ShouldQueue
@@ -25,7 +25,7 @@ abstract class Job implements ShouldQueue
 
     public function failed(\Throwable $exception)
     {
-        Log::error('Exception in '.static::class, [
+        Log::error('Exception in ' . static::class, [
             'exception' => $exception,
         ]);
     }

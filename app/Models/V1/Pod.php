@@ -2,25 +2,21 @@
 
 namespace App\Models\V1;
 
-use App\Models\V1\Pod\Resource;
 use App\Models\V1\Pod\ResourceAbstract;
 use App\Models\V1\Pod\ServiceAbstract;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Facades\Log;
+use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
-use UKFast\Api\Resource\Property\BooleanProperty;
-
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
-use App\Models\V1\San;
 
 class Pod extends Model implements Filterable, Sortable
 {
@@ -150,7 +146,7 @@ class Pod extends Model implements Filterable, Sortable
             IntProperty::create('ucs_datacentre_reseller_id', 'reseller_id'),
             BooleanProperty::create('ucs_datacentre_active', 'active', null, 'Yes', 'No'),
             IntProperty::create('ucs_datacentre_datacentre_id', 'datacentre_id'),
-            
+
             IntProperty::create('ucs_datacentre_vce_server_id', 'vce_server_id'),
             IntProperty::create('ucs_datacentre_vcl_server_id', 'vcl_server_id'),
 
@@ -292,9 +288,9 @@ class Pod extends Model implements Filterable, Sortable
 
     /**
      * Load VCE server details/credentials by username
-     * @deprecated Use the devices API
      * @param string $username
      * @return array|bool
+     * @deprecated Use the devices API
      */
     public function vceServerDetails($username)
     {
@@ -378,6 +374,6 @@ class Pod extends Model implements Filterable, Sortable
      */
     public function hasEnabledService($serviceName)
     {
-        return $this->{'ucs_datacentre_'.strtolower($serviceName).'_enabled'} == 'Yes';
+        return $this->{'ucs_datacentre_' . strtolower($serviceName) . '_enabled'} == 'Yes';
     }
 }

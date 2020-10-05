@@ -2,24 +2,19 @@
 
 namespace App\Models\V1;
 
-use App\Exceptions\V1\KingpinException;
+use App\Scopes\ECloudVmServersScope;
 use App\VM\Exceptions\UnrecognisedVmStateException;
 use App\VM\Status;
 use Illuminate\Database\Eloquent\Model;
-
-use App\Scopes\ECloudVmServersScope;
-
-use Illuminate\Support\Facades\DB;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\BooleanProperty;
-use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\IdProperty;
-
+use UKFast\Api\Resource\Property\IntProperty;
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 /**
  * Class VirtualMachine
@@ -123,14 +118,49 @@ class VirtualMachine extends Model implements Filterable, Sortable
         // Fallback if we can't load admin roles from database enum column
         $adminRoles =
             [
-                'N/A', 'Web Server', 'MySQL Server', 'MSSQL Server', 'Web + DB Server', 'Deployment Server',
-            'Application Server', 'Mail Server', 'Development Server', 'Exchange server', 'Mail Relay', 'Test Server',
-            'Hardware Node', 'Network Logging Server', 'Storage Server', 'File Server', 'Active Directory Server',
-            'Gaming Server', 'Intranet Server', 'FTP Server', 'Oracle Server', 'Database Server', 'PostgreSQL Server',
-            'DPM Server', 'Backup server', 'CommVault Server', 'Magento Server', 'Primary Active Directory Server',
-            'Secondary Active Directory Server', 'VMware Management Server', 'HyperV Management Server', 'Streaming Server',
-            'API Server', 'Web Apllication Firewall', 'NAS', 'Webcelerator Appliance', 'Web Application Firewall',
-                'MSSQL Cluster', 'MySQL Cluster', 'File Cluster', 'Zabbix Proxy','Magento 2 Server','UKFast Backup Server'
+                'N/A',
+                'Web Server',
+                'MySQL Server',
+                'MSSQL Server',
+                'Web + DB Server',
+                'Deployment Server',
+                'Application Server',
+                'Mail Server',
+                'Development Server',
+                'Exchange server',
+                'Mail Relay',
+                'Test Server',
+                'Hardware Node',
+                'Network Logging Server',
+                'Storage Server',
+                'File Server',
+                'Active Directory Server',
+                'Gaming Server',
+                'Intranet Server',
+                'FTP Server',
+                'Oracle Server',
+                'Database Server',
+                'PostgreSQL Server',
+                'DPM Server',
+                'Backup server',
+                'CommVault Server',
+                'Magento Server',
+                'Primary Active Directory Server',
+                'Secondary Active Directory Server',
+                'VMware Management Server',
+                'HyperV Management Server',
+                'Streaming Server',
+                'API Server',
+                'Web Apllication Firewall',
+                'NAS',
+                'Webcelerator Appliance',
+                'Web Application Firewall',
+                'MSSQL Cluster',
+                'MySQL Cluster',
+                'File Cluster',
+                'Zabbix Proxy',
+                'Magento 2 Server',
+                'UKFast Backup Server'
             ];
 
         return ($isAdmin) ?
@@ -911,7 +941,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
      */
     public function isManaged()
     {
-        $managedDevices =  array(
+        $managedDevices = array(
             'UKFast Load Balancer',
             'UKFast Web Application firewall'
         );
@@ -929,7 +959,9 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function isClusteredDevice()
     {
         return (in_array($this->servers_role, array(
-            'MSSQL Cluster', 'MySQL Cluster', 'File Cluster'
+            'MSSQL Cluster',
+            'MySQL Cluster',
+            'File Cluster'
         )));
     }
 
@@ -940,7 +972,8 @@ class VirtualMachine extends Model implements Filterable, Sortable
     public function isFirewall()
     {
         return in_array($this->servers_type, array(
-            'firewall', 'virtual firewall'
+            'firewall',
+            'virtual firewall'
         ));
     }
 
@@ -1014,6 +1047,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
     {
         return empty($value) ? null : $value;
     }
+
     public function setServersAdDomainIdAttribute($value)
     {
         return empty($value) ? 0 : $value;

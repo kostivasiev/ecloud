@@ -2,13 +2,12 @@
 
 namespace App\Listeners\V2;
 
-use App\Models\V2\Router;
-use App\Services\V2\NsxService;
 use App\Events\V2\FirewallRuleCreated;
 use App\Models\V2\FirewallRule;
+use App\Models\V2\Router;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
 class FirewallRuleDeploy implements ShouldQueue
 {

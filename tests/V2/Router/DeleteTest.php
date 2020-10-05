@@ -7,8 +7,8 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
@@ -26,7 +26,7 @@ class DeleteTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),

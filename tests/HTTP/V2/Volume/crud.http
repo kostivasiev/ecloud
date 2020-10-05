@@ -12,6 +12,7 @@ Content-Type:  application/json
 client.global.set('region_id', response.body.data.id);
 client.log('Region ID: ' + response.body.data.id);
 %}
+
 ###
 
 POST https://{{host}}/{{version}}/availability-zones
@@ -50,6 +51,7 @@ X-Reseller-Id: 1
 client.global.set('vpc_id', response.body.data.id);
 client.log('VPC UUID: ' + response.body.data.id);
 %}
+
 ###
 
 POST https://{{host}}/{{version}}/vpcs
@@ -68,6 +70,7 @@ X-Reseller-Id: 1
 client.global.set('vpc_id2', response.body.data.id);
 client.log('VPC 2 UUID: ' + response.body.data.id);
 %}
+
 ###
 
 ## Test Resource CRUD
@@ -110,6 +113,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+
 ###
 
 GET https://{{host}}/{{version}}/volumes/{{volume_id}}
@@ -147,6 +151,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
 });
 %}
+
 ###
 
 
@@ -218,6 +223,7 @@ client.test("Request executed successfully", function() {
 client.global.set('volume_id', response.body.data.id);
 client.log('Volume ID: ' + response.body.data.id);
 %}
+
 ###
 
 GET https://{{host}}/{{version}}/volumes/{{volume_id}}
@@ -241,6 +247,7 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 DELETE https://{{host}}/{{version}}/regions/{{region_id}}
 Accept: */*
@@ -248,6 +255,7 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
@@ -255,6 +263,7 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id2}}
 Accept: */*

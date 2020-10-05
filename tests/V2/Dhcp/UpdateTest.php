@@ -28,7 +28,7 @@ class UpdateTest extends TestCase
             'name' => $this->faker->country(),
         ]);
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
@@ -48,7 +48,7 @@ class UpdateTest extends TestCase
             []
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -60,7 +60,7 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/dhcps/' . $this->dhcp->getKey(),
             [
-                'vpc_id'    => '',
+                'vpc_id' => '',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -68,7 +68,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The vpc id field, when specified, cannot be null',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -85,7 +85,7 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/dhcps/' . $this->dhcp->getKey(),
             [
-                'vpc_id'    => $vpc2->getKey(),
+                'vpc_id' => $vpc2->getKey(),
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -93,7 +93,7 @@ class UpdateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'

@@ -18,7 +18,7 @@ use UKFast\DB\Ditto\QueryTransformer;
 class VpcController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -34,7 +34,7 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $vpcId
      * @return VpcResource
      */
@@ -46,7 +46,7 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateVpcRequest $request
+     * @param CreateVpcRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateVpcRequest $request)
@@ -58,7 +58,7 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateVpcRequest $request
+     * @param UpdateVpcRequest $request
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -76,7 +76,7 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -87,7 +87,7 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception

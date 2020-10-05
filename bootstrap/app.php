@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
@@ -18,7 +18,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 */
 
 $app = new Laravel\Lumen\Application(
-    realpath(__DIR__.'/../')
+    realpath(__DIR__ . '/../')
 );
 
 $app->configure('app');
@@ -74,7 +74,7 @@ $app->singleton(
 */
 
 $app->routeMiddleware([
-    'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
+    'auth' => \UKFast\Api\Auth\Middleware\Authenticate::class,
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'is-administrator' => \App\Http\Middleware\IsAdministrator::class
@@ -144,7 +144,7 @@ if (is_dir($app->basePath('vendor/beyondcode/laravel-er-diagram-generator'))) {
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 return $app;

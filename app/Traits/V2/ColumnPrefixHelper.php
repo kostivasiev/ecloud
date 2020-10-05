@@ -2,6 +2,7 @@
 /**
  * V1Refactor - Brought in from V1 namespace
  */
+
 namespace App\Traits\V2;
 
 use Illuminate\Support\Str;

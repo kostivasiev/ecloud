@@ -2,26 +2,22 @@
 
 namespace App\Models\V1;
 
+use App\Events\V1\ApplianceDeletedEvent;
 use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
-use App\Events\V1\ApplianceDeletedEvent;
-
 use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
+use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class Appliance extends Model implements Filterable, Sortable
 {
@@ -67,7 +63,7 @@ class Appliance extends Model implements Filterable, Sortable
 
     // Validation Rules
     public static $rules = [
-        'name' => ['required',  'max:255'],
+        'name' => ['required', 'max:255'],
         'logo_uri' => ['nullable', 'max:255'],
         'description' => ['nullable'],
         'documentation_uri' => ['nullable'],

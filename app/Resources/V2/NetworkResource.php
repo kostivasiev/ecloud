@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -23,8 +24,8 @@ class NetworkResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
+            'id' => $this->id,
+            'name' => $this->name,
             'router_id' => $this->router_id,
             'created_at' => Carbon::parse(
                 $this->created_at,

@@ -25,8 +25,8 @@ class InstanceController extends BaseController
 {
     /**
      * Get instance collection
-     * @param  \Illuminate\Http\Request  $request
-     * @param  QueryTransformer  $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -42,8 +42,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $instanceId
+     * @param Request $request
+     * @param string $instanceId
      * @return InstanceResource
      */
     public function show(Request $request, string $instanceId)
@@ -58,8 +58,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  CreateRequest  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param CreateRequest $request
+     * @return JsonResponse
      */
     public function store(CreateRequest $request)
     {
@@ -117,9 +117,9 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  UpdateRequest  $request
-     * @param  string  $instanceId
-     * @return \Illuminate\Http\JsonResponse
+     * @param UpdateRequest $request
+     * @param string $instanceId
+     * @return JsonResponse
      */
     public function update(UpdateRequest $request, string $instanceId)
     {
@@ -145,7 +145,7 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     private function isLocked(): JsonResponse
     {
@@ -159,7 +159,7 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $instanceId
      * @return \Illuminate\Http\Response
      */
@@ -174,8 +174,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  Request  $request
-     * @param  string  $instanceId
+     * @param Request $request
+     * @param string $instanceId
      *
      * @return AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */

@@ -32,7 +32,7 @@ class UpdateTest extends TestCase
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'reseller_id' => 3,
-            'region_id'   => $this->region->getKey()
+            'region_id' => $this->region->getKey()
         ]);
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey()
@@ -44,16 +44,16 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/firewall-rules/' . $this->firewall_rule->id,
             [
-                'name'      => $this->faker->word(),
+                'name' => $this->faker->word(),
                 'router_id' => $this->router->getKey()
             ],
             [
                 'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified router id was not found',
                 'status' => 422,
                 'source' => 'router_id'
@@ -70,7 +70,7 @@ class UpdateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(200);

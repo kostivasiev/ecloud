@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Datastore\Exceptions\DatastoreNotFoundException;
 use App\Datastore\Status;
 use App\Events\V1\DatastoreExpandEvent;
 use App\Events\V1\VolumeSetIopsUpdatedEvent;
@@ -11,27 +12,23 @@ use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\KingpinException;
 use App\Exceptions\V1\SanNotFoundException;
 use App\Exceptions\V1\ServiceUnavailableException;
+use App\Models\V1\Datastore;
 use App\Models\V1\Storage;
+use App\Resources\V1\DatastoreResource;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\IntapiService;
 use App\Traits\V1\SanitiseRequestData;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
-use UKFast\DB\Ditto\QueryTransformer;
-use Illuminate\Support\Facades\Log;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-
-use App\Models\V1\Datastore;
-use App\Resources\V1\DatastoreResource;
-use App\Datastore\Exceptions\DatastoreNotFoundException;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class DatastoreController extends BaseController
 {
@@ -41,7 +38,7 @@ class DatastoreController extends BaseController
      * List all Datastores
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -66,7 +63,7 @@ class DatastoreController extends BaseController
      *
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      */
     public function show(Request $request, $datastoreId)
@@ -88,7 +85,7 @@ class DatastoreController extends BaseController
      *
      * @param Request $request
      * @param $solutionId
-     * @return \Illuminate\http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      */
@@ -112,7 +109,7 @@ class DatastoreController extends BaseController
      * Update IOPS on a datastore's volume set
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws BadRequestException
      * @throws DatastoreNotFoundException
@@ -201,7 +198,7 @@ class DatastoreController extends BaseController
      * Creates the initial reseller_lun record and fires off automation
      * @param Request $request
      * @param IntapiService $intapiService
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws BadRequestException
      * @throws ConflictException
      * @throws SanNotFoundException
@@ -352,7 +349,7 @@ class DatastoreController extends BaseController
      * Create a volume on the SAN for the datastore
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws BadRequestException
      * @throws DatastoreNotFoundException
      */
@@ -373,7 +370,7 @@ class DatastoreController extends BaseController
      * Create the datastore on VMWare
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws KingpinException
      */
@@ -390,7 +387,7 @@ class DatastoreController extends BaseController
      * Update datastore
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -415,7 +412,16 @@ class DatastoreController extends BaseController
         $request['id'] = $datastoreId;
         $this->validate($request, $rules);
 
-        $datastore = $this->receiveItem(new Request($request->only(['id', 'status', 'name', 'type', 'lun_name', 'lun_wwn', 'site_id', 'capacity'])), Datastore::class);
+        $datastore = $this->receiveItem(new Request($request->only([
+            'id',
+            'status',
+            'name',
+            'type',
+            'lun_name',
+            'lun_wwn',
+            'site_id',
+            'capacity'
+        ])), Datastore::class);
 
         $datastore->resource->save();
 
@@ -428,7 +434,7 @@ class DatastoreController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws ServiceUnavailableException
      */
@@ -464,7 +470,7 @@ class DatastoreController extends BaseController
      * @param Request $request
      * @param IntapiService $intapiService
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws ForbiddenException
      * @throws ServiceUnavailableException
@@ -559,7 +565,7 @@ class DatastoreController extends BaseController
      * List Solution Datastores
      * @param Request $request
      * @param $solutionId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      */
     public function indexSolution(Request $request, $solutionId)
@@ -586,7 +592,7 @@ class DatastoreController extends BaseController
      * Expand the datastore volume on the SAN
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws ForbiddenException
      */
@@ -612,7 +618,7 @@ class DatastoreController extends BaseController
      * Rescan the datastore's cluster on VMWare
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws KingpinException
      */
@@ -633,7 +639,7 @@ class DatastoreController extends BaseController
      * Expand the datastore on VMWare
      * @param Request $request
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws DatastoreNotFoundException
      * @throws KingpinException
      */

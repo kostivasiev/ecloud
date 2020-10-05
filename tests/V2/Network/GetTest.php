@@ -4,8 +4,8 @@ namespace Tests\V2\Network;
 
 use App\Models\V2\Network;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -26,7 +26,7 @@ class GetTest extends TestCase
             []
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -36,7 +36,7 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $network = factory(Network::class)->create([
-            'name'    => 'Manchester Network',
+            'name' => 'Manchester Network',
         ]);
         $this->get(
             '/v2/networks',
@@ -46,8 +46,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $network->id,
-                'name'       => $network->name,
+                'id' => $network->id,
+                'name' => $network->name,
             ])
             ->assertResponseStatus(200);
     }
@@ -55,7 +55,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $network = factory(Network::class)->create([
-            'name'    => 'Manchester Network',
+            'name' => 'Manchester Network',
         ]);
         $this->get(
             '/v2/networks/' . $network->getKey(),
@@ -65,8 +65,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $network->id,
-                'name'       => $network->name,
+                'id' => $network->id,
+                'name' => $network->name,
             ])
             ->assertResponseStatus(200);
     }

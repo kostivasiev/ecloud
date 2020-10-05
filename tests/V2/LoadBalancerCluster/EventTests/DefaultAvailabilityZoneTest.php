@@ -3,7 +3,6 @@
 namespace Tests\V2\LoadBalancerCluster\EventTests;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Dhcp;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -29,7 +28,7 @@ class DefaultAvailabilityZoneTest extends TestCase
             'name' => $this->faker->country(),
         ]);
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
@@ -41,13 +40,13 @@ class DefaultAvailabilityZoneTest extends TestCase
         $this->post(
             '/v2/lbcs',
             [
-                'name'                 => 'My Load Balancer Cluster',
-                'vpc_id'               => $this->vpc->getKey(),
+                'name' => 'My Load Balancer Cluster',
+                'vpc_id' => $this->vpc->getKey(),
                 'availability_zone_id' => $this->availability_zone->getKey(),
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(201);
@@ -62,12 +61,12 @@ class DefaultAvailabilityZoneTest extends TestCase
         $this->post(
             '/v2/lbcs',
             [
-                'name'   => 'My Load Balancer Cluster',
+                'name' => 'My Load Balancer Cluster',
                 'vpc_id' => $this->vpc->getKey(),
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(201);

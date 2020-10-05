@@ -2,58 +2,48 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Models\V1\ActiveDirectoryDomain;
-use App\Exceptions\V1\InsufficientCreditsException;
-use App\Models\V1\GpuProfile;
-use App\Models\V1\PodTemplate;
-use App\Models\V1\Solution;
-use App\Models\V1\SolutionTemplate;
-use App\Models\V1\Trigger;
-use App\Services\AccountsService;
-use App\Services\BillingService;
-use App\Solution\EncryptionBillingType;
-use App\VM\Status;
-use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Event;
+use App\Datastore\Exceptions\DatastoreInsufficientSpaceException;
+use App\Datastore\Exceptions\DatastoreNotFoundException;
 use App\Events\V1\ApplianceLaunchedEvent;
 use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 use App\Exceptions\V1\EncryptionServiceNotEnabledException;
-use App\Exceptions\V1\TemplateNotFoundException;
-use App\Rules\V1\IsValidSSHPublicKey;
-use App\Rules\V1\IsValidUuid;
-use App\Solution\CanModifyResource;
-use Illuminate\Http\Request;
-use UKFast\DB\Ditto\QueryTransformer;
-
-use App\Models\V1\VirtualMachine;
-use App\Resources\V1\VirtualMachineResource;
-
-use App\Models\V1\Pod;
-use App\Models\V1\Tag;
-
+use App\Exceptions\V1\InsufficientCreditsException;
+use App\Exceptions\V1\InsufficientResourceException;
+use App\Exceptions\V1\IntapiServiceException;
+use App\Exceptions\V1\KingpinException;
+use App\Exceptions\V1\ServiceResponseException;
+use App\Exceptions\V1\ServiceTimeoutException;
+use App\Exceptions\V1\ServiceUnavailableException;
 use App\Exceptions\V1\SolutionNotFoundException;
-
+use App\Exceptions\V1\TemplateNotFoundException;
+use App\Models\V1\ActiveDirectoryDomain;
+use App\Models\V1\Datastore;
+use App\Models\V1\GpuProfile;
+use App\Models\V1\Pod;
+use App\Models\V1\PodTemplate;
 use App\Models\V1\SolutionNetwork;
 use App\Models\V1\SolutionSite;
-
-use App\Models\V1\Datastore;
-use App\Datastore\Exceptions\DatastoreNotFoundException;
-use App\Datastore\Exceptions\DatastoreInsufficientSpaceException;
-
-use App\Exceptions\V1\KingpinException;
-
+use App\Models\V1\SolutionTemplate;
+use App\Models\V1\Tag;
+use App\Models\V1\Trigger;
+use App\Models\V1\VirtualMachine;
+use App\Resources\V1\VirtualMachineResource;
+use App\Rules\V1\IsValidSSHPublicKey;
+use App\Rules\V1\IsValidUuid;
+use App\Services\AccountsService;
+use App\Services\BillingService;
 use App\Services\IntapiService;
-use App\Exceptions\V1\IntapiServiceException;
-
-use UKFast\Api\Exceptions;
-use App\Exceptions\V1\ServiceTimeoutException;
-use App\Exceptions\V1\ServiceResponseException;
-use App\Exceptions\V1\ServiceUnavailableException;
-use App\Exceptions\V1\InsufficientResourceException;
-use Log;
+use App\Solution\CanModifyResource;
+use App\Solution\EncryptionBillingType;
 use App\VM\ResizeCheck;
-
+use App\VM\Status;
+use GuzzleHttp\Client;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Log;
 use Mustache_Engine;
+use UKFast\Api\Exceptions;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class VirtualMachineController extends BaseController
 {
@@ -151,7 +141,7 @@ class VirtualMachineController extends BaseController
             'name' => ['nullable', 'regex:/' . VirtualMachine::NAME_FORMAT_REGEX . '/'],
             'tags' => ['nullable', 'array'],
 
-             // User must either specify a vm template or an appliance_id
+            // User must either specify a vm template or an appliance_id
             'template' => ['required_without:appliance_id'],
             'appliance_id' => ['required_without:template', new IsValidUuid()],
 
@@ -164,7 +154,7 @@ class VirtualMachineController extends BaseController
             'hdd_disks' => [
                 'required_without:hdd',
                 'array',
-                "max:".VirtualMachine::MAX_HDD_COUNT."",
+                "max:" . VirtualMachine::MAX_HDD_COUNT . "",
             ],
             'datastore_id' => ['nullable', 'integer'],
             'network_id' => ['nullable', 'integer'],
@@ -190,7 +180,7 @@ class VirtualMachineController extends BaseController
 
         // Validate role is allowed
         if ($request->has('role')) {
-            $rules['role'] = ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+            $rules['role'] = ['required', 'sometimes', 'in:' . implode(',', VirtualMachine::getRoles($this->isAdmin))];
         }
 
         // Check we either have template or appliance_id but not both
@@ -224,10 +214,12 @@ class VirtualMachineController extends BaseController
 
         if ($request->has('tags')) {
             $rules['tags.*.key'] = [
-                'required', 'regex:/' . Tag::KEY_FORMAT_REGEX . '/'
+                'required',
+                'regex:/' . Tag::KEY_FORMAT_REGEX . '/'
             ];
             $rules['tags.*.value'] = [
-                'required', 'string'
+                'required',
+                'string'
             ];
         }
 
@@ -277,7 +269,7 @@ class VirtualMachineController extends BaseController
                     'Legacy Control Panel installation is no longer available, please use a marketplace appliance.'
                 );
             }
-            
+
             $solution = null;
             $pod = Pod::findOrFail($request->input('pod_id'));
 
@@ -364,11 +356,13 @@ class VirtualMachineController extends BaseController
         }
 
         $rules['cpu'] = array_merge($rules['cpu'], [
-            'min:' . $minCpu, 'max:' . $maxCpu
+            'min:' . $minCpu,
+            'max:' . $maxCpu
         ]);
 
         $rules['ram'] = array_merge($rules['ram'], [
-            'min:' . $minRam, 'max:' . $maxRam
+            'min:' . $minRam,
+            'max:' . $maxRam
         ]);
 
         $insufficientSpaceMessage =
@@ -398,7 +392,8 @@ class VirtualMachineController extends BaseController
         if ($request->has('hdd_disks')) {
             // validate disk names
             $rules['hdd_disks.*.name'] = [
-                'required', 'regex:/' . VirtualMachine::HDD_NAME_FORMAT_REGEX . '/'
+                'required',
+                'regex:/' . VirtualMachine::HDD_NAME_FORMAT_REGEX . '/'
             ];
 
             // todo check numbers are sequential?
@@ -467,7 +462,7 @@ class VirtualMachineController extends BaseController
             foreach ($request->input('parameters', []) as $requestParam) {
                 $requestApplianceParams[trim($requestParam['key'])] = $requestParam['value'];
                 //Add prefixed param to request (to avoid conflicts)
-                $request['appliance_param_'.trim($requestParam['key'])] = $requestParam['value'];
+                $request['appliance_param_' . trim($requestParam['key'])] = $requestParam['value'];
             }
 
             // Get the script parameters that we need from the latest version of teh appliance
@@ -671,7 +666,7 @@ class VirtualMachineController extends BaseController
         $templateHDDs = collect($template->hard_drives);
 
         if ($request->has('hdd')) {
-            $templatePrimaryHdd = (object) $templateHDDs->firstWhere('name', 'Hard disk 1');
+            $templatePrimaryHdd = (object)$templateHDDs->firstWhere('name', 'Hard disk 1');
 
             if (!$templatePrimaryHdd) {
                 throw new ServiceResponseException('Unable to determine minimum size requirements for Hard disk 1');
@@ -689,7 +684,7 @@ class VirtualMachineController extends BaseController
 
             // Loop over the template HDD's and match to the request HDD's. Check the requested capacity is >= the template capacity.
             $templateHDDs->each(function ($templateHdd) use ($requestHDDs) {
-                $requestHdd = (object) $requestHDDs->firstWhere('name', $templateHdd->name);
+                $requestHdd = (object)$requestHDDs->firstWhere('name', $templateHdd->name);
 
                 if (!$requestHdd) {
                     throw new Exceptions\BadRequestException(
@@ -866,8 +861,8 @@ class VirtualMachineController extends BaseController
         if (!empty($encrypt_vm)) {
             if ($solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
                 $result = $accountsService
-                        ->scopeResellerId($solution->resellerId())
-                        ->assignVmEncryptionCredit($virtualMachine->getKey());
+                    ->scopeResellerId($solution->resellerId())
+                    ->assignVmEncryptionCredit($virtualMachine->getKey());
 
                 if (!$result) {
                     Log::critical(
@@ -883,7 +878,7 @@ class VirtualMachineController extends BaseController
 
         // Add the VM credentials to the response
         $credentials = $intapiData->data->credentials;
-        $response =  $this->respondSave($request, $virtualMachine, 202, null, $headers);
+        $response = $this->respondSave($request, $virtualMachine, 202, null, $headers);
         $content = $response->getOriginalContent();
         $content['data']['credentials'] = is_array($credentials) ? $credentials : [$credentials];
 
@@ -1236,7 +1231,7 @@ class VirtualMachineController extends BaseController
         ];
 
         if ($request->has('role')) {
-            $rules['role'] = ['required', 'sometimes', 'in:'.implode(',', VirtualMachine::getRoles($this->isAdmin))];
+            $rules['role'] = ['required', 'sometimes', 'in:' . implode(',', VirtualMachine::getRoles($this->isAdmin))];
         }
 
         $this->validateVirtualMachineId($request, $vmId);
@@ -1380,7 +1375,7 @@ class VirtualMachineController extends BaseController
         if ($request->filled('hdd_disks')) {
             $newDisksCount = 0;
             foreach ($request->input('hdd_disks') as $hdd) {
-                $hdd = (object) $hdd;
+                $hdd = (object)$hdd;
 
                 if (!$request->user->isAdministrator) {
                     if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
@@ -1418,7 +1413,7 @@ class VirtualMachineController extends BaseController
 
                         // Don't allow deletion of RDM disks
                         if ($existingDisks[$hdd->uuid]->type != 'Flat') {
-                            $message = 'Unable to delete cluster disk ('.$hdd->name.')';
+                            $message = 'Unable to delete cluster disk (' . $hdd->name . ')';
                             throw new Exceptions\ForbiddenException($message);
                         }
 
@@ -1488,7 +1483,7 @@ class VirtualMachineController extends BaseController
                     if (!empty($hdd->uuid)) {
                         $message .= " '" . $hdd->uuid . "'";
                     }
-                    $message .= ' value must be '.VirtualMachine::MAX_HDD.'GB or smaller';
+                    $message .= ' value must be ' . VirtualMachine::MAX_HDD . 'GB or smaller';
                     throw new Exceptions\ForbiddenException($message);
                 }
 
@@ -1507,7 +1502,10 @@ class VirtualMachineController extends BaseController
             $unchangedDisks = $existingDisks;
             if (!empty($automationData['hdd'])) {
                 // Add any unspecified disks to our automation data as we want to send the complete required Storage state
-                $unchangedDisks = array_diff_key($existingDisks, array_flip(array_column($automationData['hdd'], 'uuid')));
+                $unchangedDisks = array_diff_key(
+                    $existingDisks,
+                    array_flip(array_column($automationData['hdd'], 'uuid'))
+                );
             }
 
             foreach ($unchangedDisks as $disk) {
@@ -1611,7 +1609,7 @@ class VirtualMachineController extends BaseController
 
         if ($virtualMachine->servers_status != 'Complete') {
             throw new Exceptions\UnprocessableEntityException(
-                'Unable to clone vm while status is: '. $virtualMachine->servers_status
+                'Unable to clone vm while status is: ' . $virtualMachine->servers_status
             );
         }
 
@@ -1639,7 +1637,10 @@ class VirtualMachineController extends BaseController
             }
 
             try {
-                $existingTemplate = PodTemplate::withFriendlyName($virtualMachine->pod, $request->input('template_name'));
+                $existingTemplate = PodTemplate::withFriendlyName(
+                    $virtualMachine->pod,
+                    $request->input('template_name')
+                );
             } catch (TemplateNotFoundException $exception) {
                 // Do nothing
             }
@@ -2435,10 +2436,12 @@ class VirtualMachineController extends BaseController
                 'X-API-Authentication' => $consoleResource->token,
             ],
         ]);
-        $response = $client->post('/session', [\GuzzleHttp\RequestOptions::JSON => [
-            'host' => $host,
-            'ticket' => $ticket,
-        ]]);
+        $response = $client->post('/session', [
+            \GuzzleHttp\RequestOptions::JSON => [
+                'host' => $host,
+                'ticket' => $ticket,
+            ]
+        ]);
         $responseJson = json_decode($response->getBody()->getContents());
         $uuid = $responseJson->uuid ?? '';
         if (empty($uuid)) {

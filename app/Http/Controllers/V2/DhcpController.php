@@ -16,8 +16,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class DhcpController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -34,7 +34,7 @@ class DhcpController extends BaseController
 
     /**
      * @param string $dhcpId
-     * @return \App\Resources\V2\DhcpResource
+     * @return DhcpResource
      */
     public function show(string $dhcpId)
     {
@@ -44,7 +44,7 @@ class DhcpController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateDhcpRequest $request
+     * @param CreateDhcpRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateDhcpRequest $request)
@@ -56,7 +56,7 @@ class DhcpController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateDhcpRequest $request
+     * @param UpdateDhcpRequest $request
      * @param string $dhcpId
      * @return \Illuminate\Http\JsonResponse
      */
