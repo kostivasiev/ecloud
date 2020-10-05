@@ -23,7 +23,7 @@ class UpdateNetworkAdapter extends Job
      */
     public function handle()
     {
-        Log::info('Starting UpdateNetworkAdapter for instance '.$this->data['instance_id']);
+        Log::info('Starting UpdateNetworkAdapter for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         if (!empty($instance->applianceVersion->appliance_version_vm_template)) {
             Log::info('UpdateNetworkAdapter');
@@ -33,7 +33,7 @@ class UpdateNetworkAdapter extends Job
                 try {
                     /** @var Response $response */
                     $response = $instance->availabilityZone->kingpinService()->put(
-                        '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/nic/'.$nic->mac_address.'/connect',
+                        '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/nic/' . $nic->mac_address . '/connect',
                         [
                             'json' => [
                                 'networkId' => $nic->network_id,
@@ -41,17 +41,17 @@ class UpdateNetworkAdapter extends Job
                         ]
                     );
                     if ($response->getStatusCode() == 200) {
-                        Log::info('UpdateNetworkAdapter finished successfully for instance '.$instance->id);
+                        Log::info('UpdateNetworkAdapter finished successfully for instance ' . $instance->id);
                         return;
                     }
                     $this->fail(new \Exception(
-                        'Failed UpdateNetworkAdapter for '.$instance->id.', Kingpin status was '.
+                        'Failed UpdateNetworkAdapter for ' . $instance->id . ', Kingpin status was ' .
                         $response->getStatusCode()
                     ));
                     return;
                 } catch (GuzzleException $exception) {
                     $this->fail(new \Exception(
-                        'Failed UpdateNetworkAdapter for '.$instance->id.' : '.
+                        'Failed UpdateNetworkAdapter for ' . $instance->id . ' : ' .
                         $exception->getResponse()->getBody()->getContents()
                     ));
                     return;

@@ -2,8 +2,8 @@
 
 namespace App\Events\V2;
 
-use Illuminate\Queue\SerializesModels;
 use App\Models\V2\Network;
+use Illuminate\Queue\SerializesModels;
 
 class NetworkCreated
 {

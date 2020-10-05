@@ -2,7 +2,6 @@
 
 namespace App\Resources\V1;
 
-use App\Models\V1\Host;
 use UKFast\Api\Resource\CustomResource;
 
 class HostResource extends CustomResource

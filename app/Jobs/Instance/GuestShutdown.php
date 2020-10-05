@@ -20,25 +20,25 @@ class GuestShutdown extends Job
 
     public function handle()
     {
-        Log::info('Attempting to shutdown instance '.$this->data['instance_id']);
+        Log::info('Attempting to shutdown instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/power/guest/shutdown'
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power/guest/shutdown'
             );
             if ($response->getStatusCode() == 200) {
-                Log::info('GuestShutdown finished successfully for instance '.$instance->id);
+                Log::info('GuestShutdown finished successfully for instance ' . $instance->id);
                 return;
             }
             $this->fail(new \Exception(
-                'Failed to GuestShutdown '.$instance->id.', Kingpin status was '.$response->getStatusCode()
+                'Failed to GuestShutdown ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
             ));
             return;
         } catch (GuzzleException $exception) {
             $this->fail(new \Exception(
-                'Failed to GuestShutdown '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
+                'Failed to GuestShutdown ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
             ));
             return;
         }

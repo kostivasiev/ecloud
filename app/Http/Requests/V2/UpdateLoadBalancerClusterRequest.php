@@ -30,9 +30,15 @@ class UpdateLoadBalancerClusterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'nullable|string',
+            'name' => 'nullable|string',
             'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
-            'vpc_id' => ['sometimes', 'required', 'string', 'exists:ecloud.vpcs,id,deleted_at,NULL', new ExistsForUser(Vpc::class)]
+            'vpc_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
+                new ExistsForUser(Vpc::class)
+            ]
         ];
     }
 

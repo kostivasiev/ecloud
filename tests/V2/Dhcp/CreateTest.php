@@ -46,7 +46,7 @@ class CreateTest extends TestCase
         $this->post('/v2/dhcps', [
             'vpc_id' => $this->vpc->id,
         ])->seeJson([
-            'title'  => 'Unauthorised',
+            'title' => 'Unauthorised',
             'detail' => 'Unauthorised',
             'status' => 401,
         ])->assertResponseStatus(401);
@@ -60,7 +60,7 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
-            'title'  => 'Validation Error',
+            'title' => 'Validation Error',
             'detail' => 'The vpc id field is required',
             'status' => 422,
             'source' => 'vpc_id'
@@ -77,7 +77,7 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
-            'title'  => 'Validation Error',
+            'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'

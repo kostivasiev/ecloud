@@ -19,12 +19,12 @@ class NsxServiceProvider extends ServiceProvider
             $credentials = $availabilityZone->credentials()
                 ->where('name', '=', 'NSX')
                 ->firstOrFail();
-            $auth = base64_encode($credentials->user.':'.$credentials->password);
+            $auth = base64_encode($credentials->user . ':' . $credentials->password);
             return new NsxService(
                 new Client([
-                    'base_uri' => $credentials->host.(empty($credentials->port) ? '' : ':'.$credentials->port),
+                    'base_uri' => $credentials->host . (empty($credentials->port) ? '' : ':' . $credentials->port),
                     'headers' => [
-                        'Authorization' => ['Basic '.$auth],
+                        'Authorization' => ['Basic ' . $auth],
                     ],
                     'timeout' => 10,
                     'verify' => false, //$this->app->environment() === 'production',

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateFirewallRuleRequest;
@@ -15,8 +16,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class FirewallRuleController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -33,7 +34,7 @@ class FirewallRuleController extends BaseController
 
     /**
      * @param string $firewallRuleId
-     * @return \App\Resources\V2\FirewallRuleResource
+     * @return FirewallRuleResource
      */
     public function show(string $firewallRuleId)
     {
@@ -43,7 +44,7 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateFirewallRuleRequest $request
+     * @param CreateFirewallRuleRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(CreateFirewallRuleRequest $request)
@@ -56,7 +57,7 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateFirewallRuleRequest $request
+     * @param UpdateFirewallRuleRequest $request
      * @param string $firewallRuleId
      * @return \Illuminate\Http\JsonResponse
      */

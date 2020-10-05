@@ -87,7 +87,7 @@ class Router extends Model implements Filterable, Sortable
     {
         try {
             $response = $this->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/'.$this->getKey().'/state'
+                'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
             return $response->tier1_state->state == 'in_sync';
@@ -119,7 +119,7 @@ class Router extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  FilterFactory  $factory
+     * @param FilterFactory $factory
      * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
@@ -136,7 +136,7 @@ class Router extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -154,7 +154,7 @@ class Router extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */

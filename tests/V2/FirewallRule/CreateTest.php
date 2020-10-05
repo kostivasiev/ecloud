@@ -27,7 +27,7 @@ class CreateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
@@ -48,11 +48,11 @@ class CreateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified router id was not found',
                 'status' => 422,
                 'source' => 'router_id'
@@ -70,7 +70,7 @@ class CreateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(201);
 

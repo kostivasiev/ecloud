@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\V2;
 
 use UKFast\FormRequests\FormRequest;
@@ -23,8 +24,8 @@ class CreateAvailabilityZoneRequest extends FormRequest
     public function rules()
     {
         return [
-            'code'    => 'required|string',
-            'name'    => 'required|string',
+            'code' => 'required|string',
+            'name' => 'required|string',
             'datacentre_site_id' => 'required|integer',
             'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL',
             'is_public' => 'sometimes|required|boolean',

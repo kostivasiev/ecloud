@@ -98,7 +98,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Forbidden',
+                'title' => 'Forbidden',
                 'detail' => 'The specified instance is locked',
                 'status' => 403,
             ])

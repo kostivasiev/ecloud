@@ -45,7 +45,7 @@ class VolumeTest extends TestCase
     public function testGetVolumes()
     {
         $this->instance->volumes()->attach($this->volume);
-        $this->get('/v2/instances/'.$this->instance->getKey().'/volumes', [
+        $this->get('/v2/instances/' . $this->instance->getKey() . '/volumes', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([

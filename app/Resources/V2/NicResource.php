@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -24,16 +25,16 @@ class NicResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'          => $this->id,
+            'id' => $this->id,
             'mac_address' => $this->mac_address,
             'instance_id' => $this->instance_id,
-            'network_id'  => $this->network_id,
+            'network_id' => $this->network_id,
             'ip_address' => $this->ip_address,
-            'created_at'  => Carbon::parse(
+            'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at'  => Carbon::parse(
+            'updated_at' => Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

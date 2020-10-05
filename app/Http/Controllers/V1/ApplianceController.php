@@ -3,25 +3,20 @@
 namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\ApplianceNotFoundException;
-use App\Exceptions\V1\InvalidJsonException;
 use App\Exceptions\V1\TemplateNotFoundException;
+use App\Models\V1\Appliance;
 use App\Models\V1\Appliance\Version\Data;
 use App\Models\V1\AppliancePodAvailability;
+use App\Models\V1\ApplianceVersion;
 use App\Models\V1\Pod;
 use App\Rules\V1\IsValidUuid;
+use Illuminate\Http\Request;
+use Log;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
-use UKFast\DB\Ditto\QueryTransformer;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-
-use App\Models\V1\Appliance;
-
-use App\Models\V1\ApplianceVersion;
-use Log;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class ApplianceController extends BaseController
 {

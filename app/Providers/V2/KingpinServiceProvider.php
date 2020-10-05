@@ -21,7 +21,7 @@ class KingpinServiceProvider extends ServiceProvider
                 ->firstOrFail();
             return new KingpinService(
                 new Client([
-                    'base_uri' => $credentials->host.(empty($credentials->port) ? '' : ':'.$credentials->port),
+                    'base_uri' => $credentials->host . (empty($credentials->port) ? '' : ':' . $credentials->port),
                     'auth' => [$credentials->user, $credentials->password],
                     'timeout' => config('kingpin.timeout'),
                     'verify' => $this->app->environment() === 'production'

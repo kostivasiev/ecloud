@@ -9,8 +9,8 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -47,7 +47,7 @@ class GetTest extends TestCase
         $this->nic = factory(Nic::class)->create([
             'mac_address' => $this->macAddress,
             'instance_id' => $this->instance->getKey(),
-            'network_id'  => $this->network->getKey(),
+            'network_id' => $this->network->getKey(),
         ]);
     }
 
@@ -57,7 +57,7 @@ class GetTest extends TestCase
             '/v2/nics',
             [
                 'X-consumer-custom_id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
@@ -75,13 +75,13 @@ class GetTest extends TestCase
             '/v2/nics/' . $this->nic->getKey(),
             [
                 'X-consumer-custom_id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getkey(),
-                'network_id'  => $this->network->getKey(),
+                'network_id' => $this->network->getKey(),
                 'ip_address' => '10.0.0.5'
             ])
             ->assertResponseStatus(200);

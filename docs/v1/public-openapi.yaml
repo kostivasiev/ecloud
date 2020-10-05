@@ -1838,7 +1838,7 @@ components:
             type:
               description: The virtual disk type
               type: string
-              enum: [Standard, Cluster]
+              enum: [ Standard, Cluster ]
             key:
               description: Controller device key, while unique keys may be recycled as disks are attached/removed
               type: integer

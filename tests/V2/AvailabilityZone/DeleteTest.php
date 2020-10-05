@@ -4,8 +4,8 @@ namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
@@ -31,7 +31,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -49,7 +49,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Not found',
+                'title' => 'Not found',
                 'detail' => 'No Availability Zone with that ID was found',
                 'status' => 404,
             ])

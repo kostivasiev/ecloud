@@ -23,25 +23,25 @@ class GuestRestart extends Job
      */
     public function handle()
     {
-        Log::info('Attempting to GuestRestart instance '.$this->data['instance_id']);
+        Log::info('Attempting to GuestRestart instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/power/guest/restart'
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power/guest/restart'
             );
             if ($response->getStatusCode() == 200) {
-                Log::info('GuestRestart finished successfully for instance '.$instance->id);
+                Log::info('GuestRestart finished successfully for instance ' . $instance->id);
                 return;
             }
             $this->fail(new \Exception(
-                'Failed to GuestRestart '.$instance->id.', Kingpin status was '.$response->getStatusCode()
+                'Failed to GuestRestart ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
             ));
             return;
         } catch (GuzzleException $exception) {
             $this->fail(new \Exception(
-                'Failed to GuestRestart '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
+                'Failed to GuestRestart ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
             ));
             return;
         }

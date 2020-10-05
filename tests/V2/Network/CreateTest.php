@@ -6,11 +6,11 @@ use App\Events\V2\NetworkCreated;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
-use Illuminate\Support\Facades\Event;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -27,7 +27,7 @@ class CreateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),

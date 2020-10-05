@@ -4,7 +4,6 @@ namespace Tests\V1\Appliances\ApplianceParameters;
 
 use App\Models\V1\ApplianceParameter;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use Tests\ApplianceTestCase;
 
 class PatchTest extends ApplianceTestCase

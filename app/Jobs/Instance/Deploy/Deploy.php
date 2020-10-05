@@ -24,14 +24,14 @@ class Deploy extends Job
      */
     public function handle()
     {
-        Log::info('Performing Deploy for instance '.$this->data['instance_id']);
-        $logMessage = 'Deploy instance '.$this->data['instance_id'].' : ';
+        Log::info('Performing Deploy for instance ' . $this->data['instance_id']);
+        $logMessage = 'Deploy instance ' . $this->data['instance_id'] . ' : ';
 
         $instance = Instance::findOrFail($this->data['instance_id']);
 
         if (empty($instance->applianceVersion)) {
             $this->fail(new \Exception(
-                'Deploy failed for '.$instance->id.', Failed to load appliance version'
+                'Deploy failed for ' . $instance->id . ', Failed to load appliance version'
             ));
             return;
         }
@@ -39,7 +39,7 @@ class Deploy extends Job
         try {
             /** @var Response $deployResponse */
             $deployResponse = $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/'.$this->data['vpc_id'].'/instance/fromtemplate',
+                '/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/fromtemplate',
                 [
                     'json' => [
                         'templateName' => $instance->applianceVersion->appliance_version_vm_template,
@@ -52,7 +52,7 @@ class Deploy extends Job
             );
 
             if ($deployResponse->getStatusCode() != 200) {
-                throw new \Exception('Invalid response status code: '.$deployResponse->getStatusCode());
+                throw new \Exception('Invalid response status code: ' . $deployResponse->getStatusCode());
             }
 
             $deployResponse = json_decode($deployResponse->getBody()->getContents());
@@ -60,9 +60,9 @@ class Deploy extends Job
                 throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
             }
 
-            Log::info($logMessage.'Instance was deployed');
+            Log::info($logMessage . 'Instance was deployed');
 
-            Log::info($logMessage.count($deployResponse->volumes).' volume(s) found');
+            Log::info($logMessage . count($deployResponse->volumes) . ' volume(s) found');
             // Create Volumes from kingpin
             foreach ($deployResponse->volumes as $volumeData) {
                 $volume = Volume::withoutEvents(function () use ($instance, $volumeData) {
@@ -78,11 +78,11 @@ class Deploy extends Job
                     return $volume;
                 });
 
-                Log::info($logMessage.'Created volume resource '.$volume->getKey().' for volume '.$volume->vmware_uuid);
+                Log::info($logMessage . 'Created volume resource ' . $volume->getKey() . ' for volume ' . $volume->vmware_uuid);
 
                 // Send created Volume ID's to Kinpin
                 $volumeResponse = $instance->availabilityZone->kingpinService()->put(
-                    '/api/v1/vpc/'.$this->data['vpc_id'].'/volume/'.$volume->vmware_uuid.'/resourceid',
+                    '/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid',
                     [
                         'json' => [
                             'volumeId' => $volume->getKey()
@@ -90,13 +90,13 @@ class Deploy extends Job
                     ]
                 );
                 if ($volumeResponse->getStatusCode() != 200) {
-                    throw new \Exception('Invalid response status code '.$volumeResponse->getStatusCode().' whilst updating volume '.$volume->vmware_uuid);
+                    throw new \Exception('Invalid response status code ' . $volumeResponse->getStatusCode() . ' whilst updating volume ' . $volume->vmware_uuid);
                 }
-                Log::info($logMessage.'Volume '.$volume->vmware_uuid.' successfully updated with resource ID '.$volume->getKey());
+                Log::info($logMessage . 'Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
             }
 
             // Create NIC's
-            Log::info($logMessage.count($deployResponse->nics).' NIC\'s found');
+            Log::info($logMessage . count($deployResponse->nics) . ' NIC\'s found');
             foreach ($deployResponse->nics as $nicData) {
                 $nic = new Nic([
                     'mac_address' => $nicData->macAddress,
@@ -104,19 +104,19 @@ class Deploy extends Job
                     'network_id' => $this->data['network_id'],
                 ]);
                 $nic->save();
-                Log::info($logMessage.'Created NIC resource '.$nic->getKey());
+                Log::info($logMessage . 'Created NIC resource ' . $nic->getKey());
             }
         } catch (GuzzleException $exception) {
             $error = $exception->getResponse()->getBody()->getContents();
-            Log::info($logMessage.$error);
-            $this->fail(new \Exception('Deploy failed for '.$instance->id.' : '.$error));
+            Log::info($logMessage . $error);
+            $this->fail(new \Exception('Deploy failed for ' . $instance->id . ' : ' . $error));
             return;
         } catch (\Exception $exception) {
-            Log::info($logMessage.$exception->getMessage());
-            $this->fail(new \Exception('Deploy failed for '.$instance->id.' : '.$exception->getMessage()));
+            Log::info($logMessage . $exception->getMessage());
+            $this->fail(new \Exception('Deploy failed for ' . $instance->id . ' : ' . $exception->getMessage()));
             return;
         }
 
-        Log::info('Deploy finished successfully for instance '.$instance->getKey());
+        Log::info('Deploy finished successfully for instance ' . $instance->getKey());
     }
 }

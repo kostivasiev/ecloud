@@ -48,7 +48,7 @@ class UpdateVpnRequest extends FormRequest
     public function messages()
     {
         return [
-            'router_id.required'            => 'The :attribute field, when specified, cannot be null',
+            'router_id.required' => 'The :attribute field, when specified, cannot be null',
             'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }

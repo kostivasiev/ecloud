@@ -11,13 +11,13 @@ class PublicSupportResource extends UKFastResource
     /**
      * Transform the resource into an array.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request)
     {
         return [
-            'id'          => $this->id,
+            'id' => $this->id,
             'reseller_id' => $this->reseller_id,
             'created_at' => Carbon::parse(
                 $this->created_at,

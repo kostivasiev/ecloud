@@ -1,7 +1,12 @@
 {
   "name": "ukfast/apio-ecloud",
   "description": "eCloud APIo Webservice",
-  "keywords": ["lumen", "ukfast", "apio", "ecloud"],
+  "keywords": [
+    "lumen",
+    "ukfast",
+    "apio",
+    "ecloud"
+  ],
   "license": "MIT",
   "type": "project",
   "require": {
@@ -129,10 +134,12 @@
     {
       "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/api-internal-communication.git"
-    }, {
-    "type": "vcs",
+    },
+    {
+      "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git"
-    }, {
+    },
+    {
       "type": "vcs",
       "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/encryption.git"
     },

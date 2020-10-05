@@ -3,24 +3,20 @@
 namespace App\Models\V1;
 
 use App\Exceptions\V1\KingpinException;
-use App\Exceptions\V1\SolutionNotFoundException;
 use App\Solution\EncryptionBillingType;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
-use UKFast\Api\Resource\Property\DateProperty;
+use UKFast\Api\Resource\Property\BooleanProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
-use UKFast\Api\Resource\Property\BooleanProperty;
-
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class Solution extends Model implements Filterable, Sortable
 {
@@ -498,30 +494,28 @@ class Solution extends Model implements Filterable, Sortable
      */
     public function isMultiSite()
     {
-        return $this->hasMany(
+        $result = $this->hasMany(
             'App\Models\V1\SolutionSite',
             'ucs_site_ucs_reseller_id',
             'ucs_reseller_id'
         )
-                ->where('ucs_site_state', '=', 'Active')
-                ->limit(2)
-                ->count() > 1;
+            ->where('ucs_site_state', '=', 'Active')
+            ->limit(2);
+        return $result->count() > 1;
     }
 
     public function isMultiNetwork()
     {
         return SolutionNetwork::withSolution($this->getKey())
-            ->limit(1)
-            ->count() > 0
-        ;
+                ->limit(1)
+                ->count() > 0;
     }
 
     public function hasMultipleNetworks()
     {
         return SolutionNetwork::withSolution($this->getKey())
                 ->limit(2)
-                ->count() > 1
-            ;
+                ->count() > 1;
     }
 
 
@@ -637,6 +631,7 @@ class Solution extends Model implements Filterable, Sortable
     {
         return empty($value) ? 'No' : $value;
     }
+
     public function getUcsResellerEncryptionDefaultAttribute($value)
     {
         return empty($value) ? 'No' : $value;

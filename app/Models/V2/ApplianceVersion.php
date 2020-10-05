@@ -2,13 +2,13 @@
 /**
  * V1Refactor - Brought in from V1 namespace
  */
+
 namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Devices\AdminClient;
 
 class ApplianceVersion extends Model
@@ -38,7 +38,7 @@ class ApplianceVersion extends Model
      */
     public function getApplianceUuidAttribute()
     {
-        $appliance =  Appliance::select('appliance_uuid')
+        $appliance = Appliance::select('appliance_uuid')
             ->where('appliance_id', '=', $this->attributes['appliance_version_appliance_id']);
 
         if ($appliance->count() > 0) {

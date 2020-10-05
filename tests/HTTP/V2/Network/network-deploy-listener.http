@@ -50,6 +50,7 @@ Content-Type: application/json
 client.global.set('vpc_id', response.body.data.id);
 client.log('VPC ID: ' + response.body.data.id);
 %}
+
 ###
 # vpc-7dd2d8df
 # dhcp-8f7679e5

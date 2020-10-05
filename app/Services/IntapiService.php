@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Exception\RequestException;
-
 use App\Exceptions\V1\IntapiServiceException;
+use GuzzleHttp\Exception\RequestException;
 use Log;
 
 class IntapiService
@@ -85,7 +84,7 @@ class IntapiService
         if (strpos($content_type, 'json') !== false) {
             $json = json_decode($this->response->getBody()->getContents());
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new IntapiServiceException('failed to parse response data: '.json_last_error_msg());
+                throw new IntapiServiceException('failed to parse response data: ' . json_last_error_msg());
             }
 
             return $json;
@@ -111,14 +110,19 @@ class IntapiService
             return $json;
         }
 
-        throw new IntapiServiceException('unknown response format: '.$content_type);
+        throw new IntapiServiceException('unknown response format: ' . $content_type);
     }
 
     public function getFriendlyError($error)
     {
         Log::error('IntAPI error: ' . $error);
+        $pregResult = preg_match(
+            '/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/',
+            $error,
+            $matches
+        );
         switch ($error) {
-            case (preg_match('/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/', $error, $matches) == true):
+            case ($pregResult == true):
                 $ip_type = $matches[1];
 //                $vlan = $matches[2];
 

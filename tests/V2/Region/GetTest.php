@@ -5,9 +5,8 @@ namespace Tests\V2\Region;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -22,7 +21,7 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
 
         $this->regions = factory(Region::class, 2)->create([
-            'name'    => $this->faker->country(),
+            'name' => $this->faker->country(),
         ])->each(function ($region) {
             factory(AvailabilityZone::class, 2)->create([
                 'region_id' => $region->getKey(),
@@ -46,8 +45,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $this->regions->first()->getKey(),
-                'name'         => $this->regions->first()->name,
+                'id' => $this->regions->first()->getKey(),
+                'name' => $this->regions->first()->name,
             ])
             ->assertResponseStatus(200);
 
@@ -68,10 +67,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $this->regions->first()->getKey(),
-                'name'         => $this->regions->first()->name,
+                'id' => $this->regions->first()->getKey(),
+                'name' => $this->regions->first()->name,
             ])
-
             ->assertResponseStatus(200);
 
         $this->assertCount(1, $this->response->original);
@@ -91,8 +89,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $region->getKey(),
-                'name'       => $region->name,
+                'id' => $region->getKey(),
+                'name' => $region->name,
             ])
             ->assertResponseStatus(200);
     }
@@ -111,8 +109,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $region->getKey(),
-                'name'       => $region->name,
+                'id' => $region->getKey(),
+                'name' => $region->name,
             ])
             ->assertResponseStatus(200);
     }
@@ -131,8 +129,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $region->getKey(),
-                'name'       => $region->name,
+                'id' => $region->getKey(),
+                'name' => $region->name,
             ])
             ->assertResponseStatus(200);
     }
@@ -169,8 +167,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $availabilityZones->first()->getKey(),
-                'name'       => $availabilityZones->first()->name,
+                'id' => $availabilityZones->first()->getKey(),
+                'name' => $availabilityZones->first()->name,
             ])
             ->assertResponseStatus(200);
     }
@@ -191,8 +189,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $availabilityZones->first()->getKey(),
-                'name'       => $availabilityZones->first()->name,
+                'id' => $availabilityZones->first()->getKey(),
+                'name' => $availabilityZones->first()->name,
             ])
             ->assertResponseStatus(200);
     }

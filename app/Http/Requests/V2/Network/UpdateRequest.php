@@ -31,8 +31,8 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'sometimes|required|string',
-            'router_id'    => [
+            'name' => 'sometimes|required|string',
+            'router_id' => [
                 'sometimes',
                 'required',
                 'string',

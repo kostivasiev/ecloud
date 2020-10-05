@@ -28,7 +28,7 @@ class CreateVpcRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'nullable|string',
+            'name' => 'nullable|string',
             'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL'
         ];
     }

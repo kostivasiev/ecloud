@@ -2,6 +2,7 @@
 /**
  * V1Refactor - Brought in from V1 namespace
  */
+
 namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;
@@ -39,8 +40,8 @@ class Appliance extends Model
 
     /**
      * Get the latest version of the appliance.
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
-     * @throws \UKFast\Api\Exceptions\NotFoundException
+     * @return Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
+     * @throws NotFoundException
      */
     public function getLatestVersion()
     {

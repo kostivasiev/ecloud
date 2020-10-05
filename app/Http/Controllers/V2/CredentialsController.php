@@ -17,8 +17,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class CredentialsController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -34,7 +34,7 @@ class CredentialsController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $credentialsId
      * @return CredentialResource
      */
@@ -70,7 +70,7 @@ class CredentialsController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $credentialsId
      * @return \Illuminate\Http\JsonResponse
      */

@@ -12,6 +12,7 @@ Content-Type:  application/json
 client.global.set('region_id', response.body.data.id);
 client.log('Region ID: ' + response.body.data.id);
 %}
+
 ###
 POST https://{{host}}/{{version}}/availability-zones
 X-consumer-custom-id:  0-0
@@ -31,6 +32,7 @@ Content-Type:  application/json
 client.global.set('availability_zone_id', response.body.data.id);
 client.log('Availability Zone ID: ' + response.body.data.id);
 %}
+
 ###
 POST https://{{host}}/{{version}}/availability-zones
 X-consumer-custom-id:  0-0
@@ -50,6 +52,7 @@ Content-Type:  application/json
 client.global.set('availability_zone_id_2', response.body.data.id);
 client.log('Availability Zone ID 2: ' + response.body.data.id);
 %}
+
 ###
 POST https://{{host}}/{{version}}/vpcs
 Accept: */*
@@ -67,6 +70,7 @@ X-Reseller-Id: 1
 client.global.set('vpc_id', response.body.data.id);
 client.log('VPC UUID: ' + response.body.data.id);
 %}
+
 ###
 
 
@@ -110,6 +114,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+
 ###
 
 GET https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
@@ -148,6 +153,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.id === client.global.get('lbc_id'), "Incorrect resource ID returned");
 });
 %}
+
 ###
 
 
@@ -207,6 +213,7 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 DELETE https://ecloud-apio.paul.rnd.ukfast/v2/availability_zones/{{availability_zone_id}}
 Accept: */*
@@ -214,6 +221,7 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 DELETE https://ecloud-apio.paul.rnd.ukfast/v2/availability_zones/{{availability_zone_id_2}}
 Accept: */*
@@ -221,6 +229,7 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
 ###
 DELETE https://ecloud-apio.paul.rnd.ukfast/v2/vpcs/{{vpc_id}}
 Accept: */*

@@ -3,16 +3,14 @@
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
-
 use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
-
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class SolutionSite extends Model implements Filterable, Sortable
 {
@@ -63,11 +61,11 @@ class SolutionSite extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'            => 'ucs_site_id',
-            'state'         => 'ucs_site_state',
-            'order'         => 'ucs_site_order',
-            'solution_id'   => 'ucs_site_ucs_reseller_id',
-            'pod_id'        => 'ucs_site_ucs_datacentre_id',
+            'id' => 'ucs_site_id',
+            'state' => 'ucs_site_state',
+            'order' => 'ucs_site_order',
+            'solution_id' => 'ucs_site_ucs_reseller_id',
+            'pod_id' => 'ucs_site_ucs_datacentre_id',
         ];
     }
 

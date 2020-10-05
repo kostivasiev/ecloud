@@ -8,12 +8,10 @@ use App\Models\V1\Datastore;
 use App\Models\V1\San;
 use App\Models\V1\Solution;
 use App\Models\V1\Storage;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-use Illuminate\Support\ServiceProvider;
 use App\Services\Artisan\V1\ArtisanService;
-
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\ServiceProvider;
 use Log;
 use UKFast\Api\Exceptions\NotFoundException;
 
@@ -119,7 +117,7 @@ class ArtisanServiceProvider extends ServiceProvider
      * @return array
      * @throws ServiceUnavailableException
      */
-    private function loadConfigFromDatastore(Datastore $datastore) : array
+    private function loadConfigFromDatastore(Datastore $datastore): array
     {
         if (empty($datastore->storage) || $datastore->storage->count() < 1) {
             throw new ServiceUnavailableException('No storage is configured for this datastore.');
@@ -137,7 +135,7 @@ class ArtisanServiceProvider extends ServiceProvider
      * @throws NotFoundException
      * @throws ServiceUnavailableException
      */
-    private function loadConfig(Storage $storage) : array
+    private function loadConfig(Storage $storage): array
     {
         $pod = $storage->pod;
         $san = $storage->san;
@@ -164,8 +162,8 @@ class ArtisanServiceProvider extends ServiceProvider
             Log::error(
                 'Failed to load storage API password for Pod.',
                 [
-                    'pod_id'       => $pod->getKey(),
-                    'vce_server_id'=> $pod->ucs_datacentre_vce_server_id
+                    'pod_id' => $pod->getKey(),
+                    'vce_server_id' => $pod->ucs_datacentre_vce_server_id
                 ]
             );
             throw new ServiceUnavailableException('Failed to load storage for datastore.');
@@ -198,10 +196,10 @@ class ArtisanServiceProvider extends ServiceProvider
         }
 
         return [
-            'api_url'      => $storageApiUrl,
+            'api_url' => $storageApiUrl,
             'api_password' => $storageApiPassword,
-            'api_port'     => $storageApiPort,
-            'san_name'     => $san->name(),
+            'api_port' => $storageApiPort,
+            'san_name' => $san->name(),
             'san_password' => $sanPassword
         ];
     }

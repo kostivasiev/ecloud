@@ -6,8 +6,9 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeployDefaultsTest extends TestCase
 {
@@ -39,9 +40,9 @@ class DeployDefaultsTest extends TestCase
     {
         $this->post('/v2/vpcs/x/deploy-defaults', [], [
             'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups'    => 'ecloud.write'
+            'X-consumer-groups' => 'ecloud.write'
         ])->seeJson([
-            'title'  => 'Not found',
+            'title' => 'Not found',
             'detail' => 'No Vpc with that ID was found'
         ])->assertResponseStatus(404);
     }
@@ -50,7 +51,7 @@ class DeployDefaultsTest extends TestCase
     {
         $this->post('/v2/vpcs/' . $this->vpc->getKey() . '/deploy-defaults', [], [
             'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups'    => 'ecloud.write'
+            'X-consumer-groups' => 'ecloud.write'
         ])->assertResponseStatus(202);
 
         // Check the relationships are intact

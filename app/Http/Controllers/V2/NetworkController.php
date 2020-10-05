@@ -21,8 +21,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class NetworkController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -39,7 +39,7 @@ class NetworkController extends BaseController
     /**
      * @param Request $request
      * @param string $networkId
-     * @return \App\Resources\V2\NetworkResource
+     * @return NetworkResource
      */
     public function show(Request $request, string $networkId)
     {
@@ -50,13 +50,14 @@ class NetworkController extends BaseController
 
     /**
      * @param CreateRequest  $request
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateRequest $request)
     {
         $network = new Network($request->only([
-            'router_id', 'name', 'subnet'
+            'router_id',
+            'name',
+            'subnet',
         ]));
         $network->save();
         $network->refresh();
@@ -66,14 +67,15 @@ class NetworkController extends BaseController
     /**
      * @param UpdateRequest  $request
      * @param string $networkId
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateRequest $request, string $networkId)
     {
         $network = Network::forUser(app('request')->user)->findOrFail($networkId);
         $network->fill($request->only([
-            'router_id', 'name', 'subnet'
+            'router_id',
+            'name',
+            'subnet',
         ]));
         $network->save();
         return $this->responseIdMeta($request, $network->getKey(), 200);

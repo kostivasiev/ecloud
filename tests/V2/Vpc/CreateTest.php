@@ -5,12 +5,12 @@ namespace Tests\V2\Vpc;
 use App\Events\V2\DhcpCreated;
 use App\Events\V2\VpcCreated;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Vpc;
 use App\Models\V2\Region;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Event;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -27,14 +27,14 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create([
-            'name'    => 'Manchester',
+            'name' => 'Manchester',
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
         $data = [
-            'name'    => 'Manchester DC',
+            'name' => 'Manchester DC',
         ];
         $this->post(
             '/v2/vpcs',
@@ -42,7 +42,7 @@ class CreateTest extends TestCase
             []
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -52,7 +52,7 @@ class CreateTest extends TestCase
     public function testNullNameDefaultsToId()
     {
         $data = [
-            'name'    => '',
+            'name' => '',
             'region_id' => $this->region->getKey(),
         ];
         $this->post(
@@ -78,7 +78,7 @@ class CreateTest extends TestCase
     public function testNullRegionIsFailed()
     {
         $data = [
-            'name'    => $this->faker->word(),
+            'name' => $this->faker->word(),
         ];
         $this->post(
             '/v2/vpcs',
@@ -90,7 +90,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The region id field is required',
                 'status' => 422,
                 'source' => 'region_id'
@@ -101,9 +101,9 @@ class CreateTest extends TestCase
     public function testNotScopedFails()
     {
         $data = [
-            'name'    => $this->faker->word(),
+            'name' => $this->faker->word(),
             'reseller_id' => 1,
-            'region_id'    => $this->region->getKey()
+            'region_id' => $this->region->getKey()
         ];
         $this->post(
             '/v2/vpcs',
@@ -114,7 +114,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Bad Request',
+                'title' => 'Bad Request',
                 'detail' => 'Missing Reseller scope',
                 'status' => 400,
             ])
@@ -124,7 +124,7 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => $this->faker->word(),
+            'name' => $this->faker->word(),
             'region_id' => $this->region->getKey(),
             'reseller_id' => 1
         ];

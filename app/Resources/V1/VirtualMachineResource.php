@@ -13,6 +13,7 @@ class VirtualMachineResource extends CustomResource
     }
 
     //TODO: This is how the old API does it, but it may make sense to just do one call to getVM()
+
     /**
      * Check the state of the VM
      * @return mixed
@@ -59,7 +60,7 @@ class VirtualMachineResource extends CustomResource
                 $hdd->name = $disk->name;
 
                 // rename disk type to customer friendly wording
-                $hdd->type = ($disk->type=='Flat'?'Standard':'Cluster');
+                $hdd->type = ($disk->type == 'Flat' ? 'Standard' : 'Cluster');
                 $hdd->key = $disk->key;
 
                 $hdd->capacity = $disk->capacity;

@@ -4,8 +4,8 @@ namespace Tests\V2\Vpc;
 
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -29,7 +29,7 @@ class GetTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->get('/v2/vpcs')->seeJson([
-            'title'  => 'Unauthorised',
+            'title' => 'Unauthorised',
             'detail' => 'Unauthorised',
             'status' => 401,
         ])->assertResponseStatus(401);
@@ -92,7 +92,7 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
-            'title'  => 'Not found',
+            'title' => 'Not found',
             'detail' => 'No Vpc with that ID was found',
             'status' => 404,
         ])->assertResponseStatus(404);

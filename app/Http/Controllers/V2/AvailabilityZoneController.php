@@ -4,9 +4,8 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
-use App\Resources\V2\AvailabilityZoneResource;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Router;
+use App\Resources\V2\AvailabilityZoneResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -18,8 +17,8 @@ class AvailabilityZoneController extends BaseController
 {
     /**
      * Get availability zones collection
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -35,9 +34,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $zoneId
-     * @return \App\Resources\V2\AvailabilityZoneResource
+     * @return AvailabilityZoneResource
      */
     public function show(Request $request, string $zoneId)
     {
@@ -47,7 +46,7 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateAvailabilityZoneRequest $request
+     * @param CreateAvailabilityZoneRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateAvailabilityZoneRequest $request)
@@ -67,7 +66,7 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateAvailabilityZoneRequest $request
+     * @param UpdateAvailabilityZoneRequest $request
      * @param string $zoneId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -88,7 +87,7 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $zoneId
      * @return \Illuminate\Http\JsonResponse
      */

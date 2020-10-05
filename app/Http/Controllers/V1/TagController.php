@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Solution\CanModifyResource;
-use UKFast\DB\Ditto\QueryTransformer;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-
-use App\Models\V1\Tag;
 use App\Exceptions\V1\TagNotFoundException;
+use App\Models\V1\Tag;
+use App\Solution\CanModifyResource;
+use Illuminate\Http\Request;
 use UKFast\Api\Exceptions\BadRequestException;
+use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class TagController extends BaseController
 {
@@ -78,7 +75,7 @@ class TagController extends BaseController
         (new CanModifyResource($solution))->validate();
 
         $this->validate($request, [
-            'key' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
+            'key' => ['required', 'regex:/' . Tag::KEY_FORMAT_REGEX . '/'],
             'value' => ['required'],
         ]);
 
@@ -231,7 +228,7 @@ class TagController extends BaseController
         }
 
         $this->validate($request, [
-            'key' => ['required', 'regex:/'.Tag::KEY_FORMAT_REGEX.'/'],
+            'key' => ['required', 'regex:/' . Tag::KEY_FORMAT_REGEX . '/'],
             'value' => ['required'],
         ]);
 

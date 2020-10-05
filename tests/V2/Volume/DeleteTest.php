@@ -6,8 +6,8 @@ use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
@@ -50,7 +50,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Not found',
+                'title' => 'Not found',
                 'detail' => 'No Volume with that ID was found',
                 'status' => 404,
             ])

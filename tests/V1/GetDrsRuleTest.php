@@ -2,10 +2,9 @@
 
 namespace Tests\V1;
 
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use App\Models\V1\Solution;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetDrsRuleTest extends TestCase
 {
@@ -20,12 +19,12 @@ class GetDrsRuleTest extends TestCase
         factory(Solution::class, 1)->create([
             'ucs_reseller_id' => 123,
         ]);
-        
+
         $this->get('/v1/solutions/123/constraints', [
             'X-consumer-custom-id' => '0-1',
             'X-consumer-groups' => env('APP_NAME') . '.read',
         ]);
-        
+
         $this->assertResponseStatus(503);
     }
 
@@ -50,7 +49,7 @@ class GetDrsRuleTest extends TestCase
     public function testUnauthorizedWhenNotAdmin()
     {
         factory(Solution::class, 1)->create([
-          'ucs_reseller_id' => 123,
+            'ucs_reseller_id' => 123,
         ]);
 
         $this->get('/v1/solutions/123/constraints', [

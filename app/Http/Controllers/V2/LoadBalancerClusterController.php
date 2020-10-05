@@ -16,7 +16,7 @@ use UKFast\DB\Ditto\QueryTransformer;
 class LoadBalancerClusterController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -32,7 +32,7 @@ class LoadBalancerClusterController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $lbcId
      * @return LoadBalancerClusterResource
      */
@@ -44,7 +44,7 @@ class LoadBalancerClusterController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateLoadBalancerClusterRequest $request
+     * @param CreateLoadBalancerClusterRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(CreateLoadBalancerClusterRequest $request)
@@ -57,7 +57,7 @@ class LoadBalancerClusterController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateLoadBalancerClusterRequest $request
+     * @param UpdateLoadBalancerClusterRequest $request
      * @param string $lbcId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -70,7 +70,7 @@ class LoadBalancerClusterController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $lbcId
      * @return \Illuminate\Http\JsonResponse
      */

@@ -7,8 +7,8 @@ use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -45,12 +45,12 @@ class GetTest extends TestCase
         ]);
 
         $this->volume = factory(Volume::class)->create([
-            'name'       => 'Volume 1',
+            'name' => 'Volume 1',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey()
         ]);
     }
-    
+
     public function testGetCollection()
     {
         $this->get(
@@ -61,11 +61,11 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $this->volume->getKey(),
-                'name'       => $this->volume->name,
-                'vpc_id'       => $this->volume->vpc_id,
+                'id' => $this->volume->getKey(),
+                'name' => $this->volume->name,
+                'vpc_id' => $this->volume->vpc_id,
                 'availability_zone_id' => $this->volume->availability_zone_id,
-                'capacity'       => $this->volume->capacity,
+                'capacity' => $this->volume->capacity,
             ])
             ->assertResponseStatus(200);
     }
@@ -80,9 +80,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $this->volume->id,
-                'name'       => $this->volume->name,
-                'vpc_id'       => $this->volume->vpc_id,
+                'id' => $this->volume->id,
+                'name' => $this->volume->name,
+                'vpc_id' => $this->volume->vpc_id,
                 'availability_zone_id' => $this->volume->availability_zone_id
             ])
             ->dontSeeJson(
@@ -103,9 +103,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $this->volume->id,
-                'name'       => $this->volume->name,
-                'vpc_id'       => $this->volume->vpc_id,
+                'id' => $this->volume->id,
+                'name' => $this->volume->name,
+                'vpc_id' => $this->volume->vpc_id,
                 'availability_zone_id' => $this->volume->availability_zone_id,
                 'vmware_uuid' => '03747ccf-d56b-45a9-b589-177f3cb9936e'
             ])
