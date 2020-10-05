@@ -8,7 +8,10 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
+use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -49,6 +52,17 @@ class DeleteTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ]);
+
+        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
+        $mockKingpinService->shouldReceive('delete')
+            ->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey()])
+            ->andReturn(
+                new Response(200)
+            );
+
+        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
+            return $mockKingpinService;
+        });
     }
 
     public function testSuccessfulDelete()
