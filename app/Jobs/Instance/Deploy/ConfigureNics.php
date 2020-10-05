@@ -5,8 +5,10 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use IPLib\Range\Subnet;
 
 class ConfigureNics extends Job
 {
@@ -34,13 +36,13 @@ class ConfigureNics extends Job
         $instanceNics = $instance->nics()
             ->whereNotNull('network_id')
             ->where('network_id', '!=', '')
-            ->lockForUpdate()
             ->get();
 
         $nicsByNetwork = $instanceNics->groupBy('network_id');
-        $nicsByNetwork->each(function ($nics, $networkId) use ($nsxService, $logMessage, $database) {
+
+        foreach ($nicsByNetwork as $networkId => $nics) {
             $network = Network::findOrFail($networkId);
-            $subnet = \IPLib\Range\Subnet::fromString($network->subnet);
+            $subnet = Subnet::fromString($network->subnet);
 
             /**
              * Get DHCP static bindings to determine used IP addresses on the network
@@ -60,7 +62,7 @@ class ConfigureNics extends Job
             } catch (GuzzleException $exception) {
                 $database->rollback();
                 $this->fail(
-                    new \Exception($logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents())
+                    new Exception($logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents())
                 );
                 return;
             }
@@ -75,7 +77,7 @@ class ConfigureNics extends Job
                 $reserved = 3;
                 $iterator = 0;
 
-                $ip = $subnet->getStartAddress();
+                $ip = $subnet->getStartAddress(); //First reserved IP
                 while ($ip = $ip->getNextAddress()) {
                     $iterator++;
                     if ($iterator <= $reserved) {
@@ -83,7 +85,7 @@ class ConfigureNics extends Job
                     }
                     if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
                         $database->rollback();
-                        $this->fail(new \Exception('Insufficient available IP\'s in subnet to assign to NICs'));
+                        $this->fail(new Exception('Insufficient available IP\'s in subnet to assign to NICs'));
                         return;
                     }
 
@@ -98,16 +100,32 @@ class ConfigureNics extends Job
                         continue;
                     }
 
-                    $nic->ip_address = $checkIp;
-                    $nic->save();
                     $assignedIpsDb->push($checkIp);
+
+                    $nic->ip_address = $checkIp;
+                    Log::info('Ip Address ' . $nic->ip_address . ' assigned to ' . $nic->getKey());
+
+                    try {
+                        $nic->save();
+                    } catch (Exception $exception) {
+                        if ($exception->getCode() == 23000) {
+                            // Ip already assigned
+                            Log::error('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': ' . $exception->getMessage());
+                            continue;
+                        }
+
+                        $database->rollback();
+                        $this->fail(new Exception(
+                            $logMessage . 'Failed: ' . $exception->getMessage()
+                        ));
+                        return;
+                    }
                     break;
                 }
             }
-        });
+        }
 
         $database->commit();
-
         //Create dhcp lease for the ip to the nic's mac address on NSX
         //https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
         $instanceNics->each(function ($nic) use ($nsxService, $logMessage) {
@@ -124,11 +142,12 @@ class ConfigureNics extends Job
                     ]
                 );
             } catch (GuzzleException $exception) {
-                $this->fail(new \Exception(
-                    $logMessage.'Failed: '.$exception->getResponse()->getBody()->getContents()
+                $this->fail(new Exception(
+                    $logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents()
                 ));
                 return;
             }
+            Log::info('DHCP lease created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
         });
     }
 }

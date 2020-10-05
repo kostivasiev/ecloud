@@ -15,6 +15,8 @@ class AddIpAddressToNicsTable extends Migration
     {
         Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
             $table->ipAddress('ip_address')->after('network_id')->nullable();
+            $table->boolean('deleted')->default(false);
+            $table->unique(['ip_address', 'network_id', 'deleted'], 'idx_unique_ip');
         });
     }
 
@@ -25,8 +27,13 @@ class AddIpAddressToNicsTable extends Migration
      */
     public function down()
     {
+        //Separate statement to satisfy SQLite dropping the index
         Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
-            $table->dropColumn('ip_address');
+            $table->dropUnique('idx_unique_ip');
+        });
+
+        Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
+            $table->dropColumn(['ip_address', 'deleted']);
         });
     }
 }

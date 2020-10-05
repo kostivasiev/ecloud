@@ -5,9 +5,11 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
+use UKFast\DB\Ditto\Sort;
 
 /**
  * Class Nic
@@ -31,6 +33,19 @@ class Nic extends Model
         'network_id',
         'ip_address'
     ];
+
+    protected $casts = [
+        'deleted' => 'boolean'
+    ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($instance) {
+            $instance->deleted = true;
+        });
+    }
 
     public function instance()
     {
@@ -79,8 +94,8 @@ class Nic extends Model
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -97,7 +112,7 @@ class Nic extends Model
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @return array|Sort|Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
     {
