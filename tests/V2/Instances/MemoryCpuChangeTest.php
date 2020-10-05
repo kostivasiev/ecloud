@@ -1,21 +1,15 @@
 <?php
 namespace Tests\V2\Instances;
 
-use App\Events\V2\MemoryChanged;
-use App\Listeners\V2\MemoryChange;
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
+use App\Events\V2\ComputeChanged;
+use App\Listeners\V2\ComputeChange;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
-use App\Models\V2\Vpc;
 use App\Services\NsxService;
 use Faker\Factory as Faker;
-use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
-use UKFast\Admin\Devices\AdminClient;
 
 class MemoryCpuChangeTest extends TestCase
 {
@@ -48,9 +42,9 @@ class MemoryCpuChangeTest extends TestCase
         $this->instance->id = 'i-abc123xyz';
         $this->instance->vpc_id = 'vpc-abc123xyz';
 
-        $this->event = new MemoryChanged($this->instance);
+        $this->event = new ComputeChanged($this->instance);
 
-        $this->listener = \Mockery::mock(MemoryChange::class)
+        $this->listener = \Mockery::mock(ComputeChange::class)
             ->makePartial();
         $this->listener->shouldReceive('put')
             ->with(
