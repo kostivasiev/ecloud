@@ -19,6 +19,7 @@ use UKFast\Responses\UKFastResource;
  * @property boolean locked
  * @property string online
  * @property string platform
+ * @property integer volume_capacity
  * @property string created_at
  * @property string updated_at
  */
@@ -40,6 +41,7 @@ class InstanceResource extends UKFastResource
             'ram_capacity' => $this->ram_capacity,
             'locked' => $this->locked,
             'platform' => $this->platform,
+            'volume_capacity' => $this->volume_capacity,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
