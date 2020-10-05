@@ -48,11 +48,11 @@ class UpdateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified router id was not found',
                 'status' => 422,
                 'source' => 'router_id'
@@ -70,7 +70,7 @@ class UpdateTest extends TestCase
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(200);
 

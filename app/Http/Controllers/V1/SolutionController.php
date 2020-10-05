@@ -3,26 +3,19 @@
 namespace App\Http\Controllers\V1;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
-use App\Exceptions\V1\ServiceUnavailableException;
-use App\Models\V1\DrsRule;
-use App\Services\AccountsService;
-use App\Solution\CanModifyResource;
-use UKFast\DB\Ditto\QueryTransformer;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-
-use App\Models\V1\Solution;
 use App\Exceptions\V1\SolutionNotFoundException;
-use UKFast\Api\Exceptions\DatabaseException;
-
+use App\Models\V1\DrsRule;
+use App\Models\V1\Solution;
+use App\Solution\CanModifyResource;
 use App\Traits\V1\SanitiseRequestData;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Collection;
-
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use UKFast\Api\Exceptions\DatabaseException;
+use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class SolutionController extends BaseController
 {
@@ -168,7 +161,7 @@ class SolutionController extends BaseController
      * @param Request $request
      * @param $solutionId
      * @return \Illuminate\Http\Response
-     * @throws \App\Exceptions\V1\SolutionNotFoundException
+     * @throws SolutionNotFoundException
      */
     public function getDrsRules(Request $request, $solutionId)
     {
@@ -181,7 +174,7 @@ class SolutionController extends BaseController
             $this->paginateDrsRuleData($rules)
         );
     }
-    
+
     /**
      * Paginate template data
      * @param $rules

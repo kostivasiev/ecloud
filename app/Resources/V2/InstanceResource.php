@@ -25,26 +25,26 @@ use UKFast\Responses\UKFastResource;
 class InstanceResource extends UKFastResource
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
     {
         $response = [
-            'id'           => $this->id,
-            'name'         => $this->name,
-            'vpc_id'       => $this->vpc_id,
+            'id' => $this->id,
+            'name' => $this->name,
+            'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
             'appliance_id' => $this->appliance_id,
-            'vcpu_cores'   => $this->vcpu_cores,
+            'vcpu_cores' => $this->vcpu_cores,
             'ram_capacity' => $this->ram_capacity,
-            'locked'       => $this->locked,
-            'platform'     => $this->platform,
-            'created_at'   => Carbon::parse(
+            'locked' => $this->locked,
+            'platform' => $this->platform,
+            'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at'   => Carbon::parse(
+            'updated_at' => Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

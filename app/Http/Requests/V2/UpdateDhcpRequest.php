@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\V2;
 
-use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
@@ -31,7 +30,7 @@ class UpdateDhcpRequest extends FormRequest
     public function rules()
     {
         return [
-            'vpc_id'    => [
+            'vpc_id' => [
                 'sometimes',
                 'required',
                 'string',

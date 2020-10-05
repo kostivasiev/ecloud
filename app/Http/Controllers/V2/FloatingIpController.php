@@ -17,7 +17,7 @@ class FloatingIpController extends BaseController
 {
     /**
      * Get resource collection
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
@@ -34,7 +34,7 @@ class FloatingIpController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $instanceId
      * @return FloatingIpResource
      */
@@ -52,7 +52,7 @@ class FloatingIpController extends BaseController
     public function store(CreateFloatingIpRequest $request)
     {
         $resource = new FloatingIp(
-            //$request->only([''])
+        //$request->only([''])
         );
         $resource->save();
         $resource->refresh();
@@ -73,7 +73,7 @@ class FloatingIpController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $instanceId
      * @return \Illuminate\Http\JsonResponse
      */

@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\V1;
 
-use UKFast\DB\Ditto\QueryTransformer;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-
 use App\Models\V1\SolutionNetwork;
+use Illuminate\Http\Request;
+use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class SolutionNetworkController extends BaseController
 {

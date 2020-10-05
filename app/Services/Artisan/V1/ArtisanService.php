@@ -218,8 +218,8 @@ class ArtisanService
      */
     public function getHostSet($hostSetName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/hostset/' . $hostSetName;
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/hostset/' . $hostSetName;
 
         try {
             $this->makeRequest('GET', $url);
@@ -247,8 +247,8 @@ class ArtisanService
      */
     public function getVolumeSet($volumeSetName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset/' . $volumeSetName;
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset/' . $volumeSetName;
 
         try {
             $this->makeRequest('GET', $url);
@@ -277,8 +277,8 @@ class ArtisanService
      */
     public function getVolumeSetExports($volumeSetName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset/' . $volumeSetName. '/export';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset/' . $volumeSetName . '/export';
 
         try {
             $this->makeRequest('GET', $url);
@@ -306,8 +306,8 @@ class ArtisanService
      */
     public function setIOPS($volumeSetName, $maximumIOPS)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset/' . $volumeSetName . '/maxiops';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset/' . $volumeSetName . '/maxiops';
 
         $model = array(
             'maximumIOPS' => $maximumIOPS
@@ -333,8 +333,8 @@ class ArtisanService
      */
     public function addHostToHostSet($hostSetName, $hostName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/hostset/' . $hostSetName. '/member';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/hostset/' . $hostSetName . '/member';
 
         $model = array(
             'hostName' => $hostName
@@ -359,8 +359,8 @@ class ArtisanService
      */
     public function removeHostFromHostSet($hostSetName, $hostName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/hostset/' . $hostSetName. '/member/' . $hostName;
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/hostset/' . $hostSetName . '/member/' . $hostName;
 
         try {
             $this->makeRequest('DELETE', $url);
@@ -381,8 +381,8 @@ class ArtisanService
      */
     public function removeHost($hostName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/host/' . $hostName;
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/host/' . $hostName;
 
         try {
             $this->makeRequest('DELETE', $url);
@@ -403,8 +403,8 @@ class ArtisanService
      */
     public function addVolumeToVolumeSet($volumeSetName, $volumeName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset/' . $volumeSetName. '/member';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset/' . $volumeSetName . '/member';
 
         $model = array(
             'volumeName' => $volumeName
@@ -429,8 +429,8 @@ class ArtisanService
      */
     public function expandVolume($volumeName, $newSizeMib)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volume/' . $volumeName. '/expand';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volume/' . $volumeName . '/expand';
 
         $model = array(
             'newSizeMiB' => $newSizeMib
@@ -446,8 +446,6 @@ class ArtisanService
     }
 
 
-
-
     /**
      * Remove a volume from a volume set
      * @param $volumeSetName
@@ -458,8 +456,8 @@ class ArtisanService
      */
     public function removeVolumeFromVolumeSet($volumeSetName, $volumeName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset/' . $volumeSetName. '/member/' . $volumeName;
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset/' . $volumeSetName . '/member/' . $volumeName;
 
         try {
             $this->makeRequest('DELETE', $url);
@@ -480,8 +478,8 @@ class ArtisanService
      */
     public function createHostSet($hostSetIdentifier)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/hostset';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/hostset';
 
         $model = array(
             'hostSetIdentifier' => $hostSetIdentifier
@@ -509,8 +507,8 @@ class ArtisanService
      */
     public function createVolumeSet($volumeSetIdentifier)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset';
 
         $model = array(
             'volumeSetIdentifier' => $volumeSetIdentifier
@@ -540,8 +538,8 @@ class ArtisanService
      */
     public function createVolume($volumeIdentifier, $type, $sizeMiB)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volume';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volume';
 
         $model = array(
             'volumeIdentifier' => $volumeIdentifier,
@@ -576,8 +574,8 @@ class ArtisanService
      */
     public function exportVolumeSet($volumeSetName, $hostSetName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset/' . $volumeSetName. '/export';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset/' . $volumeSetName . '/export';
 
         $model = array(
             'hostSetName' => $hostSetName
@@ -602,8 +600,8 @@ class ArtisanService
      */
     public function unExportVolumeSet($volumeSetName, $hostSetName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset/' . $volumeSetName. '/export';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset/' . $volumeSetName . '/export';
 
         $model = array(
             'hostSetName' => $hostSetName
@@ -619,7 +617,6 @@ class ArtisanService
     }
 
 
-
     /**
      * Delete a host set
      * @param $hostSetName
@@ -629,8 +626,8 @@ class ArtisanService
      */
     public function deleteHostSet($hostSetName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/hostset' . '/' . $hostSetName;
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/hostset' . '/' . $hostSetName;
 
         try {
             $this->makeRequest('DELETE', $url);
@@ -650,8 +647,8 @@ class ArtisanService
      */
     public function deleteVolumeSet($volumeSetName)
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/volumeset' . '/' . $volumeSetName;
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/volumeset' . '/' . $volumeSetName;
 
         try {
             $this->makeRequest('DELETE', $url);
@@ -674,8 +671,8 @@ class ArtisanService
      */
     public function createHost($hostIdentifier, array $FCWWNs = [], $osType = "VMWare")
     {
-        $baseUrl       = $this->generateV1URL();
-        $url           = $baseUrl . '/host';
+        $baseUrl = $this->generateV1URL();
+        $url = $baseUrl . '/host';
 
         $model = array(
             'hostIdentifier' => $hostIdentifier,
@@ -695,7 +692,6 @@ class ArtisanService
         // Return the new host name
         return $Host;
     }
-
 
 
     /**
@@ -758,11 +754,11 @@ class ArtisanService
      */
     protected function makeRequest(string $method, string $url, array $data = array())
     {
-        $this->requestData   = $data;
+        $this->requestData = $data;
         $this->requestMethod = $method;
-        $this->requestUrl    = $url;
-        $this->response      = null;
-        $this->responseData  = null;
+        $this->requestUrl = $url;
+        $this->response = null;
+        $this->responseData = null;
 
         if (empty($this->sanUsername) || empty($this->sanPassword)) {
             throw new ArtisanException('Invalid credentials');
@@ -771,7 +767,7 @@ class ArtisanService
         // Always set the authentication options
         $requestOptions = [
             'auth' => [$this->authUsername, $this->authPassword],
-            'headers'=>[
+            'headers' => [
                 "X-UKFast-SAN-Username" => $this->sanUsername,
                 "X-UKFast-SAN-Password" => $this->sanPassword
             ]

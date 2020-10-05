@@ -4,8 +4,8 @@ namespace Tests\V2\FirewallRule;
 
 use App\Models\V2\FirewallRule;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
@@ -30,7 +30,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Not found',
+                'title' => 'Not found',
                 'detail' => 'No Firewall Rule with that ID was found',
                 'status' => 404,
             ])

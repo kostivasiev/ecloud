@@ -47,11 +47,11 @@ class OnlineTest extends TestCase
             'appliance_version_appliance_id' => $this->appliance->id,
         ])->refresh();
         $this->instance = factory(Instance::class)->create([
-            'vpc_id'               => $this->vpc->getKey(),
-            'name'                 => 'GetTest Default',
+            'vpc_id' => $this->vpc->getKey(),
+            'name' => 'GetTest Default',
             'appliance_version_id' => $this->appliance_version->uuid,
-            'vcpu_cores'           => 1,
-            'ram_capacity'         => 1024,
+            'vcpu_cores' => 1,
+            'ram_capacity' => 1024,
         ]);
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
@@ -73,7 +73,7 @@ class OnlineTest extends TestCase
             '/v2/instances',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->dontSeeJson([
@@ -91,7 +91,7 @@ class OnlineTest extends TestCase
             '/v2/instances/' . $this->instance->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([

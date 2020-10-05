@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * Class Delete
  * Delete an instance from vmware
- * @param  string instanceId
+ * @param string instanceId
  * @package App\Console\Commands\Kingpin\Instance
  */
 class Delete extends Command
@@ -28,10 +28,10 @@ class Delete extends Command
 
         try {
             $instance->availabilityZone->kingpinService()->delete(
-                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->getKey()
+                '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey()
             );
         } catch (\Exception $e) {
-            $errorMessage = 'Failed to delete instance'.$e->getMessage();
+            $errorMessage = 'Failed to delete instance' . $e->getMessage();
             $this->output->writeln($errorMessage);
             Log::error($errorMessage);
         }

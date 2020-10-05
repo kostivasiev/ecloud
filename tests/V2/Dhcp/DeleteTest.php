@@ -29,7 +29,7 @@ class DeleteTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->delete('/v2/dhcps/' . $this->dhcp->getKey())->seeJson([
-            'title'  => 'Unauthorised',
+            'title' => 'Unauthorised',
             'detail' => 'Unauthorised',
             'status' => 401,
         ])->assertResponseStatus(401);
@@ -54,7 +54,7 @@ class DeleteTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
-            'title'  => 'Not found',
+            'title' => 'Not found',
             'detail' => 'No Dhcp with that ID was found',
             'status' => 404,
         ])->assertResponseStatus(404);

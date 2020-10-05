@@ -5,8 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -40,8 +38,8 @@ class FloatingIp extends Model implements Filterable, Sortable
     ];
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
-     * @return array|\UKFast\DB\Ditto\Filter[]
+     * @param FilterFactory $factory
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
@@ -53,7 +51,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -67,7 +65,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
@@ -83,7 +81,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'=> 'id',
+            'id' => 'id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

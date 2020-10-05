@@ -3,12 +3,10 @@
 namespace App\Services\Kingpin\V1;
 
 use App\Exceptions\V1\KingpinException;
-use App\Models\V1\ServerLicense;
 use App\Models\V1\Solution;
 use App\Template\PodTemplate;
 use App\Template\SolutionTemplate;
 use App\Template\Template;
-use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TransferException;
 use Log;
 use Psr\Http\Message\ResponseInterface;
@@ -274,9 +272,9 @@ class KingpinService
                     $hdd = new \StdClass();
 
                     if (isset($disk->scsiCanonicalName)) {
-                        $hdd->uuid   = $disk->scsiCanonicalName;
+                        $hdd->uuid = $disk->scsiCanonicalName;
                     } else {
-                        $hdd->uuid   = $disk->uuid;
+                        $hdd->uuid = $disk->uuid;
                     }
 
                     $hdd->name = $disk->name;
@@ -454,9 +452,9 @@ class KingpinService
                 Log::info(
                     'Failed to load solution template from Kingpin by name: no response data from Kingpin',
                     [
-                        'solution_id'             => $solution->getKey(),
+                        'solution_id' => $solution->getKey(),
                         'requested_template_name' => $templateName,
-                        'url'                     => $url,
+                        'url' => $url,
                     ]
                 );
                 return false;
@@ -469,9 +467,9 @@ class KingpinService
             Log::info(
                 'Failed to load solution template from Kingpin by name',
                 [
-                    'solution_id'             => $solution->getKey(),
+                    'solution_id' => $solution->getKey(),
                     'requested_template_name' => $templateName,
-                    'url'                     => $url,
+                    'url' => $url,
                 ]
             );
             return false;
@@ -594,7 +592,7 @@ class KingpinService
     public function expandDatastore($solutionId, $datastoreName)
     {
         $url = $this->generateV1URL($solutionId);
-        $url .= 'datastore/'. $datastoreName  .'/expand';
+        $url .= 'datastore/' . $datastoreName . '/expand';
 
         try {
             $this->makeRequest('PUT', $url);
@@ -618,7 +616,7 @@ class KingpinService
         try {
             $this->makeRequest(
                 'GET',
-                $this->generateV1URL($solutionId) . 'host/'.$eth0_mac.''
+                $this->generateV1URL($solutionId) . 'host/' . $eth0_mac . ''
             );
         } catch (TransferException $exception) {
 //            throw new KingpinException($exception->getMessage());
@@ -639,7 +637,7 @@ class KingpinService
      */
     protected function formatHost($vmwareObject)
     {
-        return (object) [
+        return (object)[
             'uuid' => $vmwareObject->modelRef,
             'name' => $vmwareObject->name,
             'macAddress' => $vmwareObject->macAddress,
@@ -663,7 +661,7 @@ class KingpinService
         try {
             $this->makeRequest(
                 'GET',
-                $this->generateV1URL($solutionId) . 'host?detailVM=' . ($detailVM ? 'true':'false')
+                $this->generateV1URL($solutionId) . 'host?detailVM=' . ($detailVM ? 'true' : 'false')
             );
         } catch (TransferException $exception) {
             throw new KingpinException('unable to query hosts');
@@ -695,7 +693,7 @@ class KingpinService
         try {
             $this->makeRequest(
                 'GET',
-                $this->generateV1URL($solutionId) . 'datastore/'.$datastoreName.''
+                $this->generateV1URL($solutionId) . 'datastore/' . $datastoreName . ''
             );
         } catch (TransferException $exception) {
             throw new KingpinException($exception->getMessage());
@@ -739,7 +737,7 @@ class KingpinService
         return $datastores;
     }
 
-        /**
+    /**
      * Returns an array of DRS rules for the solution
      * @param $solution
      * @return null
@@ -767,7 +765,7 @@ class KingpinService
      */
     protected function formatDatastore($vmwareObject)
     {
-        return (object) [
+        return (object)[
             'uuid' => $vmwareObject->modelRef,
             'name' => $vmwareObject->name,
             'type' => $vmwareObject->type,

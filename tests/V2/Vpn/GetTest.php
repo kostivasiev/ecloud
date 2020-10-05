@@ -28,7 +28,7 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
@@ -51,8 +51,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'                   => $this->vpn->getKey(),
-                'router_id'            => $this->vpn->router_id,
+                'id' => $this->vpn->getKey(),
+                'router_id' => $this->vpn->router_id,
                 'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
@@ -68,8 +68,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'                   => $this->vpn->getKey(),
-                'router_id'            => $this->vpn->router_id,
+                'id' => $this->vpn->getKey(),
+                'router_id' => $this->vpn->router_id,
                 'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);

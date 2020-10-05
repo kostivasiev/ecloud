@@ -27,24 +27,29 @@ class WaitOsCustomisation extends Job
      */
     public function handle()
     {
-        Log::info('Performing WaitOsCustomisation for instance '.$this->data['instance_id']);
+        Log::info('Performing WaitOsCustomisation for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/oscustomization/status'
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/oscustomization/status'
             );
             if ($response->getStatusCode() != 200) {
                 $this->fail(new \Exception(
-                    'WaitOsCustomisation failed for '.$instance->id.', Kingpin status was '.$response->getStatusCode()
+                    'WaitOsCustomisation failed for ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
                 ));
                 return;
             }
 
             $data = json_decode($response->getBody()->getContents());
             if (!$data) {
-                $this->fail(new \Exception('WaitOsCustomisation failed for '.$instance->id.', could not decode response'));
+                $this->fail(new \Exception('WaitOsCustomisation failed for ' . $instance->id . ', could not decode response'));
+                return;
+            }
+
+            if ($data->status === 'Failed') {
+                $this->fail(new \Exception('WaitOsCustomisation failed for ' . $instance->id));
                 return;
             }
 
@@ -52,26 +57,21 @@ class WaitOsCustomisation extends Job
                 if ($this->attempts() <= static::RETRY_ATTEMPTS) {
                     $this->release(static::RETRY_DELAY);
                     Log::info(
-                        'Check for WaitOsCustomisation for '.$instance->id.' returned "'.
-                        $data->status.'", retrying in '.static::RETRY_DELAY.' seconds'
+                        'Check for WaitOsCustomisation for ' . $instance->id . ' returned "' .
+                        $data->status . '", retrying in ' . static::RETRY_DELAY . ' seconds'
                     );
                     return;
                 } else {
-                    $this->fail(new \Exception('Timed out on WaitOsCustomisation for '.$instance->id));
+                    $this->fail(new \Exception('Timed out on WaitOsCustomisation for ' . $instance->id));
                     return;
                 }
             }
         } catch (GuzzleException $exception) {
             $this->fail(new \Exception(
-                'WaitOsCustomisation failed for '.$instance->id.' : '.
+                'WaitOsCustomisation failed for ' . $instance->id . ' : ' .
                 $exception->getResponse()->getBody()->getContents()
             ));
             return;
         }
-    }
-
-    public function failed(\Exception $exception)
-    {
-        Log::info($exception->getMessage());
     }
 }

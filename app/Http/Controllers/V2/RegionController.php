@@ -17,7 +17,7 @@ use UKFast\DB\Ditto\QueryTransformer;
 class RegionController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -33,7 +33,7 @@ class RegionController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $regionId
      * @return RegionResource
      */
@@ -45,31 +45,31 @@ class RegionController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateRegionRequest $request
+     * @param CreateRegionRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateRegionRequest $request)
     {
-        $region = new Region($request->only(['name','is_public']));
+        $region = new Region($request->only(['name', 'is_public']));
         $region->save();
         return $this->responseIdMeta($request, $region->getKey(), 201);
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateRegionRequest $request
+     * @param UpdateRegionRequest $request
      * @param string $regionId
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateRegionRequest $request, string $regionId)
     {
         $region = Region::findOrFail($regionId);
-        $region->fill($request->only(['name','is_public']))->save();
+        $region->fill($request->only(['name', 'is_public']))->save();
         return $this->responseIdMeta($request, $region->getKey(), 200);
     }
 
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $regionId
      * @return \Illuminate\Http\JsonResponse
      */

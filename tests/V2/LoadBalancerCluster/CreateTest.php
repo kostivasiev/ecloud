@@ -7,8 +7,8 @@ use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -27,7 +27,7 @@ class CreateTest extends TestCase
         $this->region = factory(Region::class)->create();
 
         $this->vpc = factory(Vpc::class)->create([
-            'name'    => 'Manchester DC',
+            'name' => 'Manchester DC',
             'region_id' => $this->region->getKey()
         ]);
 
@@ -39,7 +39,7 @@ class CreateTest extends TestCase
     public function testInvalidVpcIdIsFailed()
     {
         $data = [
-            'name'    => 'My Load Balancer Cluster',
+            'name' => 'My Load Balancer Cluster',
             'vpc_id' => $this->faker->uuid(),
             'availability_zone_id' => $this->availabilityZone->getKey()
         ];
@@ -53,7 +53,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -64,7 +64,7 @@ class CreateTest extends TestCase
     public function testInvalidavailabilityZoneIsFailed()
     {
         $data = [
-            'name'    => 'My Load Balancer Cluster',
+            'name' => 'My Load Balancer Cluster',
             'vpc_id' => $this->faker->uuid(),
             'availability_zone_id' => $this->faker->uuid()
         ];
@@ -78,7 +78,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -89,7 +89,7 @@ class CreateTest extends TestCase
     public function testNotOwnedVpcIdIsFailed()
     {
         $data = [
-            'name'    => 'My Load Balancer Cluster',
+            'name' => 'My Load Balancer Cluster',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->faker->uuid()
         ];
@@ -103,7 +103,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
                 'status' => 422,
                 'source' => 'vpc_id'
@@ -114,8 +114,8 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => 'My Load Balancer Cluster',
-            'vpc_id'    => $this->vpc->getKey(),
+            'name' => 'My Load Balancer Cluster',
+            'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey()
         ];
         $this->post(

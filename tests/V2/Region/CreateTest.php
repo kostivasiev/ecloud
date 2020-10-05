@@ -4,8 +4,8 @@ namespace Tests\V2\Region;
 
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -21,14 +21,14 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create([
-            'name'    => 'Manchester',
+            'name' => 'Manchester',
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
         $data = [
-            'name'    => 'United Kingdom',
+            'name' => 'United Kingdom',
         ];
         $this->post(
             '/v2/regions',
@@ -36,7 +36,7 @@ class CreateTest extends TestCase
             []
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -46,7 +46,7 @@ class CreateTest extends TestCase
     public function testNullNameIsFailed()
     {
         $data = [
-            'name'    => '',
+            'name' => '',
         ];
         $this->post(
             '/v2/regions',
@@ -58,7 +58,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The name field is required',
                 'status' => 422,
                 'source' => 'name'
@@ -69,7 +69,7 @@ class CreateTest extends TestCase
     public function testNotAdminFails()
     {
         $data = [
-            'name'    => $this->faker->word(),
+            'name' => $this->faker->word(),
         ];
         $this->post(
             '/v2/regions',
@@ -80,7 +80,7 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title'  => 'Unauthorised',
+                'title' => 'Unauthorised',
                 'detail' => 'Unauthorised',
                 'status' => 401,
             ])
@@ -90,7 +90,7 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'    => $this->faker->word(),
+            'name' => $this->faker->word(),
         ];
         $this->post(
             '/v2/regions',

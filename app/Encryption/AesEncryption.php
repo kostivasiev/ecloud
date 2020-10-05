@@ -2,8 +2,6 @@
 
 namespace App\Encryption;
 
-use GuzzleHttp\Client;
-
 class AesEncryption
 {
     /**
@@ -55,9 +53,9 @@ class AesEncryption
      */
     public function __construct(?string $key, ?string $initialisationVector)
     {
-        $this->key                  = $key;
+        $this->key = $key;
         $this->initialisationVector = $initialisationVector;
-        $this->handler              = mcrypt_module_open(
+        $this->handler = mcrypt_module_open(
             $this->algorithm,
             $this->algorithmDirectory,
             $this->mode,

@@ -5,8 +5,8 @@ namespace Tests\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -71,7 +71,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/availability-zones/'.$this->availabilityZone->getKey(),
+            '/v2/availability-zones/' . $this->availabilityZone->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -90,7 +90,7 @@ class GetTest extends TestCase
     public function testGetItemDetailNonAdminPropertiesHidden()
     {
         $this->get(
-            '/v2/availability-zones/'.$this->availabilityZone->getKey(),
+            '/v2/availability-zones/' . $this->availabilityZone->getKey(),
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',

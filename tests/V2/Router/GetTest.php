@@ -7,8 +7,8 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -42,12 +42,12 @@ class GetTest extends TestCase
             '/v2/routers',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'     => $this->router->getKey(),
-                'name'   => $this->router->name,
+                'id' => $this->router->getKey(),
+                'name' => $this->router->name,
                 'vpc_id' => $this->router->vpc_id,
             ])
             ->assertResponseStatus(200);
@@ -59,12 +59,12 @@ class GetTest extends TestCase
             '/v2/routers/' . $this->router->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'     => $this->router->id,
-                'name'   => $this->router->name,
+                'id' => $this->router->id,
+                'name' => $this->router->name,
                 'vpc_id' => $this->router->vpc_id
             ])
             ->assertResponseStatus(200);

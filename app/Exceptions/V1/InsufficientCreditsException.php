@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exceptions\V1;
 
 use UKFast\Api\Exceptions\ApiException;

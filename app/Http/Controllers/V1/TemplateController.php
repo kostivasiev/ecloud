@@ -2,25 +2,21 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\V1\IntapiServiceException;
 use App\Exceptions\V1\SolutionNotFoundException;
 use App\Exceptions\V1\TemplateNotFoundException;
-
-use App\Models\V1\Solution;
+use App\Exceptions\V1\TemplateUpdateException;
 use App\Models\V1\Pod;
-
 use App\Models\V1\PodTemplate;
+use App\Models\V1\Solution;
 use App\Models\V1\SolutionTemplate;
+use App\Services\IntapiService;
 use App\Solution\CanModifyResource;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-
-use App\Services\IntapiService;
-use App\Exceptions\V1\IntapiServiceException;
-
-use UKFast\Api\Exceptions\ForbiddenException;
-use App\Exceptions\V1\TemplateUpdateException;
 use Log;
+use UKFast\Api\Exceptions\ForbiddenException;
 
 /**
  * Class TemplateController
@@ -81,7 +77,7 @@ class TemplateController extends BaseController
      */
     public function showSolutionTemplate(Request $request, $solutionId, $templateName)
     {
-        $solution =  SolutionController::getSolutionById($request, $solutionId);
+        $solution = SolutionController::getSolutionById($request, $solutionId);
 
         $templateName = urldecode($templateName);
 

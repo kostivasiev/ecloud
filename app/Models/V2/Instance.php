@@ -73,6 +73,11 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(AvailabilityZone::class);
     }
 
+    public function nics()
+    {
+        return $this->hasMany(Nic::class);
+    }
+
     public function volumes()
     {
         return $this->belongsToMany(Volume::class);
@@ -82,7 +87,7 @@ class Instance extends Model implements Filterable, Sortable
     {
         try {
             $response = $this->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/'.$this->vpc_id.'/instance/'.$this->getKey()
+                '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
             );
         } catch (\Exception $e) {
             Log::info('Failed to get power state', [
@@ -131,14 +136,14 @@ class Instance extends Model implements Filterable, Sortable
     public function setDefaultPlatform()
     {
         if (empty($this->platform) && $this->applianceVersion) {
-                $this->platform = $this->applianceVersion->serverLicense()->category;
-                $this->save();
+            $this->platform = $this->applianceVersion->serverLicense()->category;
+            $this->save();
         }
     }
 
     /**
-     * @param  \UKFast\DB\Ditto\Factories\FilterFactory  $factory
-     * @return array|\UKFast\DB\Ditto\Filter[]
+     * @param FilterFactory $factory
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
@@ -158,7 +163,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  \UKFast\DB\Ditto\Factories\SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -180,7 +185,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  \UKFast\DB\Ditto\Factories\SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */

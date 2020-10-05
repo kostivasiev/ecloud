@@ -2,11 +2,10 @@
 
 namespace Tests\V2\FirewallRule;
 
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallRule;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -33,8 +32,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $instance->id,
-                'name'       => $instance->name,
+                'id' => $instance->id,
+                'name' => $instance->name,
             ])
             ->assertResponseStatus(200);
     }
@@ -52,8 +51,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $instance->id,
-                'name'       => $instance->name,
+                'id' => $instance->id,
+                'name' => $instance->name,
             ])
             ->assertResponseStatus(200);
     }

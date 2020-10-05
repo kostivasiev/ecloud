@@ -8,8 +8,8 @@ use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CredentialsTest extends TestCase
 {

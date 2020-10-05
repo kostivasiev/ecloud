@@ -2,10 +2,9 @@
 
 namespace Tests\V2\Credential;
 
-use App\Models\V2\Credential;
 use App\Providers\EncryptionServiceProvider;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -17,7 +16,7 @@ class CreateTest extends TestCase
 
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
             ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function() use ($mockEncryptionServiceProvider) {
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
             return $mockEncryptionServiceProvider;
         });
         $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');

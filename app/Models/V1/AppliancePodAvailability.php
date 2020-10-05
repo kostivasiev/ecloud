@@ -2,10 +2,9 @@
 
 namespace App\Models\V1;
 
-use Illuminate\Database\Eloquent\Model;
-
-use App\Traits\V1\ColumnPrefixHelper;
 use App\Events\V1\AppliancePodAvailabilityDeletedEvent;
+use App\Traits\V1\ColumnPrefixHelper;
+use Illuminate\Database\Eloquent\Model;
 
 class AppliancePodAvailability extends Model
 {

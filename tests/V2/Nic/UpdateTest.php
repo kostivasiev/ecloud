@@ -47,7 +47,7 @@ class UpdateTest extends TestCase
         $this->nic = factory(Nic::class)->create([
             'mac_address' => $this->macAddress,
             'instance_id' => $this->instance->getKey(),
-            'network_id'  => $this->network->getKey(),
+            'network_id' => $this->network->getKey(),
         ])->refresh();
     }
 
@@ -60,11 +60,11 @@ class UpdateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The mac address must be a valid MAC address',
                 'status' => 422,
             ])
@@ -80,11 +80,11 @@ class UpdateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The instance id is not a valid Instance',
                 'status' => 422,
             ])
@@ -100,11 +100,11 @@ class UpdateTest extends TestCase
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The network id is not a valid Network',
                 'status' => 422,
             ])
@@ -118,11 +118,11 @@ class UpdateTest extends TestCase
             [
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getKey(),
-                'network_id'  => $this->network->getKey(),
+                'network_id' => $this->network->getKey(),
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(201);

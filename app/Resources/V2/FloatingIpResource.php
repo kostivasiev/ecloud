@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -21,7 +22,7 @@ class FloatingIpResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
+            'id' => $this->id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

@@ -24,7 +24,7 @@ return [
         //     'user'
         // ]
     ],
-    
+
     /*
      * If true, all directories specified will be scanned recursively for models.
      * Set this to false if you prefer to explicitly define each directory that should

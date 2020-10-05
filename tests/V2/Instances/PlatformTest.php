@@ -4,8 +4,9 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
-use App\Models\V2\Instance;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -19,6 +20,7 @@ class PlatformTest extends TestCase
 
     protected \Faker\Generator $faker;
     protected $availability_zone;
+    protected $network;
     protected $region;
     protected $vpc;
     protected $appliance;
@@ -51,6 +53,7 @@ class PlatformTest extends TestCase
             return $mockAdminDevices;
         });
         Instance::boot();
+        $this->network = factory(Network::class)->create();
     }
 
     public function testSettingPlatform()
@@ -58,6 +61,7 @@ class PlatformTest extends TestCase
         $data = [
             'vpc_id' => $this->vpc->getKey(),
             'appliance_id' => $this->appliance->uuid,
+            'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ];

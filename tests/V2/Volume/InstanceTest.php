@@ -45,7 +45,7 @@ class InstanceTest extends TestCase
     public function testGetInstances()
     {
         $this->volume->instances()->attach($this->instance);
-        $this->get('/v2/volumes/'.$this->volume->getKey().'/instances', [
+        $this->get('/v2/volumes/' . $this->volume->getKey() . '/instances', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([

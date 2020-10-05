@@ -44,7 +44,7 @@ class AccountsService extends AbstractApioService
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function assignVmEncryptionCredit(Int $serverId): bool
+    public function assignVmEncryptionCredit(int $serverId): bool
     {
         try {
             $data = ['resource_id' => $serverId];
@@ -63,7 +63,7 @@ class AccountsService extends AbstractApioService
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function refundVmEncryptionCredit(Int $serverId): bool
+    public function refundVmEncryptionCredit(int $serverId): bool
     {
         try {
             $response = $this->makeRequest('DELETE', 'v1/credits/ecloud_vm_encryption/' . $serverId);
@@ -84,9 +84,9 @@ class AccountsService extends AbstractApioService
     public function getPaymentMethod($resellerId)
     {
         try {
-            $response = $this->makeRequest('GET', 'v1/customers/'.$resellerId.'');
+            $response = $this->makeRequest('GET', 'v1/customers/' . $resellerId . '');
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('unexpected response ('.$response->getStatusCode().') from accounts apio');
+                throw new \Exception('unexpected response (' . $response->getStatusCode() . ') from accounts apio');
             }
 
             $data = $this->parseResponseData($response->getBody()->getContents())->data;
@@ -109,9 +109,9 @@ class AccountsService extends AbstractApioService
     public function isDemoCustomer($resellerId)
     {
         try {
-            $response = $this->makeRequest('GET', 'v1/customers/'.$resellerId.'');
+            $response = $this->makeRequest('GET', 'v1/customers/' . $resellerId . '');
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('unexpected response ('.$response->getStatusCode().') from accounts apio');
+                throw new \Exception('unexpected response (' . $response->getStatusCode() . ') from accounts apio');
             }
 
             $data = $this->parseResponseData($response->getBody()->getContents())->data;

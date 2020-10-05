@@ -32,7 +32,7 @@ class GetTest extends TestCase
             'region_id' => $this->region->getKey(),
         ]);
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id'          => $this->region->getKey(),
+            'region_id' => $this->region->getKey(),
         ]);
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
@@ -42,7 +42,7 @@ class GetTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->get('/v2/dhcps')->seeJson([
-            'title'  => 'Unauthorised',
+            'title' => 'Unauthorised',
             'detail' => 'Unauthorised',
             'status' => 401,
         ])->assertResponseStatus(401);
@@ -54,7 +54,7 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
-            'id'     => $this->dhcp->id,
+            'id' => $this->dhcp->id,
             'vpc_id' => $this->dhcp->vpc_id,
         ])->assertResponseStatus(200);
     }

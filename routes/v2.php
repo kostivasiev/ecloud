@@ -6,7 +6,7 @@
 
 $middleware = [
     'auth',
-    'paginator-limit:'.env('PAGINATION_LIMIT')
+    'paginator-limit:' . env('PAGINATION_LIMIT')
 ];
 
 $baseRouteParameters = [
@@ -82,9 +82,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('instances', 'InstanceController@store');
         $router->patch('instances/{instanceId}', 'InstanceController@update');
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
-        $router->post('instances/{instanceId}/deploy', 'InstanceController@deploy');
         $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
         $router->put('instances/{instanceId}/power-off', 'InstanceController@powerOff');
+        $router->put('instances/{instanceId}/power-reset', 'InstanceController@powerReset');
+        $router->put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
+        $router->put('instances/{instanceId}/power-shutdown', 'InstanceController@guestShutdown');
     });
 
     /** Floating Ips */
@@ -136,7 +138,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
     });
-    
+
     /** Nics */
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('nics', 'NicController@index');

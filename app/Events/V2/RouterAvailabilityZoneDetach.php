@@ -3,8 +3,8 @@
 namespace App\Events\V2;
 
 use App\Models\V2\AvailabilityZone;
-use Illuminate\Queue\SerializesModels;
 use App\Models\V2\Router;
+use Illuminate\Queue\SerializesModels;
 
 class RouterAvailabilityZoneDetach
 {

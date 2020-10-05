@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Exceptions\V1\ServiceUnavailableException;
 use App\Services\AccountsService;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
-
 use Illuminate\Http\Request;
+use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
 
 class CreditsController extends BaseController
 {

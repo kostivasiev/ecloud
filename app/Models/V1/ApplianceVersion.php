@@ -2,27 +2,23 @@
 
 namespace App\Models\V1;
 
+use App\Events\V1\ApplianceVersionDeletedEvent;
+use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
 use App\Rules\V1\IsValidUuid;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Events\V1\ApplianceVersionDeletedEvent;
-
-use App\Exceptions\V1\ApplianceServerLicenseNotFoundException;
-
 use UKFast\Api\Resource\Property\BooleanProperty;
+use UKFast\Api\Resource\Property\DateTimeProperty;
+use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class ApplianceVersion extends Model implements Filterable, Sortable
 {
@@ -261,7 +257,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
      */
     public function getApplianceUuidAttribute()
     {
-        $appliance =  Appliance::select('appliance_uuid')
+        $appliance = Appliance::select('appliance_uuid')
             ->where('appliance_id', '=', $this->attributes['appliance_version_appliance_id']);
 
         if ($appliance->count() > 0) {
@@ -282,10 +278,9 @@ class ApplianceVersion extends Model implements Filterable, Sortable
     {
         $this->attributes['appliance_version_appliance_id'] =
             Appliance::select('appliance_id')
-            ->where('appliance_uuid', '=', $value)
-            ->first()->appliance_id;
+                ->where('appliance_uuid', '=', $value)
+                ->first()->appliance_id;
     }
-
 
 
     /**

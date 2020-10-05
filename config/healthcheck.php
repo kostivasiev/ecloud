@@ -35,7 +35,7 @@ return [
      * check the 'default' connection
      */
     'database' => [
-        'connections' => ['reseller','ecloud'],
+        'connections' => ['reseller', 'ecloud'],
     ],
 
     /**

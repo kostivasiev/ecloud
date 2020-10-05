@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Resources\V2\VolumeResource;
-use Illuminate\Http\Request;
+use App\Events\V2\Data\InstanceDeployEventData;
+use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\DeployRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -22,7 +25,7 @@ class InstanceController extends BaseController
 {
     /**
      * Get instance collection
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
@@ -39,7 +42,7 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $instanceId
      * @return InstanceResource
      */
@@ -55,8 +58,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  CreateRequest  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param CreateRequest $request
+     * @return JsonResponse
      */
     public function store(CreateRequest $request)
     {
@@ -76,13 +79,47 @@ class InstanceController extends BaseController
         }
         $instance->save();
         $instance->refresh();
+
+        // Use the default network if there is only one and no network_id was passed in
+        $defaultNetworkId = null;
+        if (!$request->has('network_id')) {
+            $routers = $instance->vpc->routers;
+            if (count($routers) == 1) {
+                $networks = $routers->first()->networks;
+                if (count($networks) == 1) {
+                    // This could be done better, but deadlines. Should check all routers/networks for owned Networks
+                    $defaultNetworkId = Network::forUser(app('request')->user)->findOrFail($networks->first()->id)->id;
+                }
+            }
+            if (!$defaultNetworkId) {
+                return JsonResponse::create([
+                    'errors' => [
+                        'title' => 'Not Found',
+                        'detail' => 'No network_id provided and could not find a default network',
+                        'status' => 404,
+                        'source' => 'availability_zone_id'
+                    ]
+                ], 404);
+            }
+        }
+
+        $instanceDeployData = new InstanceDeployEventData();
+        $instanceDeployData->instance_id = $instance->id;
+        $instanceDeployData->vpc_id = $instance->vpc->id;
+        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
+        $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
+        $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
+        $instanceDeployData->appliance_data = $request->input('appliance_data');
+        $instanceDeployData->user_script = $request->input('user_script');
+        event(new InstanceDeployEvent($instanceDeployData));
+
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
 
     /**
      * @param UpdateRequest $request
      * @param string $instanceId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(UpdateRequest $request, string $instanceId)
     {
@@ -108,9 +145,23 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @return JsonResponse
+     */
+    private function isLocked(): JsonResponse
+    {
+        return JsonResponse::create([
+            'errors' => [
+                'title' => 'Forbidden',
+                'detail' => 'The specified instance is locked',
+                'status' => 403,
+            ]
+        ], 403);
+    }
+
+    /**
+     * @param Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, string $instanceId)
     {
@@ -119,26 +170,12 @@ class InstanceController extends BaseController
             return $this->isLocked();
         }
         $instance->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function isLocked(): JsonResponse
-    {
-        return JsonResponse::create([
-            'errors' => [
-                'title'  => 'Forbidden',
-                'detail' => 'The specified instance is locked',
-                'status' => 403,
-            ]
-        ], 403);
-    }
-
-    /**
-     * @param  Request  $request
-     * @param  string  $instanceId
+     * @param Request $request
+     * @param string $instanceId
      *
      * @return AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
@@ -162,57 +199,17 @@ class InstanceController extends BaseController
         );
     }
 
-    public function deploy(DeployRequest $request, string $instanceId)
-    {
-        $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        if (!$instance) {
-            return response()->json([], 404);
-        }
-
-        // Use the default network if there is only one
-        $defaultNetwork = null;
-        if (!$request->has('network_id')) {
-            $routers = $instance->vpc->routers;
-            if (count($routers) == 1) {
-                $networks = $routers->first()->networks;
-                if (count($networks) == 1) {
-                    $defaultNetwork = $networks->first();
-                }
-            }
-        }
-
-        $data = [
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id,
-            'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.min')),
-            'network_id' => $request->input('network_id', $defaultNetwork),
-            'floating_ip_id' => $request->input('floating_ip_id'),
-            'appliance_data' => $request->input('appliance_data'),
-        ];
-
-        // Create the chained jobs for deployment
-        $this->dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
-            new \App\Jobs\Instance\Deploy\UpdateNetworkAdapter($data),
-            new \App\Jobs\Instance\PowerOn($data),
-            new \App\Jobs\Instance\Deploy\WaitOsCustomisation($data),
-            new \App\Jobs\Instance\Deploy\PrepareOsUsers($data),
-            new \App\Jobs\Instance\Deploy\OsCustomisation($data),
-            new \App\Jobs\Instance\Deploy\PrepareOsDisk($data),
-            new \App\Jobs\Instance\Deploy\RunApplianceBootstrap($data),
-            new \App\Jobs\Instance\Deploy\RunBootstrapScript($data),
-        ]));
-
-        return response()->json([], 202);
-    }
-
     public function powerOn(Request $request, $instanceId)
     {
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        // @todo - trigger power-onff event
+        $this->dispatch(new \App\Jobs\Instance\PowerOn([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
 
-        return response()->json([], 202);
+        return response('', 202);
     }
 
     public function powerOff(Request $request, $instanceId)
@@ -220,8 +217,51 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        // @todo - trigger power-off event
+        $this->dispatch(new \App\Jobs\Instance\PowerOff([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
 
-        return response()->json([], 202);
+
+        return response('', 202);
+    }
+
+    public function guestRestart(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        $this->dispatch(new \App\Jobs\Instance\GuestRestart([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
+
+        return response('', 202);
+    }
+
+    public function guestShutdown(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        $this->dispatch(new \App\Jobs\Instance\GuestShutdown([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
+
+        return response('', 202);
+    }
+
+    public function powerReset(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($instanceId);
+
+        $this->dispatch(new \App\Jobs\Instance\PowerReset([
+            'instance_id' => $instance->id,
+            'vpc_id' => $instance->vpc->id
+        ]));
+
+        return response('', 202);
     }
 }

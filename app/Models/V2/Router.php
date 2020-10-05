@@ -9,6 +9,7 @@ use App\Traits\V2\DefaultName;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -27,11 +28,10 @@ class Router extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'rtr';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'name',
@@ -92,6 +92,10 @@ class Router extends Model implements Filterable, Sortable
             $response = json_decode($response->getBody()->getContents());
             return $response->tier1_state->state == 'in_sync';
         } catch (GuzzleException $exception) {
+            Log::info('Router available state response', [
+                'id' => $this->getKey(),
+                'response' => json_decode($exception->getResponse()->getBody()->getContents())->details,
+            ]);
             return false;
         }
     }

@@ -2,16 +2,14 @@
 
 namespace App\Models\V1;
 
+use App\Traits\V1\UUIDHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
-use Ramsey\Uuid\Uuid;
-use App\Traits\V1\UUIDHelper;
 
 class PublicSupport extends Model implements Filterable, Sortable
 {

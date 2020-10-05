@@ -47,7 +47,7 @@ class DeleteTest extends TestCase
         $this->nic = factory(Nic::class)->create([
             'mac_address' => $this->macAddress,
             'instance_id' => $this->instance->getKey(),
-            'network_id'  => $this->network->getKey(),
+            'network_id' => $this->network->getKey(),
         ])->refresh();
     }
 
@@ -58,7 +58,7 @@ class DeleteTest extends TestCase
             [],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(204);

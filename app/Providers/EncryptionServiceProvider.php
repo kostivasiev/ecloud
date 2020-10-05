@@ -33,7 +33,7 @@ class EncryptionServiceProvider extends ServiceProvider
 
         $client = new Client([
             'base_uri' => config('encryption.keystore_host'),
-            'timeout'  => 2,
+            'timeout' => 2,
             'verify' => app()->environment('production'),
         ]);
 

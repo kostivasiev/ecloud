@@ -4,8 +4,8 @@ namespace Tests\V2\Credential;
 
 use App\Models\V2\Credential;
 use App\Providers\EncryptionServiceProvider;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
@@ -20,7 +20,7 @@ class UpdateTest extends TestCase
 
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
             ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function() use ($mockEncryptionServiceProvider) {
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
             return $mockEncryptionServiceProvider;
         });
         $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
@@ -33,7 +33,7 @@ class UpdateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $this->patch(
-            '/v2/credentials/'.$this->credential->getKey(),
+            '/v2/credentials/' . $this->credential->getKey(),
             [
                 'resource_id' => 'abc-abc123',
                 'host' => 'https://0.0.0.0',

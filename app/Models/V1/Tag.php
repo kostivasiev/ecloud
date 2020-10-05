@@ -3,17 +3,15 @@
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
-
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
-use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
-
+use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\IntProperty;
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 class Tag extends Model implements Filterable, Sortable
 {
@@ -160,7 +158,7 @@ class Tag extends Model implements Filterable, Sortable
         $solutionId = filter_var($solutionId, FILTER_SANITIZE_NUMBER_INT);
 
         $query->where('metadata_resource', 'ucs_reseller')
-              ->where('metadata_resource_id', $solutionId);
+            ->where('metadata_resource_id', $solutionId);
 
         return $query;
     }

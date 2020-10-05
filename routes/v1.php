@@ -6,7 +6,7 @@
 
 $middleware = [
     'auth',
-    'paginator-limit:'.env('PAGINATION_LIMIT')
+    'paginator-limit:' . env('PAGINATION_LIMIT')
 ];
 
 $baseRouteParameters = [
@@ -74,7 +74,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
     $router->get('solutions/{solution_id}/templates', 'TemplateController@indexSolutionTemplate');
     $router->get('solutions/{solution_id}/templates/{template_name}', 'TemplateController@showSolutionTemplate');
-    $router->post('solutions/{solution_id}/templates/{template_name}/move', 'TemplateController@renameSolutionTemplate');
+    $router->post('solutions/{solution_id}/templates/{template_name}/move',
+        'TemplateController@renameSolutionTemplate');
     $router->delete('solutions/{solution_id}/templates/{template_name}', 'TemplateController@deleteSolutionTemplate');
     $router->get('solutions/{solution_id}/tags', 'TagController@indexSolutionTags');
     $router->post('solutions/{solution_id}/tags', 'TagController@createSolutionTag');
@@ -175,7 +176,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('appliance-versions/{appliance_version_id}', 'ApplianceVersionController@show');
     $router->post('appliance-versions', 'ApplianceVersionController@create');
     $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
-    $router->get('appliance-versions/{appliance_version_uuid}/parameters', 'ApplianceVersionController@versionParameters');
+    $router->get('appliance-versions/{appliance_version_uuid}/parameters',
+        'ApplianceVersionController@versionParameters');
     $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
 
     // Appliance Versions Data - Admin
@@ -232,7 +234,6 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
         //Credits
         $router->get('credits', 'CreditsController@index');
-
 
 
         /**

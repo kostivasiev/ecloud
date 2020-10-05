@@ -8,19 +8,17 @@ use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\SanNotFoundException;
 use App\Models\V1\IopsTier;
 use App\Models\V1\San;
-use App\Models\V1\Solution;
 use App\Models\V1\VolumeSet;
 use App\Rules\V1\IsValidUuid;
 use App\Services\Artisan\V1\ArtisanService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
-use UKFast\DB\Ditto\QueryTransformer;
-use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class VolumeSetController extends BaseController
 {
@@ -32,7 +30,7 @@ class VolumeSetController extends BaseController
      * Show collection
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -55,7 +53,7 @@ class VolumeSetController extends BaseController
      *
      * @param Request $request
      * @param $id
-     * @return \Illuminate\http\Response
+     * @return Response
      */
     public function show(Request $request, $id)
     {
@@ -66,7 +64,7 @@ class VolumeSetController extends BaseController
     /**
      * Create a volume set o the SAN
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws SanNotFoundException
      * @throws UnprocessableEntityException
@@ -80,7 +78,7 @@ class VolumeSetController extends BaseController
     public function create(Request $request)
     {
         $rules = [
-            'solution_id' =>['required_without:site_id', 'integer'],
+            'solution_id' => ['required_without:site_id', 'integer'],
             'site_id' => ['required_without:solution_id', 'integer'],
             'san_id' => ['sometimes', 'integer']
         ];
@@ -120,7 +118,10 @@ class VolumeSetController extends BaseController
 
         $identifier = VolumeSet::getNextIdentifier($solution);
 
-        $artisan = app()->makeWith('App\Services\Artisan\V1\ArtisanService', [['solution'=>$solution, 'san' => $san]]);
+        $artisan = app()->makeWith(
+            'App\Services\Artisan\V1\ArtisanService',
+            [['solution' => $solution, 'san' => $san]]
+        );
 
         $artisanResponse = $artisan->createVolumeSet($identifier);
 
@@ -145,7 +146,7 @@ class VolumeSetController extends BaseController
      *
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws UnprocessableEntityException
      * @throws \Illuminate\Validation\ValidationException
@@ -178,7 +179,7 @@ class VolumeSetController extends BaseController
             ArtisanService::class,
             [
                 [
-                    'solution'=>$volumeSet->solution,
+                    'solution' => $volumeSet->solution,
                     'san' => $san
                 ]
             ]
@@ -192,7 +193,7 @@ class VolumeSetController extends BaseController
             if (strpos($error, 'Invalid QOS target object') !== false) {
                 $errorMessage .= ' The volume set is not valid.';
             }
-            throw new ArtisanException($errorMessage. ' ' . $error);
+            throw new ArtisanException($errorMessage . ' ' . $error);
         }
 
         $volumeSet->max_iops = $request->input('max_iops');
@@ -206,7 +207,7 @@ class VolumeSetController extends BaseController
      * Add a datastore volume to a volumeset
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws DatastoreNotFoundException
      */
@@ -237,7 +238,7 @@ class VolumeSetController extends BaseController
      * @param Request $request
      * @param $volumeSetId
      * @param $datastoreId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws DatastoreNotFoundException
      */
@@ -267,7 +268,7 @@ class VolumeSetController extends BaseController
      * Export a volume set to a host set
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws NotFoundException
      */
@@ -295,7 +296,7 @@ class VolumeSetController extends BaseController
             ArtisanService::class,
             [
                 [
-                    'solution'=>$volumeSet->solution,
+                    'solution' => $volumeSet->solution,
                     'san' => $san
                 ]
             ]
@@ -315,7 +316,7 @@ class VolumeSetController extends BaseController
      * Delete volume set record.
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function delete(Request $request, $volumeSetId)
     {
@@ -335,7 +336,7 @@ class VolumeSetController extends BaseController
      * Delete a volume set from the SAN
      * @param Request $request
      * @param $volumeSetId
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws ArtisanException
      * @throws DatastoreNotFoundException
      */
@@ -362,7 +363,7 @@ class VolumeSetController extends BaseController
             throw new ArtisanException('Failed to load volume set: ' . $error);
         }
 
-        $errorMessage = 'Failed to delete volume set: ' ;
+        $errorMessage = 'Failed to delete volume set: ';
 
         if (!empty($artisanResponse->volumes)) {
             throw new ArtisanException($errorMessage . 'The volume set is not empty.');
@@ -432,8 +433,13 @@ class VolumeSetController extends BaseController
     {
         $query = self::$model::query();
         if ($request->user->resellerId != 0) {
-            $query->join('ucs_reseller', (new self::$model)->getTable() . '.ucs_reseller_id', '=', 'ucs_reseller.ucs_reseller_id')
-            ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
+            $query->join(
+                'ucs_reseller',
+                (new self::$model)->getTable() . '.ucs_reseller_id',
+                '=',
+                'ucs_reseller.ucs_reseller_id'
+            )
+                ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
         }
 
         return $query;
