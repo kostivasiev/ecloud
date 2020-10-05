@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Events\V2\ComputeChanged;
 use App\Events\V2\Data\InstanceDeployEventData;
 use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
@@ -123,11 +124,16 @@ class InstanceController extends BaseController
      */
     public function update(UpdateRequest $request, string $instanceId)
     {
+        $rebootRequired = false;
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
         if (!$this->isAdmin &&
             (!$request->has('locked') || $request->get('locked') !== false) &&
             $instance->locked === true) {
             return $this->isLocked();
+        }
+        if (($request->input('vcpu_cores') < $instance->vcpu_cores) ||
+            ($request->input('ram_capacity') < $instance->ram_capacity)) {
+            $rebootRequired = true;
         }
         $instance->fill($request->only([
             'name',
@@ -141,6 +147,9 @@ class InstanceController extends BaseController
             $instance->setApplianceVersionId($request->get('appliance_id'));
         }
         $instance->save();
+        if ($request->has('vcpu_cores') || $request->has('ram_capacity')) {
+            event(ComputeChanged::class, [$instance, $rebootRequired]);
+        }
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
 
