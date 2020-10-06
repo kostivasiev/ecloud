@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Resources\V2\VolumeResource;
+use Illuminate\Http\Request;
 use App\Events\V2\Data\InstanceDeployEventData;
 use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
@@ -11,9 +13,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
-use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
 

@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Network;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\ValidCidrSubnet;
 use UKFast\FormRequests\FormRequest;
 
 /**
  * Class UpdateNetworksRequest
  * @package App\Http\Requests\V2
  */
-class UpdateNetworkRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -38,6 +39,9 @@ class UpdateNetworkRequest extends FormRequest
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class)
             ],
+            'subnet' => [
+                'sometimes', 'nullable', 'string', new ValidCidrSubnet()
+            ]
         ];
     }
 

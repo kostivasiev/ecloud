@@ -73,8 +73,6 @@ components:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallRuleId:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
-    NicId:
-      $ref: 'resources/Nic/parameters/nicId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
@@ -97,8 +95,6 @@ components:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
-    NicIdResponse:
-      $ref: 'resources/Nic/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
     RegionIdResponse:
