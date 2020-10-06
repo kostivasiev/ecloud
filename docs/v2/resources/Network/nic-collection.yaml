@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+    - $ref: '../../resources/Network/parameters/networkId.yaml'
   responses:
     200:
       description: Success
