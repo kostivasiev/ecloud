@@ -5,6 +5,7 @@ namespace Tests\V2\Nic;
 use App\Models\V2\Nic;
 use App\Rules\V2\IpAvailable;
 use Faker\Factory as Faker;
+use Illuminate\Database\QueryException;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -60,5 +61,28 @@ class IpAvailableTest extends TestCase
     public function testNotAssignedPasses()
     {
         $this->assertTrue($this->validator->passes('', '10.0.0.3'));
+    }
+
+    public function testAssignDuplicateIpInTransactionFails()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionCode(23000);
+
+        $nics = factory(Nic::class, 3)->create([
+            'mac_address' => $this->faker->macAddress,
+            'instance_id' => 'i-abc123',
+            'network_id' => 'net-abc123',
+            'ip_address' => null
+        ]);
+
+        $database = app('db')->connection('ecloud');
+        $database->beginTransaction();
+
+        foreach ($nics as $nic) {
+            $nic->ip_address = '10.0.0.2';
+            $nic->save();
+        }
+
+        //$database->commit();
     }
 }
