@@ -37,6 +37,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('vpcs', 'VpcController@index');
         $router->get('vpcs/{vpcId}', 'VpcController@show');
         $router->delete('vpcs/{vpcId}', 'VpcController@destroy');
+
+        $router->get('vpcs/{vpcId}/volumes', 'VpcController@getVolumes');
     });
 
     /** Dhcps */
