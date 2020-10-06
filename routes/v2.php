@@ -82,6 +82,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}', 'InstanceController@show');
         $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
         $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
+        $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
         $router->post('instances', 'InstanceController@store');
         $router->patch('instances/{instanceId}', 'InstanceController@update');
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
