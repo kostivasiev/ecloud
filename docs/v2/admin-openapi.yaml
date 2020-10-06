@@ -112,11 +112,11 @@ paths:
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZone/admin-item.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers':
-    $ref: 'resources/Router/admin-collection.yaml'
+    $ref: 'resources/AvailabilityZone/router-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/dhcps':
-    $ref: 'resources/Dhcp/collection.yaml'
+    $ref: 'resources/AvailabilityZone/dhcp-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/credentials':
-    $ref: 'resources/Credential/collection.yaml'
+    $ref: 'resources/AvailabilityZone/credential-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
@@ -128,7 +128,7 @@ paths:
   '/ecloud/v2/regions/{regionId}/availability-zones':
     $ref: 'resources/Region/availabilityZones.yaml'
   '/ecloud/v2/regions/{regionId}/vpcs':
-    $ref: 'resources/Vpc/collection.yaml'
+    $ref: 'resources/Region/vpc-collection.yaml'
   '/ecloud/v2/lbcs':
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
