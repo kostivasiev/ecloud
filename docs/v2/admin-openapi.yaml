@@ -111,6 +111,8 @@ paths:
     $ref: 'resources/AvailabilityZone/admin-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZone/admin-item.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers':
+    $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
