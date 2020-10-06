@@ -56,7 +56,6 @@ class RouterController extends BaseController
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $router->save();
-        $router->refresh();
         return $this->responseIdMeta($request, $router->getKey(), 201);
     }
 

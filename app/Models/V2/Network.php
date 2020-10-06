@@ -7,10 +7,12 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 /**
@@ -33,7 +35,17 @@ class Network extends Model implements Filterable, Sortable
         'id',
         'name',
         'router_id',
+        'subnet'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->subnet = $model->subnet ?? config('defaults.network.subnets.range');
+        });
+    }
 
     protected $dispatchesEvents = [
         'created' => NetworkCreated::class,
@@ -78,6 +90,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
+            $factory->create('subnet', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -85,8 +98,8 @@ class Network extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -94,6 +107,7 @@ class Network extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_id'),
+            $factory->create('subnet'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -101,7 +115,7 @@ class Network extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @return array|Sort|Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -119,6 +133,7 @@ class Network extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'router_id' => 'router_id',
+            'subnet' => 'subnet',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

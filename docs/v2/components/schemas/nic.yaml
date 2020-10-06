@@ -18,6 +18,11 @@ properties:
     required: true
     example: 'net-2b66bb79'
     readOnly: false
+  ip_address:
+    type: string
+    required: false
+    example: '10.0.0.5'
+    readOnly: false
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

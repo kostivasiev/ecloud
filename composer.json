@@ -36,7 +36,8 @@
     "ukfast/health-check": "~1.0",
     "ukfast/log-provider": "~1.0",
     "ukfast/responses": "~1.0",
-    "vlucas/phpdotenv": "^3.3"
+    "vlucas/phpdotenv": "^3.3",
+    "mlocati/ip-lib": "^1"
   },
   "require-dev": {
     "ext-mbstring": "*",

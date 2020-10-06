@@ -2,7 +2,6 @@
 
 namespace Tests\V2\Vpc;
 
-use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
@@ -50,10 +49,6 @@ class DeployDefaultsTest extends TestCase
 
     public function testValidDeploy()
     {
-        Event::fake([
-            RouterAvailabilityZoneAttach::class,
-        ]);
-
         $this->post('/v2/vpcs/' . $this->vpc->getKey() . '/deploy-defaults', [], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write'
