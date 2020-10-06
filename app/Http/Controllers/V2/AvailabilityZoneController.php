@@ -6,6 +6,7 @@ use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Resources\V2\AvailabilityZoneResource;
+use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
 use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
@@ -112,6 +113,20 @@ class AvailabilityZoneController extends BaseController
         return DhcpResource::collection(
             AvailabilityZone::findOrFail($zoneId)
                 ->dhcps()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function credentials(Request $request, string $zoneId)
+    {
+        return CredentialResource::collection(
+            AvailabilityZone::findOrFail($zoneId)
+                ->credentials()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
     }
