@@ -6,6 +6,7 @@ use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Models\V2\Router;
 use App\Resources\V2\RouterResource;
+use App\Resources\V2\VpnResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -79,5 +80,20 @@ class RouterController extends BaseController
     {
         Router::forUser($request->user)->findOrFail($routerId)->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $routerId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function vpns(Request $request, string $routerId)
+    {
+        return VpnResource::collection(
+            Router::forUser($request->user)
+                ->findOrFail($routerId)
+                ->vpns()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
     }
 }
