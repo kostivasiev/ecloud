@@ -10,8 +10,26 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../components/schemas/instance.yaml'
+                type: array
+                  items:
+                    $ref: '../../components/schemas/instance.yaml'
               meta:
-                type: object
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=2'
   tags:
     - VirtualPrivateClouds

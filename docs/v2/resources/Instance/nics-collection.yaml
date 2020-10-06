@@ -14,6 +14,22 @@ get:
                 items:
                   $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
               meta:
-                type: object
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/{instanceId}/nics?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/{instanceId}/nics?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/{instanceId}/nics?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/{instanceId}/nics?page=2'
   tags:
     - Instances

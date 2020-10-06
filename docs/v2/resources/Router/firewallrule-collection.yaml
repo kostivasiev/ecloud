@@ -10,8 +10,26 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/FirewallRule'
+                type: array
+                  items:
+                    $ref: '../../public-openapi.yaml#/components/schemas/FirewallRule'
               meta:
-                type: object
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/routers/{routerId}/firewall-rules?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/routers/{routerId}/firewall-rules?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/routers/{routerId}/firewall-rules?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/routers/{routerId}/firewall-rules?page=2'
   tags:
     - Routers
