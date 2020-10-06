@@ -113,6 +113,8 @@ paths:
     $ref: 'resources/Network/collection.yaml'
   '/ecloud/v2/networks/{networkId}':
     $ref: 'resources/Network/item.yaml'
+  '/ecloud/v2/networks/{networkId}/nics':
+    $ref: 'resources/Network/nic-collection.yaml'
   '/ecloud/v2/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
   '/ecloud/v2/dhcps/{dhcpId}':

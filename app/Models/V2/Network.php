@@ -44,6 +44,11 @@ class Network extends Model implements Filterable, Sortable
         return $this->belongsTo(Router::class);
     }
 
+    public function nics()
+    {
+        return $this->hasMany(Nic::class);
+    }
+
     /**
      * @param $query
      * @param $user

@@ -6,6 +6,7 @@ use App\Http\Requests\V2\CreateNetworkRequest;
 use App\Http\Requests\V2\UpdateNetworkRequest;
 use App\Models\V2\Network;
 use App\Resources\V2\NetworkResource;
+use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -85,5 +86,20 @@ class NetworkController extends BaseController
         $network = Network::forUser($request->user)->findOrFail($networkId);
         $network->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function nics(Request $request, string $zoneId)
+    {
+        return NicResource::collection(
+            Network::forUser($request->user)
+                ->findOrFail($zoneId)
+                ->nics()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
     }
 }

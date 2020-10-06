@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
+              meta:
+                type: object
+  tags:
+    - Networks

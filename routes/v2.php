@@ -63,6 +63,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('networks', 'NetworkController@index');
         $router->get('networks/{networkId}', 'NetworkController@show');
+        $router->get('networks/{networkId}/nics', 'NetworkController@nics');
         $router->post('networks', 'NetworkController@create');
         $router->patch('networks/{networkId}', 'NetworkController@update');
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
