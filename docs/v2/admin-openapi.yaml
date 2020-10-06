@@ -115,6 +115,8 @@ paths:
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/credentials':
+    $ref: 'resources/Credential/collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
