@@ -16,4 +16,4 @@ get:
               meta:
                 type: object
   tags:
-    - Instance
+    - Instances
