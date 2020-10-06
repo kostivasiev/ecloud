@@ -14,7 +14,6 @@ use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
-use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
