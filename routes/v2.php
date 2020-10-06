@@ -73,11 +73,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Routers */
-    $router->get('routers', 'RouterController@index');
-    $router->get('routers/{routerId}', 'RouterController@show');
-    $router->post('routers', 'RouterController@create');
-    $router->patch('routers/{routerId}', 'RouterController@update');
-    $router->delete('routers/{routerId}', 'RouterController@destroy');
+    $router->group([], function () use ($router) {
+        $router->get('routers', 'RouterController@index');
+        $router->get('routers/{routerId}', 'RouterController@show');
+        $router->get('routers/{routerId}/vpns', 'RouterController@vpns');
+        $router->post('routers', 'RouterController@create');
+        $router->patch('routers/{routerId}', 'RouterController@update');
+        $router->delete('routers/{routerId}', 'RouterController@destroy');
+    });
 
     /** Instances */
     $router->group([], function () use ($router) {
@@ -163,8 +166,5 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('credentials', 'CredentialsController@store');
         $router->patch('credentials/{credentialsId}', 'CredentialsController@update');
         $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
-
     });
 });
-
-
