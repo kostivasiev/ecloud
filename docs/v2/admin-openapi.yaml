@@ -149,3 +149,5 @@ paths:
     $ref: 'resources/Credential/collection.yaml'
   '/ecloud/v2/credentials/{credentialId}':
     $ref: 'resources/Credential/item.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/clusters':
+    $ref: 'resources/Vpc/clusters-collection.yaml'

@@ -45,6 +45,9 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
         $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->get('vpcs/{vpcId}/clusters', 'VpcController@clusters');
+        });
     });
 
     /** Dhcps */

@@ -65,6 +65,11 @@ class Vpc extends Model implements Filterable, Sortable
         return $this->hasMany(Volume::class);
     }
 
+    public function clusters()
+    {
+        return $this->hasMany(LoadBalancerCluster::class);
+    }
+
     /**
      * @param $query
      * @param $user
