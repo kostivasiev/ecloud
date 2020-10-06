@@ -25,6 +25,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
+        $router->get('availability-zones/{zoneId}/routers', 'AvailabilityZoneController@routers');
     });
 
     /** Virtual Private Clouds */
