@@ -57,8 +57,6 @@ components:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
-    NetworkId:
-      $ref: 'resources/Network/parameters/networkId.yaml'
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     VpnId:
@@ -78,8 +76,6 @@ components:
   responses:
     VirtualPrivateCloudsIdResponse:
       $ref: 'resources/Vpc/responses/idResponse.yaml'
-    NetworksIdResponse:
-      $ref: 'resources/Network/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     VpnIdResponse:
