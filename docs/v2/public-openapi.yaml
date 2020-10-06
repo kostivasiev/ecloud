@@ -158,7 +158,7 @@ paths:
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/item.yaml'
   '/ecloud/v2/routers/{routerId}/vpns':
-    $ref: 'resources/Vpn/collection.yaml'
+    $ref: 'resources/Router/vpns-collection.yaml'
   '/ecloud/v2/lbcs':
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
