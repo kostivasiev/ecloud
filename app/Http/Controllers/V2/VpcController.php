@@ -7,6 +7,7 @@ use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
+use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
@@ -96,6 +97,19 @@ class VpcController extends BaseController
     {
         $volumes = Vpc::forUser($request->user)->findOrFail($vpcId)->volumes();
         return VolumeResource::collection($volumes->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $vpcId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function instances(Request $request, string $vpcId)
+    {
+        $instances = Vpc::forUser($request->user)->findOrFail($vpcId)->instances();
+        return InstanceResource::collection($instances->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
