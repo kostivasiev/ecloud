@@ -16,14 +16,26 @@ class CidrSubnetValidationTest extends TestCase
         $this->validator = new ValidCidrSubnet();
     }
 
-    public function testInvalidSubnetRange()
+    public function testInvalidSubnet()
     {
         $this->assertFalse($this->validator->passes('', 'INVALID_STRING'));
-        // IP, No mask
+    }
+
+    public function testValidSubnetNoMask()
+    {
         $this->assertFalse($this->validator->passes('', '10.0.0.0'));
-        //Invalid mask
+    }
+
+    public function testValidSubnetMask()
+    {
         $this->assertFalse($this->validator->passes('', '10.0.0.0/33'));
-        //Invalid mask - too small range (min we allow is /29)
+    }
+
+    /**
+     * Invalid mask - too small range (min we allow is /29)
+     */
+    public function testInvalidValidSubnetMaskTooSmall()
+    {
         $this->assertFalse($this->validator->passes('', '10.0.0.0/30'));
     }
 
