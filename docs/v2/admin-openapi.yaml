@@ -121,6 +121,8 @@ paths:
     $ref: 'resources/Region/admin-item.yaml'
   '/ecloud/v2/regions/{regionId}/availability-zones':
     $ref: 'resources/Region/availabilityZones.yaml'
+  '/ecloud/v2/regions/{regionId}/vpcs':
+    $ref: 'resources/Vpc/collection.yaml'
   '/ecloud/v2/lbcs':
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
