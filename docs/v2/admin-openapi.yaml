@@ -114,7 +114,7 @@ paths:
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/credentials':
     $ref: 'resources/AvailabilityZone/credential-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/instances':
-    $ref: 'resources/AvailabilityZone/instances-collection.yaml'
+    $ref: 'resources/AvailabilityZone/instance-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/clusters':
     $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
   '/ecloud/v2/routers':
