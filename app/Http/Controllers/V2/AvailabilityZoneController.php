@@ -6,6 +6,7 @@ use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Resources\V2\AvailabilityZoneResource;
+use App\Resources\V2\DhcpResource;
 use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -97,6 +98,20 @@ class AvailabilityZoneController extends BaseController
         return RouterResource::collection(
             AvailabilityZone::findOrFail($zoneId)
                 ->routers()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function dhcps(Request $request, string $zoneId)
+    {
+        return DhcpResource::collection(
+            AvailabilityZone::findOrFail($zoneId)
+                ->dhcps()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
     }
