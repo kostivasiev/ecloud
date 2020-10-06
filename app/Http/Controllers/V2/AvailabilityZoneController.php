@@ -6,6 +6,7 @@ use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Resources\V2\AvailabilityZoneResource;
+use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -84,6 +85,20 @@ class AvailabilityZoneController extends BaseController
         ]));
         $availabilityZone->save();
         return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function routers(Request $request, string $zoneId)
+    {
+        return RouterResource::collection(
+            AvailabilityZone::findOrFail($zoneId)
+                ->routers()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
     }
 
     /**
