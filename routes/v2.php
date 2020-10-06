@@ -77,6 +77,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('routers', 'RouterController@index');
         $router->get('routers/{routerId}', 'RouterController@show');
         $router->get('routers/{routerId}/vpns', 'RouterController@vpns');
+        $router->get('routers/{routerId}/firewall-rules', 'RouterController@firewallRules');
         $router->post('routers', 'RouterController@create');
         $router->patch('routers/{routerId}', 'RouterController@update');
         $router->delete('routers/{routerId}', 'RouterController@destroy');
