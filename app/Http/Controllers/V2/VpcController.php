@@ -7,6 +7,7 @@ use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
+use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -84,6 +85,23 @@ class VpcController extends BaseController
     {
         Vpc::forUser($request->user)->findOrFail($vpcId)->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @param  Request  $request
+     * @param  string  $vpcId
+     * @return \Illuminate\Http\Response
+     */
+    public function getVolumes(Request $request, string $vpcId)
+    {
+        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->volumes();
+        (new QueryTransformer($request))
+            ->config(Vpc::class)
+            ->transform($collection);
+
+        return VolumeResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
