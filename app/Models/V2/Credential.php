@@ -53,6 +53,11 @@ class Credential extends Model implements Filterable, Sortable
         return decrypt($value);
     }
 
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class, 'id', 'resource_id');
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
