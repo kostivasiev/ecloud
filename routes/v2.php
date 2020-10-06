@@ -27,6 +27,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
         $router->get('availability-zones/{zoneId}/routers', 'AvailabilityZoneController@routers');
         $router->get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
+        $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
     });
 
     /** Virtual Private Clouds */
