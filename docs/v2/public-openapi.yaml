@@ -102,9 +102,9 @@ paths:
   '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
     $ref: 'resources/Vpc/deploy-defaults.yaml'
   '/ecloud/v2/vpcs/{vpcId}/volumes':
-    $ref: 'resources/Volume/collection.yaml'
+    $ref: 'resources/Vpc/volumes-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/instances':
-    $ref: 'resources/Instance/collection.yaml'
+    $ref: 'resources/Vpc/instances-collection.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
@@ -130,7 +130,7 @@ paths:
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
   '/ecloud/v2/instances/{instanceId}/nics':
-    $ref: 'resources/Nic/collection.yaml'
+    $ref: 'resources/Instance/nics-collection.yaml'
   '/ecloud/v2/instances/{instanceId}/power-on':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-off':

@@ -1,0 +1,19 @@
+get:
+  parameters:
+    - $ref: '../../resources/Instance/parameters/instanceId.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
+              meta:
+                type: object
+  tags:
+    - Instance

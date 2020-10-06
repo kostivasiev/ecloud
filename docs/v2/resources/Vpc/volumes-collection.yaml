@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../resources/Vpc/parameters/vpcid.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/Volume'
+              meta:
+                type: object
+  tags:
+    - VirtualPrivateClouds
