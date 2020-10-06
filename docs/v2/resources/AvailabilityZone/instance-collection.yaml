@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
+    - $ref: '../../public-openapi.yaml#/components/parameters/AvailabilityZoneId'
   responses:
     200:
       description: Success
