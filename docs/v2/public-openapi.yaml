@@ -103,6 +103,8 @@ paths:
     $ref: 'resources/Vpc/deploy-defaults.yaml'
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Volume/collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/instances':
+    $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
