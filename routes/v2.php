@@ -114,6 +114,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('regions', 'RegionController@index');
         $router->get('regions/{regionId}', 'RegionController@show');
         $router->get('regions/{regionId}/availability-zones', 'RegionController@availabilityZones');
+        $router->get('regions/{regionId}/vpcs', 'RegionController@vpcs');
 
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
             $router->post('regions', 'RegionController@create');
