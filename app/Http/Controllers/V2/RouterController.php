@@ -6,6 +6,7 @@ use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Models\V2\Router;
 use App\Resources\V2\FirewallRuleResource;
+use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\VpnResource;
 use Illuminate\Http\Request;
@@ -109,6 +110,21 @@ class RouterController extends BaseController
             Router::forUser($request->user)
                 ->findOrFail($routerId)
                 ->firewallRules()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $routerId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function networks(Request $request, string $routerId)
+    {
+        return NetworkResource::collection(
+            Router::forUser($request->user)
+                ->findOrFail($routerId)
+                ->networks()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
     }

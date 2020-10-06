@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/RouterId'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/Network'
+              meta:
+                type: object
+  tags:
+    - Routers
