@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\InstanceDeleteEvent;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -48,6 +49,10 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $casts = [
         'locked' => 'boolean',
+    ];
+
+    protected $dispatchesEvents = [
+        'deleted' => InstanceDeleteEvent::class,
     ];
 
     protected static function boot()
