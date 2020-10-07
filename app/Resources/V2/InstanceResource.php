@@ -59,9 +59,18 @@ class InstanceResource extends UKFastResource
             $response['appliance_version_id'] = $this->appliance_version_id;
         }
         if ($request->route('instanceId')) {
-            $kingpinData = $this->availabilityZone->kingpinService()->getInstance($this);
-            $response['online'] = $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON;
-            $response['agent_running'] = $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING;
+            $kingpinData = null;
+            try {
+                $kingpinData = $this->availabilityZone->kingpinService()->getInstance($this);        
+            } catch (\Exception $e) {            
+                Log::info('Failed to retrieve instance from Kingpin', [
+                    'vpc_id' => $this->vpc_id,
+                    'instance_id' => $this->getKey(),
+                    'message' => $e->getMessage()
+                ]);
+            }
+            $response['online'] = isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null;
+            $response['agent_running'] = isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null;
         }
         return $response;
     }
