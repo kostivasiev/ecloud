@@ -97,6 +97,10 @@ paths:
     $ref: 'resources/Vpc/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
     $ref: 'resources/Vpc/deploy-defaults.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/volumes':
+    $ref: 'resources/Vpc/volumes-collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/instances':
+    $ref: 'resources/Vpc/instances-collection.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
@@ -105,6 +109,8 @@ paths:
     $ref: 'resources/Network/collection.yaml'
   '/ecloud/v2/networks/{networkId}':
     $ref: 'resources/Network/item.yaml'
+  '/ecloud/v2/networks/{networkId}/nics':
+    $ref: 'resources/Network/nic-collection.yaml'
   '/ecloud/v2/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
   '/ecloud/v2/dhcps/{dhcpId}':
@@ -121,6 +127,8 @@ paths:
     $ref: 'resources/Instance/credentials.yaml'
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
+  '/ecloud/v2/instances/{instanceId}/nics':
+    $ref: 'resources/Instance/nics-collection.yaml'
   '/ecloud/v2/instances/{instanceId}/power-on':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-off':
@@ -147,6 +155,12 @@ paths:
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/item.yaml'
+  '/ecloud/v2/routers/{routerId}/firewall-rules':
+    $ref: 'resources/Router/firewallrule-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/networks':
+    $ref: 'resources/Router/network-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/vpns':
+    $ref: 'resources/Router/vpns-collection.yaml'
   '/ecloud/v2/lbcs':
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
