@@ -13,6 +13,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\NicResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -195,6 +196,21 @@ class InstanceController extends BaseController
             Instance::forUser($request->user)
                 ->findOrFail($instanceId)
                 ->volumes()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $instanceId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function nics(Request $request, string $instanceId)
+    {
+        return NicResource::collection(
+            Instance::forUser($request->user)
+                ->findOrFail($instanceId)
+                ->nics()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
     }

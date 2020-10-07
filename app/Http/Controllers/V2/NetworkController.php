@@ -4,14 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
-use App\Models\V2\Instance;
 use App\Models\V2\Network;
-use App\Models\V2\Nic;
 use App\Resources\V2\NetworkResource;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Exception\GuzzleException;
+use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -92,5 +88,20 @@ class NetworkController extends BaseController
         $network = Network::forUser($request->user)->findOrFail($networkId);
         $network->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function nics(Request $request, string $zoneId)
+    {
+        return NicResource::collection(
+            Network::forUser($request->user)
+                ->findOrFail($zoneId)
+                ->nics()
+                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
+        );
     }
 }

@@ -42,6 +42,11 @@ class Region extends Model implements Filterable, Sortable
         return $this->hasMany(AvailabilityZone::class);
     }
 
+    public function vpcs()
+    {
+        return $this->hasMany(Vpc::class);
+    }
+
     /**
      * @param $query
      * @param $user
