@@ -131,9 +131,8 @@ class InstanceController extends BaseController
             $instance->locked === true) {
             return $this->isLocked();
         }
-        if (($request->has('vcpu_cores') || ($request->has('ram_capacity'))) &&
-            (($request->input('vcpu_cores') < $instance->vcpu_cores) ||
-                ($request->input('ram_capacity') < $instance->ram_capacity))) {
+        if (($request->input('vcpu_cores', $instance->vcpu_cores) < $instance->vcpu_cores) ||
+            ($request->input('ram_capacity', $instance->ram_capacity) < $instance->ram_capacity)) {
             $rebootRequired = true;
         }
         $instance->fill($request->only([
