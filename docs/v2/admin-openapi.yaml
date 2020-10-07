@@ -73,8 +73,6 @@ components:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallRuleId:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
-    NicId:
-      $ref: 'resources/Nic/parameters/nicId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
@@ -97,8 +95,6 @@ components:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
-    NicIdResponse:
-      $ref: 'resources/Nic/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
     RegionIdResponse:
@@ -111,6 +107,16 @@ paths:
     $ref: 'resources/AvailabilityZone/admin-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZone/admin-item.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers':
+    $ref: 'resources/AvailabilityZone/router-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/dhcps':
+    $ref: 'resources/AvailabilityZone/dhcp-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/credentials':
+    $ref: 'resources/AvailabilityZone/credential-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/instances':
+    $ref: 'resources/AvailabilityZone/instance-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/clusters':
+    $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
@@ -121,6 +127,8 @@ paths:
     $ref: 'resources/Region/admin-item.yaml'
   '/ecloud/v2/regions/{regionId}/availability-zones':
     $ref: 'resources/Region/availabilityZones.yaml'
+  '/ecloud/v2/regions/{regionId}/vpcs':
+    $ref: 'resources/Region/vpc-collection.yaml'
   '/ecloud/v2/lbcs':
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
@@ -137,3 +145,5 @@ paths:
     $ref: 'resources/Credential/collection.yaml'
   '/ecloud/v2/credentials/{credentialId}':
     $ref: 'resources/Credential/item.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/clusters':
+    $ref: 'resources/Vpc/cluster-collection.yaml'

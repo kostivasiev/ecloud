@@ -26,6 +26,7 @@ class InstanceDeploy implements ShouldQueue
 
         // Create the chained jobs for deployment
         dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
+            new \App\Jobs\Instance\Deploy\ConfigureNics($data),
             new \App\Jobs\Instance\Deploy\UpdateNetworkAdapter($data),
             new \App\Jobs\Instance\Deploy\OsCustomisation($data),
             new \App\Jobs\Instance\PowerOn($data),

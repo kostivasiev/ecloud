@@ -6,7 +6,11 @@ use App\Http\Requests\V2\CreateNicRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
 use App\Models\V2\Nic;
 use App\Resources\V2\NicResource;
+use App\Rules\V2\IpAvailable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class NicController extends BaseController
@@ -14,7 +18,7 @@ class NicController extends BaseController
     /**
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -41,7 +45,7 @@ class NicController extends BaseController
 
     /**
      * @param CreateNicRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create(CreateNicRequest $request)
     {
@@ -49,16 +53,17 @@ class NicController extends BaseController
             'mac_address',
             'instance_id',
             'network_id',
+            'ip_address',
         ]));
         $nic->save();
-        $nic->refresh();
         return $this->responseIdMeta($request, $nic->getKey(), 201);
     }
 
     /**
      * @param UpdateNicRequest $request
      * @param string $nicId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function update(UpdateNicRequest $request, string $nicId)
     {
@@ -67,7 +72,9 @@ class NicController extends BaseController
             'mac_address',
             'instance_id',
             'network_id',
+            'ip_address'
         ]));
+        $this->validate($request, ['ip_address' => [new IpAvailable($nic->network_id)]]);
         $nic->save();
         return $this->responseIdMeta($request, $nic->getKey(), 200);
     }
@@ -75,7 +82,7 @@ class NicController extends BaseController
     /**
      * @param Request $request
      * @param string $nicId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy(Request $request, string $nicId)
     {
