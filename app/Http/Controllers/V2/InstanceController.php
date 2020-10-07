@@ -170,12 +170,6 @@ class InstanceController extends BaseController
         if (!$this->isAdmin && $instance->locked === true) {
             return $this->isLocked();
         }
-        $instance->volumes->each(function ($volume) {
-            // If volume is only used in this instance then delete
-            if ($volume->instances()->count() == 1) {
-                $volume->delete();
-            }
-        });
         $instance->delete();
         return response('', 204);
     }
