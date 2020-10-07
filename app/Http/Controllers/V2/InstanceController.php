@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Jobs\Instance\GuestRestart;
+use App\Jobs\Instance\GuestShutdown;
+use App\Jobs\Instance\PowerOff;
+use App\Jobs\Instance\PowerOn;
+use App\Jobs\Instance\PowerReset;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use App\Events\V2\Data\InstanceDeployEventData;
@@ -15,6 +20,8 @@ use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -27,7 +34,7 @@ class InstanceController extends BaseController
      * Get instance collection
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -63,6 +70,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
+        exit(print_r('tets'));
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
@@ -109,6 +117,7 @@ class InstanceController extends BaseController
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
         $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
+        $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
         event(new InstanceDeployEvent($instanceDeployData));
@@ -161,7 +170,7 @@ class InstanceController extends BaseController
     /**
      * @param Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, string $instanceId)
     {
@@ -177,7 +186,7 @@ class InstanceController extends BaseController
      * @param Request $request
      * @param string $instanceId
      *
-     * @return AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function credentials(Request $request, string $instanceId)
     {
@@ -204,7 +213,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\PowerOn([
+        $this->dispatch(new PowerOn([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -217,7 +226,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\PowerOff([
+        $this->dispatch(new PowerOff([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -231,7 +240,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\GuestRestart([
+        $this->dispatch(new GuestRestart([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -244,7 +253,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\GuestShutdown([
+        $this->dispatch(new GuestShutdown([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -257,7 +266,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\PowerReset([
+        $this->dispatch(new PowerReset([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));

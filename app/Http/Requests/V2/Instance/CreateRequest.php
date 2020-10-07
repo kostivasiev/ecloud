@@ -75,6 +75,11 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.floating_ips,id,deleted_at,NULL',
                 new ExistsForUser(FloatingIp::class),
             ],
+            'requires_floating_ip' => [
+                'sometimes',
+                'required_without:floating_ip_id',
+                'boolean'
+            ],
             'appliance_data' => [
                 'sometimes',
                 'required',

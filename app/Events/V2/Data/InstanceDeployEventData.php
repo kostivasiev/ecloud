@@ -9,6 +9,7 @@ class InstanceDeployEventData
     public $volume_capacity;
     public $network_id;
     public $floating_ip_id;
+    public $requires_floating_ip;
     public $appliance_data;
     public $user_script;
 }
