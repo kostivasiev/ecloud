@@ -49,5 +49,4 @@ class InstanceDelete implements ShouldQueue
             return;
         }
     }
-
 }
