@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -43,12 +44,15 @@ class Instance extends Model implements Filterable, Sortable
     protected $appends = [
         'appliance_id',
         'online',
+        'agent_running',
         'volume_capacity',
     ];
 
     protected $casts = [
         'locked' => 'boolean',
     ];
+
+    protected $kingpinInstanceDetailsData;
 
     protected static function boot()
     {
@@ -96,9 +100,7 @@ class Instance extends Model implements Filterable, Sortable
     public function getOnlineAttribute()
     {
         try {
-            $response = $this->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/'.$this->vpc_id . '/instance/' . $this->getKey()
-            );
+            return $this->kingpinInstanceDetails()->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON;
         } catch (\Exception $e) {
             Log::info('Failed to get power state', [
                 'vpc_id' => $this->vpc_id,
@@ -107,7 +109,33 @@ class Instance extends Model implements Filterable, Sortable
             ]);
             return;
         }
-        return json_decode($response->getBody()->getContents())->powerState == 'poweredOn';
+    }
+
+    public function getAgentRunningAttribute()
+    {
+        try {
+            return $this->kingpinInstanceDetails()->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING;
+        } catch (\Exception $e) {
+            Log::info('Failed to get agent running status', [
+                'vpc_id' => $this->vpc_id,
+                'instance_id' => $this->getKey(),
+                'message' => $e->getMessage()
+            ]);
+            return;
+        }
+    }
+
+    protected function kingpinInstanceDetails()
+    {
+        if (!empty($this->kingpinInstanceDetailsData)) {
+            return $this->kingpinInstanceDetailsData;
+        }
+
+        $response = $this->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
+        );
+
+        return $this->kingpinInstanceDetailsData = json_decode($response->getBody()->getContents());
     }
 
     public function scopeForUser($query, $user)

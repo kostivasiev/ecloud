@@ -18,6 +18,7 @@ use UKFast\Responses\UKFastResource;
  * @property string availability_zone_id
  * @property boolean locked
  * @property string online
+ * @property string agent_running
  * @property string platform
  * @property integer volume_capacity
  * @property string created_at
@@ -56,6 +57,7 @@ class InstanceResource extends UKFastResource
         }
         if ($request->route('instanceId')) {
             $response['online'] = $this->online;
+            $response['agent_running'] = $this->agent_running;
         }
         return $response;
     }
