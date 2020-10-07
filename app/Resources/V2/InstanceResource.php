@@ -2,6 +2,9 @@
 
 namespace App\Resources\V2;
 
+use App\Services\V2\KingpinService;
+use DateTimeZone;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
@@ -27,7 +30,7 @@ use UKFast\Responses\UKFastResource;
 class InstanceResource extends UKFastResource
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request)
@@ -45,19 +48,20 @@ class InstanceResource extends UKFastResource
             'volume_capacity' => $this->volume_capacity,
             'created_at' => Carbon::parse(
                 $this->created_at,
-                new \DateTimeZone(config('app.timezone'))
+                new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
             'updated_at' => Carbon::parse(
                 $this->updated_at,
-                new \DateTimeZone(config('app.timezone'))
+                new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
         if ($request->user->isAdministrator) {
             $response['appliance_version_id'] = $this->appliance_version_id;
         }
         if ($request->route('instanceId')) {
-            $response['online'] = $this->online;
-            $response['agent_running'] = $this->agent_running;
+            $kingpinData = $this->availabilityZone->kingpinService()->getInstance($this);
+            $response['online'] = $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON;
+            $response['agent_running'] = $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING;
         }
         return $response;
     }

@@ -2,28 +2,25 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
+use Faker\Generator;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Mockery;
 use Tests\TestCase;
 
-class AgentRunningTest extends TestCase
+class InstanceRuntimePropertyTests extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
     protected $availability_zone;
     protected $instance;
-    protected $appliance;
-    protected $appliance_version;
     protected $region;
     protected $vpc;
 
@@ -43,9 +40,9 @@ class AgentRunningTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'GetTest Default',
         ]);
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('get')->andReturn(
-            new Response(200, [], json_encode(['toolsRunningStatus' => 'guestToolsRunning']))
+        $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
+        $mockKingpinService->shouldReceive('getInstance')->andReturn(
+            (object)['powerState' => 'poweredOn', 'toolsRunningStatus' => 'guestToolsRunning']
         );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
@@ -84,6 +81,42 @@ class AgentRunningTest extends TestCase
         )
             ->seeJson([
                 'agent_running' => true,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    /**
+     * Test agent_running is not returned on the collection
+     */
+    public function testGetOnlineNotInCollection()
+    {
+        $this->get(
+            '/v2/instances',
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->dontSeeJson([
+                'online' => true,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    /**
+     * Test agent_running is returned on the model
+     */
+    public function testGetOnlineInItem()
+    {
+        $this->get(
+            '/v2/instances/' . $this->instance->getKey(),
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'online' => true,
             ])
             ->assertResponseStatus(200);
     }

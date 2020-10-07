@@ -2,19 +2,26 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Resources\V2\VolumeResource;
-use Illuminate\Http\Request;
 use App\Events\V2\Data\InstanceDeployEventData;
 use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\DeployRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
+use App\Jobs\Instance\GuestRestart;
+use App\Jobs\Instance\GuestShutdown;
+use App\Jobs\Instance\PowerOff;
+use App\Jobs\Instance\PowerOn;
+use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -27,7 +34,7 @@ class InstanceController extends BaseController
      * Get instance collection
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -52,6 +59,7 @@ class InstanceController extends BaseController
         if ($this->isAdmin) {
             $instance->makeVisible('appliance_version_id');
         }
+
         return new InstanceResource(
             $instance
         );
@@ -161,7 +169,7 @@ class InstanceController extends BaseController
     /**
      * @param Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, string $instanceId)
     {
@@ -177,7 +185,7 @@ class InstanceController extends BaseController
      * @param Request $request
      * @param string $instanceId
      *
-     * @return AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function credentials(Request $request, string $instanceId)
     {
@@ -204,7 +212,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\PowerOn([
+        $this->dispatch(new PowerOn([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -217,7 +225,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\PowerOff([
+        $this->dispatch(new PowerOff([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -231,7 +239,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\GuestRestart([
+        $this->dispatch(new GuestRestart([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -244,7 +252,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\GuestShutdown([
+        $this->dispatch(new GuestShutdown([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));
@@ -257,7 +265,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new \App\Jobs\Instance\PowerReset([
+        $this->dispatch(new PowerReset([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));

@@ -24,4 +24,11 @@ final class KingpinService
     {
         return call_user_func_array([$this->client, $name], $arguments);
     }
+
+    public function getInstance($instance)
+    {
+        $response = $this->get('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey());
+
+        return json_decode($response->getBody()->getContents());
+    }
 }

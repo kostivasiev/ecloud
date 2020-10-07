@@ -58,6 +58,9 @@ class GetTest extends TestCase
         $mockKingpinService->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode(['powerState' => 'poweredOn']))
         );
+        $mockKingpinService->shouldReceive('getInstance')->andReturn(
+            (object)['powerState' => 'poweredOn', 'toolsRunningStatus' => 'guestToolsRunning']
+        );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
         });

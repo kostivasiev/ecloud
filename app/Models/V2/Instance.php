@@ -2,18 +2,18 @@
 
 namespace App\Models\V2;
 
-use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
@@ -43,16 +43,12 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $appends = [
         'appliance_id',
-        'online',
-        'agent_running',
         'volume_capacity',
     ];
 
     protected $casts = [
         'locked' => 'boolean',
     ];
-
-    protected $kingpinInstanceDetailsData;
 
     protected static function boot()
     {
@@ -61,6 +57,14 @@ class Instance extends Model implements Filterable, Sortable
         static::created(function (Instance $instance) {
             $instance->setDefaultPlatform();
         });
+    }
+
+    public function setDefaultPlatform()
+    {
+        if (empty($this->platform) && $this->applianceVersion) {
+            $this->platform = $this->applianceVersion->serverLicense()->category;
+            $this->save();
+        }
     }
 
     public function vpc()
@@ -83,11 +87,6 @@ class Instance extends Model implements Filterable, Sortable
         return $this->hasMany(Nic::class);
     }
 
-    public function volumes()
-    {
-        return $this->belongsToMany(Volume::class);
-    }
-
     public function getVolumeCapacityAttribute()
     {
         $sum = 0;
@@ -97,45 +96,9 @@ class Instance extends Model implements Filterable, Sortable
         return $sum;
     }
 
-    public function getOnlineAttribute()
+    public function volumes()
     {
-        try {
-            return $this->kingpinInstanceDetails()->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON;
-        } catch (\Exception $e) {
-            Log::info('Failed to get power state', [
-                'vpc_id' => $this->vpc_id,
-                'instance_id' => $this->getKey(),
-                'message' => $e->getMessage()
-            ]);
-            return;
-        }
-    }
-
-    public function getAgentRunningAttribute()
-    {
-        try {
-            return $this->kingpinInstanceDetails()->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING;
-        } catch (\Exception $e) {
-            Log::info('Failed to get agent running status', [
-                'vpc_id' => $this->vpc_id,
-                'instance_id' => $this->getKey(),
-                'message' => $e->getMessage()
-            ]);
-            return;
-        }
-    }
-
-    protected function kingpinInstanceDetails()
-    {
-        if (!empty($this->kingpinInstanceDetailsData)) {
-            return $this->kingpinInstanceDetailsData;
-        }
-
-        $response = $this->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
-        );
-
-        return $this->kingpinInstanceDetailsData = json_decode($response->getBody()->getContents());
+        return $this->belongsToMany(Volume::class);
     }
 
     public function scopeForUser($query, $user)
@@ -171,16 +134,8 @@ class Instance extends Model implements Filterable, Sortable
         $this->attributes['appliance_version_id'] = $version;
     }
 
-    public function setDefaultPlatform()
-    {
-        if (empty($this->platform) && $this->applianceVersion) {
-            $this->platform = $this->applianceVersion->serverLicense()->category;
-            $this->save();
-        }
-    }
-
     /**
-     * @param  FilterFactory  $factory
+     * @param FilterFactory $factory
      * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
@@ -201,9 +156,9 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @param SortFactory $factory
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -223,9 +178,9 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @param SortFactory $factory
+     * @return array|Sort|Sort[]|null
+     * @throws InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
