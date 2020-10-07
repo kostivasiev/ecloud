@@ -162,7 +162,7 @@ class InstanceController extends BaseController
     /**
      * @param Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $instanceId)
     {
@@ -170,9 +170,12 @@ class InstanceController extends BaseController
         if (!$this->isAdmin && $instance->locked === true) {
             return $this->isLocked();
         }
-        $this->dispatch(new DeleteInstance([
-            'instance_id' => $instance->id,
-        ]));
+        $instance->volumes->each(function ($volume) {
+            // If volume is only used in this instance then delete
+            if ($volume->instances()->count() == 1) {
+                $volume->delete();
+            }
+        });
         $instance->delete();
         return response('', 204);
     }
