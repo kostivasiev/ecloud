@@ -57,6 +57,11 @@ properties:
     required: false
     type: string
     example: 'fip-912345'
+  requires_floating_ip:
+    writeOnly: true
+    required: false
+    type: boolean
+    example: true
   appliance_data:
     required: false
     type: json

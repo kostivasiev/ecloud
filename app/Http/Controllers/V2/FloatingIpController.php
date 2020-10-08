@@ -6,7 +6,9 @@ use App\Http\Requests\V2\CreateFloatingIpRequest;
 use App\Http\Requests\V2\UpdateFloatingIpRequest;
 use App\Models\V2\FloatingIp;
 use App\Resources\V2\FloatingIpResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -19,11 +21,11 @@ class FloatingIpController extends BaseController
      * Get resource collection
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FloatingIp::query();
+        $collection = FloatingIp::forUser($request->user);
 
         $queryTransformer->config(FloatingIp::class)
             ->transform($collection);
@@ -41,18 +43,18 @@ class FloatingIpController extends BaseController
     public function show(Request $request, string $instanceId)
     {
         return new FloatingIpResource(
-            FloatingIp::findOrFail($instanceId)
+            FloatingIp::forUser($request->user)->findOrFail($instanceId)
         );
     }
 
     /**
      * @param CreateFloatingIpRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(CreateFloatingIpRequest $request)
     {
         $resource = new FloatingIp(
-        //$request->only([''])
+            $request->only(['vpc_id'])
         );
         $resource->save();
         $resource->refresh();
@@ -61,12 +63,12 @@ class FloatingIpController extends BaseController
 
     /**
      * @param UpdateFloatingIpRequest $request
-     * @param string $instanceId
-     * @return \Illuminate\Http\JsonResponse
+     * @param string $fipId
+     * @return JsonResponse
      */
-    public function update(UpdateFloatingIpRequest $request, string $instanceId)
+    public function update(UpdateFloatingIpRequest $request, string $fipId)
     {
-        $resource = FloatingIp::findOrFail($instanceId);
+        $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
         //$instance->fill($request->only([]));
         $resource->save();
         return $this->responseIdMeta($request, $resource->getKey(), 200);
@@ -74,12 +76,12 @@ class FloatingIpController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $instanceId
-     * @return \Illuminate\Http\JsonResponse
+     * @param string $fipId
+     * @return JsonResponse
      */
-    public function destroy(Request $request, string $instanceId)
+    public function destroy(Request $request, string $fipId)
     {
-        $resource = FloatingIp::findOrFail($instanceId);
+        $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
         $resource->delete();
         return response()->json([], 204);
     }

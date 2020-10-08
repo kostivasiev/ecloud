@@ -169,6 +169,9 @@ X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
+{
+   "vpc_id": "{{vpc_id}}"
+}
 
 > {%
 client.global.set('fip_id', response.body.data.id);
