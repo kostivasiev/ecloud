@@ -12,7 +12,8 @@ use App\Events\V2\VpcCreated;
 use App\Listeners\V2\DhcpCreate;
 use App\Listeners\V2\DhcpDeploy;
 use App\Listeners\V2\FirewallRuleDeploy;
-use App\Listeners\V2\InstanceDelete;
+use App\Listeners\V2\InstanceUndeploy;
+use App\Listeners\V2\InstanceVolumeDelete;
 use App\Listeners\V2\InstanceDeploy;
 use App\Listeners\V2\NetworkDeploy;
 use App\Listeners\V2\RouterDeploy;
@@ -81,7 +82,8 @@ class EventServiceProvider extends ServiceProvider
             InstanceDeploy::class
         ],
         InstanceDeleteEvent::class => [
-            InstanceDelete::class
+            InstanceUndeploy::class,
+            InstanceVolumeDelete::class
         ],
     ];
 }
