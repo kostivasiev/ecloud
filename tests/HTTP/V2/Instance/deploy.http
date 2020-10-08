@@ -199,13 +199,3 @@ Content-Type: application/json
   "password": "password",
   "port": 0
 }
-
-###
-POST https://{{host}}/{{version}}/instances/{{instance_id}}/deploy
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-  "network_id": "{{network_id}}"
-}

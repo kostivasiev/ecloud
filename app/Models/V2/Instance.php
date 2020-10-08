@@ -9,6 +9,7 @@ use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use phpDocumentor\GraphViz\Exception;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -143,11 +144,21 @@ class Instance extends Model implements Filterable, Sortable
         $this->attributes['appliance_version_id'] = $version;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function setDefaultPlatform()
     {
         if (empty($this->platform) && $this->applianceVersion) {
-            $this->platform = $this->applianceVersion->serverLicense()->category;
-            $this->save();
+            try {
+                $this->platform = $this->applianceVersion->serverLicense()->category;
+                $this->save();
+            } catch (\Exception $exception) {
+                Log::error('Failed to determine default platform from appliance version', [
+                    'id' => $this->id,
+                ]);
+                throw $exception;
+            }
         }
     }
 
