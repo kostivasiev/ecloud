@@ -25,6 +25,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
+        $router->get('availability-zones/{zoneId}/routers', 'AvailabilityZoneController@routers');
+        $router->get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
+        $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
+        $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
+        $router->get('availability-zones/{zoneId}/clusters', 'AvailabilityZoneController@clusters');
     });
 
     /** Virtual Private Clouds */
@@ -37,6 +42,12 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('vpcs', 'VpcController@index');
         $router->get('vpcs/{vpcId}', 'VpcController@show');
         $router->delete('vpcs/{vpcId}', 'VpcController@destroy');
+
+        $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
+        $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->get('vpcs/{vpcId}/clusters', 'VpcController@clusters');
+        });
     });
 
     /** Dhcps */
@@ -52,6 +63,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('networks', 'NetworkController@index');
         $router->get('networks/{networkId}', 'NetworkController@show');
+        $router->get('networks/{networkId}/nics', 'NetworkController@nics');
         $router->post('networks', 'NetworkController@create');
         $router->patch('networks/{networkId}', 'NetworkController@update');
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
@@ -67,11 +79,16 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Routers */
-    $router->get('routers', 'RouterController@index');
-    $router->get('routers/{routerId}', 'RouterController@show');
-    $router->post('routers', 'RouterController@create');
-    $router->patch('routers/{routerId}', 'RouterController@update');
-    $router->delete('routers/{routerId}', 'RouterController@destroy');
+    $router->group([], function () use ($router) {
+        $router->get('routers', 'RouterController@index');
+        $router->get('routers/{routerId}', 'RouterController@show');
+        $router->get('routers/{routerId}/networks', 'RouterController@networks');
+        $router->get('routers/{routerId}/vpns', 'RouterController@vpns');
+        $router->get('routers/{routerId}/firewall-rules', 'RouterController@firewallRules');
+        $router->post('routers', 'RouterController@create');
+        $router->patch('routers/{routerId}', 'RouterController@update');
+        $router->delete('routers/{routerId}', 'RouterController@destroy');
+    });
 
     /** Instances */
     $router->group([], function () use ($router) {
@@ -79,6 +96,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}', 'InstanceController@show');
         $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
         $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
+        $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
         $router->post('instances', 'InstanceController@store');
         $router->patch('instances/{instanceId}', 'InstanceController@update');
         $router->delete('instances/{instanceId}', 'InstanceController@destroy');
@@ -112,6 +130,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('regions', 'RegionController@index');
         $router->get('regions/{regionId}', 'RegionController@show');
         $router->get('regions/{regionId}/availability-zones', 'RegionController@availabilityZones');
+        $router->get('regions/{regionId}/vpcs', 'RegionController@vpcs');
 
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
             $router->post('regions', 'RegionController@create');
@@ -155,8 +174,5 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('credentials', 'CredentialsController@store');
         $router->patch('credentials/{credentialsId}', 'CredentialsController@update');
         $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
-
     });
 });
-
-
