@@ -18,7 +18,6 @@ class InstanceVolumeDelete implements ShouldQueue
 
     public function handle(InstanceDeleteEvent $event)
     {
-        dd("HERE");
         $instance = $event->instance;
         Log::info('Attempting to Delete volumes for instance '.$instance->getKey());
         if ($this->attempts() <= $this->tries) {
