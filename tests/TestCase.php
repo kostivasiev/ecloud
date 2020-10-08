@@ -8,6 +8,7 @@ use App\Models\V2\FirewallRule;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
@@ -35,6 +36,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         Vpc::flushEventListeners();
         Network::flushEventListeners();
         Instance::flushEventListeners();
+        Volume::flushEventListeners();
     }
 
     /**
