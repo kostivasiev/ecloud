@@ -5,7 +5,7 @@ namespace App\Events\V2;
 use App\Models\V2\Volume;
 use Illuminate\Queue\SerializesModels;
 
-class VolumeCapacityUpdate
+class VolumeUpdated
 {
     use SerializesModels;
 
