@@ -29,7 +29,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
         $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
-        $router->get('availability-zones/{zoneId}/clusters', 'AvailabilityZoneController@clusters');
+        $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
     });
 
     /** Virtual Private Clouds */
@@ -46,7 +46,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
         $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->get('vpcs/{vpcId}/clusters', 'VpcController@clusters');
+            $router->get('vpcs/{vpcId}/lbcs', 'VpcController@lbcs');
         });
     });
 
