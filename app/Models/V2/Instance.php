@@ -5,11 +5,9 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
-use phpDocumentor\GraphViz\Exception;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -60,6 +58,24 @@ class Instance extends Model implements Filterable, Sortable
         });
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function setDefaultPlatform()
+    {
+        if (empty($this->platform) && $this->applianceVersion) {
+            try {
+                $this->platform = $this->applianceVersion->serverLicense()->category;
+                $this->save();
+            } catch (\Exception $exception) {
+                Log::error('Failed to determine default platform from appliance version', [
+                    'id' => $this->id,
+                ]);
+                throw $exception;
+            }
+        }
+    }
+
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
@@ -80,11 +96,6 @@ class Instance extends Model implements Filterable, Sortable
         return $this->hasMany(Nic::class);
     }
 
-    public function volumes()
-    {
-        return $this->belongsToMany(Volume::class);
-    }
-
     public function getVolumeCapacityAttribute()
     {
         $sum = 0;
@@ -94,11 +105,16 @@ class Instance extends Model implements Filterable, Sortable
         return $sum;
     }
 
+    public function volumes()
+    {
+        return $this->belongsToMany(Volume::class);
+    }
+
     public function getOnlineAttribute()
     {
         try {
             $response = $this->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/'.$this->vpc_id . '/instance/' . $this->getKey()
+                '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
             );
         } catch (\Exception $e) {
             Log::info('Failed to get power state', [
@@ -145,25 +161,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @throws \Exception
-     */
-    public function setDefaultPlatform()
-    {
-        if (empty($this->platform) && $this->applianceVersion) {
-            try {
-                $this->platform = $this->applianceVersion->serverLicense()->category;
-                $this->save();
-            } catch (\Exception $exception) {
-                Log::error('Failed to determine default platform from appliance version', [
-                    'id' => $this->id,
-                ]);
-                throw $exception;
-            }
-        }
-    }
-
-    /**
-     * @param  FilterFactory  $factory
+     * @param FilterFactory $factory
      * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
@@ -184,7 +182,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -206,7 +204,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
