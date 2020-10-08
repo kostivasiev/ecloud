@@ -27,7 +27,6 @@ trait DefaultAvailabilityZone
                 ->first();
             if ($availabilityZone) {
                 $instance->availability_zone_id = $availabilityZone->getKey();
-                $instance->save();
             } else {
                 Log::error('Failed to find default Availability Zone for instance ' . $instance->id);
             }
