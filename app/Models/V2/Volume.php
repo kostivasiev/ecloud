@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\VolumeUpdated;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -37,6 +38,10 @@ class Volume extends Model implements Filterable, Sortable
         'availability_zone_id',
         'capacity',
         'vmware_uuid',
+    ];
+
+    protected $dispatchesEvents = [
+        'updated' => VolumeUpdated::class,
     ];
 
     public function vpc()
