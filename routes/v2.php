@@ -29,7 +29,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
         $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
-        $router->get('availability-zones/{zoneId}/clusters', 'AvailabilityZoneController@clusters');
+        $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
     });
 
     /** Virtual Private Clouds */
