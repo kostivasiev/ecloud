@@ -2,8 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\DhcpCreated;
-use App\Traits\V2\CustomKey;
+use App\Events\V2\Dhcp\Created;
+use App\Events\V2\Dhcp\Creating;
 use App\Traits\V2\DefaultAvailabilityZone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,14 +20,13 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultAvailabilityZone;
+    use SoftDeletes, DefaultAvailabilityZone;
 
     public $keyPrefix = 'dhcp';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'vpc_id',
@@ -35,7 +34,8 @@ class Dhcp extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => DhcpCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function vpc()

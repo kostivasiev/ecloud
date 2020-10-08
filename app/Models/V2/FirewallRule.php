@@ -2,8 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallRuleCreated;
-use App\Traits\V2\CustomKey;
+use App\Events\V2\FirewallRule\Created;
+use App\Events\V2\FirewallRule\Creating;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,14 +20,13 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallRule extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use SoftDeletes, DefaultName;
 
     public $keyPrefix = 'fwr';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'name',
         'router_id',
@@ -44,7 +43,8 @@ class FirewallRule extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => FirewallRuleCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function router()

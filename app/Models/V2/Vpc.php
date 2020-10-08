@@ -2,8 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\VpcCreated;
-use App\Traits\V2\CustomKey;
+use App\Events\V2\Vpc\Creating;
+use App\Events\V2\Vpc\Created;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Vpc extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use SoftDeletes, DefaultName;
 
     public $keyPrefix = 'vpc';
     protected $keyType = 'string';
@@ -37,7 +37,8 @@ class Vpc extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => VpcCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function dhcp()

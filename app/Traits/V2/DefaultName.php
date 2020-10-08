@@ -2,6 +2,8 @@
 
 namespace App\Traits\V2;
 
+use App\Models\V2\Instance;
+
 trait DefaultName
 {
     /**
@@ -9,7 +11,7 @@ trait DefaultName
      */
     public static function initializeDefaultName()
     {
-        static::created(function ($instance) {
+        static::creating(function ($instance) {
             static::setDefaultName($instance);
         });
     }
@@ -21,8 +23,7 @@ trait DefaultName
     public static function setDefaultName($instance)
     {
         if (empty($instance->name)) {
-            $instance->name = $instance->getKey();
-            $instance->save();
+            $instance->name = $instance->id;
         }
     }
 }

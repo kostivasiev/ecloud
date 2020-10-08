@@ -1,20 +1,20 @@
 ###
 # Run these steps one by one
 ###
-# 1. First Create a Data Centre
+# 1. First Create a Deploy Centre
 POST https://{{host}}/{{version}}/vpcs
 X-consumer-custom-id:  1-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Manchester Data Centre 1",
+  "name": "Manchester Deploy Centre 1",
   "region_id": "reg-9afb9143"
 }
 
 > {%
 client.global.set('vdc_id', response.body.data.id);
-client.log('Data Centre UUID: ' + response.body.data.id);
+client.log('Deploy Centre UUID: ' + response.body.data.id);
 %}
 
 ###
@@ -39,7 +39,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Manchester Region Data Centre 1"
+  "name": "Manchester Region Deploy Centre 1"
 }
 
 ###

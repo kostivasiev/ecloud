@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\CustomKey;
+use App\Events\V2\Volume\Creating;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Volume extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'vol';
     protected $keyType = 'string';
@@ -37,6 +37,10 @@ class Volume extends Model implements Filterable, Sortable
         'availability_zone_id',
         'capacity',
         'vmware_uuid',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function vpc()

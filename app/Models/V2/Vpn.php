@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\CustomKey;
+use App\Events\V2\Vpn\Creating;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Vpn extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use SoftDeletes;
 
     public $keyPrefix = 'vpn';
     protected $keyType = 'string';
@@ -30,6 +30,10 @@ class Vpn extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'router_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function router()

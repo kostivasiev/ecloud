@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\CustomKey;
+use App\Events\V2\Credential\Creating;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,14 +21,13 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Credential extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use SoftDeletes, DefaultName;
 
     public $keyPrefix = 'cred';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'name',
@@ -37,6 +36,10 @@ class Credential extends Model implements Filterable, Sortable
         'user',
         'password',
         'port',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     protected $casts = [

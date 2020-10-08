@@ -2,9 +2,10 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\AvailabilityZone\Created;
+use App\Events\V2\AvailabilityZone\Creating;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
-use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -20,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class AvailabilityZone extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use SoftDeletes;
 
     public $keyPrefix = 'az';
     public $incrementing = false;
@@ -35,6 +36,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'region_id',
         'is_public',
         'nsx_edge_cluster_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     protected $casts = [

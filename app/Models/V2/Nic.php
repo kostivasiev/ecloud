@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\CustomKey;
+use App\Events\V2\Nic\Creating;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
@@ -18,7 +18,7 @@ use UKFast\DB\Ditto\Sort;
  */
 class Nic extends Model
 {
-    use CustomKey, SoftDeletes;
+    use SoftDeletes;
 
     public $keyPrefix = 'nic';
     protected $keyType = 'string';
@@ -36,6 +36,10 @@ class Nic extends Model
 
     protected $casts = [
         'deleted' => 'boolean'
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public static function boot()

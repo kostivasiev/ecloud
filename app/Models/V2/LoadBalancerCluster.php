@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\CustomKey;
+use App\Events\V2\LoadBalancerCluster\Creating;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class LoadBalancerCluster extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'lbc';
     protected $keyType = 'string';
@@ -40,6 +40,10 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
 
     protected $casts = [
         'nodes' => 'integer',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function availabilityZone()

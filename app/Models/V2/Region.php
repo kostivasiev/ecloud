@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\CustomKey;
+use App\Events\V2\Region\Creating;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Region extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use SoftDeletes;
 
     public $keyPrefix = 'reg';
     protected $keyType = 'string';
@@ -35,6 +35,10 @@ class Region extends Model implements Filterable, Sortable
 
     protected $casts = [
         'is_public' => 'boolean',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function availabilityZones()

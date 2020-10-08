@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Events\V2\Network\Creating;
 use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
+use App\Listeners\V2\Network\UKFastId;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
@@ -90,8 +92,8 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param  Request  $request
-     * @param  string  $vpcId
+     * @param Request $request
+     * @param string $vpcId
      * @return \Illuminate\Http\Response
      */
     public function volumes(Request $request, string $vpcId)
@@ -103,8 +105,8 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $vpcId
+     * @param \Illuminate\Http\Request $request
+     * @param string $vpcId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function instances(Request $request, string $vpcId)
@@ -116,8 +118,8 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $vpcId
+     * @param \Illuminate\Http\Request $request
+     * @param string $vpcId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function lbcs(Request $request, string $vpcId)
@@ -152,14 +154,19 @@ class VpcController extends BaseController
         // Create a new network
         Network::withoutEvents(function () use ($router) {
             $network = new Network();
-            $network::addCustomKey($network);
+
+            // Force the UKFastId event to run
+            $event = new Creating($network);
+            $listener = app()->make(UKFastId::class);
+            $listener->handle($event);
+
             $network->name = $network->id;
             $network->router()->associate($router);
             $network->save();
         });
 
         // Deploy router and network
-        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
+        //event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
 
         return response()->json([], 202);
     }

@@ -180,7 +180,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         'ApplianceVersionController@versionParameters');
     $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
 
-    // Appliance Versions Data - Admin
+    // Appliance Versions Deploy - Admin
     $router->group([
         'middleware' => [
             'is-administrator',
