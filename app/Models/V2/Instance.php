@@ -5,7 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -43,6 +42,7 @@ class Instance extends Model implements Filterable, Sortable
     protected $appends = [
         'appliance_id',
         'online',
+        'volume_capacity',
     ];
 
     protected $casts = [
@@ -56,6 +56,24 @@ class Instance extends Model implements Filterable, Sortable
         static::created(function (Instance $instance) {
             $instance->setDefaultPlatform();
         });
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function setDefaultPlatform()
+    {
+        if (empty($this->platform) && $this->applianceVersion) {
+            try {
+                $this->platform = $this->applianceVersion->serverLicense()->category;
+                $this->save();
+            } catch (\Exception $exception) {
+                Log::error('Failed to determine default platform from appliance version', [
+                    'id' => $this->id,
+                ]);
+                throw $exception;
+            }
+        }
     }
 
     public function vpc()
@@ -76,6 +94,15 @@ class Instance extends Model implements Filterable, Sortable
     public function nics()
     {
         return $this->hasMany(Nic::class);
+    }
+
+    public function getVolumeCapacityAttribute()
+    {
+        $sum = 0;
+        foreach ($this->volumes()->get() as $volume) {
+            $sum += $volume->capacity;
+        }
+        return $sum;
     }
 
     public function volumes()
@@ -131,14 +158,6 @@ class Instance extends Model implements Filterable, Sortable
     {
         $version = (new ApplianceVersion)->getLatest($applianceUuid);
         $this->attributes['appliance_version_id'] = $version;
-    }
-
-    public function setDefaultPlatform()
-    {
-        if (empty($this->platform) && $this->applianceVersion) {
-            $this->platform = $this->applianceVersion->serverLicense()->category;
-            $this->save();
-        }
     }
 
     /**

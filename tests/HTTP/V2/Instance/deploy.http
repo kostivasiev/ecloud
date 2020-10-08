@@ -1,3 +1,4 @@
+
 ###
 POST https://{{host}}/{{version}}/regions
 X-consumer-custom-id:  0-0
@@ -41,23 +42,6 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "name": "Kingpin (G0)",
-  "resource_id": "{{availability_zone_id}}",
-  "host": "https://mgmt-20.ecloud-service.ukfast.co.uk",
-  "user": "kingpinapi",
-  "password": "tKm?c7?Ov!of",
-  "port": 8443
-}
-
-###
-POST https://{{host}}/{{version}}/credentials
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
   "name": "NSX",
   "resource_id": "{{availability_zone_id}}",
   "host": "https://185.197.63.88",
@@ -70,11 +54,27 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 201, "Response status is not 200");
 });
 
-client.global.set('credential_id', response.body.data.id);
-client.log('Credential ID: ' + response.body.data.id);
+client.global.set('nsx_credential_id', response.body.data.id);
+client.log('NSX Credential ID: ' + response.body.data.id);
 %}
 
 ###
+
+POST https://{{host}}/{{version}}/credentials
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Kingpin (G0)",
+  "resource_id": "{{availability_zone_id}}",
+  "host": "https://mgmt-20.ecloud-service.ukfast.co.uk",
+  "user": "kingpinapi",
+  "password": "tKm?c7?Ov!of",
+  "port": 8443
+}
 
 ###
 POST https://{{host}}/{{version}}/vpcs
@@ -140,7 +140,6 @@ Content-Type:  application/json
 {
   "vpc_id": "{{vpc_id}}",
   "name": "Test",
-  "availability_zone_id": "{{availability_zone_id}}",
   "vcpu_cores": 1,
   "ram_capacity": 1024,
   "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a"
@@ -170,14 +169,4 @@ Content-Type: application/json
   "user": "root",
   "password": "password",
   "port": 0
-}
-
-###
-POST https://{{host}}/{{version}}/instances/{{instance_id}}/deploy
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-  "network_id": "{{network_id}}"
 }

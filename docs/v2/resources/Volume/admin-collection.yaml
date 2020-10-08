@@ -45,4 +45,4 @@ post:
     201:
       $ref: '../../admin-openapi.yaml#/components/responses/VolumeIdResponse'
   tags:
-    - Routers
+    - Volumes

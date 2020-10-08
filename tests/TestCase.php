@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Events\V2\NetworkCreated;
 use App\Models\V1\Datastore;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FirewallRule;
@@ -10,6 +11,7 @@ use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use Laravel\Lumen\Application;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
@@ -34,15 +36,18 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         Dhcp::flushEventListeners();
         FirewallRule::flushEventListeners();
         Vpc::flushEventListeners();
-        Network::flushEventListeners();
         Instance::flushEventListeners();
         Volume::flushEventListeners();
+
+        $dispatcher = Network::getEventDispatcher();
+        $dispatcher->forget(NetworkCreated::class);
+        Network::setEventDispatcher($dispatcher);
     }
 
     /**
      * Creates the application.
      *
-     * @return \Laravel\Lumen\Application
+     * @return Application
      */
     public function createApplication()
     {

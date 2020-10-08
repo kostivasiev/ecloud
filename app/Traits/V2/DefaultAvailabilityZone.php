@@ -3,6 +3,7 @@
 namespace App\Traits\V2;
 
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Log;
 
 trait DefaultAvailabilityZone
 {
@@ -11,7 +12,7 @@ trait DefaultAvailabilityZone
      */
     public static function initializeDefaultAvailabilityZone()
     {
-        static::created(function ($instance) {
+        static::creating(function ($instance) {
             static::setDefaultAvailabilityZone($instance);
         });
     }
@@ -26,7 +27,8 @@ trait DefaultAvailabilityZone
                 ->first();
             if ($availabilityZone) {
                 $instance->availability_zone_id = $availabilityZone->getKey();
-                $instance->save();
+            } else {
+                Log::error('Failed to find default Availability Zone for instance ' . $instance->id);
             }
         }
     }
