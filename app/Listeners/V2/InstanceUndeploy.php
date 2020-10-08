@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class InstanceDelete implements ShouldQueue
+class InstanceUndeploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
@@ -20,13 +20,6 @@ class InstanceDelete implements ShouldQueue
     public function handle(InstanceDeleteEvent $event)
     {
         $instance = $event->instance;
-        Log::info('Attempting to Delete volumes for instance '.$instance->getKey());
-        $instance->volumes->each(function ($volume) {
-            // If volume is only used in this instance then delete
-            if ($volume->instances()->count() == 1) {
-                $volume->delete();
-            }
-        });
         Log::info('Attempting to Delete instance '.$instance->getKey());
         try {
             /** @var Response $response */
