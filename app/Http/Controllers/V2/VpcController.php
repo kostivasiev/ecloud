@@ -120,12 +120,12 @@ class VpcController extends BaseController
      * @param  string  $vpcId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function clusters(Request $request, string $vpcId)
+    public function lbcs(Request $request, string $vpcId)
     {
         return LoadBalancerClusterResource::collection(
             Vpc::forUser($request->user)
                 ->findOrFail($vpcId)
-                ->clusters()
+                ->loadBalancerClusters()
                 ->paginate(
                     $request->input('per_page', env('PAGINATION_LIMIT'))
                 )

@@ -77,7 +77,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Instance::class);
     }
 
-    public function clusters()
+    public function loadBalancerClusters()
     {
         return $this->hasMany(LoadBalancerCluster::class);
     }
