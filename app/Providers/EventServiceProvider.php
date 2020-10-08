@@ -7,6 +7,7 @@ use App\Events\V2\FirewallRuleCreated;
 use App\Events\V2\InstanceDeployEvent;
 use App\Events\V2\NetworkCreated;
 use App\Events\V2\RouterCreated;
+use App\Events\V2\VolumeUpdated;
 use App\Events\V2\VpcCreated;
 use App\Listeners\V2\DhcpCreate;
 use App\Listeners\V2\DhcpDeploy;
@@ -14,6 +15,7 @@ use App\Listeners\V2\FirewallRuleDeploy;
 use App\Listeners\V2\InstanceDeploy;
 use App\Listeners\V2\NetworkDeploy;
 use App\Listeners\V2\RouterDeploy;
+use App\Listeners\V2\VolumeCapacityIncrease;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -77,6 +79,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         InstanceDeployEvent::class => [
             InstanceDeploy::class
+        ],
+        VolumeUpdated::class => [
+            VolumeCapacityIncrease::class,
         ],
     ];
 }
