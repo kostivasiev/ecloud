@@ -12,24 +12,33 @@ trait DefaultAvailabilityZone
      */
     public static function bootDefaultAvailabilityZone()
     {
-        static::creating(function ($instance) {
-            static::setDefaultAvailabilityZone($instance);
+        static::creating(function ($model) {
+            static::setDefaultAvailabilityZone($model);
         });
     }
 
-    public static function setDefaultAvailabilityZone($instance)
+    /**
+     * @param $model
+     * @throws \Exception
+     */
+    public static function setDefaultAvailabilityZone($model)
     {
+        Log::info('Setting Default Availability Zone on ' . $model->id . ' (' . get_class($model) . ')');
+
         if (empty($instance->availability_zone_id)) {
             $availabilityZone = Vpc::forUser(app('request')->user)
-                ->findOrFail($instance->vpc_id)
+                ->findOrFail($model->vpc_id)
                 ->region
                 ->availabilityZones
                 ->first();
             if ($availabilityZone) {
-                $instance->availability_zone_id = $availabilityZone->getKey();
+                $model->availability_zone_id = $availabilityZone->getKey();
             } else {
-                Log::error('Failed to find default Availability Zone for instance ' . $instance->id);
+                Log::error('Failed to find default Availability Zone for instance ' . $model->id);
+                throw new \Exception('Failed to find default Availability Zone for instance ' . $model->id);
             }
         }
+
+        Log::info('Set Default Availability Zone to "' . $model->id . '" (' . get_class($model) . ')');
     }
 }

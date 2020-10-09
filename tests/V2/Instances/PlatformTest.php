@@ -54,6 +54,12 @@ class PlatformTest extends TestCase
             return $mockAdminDevices;
         });
         $this->network = factory(Network::class)->create();
+
+        // Enable disabled event
+        Model::getEventDispatcher()->listen(
+            \App\Events\V2\Instance\Created::class,
+            \App\Listeners\V2\Instance\DefaultPlatform::class
+        );
     }
 
     public function testSettingPlatform()

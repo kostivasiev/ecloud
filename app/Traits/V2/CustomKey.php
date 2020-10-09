@@ -22,7 +22,7 @@ trait CustomKey
      */
     public static function addCustomKey($model)
     {
-        Log::info('Setting Custom Key on ' . $model->id . ' (' . get_class($model) . ')');
+        Log::info('Setting Custom Key for ' . get_class($model));
 
         if (empty($model->keyPrefix)) {
             throw new \Exception('Invalid key prefix');
@@ -33,11 +33,12 @@ trait CustomKey
                 $model->id = $model->keyPrefix . '-' . bin2hex(random_bytes(4));
             } while ($model->find($model->id));
         } catch (\Exception $exception) {
-            Log::error('Failed to set Custom Key on ' . $model->id . ' (' . get_class($model) . ')', [
+            Log::error('Failed to set Custom Key on ' . get_class($model), [
                 $exception,
             ]);
+            throw $exception;
         }
 
-        Log::info('Set Custom Key to "' . $model->id . '" (' . get_class($model) . ')');
+        Log::info('Set Custom Key to "' . $model->id . '" for ' . get_class($model));
     }
 }

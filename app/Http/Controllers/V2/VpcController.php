@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\V2;
 
 use App\Events\V2\Network\Creating;
-use App\Events\V2\RouterAvailabilityZoneAttach;
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
-use App\Listeners\V2\Network\UKFastId;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
+use App\Traits\V2\CustomKey;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -154,12 +153,7 @@ class VpcController extends BaseController
         // Create a new network
         Network::withoutEvents(function () use ($router) {
             $network = new Network();
-
-            // Force the UKFastId event to run
-            $event = new Creating($network);
-            $listener = app()->make(UKFastId::class);
-            $listener->handle($event);
-
+            $network::addCustomKey($network);
             $network->name = $network->id;
             $network->router()->associate($router);
             $network->save();

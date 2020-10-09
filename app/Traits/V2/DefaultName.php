@@ -2,6 +2,8 @@
 
 namespace App\Traits\V2;
 
+use Illuminate\Support\Facades\Log;
+
 trait DefaultName
 {
     /**
@@ -9,19 +11,23 @@ trait DefaultName
      */
     public static function bootDefaultName()
     {
-        static::creating(function ($instance) {
-            static::setDefaultName($instance);
+        static::creating(function ($model) {
+            static::setDefaultName($model);
         });
     }
 
     /**
-     * @param $instance
+     * @param $model
      * @throws \Exception
      */
-    public static function setDefaultName($instance)
+    public static function setDefaultName($model)
     {
-        if (empty($instance->name)) {
-            $instance->name = $instance->id;
+        Log::info('Setting Default Name on ' . $model->id . ' (' . get_class($model) . ')');
+
+        if (empty($model->name)) {
+            $model->name = $model->id;
         }
+
+        Log::info('Set Default Name on "' . $model->id . '" (' . get_class($model) . ')');
     }
 }

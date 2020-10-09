@@ -2,9 +2,12 @@
 
 namespace Tests;
 
+use App\Events\Event;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
+use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Router;
+use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Application;
@@ -53,18 +56,5 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
         // Deploy
         $dispatcher->forget(\App\Events\V2\Instance\Deploy::class);
-
-//        // Deploy
-//        $dispatcher->forget(\App\Listeners\V2\Dhcp\Deploy::class);
-//        $dispatcher->forget(\App\Listeners\V2\FirewallRule\Deploy::class);
-//        $dispatcher->forget(\App\Listeners\V2\Instance\Deploy::class);
-//        $dispatcher->forget(\App\Listeners\V2\Network\Deploy::class);
-//        $dispatcher->forget(\App\Listeners\V2\Router\Deploy::class);
-//
-//        // DhcpCreate
-//        $dispatcher->forget(\App\Listeners\V2\Vpc\DhcpCreate::class);
-//
-//        // DefaultPlatform
-//        $dispatcher->forget(\App\Listeners\V2\Instance\DefaultPlatform::class);
     }
 }

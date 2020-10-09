@@ -13,10 +13,10 @@ class DefaultSubnet
         /** @var Instance $model */
         $model = $event->model;
 
-        Log::info('Setting default subnet on network ' . $model->id);
+        Log::info('Setting default subnet on network');
 
         $model->subnet = $model->subnet ?? config('defaults.network.subnets.range');
 
-        Log::info('Default subnet on network ' . $model->id . ' set to ' . $model->subnet);
+        Log::info('Default subnet on network set to ' . $model->subnet);
     }
 }
