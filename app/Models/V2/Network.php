@@ -2,7 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NetworkCreated;
+use App\Events\V2\Network\Created;
+use App\Events\V2\Network\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -39,17 +40,9 @@ class Network extends Model implements Filterable, Sortable
         'subnet'
     ];
 
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            $model->subnet = $model->subnet ?? config('defaults.network.subnets.range');
-        });
-    }
-
     protected $dispatchesEvents = [
-        'created' => NetworkCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function router()

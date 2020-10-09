@@ -2,29 +2,43 @@
 
 namespace App\Traits\V2;
 
+use Illuminate\Support\Facades\Log;
+
 trait CustomKey
 {
     /**
      * @throws \Exception
      */
-    public static function initializeCustomKey()
+    public static function bootCustomKey()
     {
-        static::creating(function ($instance) {
-            static::addCustomKey($instance);
+        static::creating(function ($model) {
+            static::addCustomKey($model);
         });
     }
 
     /**
-     * @param $instance
+     * @param $model
      * @throws \Exception
      */
-    public static function addCustomKey($instance)
+    public static function addCustomKey($model)
     {
-        if (empty($instance->keyPrefix)) {
+        Log::info('Setting Custom Key for ' . get_class($model));
+
+        if (empty($model->keyPrefix)) {
             throw new \Exception('Invalid key prefix');
         }
-        do {
-            $instance->id = $instance->keyPrefix . '-' . bin2hex(random_bytes(4));
-        } while (static::find($instance->id));
+
+        try {
+            do {
+                $model->id = $model->keyPrefix . '-' . bin2hex(random_bytes(4));
+            } while ($model->find($model->id));
+        } catch (\Exception $exception) {
+            Log::error('Failed to set Custom Key on ' . get_class($model), [
+                $exception,
+            ]);
+            throw $exception;
+        }
+
+        Log::info('Set Custom Key to "' . $model->id . '" for ' . get_class($model));
     }
 }

@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Resources\V2\VolumeResource;
-use Illuminate\Http\Request;
-use App\Events\V2\Data\InstanceDeployEventData;
-use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
-use App\Http\Requests\V2\Instance\DeployRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -104,7 +101,7 @@ class InstanceController extends BaseController
             }
         }
 
-        $instanceDeployData = new InstanceDeployEventData();
+        $instanceDeployData = new \App\Events\V2\Instance\Deploy\Data();
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
@@ -112,7 +109,7 @@ class InstanceController extends BaseController
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
-        event(new InstanceDeployEvent($instanceDeployData));
+        event(new \App\Events\V2\Instance\Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
@@ -201,8 +198,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $instanceId
+     * @param \Illuminate\Http\Request $request
+     * @param string $instanceId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function nics(Request $request, string $instanceId)

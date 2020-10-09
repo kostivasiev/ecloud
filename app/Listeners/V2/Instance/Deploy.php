@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Data\InstanceDeployEventData;
-use App\Events\V2\InstanceDeployEvent;
+use App\Events\V2\Instance\Deploy\Data as DeployEventData;
+use App\Events\V2\Instance\Deploy as DeployEvent;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\OsCustomisation;
@@ -18,22 +18,22 @@ use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class InstanceDeploy implements ShouldQueue
+class Deploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
-     * @param InstanceDeployEvent $event
+     * @param DeployEvent $event
      * @return void
      * @throws Exception
      */
-    public function handle(InstanceDeployEvent $event)
+    public function handle(DeployEvent $event)
     {
-        /** @var InstanceDeployEventData $instanceDeployEventData */
-        $instanceDeployEventData = $event->instanceDeployEventData;
+        /** @var DeployEventData $data */
+        $data = $event->data;
 
-        // TODO :- post MVP, replace this in the jobs so we just pass in the "$event->instanceDeployEventData"
-        $data = (array)$instanceDeployEventData;
+        // TODO :- post MVP, replace this in the jobs so we just pass in the "$event->data"
+        $data = (array)$data;
 
         // Create the chained jobs for deployment
         dispatch((new Deploy($data))->chain([
