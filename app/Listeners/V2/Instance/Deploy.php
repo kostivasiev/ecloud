@@ -2,8 +2,8 @@
 
 namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Instance\Deploy\Data as DeployEventData;
 use App\Events\V2\Instance\Deploy as DeployEvent;
+use App\Events\V2\Instance\Deploy\Data as DeployEventData;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
