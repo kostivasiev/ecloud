@@ -2,15 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Jobs\Instance\GuestRestart;
-use App\Jobs\Instance\GuestShutdown;
-use App\Jobs\Instance\PowerOff;
-use App\Jobs\Instance\PowerOn;
-use App\Jobs\Instance\PowerReset;
-use App\Resources\V2\VolumeResource;
-use Illuminate\Http\Request;
-use App\Events\V2\Data\InstanceDeployEventData;
-use App\Events\V2\InstanceDeployEvent;
+use App\Events\V2\Instance\Deploy;
+use App\Events\V2\Instance\Deploy\Data;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Models\V2\Instance;
@@ -18,7 +11,9 @@ use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\HigherOrderTapProxy;
@@ -110,7 +105,7 @@ class InstanceController extends BaseController
             }
         }
 
-        $instanceDeployData = new InstanceDeployEventData();
+        $instanceDeployData = new Data();
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
@@ -119,7 +114,7 @@ class InstanceController extends BaseController
         $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
-        event(new InstanceDeployEvent($instanceDeployData));
+        event(new Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }

@@ -2,7 +2,7 @@
 
 namespace Tests\V2\Network;
 
-use App\Events\V2\NetworkCreated;
+use App\Events\V2\Network\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
@@ -71,8 +71,8 @@ class CreateTest extends TestCase
             'router_id' => 'x',
         ]);
 
-        Event::assertDispatched(NetworkCreated::class, function ($event) use ($network) {
-            return $event->network->id === $network->id;
+        Event::assertDispatched(Created::class, function ($event) use ($network) {
+            return $event->model->id === $network->id;
         });
     }
 }

@@ -2,15 +2,19 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\AvailabilityZone\Created;
+use App\Events\V2\AvailabilityZone\Creating;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 /**
@@ -35,6 +39,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'region_id',
         'is_public',
         'nsx_edge_cluster_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     protected $casts = [
@@ -77,7 +86,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Instance::class);
     }
 
-    public function clusters()
+    public function loadBalancerClusters()
     {
         return $this->hasMany(LoadBalancerCluster::class);
     }
@@ -119,8 +128,8 @@ class AvailabilityZone extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -139,8 +148,8 @@ class AvailabilityZone extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort|Sort[]|null
+     * @throws InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {

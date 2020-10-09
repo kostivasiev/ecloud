@@ -8,6 +8,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Faker\Generator;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,7 +16,7 @@ class GetClustersTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
     protected AvailabilityZone $availabilityZone;
     protected LoadBalancerCluster $lbc;
     protected Router $router;
@@ -30,7 +31,7 @@ class GetClustersTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $region->getKey()
         ]);
@@ -44,10 +45,10 @@ class GetClustersTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/vpcs/'.$this->vpc->getKey().'/clusters',
+            '/v2/vpcs/' . $this->vpc->getKey() . '/lbcs',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([

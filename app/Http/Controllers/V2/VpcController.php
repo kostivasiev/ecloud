@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\RouterAvailabilityZoneAttach;
+use App\Events\V2\Network\Creating;
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
 use App\Models\V2\Network;
@@ -11,7 +11,13 @@ use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
+use App\Traits\V2\CustomKey;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -22,7 +28,7 @@ class VpcController extends BaseController
 {
     /**
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -50,7 +56,7 @@ class VpcController extends BaseController
 
     /**
      * @param CreateVpcRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create(CreateVpcRequest $request)
     {
@@ -63,7 +69,7 @@ class VpcController extends BaseController
     /**
      * @param UpdateVpcRequest $request
      * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(UpdateVpcRequest $request, string $vpcId)
     {
@@ -81,7 +87,7 @@ class VpcController extends BaseController
     /**
      * @param Request $request
      * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy(Request $request, string $vpcId)
     {
@@ -90,9 +96,9 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param  Request  $request
-     * @param  string  $vpcId
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param string $vpcId
+     * @return Response
      */
     public function volumes(Request $request, string $vpcId)
     {
@@ -103,9 +109,9 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $vpcId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $vpcId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function instances(Request $request, string $vpcId)
     {
@@ -116,16 +122,16 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $vpcId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $vpcId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function clusters(Request $request, string $vpcId)
+    public function lbcs(Request $request, string $vpcId)
     {
         return LoadBalancerClusterResource::collection(
             Vpc::forUser($request->user)
                 ->findOrFail($vpcId)
-                ->clusters()
+                ->loadBalancerClusters()
                 ->paginate(
                     $request->input('per_page', env('PAGINATION_LIMIT'))
                 )
@@ -135,8 +141,8 @@ class VpcController extends BaseController
     /**
      * @param Request $request
      * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
+     * @return JsonResponse
+     * @throws Exception
      */
     public function deployDefaults(Request $request, string $vpcId)
     {
@@ -159,7 +165,7 @@ class VpcController extends BaseController
         });
 
         // Deploy router and network
-        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
+        //event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
 
         return response()->json([], 202);
     }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Network;
 
-use App\Events\V2\NetworkCreated;
+use App\Events\V2\Network\Created;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
-class NetworkDeploy implements ShouldQueue
+class Deploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
@@ -19,13 +19,13 @@ class NetworkDeploy implements ShouldQueue
     const ROUTER_RETRY_DELAY = 10;
 
     /**
-     * @param NetworkCreated $event
+     * @param Created $event
      * @return void
      * @throws Exception
      */
-    public function handle(NetworkCreated $event)
+    public function handle(Created $event)
     {
-        $network = $event->network;
+        $network = $event->model;
         $router = $network->router;
 
         if (!$router->available) {

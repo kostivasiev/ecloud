@@ -2,13 +2,16 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Region\Creating;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 /**
@@ -35,6 +38,10 @@ class Region extends Model implements Filterable, Sortable
 
     protected $casts = [
         'is_public' => 'boolean',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function availabilityZones()
@@ -78,8 +85,8 @@ class Region extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -94,8 +101,8 @@ class Region extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort|Sort[]|null
+     * @throws InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {

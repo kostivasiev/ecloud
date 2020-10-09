@@ -12,16 +12,18 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
+use Faker\Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Mockery;
 use Tests\TestCase;
 
 class GetNicsTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
     protected Appliance $appliance;
     protected ApplianceVersion $appliance_version;
     protected AvailabilityZone $availability_zone;
@@ -39,7 +41,7 @@ class GetNicsTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -66,7 +68,7 @@ class GetNicsTest extends TestCase
             'network_id' => $this->network->getKey(),
         ]);
 
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+        $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode(['powerState' => 'poweredOn']))
         );

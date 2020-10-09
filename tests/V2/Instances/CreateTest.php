@@ -10,6 +10,7 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Faker\Generator;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,7 +18,7 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
     protected $availability_zone;
     protected $instance;
     protected $network;
@@ -34,56 +35,48 @@ class CreateTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
-        ])->refresh();
+        ])->refresh();  // Hack needed since this is a V1 resource
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
+        ])->refresh();  // Hack needed since this is a V1 resource
         $this->instance = factory(Instance::class)->create([
+            'vpc_id' => $this->vpc->id,
             'appliance_version_id' => $this->appliance_version->uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),
-        ])->refresh();
+        ]);
         $this->network = factory(Network::class)->create();
     }
 
-    public function testValidDataSucceeds()
+    public function testValidDataSucceedsWithoutName()
     {
         // No name defined - defaults to ID
-        $this->post(
-            '/v2/instances',
-            [
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availability_zone->getKey(),
-                'appliance_id' => $this->appliance->uuid,
-                'network_id' => $this->network->id,
-                'vcpu_cores' => 1,
-                'ram_capacity' => 1024,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(201);
+        $this->post('/v2/instances', [
+            'vpc_id' => $this->vpc->getKey(),
+            'appliance_id' => $this->appliance->uuid,
+            'network_id' => $this->network->id,
+            'vcpu_cores' => 1,
+            'ram_capacity' => 1024,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(201);
 
         $id = (json_decode($this->response->getContent()))->data->id;
         $this->seeJson([
             'id' => $id
-        ])
-            ->seeInDatabase(
-                'instances',
-                [
-                    'id' => $id,
-                    'name' => $id,
-                ],
-                'ecloud'
-            );
+        ])->seeInDatabase('instances', [
+            'id' => $id,
+            'name' => $id,
+        ], 'ecloud');
+    }
 
+    public function testValidDataSucceedsWithName()
+    {
         // Name defined
         $name = $this->faker->word();
 
@@ -92,7 +85,6 @@ class CreateTest extends TestCase
             [
                 'name' => $name,
                 'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availability_zone->getKey(),
                 'appliance_id' => $this->appliance->uuid,
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,

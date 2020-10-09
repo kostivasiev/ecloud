@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\FloatingIp\Creating;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,11 +25,10 @@ class FloatingIp extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'fip';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'vpc_id'
@@ -54,6 +54,10 @@ class FloatingIp extends Model implements Filterable, Sortable
         }
         return $query;
     }
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+    ];
 
     /**
      * @param FilterFactory $factory

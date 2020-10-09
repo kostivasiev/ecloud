@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Vpc;
 
-use App\Events\V2\VpcCreated;
+use App\Events\V2\Vpc\Created;
 use App\Models\V2\Dhcp;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -12,15 +13,15 @@ class DhcpCreate implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @param VpcCreated $event
+     * @param Created $event
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function handle(VpcCreated $event)
+    public function handle(Created $event)
     {
-        $event->vpc->region->availabilityZones()->each(function ($availabilityZone) use ($event) {
+        $event->model->region->availabilityZones()->each(function ($availabilityZone) use ($event) {
             $dhcp = app()->make(Dhcp::class);
-            $dhcp->vpc()->associate($event->vpc);
+            $dhcp->vpc()->associate($event->model);
             $dhcp->availabilityZone()->associate($availabilityZone);
             $dhcp->save();
         });

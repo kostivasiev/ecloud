@@ -10,16 +10,18 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
+use Faker\Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Mockery;
 use Tests\TestCase;
 
 class OnlineTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
     protected $availability_zone;
     protected $instance;
     protected $appliance;
@@ -36,7 +38,7 @@ class OnlineTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -53,7 +55,7 @@ class OnlineTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
         ]);
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+        $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode(['powerState' => 'poweredOn']))
         );

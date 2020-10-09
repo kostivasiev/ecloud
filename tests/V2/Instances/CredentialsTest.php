@@ -9,6 +9,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Mockery;
 use Tests\TestCase;
 
 class CredentialsTest extends TestCase
@@ -27,7 +28,7 @@ class CredentialsTest extends TestCase
     {
         parent::setUp();
 
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+        $mockEncryptionServiceProvider = Mockery::mock(EncryptionServiceProvider::class)
             ->shouldAllowMockingProtectedMethods();
         app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
             return $mockEncryptionServiceProvider;
@@ -41,6 +42,7 @@ class CredentialsTest extends TestCase
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
+            'region_id' => $region->getKey(),
         ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),

@@ -9,6 +9,7 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Faker\Generator;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -16,7 +17,7 @@ class GetNicsTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
     protected AvailabilityZone $availability_zone;
     protected Instance $instance;
     protected Network $network;
@@ -32,7 +33,7 @@ class GetNicsTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);

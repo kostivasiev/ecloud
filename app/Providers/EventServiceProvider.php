@@ -2,18 +2,12 @@
 
 namespace App\Providers;
 
-use App\Events\V2\DhcpCreated;
-use App\Events\V2\FirewallRuleCreated;
-use App\Events\V2\InstanceDeployEvent;
-use App\Events\V2\NetworkCreated;
-use App\Events\V2\RouterCreated;
-use App\Events\V2\VpcCreated;
-use App\Listeners\V2\DhcpCreate;
-use App\Listeners\V2\DhcpDeploy;
-use App\Listeners\V2\FirewallRuleDeploy;
-use App\Listeners\V2\InstanceDeploy;
-use App\Listeners\V2\NetworkDeploy;
-use App\Listeners\V2\RouterDeploy;
+use App\Events\V2\Vpc\Created;
+use App\Events\V2\Vpn\Creating;
+use App\Listeners\V2\Instance\DefaultPlatform;
+use App\Listeners\V2\Network\DefaultSubnet;
+use App\Listeners\V2\Router\Deploy;
+use App\Listeners\V2\Vpc\DhcpCreate;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -60,23 +54,83 @@ class EventServiceProvider extends ServiceProvider
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // V2
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        RouterCreated::class => [
-            RouterDeploy::class,
+
+        // AvailabilityZone
+        \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
-        VpcCreated::class => [
+
+        // Credential
+        \App\Events\V2\Credential\Creating::class => [
+        ],
+
+        // Dhcp
+        \App\Events\V2\Dhcp\Creating::class => [
+        ],
+        \App\Events\V2\Dhcp\Created::class => [
+            \App\Listeners\V2\Dhcp\Deploy::class,
+        ],
+
+        // FirewallRule
+        \App\Events\V2\FirewallRule\Creating::class => [
+        ],
+        \App\Events\V2\FirewallRule\Created::class => [
+            \App\Listeners\V2\FirewallRule\Deploy::class,
+        ],
+
+        // FloatingIp
+        \App\Events\V2\FloatingIp\Creating::class => [
+        ],
+
+        // Instance
+        \App\Events\V2\Instance\Creating::class => [
+        ],
+        \App\Events\V2\Instance\Created::class => [
+            DefaultPlatform::class,
+        ],
+        \App\Events\V2\Instance\Deploy::class => [
+            \App\Listeners\V2\Instance\Deploy::class,
+        ],
+
+        // LoadBalancerCluster
+        \App\Events\V2\LoadBalancerCluster\Creating::class => [
+        ],
+
+        // Network
+        \App\Events\V2\Network\Creating::class => [
+            DefaultSubnet::class,
+        ],
+        \App\Events\V2\Network\Created::class => [
+            \App\Listeners\V2\Network\Deploy::class,
+        ],
+
+        // Nic
+        \App\Events\V2\Nic\Creating::class => [
+        ],
+
+        // Region
+        \App\Events\V2\Region\Creating::class => [
+        ],
+
+        // Router
+        \App\Events\V2\Router\Creating::class => [
+        ],
+        \App\Events\V2\Router\Created::class => [
+            Deploy::class,
+        ],
+
+        // Volume
+        \App\Events\V2\Volume\Creating::class => [
+        ],
+
+        // Vpc
+        \App\Events\V2\Vpc\Creating::class => [
+        ],
+        Created::class => [
             DhcpCreate::class,
         ],
-        DhcpCreated::class => [
-            DhcpDeploy::class,
-        ],
-        NetworkCreated::class => [
-            NetworkDeploy::class
-        ],
-        FirewallRuleCreated::class => [
-            FirewallRuleDeploy::class
-        ],
-        InstanceDeployEvent::class => [
-            InstanceDeploy::class
+
+        // Vpn
+        Creating::class => [
         ],
     ];
 }

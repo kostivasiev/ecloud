@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Events\V2\Data;
+namespace App\Events\V2\Instance\Deploy;
 
-class InstanceDeployEventData
+class Data
 {
     public $instance_id;
     public $vpc_id;

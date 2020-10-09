@@ -2,15 +2,18 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallRuleCreated;
+use App\Events\V2\FirewallRule\Created;
+use App\Events\V2\FirewallRule\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 /**
@@ -23,11 +26,10 @@ class FirewallRule extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'fwr';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'name',
         'router_id',
@@ -44,7 +46,8 @@ class FirewallRule extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => FirewallRuleCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function router()
@@ -69,8 +72,8 @@ class FirewallRule extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -85,7 +88,7 @@ class FirewallRule extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @return array|Sort|Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
     {

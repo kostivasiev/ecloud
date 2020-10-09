@@ -2,8 +2,7 @@
 
 namespace Tests\V2\Router\EventTests;
 
-use App\Events\V2\NetworkCreated;
-use App\Events\V2\RouterCreated;
+use App\Events\V2\Network\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -32,12 +31,12 @@ class RouterNetworkCreatedTest extends TestCase
         $router = $this->getRouter();
         $network = $this->getNetwork($router);
 
-        Event::assertDispatched(RouterCreated::class, function ($event) use ($router) {
-            return $event->router->id === $router->id;
+        Event::assertDispatched(\App\Events\V2\Router\Created::class, function ($event) use ($router) {
+            return $event->model->id === $router->id;
         });
 
-        Event::assertDispatched(NetworkCreated::class, function ($event) use ($network) {
-            return $event->network->id === $network->id;
+        Event::assertDispatched(Created::class, function ($event) use ($network) {
+            return $event->model->id === $network->id;
         });
     }
 
@@ -47,11 +46,11 @@ class RouterNetworkCreatedTest extends TestCase
 
         $router = $this->getRouter();
 
-        Event::assertDispatched(RouterCreated::class, function ($event) use ($router) {
-            return $event->router->id === $router->id;
+        Event::assertDispatched(\App\Events\V2\Router\Created::class, function ($event) use ($router) {
+            return $event->model->id === $router->id;
         });
 
-        Event::assertNotDispatched(NetworkCreated::class);
+        Event::assertNotDispatched(Created::class);
 
     }
 

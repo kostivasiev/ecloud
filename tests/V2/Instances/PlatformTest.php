@@ -2,6 +2,8 @@
 
 namespace Tests\V2\Instances;
 
+use App\Events\V2\Instance\Created;
+use App\Listeners\V2\Instance\DefaultPlatform;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
@@ -10,7 +12,11 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Faker\Generator;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Mockery;
+use stdClass;
 use Tests\TestCase;
 use UKFast\Admin\Devices\AdminClient;
 
@@ -18,7 +24,7 @@ class PlatformTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
+    protected Generator $faker;
     protected $availability_zone;
     protected $network;
     protected $region;
@@ -34,7 +40,7 @@ class PlatformTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -44,16 +50,21 @@ class PlatformTest extends TestCase
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();
-        $mockAdminDevices = \Mockery::mock(AdminClient::class)
+        $mockAdminDevices = Mockery::mock(AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
         app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
-            $mockedResponse = new \stdClass();
+            $mockedResponse = new stdClass();
             $mockedResponse->category = "Linux";
             $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
             return $mockAdminDevices;
         });
-        Instance::boot();
         $this->network = factory(Network::class)->create();
+
+        // Enable disabled event
+        Model::getEventDispatcher()->listen(
+            Created::class,
+            DefaultPlatform::class
+        );
     }
 
     public function testSettingPlatform()

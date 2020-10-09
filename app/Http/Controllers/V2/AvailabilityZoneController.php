@@ -11,7 +11,11 @@ use App\Resources\V2\DhcpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\RouterResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -24,7 +28,7 @@ class AvailabilityZoneController extends BaseController
      * Get availability zones collection
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -52,7 +56,7 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param CreateAvailabilityZoneRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create(CreateAvailabilityZoneRequest $request)
     {
@@ -73,7 +77,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param UpdateAvailabilityZoneRequest $request
      * @param string $zoneId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(UpdateAvailabilityZoneRequest $request, string $zoneId)
     {
@@ -92,9 +96,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $zoneId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function routers(Request $request, string $zoneId)
     {
@@ -106,9 +110,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $zoneId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function dhcps(Request $request, string $zoneId)
     {
@@ -120,9 +124,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $zoneId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function credentials(Request $request, string $zoneId)
     {
@@ -134,9 +138,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $zoneId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function instances(Request $request, string $zoneId)
     {
@@ -148,15 +152,15 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $zoneId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function clusters(Request $request, string $zoneId)
+    public function lbcs(Request $request, string $zoneId)
     {
         return LoadBalancerClusterResource::collection(
             AvailabilityZone::findOrFail($zoneId)
-                ->clusters()
+                ->loadBalancerClusters()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
     }
@@ -164,7 +168,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param Request $request
      * @param string $zoneId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy(Request $request, string $zoneId)
     {

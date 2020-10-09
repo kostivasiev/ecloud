@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\TransferException;
 use Log;
+use stdClass;
 
 abstract class AbstractApioService
 {
@@ -21,7 +24,7 @@ abstract class AbstractApioService
 
     /**
      * An object returned by the other APIo service
-     * @var \stdClass
+     * @var stdClass
      */
     protected $response;
 
@@ -39,14 +42,14 @@ abstract class AbstractApioService
     /**
      * AbstractApioService constructor.
      * @param $client
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(Client $client)
     {
         $this->client = $client;
 
         if (empty($this->serviceName)) {
-            throw new \Exception('Service Not Defined');
+            throw new Exception('Service Not Defined');
         }
 
         $this->headers = [
@@ -83,10 +86,10 @@ abstract class AbstractApioService
      * Send the HTTP request
      * @param       $method
      * @param $endpoint
-     * @param null $data - Data payload (JSON or query string depending on the verb)
+     * @param null $data - Deploy payload (JSON or query string depending on the verb)
      * @param array $options - Any other options we want to pass to Guzzle
      * @return bool
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function makeRequest($method, $endpoint, $data = null, $options = [])
     {
@@ -164,13 +167,13 @@ abstract class AbstractApioService
     /**
      * @param $json
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     protected function parseResponseData($json)
     {
         $data = json_decode($json);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('failed to parse response data');
+            throw new Exception('failed to parse response data');
         }
 
         return $data;

@@ -2,15 +2,18 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Volume\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 /**
@@ -37,6 +40,10 @@ class Volume extends Model implements Filterable, Sortable
         'availability_zone_id',
         'capacity',
         'vmware_uuid',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function vpc()
@@ -87,8 +94,8 @@ class Volume extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -106,8 +113,8 @@ class Volume extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort|Sort[]|null
+     * @throws InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
