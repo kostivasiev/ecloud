@@ -54,14 +54,16 @@ properties:
     type: string
     example: 'net-912345'
   floating_ip_id:
+    description: ID of existing floating IP to assign to the instance.
     required: false
     type: string
     example: 'fip-912345'
   requires_floating_ip:
+    description: Create and assign a new floating IP to the instance.
     writeOnly: true
     required: false
     type: boolean
-    example: true
+    example: false
   appliance_data:
     required: false
     type: json

@@ -3,7 +3,9 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\Nat;
 use App\Models\V2\Vpc;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
@@ -23,24 +25,36 @@ class AssignFloatingIp extends Job
     {
         Log::info('Starting AssignFloatingIp for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
+        $destination = null;
 
-        if (empty($this->data['floating_ip_id']) && !$this->data['requires_floating_ip']) {
-            Log::info('No floating IP required, skipping.');
+        if ((!empty($this->data['floating_ip_id']) || $this->data['requires_floating_ip'])
+            && $instance->nics()->count() < 1) {
+            $this->fail(
+                new Exception('AssignFloatingIp failed for ' . $instance->getKey() . ': ' . 'Failed. Instance has no NIC')
+            );
             return;
         }
 
         if (!empty($this->data['floating_ip_id'])) {
-
-        }
-        //floating_ip_id
-        //requires_floating_ip
-
-
-        if (false) {
-            $this->fail(new Exception('AssignFloatingIp failed for ' . $instance->id));
-            return;
+            $destination = $this->data['floating_ip_id'];
         }
 
+        if ($this->data['requires_floating_ip']) {
+            $floatingIp = new FloatingIp;
+            $floatingIp->vpc_id = $this->data['vpc_id'];
+            $floatingIp->save();
+            $destination = $floatingIp->getKey();
+        }
 
+        if (!empty($destination)) {
+            $nic = $instance->nics()->first();
+
+            $nat = new Nat;
+            $nat->destination = $destination;
+            $nat->translated = $nic->getKey();
+            $nat->save();
+
+            Log::info('Floating IP (' . $destination . ') assigned to NIC (' . $nic->getKey() . ')');
+        }
     }
 }

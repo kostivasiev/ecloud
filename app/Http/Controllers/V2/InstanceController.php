@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use App\Events\V2\Data\InstanceDeployEventData;
 use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
-use App\Http\Requests\V2\Instance\DeployRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;

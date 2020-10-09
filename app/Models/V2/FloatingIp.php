@@ -37,6 +37,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     protected $visible = [
         'id',
         'vpc_id',
+        'ip_address',
         'created_at',
         'updated_at',
     ];
@@ -63,6 +64,7 @@ class FloatingIp extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('ip_address', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -78,6 +80,7 @@ class FloatingIp extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('vpc_id'),
+            $factory->create('ip_address'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -102,6 +105,7 @@ class FloatingIp extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'vpc_id' => 'vpc_id',
+            'ip_address' => 'ip_address',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddVpcIdColumnToFloatingIpsTable extends Migration
+class UpdateFloatingIpsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,6 +15,7 @@ class AddVpcIdColumnToFloatingIpsTable extends Migration
     {
         Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
             $table->uuid('vpc_id')->nullable()->after('id');
+            $table->ipAddress('ip_address')->nullable();
         });
     }
 
@@ -26,7 +27,7 @@ class AddVpcIdColumnToFloatingIpsTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
-            $table->dropColumn('vpc_id');
+            $table->dropColumn(['vpc_id', 'ip_address']);
         });
     }
 }

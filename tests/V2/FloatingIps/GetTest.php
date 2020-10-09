@@ -42,7 +42,8 @@ class GetTest extends TestCase
         )
             ->seeJson([
                 'id' => $this->floatingIp->getKey(),
-                'vpc_id' => $this->vpc->getKey()
+                'vpc_id' => $this->vpc->getKey(),
+                'ip_address' => $this->floatingIp->ip_address
             ])
             ->assertResponseStatus(200);
     }
@@ -58,7 +59,8 @@ class GetTest extends TestCase
         )
             ->seeJson([
                 'id' => $this->floatingIp->getKey(),
-                'vpc_id' => $this->vpc->getKey()
+                'vpc_id' => $this->vpc->getKey(),
+                'ip_address' => $this->floatingIp->ip_address
             ])
             ->assertResponseStatus(200);
     }

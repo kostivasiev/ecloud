@@ -7,6 +7,11 @@ properties:
     type: string
     example: vpc-2b66bb79
     readOnly: false
+  ip_address:
+    description: The external Ip address assigned to the floating IP.
+    type: string
+    example: '1.1.1.1'
+    readOnly: true
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

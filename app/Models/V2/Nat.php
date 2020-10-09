@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Nat
+ *
+ * @property string $destination Floating IP ID
+ * @property string $translated NIC ID
  */
 class Nat extends Model
 {
