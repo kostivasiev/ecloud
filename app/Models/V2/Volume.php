@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Volume\Creating;
+use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Volume extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use SoftDeletes, CustomKey, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'vol';
     protected $keyType = 'string';

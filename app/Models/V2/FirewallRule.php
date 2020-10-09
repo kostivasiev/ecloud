@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\FirewallRule\Created;
 use App\Events\V2\FirewallRule\Creating;
+use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallRule extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, DefaultName;
+    use SoftDeletes, CustomKey, DefaultName;
 
     public $keyPrefix = 'fwr';
     public $incrementing = false;

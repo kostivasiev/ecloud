@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\Router\Creating;
 use App\Events\V2\Router\Created;
+use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use GuzzleHttp\Exception\GuzzleException;
@@ -25,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use SoftDeletes, CustomKey, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'rtr';
     public $incrementing = false;

@@ -10,6 +10,7 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Devices\AdminClient;

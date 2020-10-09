@@ -10,7 +10,7 @@ trait DefaultAvailabilityZone
     /**
      * @throws \Exception
      */
-    public static function initializeDefaultAvailabilityZone()
+    public static function bootDefaultAvailabilityZone()
     {
         static::creating(function ($instance) {
             static::setDefaultAvailabilityZone($instance);

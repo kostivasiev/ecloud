@@ -2,14 +2,12 @@
 
 namespace App\Traits\V2;
 
-use App\Models\V2\Instance;
-
 trait DefaultName
 {
     /**
      * @throws \Exception
      */
-    public static function initializeDefaultName()
+    public static function bootDefaultName()
     {
         static::creating(function ($instance) {
             static::setDefaultName($instance);

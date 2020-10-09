@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Creating;
+use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use SoftDeletes;
+    use SoftDeletes, CustomKey;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;

@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\Dhcp\Created;
 use App\Events\V2\Dhcp\Creating;
+use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, DefaultAvailabilityZone;
+    use SoftDeletes, CustomKey, DefaultAvailabilityZone;
 
     public $keyPrefix = 'dhcp';
     public $incrementing = false;
