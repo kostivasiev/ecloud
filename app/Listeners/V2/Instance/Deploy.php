@@ -5,7 +5,6 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Instance\Deploy\Data as DeployEventData;
 use App\Events\V2\Instance\Deploy as DeployEvent;
 use App\Jobs\Instance\Deploy\ConfigureNics;
-use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
@@ -36,7 +35,7 @@ class Deploy implements ShouldQueue
         $data = (array)$data;
 
         // Create the chained jobs for deployment
-        dispatch((new Deploy($data))->chain([
+        dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
             new ConfigureNics($data),
             new UpdateNetworkAdapter($data),
             new OsCustomisation($data),
