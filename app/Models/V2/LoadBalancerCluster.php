@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class LoadBalancerCluster extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey, DefaultName, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'lbc';
     protected $keyType = 'string';

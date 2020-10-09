@@ -21,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallRule extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'fwr';
     public $incrementing = false;

@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Sort;
  */
 class Nic extends Model
 {
-    use SoftDeletes, CustomKey;
+    use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'nic';
     protected $keyType = 'string';

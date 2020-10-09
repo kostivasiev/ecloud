@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Credential extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'cred';
     public $incrementing = false;

@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey;
+    use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;

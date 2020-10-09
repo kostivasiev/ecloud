@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey, DefaultName, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
 
     public $keyPrefix = 'rtr';
     public $incrementing = false;

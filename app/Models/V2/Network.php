@@ -24,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Network extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'net';
     protected $keyType = 'string';

@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Vpn extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey;
+    use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'vpn';
     protected $keyType = 'string';

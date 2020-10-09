@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Region extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey;
+    use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'reg';
     protected $keyType = 'string';

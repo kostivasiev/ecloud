@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class AvailabilityZone extends Model implements Filterable, Sortable
 {
-    use SoftDeletes, CustomKey;
+    use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'az';
     public $incrementing = false;
