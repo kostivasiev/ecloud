@@ -11,6 +11,10 @@ class ConfigureNic extends Job
 {
     private $nic;
 
+    const RETRY_ATTEMPTS = 10;
+
+    const RETRY_DELAY = 10;
+
     public function __construct($nic)
     {
         $this->nic = $nic;
@@ -29,6 +33,21 @@ class ConfigureNic extends Job
         $router = $this->nic->network->router;
         $subnet = Subnet::fromString($network->subnet);
         $nsxService = $this->nic->instance->availabilityZone->nsxService();
+
+        if (!$network->available) {
+            if ($this->attempts() <= static::RETRY_ATTEMPTS) {
+                $this->release(static::RETRY_DELAY);
+                Log::info('Attempted to configure NIC on Network (' . $network->getKey() .
+                    ') but Network was not available, will retry shortly');
+                return;
+            } else {
+                $message = 'Timed out waiting for Network (' . $network->getKey() .
+                    ') to become available for prior to NIC configuration';
+                Log::error($message);
+                $this->fail(new Exception($message));
+                return;
+            }
+        }
 
         /**
          * Get DHCP static bindings to determine used IP addresses on the network
