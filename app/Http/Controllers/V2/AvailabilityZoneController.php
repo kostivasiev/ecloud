@@ -152,11 +152,11 @@ class AvailabilityZoneController extends BaseController
      * @param  string  $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function clusters(Request $request, string $zoneId)
+    public function lbcs(Request $request, string $zoneId)
     {
         return LoadBalancerClusterResource::collection(
             AvailabilityZone::findOrFail($zoneId)
-                ->clusters()
+                ->loadBalancerClusters()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
     }

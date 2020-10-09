@@ -5,7 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
@@ -59,11 +58,21 @@ class Instance extends Model implements Filterable, Sortable
         });
     }
 
+    /**
+     * @throws \Exception
+     */
     public function setDefaultPlatform()
     {
         if (empty($this->platform) && $this->applianceVersion) {
-            $this->platform = $this->applianceVersion->serverLicense()->category;
-            $this->save();
+            try {
+                $this->platform = $this->applianceVersion->serverLicense()->category;
+                $this->save();
+            } catch (\Exception $exception) {
+                Log::error('Failed to determine default platform from appliance version', [
+                    'id' => $this->id,
+                ]);
+                throw $exception;
+            }
         }
     }
 
@@ -99,6 +108,23 @@ class Instance extends Model implements Filterable, Sortable
     public function volumes()
     {
         return $this->belongsToMany(Volume::class);
+    }
+
+    public function getOnlineAttribute()
+    {
+        try {
+            $response = $this->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
+            );
+        } catch (\Exception $e) {
+            Log::info('Failed to get power state', [
+                'vpc_id' => $this->vpc_id,
+                'instance_id' => $this->getKey(),
+                'message' => $e->getMessage()
+            ]);
+            return;
+        }
+        return json_decode($response->getBody()->getContents())->powerState == 'poweredOn';
     }
 
     public function scopeForUser($query, $user)
@@ -157,8 +183,8 @@ class Instance extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|Sort[]
-     * @throws InvalidSortException
+     * @return array|\UKFast\DB\Ditto\Sort[]
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -179,8 +205,8 @@ class Instance extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|Sort|Sort[]|null
-     * @throws InvalidSortException
+     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
