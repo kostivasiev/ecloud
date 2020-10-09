@@ -43,7 +43,6 @@ class ConfigureNic extends Job
             } else {
                 $message = 'Timed out waiting for Network (' . $network->getKey() .
                     ') to become available for prior to NIC configuration';
-                Log::error($message);
                 $this->fail(new Exception($message));
                 return;
             }
