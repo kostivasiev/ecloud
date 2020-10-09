@@ -11,7 +11,7 @@ $factory->define(App\Models\V1\Datastore::class, function (Faker\Generator $fake
         'reseller_lun_name' => 'MCS_PX_VV_1_DATA',
         'reseller_lun_friendly_name' => '',
         'reseller_lun_wwn' => '',
-        'reseller_lun_lun_type' => 'Deploy',
+        'reseller_lun_lun_type' => 'Data',
         'reseller_lun_lun_sub_type' => 'DATA_1',
     ];
 });
