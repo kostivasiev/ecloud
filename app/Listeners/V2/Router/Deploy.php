@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Router;
 
-use App\Events\V2\NetworkCreated;
-use App\Events\V2\RouterCreated;
+use App\Events\V2\Router\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -11,19 +10,19 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class RouterDeploy implements ShouldQueue
+class Deploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
-     * @param RouterCreated $event
+     * @param Created $event
      * @return void
      * @throws \Exception
      */
-    public function handle(RouterCreated $event)
+    public function handle(Created $event)
     {
         /** @var Router $router */
-        $router = $event->router;
+        $router = $event->model;
 
         /** @var AvailabilityZone $availabilityZone */
         $availabilityZone = $router->availabilityZone;
@@ -89,7 +88,7 @@ class RouterDeploy implements ShouldQueue
 
         $router->networks()->each(function ($network) {
             /** @var Network $network */
-            event(new NetworkCreated($network));
+            event(new Created($network));
         });
     }
 }
