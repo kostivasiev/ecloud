@@ -37,7 +37,7 @@ class ConfigureNic extends Job
         if (!$network->available) {
             if ($this->attempts() <= static::RETRY_ATTEMPTS) {
                 $this->release(static::RETRY_DELAY);
-                Log::info('Attempted to configure NIC on Network (' . $network->getKey() .
+                Log::info('Attempted to configure NIC (' . $this->nic->getKey() . ') on Network (' . $network->getKey() .
                     ') but Network was not available, will retry shortly');
                 return;
             } else {
