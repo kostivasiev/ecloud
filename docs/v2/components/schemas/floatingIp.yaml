@@ -3,6 +3,10 @@ properties:
     type: string
     example: fip-2b66bb79
     readOnly: true
+  vpc_id:
+    type: string
+    example: vpc-2b66bb79
+    readOnly: false
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

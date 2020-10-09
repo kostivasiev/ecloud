@@ -2,7 +2,10 @@
 
 namespace Tests\V2\FloatingIps;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Region;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -12,33 +15,24 @@ class CreateTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
+    protected $region;
+    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->floatingIp = factory(FloatingIp::class)->create();
-    }
-
-    public function testNoPermsIsDenied()
-    {
-        $data = [];
-        $this->post(
-            '/v2/floating-ips',
-            $data,
-            []
-        )
-            ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
+        $this->region = factory(Region::class)->create();
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
     }
 
     public function testValidDataSucceeds()
     {
-        $data = [];
+        $data = [
+            'vpc_id' => $this->vpc->getKey()
+        ];
         $this->post(
             '/v2/floating-ips',
             $data,
@@ -48,10 +42,5 @@ class CreateTest extends TestCase
             ]
         )
             ->assertResponseStatus(201);
-
-        $id = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $id,
-        ]);
     }
 }

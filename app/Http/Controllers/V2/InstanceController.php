@@ -71,7 +71,6 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        exit(print_r('tets'));
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
@@ -210,9 +209,9 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $instanceId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @param Request $request
+     * @param string $instanceId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function nics(Request $request, string $instanceId)
     {
