@@ -4,9 +4,11 @@ namespace App\Resources\V2;
 
 use App\Services\V2\KingpinService;
 use DateTimeZone;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
+use Log;
 
 /**
  * Class InstanceResource
@@ -62,11 +64,11 @@ class InstanceResource extends UKFastResource
             $kingpinData = null;
             try {
                 $kingpinData = $this->availabilityZone->kingpinService()->getInstance($this);
-            } catch (\Exception $e) {
+            } catch (Exception $exception) {
                 Log::info('Failed to retrieve instance from Kingpin', [
                     'vpc_id' => $this->vpc_id,
                     'instance_id' => $this->getKey(),
-                    'message' => $e->getMessage()
+                    'message' => $exception->getMessage()
                 ]);
             }
             $response['online'] = isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null;
