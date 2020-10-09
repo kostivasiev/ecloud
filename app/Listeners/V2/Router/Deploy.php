@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Router;
 
-use App\Events\V2\NetworkCreated;
-use App\Events\V2\RouterCreated;
+use App\Events\V2\Router\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -11,25 +10,33 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class RouterDeploy implements ShouldQueue
+class Deploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
-     * @param RouterCreated $event
+     * @param Created $event
      * @return void
      * @throws \Exception
      */
-    public function handle(RouterCreated $event)
+    public function handle(Created $event)
     {
         /** @var Router $router */
-        $router = $event->router;
+        $router = $event->model;
 
         /** @var AvailabilityZone $availabilityZone */
         $availabilityZone = $router->availabilityZone;
+        if (!$availabilityZone) {
+            $this->fail(new \Exception('Failed to find AZ for router ' . $router->id));
+            return;
+        }
 
         try {
             $nsxService = $availabilityZone->nsxService();
+            if (!$nsxService) {
+                $this->fail(new \Exception('Failed to find NSX Service for router ' . $router->id));
+                return;
+            }
 
             // Get the routers T0 path
             $response = $nsxService->get('policy/api/v1/infra/tier-0s');
@@ -82,14 +89,18 @@ class RouterDeploy implements ShouldQueue
                 ]
             );
         } catch (GuzzleException $exception) {
-            throw new \Exception($exception->getResponse()->getBody()->getContents());
+            $this->fail(new \Exception($exception->getResponse()->getBody()->getContents()));
+            return;
+        } catch (\Exception $exception) {
+            $this->fail($exception);
+            return;
         }
         $router->deployed = true;
         $router->save();
 
         $router->networks()->each(function ($network) {
             /** @var Network $network */
-            event(new NetworkCreated($network));
+            event(new \App\Events\V2\Network\Created($network));
         });
     }
 }

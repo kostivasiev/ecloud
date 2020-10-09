@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Data\InstanceDeployEventData;
-use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
-use App\Http\Requests\V2\Instance\DeployRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
@@ -112,7 +109,7 @@ class InstanceController extends BaseController
             }
         }
 
-        $instanceDeployData = new InstanceDeployEventData();
+        $instanceDeployData = new \App\Events\V2\Instance\Deploy\Data();
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
@@ -120,7 +117,7 @@ class InstanceController extends BaseController
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
-        event(new InstanceDeployEvent($instanceDeployData));
+        event(new \App\Events\V2\Instance\Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
@@ -209,8 +206,8 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $instanceId
+     * @param \Illuminate\Http\Request $request
+     * @param string $instanceId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function nics(Request $request, string $instanceId)

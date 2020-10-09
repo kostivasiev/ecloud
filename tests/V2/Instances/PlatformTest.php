@@ -10,6 +10,7 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Devices\AdminClient;
@@ -34,7 +35,7 @@ class PlatformTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -52,8 +53,13 @@ class PlatformTest extends TestCase
             $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
             return $mockAdminDevices;
         });
-        Instance::boot();
         $this->network = factory(Network::class)->create();
+
+        // Enable disabled event
+        Model::getEventDispatcher()->listen(
+            \App\Events\V2\Instance\Created::class,
+            \App\Listeners\V2\Instance\DefaultPlatform::class
+        );
     }
 
     public function testSettingPlatform()

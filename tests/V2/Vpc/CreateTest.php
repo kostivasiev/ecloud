@@ -158,8 +158,8 @@ class CreateTest extends TestCase
             'id' => 'vpc-abc123'
         ]);
 
-        Event::assertDispatched(VpcCreated::class, function ($event) use ($vpc) {
-            return $event->vpc->id === $vpc->id;
+        Event::assertDispatched(\App\Events\V2\Vpc\Created::class, function ($event) use ($vpc) {
+            return $event->model->id === $vpc->id;
         });
 
         $dhcp = factory(Dhcp::class)->create([
@@ -167,8 +167,8 @@ class CreateTest extends TestCase
             'vpc_id' => 'vpc-abc123'
         ]);
 
-        Event::assertDispatched(DhcpCreated::class, function ($event) use ($dhcp) {
-            return $event->dhcp->id === $dhcp->id;
+        Event::assertDispatched(\App\Events\V2\Dhcp\Created::class, function ($event) use ($dhcp) {
+            return $event->model->id === $dhcp->id;
         });
     }
 }

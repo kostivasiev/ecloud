@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Volume;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -24,19 +25,25 @@ class DeleteTest extends TestCase
     /** @var Volume */
     private $volume;
 
+    /** @var AvailabilityZone */
+    private $availabilityZone;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
+        $region = factory(Region::class)->create();
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $region->getKey(),
+        ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'name' => 'Manchester VPC',
+            'region_id' => $region->getKey(),
         ]);
         $this->volume = factory(Volume::class)->create([
             'vpc_id' => $this->vpc->getKey()
         ]);
-
     }
 
     public function testFailInvalidId()

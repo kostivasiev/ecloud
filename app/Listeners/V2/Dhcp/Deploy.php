@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Dhcp;
 
-use App\Events\V2\DhcpCreated;
+use App\Events\V2\Dhcp\Created;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class DhcpDeploy implements ShouldQueue
+class Deploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
-     * @param DhcpCreated $event
+     * @param Created $event
      * @return void
      * @throws \Exception
      */
-    public function handle(DhcpCreated $event)
+    public function handle(Created $event)
     {
-        $dhcp = $event->dhcp;
+        $dhcp = $event->model;
         try {
             $dhcp->availabilityZone->nsxService()->put('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->getKey(), [
                 'json' => [
