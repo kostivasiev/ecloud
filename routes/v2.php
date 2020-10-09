@@ -4,8 +4,6 @@
  * v2 Routes
  */
 
-use Laravel\Lumen\Routing\Router;
-
 $middleware = [
     'auth',
     'paginator-limit:' . env('PAGINATION_LIMIT')
@@ -17,7 +15,7 @@ $baseRouteParameters = [
     'middleware' => $middleware
 ];
 
-/** @var Router $router */
+/** @var \Laravel\Lumen\Routing\Router $router */
 $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
     $router->get('availability-zones', 'AvailabilityZoneController@index');

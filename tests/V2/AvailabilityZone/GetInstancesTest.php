@@ -14,18 +14,16 @@ use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
-use Faker\Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Mockery;
 use Tests\TestCase;
 
 class GetInstancesTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Generator $faker;
+    protected \Faker\Generator $faker;
     protected Appliance $appliance;
     protected ApplianceVersion $appliance_version;
     protected AvailabilityZone $availability_zone;
@@ -60,7 +58,7 @@ class GetInstancesTest extends TestCase
             'platform' => 'Linux',
         ]);
 
-        $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
+        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode(['powerState' => 'poweredOn']))
         );

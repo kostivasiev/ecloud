@@ -12,12 +12,7 @@ use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use App\Traits\V2\CustomKey;
-use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
-use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -28,7 +23,7 @@ class VpcController extends BaseController
 {
     /**
      * @param Request $request
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
@@ -56,7 +51,7 @@ class VpcController extends BaseController
 
     /**
      * @param CreateVpcRequest $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateVpcRequest $request)
     {
@@ -69,7 +64,7 @@ class VpcController extends BaseController
     /**
      * @param UpdateVpcRequest $request
      * @param string $vpcId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateVpcRequest $request, string $vpcId)
     {
@@ -87,7 +82,7 @@ class VpcController extends BaseController
     /**
      * @param Request $request
      * @param string $vpcId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $vpcId)
     {
@@ -98,7 +93,7 @@ class VpcController extends BaseController
     /**
      * @param Request $request
      * @param string $vpcId
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function volumes(Request $request, string $vpcId)
     {
@@ -109,9 +104,9 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @param string $vpcId
-     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function instances(Request $request, string $vpcId)
     {
@@ -122,9 +117,9 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @param string $vpcId
-     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function lbcs(Request $request, string $vpcId)
     {
@@ -141,8 +136,8 @@ class VpcController extends BaseController
     /**
      * @param Request $request
      * @param string $vpcId
-     * @return JsonResponse
-     * @throws Exception
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function deployDefaults(Request $request, string $vpcId)
     {

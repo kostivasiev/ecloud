@@ -7,17 +7,14 @@ use App\Events\V2\Router\Created;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
-use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 /**
@@ -84,7 +81,7 @@ class Router extends Model implements Filterable, Sortable
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/9e1c6bcc-85db-46b6-bc38-d6d2431e7c17/30af91b5-3a91-4d5d-8ed5-a7d806764a16/api_includes/types_LogicalRouterState.html
      * When the configuration is actually in effect, the state will change to "success".
      */
@@ -142,8 +139,8 @@ class Router extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|Sort[]
-     * @throws InvalidSortException
+     * @return array|\UKFast\DB\Ditto\Sort[]
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -160,8 +157,8 @@ class Router extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|Sort|Sort[]|null
-     * @throws InvalidSortException
+     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {

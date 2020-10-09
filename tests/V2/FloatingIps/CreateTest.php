@@ -2,8 +2,6 @@
 
 namespace Tests\V2\FloatingIps;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;

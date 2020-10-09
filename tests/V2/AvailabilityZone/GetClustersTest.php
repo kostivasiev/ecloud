@@ -8,7 +8,6 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Faker\Generator;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -16,7 +15,7 @@ class GetClustersTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Generator $faker;
+    protected \Faker\Generator $faker;
     protected AvailabilityZone $availabilityZone;
     protected LoadBalancerCluster $lbc;
     protected Router $router;

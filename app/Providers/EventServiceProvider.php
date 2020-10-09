@@ -2,12 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\V2\Vpc\Created;
-use App\Events\V2\Vpn\Creating;
-use App\Listeners\V2\Instance\DefaultPlatform;
-use App\Listeners\V2\Network\DefaultSubnet;
-use App\Listeners\V2\Router\Deploy;
-use App\Listeners\V2\Vpc\DhcpCreate;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -85,7 +79,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Instance\Creating::class => [
         ],
         \App\Events\V2\Instance\Created::class => [
-            DefaultPlatform::class,
+            \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
         \App\Events\V2\Instance\Deploy::class => [
             \App\Listeners\V2\Instance\Deploy::class,
@@ -97,7 +91,7 @@ class EventServiceProvider extends ServiceProvider
 
         // Network
         \App\Events\V2\Network\Creating::class => [
-            DefaultSubnet::class,
+            \App\Listeners\V2\Network\DefaultSubnet::class,
         ],
         \App\Events\V2\Network\Created::class => [
             \App\Listeners\V2\Network\Deploy::class,
@@ -115,7 +109,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Router\Creating::class => [
         ],
         \App\Events\V2\Router\Created::class => [
-            Deploy::class,
+            \App\Listeners\V2\Router\Deploy::class,
         ],
 
         // Volume
@@ -125,12 +119,12 @@ class EventServiceProvider extends ServiceProvider
         // Vpc
         \App\Events\V2\Vpc\Creating::class => [
         ],
-        Created::class => [
-            DhcpCreate::class,
+        \App\Events\V2\Vpc\Created::class => [
+            \App\Listeners\V2\Vpc\DhcpCreate::class,
         ],
 
         // Vpn
-        Creating::class => [
+        \App\Events\V2\Vpn\Creating::class => [
         ],
     ];
 }

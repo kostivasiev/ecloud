@@ -2,8 +2,6 @@
 
 namespace App\Resources\V2;
 
-use DateTimeZone;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
@@ -19,7 +17,7 @@ use UKFast\Responses\UKFastResource;
 class FloatingIpResource extends UKFastResource
 {
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
@@ -30,11 +28,11 @@ class FloatingIpResource extends UKFastResource
             'ip_address' => $this->ip_address,
             'created_at' => Carbon::parse(
                 $this->created_at,
-                new DateTimeZone(config('app.timezone'))
+                new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
             'updated_at' => Carbon::parse(
                 $this->updated_at,
-                new DateTimeZone(config('app.timezone'))
+                new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
     }

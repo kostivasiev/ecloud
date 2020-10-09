@@ -3,9 +3,6 @@
 namespace Tests;
 
 use App\Events\Event;
-use App\Events\V1\DatastoreCreatedEvent;
-use App\Events\V2\Instance\Deploy;
-use App\Events\V2\Vpc\Created;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
@@ -46,7 +43,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         $dispatcher = Model::getEventDispatcher();
 
         // V1 hack
-        $dispatcher->forget(DatastoreCreatedEvent::class);
+        $dispatcher->forget(\App\Events\V1\DatastoreCreatedEvent::class);
 
         // Created
         $dispatcher->forget(\App\Events\V2\AvailabilityZone\Created::class);
@@ -55,9 +52,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         $dispatcher->forget(\App\Events\V2\Instance\Created::class);
         $dispatcher->forget(\App\Events\V2\Network\Created::class);
         $dispatcher->forget(\App\Events\V2\Router\Created::class);
-        $dispatcher->forget(Created::class);
+        $dispatcher->forget(\App\Events\V2\Vpc\Created::class);
 
         // Deploy
-        $dispatcher->forget(Deploy::class);
+        $dispatcher->forget(\App\Events\V2\Instance\Deploy::class);
     }
 }

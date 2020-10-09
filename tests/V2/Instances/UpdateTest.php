@@ -9,7 +9,6 @@ use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Faker\Generator;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,7 +16,7 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Generator $faker;
+    protected \Faker\Generator $faker;
     protected $vpc;
     protected $appliance;
     protected $appliance_version;

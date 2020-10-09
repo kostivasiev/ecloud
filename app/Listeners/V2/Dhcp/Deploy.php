@@ -3,7 +3,6 @@
 namespace App\Listeners\V2\Dhcp;
 
 use App\Events\V2\Dhcp\Created;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,7 +14,7 @@ class Deploy implements ShouldQueue
     /**
      * @param Created $event
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(Created $event)
     {
@@ -36,7 +35,7 @@ class Deploy implements ShouldQueue
                 ]
             ]);
         } catch (GuzzleException $exception) {
-            throw new Exception($exception->getResponse()->getBody()->getContents());
+            throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
     }
 }

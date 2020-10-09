@@ -2,13 +2,12 @@
 
 namespace App\Traits\V2;
 
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 trait DefaultName
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public static function bootDefaultName()
     {
@@ -19,7 +18,7 @@ trait DefaultName
 
     /**
      * @param $model
-     * @throws Exception
+     * @throws \Exception
      */
     public static function setDefaultName($model)
     {

@@ -6,7 +6,6 @@ use App\Events\V2\Router\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -18,7 +17,7 @@ class Deploy implements ShouldQueue
     /**
      * @param Created $event
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(Created $event)
     {
@@ -28,14 +27,14 @@ class Deploy implements ShouldQueue
         /** @var AvailabilityZone $availabilityZone */
         $availabilityZone = $router->availabilityZone;
         if (!$availabilityZone) {
-            $this->fail(new Exception('Failed to find AZ for router ' . $router->id));
+            $this->fail(new \Exception('Failed to find AZ for router ' . $router->id));
             return;
         }
 
         try {
             $nsxService = $availabilityZone->nsxService();
             if (!$nsxService) {
-                $this->fail(new Exception('Failed to find NSX Service for router ' . $router->id));
+                $this->fail(new \Exception('Failed to find NSX Service for router ' . $router->id));
                 return;
             }
 
@@ -52,7 +51,7 @@ class Deploy implements ShouldQueue
                 }
             }
             if (empty($path)) {
-                throw new Exception('No tagged T0 could be found');
+                throw new \Exception('No tagged T0 could be found');
             }
 
             $vpcTag = [
@@ -90,9 +89,9 @@ class Deploy implements ShouldQueue
                 ]
             );
         } catch (GuzzleException $exception) {
-            $this->fail(new Exception($exception->getResponse()->getBody()->getContents()));
+            $this->fail(new \Exception($exception->getResponse()->getBody()->getContents()));
             return;
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->fail($exception);
             return;
         }

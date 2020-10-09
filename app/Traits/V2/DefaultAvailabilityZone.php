@@ -3,13 +3,12 @@
 namespace App\Traits\V2;
 
 use App\Models\V2\Vpc;
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 trait DefaultAvailabilityZone
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public static function bootDefaultAvailabilityZone()
     {
@@ -20,7 +19,7 @@ trait DefaultAvailabilityZone
 
     /**
      * @param $model
-     * @throws Exception
+     * @throws \Exception
      */
     public static function setDefaultAvailabilityZone($model)
     {
@@ -36,7 +35,7 @@ trait DefaultAvailabilityZone
                 $model->availability_zone_id = $availabilityZone->getKey();
             } else {
                 Log::error('Failed to find default Availability Zone for instance ' . $model->id);
-                throw new Exception('Failed to find default Availability Zone for instance ' . $model->id);
+                throw new \Exception('Failed to find default Availability Zone for instance ' . $model->id);
             }
         }
 

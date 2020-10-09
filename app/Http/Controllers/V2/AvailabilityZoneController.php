@@ -11,11 +11,7 @@ use App\Resources\V2\DhcpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\RouterResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
-use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -28,7 +24,7 @@ class AvailabilityZoneController extends BaseController
      * Get availability zones collection
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -56,7 +52,7 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param CreateAvailabilityZoneRequest $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateAvailabilityZoneRequest $request)
     {
@@ -77,7 +73,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param UpdateAvailabilityZoneRequest $request
      * @param string $zoneId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateAvailabilityZoneRequest $request, string $zoneId)
     {
@@ -96,9 +92,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @param string $zoneId
-     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function routers(Request $request, string $zoneId)
     {
@@ -110,9 +106,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @param string $zoneId
-     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function dhcps(Request $request, string $zoneId)
     {
@@ -124,9 +120,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @param string $zoneId
-     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function credentials(Request $request, string $zoneId)
     {
@@ -138,9 +134,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @param string $zoneId
-     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function instances(Request $request, string $zoneId)
     {
@@ -152,9 +148,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @param string $zoneId
-     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function lbcs(Request $request, string $zoneId)
     {
@@ -168,7 +164,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param Request $request
      * @param string $zoneId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $zoneId)
     {

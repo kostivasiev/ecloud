@@ -5,7 +5,6 @@ namespace App\Listeners\V2\FirewallRule;
 use App\Events\V2\FirewallRule\Created;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\Router;
-use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -18,7 +17,7 @@ class Deploy implements ShouldQueue
     /**
      * @param Created $event
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(Created $event)
     {
@@ -31,7 +30,7 @@ class Deploy implements ShouldQueue
             // TODO
             Log::notice('FirewallRule deployment not implemented yet');
         } catch (RequestException $exception) {
-            throw new Exception($exception->getResponse()->getBody()->getContents());
+            throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
 
         $firewallRule->deployed = true;

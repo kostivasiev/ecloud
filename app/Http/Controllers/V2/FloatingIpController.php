@@ -6,9 +6,7 @@ use App\Http\Requests\V2\CreateFloatingIpRequest;
 use App\Http\Requests\V2\UpdateFloatingIpRequest;
 use App\Models\V2\FloatingIp;
 use App\Resources\V2\FloatingIpResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -21,7 +19,7 @@ class FloatingIpController extends BaseController
      * Get resource collection
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
@@ -49,7 +47,7 @@ class FloatingIpController extends BaseController
 
     /**
      * @param CreateFloatingIpRequest $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(CreateFloatingIpRequest $request)
     {
@@ -63,8 +61,8 @@ class FloatingIpController extends BaseController
 
     /**
      * @param UpdateFloatingIpRequest $request
-     * @param string $fipId
-     * @return JsonResponse
+     * @param string $instanceId
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateFloatingIpRequest $request, string $fipId)
     {
@@ -76,8 +74,8 @@ class FloatingIpController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $fipId
-     * @return JsonResponse
+     * @param string $instanceId
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $fipId)
     {

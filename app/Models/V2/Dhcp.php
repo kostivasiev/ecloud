@@ -8,12 +8,10 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 /**
@@ -68,8 +66,8 @@ class Dhcp extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|Sort[]
-     * @throws InvalidSortException
+     * @return array|\UKFast\DB\Ditto\Sort[]
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -84,7 +82,7 @@ class Dhcp extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|Sort|Sort[]|null
+     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
     {

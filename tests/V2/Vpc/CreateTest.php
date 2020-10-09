@@ -2,7 +2,6 @@
 
 namespace Tests\V2\Vpc;
 
-use App\Events\V2\Dhcp\Created;
 use App\Events\V2\DhcpCreated;
 use App\Events\V2\VpcCreated;
 use App\Models\V2\Dhcp;
@@ -168,7 +167,7 @@ class CreateTest extends TestCase
             'vpc_id' => 'vpc-abc123'
         ]);
 
-        Event::assertDispatched(Created::class, function ($event) use ($dhcp) {
+        Event::assertDispatched(\App\Events\V2\Dhcp\Created::class, function ($event) use ($dhcp) {
             return $event->model->id === $dhcp->id;
         });
     }

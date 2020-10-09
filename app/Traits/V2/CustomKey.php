@@ -2,13 +2,12 @@
 
 namespace App\Traits\V2;
 
-use Exception;
 use Illuminate\Support\Facades\Log;
 
 trait CustomKey
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public static function bootCustomKey()
     {
@@ -19,21 +18,21 @@ trait CustomKey
 
     /**
      * @param $model
-     * @throws Exception
+     * @throws \Exception
      */
     public static function addCustomKey($model)
     {
         Log::info('Setting Custom Key for ' . get_class($model));
 
         if (empty($model->keyPrefix)) {
-            throw new Exception('Invalid key prefix');
+            throw new \Exception('Invalid key prefix');
         }
 
         try {
             do {
                 $model->id = $model->keyPrefix . '-' . bin2hex(random_bytes(4));
             } while ($model->find($model->id));
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Log::error('Failed to set Custom Key on ' . get_class($model), [
                 $exception,
             ]);

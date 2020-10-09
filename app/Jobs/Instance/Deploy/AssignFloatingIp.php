@@ -6,10 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Nat;
-use App\Models\V2\Vpc;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
 class AssignFloatingIp extends Job

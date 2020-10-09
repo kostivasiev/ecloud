@@ -4,7 +4,6 @@ namespace App\Listeners\V2\Vpc;
 
 use App\Events\V2\Vpc\Created;
 use App\Models\V2\Dhcp;
-use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -15,7 +14,7 @@ class DhcpCreate implements ShouldQueue
     /**
      * @param Created $event
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(Created $event)
     {

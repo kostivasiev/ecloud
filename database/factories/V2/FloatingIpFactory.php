@@ -1,10 +1,9 @@
 <?php
 
-/** @var Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\FloatingIp;
 use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
 
 $factory->define(FloatingIp::class, function (Faker $faker) {
     return [
