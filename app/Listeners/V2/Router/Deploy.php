@@ -26,9 +26,17 @@ class Deploy implements ShouldQueue
 
         /** @var AvailabilityZone $availabilityZone */
         $availabilityZone = $router->availabilityZone;
+        if (!$availabilityZone) {
+            $this->fail(new \Exception('Failed to find AZ for router ' . $router->id));
+            return;
+        }
 
         try {
             $nsxService = $availabilityZone->nsxService();
+            if (!$nsxService) {
+                $this->fail(new \Exception('Failed to find NSX Service for router ' . $router->id));
+                return;
+            }
 
             // Get the routers T0 path
             $response = $nsxService->get('policy/api/v1/infra/tier-0s');
@@ -81,14 +89,18 @@ class Deploy implements ShouldQueue
                 ]
             );
         } catch (GuzzleException $exception) {
-            throw new \Exception($exception->getResponse()->getBody()->getContents());
+            $this->fail(new \Exception($exception->getResponse()->getBody()->getContents()));
+            return;
+        } catch (\Exception $exception) {
+            $this->fail($exception);
+            return;
         }
         $router->deployed = true;
         $router->save();
 
         $router->networks()->each(function ($network) {
             /** @var Network $network */
-            event(new Created($network));
+            event(new \App\Events\V2\Network\Created($network));
         });
     }
 }
