@@ -26,20 +26,20 @@ class VolumeDelete implements ShouldQueue
                     // If volume is only used in this instance then delete
                     if ($volume->instances()->count() == 0) {
                         Log::info('Deleting volume: ' . $volume->getKey());
-                        $volume->delete();
                         $volume->instances()->detach($instance);
+                        $volume->delete();
                     }
                 });
             } else {
                 Log::info(
-                    'Instance '.$instance->getKey().' not yet deleted. Deferring volume deletion for '.
-                    $this->delay.' seconds'
+                    'Instance ' . $instance->getKey() . ' not yet deleted. Deferring volume deletion for ' .
+                    $this->delay . ' seconds'
                 );
                 $this->release($this->delay);
             }
         } else {
             $this->fail(new \Exception(
-                'Failed to Delete volumes for Instance '.$instance->getKey().' : '.
+                'Failed to Delete volumes for Instance ' . $instance->getKey() . ' : ' .
                 'maximum number of retries exceeded'
             ));
             $this->delete(); // releases the job if the number of retries has been exceeded

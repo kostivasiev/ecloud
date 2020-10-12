@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Instance\Deleted;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -31,13 +32,12 @@ class Undeploy implements ShouldQueue
                 return;
             }
             $this->fail(new \Exception(
-                'Failed to Delete '.$instance->getKey().', Kingpin status was '.$response->getStatusCode()
+                'Failed to Delete ' . $instance->getKey() . ', Kingpin status was ' . $response->getStatusCode()
             ));
             return;
         } catch (GuzzleException $exception) {
             $this->fail(new \Exception(
-                'Failed to Delete '.$instance->getKey().' : '.
-                $exception->getResponse()->getBody()->getContents()
+                'Failed to Delete ' . $instance->getKey() . ' : ' . $exception->getResponse()->getBody()->getContents()
             ));
             return;
         }
