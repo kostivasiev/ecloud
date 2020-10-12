@@ -8,7 +8,7 @@ properties:
     example: vpc-2b66bb79
     readOnly: false
   ip_address:
-    description: The external Ip address assigned to the floating IP.
+    description: The external IP address assigned to the floating IP.
     type: string
     example: '1.1.1.1'
     readOnly: true
