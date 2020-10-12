@@ -30,7 +30,7 @@ class GetClustersTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $region->getKey()
         ]);
@@ -44,10 +44,10 @@ class GetClustersTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/vpcs/'.$this->vpc->getKey().'/lbcs',
+            '/v2/vpcs/' . $this->vpc->getKey() . '/lbcs',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([

@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\LoadBalancerCluster\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -40,6 +41,10 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
 
     protected $casts = [
         'nodes' => 'integer',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function availabilityZone()

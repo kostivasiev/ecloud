@@ -2,6 +2,8 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Instance\Created;
+use App\Events\V2\Instance\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -49,32 +51,10 @@ class Instance extends Model implements Filterable, Sortable
         'locked' => 'boolean',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function (Instance $instance) {
-            $instance->setDefaultPlatform();
-        });
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function setDefaultPlatform()
-    {
-        if (empty($this->platform) && $this->applianceVersion) {
-            try {
-                $this->platform = $this->applianceVersion->serverLicense()->category;
-                $this->save();
-            } catch (\Exception $exception) {
-                Log::error('Failed to determine default platform from appliance version', [
-                    'id' => $this->id,
-                ]);
-                throw $exception;
-            }
-        }
-    }
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+        'created' => Created::class,
+    ];
 
     public function vpc()
     {
@@ -156,7 +136,7 @@ class Instance extends Model implements Filterable, Sortable
 
     public function setApplianceVersionId(string $applianceUuid)
     {
-        $version = (new ApplianceVersion)->getLatest($applianceUuid);
+        $version = app()->make(ApplianceVersion::class)->getLatest($applianceUuid);
         $this->attributes['appliance_version_id'] = $version;
     }
 

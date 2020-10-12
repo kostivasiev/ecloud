@@ -2,7 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\VolumeUpdated;
+use App\Events\V2\Volume\Updated;
+use App\Events\V2\Volume\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -41,7 +42,8 @@ class Volume extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'updated' => VolumeUpdated::class,
+        'updated' => Updated::class,
+        'creating' => Creating::class,
     ];
 
     public function vpc()

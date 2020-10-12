@@ -63,17 +63,21 @@ class CreateRequest extends FormRequest
             'platform' => 'sometimes|required|in:Windows,Linux',
             'network_id' => [
                 'sometimes',
-                'required',
                 'string',
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),
             ],
             'floating_ip_id' => [
                 'sometimes',
-                'required',
                 'string',
                 'exists:ecloud.floating_ips,id,deleted_at,NULL',
+                'required_without:requires_floating_ip',
                 new ExistsForUser(FloatingIp::class),
+            ],
+            'requires_floating_ip' => [
+                'sometimes',
+                'required_without:floating_ip_id',
+                'boolean',
             ],
             'appliance_data' => [
                 'sometimes',
