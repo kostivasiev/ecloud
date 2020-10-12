@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Instance\Deleted;
 use GuzzleHttp\Psr7\Response;
