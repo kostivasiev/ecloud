@@ -3,8 +3,10 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
+use App\Services\V2\PasswordService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
@@ -20,10 +22,35 @@ class PrepareOsUsers extends Job
     /**
      * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/330
      */
-    public function handle()
+    public function handle(PasswordService $passwordService)
     {
         Log::info('Starting PrepareOsUsers for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
+
+        // Create user accounts
+        if ($instance->platform == 'Windows') {
+            $accounts = collect([
+                ['Administrator', $passwordService->generate()],
+                ['graphite.rack', $passwordService->generate()],
+                ['ukfast.support', $passwordService->generate()],
+            ]);
+        } else {
+            $accounts = collect([
+                ['root', $passwordService->generate()],
+                ['graphiterack', $passwordService->generate()],
+                ['ukfastsupport', $passwordService->generate()],
+            ]);
+        }
+        $accounts->each(function ($username, $password) use ($instance) {
+            app()->makeWith(Credential::class, [
+                'name' => $username,
+                'resource_id' => $instance->id,
+                'user' => $username,
+                'password' => $password,
+            ]);
+        });
+
+        // TODO BELOW
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $credential = $instance->credentials()
             ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
