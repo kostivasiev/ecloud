@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2;
 
-use App\Events\V2\InstanceDeleteEvent;
+use App\Events\V2\Instance\Deleted;
 use App\Models\V2\Instance;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,16 +16,16 @@ class InstanceVolumeDelete implements ShouldQueue
     public $tries = 3;
     public $delay = 10;
 
-    public function handle(InstanceDeleteEvent $event)
+    public function handle(Deleted $event)
     {
-        $instance = $event->instance;
-        Log::info('Attempting to Delete volumes for instance '.$instance->getKey());
+        $instance = $event->model;
+        Log::info('Attempting to Delete volumes for instance ' . $instance->getKey());
         if ($this->attempts() <= $this->tries) {
             if (!is_null(Instance::withTrashed()->findOrFail($instance->id)->deleted_at)) {
                 $instance->volumes()->each(function ($volume) use ($instance) {
                     // If volume is only used in this instance then delete
                     if ($volume->instances()->count() == 0) {
-                        Log::info('Deleting volume: '.$volume->getKey());
+                        Log::info('Deleting volume: ' . $volume->getKey());
                         $volume->delete();
                         $volume->instances()->detach($instance);
                     }

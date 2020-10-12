@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2;
 
-use App\Events\V2\InstanceDeleteEvent;
+use App\Events\V2\Instance\Deleted;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -13,21 +13,21 @@ class InstanceUndeploy implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @param  InstanceDeleteEvent  $event
+     * @param Deleted $event
      * @return void
      * @throws \Exception
      */
-    public function handle(InstanceDeleteEvent $event)
+    public function handle(Deleted $event)
     {
-        $instance = $event->instance;
-        Log::info('Attempting to Delete instance '.$instance->getKey());
+        $instance = $event->model;
+        Log::info('Attempting to Delete instance ' . $instance->getKey());
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone
                 ->kingpinService()
-                ->delete('/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->getKey());
+                ->delete('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey());
             if ($response->getStatusCode() == 200) {
-                Log::info('Delete finished successfully for instance '.$instance->id);
+                Log::info('Delete finished successfully for instance ' . $instance->id);
                 return;
             }
             $this->fail(new \Exception(
