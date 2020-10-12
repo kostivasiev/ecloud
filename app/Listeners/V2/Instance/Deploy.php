@@ -4,8 +4,10 @@ namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Instance\Deploy as DeployEvent;
 use App\Events\V2\Instance\Deploy\Data as DeployEventData;
+use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\ConfigureNics;
+use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
@@ -43,6 +45,8 @@ class Deploy implements ShouldQueue
             new OsCustomisation($data),
             new PowerOn($data),
             new WaitOsCustomisation($data),
+            new ConfigureWinRm($data),
+            new ActivateWindows($data),
             new PrepareOsUsers($data),
             new PrepareOsDisk($data),
             new RunApplianceBootstrap($data),
