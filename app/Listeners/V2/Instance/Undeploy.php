@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class InstanceUndeploy implements ShouldQueue
+class Undeploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
