@@ -2,17 +2,19 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Instance\Created;
+use App\Events\V2\Instance\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
@@ -42,7 +44,6 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $appends = [
         'appliance_id',
-        'online',
         'volume_capacity',
     ];
 
@@ -50,14 +51,10 @@ class Instance extends Model implements Filterable, Sortable
         'locked' => 'boolean',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function (Instance $instance) {
-            $instance->setDefaultPlatform();
-        });
-    }
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+        'created' => Created::class,
+    ];
 
     public function vpc()
     {
@@ -79,11 +76,6 @@ class Instance extends Model implements Filterable, Sortable
         return $this->hasMany(Nic::class);
     }
 
-    public function volumes()
-    {
-        return $this->belongsToMany(Volume::class);
-    }
-
     public function getVolumeCapacityAttribute()
     {
         $sum = 0;
@@ -93,11 +85,16 @@ class Instance extends Model implements Filterable, Sortable
         return $sum;
     }
 
+    public function volumes()
+    {
+        return $this->belongsToMany(Volume::class);
+    }
+
     public function getOnlineAttribute()
     {
         try {
             $response = $this->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/'.$this->vpc_id . '/instance/' . $this->getKey()
+                '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
             );
         } catch (\Exception $e) {
             Log::info('Failed to get power state', [
@@ -139,20 +136,12 @@ class Instance extends Model implements Filterable, Sortable
 
     public function setApplianceVersionId(string $applianceUuid)
     {
-        $version = (new ApplianceVersion)->getLatest($applianceUuid);
+        $version = app()->make(ApplianceVersion::class)->getLatest($applianceUuid);
         $this->attributes['appliance_version_id'] = $version;
     }
 
-    public function setDefaultPlatform()
-    {
-        if (empty($this->platform) && $this->applianceVersion) {
-            $this->platform = $this->applianceVersion->serverLicense()->category;
-            $this->save();
-        }
-    }
-
     /**
-     * @param  FilterFactory  $factory
+     * @param FilterFactory $factory
      * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
@@ -173,7 +162,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -195,7 +184,7 @@ class Instance extends Model implements Filterable, Sortable
     }
 
     /**
-     * @param  SortFactory  $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */

@@ -2,7 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\VpcCreated;
+use App\Events\V2\Vpc\Creating;
+use App\Events\V2\Vpc\Created;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +38,8 @@ class Vpc extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => VpcCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function dhcp()
@@ -65,7 +67,7 @@ class Vpc extends Model implements Filterable, Sortable
         return $this->hasMany(Volume::class);
     }
 
-    public function clusters()
+    public function loadBalancerClusters()
     {
         return $this->hasMany(LoadBalancerCluster::class);
     }

@@ -2,11 +2,13 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NetworkCreated;
+use App\Events\V2\Network\Created;
+use App\Events\V2\Network\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -38,17 +40,9 @@ class Network extends Model implements Filterable, Sortable
         'subnet'
     ];
 
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            $model->subnet = $model->subnet ?? config('defaults.network.subnets.range');
-        });
-    }
-
     protected $dispatchesEvents = [
-        'created' => NetworkCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function router()
@@ -59,6 +53,29 @@ class Network extends Model implements Filterable, Sortable
     public function nics()
     {
         return $this->hasMany(Nic::class);
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/9e1c6bcc-85db-46b6-bc38-d6d2431e7c17/30af91b5-3a91-4d5d-8ed5-a7d806764a16/api_includes/method_GetSegmentState.html
+     * When the configuration is actually in effect, the state will change to "success".
+     */
+    public function getAvailableAttribute()
+    {
+        try {
+            $response = $this->router->availabilityZone->nsxService()->get(
+                'policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/segments/' . $this->getKey() . '/state'
+            );
+            $response = json_decode($response->getBody()->getContents());
+            return in_array($response->state, ['in_sync', 'success']);
+        } catch (GuzzleException $exception) {
+            Log::info('Segment state response', [
+                'id' => $this->getKey(),
+                'response' => json_decode($exception->getResponse()->getBody()->getContents()),
+            ]);
+            return false;
+        }
     }
 
     /**
