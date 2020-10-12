@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events\V2;
+namespace App\Events\V2\Volume;
 
 use App\Models\V2\Volume;
 use Illuminate\Queue\SerializesModels;
 
-class VolumeUpdated
+class Updated
 {
     use SerializesModels;
 
