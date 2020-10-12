@@ -6,6 +6,10 @@ use GuzzleHttp\Client;
 
 final class KingpinService
 {
+    const INSTANCE_POWERSTATE_POWEREDON = 'poweredOn';
+    const INSTANCE_POWERSTATE_POWEREDOFF = 'poweredOff';
+    const INSTANCE_TOOLSRUNNINGSTATUS_RUNNING = 'guestToolsRunning';
+
     /**
      * @var Client
      */

@@ -40,6 +40,11 @@ class FloatingIp extends Model implements Filterable, Sortable
         'updated_at',
     ];
 
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
+
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
