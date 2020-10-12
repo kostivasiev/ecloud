@@ -41,7 +41,7 @@ class PowerResetTest extends TestCase
         ]);
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('put')->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey().'/power/reset'])->andReturn(
+        $mockKingpinService->shouldReceive('put')->withArgs(['/api/v2/vpc/' . $this->vpc->getKey() . '/instance/' . $this->instance->getKey() . '/power/reset'])->andReturn(
             new Response(200)
         );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {

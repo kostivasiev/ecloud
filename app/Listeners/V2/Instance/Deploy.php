@@ -4,6 +4,7 @@ namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Instance\Deploy as DeployEvent;
 use App\Events\V2\Instance\Deploy\Data as DeployEventData;
+use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
@@ -37,6 +38,7 @@ class Deploy implements ShouldQueue
         // Create the chained jobs for deployment
         dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
             new ConfigureNics($data),
+            new AssignFloatingIp($data),
             new UpdateNetworkAdapter($data),
             new OsCustomisation($data),
             new PowerOn($data),

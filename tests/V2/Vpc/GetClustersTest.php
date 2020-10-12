@@ -44,10 +44,10 @@ class GetClustersTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/vpcs/'.$this->vpc->getKey().'/lbcs',
+            '/v2/vpcs/' . $this->vpc->getKey() . '/lbcs',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([

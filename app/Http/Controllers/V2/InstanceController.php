@@ -107,6 +107,7 @@ class InstanceController extends BaseController
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
         $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
+        $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
         event(new \App\Events\V2\Instance\Deploy($instanceDeployData));
