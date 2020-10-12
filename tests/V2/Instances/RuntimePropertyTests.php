@@ -8,6 +8,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Mockery;
 use Tests\TestCase;
@@ -35,9 +36,10 @@ class RuntimePropertyTests extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'GetTest Default',
         ]);
+
         $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
-            (object)['powerState' => 'poweredOn', 'toolsRunningStatus' => 'guestToolsRunning']
+            new Response(200, [], json_encode(['powerState' => 'poweredOn', 'powerState' => 'poweredOn', 'toolsRunningStatus' => 'guestToolsRunning']))
         );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
@@ -47,7 +49,7 @@ class RuntimePropertyTests extends TestCase
     /**
      * Test agent_running is not returned on the collection
      */
-    public function testGetAgentRunningNotInCollection()
+    public function testRuntimePropertiesNotInCollection()
     {
         $this->get(
             '/v2/instances',
@@ -58,6 +60,7 @@ class RuntimePropertyTests extends TestCase
         )
             ->dontSeeJson([
                 'agent_running' => true,
+                'online' => true,
             ])
             ->assertResponseStatus(200);
     }
@@ -92,7 +95,7 @@ class RuntimePropertyTests extends TestCase
     /**
      * Test agent_running is returned on the model
      */
-    public function testGetAgentRunningStateInItem()
+    public function testGetRuntimePropertiesInItem()
     {
         $this->get(
             '/v2/instances/' . $this->instance->getKey(),
@@ -103,41 +106,6 @@ class RuntimePropertyTests extends TestCase
         )
             ->seeJson([
                 'agent_running' => true,
-            ])
-            ->assertResponseStatus(200);
-    }
-
-    /**
-     * Test agent_running is not returned on the collection
-     */
-    public function testGetOnlineNotInCollection()
-    {
-        $this->get(
-            '/v2/instances',
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->dontSeeJson([
-                'online' => true,
-            ])
-            ->assertResponseStatus(200);
-    }
-
-    /**
-     * Test agent_running is returned on the model
-     */
-    public function testGetOnlineInItem()
-    {
-        $this->get(
-            '/v2/instances/' . $this->instance->getKey(),
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
                 'online' => true,
             ])
             ->assertResponseStatus(200);
