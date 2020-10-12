@@ -28,7 +28,6 @@ class RuntimePropertyTests extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -37,7 +36,7 @@ class RuntimePropertyTests extends TestCase
             'name' => 'GetTest Default',
         ]);
         $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('getInstance')->andReturn(
+        $mockKingpinService->shouldReceive('get')->andReturn(
             (object)['powerState' => 'poweredOn', 'toolsRunningStatus' => 'guestToolsRunning']
         );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
@@ -69,7 +68,7 @@ class RuntimePropertyTests extends TestCase
     public function testRuntimePropertiesNullWithKingpinException()
     {
         $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('getInstance')->andThrow(
+        $mockKingpinService->shouldReceive('get')->andThrow(
             new \Exception("test exception")
         );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {

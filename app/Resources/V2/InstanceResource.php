@@ -63,7 +63,9 @@ class InstanceResource extends UKFastResource
         if ($request->route('instanceId')) {
             $kingpinData = null;
             try {
-                $kingpinData = $this->availabilityZone->kingpinService()->getInstance($this);
+                $kingpinResponse = $this->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
+
+                $kingpinData = json_decode($kingpinResponse->getBody()->getContents());
             } catch (Exception $exception) {
                 Log::info('Failed to retrieve instance from Kingpin', [
                     'vpc_id' => $this->vpc_id,
