@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2;
 
-use App\Events\V2\VolumeUpdated;
+use App\Events\V2\Updated;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
@@ -12,11 +12,11 @@ class VolumeCapacityIncrease implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @param  VolumeUpdated  $event
+     * @param  Updated  $event
      * @return void
      * @throws \Exception
      */
-    public function handle(VolumeUpdated $event)
+    public function handle(Updated $event)
     {
         $volume = $event->volume;
         if ($volume->capacity > $volume->getOriginal('capacity')) {
