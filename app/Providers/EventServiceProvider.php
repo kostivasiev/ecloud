@@ -2,21 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\V2\DhcpCreated;
-use App\Events\V2\FirewallRuleCreated;
-use App\Events\V2\InstanceDeleteEvent;
-use App\Events\V2\InstanceDeployEvent;
-use App\Events\V2\NetworkCreated;
-use App\Events\V2\RouterCreated;
-use App\Events\V2\VpcCreated;
-use App\Listeners\V2\DhcpCreate;
-use App\Listeners\V2\DhcpDeploy;
-use App\Listeners\V2\FirewallRuleDeploy;
-use App\Listeners\V2\InstanceUndeploy;
-use App\Listeners\V2\InstanceVolumeDelete;
-use App\Listeners\V2\InstanceDeploy;
-use App\Listeners\V2\NetworkDeploy;
-use App\Listeners\V2\RouterDeploy;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -63,27 +48,87 @@ class EventServiceProvider extends ServiceProvider
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // V2
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        RouterCreated::class => [
-            RouterDeploy::class,
+
+        // AvailabilityZone
+        \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
-        VpcCreated::class => [
-            DhcpCreate::class,
+
+        // Credential
+        \App\Events\V2\Credential\Creating::class => [
         ],
-        DhcpCreated::class => [
-            DhcpDeploy::class,
+
+        // Dhcp
+        \App\Events\V2\Dhcp\Creating::class => [
         ],
-        NetworkCreated::class => [
-            NetworkDeploy::class
+        \App\Events\V2\Dhcp\Created::class => [
+            \App\Listeners\V2\Dhcp\Deploy::class,
         ],
-        FirewallRuleCreated::class => [
-            FirewallRuleDeploy::class
+
+        // FirewallRule
+        \App\Events\V2\FirewallRule\Creating::class => [
         ],
-        InstanceDeployEvent::class => [
-            InstanceDeploy::class
+        \App\Events\V2\FirewallRule\Created::class => [
+            \App\Listeners\V2\FirewallRule\Deploy::class,
         ],
-        InstanceDeleteEvent::class => [
-            InstanceUndeploy::class,
-            InstanceVolumeDelete::class
+
+        // FloatingIp
+        \App\Events\V2\FloatingIp\Creating::class => [
+        ],
+
+        // Instance
+        \App\Events\V2\Instance\Creating::class => [
+        ],
+        \App\Events\V2\Instance\Created::class => [
+            \App\Listeners\V2\Instance\DefaultPlatform::class,
+        ],
+        \App\Events\V2\InstanceDeleteEvent::class => [
+            \App\Listeners\V2\InstanceUndeploy::class,
+            \App\Listeners\V2\InstanceVolumeDelete::class
+        ],
+        \App\Events\V2\Instance\Deploy::class => [
+            \App\Listeners\V2\Instance\Deploy::class,
+        ],
+
+        // LoadBalancerCluster
+        \App\Events\V2\LoadBalancerCluster\Creating::class => [
+        ],
+
+        // Network
+        \App\Events\V2\Network\Creating::class => [
+            \App\Listeners\V2\Network\DefaultSubnet::class,
+        ],
+        \App\Events\V2\Network\Created::class => [
+            \App\Listeners\V2\Network\Deploy::class,
+        ],
+
+        // Nic
+        \App\Events\V2\Nic\Creating::class => [
+        ],
+
+        // Region
+        \App\Events\V2\Region\Creating::class => [
+        ],
+
+        // Router
+        \App\Events\V2\Router\Creating::class => [
+        ],
+        \App\Events\V2\Router\Created::class => [
+            \App\Listeners\V2\Router\Deploy::class,
+        ],
+
+        // Volume
+        \App\Events\V2\Volume\Creating::class => [
+        ],
+
+        // Vpc
+        \App\Events\V2\Vpc\Creating::class => [
+        ],
+        \App\Events\V2\Vpc\Created::class => [
+            \App\Listeners\V2\Vpc\DhcpCreate::class,
+        ],
+
+        // Vpn
+        \App\Events\V2\Vpn\Creating::class => [
         ],
     ];
 }

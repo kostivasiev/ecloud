@@ -20,16 +20,10 @@ trait UUIDHelper
     {
         parent::boot();
 
+        // DO NOT DO THIS - DO NOT DO THIS - DO NOT DO THIS - DO NOT DO THIS
         static::creating(function ($instance) {
             $instance->{$instance->getKeyName()} = Uuid::uuid4()->toString();
         });
+        // DO NOT DO THIS - DO NOT DO THIS - DO NOT DO THIS - DO NOT DO THIS
     }
-
-    // The better way to do it, just not enabled yet...
-//    public static function initializeUUIDHelper()
-//    {
-//        static::creating(function ($instance) {
-//            $instance->{$instance->getKeyName()} = Uuid::uuid4()->toString();
-//        });
-//    }
 }

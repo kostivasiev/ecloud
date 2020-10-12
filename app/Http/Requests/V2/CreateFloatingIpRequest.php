@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Vpc;
+use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -27,7 +29,14 @@ class CreateFloatingIpRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return [
+            'vpc_id' => [
+                'required',
+                'string',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
+                new ExistsForUser(Vpc::class)
+            ],
+        ];
     }
 
     /**
@@ -37,6 +46,9 @@ class CreateFloatingIpRequest extends FormRequest
      */
     public function messages()
     {
-        return [];
+        return [
+            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
+            'vpc_id.exists' => 'The specified :attribute was not found',
+        ];
     }
 }

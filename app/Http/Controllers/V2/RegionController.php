@@ -7,6 +7,7 @@ use App\Http\Requests\V2\UpdateRegionRequest;
 use App\Models\V2\Region;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RegionResource;
+use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -89,6 +90,19 @@ class RegionController extends BaseController
         $availabilityZones = Region::forUser($request->user)->findOrFail($regionId)->availabilityZones();
 
         return AvailabilityZoneResource::collection($availabilityZones->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $regionId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function vpcs(Request $request, string $regionId)
+    {
+        $vpcs = Region::forUser(app('request')->user)->findOrFail($regionId)->vpcs();
+        return VpcResource::collection($vpcs->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
