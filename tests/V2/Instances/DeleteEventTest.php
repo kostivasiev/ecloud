@@ -2,9 +2,9 @@
 
 namespace Tests\V2\Instances;
 
-use App\Events\V2\InstanceDeleteEvent;
-use App\Listeners\V2\InstanceUndeploy;
-use App\Listeners\V2\InstanceVolumeDelete;
+use App\Events\V2\Instance\Deleted;
+use App\Listeners\V2\Instance\Undeploy;
+use App\Listeners\V2\Instance\VolumeDelete;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
@@ -14,9 +14,7 @@ use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Events\CallQueuedListener;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -59,7 +57,7 @@ class DeleteEventTest extends TestCase
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
         $mockKingpinService->shouldReceive('delete')
-            ->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey()])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc->getKey() . '/instance/' . $this->instance->getKey()])
             ->andReturn(
                 new Response(200)
             );
@@ -78,21 +76,21 @@ class DeleteEventTest extends TestCase
             [],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->assertResponseStatus(204);
 
-        Event::assertDispatched(InstanceDeleteEvent::class, function ($event) {
+        Event::assertDispatched(Deleted::class, function ($event) {
             return $event->instance->id === $this->instance->getKey();
         });
     }
 
     public function testDeleteInstanceListener()
     {
-        $event = new InstanceDeleteEvent($this->instance);
-        /** @var InstanceUndeploy $listener */
-        $listener = \Mockery::mock(InstanceUndeploy::class)
+        $event = new Deleted($this->instance);
+        /** @var Undeploy $listener */
+        $listener = \Mockery::mock(Undeploy::class)
             ->makePartial();
         $listener->handle($event);
     }
@@ -101,8 +99,8 @@ class DeleteEventTest extends TestCase
     {
         $volumeCount = $this->instance->volumes()->count();
         $this->instance->delete();
-        $event = new InstanceDeleteEvent($this->instance);
-        $listener = \Mockery::mock(InstanceVolumeDelete::class)
+        $event = new Deleted($this->instance);
+        $listener = \Mockery::mock(VolumeDelete::class)
             ->makePartial();
         $listener->shouldReceive('attempts')->andReturn(1);
         $listener->handle($event);
