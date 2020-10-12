@@ -42,6 +42,11 @@ properties:
     required: false
     example: true
     readOnly: true
+  agent_running:
+    type: boolean
+    required: false
+    example: true
+    readOnly: true
   platform:
     type: string
     required: false
