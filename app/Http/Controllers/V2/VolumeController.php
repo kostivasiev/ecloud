@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\VolumeUpdated;
+use App\Events\V2\Updated;
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
 use App\Models\V2\Volume;
