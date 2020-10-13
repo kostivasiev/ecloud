@@ -27,7 +27,7 @@ class RunApplianceBootstrap extends Job
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $credential = $instance->credentials()
-            ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'administrator')
             ->firstOrFail();
         if (!$credential) {
             $this->fail(new \Exception('RunApplianceBootstrap failed for ' . $instance->id . ', no credentials found'));
@@ -49,7 +49,7 @@ class RunApplianceBootstrap extends Job
                             (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
                                 ->render(json_decode($this->data['appliance_data']))
                         ),
-                        'username' => $credential->user,
+                        'username' => $credential->username,
                         'password' => $credential->password,
                     ],
                 ]

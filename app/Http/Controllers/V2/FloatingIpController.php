@@ -23,7 +23,7 @@ class FloatingIpController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FloatingIp::query();
+        $collection = FloatingIp::forUser($request->user);
 
         $queryTransformer->config(FloatingIp::class)
             ->transform($collection);
@@ -41,7 +41,7 @@ class FloatingIpController extends BaseController
     public function show(Request $request, string $instanceId)
     {
         return new FloatingIpResource(
-            FloatingIp::findOrFail($instanceId)
+            FloatingIp::forUser($request->user)->findOrFail($instanceId)
         );
     }
 
@@ -52,7 +52,7 @@ class FloatingIpController extends BaseController
     public function store(CreateFloatingIpRequest $request)
     {
         $resource = new FloatingIp(
-        //$request->only([''])
+            $request->only(['vpc_id'])
         );
         $resource->save();
         $resource->refresh();
@@ -64,9 +64,9 @@ class FloatingIpController extends BaseController
      * @param string $instanceId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateFloatingIpRequest $request, string $instanceId)
+    public function update(UpdateFloatingIpRequest $request, string $fipId)
     {
-        $resource = FloatingIp::findOrFail($instanceId);
+        $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
         //$instance->fill($request->only([]));
         $resource->save();
         return $this->responseIdMeta($request, $resource->getKey(), 200);
@@ -77,9 +77,9 @@ class FloatingIpController extends BaseController
      * @param string $instanceId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, string $instanceId)
+    public function destroy(Request $request, string $fipId)
     {
-        $resource = FloatingIp::findOrFail($instanceId);
+        $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
         $resource->delete();
         return response()->json([], 204);
     }

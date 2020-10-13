@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Vpn\Creating;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,6 +31,10 @@ class Vpn extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'router_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     public function router()

@@ -2,6 +2,8 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\AvailabilityZone\Created;
+use App\Events\V2\AvailabilityZone\Creating;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
@@ -35,6 +37,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'region_id',
         'is_public',
         'nsx_edge_cluster_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     protected $casts = [
