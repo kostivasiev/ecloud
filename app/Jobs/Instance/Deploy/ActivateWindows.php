@@ -27,7 +27,7 @@ class ActivateWindows extends Job
             return;
         }
 
-        $credential = $instance->credentials()->where('user', 'administrator')->firstOrFail();
+        $credential = $instance->credentials()->where('username', 'administrator')->firstOrFail();
         if (!$credential) {
             $this->fail(new \Exception($logMessage . 'Failed. No credentials found'));
             return;
