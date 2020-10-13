@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateResourceTaskStatusesTable extends Migration
+class CreateResourceTasksTable extends Migration
 {
     /**
      * Run the migrations.
