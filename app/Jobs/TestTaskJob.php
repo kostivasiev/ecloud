@@ -4,10 +4,10 @@ namespace App\Jobs;
 
 use Illuminate\Support\Facades\Log;
 
-class TestTask extends ResourceTask
+class TestTaskJob extends ResourceTaskJob
 {
     public function handle()
     {
-        Log::info('TestTask: Handling TestTask');
+        Log::info('TestTaskJob: Handling TestTaskJob');
     }
 }

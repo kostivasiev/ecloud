@@ -6,12 +6,12 @@ use App\Traits\V2\CustomKey;
 use Imtigger\LaravelJobStatus\JobStatus;
 
 /**
- * App\Models\V2\ResourceTaskStatus.
+ * App\Models\V2\ResourceTask.
  *
  * @property string $id
  * @property string $resource_id
  */
-class ResourceTaskStatus extends JobStatus
+class ResourceTask extends JobStatus
 {
     use CustomKey;
 
@@ -19,5 +19,5 @@ class ResourceTaskStatus extends JobStatus
     public $incrementing = false;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
-    protected $table = 'resource_task_statuses';
+    protected $table = 'resource_tasks';
 }

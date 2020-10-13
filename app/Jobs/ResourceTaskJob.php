@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use Imtigger\LaravelJobStatus\Trackable;
 
-abstract class ResourceTask extends \App\Jobs\Job {
+abstract class ResourceTaskJob extends \App\Jobs\Job {
     use Trackable;
 
     public function __construct($resourceId)

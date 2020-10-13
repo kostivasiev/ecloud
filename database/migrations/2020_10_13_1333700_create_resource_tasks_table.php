@@ -10,7 +10,7 @@ class CreateResourceTaskStatusesTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('resource_task_statuses', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('resource_tasks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('job_id')->index()->nullable();
             $table->string('type')->index();
@@ -18,7 +18,7 @@ class CreateResourceTaskStatusesTable extends Migration
             $table->integer('attempts')->default(0);
             $table->integer('progress_now')->default(0);
             $table->integer('progress_max')->default(0);
-            $table->string('status', 16)->default(\App\Models\V2\ResourceTaskStatus::STATUS_QUEUED)->index();
+            $table->string('status', 16)->default(\App\Models\V2\ResourceTask::STATUS_QUEUED)->index();
             $table->longText('input')->nullable();
             $table->longText('output')->nullable();
             $table->timestamps();
@@ -32,6 +32,6 @@ class CreateResourceTaskStatusesTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->drop('resource_task_statuses');
+        Schema::connection('ecloud')->drop('resource_tasks');
     }
 }
