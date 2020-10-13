@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Credential\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -24,19 +25,22 @@ class Credential extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'cred';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'name',
         'resource_id',
         'host',
-        'user',
+        'username',
         'password',
         'port',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     protected $casts = [
@@ -74,7 +78,7 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('resource_id', Filter::$stringDefaults),
             $factory->create('host', Filter::$stringDefaults),
-            $factory->create('user', Filter::$stringDefaults),
+            $factory->create('username', Filter::$stringDefaults),
             $factory->create('password', Filter::$stringDefaults),
             $factory->create('port', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -94,7 +98,7 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('resource_id'),
             $factory->create('host'),
-            $factory->create('user'),
+            $factory->create('username'),
             $factory->create('port'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -120,7 +124,7 @@ class Credential extends Model implements Filterable, Sortable
             'name' => 'name',
             'resource_id' => 'resource_id',
             'host' => 'host',
-            'user' => 'user',
+            'username' => 'username',
             'password' => 'password',
             'port' => 'port',
             'created_at' => 'created_at',

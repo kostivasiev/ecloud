@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\FloatingIp\Creating;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,19 +23,43 @@ class FloatingIp extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'fip';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
+        'vpc_id'
     ];
 
     protected $visible = [
         'id',
+        'vpc_id',
+        'ip_address',
         'created_at',
         'updated_at',
+    ];
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
+
+    public function scopeForUser($query, $user)
+    {
+        if (!empty($user->resellerId)) {
+            $query->whereHas('vpc', function ($query) use ($user) {
+                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($resellerId)) {
+                    $query->where('reseller_id', '=', $resellerId);
+                }
+            });
+        }
+        return $query;
+    }
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
     ];
 
     /**
@@ -45,6 +70,8 @@ class FloatingIp extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('ip_address', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -59,6 +86,8 @@ class FloatingIp extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('vpc_id'),
+            $factory->create('ip_address'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -82,6 +111,8 @@ class FloatingIp extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
+            'vpc_id' => 'vpc_id',
+            'ip_address' => 'ip_address',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

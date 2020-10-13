@@ -35,7 +35,7 @@ class GetTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -56,7 +56,7 @@ class GetTest extends TestCase
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
-            new Response(200, [], json_encode(['powerState' => 'poweredOn']))
+            new Response(200, [], json_encode(['powerState' => 'poweredOn', 'powerState' => 'poweredOn', 'toolsRunningStatus' => 'guestToolsRunning']))
         );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;

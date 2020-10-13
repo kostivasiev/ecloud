@@ -6,7 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
-use App\Jobs\TestTask;
+use App\Jobs\TestTaskJob;
 
 class TestJob extends Command
 {
@@ -22,7 +22,7 @@ class TestJob extends Command
     public function handle()
     {
         $this->info('TestJobCommand: Dispatching job');
-        dispatch(new TestTask("i-abcdef12"));
+        dispatch(new TestTaskJob("i-abcdef12"));
         $this->info('TestJobCommand: Dispatched job');
     }
 }

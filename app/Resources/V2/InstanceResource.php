@@ -2,8 +2,13 @@
 
 namespace App\Resources\V2;
 
+use App\Services\V2\KingpinService;
+use DateTimeZone;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
+use Log;
 
 /**
  * Class InstanceResource
@@ -18,6 +23,7 @@ use UKFast\Responses\UKFastResource;
  * @property string availability_zone_id
  * @property boolean locked
  * @property string online
+ * @property string agent_running
  * @property string platform
  * @property integer volume_capacity
  * @property string created_at
@@ -26,7 +32,7 @@ use UKFast\Responses\UKFastResource;
 class InstanceResource extends UKFastResource
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request)
@@ -44,18 +50,31 @@ class InstanceResource extends UKFastResource
             'volume_capacity' => $this->volume_capacity,
             'created_at' => Carbon::parse(
                 $this->created_at,
-                new \DateTimeZone(config('app.timezone'))
+                new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
             'updated_at' => Carbon::parse(
                 $this->updated_at,
-                new \DateTimeZone(config('app.timezone'))
+                new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
         if ($request->user->isAdministrator) {
             $response['appliance_version_id'] = $this->appliance_version_id;
         }
         if ($request->route('instanceId')) {
-            $response['online'] = $this->online;
+            $kingpinData = null;
+            try {
+                $kingpinResponse = $this->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey());
+
+                $kingpinData = json_decode($kingpinResponse->getBody()->getContents());
+            } catch (Exception $exception) {
+                Log::info('Failed to retrieve instance from Kingpin', [
+                    'vpc_id' => $this->vpc_id,
+                    'instance_id' => $this->getKey(),
+                    'message' => $exception->getMessage()
+                ]);
+            }
+            $response['online'] = isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null;
+            $response['agent_running'] = isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null;
         }
         return $response;
     }
