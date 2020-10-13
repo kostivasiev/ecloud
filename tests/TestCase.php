@@ -2,13 +2,6 @@
 
 namespace Tests;
 
-use App\Events\Event;
-use App\Models\V2\Dhcp;
-use App\Models\V2\Instance;
-use App\Models\V2\LoadBalancerCluster;
-use App\Models\V2\Router;
-use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Application;
 
@@ -24,16 +17,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         'X-consumer-custom-id' => '0-0',
         'X-consumer-groups' => 'ecloud.write',
     ];
-
-    /**
-     * Creates the application.
-     *
-     * @return Application
-     */
-    public function createApplication()
-    {
-        return require __DIR__ . '/../bootstrap/app.php';
-    }
 
     protected function setUp(): void
     {
@@ -54,7 +37,20 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         $dispatcher->forget(\App\Events\V2\Router\Created::class);
         $dispatcher->forget(\App\Events\V2\Vpc\Created::class);
 
+        // Updated
+        $dispatcher->forget(\App\Events\V2\Volume\Updated::class);
+
         // Deploy
         $dispatcher->forget(\App\Events\V2\Instance\Deploy::class);
+    }
+
+    /**
+     * Creates the application.
+     *
+     * @return Application
+     */
+    public function createApplication()
+    {
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\VolumeCapacityIsGreater;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateVolumeRequest extends FormRequest
@@ -45,7 +46,8 @@ class UpdateVolumeRequest extends FormRequest
                 'required',
                 'integer',
                 'min:' . config('volume.capacity.min'),
-                'max:' . config('volume.capacity.max')
+                'max:' . config('volume.capacity.max'),
+                new VolumeCapacityIsGreater(),
             ],
             'vmware_uuid' => [
                 'sometimes',
