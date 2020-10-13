@@ -49,7 +49,7 @@ class WaitOsCustomisation extends Job
             }
 
             if ($data->status === 'Failed') {
-                $this->fail(new \Exception('WaitOsCustomisation failed for ' . $instance->id));
+                $this->fail(new \Exception('WaitOsCustomisation failed for ' . $instance->id . ': ' . $data->description));
                 return;
             }
 
