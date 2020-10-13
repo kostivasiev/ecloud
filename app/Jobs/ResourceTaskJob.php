@@ -9,6 +9,7 @@ abstract class ResourceTaskJob extends \App\Jobs\Job {
 
     public function __construct($resourceId)
     {
+        parent::__construct();
         $this->prepareStatus();
         $this->update(['resource_id' => $resourceId]);
     }
