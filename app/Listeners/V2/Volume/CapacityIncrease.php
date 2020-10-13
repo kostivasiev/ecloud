@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Volume;
 
 use App\Events\V2\Updated;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
 
-class VolumeCapacityIncrease implements ShouldQueue
+class CapacityIncrease implements ShouldQueue
 {
     use InteractsWithQueue;
 
