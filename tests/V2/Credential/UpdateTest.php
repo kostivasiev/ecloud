@@ -37,7 +37,7 @@ class UpdateTest extends TestCase
             [
                 'resource_id' => 'abc-abc123',
                 'host' => 'https://0.0.0.0',
-                'user' => 'username',
+                'username' => 'username',
                 'password' => 'newPass',
                 'port' => 8080
             ],
@@ -52,7 +52,7 @@ class UpdateTest extends TestCase
                     'id' => $this->credential->getKey(),
                     'resource_id' => 'abc-abc123',
                     'host' => 'https://0.0.0.0',
-                    'user' => 'username',
+                    'username' => 'username',
                     'port' => 8080
                 ],
                 'ecloud'

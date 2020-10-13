@@ -33,7 +33,7 @@ class RunBootstrapScript extends Job
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $credential = $instance->credentials()
-            ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'administrator')
             ->firstOrFail();
         if (!$credential) {
             $this->fail(new \Exception('RunBootstrapScript failed for ' . $instance->id . ', no credentials found'));
@@ -48,7 +48,7 @@ class RunBootstrapScript extends Job
                 [
                     'json' => [
                         'encodedScript' => base64_encode($this->data['user_script']),
-                        'username' => $credential->user,
+                        'username' => $credential->username,
                         'password' => $credential->password,
                     ],
                 ]
