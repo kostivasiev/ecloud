@@ -19,7 +19,7 @@ class NsxServiceProvider extends ServiceProvider
             $credentials = $availabilityZone->credentials()
                 ->where('name', '=', 'NSX')
                 ->firstOrFail();
-            $auth = base64_encode($credentials->user . ':' . $credentials->password);
+            $auth = base64_encode($credentials->username . ':' . $credentials->password);
             return new NsxService(
                 new Client([
                     'base_uri' => $credentials->host . (empty($credentials->port) ? '' : ':' . $credentials->port),

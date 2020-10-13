@@ -43,7 +43,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'resource_id' => 'abc-abc132',
                 'host' => 'https://127.0.0.1',
-                'user' => 'someuser',
+                'username' => 'someuser',
                 'password' => 'somepassword',
                 'port' => 8080
             ])
@@ -62,7 +62,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'resource_id' => 'abc-abc132',
                 'host' => 'https://127.0.0.1',
-                'user' => 'someuser',
+                'username' => 'someuser',
                 'password' => 'somepassword',
                 'port' => 8080
             ])

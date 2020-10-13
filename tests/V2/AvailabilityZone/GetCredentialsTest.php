@@ -4,9 +4,7 @@ namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
-use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
-use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use Faker\Factory as Faker;
@@ -49,19 +47,19 @@ class GetCredentialsTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/availability-zones/'.$this->availabilityZone->getKey().'/credentials',
+            '/v2/availability-zones/' . $this->availabilityZone->getKey() . '/credentials',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'          => $this->credential->getKey(),
+                'id' => $this->credential->getKey(),
                 'resource_id' => $this->credential->resource_id,
-                'host'        => $this->credential->host,
-                'user'        => $this->credential->user,
-                'password'    => $this->credential->password,
-                'port'        => $this->credential->port,
+                'host' => $this->credential->host,
+                'username' => $this->credential->username,
+                'password' => $this->credential->password,
+                'port' => $this->credential->port,
             ])
             ->assertResponseStatus(200);
     }

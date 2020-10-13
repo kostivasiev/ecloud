@@ -51,7 +51,7 @@ class CredentialsController extends BaseController
      */
     public function store(CreateCredentialRequest $request)
     {
-        $credential = new Credential($request->only(['name', 'resource_id', 'host', 'user', 'password', 'port']));
+        $credential = new Credential($request->only(['name', 'resource_id', 'host', 'username', 'password', 'port']));
         $credential->save();
         return $this->responseIdMeta($request, $credential->getKey(), 201);
     }
@@ -64,7 +64,7 @@ class CredentialsController extends BaseController
     public function update(UpdateCredentialRequest $request, string $credentialsId)
     {
         $credential = Credential::findOrFail($credentialsId);
-        $credential->fill($request->only(['name', 'resource_id', 'host', 'user', 'password', 'port']));
+        $credential->fill($request->only(['name', 'resource_id', 'host', 'username', 'password', 'port']));
         $credential->save();
         return $this->responseIdMeta($request, $credential->getKey(), 200);
     }

@@ -27,7 +27,7 @@ class OsCustomisation extends Job
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $credential = $instance->credentials()
-            ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'administrator')
             ->firstOrFail();
         if (!$credential) {
             $this->fail(new \Exception('OsCustomisation failed for ' . $instance->id . ', no credentials found'));
