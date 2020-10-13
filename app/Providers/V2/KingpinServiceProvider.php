@@ -17,12 +17,12 @@ class KingpinServiceProvider extends ServiceProvider
                 throw new \Exception('Failed to create NSX connection: Invalid AvailabilityZone');
             }
             $credentials = $availabilityZone->credentials()
-                ->where('user', '=', config('kingpin.user'))
+                ->where('username', '=', config('kingpin.user'))
                 ->firstOrFail();
             return new KingpinService(
                 new Client([
                     'base_uri' => $credentials->host . (empty($credentials->port) ? '' : ':' . $credentials->port),
-                    'auth' => [$credentials->user, $credentials->password],
+                    'auth' => [$credentials->username, $credentials->password],
                     'timeout' => config('kingpin.timeout'),
                     'verify' => $this->app->environment() === 'production'
                 ])

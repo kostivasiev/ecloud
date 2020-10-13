@@ -29,7 +29,7 @@ class CreateTest extends TestCase
             [
                 'resource_id' => 'abc-abc132',
                 'host' => 'https://127.0.0.1',
-                'user' => 'someuser',
+                'username' => 'someuser',
                 'password' => 'somepassword',
                 'port' => 8080
             ],
@@ -43,7 +43,7 @@ class CreateTest extends TestCase
                 [
                     'resource_id' => 'abc-abc132',
                     'host' => 'https://127.0.0.1',
-                    'user' => 'someuser',
+                    'username' => 'someuser',
                     'port' => 8080
                 ],
                 'ecloud'

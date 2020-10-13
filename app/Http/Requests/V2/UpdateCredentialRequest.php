@@ -27,7 +27,7 @@ class UpdateCredentialRequest extends FormRequest
             'name' => ['sometimes', 'required', 'string'],
             'resource_id' => ['sometimes', 'nullable', 'string'],
             'host' => ['sometimes', 'nullable', 'string'],
-            'user' => ['sometimes', 'required', 'string'],
+            'username' => ['sometimes', 'required', 'string'],
             'password' => ['sometimes', 'required', 'string'],
             'port' => ['sometimes', 'nullable', 'integer'],
         ];
@@ -42,7 +42,7 @@ class UpdateCredentialRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field, when specified, cannot be null',
-            'user.required' => 'The :attribute field, when specified, cannot be null',
+            'username.required' => 'The :attribute field, when specified, cannot be null',
             'password.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
