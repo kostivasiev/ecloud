@@ -29,11 +29,11 @@ class OsCustomisation extends Job
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
 
-        $username = ($instance->platform == 'Linux') ? 'root' : 'administrator';
+        $username = ($instance->platform == 'Linux') ? 'root' : 'Administrator';
         $credential = app()->makeWith(Credential::class, [
             'name' => $username,
             'resource_id' => $instance->id,
-            'user' => $username,
+            'username' => $username,
             'password' => $passwordService->generate(),
         ]);
         $credential->save();

@@ -28,7 +28,7 @@ class CreateUser extends Job
         $credential = app()->makeWith(Credential::class, [
             'name' => $this->data['username'],
             'resource_id' => $instance->id,
-            'user' => $this->data['username'],
+            'username' => $this->data['username'],
             'password' => $passwordService->generate(),
         ]);
         $credential->save();

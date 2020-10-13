@@ -45,7 +45,7 @@ class PrepareOsUsers extends Job
             app()->makeWith(Credential::class, [
                 'name' => $username,
                 'resource_id' => $instance->id,
-                'user' => $username,
+                'username' => $username,
                 'password' => $password,
             ]);
         });
@@ -53,7 +53,7 @@ class PrepareOsUsers extends Job
         // TODO BELOW
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $credential = $instance->credentials()
-            ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'administrator')
             ->firstOrFail();
         if (!$credential) {
             $this->fail(new \Exception('PrepareOsUsers failed for ' . $instance->id . ', no credentials found'));
