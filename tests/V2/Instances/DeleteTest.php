@@ -13,6 +13,7 @@ use Faker\Factory as Faker;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
@@ -53,9 +54,14 @@ class DeleteTest extends TestCase
             'ram_capacity' => 1024,
         ]);
 
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
+        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('delete')
-            ->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey()])
+            ->withArgs(['/api/v2/vpc/' . $this->instance->vpc->getKey() . '/instance/' . $this->instance->getKey() . '/power'])
+            ->andReturn(
+                new Response(200)
+            );
+        $mockKingpinService->shouldReceive('delete')
+            ->withArgs(['/api/v2/vpc/' . $this->instance->vpc->getKey() . '/instance/' . $this->instance->getKey()])
             ->andReturn(
                 new Response(200)
             );

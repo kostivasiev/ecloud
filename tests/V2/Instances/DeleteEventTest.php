@@ -3,8 +3,8 @@
 namespace Tests\V2\Instances;
 
 use App\Events\V2\Instance\Deleted;
+use App\Jobs\Instance\PowerOff;
 use App\Listeners\V2\Instance\Undeploy;
-use App\Listeners\V2\Instance\VolumeDelete;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
@@ -54,9 +54,14 @@ class DeleteEventTest extends TestCase
                 $volume->instances()->attach($this->instance);
             });
 
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
+        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('delete')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc->getKey() . '/instance/' . $this->instance->getKey()])
+            ->withArgs(['/api/v2/vpc/' . $this->instance->vpc->getKey() . '/instance/' . $this->instance->getKey() . '/power'])
+            ->andReturn(
+                new Response(200)
+            );
+        $mockKingpinService->shouldReceive('delete')
+            ->withArgs(['/api/v2/vpc/' . $this->instance->vpc->getKey() . '/instance/' . $this->instance->getKey()])
             ->andReturn(
                 new Response(200)
             );
@@ -81,29 +86,20 @@ class DeleteEventTest extends TestCase
             ->assertResponseStatus(204);
 
         Event::assertDispatched(Deleted::class, function ($event) {
-            return $event->instance->id === $this->instance->getKey();
+            return $event->model->id === $this->instance->getKey();
         });
     }
 
     public function testDeleteInstanceListener()
     {
+        $this->expectsJobs([
+            PowerOff::class,
+            //\App\Jobs\Instance\Undeploy\Undeploy::class,
+        ]);
+
         $event = new Deleted($this->instance);
         /** @var Undeploy $listener */
-        $listener = \Mockery::mock(Undeploy::class)
-            ->makePartial();
+        $listener = \Mockery::mock(Undeploy::class)->makePartial();
         $listener->handle($event);
-    }
-
-    public function testDeleteVolumeListener()
-    {
-        $volumeCount = $this->instance->volumes()->count();
-        $this->instance->delete();
-        $event = new Deleted($this->instance);
-        $listener = \Mockery::mock(VolumeDelete::class)
-            ->makePartial();
-        $listener->shouldReceive('attempts')->andReturn(1);
-        $listener->handle($event);
-        $this->assertEquals(3, $volumeCount);
-        $this->assertEquals(0, $this->instance->volumes()->count());
     }
 }
