@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Instance\Deleted;
+use App\Jobs\Instance\PowerOff;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,25 +22,20 @@ class Undeploy implements ShouldQueue
     public function handle(Deleted $event)
     {
         $instance = $event->model;
-        Log::info('Attempting to Delete instance ' . $instance->getKey());
-        try {
-            /** @var Response $response */
-            $response = $instance->availabilityZone
-                ->kingpinService()
-                ->delete('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey());
-            if ($response->getStatusCode() == 200) {
-                Log::info('Delete finished successfully for instance ' . $instance->id);
-                return;
-            }
-            $this->fail(new \Exception(
-                'Failed to Delete ' . $instance->getKey() . ', Kingpin status was ' . $response->getStatusCode()
-            ));
-            return;
-        } catch (GuzzleException $exception) {
-            $this->fail(new \Exception(
-                'Failed to Delete ' . $instance->getKey() . ' : ' . $exception->getResponse()->getBody()->getContents()
-            ));
-            return;
-        }
+
+        $data = [
+            'instance_id' => $instance->getKey(),
+            'vpc_id' => $instance->vpc->getKey()
+        ];
+
+        dispatch((new PowerOff($data))->chain([
+            new Undeploy($data)
+        ]));
+
+
+        Log::info('Starting Undeploy for instance ' . $instance->getKey());
+        $logMessage = 'Undeploy instance ' . $instance->getKey() . ': ';
+
+
     }
 }
