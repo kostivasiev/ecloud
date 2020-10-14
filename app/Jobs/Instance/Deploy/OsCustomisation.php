@@ -21,6 +21,7 @@ class OsCustomisation extends Job
     }
 
     /**
+     * @param PasswordService $passwordService
      * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/331
      */
     public function handle(PasswordService $passwordService)
@@ -29,13 +30,13 @@ class OsCustomisation extends Job
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
 
-        $username = ($instance->platform == 'Linux') ? 'root' : 'Administrator';
+        $username = ($instance->platform == 'Linux') ? 'root' : 'graphite.rack';
         $credential = app()->makeWith(Credential::class, [
             'name' => $username,
             'resource_id' => $instance->id,
             'username' => $username,
-            'password' => $passwordService->generate(),
         ]);
+        $credential->password = $passwordService->generate();
         $credential->save();
 
         try {
@@ -50,18 +51,16 @@ class OsCustomisation extends Job
                     ],
                 ]
             );
-            if ($response->getStatusCode() == 200) {
-                Log::info('OsCustomisation finished successfully for instance ' . $instance->id);
+            if ($response->getStatusCode() != 200) {
+                $message = 'Failed OsCustomisation for ' . $instance->id;
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
                 return;
             }
-            $this->fail(new \Exception(
-                'Failed OsCustomisation for ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
-            ));
-            return;
         } catch (GuzzleException $exception) {
-            $this->fail(new \Exception(
-                'Failed OsCustomisation for ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
-            ));
+            $message = 'Failed OsCustomisation for ' . $instance->id;
+            Log::error($message, ['exception' => $exception]);
+            $this->fail(new \Exception($message));
             return;
         }
     }

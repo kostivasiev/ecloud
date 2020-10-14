@@ -45,7 +45,7 @@ Content-Type: application/json
   "name": "NSX",
   "resource_id": "{{availability_zone_id}}",
   "host": "https://185.197.63.88",
-  "user": "ecloud.api@ecloudgov.dev",
+  "username": "ecloud.api@ecloudgov.dev",
   "password": "a5hfysIVpUND"
 }
 
@@ -71,7 +71,7 @@ Content-Type: application/json
   "name": "Kingpin (G0)",
   "resource_id": "{{availability_zone_id}}",
   "host": "https://mgmt-20.ecloud-service.ukfast.co.uk",
-  "user": "kingpinapi",
+  "username": "kingpinapi",
   "password": "tKm?c7?Ov!of",
   "port": 8443
 }
@@ -173,22 +173,3 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 201, "Response status is not 201 Created");
 });
 %}
-
-###
-POST https://{{host}}/{{version}}/credentials
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-  "name": "Test",
-  "resource_id": "{{instance_id}}",
-  "host": "",
-  "user": "root",
-  "password": "password",
-  "port": 0
-}
-
-###
