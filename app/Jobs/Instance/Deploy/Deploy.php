@@ -116,7 +116,6 @@ class Deploy extends Job
             $this->fail(new \Exception('Deploy failed for ' . $instance->id . ' : ' . $exception->getMessage()));
             return;
         }
-
         Log::info('Deploy finished successfully for instance ' . $instance->getKey());
     }
 }
