@@ -160,7 +160,7 @@ Content-Type:  application/json
   "vpc_id": "{{vpc_id}}",
   "name": "Test",
   "vcpu_cores": 1,
-  "ram_capacity": 1024,
+  "ram_capacity": 2048,
   "appliance_id": "ced9e02a-b3fa-4324-9ebc-42250a462e9a",
   "floating_ip_id": "{{fip_id}}"
 }

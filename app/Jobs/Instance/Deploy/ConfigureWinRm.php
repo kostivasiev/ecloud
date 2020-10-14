@@ -40,10 +40,10 @@ class ConfigureWinRm extends Job
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $instance->vpc->getKey() . '/instance/' . $instance->getKey() . '/guest/windows/winrm',
+                '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/winrm',
                 [
                     'json' => [
-                        'username' => $guestAdminCredential->username,
+                        'username' => 'administrator',
                         'password' => $guestAdminCredential->password,
                     ],
                 ]
