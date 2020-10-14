@@ -27,9 +27,13 @@ class ActivateWindows extends Job
             return;
         }
 
-        $credential = $instance->credentials()->where('username', 'administrator')->firstOrFail();
-        if (!$credential) {
-            $this->fail(new \Exception($logMessage . 'Failed. No credentials found'));
+        $guestAdminCredential = $instance->credentials()
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
+            ->firstOrFail();
+        if (!$guestAdminCredential) {
+            $message = 'ActivateWindows failed for ' . $instance->id . ', no admin credentials found';
+            Log::error($message);
+            $this->fail(new \Exception($message));
             return;
         }
 
@@ -39,8 +43,8 @@ class ActivateWindows extends Job
                 '/api/v2/vpc/' . $instance->vpc->getKey() . '/instance/' . $instance->getKey() . '/guest/windows/activate',
                 [
                     'json' => [
-                        'username' => $credential->username,
-                        'password' => $credential->password,
+                        'username' => $guestAdminCredential->username,
+                        'password' => $guestAdminCredential->password,
                     ],
                 ]
             );

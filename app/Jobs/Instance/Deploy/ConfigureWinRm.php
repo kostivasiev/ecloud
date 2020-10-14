@@ -43,7 +43,7 @@ class ConfigureWinRm extends Job
                 '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/winrm',
                 [
                     'json' => [
-                        'username' => 'administrator',
+                        'username' => $guestAdminCredential->username,
                         'password' => $guestAdminCredential->password,
                     ],
                 ]
