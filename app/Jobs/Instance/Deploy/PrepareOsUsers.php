@@ -34,7 +34,7 @@ class PrepareOsUsers extends Job
             ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
-            $message = 'PrepareOsDisk failed for ' . $instance->id . ', no admin credentials found';
+            $message = 'PrepareOsUsers failed for ' . $instance->id . ', no admin credentials found';
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
@@ -42,6 +42,7 @@ class PrepareOsUsers extends Job
 
         if ($instance->platform == 'Windows') {
             // Rename the Windows "administrator" account to "graphite.rack"
+            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Rename "Administrator" user');
             try {
                 /** @var Response $response */
                 $response = $instance->availabilityZone->kingpinService()->put(
@@ -66,11 +67,14 @@ class PrepareOsUsers extends Job
                 $this->fail(new \Exception($message));
                 return;
             }
+            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Renamed "Administrator" user');
 
             // Add Windows user accounts
+            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Adding Windows accounts');
             collect([
                 ['ukfast.support', $passwordService->generate()],
-            ])->each(function ($username, $password) use ($instance, $vpc, $guestAdminCredential) {
+            ])->eachSpread(function ($username, $password) use ($instance, $vpc, $guestAdminCredential) {
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Creating Windows account "' . $username . '"');
                 $credential = Credential::create([
                     'name' => $username,
                     'resource_id' => $instance->id,
@@ -78,17 +82,19 @@ class PrepareOsUsers extends Job
                 ]);
                 $credential->password = $password;
                 $credential->save();
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Created Windows account "' . $username . '"');
 
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushing Windows account "' . $username . '"');
                 try {
                     /** @var Response $response */
-                    $response = $instance->availabilityZone->kingpinService()->put(
+                    $response = $instance->availabilityZone->kingpinService()->post(
                         '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/windows/user',
                         [
                             'json' => [
-                                'targetPassword' => $guestAdminCredential->username,
-                                'targetUsername' => $guestAdminCredential->password,
-                                'username' => $username,
-                                'password' => $password,
+                                'targetUsername' => $username,
+                                'targetPassword' => $password,
+                                'username' => $guestAdminCredential->username,
+                                'password' => $guestAdminCredential->password,
                             ],
                         ]
                     );
@@ -106,12 +112,14 @@ class PrepareOsUsers extends Job
                     $this->fail(new \Exception($message));
                     return;
                 }
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushed Windows account "' . $username . '"');
             });
         } else {
             // Create Linux Admin Group
+            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Creating Linux admin group');
             try {
                 /** @var Response $response */
-                $response = $instance->availabilityZone->kingpinService()->put(
+                $response = $instance->availabilityZone->kingpinService()->post(
                     '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/admingroup',
                     [
                         'json' => [
@@ -132,12 +140,15 @@ class PrepareOsUsers extends Job
                 $this->fail(new \Exception($message));
                 return;
             }
+            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Created Linux admin group');
 
             // Add Linux user accounts
+            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Adding Linux accounts');
             collect([
                 ['graphiterack', $passwordService->generate()],
                 ['ukfastsupport', $passwordService->generate()],
-            ])->each(function ($username, $password) use ($instance, $vpc, $guestAdminCredential) {
+            ])->eachSpread(function ($username, $password) use ($instance, $vpc, $guestAdminCredential) {
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Creating Linux account "' . $username . '"');
                 $credential = Credential::create([
                     'name' => $username,
                     'resource_id' => $instance->id,
@@ -145,17 +156,19 @@ class PrepareOsUsers extends Job
                 ]);
                 $credential->password = $password;
                 $credential->save();
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Created Linux account "' . $username . '"');
 
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushing Linux account "' . $username . '"');
                 try {
                     /** @var Response $response */
-                    $response = $instance->availabilityZone->kingpinService()->put(
+                    $response = $instance->availabilityZone->kingpinService()->post(
                         '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
                         [
                             'json' => [
-                                'targetPassword' => $guestAdminCredential->username,
-                                'targetUsername' => $guestAdminCredential->password,
-                                'username' => $username,
-                                'password' => $password,
+                                'targetUsername' => $username,
+                                'targetPassword' => $password,
+                                'username' => $guestAdminCredential->username,
+                                'password' => $guestAdminCredential->password,
                             ],
                         ]
                     );
@@ -173,6 +186,7 @@ class PrepareOsUsers extends Job
                     $this->fail(new \Exception($message));
                     return;
                 }
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushed Linux account "' . $username . '"');
             });
         }
     }
