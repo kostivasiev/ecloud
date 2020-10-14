@@ -71,7 +71,7 @@ class PrepareOsUsers extends Job
             collect([
                 ['ukfast.support', $passwordService->generate()],
             ])->each(function ($username, $password) use ($instance, $vpc, $guestAdminCredential) {
-                $credential = app()->makeWith(Credential::class, [
+                $credential = Credential::create([
                     'name' => $username,
                     'resource_id' => $instance->id,
                     'username' => $username,
@@ -138,7 +138,7 @@ class PrepareOsUsers extends Job
                 ['graphiterack', $passwordService->generate()],
                 ['ukfastsupport', $passwordService->generate()],
             ])->each(function ($username, $password) use ($instance, $vpc, $guestAdminCredential) {
-                $credential = app()->makeWith(Credential::class, [
+                $credential = Credential::create([
                     'name' => $username,
                     'resource_id' => $instance->id,
                     'username' => $username,

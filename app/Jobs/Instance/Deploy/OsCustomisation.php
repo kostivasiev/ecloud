@@ -31,7 +31,7 @@ class OsCustomisation extends Job
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
 
         $username = ($instance->platform == 'Linux') ? 'root' : 'graphite.rack';
-        $credential = app()->makeWith(Credential::class, [
+        $credential = Credential::create([
             'name' => $username,
             'resource_id' => $instance->id,
             'username' => $username,
