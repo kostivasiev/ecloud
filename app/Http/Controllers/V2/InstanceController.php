@@ -168,7 +168,7 @@ class InstanceController extends BaseController
     /**
      * @param Request $request
      * @param string $instanceId
-     * @return Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $instanceId)
     {

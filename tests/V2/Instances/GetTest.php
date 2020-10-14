@@ -56,7 +56,11 @@ class GetTest extends TestCase
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
-            new Response(200, [], json_encode(['powerState' => 'poweredOn', 'powerState' => 'poweredOn', 'toolsRunningStatus' => 'guestToolsRunning']))
+            new Response(200, [], json_encode([
+                'powerState' => 'poweredOn',
+                'powerState' => 'poweredOn',
+                'toolsRunningStatus' => 'guestToolsRunning'
+            ]))
         );
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             return $mockKingpinService;
