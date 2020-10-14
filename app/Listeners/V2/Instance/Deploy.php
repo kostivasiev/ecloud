@@ -44,7 +44,7 @@ class Deploy implements ShouldQueue
             new UpdateNetworkAdapter($data),
             new OsCustomisation($data),
             new PowerOn($data),
-            new WaitOsCustomisation($data),
+            //new WaitOsCustomisation($data),
             new ConfigureWinRm($data),
             new ActivateWindows($data),
             new PrepareOsUsers($data),

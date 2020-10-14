@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Jobs\Instance;
+namespace App\Jobs\Instance\Undeploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Vpc;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
@@ -18,13 +17,11 @@ class Undeploy extends Job
         $this->data = $data;
     }
 
-    /**
-     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/328
-     */
     public function handle()
     {
         Log::info('Performing Undeploy for instance ' . $this->data['instance_id']);
-        $instance = Instance::findOrFail($this->data['instance_id']);
+        $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
+        $logMessage = 'Undeploy for instance ' . $instance->getKey() . ': ';
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone
@@ -36,11 +33,20 @@ class Undeploy extends Job
                 ));
                 return;
             }
-            Log::info($logMessage . 'Success');
-            return;
         } catch (GuzzleException $exception) {
             $this->fail($exception);
             return;
         }
+
+        $instance->volumes()->each(function ($volume) use ($instance) {
+            // If volume is only used in this instance then delete
+            if ($volume->instances()->count() == 0) {
+                Log::info('Deleting volume: ' . $volume->getKey());
+                $volume->instances()->detach($instance);
+                $volume->delete();
+            }
+        });
+
+        Log::info($logMessage . 'Success');
     }
 }
