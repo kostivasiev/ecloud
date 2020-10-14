@@ -13,10 +13,9 @@ final class PasswordService
             for ($i = 0; $i < 12; $i++) {
                 $password .= $alphabet[mt_rand(0, $alphaLength)];
             }
-        } while (
-            !preg_match('/[A-Z]/', $password) ||
-            !preg_match('/[a-z]/', $password) ||
-            !preg_match('/[0-9]/', $password)
+        } while (!preg_match('/[A-Z]/', $password) ||
+        !preg_match('/[a-z]/', $password) ||
+        !preg_match('/[0-9]/', $password)
         );
         return $password;
     }
