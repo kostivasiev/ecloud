@@ -31,7 +31,7 @@ class RunApplianceBootstrap extends Job
             ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
-            $message = 'ActivateWindows failed for ' . $instance->id . ', no admin credentials found';
+            $message = 'RunApplianceBootstrap failed for ' . $instance->id . ', no admin credentials found';
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
