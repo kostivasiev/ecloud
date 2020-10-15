@@ -2,7 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\VpcCreated;
+use App\Events\V2\Vpc\Creating;
+use App\Events\V2\Vpc\Created;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -13,12 +14,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class VirtualPrivateClouds
- * @package App\Models\V2
- * @method static findOrFail(string $vdcUuid)
- * @method static forUser(string $user)
- */
 class Vpc extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName;
@@ -37,7 +32,8 @@ class Vpc extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => VpcCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     public function dhcp()
@@ -58,6 +54,16 @@ class Vpc extends Model implements Filterable, Sortable
     public function instances()
     {
         return $this->hasMany(Instance::class);
+    }
+
+    public function volumes()
+    {
+        return $this->hasMany(Volume::class);
+    }
+
+    public function loadBalancerClusters()
+    {
+        return $this->hasMany(LoadBalancerCluster::class);
     }
 
     /**

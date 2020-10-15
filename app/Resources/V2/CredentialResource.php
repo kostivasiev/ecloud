@@ -31,7 +31,7 @@ class CredentialResource extends UKFastResource
             'name' => $this->name,
             'resource_id' => $this->resource_id,
             'host' => $this->host,
-            'user' => $this->user,
+            'username' => $this->username,
             'password' => $this->password,
             'port' => $this->port
         ];

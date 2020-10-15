@@ -12,6 +12,7 @@ use UKFast\Responses\UKFastResource;
  * @property string mac_address
  * @property string instance_id
  * @property string network_id
+ * @property string ip_address
  * @property string created_at
  * @property string updated_at
  */
@@ -28,6 +29,7 @@ class NicResource extends UKFastResource
             'mac_address' => $this->mac_address,
             'instance_id' => $this->instance_id,
             'network_id' => $this->network_id,
+            'ip_address' => $this->ip_address,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

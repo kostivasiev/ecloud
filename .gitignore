@@ -5,3 +5,4 @@ Homestead.yaml
 .env
 /logs
 composer.phar
+tests/HTTP/V2/http-client.env.json

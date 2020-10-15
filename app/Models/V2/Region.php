@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Region\Creating;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -37,9 +38,18 @@ class Region extends Model implements Filterable, Sortable
         'is_public' => 'boolean',
     ];
 
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+    ];
+
     public function availabilityZones()
     {
         return $this->hasMany(AvailabilityZone::class);
+    }
+
+    public function vpcs()
+    {
+        return $this->hasMany(Vpc::class);
     }
 
     /**

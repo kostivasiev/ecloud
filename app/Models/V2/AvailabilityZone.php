@@ -2,6 +2,8 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\AvailabilityZone\Created;
+use App\Events\V2\AvailabilityZone\Creating;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
@@ -37,6 +39,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'nsx_edge_cluster_id',
     ];
 
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+        'created' => Created::class,
+    ];
+
     protected $casts = [
         'is_public' => 'boolean',
         'datacentre_site_id' => 'integer',
@@ -70,6 +77,16 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public function credentials()
     {
         return $this->hasMany(Credential::class, 'resource_id', 'id');
+    }
+
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
+    }
+
+    public function loadBalancerClusters()
+    {
+        return $this->hasMany(LoadBalancerCluster::class);
     }
 
     public function nsxService()

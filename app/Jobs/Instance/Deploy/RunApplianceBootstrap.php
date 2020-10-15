@@ -26,11 +26,14 @@ class RunApplianceBootstrap extends Job
         Log::info('Starting RunApplianceBootstrap for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $credential = $instance->credentials()
-            ->where('user', ($instance->platform == 'Linux') ? 'root' : 'administrator')
+
+        $guestAdminCredential = $instance->credentials()
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
-        if (!$credential) {
-            $this->fail(new \Exception('RunApplianceBootstrap failed for ' . $instance->id . ', no credentials found'));
+        if (!$guestAdminCredential) {
+            $message = 'RunApplianceBootstrap failed for ' . $instance->id . ', no admin credentials found';
+            Log::error($message);
+            $this->fail(new \Exception($message));
             return;
         }
 
@@ -49,8 +52,8 @@ class RunApplianceBootstrap extends Job
                             (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
                                 ->render(json_decode($this->data['appliance_data']))
                         ),
-                        'username' => $credential->user,
-                        'password' => $credential->password,
+                        'username' => $guestAdminCredential->username,
+                        'password' => $guestAdminCredential->password,
                     ],
                 ]
             );

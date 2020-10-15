@@ -2,13 +2,8 @@
 
 namespace Tests;
 
-use App\Models\V1\Datastore;
-use App\Models\V2\Dhcp;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Lumen\Application;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
@@ -27,20 +22,32 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         parent::setUp();
 
-        // Do not dispatch default ORM events on the following models, otherwise deployments will happen
-        Datastore::flushEventListeners();
-        Router::flushEventListeners();
-        Dhcp::flushEventListeners();
-        FirewallRule::flushEventListeners();
-        Vpc::flushEventListeners();
-        Network::flushEventListeners();
-        Instance::flushEventListeners();
+        // Do not dispatch non-ORM events for the following models
+        $dispatcher = Model::getEventDispatcher();
+
+        // V1 hack
+        $dispatcher->forget(\App\Events\V1\DatastoreCreatedEvent::class);
+
+        // Created
+        $dispatcher->forget(\App\Events\V2\AvailabilityZone\Created::class);
+        $dispatcher->forget(\App\Events\V2\Dhcp\Created::class);
+        $dispatcher->forget(\App\Events\V2\FirewallRule\Created::class);
+        $dispatcher->forget(\App\Events\V2\Instance\Created::class);
+        $dispatcher->forget(\App\Events\V2\Network\Created::class);
+        $dispatcher->forget(\App\Events\V2\Router\Created::class);
+        $dispatcher->forget(\App\Events\V2\Vpc\Created::class);
+
+        // Updated
+        $dispatcher->forget(\App\Events\V2\Volume\Updated::class);
+
+        // Deploy
+        $dispatcher->forget(\App\Events\V2\Instance\Deploy::class);
     }
 
     /**
      * Creates the application.
      *
-     * @return \Laravel\Lumen\Application
+     * @return Application
      */
     public function createApplication()
     {

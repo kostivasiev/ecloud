@@ -83,7 +83,7 @@ abstract class AbstractApioService
      * Send the HTTP request
      * @param       $method
      * @param $endpoint
-     * @param null $data - Data payload (JSON or query string depending on the verb)
+     * @param null $data - Deploy payload (JSON or query string depending on the verb)
      * @param array $options - Any other options we want to pass to Guzzle
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException

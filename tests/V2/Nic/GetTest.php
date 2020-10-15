@@ -34,7 +34,7 @@ class GetTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -64,6 +64,7 @@ class GetTest extends TestCase
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getkey(),
                 'network_id' => $this->network->getKey(),
+                'ip_address' => '10.0.0.5'
             ])
             ->assertResponseStatus(200);
     }
@@ -81,6 +82,7 @@ class GetTest extends TestCase
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getkey(),
                 'network_id' => $this->network->getKey(),
+                'ip_address' => '10.0.0.5'
             ])
             ->assertResponseStatus(200);
     }

@@ -64,12 +64,16 @@ class UpdateTest extends TestCase
             '/v2/networks/' . $this->network->getKey(),
             [
                 'name' => 'expected',
-                'router_id' => $this->router->getKey()
+                'router_id' => $this->router->getKey(),
+                'subnet' => '192.168.0.0/24'
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ])->assertResponseStatus(200);
-        $this->assertEquals('expected', Network::findOrFail($this->network->getKey())->name);
+
+        $network = Network::findOrFail($this->network->getKey());
+        $this->assertEquals('expected', $network->name);
+        $this->assertEquals('192.168.0.0/24', $network->subnet);
     }
 }

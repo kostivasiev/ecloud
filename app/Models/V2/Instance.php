@@ -2,17 +2,20 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Instance\Created;
+use App\Events\V2\Instance\Creating;
+use App\Events\V2\Instance\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DefaultPlatform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
@@ -42,21 +45,18 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $appends = [
         'appliance_id',
-        'online',
+        'volume_capacity',
     ];
 
     protected $casts = [
         'locked' => 'boolean',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function (Instance $instance) {
-            $instance->setDefaultPlatform();
-        });
-    }
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+        'created' => Created::class,
+        'deleted' => Deleted::class,
+    ];
 
     public function vpc()
     {
@@ -76,6 +76,15 @@ class Instance extends Model implements Filterable, Sortable
     public function nics()
     {
         return $this->hasMany(Nic::class);
+    }
+
+    public function getVolumeCapacityAttribute()
+    {
+        $sum = 0;
+        foreach ($this->volumes()->get() as $volume) {
+            $sum += $volume->capacity;
+        }
+        return $sum;
     }
 
     public function volumes()
@@ -129,16 +138,8 @@ class Instance extends Model implements Filterable, Sortable
 
     public function setApplianceVersionId(string $applianceUuid)
     {
-        $version = (new ApplianceVersion)->getLatest($applianceUuid);
+        $version = app()->make(ApplianceVersion::class)->getLatest($applianceUuid);
         $this->attributes['appliance_version_id'] = $version;
-    }
-
-    public function setDefaultPlatform()
-    {
-        if (empty($this->platform) && $this->applianceVersion) {
-            $this->platform = $this->applianceVersion->serverLicense()->category;
-            $this->save();
-        }
     }
 
     /**

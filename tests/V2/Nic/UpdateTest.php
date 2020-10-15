@@ -34,7 +34,7 @@ class UpdateTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-        Vpc::flushEventListeners();
+
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
@@ -113,18 +113,30 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $this->post(
-            '/v2/nics',
+        $this->patch(
+            '/v2/nics/' . $this->nic->getKey(),
             [
                 'mac_address' => $this->macAddress,
                 'instance_id' => $this->instance->getKey(),
                 'network_id' => $this->network->getKey(),
+                'ip_address' => '10.0.0.6'
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(201);
+            ->seeInDatabase(
+                'nics',
+                [
+                    'id' => $this->nic->getKey(),
+                    'mac_address' => $this->macAddress,
+                    'instance_id' => $this->instance->getKey(),
+                    'network_id'  => $this->network->getKey(),
+                    'ip_address' => '10.0.0.6'
+                ],
+                'ecloud'
+            )
+            ->assertResponseStatus(200);
     }
 }
