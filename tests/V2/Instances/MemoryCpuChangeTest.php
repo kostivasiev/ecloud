@@ -29,94 +29,83 @@ class MemoryCpuChangeTest extends TestCase
 
     public function setUp(): void
     {
-//        parent::setUp();
-//        $this->faker = Faker::create();
-//        $this->region = factory(Region::class)->create();
-//        $this->availability_zone = factory(AvailabilityZone::class)->create([
-//            'region_id' => $this->region->getKey(),
-//        ]);
-//        $this->instance = \Mockery::mock(Instance::class)
-//            ->shouldAllowMockingProtectedMethods()
-//            ->makePartial();
-//        $this->instance->shouldReceive('getOnlineAttribute')
-//            ->andReturnTrue();
-//        $this->instance->shouldReceive('getVolumeCapacityAttribute')
-//            ->andReturn(10);
-//        $this->instance->availabilityZone = $this->availability_zone;
-//        $this->instance->id = 'i-abc123xyz';
-//        $this->instance->vpc_id = 'vpc-abc123xyz';
-//
-//        $this->event = new ComputeChanged($this->instance);
+        parent::setUp();
+        $this->faker = Faker::create();
+        $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->instance = \Mockery::mock(Instance::class)
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $this->instance->shouldReceive('getOnlineAttribute')
+            ->andReturnTrue();
+        $this->instance->shouldReceive('getVolumeCapacityAttribute')
+            ->andReturn(10);
+        $this->instance->availabilityZone = $this->availability_zone;
+        $this->instance->id = 'i-abc123xyz';
+        $this->instance->vpc_id = 'vpc-abc123xyz';
 
-//        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-//        $mockKingpinService->shouldReceive('put')->with(
-//            \Mockery::capture($this->capturedUri),
-//            \Mockery::capture($this->capturedParams)
-//        )->andReturn(
-//            new Response(200)
-//        );
-//        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-//            return $mockKingpinService;
-//        });
-//
-//        $this->listener = \Mockery::mock(ComputeChange::class)
-//            ->makePartial();
-//
-//
-////        $this->listener = \Mockery::mock(ComputeChange::class)
-////            ->makePartial();
-////        $this->listener->shouldReceive('put')
-////            ->with(
-////                \Mockery::capture($this->capturedUri),
-////                \Mockery::capture($this->capturedParams)
-////            )
-////            ->andReturnTrue();
+        $this->event = new ComputeChanged($this->instance);
+
+        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+        $mockKingpinService->shouldReceive('put')->with(
+            \Mockery::capture($this->capturedUri),
+            \Mockery::capture($this->capturedParams)
+        )->andReturn(
+            new Response(200)
+        );
+        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
+            return $mockKingpinService;
+        });
+
+        $this->listener = \Mockery::mock(ComputeChange::class)
+            ->makePartial();
     }
 
     public function testMemoryChangeRamCapacity()
     {
-        $this->markTestSkipped('ComputeChange Test, needs refactoring');
-//        // First check Linux 2Gb change (no reboot)
-//        $this->instance->platform = 'Linux';
-//        $this->instance->ram_capacity = 2048;
-//        $this->instance->vcpu_cores = 1;
-//
-//        $this->listener->handle($this->event);
-//        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
-//        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
-//        $this->assertFalse($this->capturedParams['guestShutdown']);
-//
-//        // Now check Linux 4Gb change (reboot required)
-//        $this->instance->ram_capacity = 4096;
-//        $this->instance->vcpu_cores = 2;
-//        $this->listener->handle($this->event);
-//        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
-//        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
-//        $this->assertTrue($this->capturedParams['guestShutdown']);
-//
-//        // Now check Windows 2Gb change
-//        $this->instance->platform = 'Windows';
-//        $this->instance->ram_capacity = 2048;
-//        $this->instance->vcpu_cores = 1;
-//        $this->listener->handle($this->event);
-//        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
-//        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
-//        $this->assertFalse($this->capturedParams['guestShutdown']);
-//
-//        // Now check Windows 4Gb change (no reboot)
-//        $this->instance->ram_capacity = 4096;
-//        $this->instance->vcpu_cores = 2;
-//        $this->listener->handle($this->event);
-//        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
-//        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
-//        $this->assertFalse($this->capturedParams['guestShutdown']);
-//
-//        // Now check Windows 17Gb change (reboot required)
-//        $this->instance->ram_capacity = 17408;
-//        $this->instance->vcpu_cores = 4;
-//        $this->listener->handle($this->event);
-//        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['ramGB']);
-//        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['numCpu']);
-//        $this->assertTrue($this->capturedParams['guestShutdown']);
+        // First check Linux 2Gb change (no reboot)
+        $this->instance->platform = 'Linux';
+        $this->instance->ram_capacity = 2048;
+        $this->instance->vcpu_cores = 1;
+        $this->listener->handle($this->event);
+
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertFalse($this->capturedParams['json']['guestShutdown']);
+
+        // Now check Linux 4Gb change (reboot required)
+        $this->instance->ram_capacity = 4096;
+        $this->instance->vcpu_cores = 2;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertTrue($this->capturedParams['json']['guestShutdown']);
+
+        // Now check Windows 2Gb change
+        $this->instance->platform = 'Windows';
+        $this->instance->ram_capacity = 2048;
+        $this->instance->vcpu_cores = 1;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertFalse($this->capturedParams['json']['guestShutdown']);
+
+        // Now check Windows 4Gb change (no reboot)
+        $this->instance->ram_capacity = 4096;
+        $this->instance->vcpu_cores = 2;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertFalse($this->capturedParams['json']['guestShutdown']);
+
+        // Now check Windows 17Gb change (reboot required)
+        $this->instance->ram_capacity = 17408;
+        $this->instance->vcpu_cores = 4;
+        $this->listener->handle($this->event);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertTrue($this->capturedParams['json']['guestShutdown']);
     }
 }
