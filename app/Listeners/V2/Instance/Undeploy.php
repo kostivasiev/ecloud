@@ -3,7 +3,7 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Instance\Deleted;
-use App\Jobs\Instance\PowerOff;
+use App\Jobs\Instance\Undeploy\PowerOff;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
