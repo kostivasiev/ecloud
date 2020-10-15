@@ -36,6 +36,31 @@ class PrepareOsDisk extends Job
             return;
         }
 
+        // Expand disk - Single volume for MVP
+        try {
+            $response = $instance->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $instance->volumes->first()->vmware_uuid . '/size',
+                [
+                    'json' => [
+                        'sizeGiB' => $this->data['volume_capacity'],
+                    ]
+                ]
+            );
+
+            if ($response->getStatusCode() != 200) {
+                $message = 'Failed PrepareOsDisk for ' . $instance->id;
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
+                return;
+            }
+        } catch (GuzzleException $exception) {
+            $message = 'Failed PrepareOsDisk for ' . $instance->id;
+            Log::error($message, ['exception' => $exception]);
+            $this->fail(new \Exception($message));
+            return;
+        }
+
+        // Extend to expanded size
         $endpoint = ($instance->platform == 'Linux') ? 'linux/disk/lvm/extend' : 'windows/disk/expandall';
         try {
             /** @var Response $response */
