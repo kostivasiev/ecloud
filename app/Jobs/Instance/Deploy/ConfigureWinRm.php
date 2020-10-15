@@ -28,7 +28,7 @@ class ConfigureWinRm extends Job
         }
 
         $guestAdminCredential = $instance->credentials()
-            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
+            ->where('username', 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
             $message = 'ConfigureWinRm failed for ' . $instance->id . ', no admin credentials found';
