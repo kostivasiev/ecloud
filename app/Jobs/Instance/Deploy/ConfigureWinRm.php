@@ -21,37 +21,44 @@ class ConfigureWinRm extends Job
     {
         Log::info('Starting ConfigureWinRm for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
-        $logMessage = 'ConfigureWinRm for ' . $instance->getKey() . ': ';
+        $logMessage = 'ConfigureWinRm for ' . $instance->id . ': ';
         if ($instance->platform != 'Windows') {
             Log::info($logMessage . 'Platform is not Windows. Skipped.');
             return;
         }
 
-        $credential = $instance->credentials()->where('username', 'administrator')->firstOrFail();
-        if (!$credential) {
-            $this->fail(new \Exception($logMessage . 'Failed. No credentials found'));
+        $guestAdminCredential = $instance->credentials()
+            ->where('username', 'graphite.rack')
+            ->firstOrFail();
+        if (!$guestAdminCredential) {
+            $message = 'ConfigureWinRm failed for ' . $instance->id . ', no admin credentials found';
+            Log::error($message);
+            $this->fail(new \Exception($message));
             return;
         }
 
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $instance->vpc->getKey() . '/instance/' . $instance->getKey() . '/guest/windows/winrm',
+                '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/winrm',
                 [
                     'json' => [
-                        'username' => $credential->username,
-                        'password' => $credential->password,
+                        'username' => $guestAdminCredential->username,
+                        'password' => $guestAdminCredential->password,
                     ],
                 ]
             );
-            if ($response->getStatusCode() == 200) {
-                Log::info($logMessage . 'Success');
+
+            if ($response->getStatusCode() != 200) {
+                $message = 'Failed ConfigureWinRm for ' . $instance->id;
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
                 return;
             }
-            $this->fail(new \Exception($logMessage . 'Failed. Kingpin status was ' . $response->getStatusCode()));
-            return;
         } catch (GuzzleException $exception) {
-            $this->fail(new \Exception($logMessage . 'Failed. ' . $exception->getResponse()->getBody()->getContents()));
+            $message = 'Failed ConfigureWinRm for ' . $instance->id;
+            Log::error($message, ['exception' => $exception]);
+            $this->fail(new \Exception($message));
             return;
         }
     }

@@ -106,13 +106,14 @@ class Deploy extends Job
                 $nic->save();
                 Log::info($logMessage . 'Created NIC resource ' . $nic->getKey());
             }
-        } catch (\Exception $exception) {
-            if ($exception->hasResponse()) {
-                $error = $exception->getResponse()->getBody()->getContents();
-            } else {
-                $error = $exception->getMessage();
-            }
+        } catch (GuzzleException $exception) {
+            $error = $exception->getResponse()->getBody()->getContents();
+            Log::error($logMessage . $error);
             $this->fail(new \Exception('Deploy failed for ' . $instance->id . ' : ' . $error));
+            return;
+        } catch (\Exception $exception) {
+            Log::error($logMessage . $exception->getMessage());
+            $this->fail(new \Exception('Deploy failed for ' . $instance->id . ' : ' . $exception->getMessage()));
             return;
         }
         Log::info('Deploy finished successfully for instance ' . $instance->getKey());
