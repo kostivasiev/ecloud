@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Listeners\V2;
+namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\ComputeChanged;
+use App\Events\V2\Instance\ComputeChanged;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class ComputeChange implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
-     * @param  \App\Events\V2\ComputeChanged  $event
+     * @param ComputeChanged $event
      * @return void
      * @throws \Exception
      */
@@ -31,18 +32,19 @@ class ComputeChange implements ShouldQueue
         $parameters['numCpu'] = $instance->vcpu_cores;
         $parameters['guestShutdown'] = $reboot;
 
-        $this->put($instance, $parameters);
-    }
-
-    public function put($instance, $parameters)
-    {
         try {
-            $instance->availabilityZone->nsxClient()->put(
-                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->getKey().'/resize',
-                $parameters
+            $instance->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey() . '/resize',
+                [
+                    'json' => $parameters
+                ]
             );
         } catch (GuzzleException $exception) {
-            throw new \Exception($exception->getResponse()->getBody()->getContents());
+            $error = ($exception->hasResponse()) ? $exception->getResponse()->getBody()->getContents() : $exception->getMessage();
+            Log::debug($error);
+            $this->fail($exception);
+            return;
         }
+        Log::debug('Instance ' . $instance->getKey() . ' Compute updated. CPU: ' . $instance->vcpu_cores . ', RAM: ' . $instance->ram_capacity);
     }
 }

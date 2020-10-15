@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Events\V2;
+namespace App\Events\V2\Instance;
 
-use App\Models\V2\Instance;
 use Illuminate\Queue\SerializesModels;
 
 class ComputeChanged
