@@ -160,7 +160,7 @@ Content-Type:  application/json
   "vpc_id": "{{vpc_id}}",
   "name": "Test",
   "vcpu_cores": 1,
-  "ram_capacity": 1024,
+  "ram_capacity": 2048,
   "appliance_id": "ced9e02a-b3fa-4324-9ebc-42250a462e9a",
   "floating_ip_id": "{{fip_id}}"
 }
@@ -173,22 +173,3 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 201, "Response status is not 201 Created");
 });
 %}
-
-###
-POST https://{{host}}/{{version}}/credentials
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-  "name": "Test",
-  "resource_id": "{{instance_id}}",
-  "host": "",
-  "username": "administrator",
-  "password": "password",
-  "port": 0
-}
-
-###

@@ -2,10 +2,11 @@
 
 namespace App\Listeners\V2\Volume;
 
-use App\Events\V2\Updated;
+use App\Events\V2\Volume\Updated;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 class CapacityIncrease implements ShouldQueue
 {
@@ -19,18 +20,28 @@ class CapacityIncrease implements ShouldQueue
     public function handle(Updated $event)
     {
         $volume = $event->volume;
-        if ($volume->capacity > $volume->getOriginal('capacity')) {
-            $instance = $volume->instances()->first();
+        if ($volume->capacity > $event->originalCapacity) {
+            $endpoint = '/api/v1/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
+
+            if ($volume->instances()->count() > 0) {
+                $instance = $volume->instances()->first();
+                $endpoint = '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size';
+            }
+
             try {
-                $instance->availabilityZone->kingpinService()->put(
-                    '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/volume/'.$volume->vmware_uuid.'/size',
+                $volume->availabilityZone->kingpinService()->put(
+                    $endpoint,
                     [
-                        'sizeGiB' => $volume->capacity,
+                        'json' => [
+                            'sizeGiB' => $volume->capacity
+                        ]
                     ]
                 );
             } catch (GuzzleException $exception) {
                 throw new \Exception($exception->getResponse()->getBody()->getContents());
             }
+
+            Log::info('Volume ' . $volume->getKey() . ' capacity increased from ' . $event->originalCapacity . ' to ' . $volume->capacity);
         }
     }
 }

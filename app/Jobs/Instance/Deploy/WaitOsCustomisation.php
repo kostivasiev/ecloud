@@ -36,20 +36,24 @@ class WaitOsCustomisation extends Job
                 '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/oscustomization/status'
             );
             if ($response->getStatusCode() != 200) {
-                $this->fail(new \Exception(
-                    'WaitOsCustomisation failed for ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
-                ));
+                $message = 'WaitOsCustomisation failed for ' . $instance->id;
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
                 return;
             }
 
             $data = json_decode($response->getBody()->getContents());
             if (!$data) {
-                $this->fail(new \Exception('WaitOsCustomisation failed for ' . $instance->id . ', could not decode response'));
+                $message = 'WaitOsCustomisation failed for ' . $instance->id . ', could not decode response';
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
                 return;
             }
 
             if ($data->status === 'Failed') {
-                $this->fail(new \Exception('WaitOsCustomisation failed for ' . $instance->id . ': ' . $data->description));
+                $message = 'WaitOsCustomisation failed for ' . $instance->id;
+                Log::error($message, ['data' => $data]);
+                $this->fail(new \Exception($message));
                 return;
             }
 
@@ -67,10 +71,9 @@ class WaitOsCustomisation extends Job
                 }
             }
         } catch (GuzzleException $exception) {
-            $this->fail(new \Exception(
-                'WaitOsCustomisation failed for ' . $instance->id . ' : ' .
-                $exception->getResponse()->getBody()->getContents()
-            ));
+            $message = 'WaitOsCustomisation failed for ' . $instance->id;
+            Log::error($message, ['exception' => $exception]);
+            $this->fail(new \Exception($message));
             return;
         }
     }

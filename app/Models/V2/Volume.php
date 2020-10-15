@@ -51,6 +51,11 @@ class Volume extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
+
     public function instances()
     {
         return $this->belongsToMany(Instance::class);
