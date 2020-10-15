@@ -10,12 +10,11 @@ use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\DB\Ditto\Exceptions\InvalidSortException;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable

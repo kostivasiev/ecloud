@@ -34,8 +34,14 @@ class Undeploy extends Job
                 return;
             }
         } catch (GuzzleException $exception) {
-            $this->fail($exception);
-            return;
+            // Catch already deleted
+            if ($exception->hasResponse()
+                && json_decode($exception->getResponse()->getBody()->getContents())->ExceptionType == 'UKFast.VimLibrary.Exception.EntityNotFoundException') {
+                Log::info('Attempted to undeploy instance, but entity was not found, skipping.');
+            } else {
+                $this->fail($exception);
+                return;
+            }
         }
 
         $instance->volumes()->each(function ($volume) use ($instance) {
