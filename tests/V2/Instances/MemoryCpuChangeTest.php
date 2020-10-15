@@ -38,6 +38,8 @@ class MemoryCpuChangeTest extends TestCase
             ->makePartial();
         $this->instance->shouldReceive('getOnlineAttribute')
             ->andReturnTrue();
+        $this->instance->shouldReceive('getVolumeCapacityAttribute')
+            ->andReturn(10);
         $this->instance->availabilityZone = $this->availability_zone;
         $this->instance->id = 'i-abc123xyz';
         $this->instance->vpc_id = 'vpc-abc123xyz';
