@@ -1,0 +1,43 @@
+GET https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+
+client.global.set('volume_id', response.body.data[0].id);
+client.log('Volume ID: ' + response.body.data[0].id);
+
+client.global.set('volume_capacity', response.body.data[0].capacity);
+client.log('Volume Capacity: ' + response.body.data[0].capacity);
+client.global.set('new_capacity', response.body.data[0].capacity+1);
+client.log('New Capacity: ' + client.global.get('new_capacity'));
+
+%}
+
+###
+
+PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "capacity": {{new_capacity}}
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+
+%}
+
+###

@@ -9,8 +9,8 @@ class Updated
 {
     use SerializesModels;
 
-    /** @var \App\Models\V2\Volume */
-    public Volume $volume;
+    public $volume;
+    public $originalCapacity;
 
     /**
      * @param Volume $volume
@@ -19,5 +19,6 @@ class Updated
     public function __construct(Volume $volume)
     {
         $this->volume = $volume;
+        $this->originalCapacity = $volume->getOriginal('capacity');
     }
 }
