@@ -3,7 +3,6 @@
 namespace Tests\V2\Instances;
 
 use App\Events\V2\Instance\Deleted;
-use App\Jobs\Instance\PowerOff;
 use App\Listeners\V2\Instance\Undeploy;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
@@ -93,7 +92,7 @@ class DeleteEventTest extends TestCase
     public function testDeleteInstanceListener()
     {
         $this->expectsJobs([
-            PowerOff::class,
+            \App\Jobs\Instance\Undeploy\PowerOff::class,
             //\App\Jobs\Instance\Undeploy\Undeploy::class,
         ]);
 
