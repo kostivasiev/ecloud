@@ -8,6 +8,7 @@ use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -50,7 +51,7 @@ class VolumeController extends BaseController
 
     /**
      * @param CreateVolumeRequest $request
-     * @return \Illuminate\Http\JsonResponse|Response
+     * @return JsonResponse|Response
      */
     public function store(CreateVolumeRequest $request)
     {
@@ -84,7 +85,7 @@ class VolumeController extends BaseController
     /**
      * @param UpdateVolumeRequest $request
      * @param string $volumeId
-     * @return \Illuminate\Http\JsonResponse|Response
+     * @return JsonResponse|Response
      */
     public function update(UpdateVolumeRequest $request, string $volumeId)
     {
@@ -132,7 +133,7 @@ class VolumeController extends BaseController
     /**
      * @param Request $request
      * @param string $routerUuid
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy(Request $request, string $volumeId)
     {

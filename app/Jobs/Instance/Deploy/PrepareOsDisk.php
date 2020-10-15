@@ -26,39 +26,67 @@ class PrepareOsDisk extends Job
         Log::info('Starting PrepareOsDisk for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $credential = $instance->credentials()
-            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'administrator')
+        $guestAdminCredential = $instance->credentials()
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
-        if (!$credential) {
-            $this->fail(new \Exception('PrepareOsDisk failed for ' . $instance->id . ', no credentials found'));
+        if (!$guestAdminCredential) {
+            $message = 'PrepareOsDisk failed for ' . $instance->id . ', no admin credentials found';
+            Log::error($message);
+            $this->fail(new \Exception($message));
             return;
         }
 
-        $endpoint = ($instance->platform == 'Linux') ? 'linux/lvm/extend' : 'windows/disk/expandall';
+        // Expand disk - Single volume for MVP
+        try {
+            $response = $instance->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $instance->volumes->first()->vmware_uuid . '/size',
+                [
+                    'json' => [
+                        'sizeGiB' => $this->data['volume_capacity'],
+                    ]
+                ]
+            );
+
+            if ($response->getStatusCode() != 200) {
+                $message = 'Failed PrepareOsDisk for ' . $instance->id;
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
+                return;
+            }
+        } catch (GuzzleException $exception) {
+            $message = 'Failed PrepareOsDisk for ' . $instance->id;
+            Log::error($message, ['exception' => $exception]);
+            $this->fail(new \Exception($message));
+            return;
+        }
+
+        // Extend to expanded size
+        $endpoint = ($instance->platform == 'Linux') ? 'linux/disk/lvm/extend' : 'windows/disk/expandall';
         try {
             /** @var Response $response */
             $response = $instance->availabilityZone->kingpinService()->put(
                 '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
                 [
                     'json' => [
-                        'username' => $credential->username,
-                        'password' => $credential->password,
+                        'username' => $guestAdminCredential->username,
+                        'password' => $guestAdminCredential->password,
                     ],
                 ]
             );
-            if ($response->getStatusCode() == 200) {
-                Log::info('PrepareOsDisk finished successfully for instance ' . $instance->id);
+
+            if ($response->getStatusCode() != 200) {
+                $message = 'Failed PrepareOsDisk for ' . $instance->id;
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
                 return;
             }
-            $this->fail(new \Exception(
-                'Failed PrepareOsDisk for ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
-            ));
-            return;
         } catch (GuzzleException $exception) {
-            $this->fail(new \Exception(
-                'Failed PrepareOsDisk for ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
-            ));
+            $message = 'Failed PrepareOsDisk for ' . $instance->id;
+            Log::error($message, ['exception' => $exception]);
+            $this->fail(new \Exception($message));
             return;
         }
+
+        Log::info('PrepareOsDisk finished successfully for instance ' . $instance->id);
     }
 }

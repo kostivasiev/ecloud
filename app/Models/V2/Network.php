@@ -6,6 +6,7 @@ use App\Events\V2\Network\Created;
 use App\Events\V2\Network\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;

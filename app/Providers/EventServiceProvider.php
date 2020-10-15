@@ -81,6 +81,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Instance\Created::class => [
             \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
+        \App\Events\V2\Instance\Deleted::class => [
+            \App\Listeners\V2\Instance\Undeploy::class,
+        ],
         \App\Events\V2\Instance\Deploy::class => [
             \App\Listeners\V2\Instance\Deploy::class,
         ],
@@ -114,6 +117,9 @@ class EventServiceProvider extends ServiceProvider
 
         // Volume
         \App\Events\V2\Volume\Creating::class => [
+        ],
+        \App\Events\V2\Volume\Updated::class => [
+            \App\Listeners\V2\Volume\CapacityIncrease::class,
         ],
 
         // Vpc

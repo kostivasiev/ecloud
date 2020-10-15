@@ -108,15 +108,14 @@ class Deploy extends Job
             }
         } catch (GuzzleException $exception) {
             $error = $exception->getResponse()->getBody()->getContents();
-            Log::info($logMessage . $error);
+            Log::error($logMessage . $error);
             $this->fail(new \Exception('Deploy failed for ' . $instance->id . ' : ' . $error));
             return;
         } catch (\Exception $exception) {
-            Log::info($logMessage . $exception->getMessage());
+            Log::error($logMessage . $exception->getMessage());
             $this->fail(new \Exception('Deploy failed for ' . $instance->id . ' : ' . $exception->getMessage()));
             return;
         }
-
         Log::info('Deploy finished successfully for instance ' . $instance->getKey());
     }
 }

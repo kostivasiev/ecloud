@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Kingpin\Instance\Delete::class,
         \App\Console\Commands\Job\TestJob::class,
         \App\Console\Commands\Queue\TestRead::class,
+        \App\Console\Commands\Credentials\Show::class,
     ];
 
     /**
