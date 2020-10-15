@@ -61,5 +61,7 @@ class ConfigureWinRm extends Job
             $this->fail(new \Exception($message));
             return;
         }
+
+        Log::info($logMessage . 'Success');
     }
 }
