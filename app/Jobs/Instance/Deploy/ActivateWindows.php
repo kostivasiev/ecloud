@@ -28,7 +28,7 @@ class ActivateWindows extends Job
         }
 
         $guestAdminCredential = $instance->credentials()
-            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
+            ->where('username', 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
             $message = 'ActivateWindows failed for ' . $instance->id . ', no admin credentials found';
