@@ -71,16 +71,16 @@ class MemoryCpuChangeTest extends TestCase
         $this->instance->vcpu_cores = 1;
         $this->listener->handle($this->event);
 
-        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
-        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramMiB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCPU']);
         $this->assertFalse($this->capturedParams['json']['guestShutdown']);
 
         // Now check Linux 4Gb change (reboot required)
         $this->instance->ram_capacity = 4096;
         $this->instance->vcpu_cores = 2;
         $this->listener->handle($this->event);
-        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
-        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramMiB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCPU']);
         $this->assertTrue($this->capturedParams['json']['guestShutdown']);
 
         // Now check Windows 2Gb change
@@ -88,24 +88,24 @@ class MemoryCpuChangeTest extends TestCase
         $this->instance->ram_capacity = 2048;
         $this->instance->vcpu_cores = 1;
         $this->listener->handle($this->event);
-        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
-        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramMiB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCPU']);
         $this->assertFalse($this->capturedParams['json']['guestShutdown']);
 
         // Now check Windows 4Gb change (no reboot)
         $this->instance->ram_capacity = 4096;
         $this->instance->vcpu_cores = 2;
         $this->listener->handle($this->event);
-        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
-        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramMiB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCPU']);
         $this->assertFalse($this->capturedParams['json']['guestShutdown']);
 
         // Now check Windows 17Gb change (reboot required)
         $this->instance->ram_capacity = 17408;
         $this->instance->vcpu_cores = 4;
         $this->listener->handle($this->event);
-        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramGB']);
-        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCpu']);
+        $this->assertEquals($this->instance->ram_capacity, $this->capturedParams['json']['ramMiB']);
+        $this->assertEquals($this->instance->vcpu_cores, $this->capturedParams['json']['numCPU']);
         $this->assertTrue($this->capturedParams['json']['guestShutdown']);
     }
 }

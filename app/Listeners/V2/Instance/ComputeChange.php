@@ -20,31 +20,30 @@ class ComputeChange implements ShouldQueue
     public function handle(ComputeChanged $event)
     {
         $instance = $event->instance;
+        Log::info('Attempting to update compute for instance ' . $instance->getKey());
         $reboot = $event->rebootRequired;
-        $parameters = [];
 
         // Handle ram_capacity
-        $parameters['ramMiB'] = $instance->ram_capacity;
         $limit = ($instance->platform == "Windows") ? 16 : 3;
         $reboot = ((!$reboot) && (($instance->ram_capacity / 1024) <= $limit)) ? false : true;
-
-        // Handle vcpu_cores
-        $parameters['numCpu'] = $instance->vcpu_cores;
-        $parameters['guestShutdown'] = $reboot;
 
         try {
             $instance->availabilityZone->kingpinService()->put(
                 '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey() . '/resize',
                 [
-                    'json' => $parameters
+                    'json' => [
+                        'numCPU' => $instance->vcpu_cores,
+                        'ramMiB' => $instance->ram_capacity,
+                        'guestShutdown' => $reboot
+                    ]
                 ]
             );
         } catch (GuzzleException $exception) {
             $error = ($exception->hasResponse()) ? $exception->getResponse()->getBody()->getContents() : $exception->getMessage();
-            Log::debug($error);
+            Log::error('Failed to update compute for instance ' . $instance->getKey() . ': ' . $error);
             $this->fail($exception);
             return;
         }
-        Log::debug('Instance ' . $instance->getKey() . ' Compute updated. CPU: ' . $instance->vcpu_cores . ', RAM: ' . $instance->ram_capacity);
+        Log::info('Instance ' . $instance->getKey() . ' Compute updated. CPU: ' . $instance->vcpu_cores . ', RAM: ' . $instance->ram_capacity);
     }
 }
