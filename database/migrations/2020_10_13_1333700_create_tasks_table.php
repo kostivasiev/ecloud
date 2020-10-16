@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateResourceTasksTable extends Migration
+class CreateTasksTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('resource_tasks', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('tasks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('job_id')->index()->nullable();
             $table->string('type')->index();
@@ -18,7 +18,7 @@ class CreateResourceTasksTable extends Migration
             $table->integer('attempts')->default(0);
             $table->integer('progress_now')->default(0);
             $table->integer('progress_max')->default(0);
-            $table->string('status', 16)->default(\App\Models\V2\ResourceTask::STATUS_QUEUED)->index();
+            $table->string('status', 16)->default(\App\Models\V2\Task::STATUS_QUEUED)->index();
             $table->longText('input')->nullable();
             $table->longText('output')->nullable();
             $table->timestamps();
@@ -32,6 +32,6 @@ class CreateResourceTasksTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->drop('resource_tasks');
+        Schema::connection('ecloud')->drop('tasks');
     }
 }

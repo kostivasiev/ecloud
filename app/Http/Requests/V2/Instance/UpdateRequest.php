@@ -44,19 +44,19 @@ class UpdateRequest extends FormRequest
     {
         $rules = [
             'name' => 'nullable|string',
-            'vpc_id' => [
+/*            'vpc_id' => [
                 'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.vpcs,id',
                 new ExistsForUser(Vpc::class)
-            ],
-            'appliance_id' => [
+            ],*/
+/*            'appliance_id' => [
                 'sometimes',
                 'required',
                 'uuid',
                 'exists:ecloud.appliance,appliance_uuid'
-            ],
+            ],*/
             'vcpu_cores' => [
                 'sometimes',
                 'required',
@@ -72,7 +72,7 @@ class UpdateRequest extends FormRequest
                 'max:' . config('instance.ram_capacity.max'),
             ],
             'locked' => 'sometimes|required|boolean',
-            'platform' => 'sometimes|required|in:Windows,Linux',
+            // 'platform' => 'sometimes|required|in:Windows,Linux',
         ];
 
         return $rules;

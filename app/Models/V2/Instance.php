@@ -8,6 +8,7 @@ use App\Events\V2\Instance\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Resource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
@@ -20,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Resource;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
@@ -90,23 +91,6 @@ class Instance extends Model implements Filterable, Sortable
     public function volumes()
     {
         return $this->belongsToMany(Volume::class);
-    }
-
-    public function getOnlineAttribute()
-    {
-        try {
-            $response = $this->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->getKey()
-            );
-        } catch (\Exception $e) {
-            Log::info('Failed to get power state', [
-                'vpc_id' => $this->vpc_id,
-                'instance_id' => $this->getKey(),
-                'message' => $e->getMessage()
-            ]);
-            return;
-        }
-        return json_decode($response->getBody()->getContents())->powerState == 'poweredOn';
     }
 
     public function scopeForUser($query, $user)

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'model' => App\Models\V2\ResourceTask::class,
-    'event_manager' => \Imtigger\LaravelJobStatus\EventManagers\DefaultEventManager::class,
+    'model' => App\Models\V2\Task::class,
+    'event_manager' => App\Events\TaskEventManager::class,
     'database_connection' => 'ecloud'
 ];

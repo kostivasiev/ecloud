@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\ComputeChanged;
 use App\Events\V2\Data\InstanceDeployEventData;
+use App\Events\V2\Instance\Deploy;
+use App\Events\V2\Instance\Deploy\Data;
 use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
@@ -12,12 +13,13 @@ use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
+use App\Jobs\Instance\UpdateTask;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
-use App\Resources\V2\VolumeResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -112,7 +114,7 @@ class InstanceController extends BaseController
             }
         }
 
-        $instanceDeployData = new \App\Events\V2\Instance\Deploy\Data();
+        $instanceDeployData = new Data();
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
@@ -121,7 +123,7 @@ class InstanceController extends BaseController
         $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
-        event(new \App\Events\V2\Instance\Deploy($instanceDeployData));
+        event(new Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
@@ -133,32 +135,20 @@ class InstanceController extends BaseController
      */
     public function update(UpdateRequest $request, string $instanceId)
     {
-        $rebootRequired = false;
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
         if (!$this->isAdmin &&
             (!$request->has('locked') || $request->get('locked') !== false) &&
             $instance->locked === true) {
             return $this->isLocked();
         }
-        if (($request->input('vcpu_cores', $instance->vcpu_cores) < $instance->vcpu_cores) ||
-            ($request->input('ram_capacity', $instance->ram_capacity) < $instance->ram_capacity)) {
-            $rebootRequired = true;
-        }
+
         $instance->fill($request->only([
             'name',
-            'vpc_id',
-            'availability_zone_id',
-            'vcpu_cores',
-            'ram_capacity',
             'locked'
-        ]));
-        if ($request->has('appliance_id')) {
-            $instance->setApplianceVersionId($request->get('appliance_id'));
-        }
-        $instance->save();
-        if ($request->has('vcpu_cores') || $request->has('ram_capacity')) {
-            event(ComputeChanged::class, [$instance, $rebootRequired]);
-        }
+        ]))->save();
+
+        dispatch(new UpdateTask($instance, $request->all()));
+
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }
 
@@ -179,7 +169,7 @@ class InstanceController extends BaseController
     /**
      * @param Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return Response|JsonResponse
      */
     public function destroy(Request $request, string $instanceId)
     {
@@ -218,9 +208,9 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $instanceId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function nics(Request $request, string $instanceId)
     {

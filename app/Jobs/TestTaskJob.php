@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use Illuminate\Support\Facades\Log;
 
-class TestTaskJob extends ResourceTaskJob
+class TestTaskJob extends TaskJob
 {
     public function handle()
     {

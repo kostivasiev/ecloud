@@ -26,6 +26,7 @@ use Log;
  * @property string agent_running
  * @property string platform
  * @property integer volume_capacity
+ * @property boolean task_running
  * @property string created_at
  * @property string updated_at
  */
@@ -48,6 +49,7 @@ class InstanceResource extends UKFastResource
             'locked' => $this->locked,
             'platform' => $this->platform,
             'volume_capacity' => $this->volume_capacity,
+            'task_running' => $this->task_running,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))
