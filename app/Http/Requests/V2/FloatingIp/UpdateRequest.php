@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\FloatingIp;
 
 use UKFast\FormRequests\FormRequest;
 
@@ -8,7 +8,7 @@ use UKFast\FormRequests\FormRequest;
  * Class UpdateFloatingIpRequest
  * @package App\Http\Requests\V2
  */
-class UpdateFloatingIpRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,9 @@ class UpdateFloatingIpRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return [
+            'name' => ['nullable', 'string'],
+        ];
     }
 
     /**
