@@ -10,23 +10,19 @@ use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
+use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
+use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class Nic
- * @package App\Models\V2
- * @method static forUser($user)
- */
-class Nic extends Model
+class Nic extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'nic';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'mac_address',
@@ -36,7 +32,7 @@ class Nic extends Model
     ];
 
     protected $casts = [
-        'deleted' => 'boolean'
+        'deleted' => 'boolean'  // This is for the "atomic" IP fudge. It needs replacing at some point
     ];
 
     protected $dispatchesEvents = [
@@ -136,7 +132,7 @@ class Nic extends Model
             'mac_address' => 'mac_address',
             'instance_id' => 'instance_id',
             'network_id' => 'network_id',
-            'ip_address'  => 'ip_address',
+            'ip_address' => 'ip_address',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

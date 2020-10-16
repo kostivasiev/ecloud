@@ -25,7 +25,7 @@ trait DefaultAvailabilityZone
     {
         Log::info('Setting Default Availability Zone on ' . $model->id . ' (' . get_class($model) . ')');
 
-        if (empty($instance->availability_zone_id)) {
+        if (empty($model->availability_zone_id)) {
             $availabilityZone = Vpc::forUser(app('request')->user)
                 ->findOrFail($model->vpc_id)
                 ->region
