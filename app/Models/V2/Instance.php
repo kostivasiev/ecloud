@@ -8,9 +8,9 @@ use App\Events\V2\Instance\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\Resource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use ResourceStatus;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -21,7 +21,12 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Resource;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, \App\Traits\V2\Resource, \App\Traits\V2\ResourceStatus;
+
+    public const STATUS_READY = 'ready';
+    public const STATUS_CREATING = 'creating';
+    public const STATUS_UPDATING = 'updating';
+    public const STATUS_FAILED = 'failed';
 
     public $keyPrefix = 'i';
     public $incrementing = false;
@@ -149,8 +154,8 @@ class Instance extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort[]
+     * @throws InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
@@ -171,8 +176,8 @@ class Instance extends Model implements Filterable, Sortable
 
     /**
      * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|Sort|Sort[]|null
+     * @throws InvalidSortException
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -194,8 +199,8 @@ class Instance extends Model implements Filterable, Sortable
             'vcpu_cores' => 'vcpu_cores',
             'ram_capacity' => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',
-            'locked'     => 'locked',
-            'platform'   => 'platform',
+            'locked' => 'locked',
+            'platform' => 'platform',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
