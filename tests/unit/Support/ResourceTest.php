@@ -61,8 +61,8 @@ class ResourceTest extends TestCase
      */
     public function testLoadFromIdReturnsCorrectResources($classname, $class)
     {
-        $resource = Resource::loadFromId($this->$classname->id);
-        $this->assertTrue($resource instanceof $class);
-        $this->assertTrue($resource->id == $this->$classname->id);
+        $resource = Resource::classFromId($this->$classname->id);
+        $this->assertTrue($resource == $class);
+        $this->assertTrue($resource::find($this->$classname->id)->id == $this->$classname->id);
     }
 }

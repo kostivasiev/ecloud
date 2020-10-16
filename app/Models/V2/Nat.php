@@ -41,11 +41,11 @@ class Nat extends Model
 
     public function getDestinationResourceAttribute()
     {
-        return Resource::loadFromId($this->destination);
+        return Resource::classFromId($this->destination)::findOrFail($this->destination);
     }
 
     public function getTranslatedResourceAttribute()
     {
-        return Resource::loadFromId($this->translated);
+        return Resource::classFromId($this->translated)::findOrFail($this->translated);
     }
 }

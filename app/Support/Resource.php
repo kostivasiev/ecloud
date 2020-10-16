@@ -9,22 +9,21 @@ class Resource
     use Macroable;
 
     /**
-     * Loads a resource for a given "key-123456" formatted ID
+     * Get the class for a given "key-123456" formatted ID
      * @param $id
-     * @return null
+     * @return null|string
      */
-    public static function loadFromId($id)
+    public static function classFromId($id)
     {
-        list($key, $id) = explode('-', $id);
+        list($key) = explode('-', $id);
         $files = array_diff(scandir(app()->basePath('app/Models/V2')), array('.', '..'));
         foreach ($files as $file) {
             $model = 'App\\Models\\V2\\' . str_replace('.php', '', $file);
             if (!class_exists($model)) {
                 continue;
             }
-            $instance = (new $model);
-            if ($key == $instance->keyPrefix) {
-                return $instance->findOrFail($key . '-' . $id);
+            if ($key == (new $model)->keyPrefix) { // TODO :- Why isn't keyPrefix static const?
+                return $model;
             }
         }
         return null;
