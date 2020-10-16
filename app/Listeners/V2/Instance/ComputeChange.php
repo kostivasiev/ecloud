@@ -24,7 +24,7 @@ class ComputeChange implements ShouldQueue
         $parameters = [];
 
         // Handle ram_capacity
-        $parameters['ramGB'] = $instance->ram_capacity;
+        $parameters['ramMiB'] = $instance->ram_capacity;
         $limit = ($instance->platform == "Windows") ? 16 : 3;
         $reboot = ((!$reboot) && (($instance->ram_capacity / 1024) <= $limit)) ? false : true;
 
