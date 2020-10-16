@@ -2,12 +2,12 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NatCreated;
+use App\Events\V2\Nat\Created;
+use App\Events\V2\Nat\Saved;
 use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
 
 /**
  * Class Nat
@@ -31,7 +31,8 @@ class Nat extends Model
     ];
 
     protected $dispatchesEvents = [
-        'created' => NatCreated::class,
+        'created' => Created::class,
+        'saved' => Saved::class,
     ];
 
     public function getRuleIdAttribute()

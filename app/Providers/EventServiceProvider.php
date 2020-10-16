@@ -100,6 +100,13 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Network\Deploy::class,
         ],
 
+        // Nat
+        \App\Events\V2\Nat\Created::class => [
+        ],
+        \App\Events\V2\Nat\Saved::class => [
+            \App\Listeners\V2\Nat\Deploy::class
+        ],
+
         // Nic
         \App\Events\V2\Nic\Creating::class => [
         ],

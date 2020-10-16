@@ -45,12 +45,12 @@ class ResourceTest extends TestCase
     public function loadFromIdReturnsCorrectResourcesProvider()
     {
         return [
-            'region resource lookup' => ['region', Region::class],
-            'availability_zone resource lookup' => ['availability_zone', AvailabilityZone::class],
-            'vpc resource lookup' => ['vpc', Vpc::class],
-            'instance resource lookup' => ['instance', Instance::class],
-            'floating_ip resource lookup' => ['floating_ip', FloatingIp::class],
-            'nic resource lookup' => ['nic', Nic::class],
+            'region' => ['region', Region::class],
+            'availability_zone' => ['availability_zone', AvailabilityZone::class],
+            'vpc' => ['vpc', Vpc::class],
+            'instance' => ['instance', Instance::class],
+            'floating_ip' => ['floating_ip', FloatingIp::class],
+            'nic' => ['nic', Nic::class],
         ];
     }
 
