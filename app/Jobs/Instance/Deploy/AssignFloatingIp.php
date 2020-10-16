@@ -27,7 +27,7 @@ class AssignFloatingIp extends Job
         if ((!empty($this->data['floating_ip_id']) || $this->data['requires_floating_ip'])
             && $instance->nics()->count() < 1) {
             $this->fail(
-                new Exception('AssignFloatingIp failed for ' . $instance->getKey() . ': ' . 'Failed. Instance has no NIC')
+                new Exception('AssignFloatingIp failed for ' . $instance->id . ': ' . 'Failed. Instance has no NIC')
             );
             return;
         }
@@ -37,21 +37,19 @@ class AssignFloatingIp extends Job
         }
 
         if ($this->data['requires_floating_ip']) {
-            $floatingIp = new FloatingIp;
+            $floatingIp = app()->make(FloatingIp::class);
             $floatingIp->vpc_id = $this->data['vpc_id'];
             $floatingIp->save();
-            $destination = $floatingIp->getKey();
+            $destination = $floatingIp->id;
         }
 
         if (!empty($destination)) {
             $nic = $instance->nics()->first();
-
-            $nat = new Nat;
+            $nat = app()->make(Nat::class);
             $nat->destination = $destination;
-            $nat->translated = $nic->getKey();
+            $nat->translated = $nic->id;
             $nat->save();
-
-            Log::info('Floating IP (' . $destination . ') assigned to NIC (' . $nic->getKey() . ')');
+            Log::info('Floating IP (' . $destination . ') assigned to NIC (' . $nic->id . ')');
         }
     }
 }

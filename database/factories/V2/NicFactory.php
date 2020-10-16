@@ -7,6 +7,9 @@ use Faker\Generator as Faker;
 
 $factory->define(Nic::class, function (Faker $faker) {
     return [
-        'ip_address' => '10.0.0.5'
+        'mac_address' => $faker->macAddress,
+        'instance_id' => 'i-' . $faker->numberBetween(0, PHP_INT_MAX),
+        'network_id' => $faker->ipv4,
+        'ip_address' => $faker->ipv4,
     ];
 });
