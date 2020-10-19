@@ -18,6 +18,7 @@ abstract class TaskJob extends \App\Jobs\Job {
     public function dispatchChild($job) {
         Log::info("BEFORE: " . print_r($job));
         dispatch($job)->onConnection('sync');
+
         Log::info("AFTER: " . print_r($job));
 /*        if ($job->hasFailed()) {
             $this->fail(new \Exception("Child job failed: " . $job->exception()));
