@@ -42,6 +42,7 @@ class GetTest extends TestCase
         )
             ->seeJson([
                 'id' => $this->floatingIp->getKey(),
+                'name' => $this->floatingIp->getKey(),
                 'vpc_id' => $this->vpc->getKey(),
                 'ip_address' => $this->floatingIp->ip_address
             ])
@@ -59,6 +60,7 @@ class GetTest extends TestCase
         )
             ->seeJson([
                 'id' => $this->floatingIp->getKey(),
+                'name' => $this->floatingIp->getKey(),
                 'vpc_id' => $this->vpc->getKey(),
                 'ip_address' => $this->floatingIp->ip_address
             ])

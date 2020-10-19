@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\FloatingIp;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
@@ -10,7 +10,7 @@ use UKFast\FormRequests\FormRequest;
  * Class CreateFloatingIpRequest
  * @package App\Http\Requests\V2
  */
-class CreateFloatingIpRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,6 +30,7 @@ class CreateFloatingIpRequest extends FormRequest
     public function rules()
     {
         return [
+            'name' => ['nullable', 'string'],
             'vpc_id' => [
                 'required',
                 'string',

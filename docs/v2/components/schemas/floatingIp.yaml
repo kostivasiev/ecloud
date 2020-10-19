@@ -3,6 +3,10 @@ properties:
     type: string
     example: fip-2b66bb79
     readOnly: true
+  name:
+    type: string
+    example: fip-2b66bb79
+    readOnly: false
   vpc_id:
     type: string
     example: vpc-2b66bb79
