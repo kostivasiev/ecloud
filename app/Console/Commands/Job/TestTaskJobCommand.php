@@ -4,10 +4,11 @@ namespace App\Console\Commands\Job;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
-use App\Jobs\TestTaskJob;
+use App\Jobs\TestTaskChildJob;
 
 class TestTaskJobCommand extends Command
 {
@@ -22,8 +23,12 @@ class TestTaskJobCommand extends Command
 
     public function handle()
     {
+        $task = Task::create([
+            'resource_id' => "i-abcdef12"
+        ]);
+
         $this->info('TestJobCommand: Dispatching job');
-        dispatch(new TestTaskJob(Instance::findOrFail("i-0efdbc98")));
+        dispatch(new TestTaskChildJob($task));
         $this->info('TestJobCommand: Dispatched job');
     }
 }

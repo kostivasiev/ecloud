@@ -17,11 +17,11 @@ use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
-use App\Jobs\TaskJob;
+use App\Jobs\TaskChildJob;
 use App\Models\V2\Instance;
 
 
-class TestTaskJob extends TaskJob
+class TestTaskChildJob extends TaskChildJob
 {
     private $data;
 

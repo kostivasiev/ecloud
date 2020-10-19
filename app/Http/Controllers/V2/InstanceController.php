@@ -16,6 +16,7 @@ use App\Jobs\Instance\PowerReset;
 use App\Jobs\Instance\UpdateTask;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\Task;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
@@ -147,7 +148,12 @@ class InstanceController extends BaseController
             'locked'
         ]))->save();
 
-        dispatch(new UpdateTask($instance, $request->all()));
+
+        $task = Task::create([
+            'resource_id' => $this->getKey(),
+        ]);
+
+        dispatch(new UpdateTask($task, $instance, $request->all()));
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }

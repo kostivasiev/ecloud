@@ -16,9 +16,9 @@ class UpdateTask extends TaskJob
     private $instance;
     private $data;
 
-    public function __construct(Instance $instance, array $data)
+    public function __construct($task, Instance $instance, array $data)
     {
-        parent::__construct($instance);
+        parent::__construct($task);
 
         $this->instance = $instance;
         $this->data = $data;

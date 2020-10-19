@@ -4,11 +4,11 @@ namespace App\Jobs;
 
 use Illuminate\Support\Facades\Log;
 
-class TestTaskJobChild extends Job
+class TestTaskChildJobChild extends TaskJob
 {
     public function handle()
     {
-        Log::info('TestTaskJobChild: Handling TestTaskJobChild');
+        Log::info('TestTaskChildJobChild: Handling TestTaskChildJobChild');
         $this->fail(new \Exception("test exception"));
         // throw new \Exception("test exception");
     }

@@ -2,7 +2,7 @@
 
 namespace App\Traits\V2;
 
-use App\Models\V2\Task;
+use App\Models\V2\TaskJobStatus;
 
 trait ResourceStatus
 {
