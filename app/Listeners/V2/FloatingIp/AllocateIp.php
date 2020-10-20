@@ -22,17 +22,15 @@ class AllocateIp implements ShouldQueue
      */
     public function handle(Created $event)
     {
-        $floatingIp = $event->model;
-        Log::info('Attempting to allocate IP address to floating IP ' . $floatingIp->getKey());
-        $logMessage = 'Allocate external Ip to floating IP ' . $floatingIp->getKey() . ': ';
-
+        Log::info('Attempting to allocate IP address to floating IP ' . $event->model->getKey());
         $floatingIp = FloatingIp::find($event->model->getKey());
         if (empty($floatingIp)) {
-            $error = $logMessage . 'Failed. Resource has been deleted';
+            $error = 'Failed to allocate floating IP to ' . $event->model->getKey() . '. Resource has been deleted';
             Log::error($error);
             $this->fail(new \Exception($error));
+            return;
         }
-
+        $logMessage = 'Allocate external Ip to floating IP ' . $floatingIp->getKey() . ': ';
 
         $datacentreSiteIds = $floatingIp->vpc->region->availabilityZones->pluck('datacentre_site_id')->unique();
         $networkingAdminClient = app()->make(AdminClient::class);
@@ -53,7 +51,6 @@ class AllocateIp implements ShouldQueue
 
         foreach ($ipRanges as $ipRange) {
             $subnet = Subnet::fromString(long2ip($ipRange->networkAddress) . '/' . $ipRange->cidr);
-
             if (empty($subnet)) {
                 Log::error($logMessage . 'Failed to load subnet details from IP range ' . $ipRange->id);
                 continue;

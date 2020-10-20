@@ -14,8 +14,8 @@ class AddDeletedIndexToFloatingIpsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
-            $table->boolean('deleted')->default(false);
-            $table->unique(['ip_address', 'deleted'], 'idx_unique_ip');
+            $table->integer('deleted', false, true)->default(0);
+            $table->unique(['ip_address', 'deleted'], 'idx_unique_ip_address');
         });
     }
 
@@ -28,11 +28,11 @@ class AddDeletedIndexToFloatingIpsTable extends Migration
     {
         //Separate statement to satisfy SQLite dropping the index
         Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
-            $table->dropUnique('idx_unique_ip');
+            $table->dropUnique('idx_unique_ip_address');
         });
 
         Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
-            $table->dropColumn(['ip_address', 'deleted']);
+            $table->dropColumn(['deleted']);
         });
     }
 }

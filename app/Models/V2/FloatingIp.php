@@ -33,16 +33,12 @@ class FloatingIp extends Model implements Filterable, Sortable
         'deleted'
     ];
 
-    protected $casts = [
-        'deleted' => 'boolean'
-    ];
-
     public static function boot()
     {
         parent::boot();
 
         static::deleting(function ($model) {
-            $model->attributes['deleted'] = true;
+            $model->attributes['deleted'] = time();
             $model->save();
         });
     }

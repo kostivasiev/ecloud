@@ -48,8 +48,7 @@ class Nic extends Model
         parent::boot();
 
         static::deleting(function ($instance) {
-            $instance->attributes['deleted'] = true;
-            $instance->save();
+            $instance->deleted = true;
         });
     }
 
