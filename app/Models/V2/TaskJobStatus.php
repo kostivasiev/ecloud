@@ -20,6 +20,4 @@ class TaskJobStatus extends JobStatus
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $table = 'task_jobs';
-
-    const TASK_FINISHED_STATUSES = [self::STATUS_FINISHED, self::STATUS_FAILED];
 }

@@ -13,7 +13,7 @@ use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
-use App\Jobs\Instance\UpdateTask;
+use App\Jobs\Instance\UpdateTaskJob;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Task;
@@ -149,11 +149,9 @@ class InstanceController extends BaseController
         ]))->save();
 
 
-        $task = Task::create([
-            'resource_id' => $this->getKey(),
-        ]);
+        $task = $instance->createtask();
 
-        dispatch(new UpdateTask($task, $instance, $request->all()));
+        dispatch(new UpdateTaskJob($task, $instance, $request->all()));
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }

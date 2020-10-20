@@ -10,7 +10,6 @@ use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use ResourceStatus;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -21,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, \App\Traits\V2\Resource, \App\Traits\V2\ResourceStatus;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, \App\Traits\V2\Resource;
 
     public const STATUS_READY = 'ready';
     public const STATUS_CREATING = 'creating';

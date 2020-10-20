@@ -12,10 +12,12 @@ abstract class TaskJob extends \App\Jobs\Job {
 
     protected $task;
 
-    public function __construct($task)
+    public function __construct(Task $task = null)
     {
-        $this->prepareStatus();
-        $this->update(['task_id' => $task->getKey()]);
-        $this->task = $task;
+        if ($task) {
+            $this->prepareStatus();
+            $this->update(['task_id' => $task->getKey()]);
+            $this->task = $task;
+        }
     }
 }

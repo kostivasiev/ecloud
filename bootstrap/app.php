@@ -132,7 +132,6 @@ $app->bind(\Illuminate\Queue\QueueManager::class, function ($app) {
 });
 
 $app->register(Imtigger\LaravelJobStatus\LaravelJobStatusServiceProvider::class);
-$app->register(Imtigger\LaravelJobStatus\LaravelJobStatusBusServiceProvider::class);
 
 // ErdGenerator - Only enable on dev
 if (is_dir($app->basePath('vendor/beyondcode/laravel-er-diagram-generator'))) {
