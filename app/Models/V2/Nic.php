@@ -49,6 +49,7 @@ class Nic extends Model
 
         static::deleting(function ($instance) {
             $instance->attributes['deleted'] = time();
+            $instance->save();
         });
     }
 
