@@ -38,8 +38,13 @@ class PrepareOsDisk extends Job
 
         // Expand disk - Single volume for MVP
         try {
+            $volume = $instance->volumes->first();
+            $volume->capacity = $this->data['volume_capacity'];
+            $volume->save();
+
+            // TODO - Move to "volume.updated"
             $response = $instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $instance->volumes->first()->vmware_uuid . '/size',
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size',
                 [
                     'json' => [
                         'sizeGiB' => $this->data['volume_capacity'],
