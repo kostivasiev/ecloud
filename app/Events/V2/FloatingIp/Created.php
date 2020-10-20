@@ -5,7 +5,7 @@ namespace App\Events\V2\FloatingIp;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Creating
+class Created
 {
     use SerializesModels;
 

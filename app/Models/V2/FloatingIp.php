@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FloatingIp\Creating;
+use App\Events\V2\FloatingIp\Created;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,16 +29,23 @@ class FloatingIp extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $fillable = [
         'id',
-        'vpc_id'
+        'vpc_id',
+        'deleted'
     ];
 
-    protected $visible = [
-        'id',
-        'vpc_id',
-        'ip_address',
-        'created_at',
-        'updated_at',
+    protected $casts = [
+        'deleted' => 'boolean'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($model) {
+            $model->attributes['deleted'] = true;
+            $model->save();
+        });
+    }
 
     public function vpc()
     {
@@ -59,7 +66,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     }
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     /**
