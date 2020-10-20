@@ -28,7 +28,7 @@ class Task extends Model
 
     public function getIsFailedAttribute()
     {
-        $this->jobStatuses()->get()->filter(function($status) {
+        return $this->jobStatuses()->get()->filter(function($status) {
             return $status->is_failed;
         })->count() > 0;
     }
