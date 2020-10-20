@@ -23,16 +23,12 @@ trait Resource
     // else status will be STATUS_READY
     public function getStatusAttribute()
     {
-        if ($this->tasks()->count() == 1 && $this->tasks()->latest()->first()->is_failed) {
+        if ($this->tasks()->count() > 0 && $this->tasks()->latest()->first()->is_failed) {
             return self::STATUS_FAILED;
         }
 
-        if ($this->tasks()->count() == 1 && !$this->tasks()->latest()->first()->is_ended) {
-            return self::STATUS_CREATING;
-        }
-
         if ($this->task_running) {
-            return self::STATUS_UPDATING;
+            return self::STATUS_PROVISIONING;
         }
 
         return self::STATUS_READY;
@@ -48,8 +44,6 @@ trait Resource
             throw new \Exception("Task already running for resource");
         }
 
-        return Task::create([
-            'resource_id' => $this->getKey()
-        ]);
+        return $this->tasks()->create();
     }
 }

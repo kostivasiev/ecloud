@@ -50,7 +50,6 @@ class InstanceResource extends UKFastResource
             'locked' => $this->locked,
             'platform' => $this->platform,
             'volume_capacity' => $this->volume_capacity,
-            'task_running' => $this->task_running,
             'status' => $this->status,
             'created_at' => Carbon::parse(
                 $this->created_at,
@@ -63,6 +62,7 @@ class InstanceResource extends UKFastResource
         ];
         if ($request->user->isAdministrator) {
             $response['appliance_version_id'] = $this->appliance_version_id;
+            $response['task_running'] = $this->task_running;
         }
         if ($request->route('instanceId')) {
             $kingpinData = null;

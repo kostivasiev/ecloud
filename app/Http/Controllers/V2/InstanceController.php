@@ -149,7 +149,7 @@ class InstanceController extends BaseController
         ]))->save();
 
 
-        $task = $instance->createtask();
+        $task = $instance->createTask();
 
         dispatch(new UpdateTaskJob($task, $instance, $request->all()));
 

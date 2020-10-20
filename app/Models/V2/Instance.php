@@ -23,8 +23,7 @@ class Instance extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, \App\Traits\V2\Resource;
 
     public const STATUS_READY = 'ready';
-    public const STATUS_CREATING = 'creating';
-    public const STATUS_UPDATING = 'updating';
+    public const STATUS_PROVISIONING = 'provisioning';
     public const STATUS_FAILED = 'failed';
 
     public $keyPrefix = 'i';
