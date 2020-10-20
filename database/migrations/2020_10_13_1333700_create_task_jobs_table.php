@@ -3,16 +3,17 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateTasksTable extends Migration
+class CreateTaskJobsTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('tasks', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('task_jobs', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('job_id')->index()->nullable();
+            $table->string('task_id')->index();
             $table->string('type')->index();
             $table->string('queue')->index()->nullable();
             $table->integer('attempts')->default(0);
@@ -32,6 +33,6 @@ class CreateTasksTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->drop('tasks');
+        Schema::connection('ecloud')->drop('task_jobs');
     }
 }
