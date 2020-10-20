@@ -15,8 +15,7 @@ abstract class TaskJob extends \App\Jobs\Job {
     public function __construct(Task $task = null)
     {
         if ($task) {
-            $this->prepareStatus();
-            $this->update(['task_id' => $task->getKey()]);
+            $this->prepareStatus(['task_id' => $task->getKey()]);
             $this->task = $task;
         }
     }
