@@ -48,7 +48,9 @@ class AssignFloatingIp extends Job
 
             $nat = new Nat;
             $nat->destination = $destination;
+            $nat->destinationable_type = 'fip';
             $nat->translated = $nic->getKey();
+            $nat->translatedable_type = 'nic';
             $nat->save();
 
             Log::info('Floating IP (' . $destination . ') assigned to NIC (' . $nic->getKey() . ')');

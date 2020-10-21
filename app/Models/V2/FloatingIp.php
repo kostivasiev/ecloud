@@ -18,6 +18,7 @@ use UKFast\DB\Ditto\Sortable;
  * @package App\Models\V2
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
+ * @method static forUser($user)
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {

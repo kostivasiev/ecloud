@@ -36,9 +36,7 @@ class AppServiceProvider extends ServiceProvider
 
 
         Relation::morphMap([
-            'nic' => Nic::class
-        ]);
-        Relation::morphMap([
+            'nic' => Nic::class,
             'fip' => FloatingIp::class
         ]);
     }

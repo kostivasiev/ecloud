@@ -116,22 +116,6 @@ client.test("Request executed successfully", function() {
 
 ###
 
-
-
-POST https://ecloud-apio.paul.rnd.ukfast/v2/floating-ips/{{fip_id}}/assign
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-  "resource_id": "nic-abc123"
-}
-
-
-###
-
 PATCH https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache

@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property string $destination Floating IP ID
  * @property string $translated NIC ID
+ * @property string $destinationable_type model type of the destination resource (See AppServiceProvider for morph maps)
+ * @property string $translatedable_type model type of the translated resource (See AppServiceProvider for morph maps)
  */
 class Nat extends Model
 {
