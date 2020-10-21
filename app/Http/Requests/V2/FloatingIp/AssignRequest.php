@@ -42,6 +42,8 @@ class AssignRequest extends FormRequest
      */
     public function messages()
     {
-        return [];
+        return [
+            'resource_id.required' => 'The :attribute field is required',
+        ];
     }
 }
