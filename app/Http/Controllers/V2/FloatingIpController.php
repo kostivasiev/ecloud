@@ -55,7 +55,6 @@ class FloatingIpController extends BaseController
             $request->only(['vpc_id', 'name'])
         );
         $resource->save();
-        $resource->refresh();
         return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
 

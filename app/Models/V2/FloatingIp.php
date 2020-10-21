@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FloatingIp\Creating;
+use App\Events\V2\FloatingIp\Created;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -32,8 +32,19 @@ class FloatingIp extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
-        'vpc_id'
+        'vpc_id',
+        'deleted'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($model) {
+            $model->attributes['deleted'] = time();
+            $model->save();
+        });
+    }
 
     public function vpc()
     {
@@ -54,7 +65,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     }
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
+        'created' => Created::class,
     ];
 
     /**
