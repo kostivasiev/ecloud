@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\V2\FloatingIp;
+use App\Models\V2\Nic;
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use UKFast\Helpers\Encryption\RemoteKeyStore;
@@ -30,5 +33,13 @@ class AppServiceProvider extends ServiceProvider
             Cache::put('encryption_key', $key, new \DateInterval('PT120S'));
             return $key;
         });
+
+
+        Relation::morphMap([
+            'nic' => Nic::class
+        ]);
+        Relation::morphMap([
+            'fip' => FloatingIp::class
+        ]);
     }
 }

@@ -32,4 +32,37 @@ class Nat extends Model
     protected $dispatchesEvents = [
         'created' => NatCreated::class,
     ];
+
+    /**
+     * Load the associated destination resource
+     * @return Model|\Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function destination()
+    {
+        return $this->destinationable()->firstOrFail();
+    }
+
+    /**
+     * Load the associated translated resource
+     * @return Model|\Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function translated()
+    {
+        return $this->translatedable()->firstOrFail();
+    }
+
+    /**
+     * Return a polymorphic relation between NAT linked resources
+     * See: https://www.richardbagshaw.co.uk/laravel-user-types-and-polymorphic-relationships/
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function destinationable()
+    {
+        return $this->morphTo('destinationable', null, 'destination', 'id');
+    }
+
+    public function translatedable()
+    {
+        return $this->morphTo('translatedable', null, 'translated', 'id');
+    }
 }

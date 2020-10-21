@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Nat;
 use App\Resources\V2\FloatingIpResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -83,4 +84,18 @@ class FloatingIpController extends BaseController
         $resource->delete();
         return response()->json([], 204);
     }
+
+    public function assign(Request $request, string $fipId)
+    {
+        $nat = Nat::findOrFail('nat-03d857ef');
+
+        exit(print_r(
+            [
+                $nat->destination(),
+                $nat->translated()
+            ]
+        ));
+
+    }
+
 }
