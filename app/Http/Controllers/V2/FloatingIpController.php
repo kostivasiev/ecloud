@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateFloatingIpRequest;
-use App\Http\Requests\V2\UpdateFloatingIpRequest;
+use App\Http\Requests\V2\FloatingIp\CreateRequest;
+use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Models\V2\FloatingIp;
 use App\Resources\V2\FloatingIpResource;
 use Illuminate\Http\Request;
@@ -46,27 +46,27 @@ class FloatingIpController extends BaseController
     }
 
     /**
-     * @param CreateFloatingIpRequest $request
+     * @param CreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateFloatingIpRequest $request)
+    public function store(CreateRequest $request)
     {
         $resource = new FloatingIp(
-            $request->only(['vpc_id'])
+            $request->only(['vpc_id', 'name'])
         );
         $resource->save();
         return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
 
     /**
-     * @param UpdateFloatingIpRequest $request
+     * @param UpdateRequest $request
      * @param string $instanceId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateFloatingIpRequest $request, string $fipId)
+    public function update(UpdateRequest $request, string $fipId)
     {
         $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
-        //$instance->fill($request->only([]));
+        $resource->fill($request->only(['name']));
         $resource->save();
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }

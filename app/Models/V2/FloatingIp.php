@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Created;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -20,15 +21,17 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;
     public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
+
     protected $fillable = [
         'id',
+        'name',
         'vpc_id',
         'deleted'
     ];
@@ -73,6 +76,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('ip_address', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -89,6 +93,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('name'),
             $factory->create('vpc_id'),
             $factory->create('ip_address'),
             $factory->create('created_at'),
@@ -114,6 +119,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
+            'name' => 'name',
             'vpc_id' => 'vpc_id',
             'ip_address' => 'ip_address',
             'created_at' => 'created_at',
