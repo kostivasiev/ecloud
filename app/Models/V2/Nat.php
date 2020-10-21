@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property string $destination Floating IP ID
  * @property string $translated NIC ID
+ * @property string $destinationable_type model type of the destination resource (See AppServiceProvider for morph maps)
+ * @property string $translatedable_type model type of the translated resource (See AppServiceProvider for morph maps)
  */
 class Nat extends Model
 {
@@ -32,4 +34,22 @@ class Nat extends Model
     protected $dispatchesEvents = [
         'created' => NatCreated::class,
     ];
+
+    /**
+     * Load the associated destination resource
+     * @return Model|\Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function destination()
+    {
+        return $this->morphTo('destinationable', null, 'destination', 'id')->firstOrFail();
+    }
+
+    /**
+     * Load the associated translated resource
+     * @return Model|\Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function translated()
+    {
+        return $this->morphTo('translatedable', null, 'translated', 'id')->firstOrFail();
+    }
 }

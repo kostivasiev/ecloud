@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Nat;
 use App\Resources\V2\FloatingIpResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -35,13 +40,13 @@ class FloatingIpController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $instanceId
+     * @param string fipId
      * @return FloatingIpResource
      */
-    public function show(Request $request, string $instanceId)
+    public function show(Request $request, string $fipId)
     {
         return new FloatingIpResource(
-            FloatingIp::forUser($request->user)->findOrFail($instanceId)
+            FloatingIp::forUser($request->user)->findOrFail($fipId)
         );
     }
 
@@ -81,5 +86,41 @@ class FloatingIpController extends BaseController
         $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
         $resource->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @param AssignRequest $request
+     * @param string $fipId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     */
+    public function assign(AssignRequest $request, string $fipId)
+    {
+        $request['id'] = $fipId;
+        $this->validate(
+            $request,
+            ['id' => 'unique:ecloud.nats,destination'],
+            ['id.unique' => 'The floating IP is already assigned']
+        );
+
+        $fip = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
+
+        $nat = new Nat;
+        $nat->destination = $fip->getKey();
+        $nat->destinationable_type = 'fip';
+        $nat->translated = $request->resource_id;
+
+        foreach (Relation::morphMap() as $map => $model) {
+            try {
+                $model::forUser(app('request')->user)->findOrFail($request->resource_id);
+                $nat->translatedable_type = $map;
+                break;
+            } catch (ModelNotFoundException $exception) {
+                continue;
+            }
+        }
+
+        $nat->save();
+
+        return response(null, 200);
     }
 }

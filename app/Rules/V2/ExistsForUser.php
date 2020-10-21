@@ -14,12 +14,20 @@ class ExistsForUser implements Rule
 
     public function passes($attribute, $value)
     {
-        try {
-            $this->model::forUser(app('request')->user)->findOrFail($value);
-        } catch (ModelNotFoundException $exception) {
-            return false;
+        if (!is_array($this->model)) {
+            $this->model = [$this->model];
         }
-        return true;
+
+        foreach ($this->model as $model) {
+            try {
+                $model::forUser(app('request')->user)->findOrFail($value);
+                return true;
+            } catch (ModelNotFoundException $exception) {
+                continue;
+            }
+        }
+
+        return false;
     }
 
     /**
