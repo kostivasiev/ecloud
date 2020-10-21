@@ -97,3 +97,40 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
+
+
+
+
+
+### Tear down dependancies
+
+DELETE https://{{host}}/{{version}}/regions/{{region_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+DELETE https://{{host}}/{{version}}/availability_zones/{{availability_zone_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+DELETE https://{{host}}/{{version}}/vpc/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+DELETE https://ecloud-apio.paul.rnd.ukfast/v2/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
