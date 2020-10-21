@@ -119,6 +119,7 @@ class FloatingIpController extends BaseController
                 continue;
             }
         }
+
         $nat->save();
 
         return response(null, 200);
