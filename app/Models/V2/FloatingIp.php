@@ -37,6 +37,10 @@ class FloatingIp extends Model implements Filterable, Sortable
         'deleted'
     ];
 
+    protected $dispatchesEvents = [
+        'created' => Created::class,
+    ];
+
     public static function boot()
     {
         parent::boot();
@@ -77,10 +81,6 @@ class FloatingIp extends Model implements Filterable, Sortable
         }
         return $query;
     }
-
-    protected $dispatchesEvents = [
-        'created' => Created::class,
-    ];
 
     /**
      * @param FilterFactory $factory
