@@ -34,6 +34,34 @@ client.log('Availability Zone ID: ' + response.body.data.id);
 %}
 
 ###
+
+POST https://{{host}}/{{version}}/credentials
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "NSX",
+  "resource_id": "{{availability_zone_id}}",
+  "host": "https://185.197.63.88",
+  "username": "ecloud.api@ecloudgov.dev",
+  "password": "a5hfysIVpUND"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('nsx_credential_id', response.body.data.id);
+client.log('NSX Credential ID: ' + response.body.data.id);
+%}
+
+###
+
+
 POST https://{{host}}/{{version}}/vpcs
 Accept: */*
 Cache-Control: no-cache
@@ -99,8 +127,18 @@ client.test("Request executed successfully", function() {
 ###
 
 
+GET https://ecloud-apio.paul.rnd.ukfast/v2/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
 
-
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.resource_id === "nic-4c036986", "Assigned resource ID was not returned in response");
+});
+%}
 
 ### Tear down dependancies
 
