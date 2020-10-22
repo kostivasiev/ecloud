@@ -28,8 +28,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = AvailabilityZone::query();
-
+        $collection = AvailabilityZone::forUser($request->user);
         $queryTransformer->config(AvailabilityZone::class)
             ->transform($collection);
 
@@ -46,7 +45,7 @@ class AvailabilityZoneController extends BaseController
     public function show(Request $request, string $zoneId)
     {
         return new AvailabilityZoneResource(
-            AvailabilityZone::findOrFail($zoneId)
+            AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
         );
     }
 
@@ -99,7 +98,7 @@ class AvailabilityZoneController extends BaseController
     public function routers(Request $request, string $zoneId)
     {
         return RouterResource::collection(
-            AvailabilityZone::findOrFail($zoneId)
+            AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
                 ->routers()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
@@ -113,7 +112,7 @@ class AvailabilityZoneController extends BaseController
     public function dhcps(Request $request, string $zoneId)
     {
         return DhcpResource::collection(
-            AvailabilityZone::findOrFail($zoneId)
+            AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
                 ->dhcps()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
@@ -127,7 +126,7 @@ class AvailabilityZoneController extends BaseController
     public function credentials(Request $request, string $zoneId)
     {
         return CredentialResource::collection(
-            AvailabilityZone::findOrFail($zoneId)
+            AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
                 ->credentials()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
@@ -141,7 +140,7 @@ class AvailabilityZoneController extends BaseController
     public function instances(Request $request, string $zoneId)
     {
         return InstanceResource::collection(
-            AvailabilityZone::findOrFail($zoneId)
+            AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
                 ->instances()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
@@ -155,7 +154,7 @@ class AvailabilityZoneController extends BaseController
     public function lbcs(Request $request, string $zoneId)
     {
         return LoadBalancerClusterResource::collection(
-            AvailabilityZone::findOrFail($zoneId)
+            AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
                 ->loadBalancerClusters()
                 ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
         );
