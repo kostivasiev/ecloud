@@ -37,6 +37,10 @@ class FloatingIp extends Model implements Filterable, Sortable
         'deleted'
     ];
 
+    protected $dispatchesEvents = [
+        'created' => Created::class,
+    ];
+
     public static function boot()
     {
         parent::boot();
@@ -52,6 +56,19 @@ class FloatingIp extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function nat()
+    {
+        return $this->morphOne(Nat::class, 'destinationable', null, 'destination');
+    }
+
+    public function getResourceIdAttribute()
+    {
+        return ($this->nat) ? $this->nat->translated : null;
+    }
+
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
@@ -64,10 +81,6 @@ class FloatingIp extends Model implements Filterable, Sortable
         }
         return $query;
     }
-
-    protected $dispatchesEvents = [
-        'created' => Created::class,
-    ];
 
     /**
      * @param FilterFactory $factory

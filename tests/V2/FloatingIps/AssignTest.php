@@ -75,6 +75,21 @@ class AssignTest extends TestCase
             'ecloud'
         )
             ->assertResponseStatus(200);
+
+        $this->assertEquals($this->nic->getKey(), $this->floatingIp->resourceId);
+
+        $this->get(
+            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $this->floatingIp->getKey(),
+                'resource_id' => $this->nic->getKey()
+            ])
+            ->assertResponseStatus(200);
     }
 
 }
