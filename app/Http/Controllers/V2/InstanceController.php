@@ -124,7 +124,9 @@ class InstanceController extends BaseController
         $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
-        event(new Deploy($instanceDeployData));
+
+        $task = $instance->createTask();
+        event(new Deploy($task, $instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
@@ -150,7 +152,6 @@ class InstanceController extends BaseController
 
 
         $task = $instance->createTask();
-
         dispatch(new UpdateTaskJob($task, $instance, $request->all()));
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
@@ -231,7 +232,8 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOn([
+        $task = $instance->createTask();
+        $this->dispatch(new PowerOn($task, [
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));

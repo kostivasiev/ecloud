@@ -38,19 +38,19 @@ class Deploy implements ShouldQueue
         $data = (array)$data;
 
         // Create the chained jobs for deployment
-        dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
-            new ConfigureNics($data),
-            new AssignFloatingIp($data),
-            new UpdateNetworkAdapter($data),
-            new OsCustomisation($data),
-            new PowerOn($data),
-            new WaitOsCustomisation($data),
-            new PrepareOsUsers($data),
-            new PrepareOsDisk($data),
-            new ConfigureWinRm($data),
-            new ActivateWindows($data),
-            new RunApplianceBootstrap($data),
-            new RunBootstrapScript($data),
+        dispatch((new \App\Jobs\Instance\Deploy\Deploy($event->task, $data))->chain([
+            new ConfigureNics($event->task, $data),
+            new AssignFloatingIp($event->task, $data),
+            new UpdateNetworkAdapter($event->task, $data),
+            new OsCustomisation($event->task, $data),
+            new PowerOn($event->task, $data),
+            new WaitOsCustomisation($event->task, $data),
+            new PrepareOsUsers($event->task, $data),
+            new PrepareOsDisk($event->task, $data),
+            new ConfigureWinRm($event->task, $data),
+            new ActivateWindows($event->task, $data),
+            new RunApplianceBootstrap($event->task, $data),
+            new RunBootstrapScript($event->task, $data),
         ]));
     }
 }

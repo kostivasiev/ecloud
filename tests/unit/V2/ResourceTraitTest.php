@@ -121,6 +121,25 @@ class ResourceTraitTest extends TestCase
     }
 
     /**
+     * Test resource status attribute is provisioning with running task
+     */
+    public function testStatusProvisioningWithRunningTaskAndFinishedTask()
+    {
+        $task = $this->instance->tasks()->create();
+        $task->jobStatuses()->create([
+            'type' => 'testjob',
+            'status' => TaskJobStatus::STATUS_QUEUED,
+        ]);
+
+        $task->jobStatuses()->create([
+            'type' => 'testjob',
+            'status' => TaskJobStatus::STATUS_FINISHED,
+        ]);
+
+        $this->assertEquals(Instance::STATUS_PROVISIONING, $this->instance->status);
+    }
+
+    /**
      * Test createTask() throws with running task for resource
      */
     public function testCreateTaskThrowsWithRunningTask()
