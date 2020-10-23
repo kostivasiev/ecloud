@@ -12,6 +12,7 @@ use IPLib\Range\Subnet;
 
 class ConfigureNics extends TaskJob
 {
+    public $tries = 20;
     const RETRY_ATTEMPTS = 10;
     const RETRY_DELAY = 10;
 
