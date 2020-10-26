@@ -1,4 +1,5 @@
-<!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
+<!-- Title: Change-Request-or-Feature.md -->
+<!-- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
 ### What is the Feature/Change?
 <!-- Enter clear and concise description of what your feature or change request is. -->
@@ -23,6 +24,8 @@
 - [ ] <!-- e.g. Must do A for this to be complete -->
 - [ ] <!-- e.g. Must do B for this to be complete -->
 
+
+<!-- ENFORCEMENT-END -->
 
 ### How would you categorise this?
 <!--- Delete as appropriate -->

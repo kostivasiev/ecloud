@@ -1,11 +1,64 @@
-Feedback: null
-Identifier: iddqd
-LeadEngineer: lee.spottiswood
+Version: 0.5
+
+# Where did this settings file come from?
 Origin: caretaker
+
+# Helps us find all the caretaker projects in GitLab.
+Identifier: iddqd
+
+# Should this project have issue templates injected into it?
+# Templates are stored in https://gitlab.devops.ukfast.co.uk/ukfast/team-projects/devops/kpi/template-enforcer/-/tree/master/Templates
+TemplatesInjected: true
+
+# Should a comment be left on a new issue if it doesn't use a template, 
+# or if the template is not filled in correctly. 
+TemplatesEnforced: true
+
+# If an issue is blocked by another issue, and the blocking issue is closed, 
+# this will leave a comment on the blocked issue as the issue may now be unblocked.
+UnblockedAlerts: true
+
+# This will alert the assignee of an issue when the total amount of time that `Doing`
+# labels have been active on the issue, has exceeded the time set in the issue estimate.
+# Note that we only count working hours on weekdays, eg: Mon-Fri 08:00-16:30.
+EstimationExceeded: true
+
+# If an issue is found that has no status, an `Awaiting Manager Authorisation` label will be added.
+NoStatus: true
+
+# If an issue is marked as `Doing` but hasn't had any label modifications or comments left on it
+# for over 7 days, a comment will be left questioning whether the issue is still being worked on.
+IdleIssue: true
+
+# Requires that a due date be set on all issues.
+DueDateRequired: true
+
+# Requires that an estimate be set on all issues.
+EstimateRequired: true
+
+# Requires that a weight be set on all issues.
+WeightRequired: true
+
+# Leaves a comment on closed issues that have been given an estimate, but not had any time spent set.
+TimeSpentRequired: true
+
+# Ensures only a single Team label ['DevOps', 'PHP', 'DotNET'] is set on an issue.
+SingleTeam: true
+
+# Label that gets applied to every issue.
+Team:
+
+# TBA
+Feedback:
+
+# Project Roles
 ProductManager: C.Evans
+LeadEngineer: lee.spottiswood
 ProjectManager: james.littlefair
-Sponsor: chris.folkerd
-Team: null
 TeamManager: gavin.taylor
+Sponsor: chris.folkerd
 Triager: gavin.taylor
-Version: 0.1
+
+# Is this project a deliverable with an end goal? Will it require a one pager?
+# If so, that is a PMOProject and this should be marked as `true`.
+PMOProject:

@@ -143,5 +143,12 @@ class EventServiceProvider extends ServiceProvider
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
         ],
+
+
+        // Nat
+        \App\Events\V2\Nat\Created::class => [
+        ],
+        \App\Events\V2\Nat\Deleted::class => [
+        ],
     ];
 }

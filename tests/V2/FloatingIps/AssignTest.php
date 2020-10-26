@@ -5,6 +5,7 @@ namespace Tests\V2\FloatingIps;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\Nat;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
@@ -77,7 +78,7 @@ class AssignTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
 
         $this->assertEquals($this->nic->getKey(), $this->floatingIp->resourceId);
 
@@ -95,4 +96,56 @@ class AssignTest extends TestCase
             ->assertResponseStatus(200);
     }
 
+
+    public function testUnAssignIsSuccessful()
+    {
+        $nat = factory(Nat::class)->create([
+            'destination' => $this->floatingIp->getKey(),
+            'destinationable_type' => 'fip',
+            'translated' => $this->nic->getKey(),
+            'translatedable_type' => 'nic'
+        ]);
+
+        $this->get(
+            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $this->floatingIp->getKey(),
+                'resource_id' => $this->nic->getKey()
+            ])
+            ->assertResponseStatus(200);
+
+        $this->post(
+            '/v2/floating-ips/' . $this->floatingIp->getKey() . '/unassign',
+            [
+                'resource_id' => $this->nic->getKey()
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->assertResponseStatus(202);
+
+        $nat->refresh();
+
+        $this->assertNotNull($nat->deleted_at);
+
+        $this->get(
+            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $this->floatingIp->getKey(),
+                'resource_id' => null
+            ])
+            ->assertResponseStatus(200);
+    }
 }

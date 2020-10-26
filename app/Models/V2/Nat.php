@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Nat\Created;
+use App\Events\V2\Nat\Deleted;
 use App\Events\V2\Nat\Saved;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,7 @@ class Nat extends Model
     protected $dispatchesEvents = [
         'created' => Created::class,
         'saved' => Saved::class,
+        'deleted' => Deleted::class,
     ];
 
     public function destination()
