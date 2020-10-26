@@ -91,7 +91,7 @@ class FloatingIpController extends BaseController
     /**
      * @param AssignRequest $request
      * @param string $fipId
-* fix response     * @return Response
+     * @return Response
      */
     public function assign(AssignRequest $request, string $fipId)
     {
