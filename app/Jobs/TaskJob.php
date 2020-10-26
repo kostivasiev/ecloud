@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Imtigger\LaravelJobStatus\Trackable;
 
-abstract class TaskJob extends \App\Jobs\Job {
+abstract class TaskJob extends \App\Jobs\Job
+{
     use Trackable;
 
     protected $task;

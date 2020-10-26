@@ -27,8 +27,8 @@ class Task extends Model
     public function getIsFailedAttribute()
     {
         return $this->jobStatuses()->get()->filter(function ($status) {
-                return $status->is_failed;
-            })->count() > 0;
+            return $status->is_failed;
+        })->count() > 0;
     }
 
     public function jobStatuses()
@@ -39,7 +39,7 @@ class Task extends Model
     public function getIsEndedAttribute()
     {
         return $this->jobStatuses()->count() == 0 || $this->jobStatuses()->get()->filter(function ($status) {
-                return !$status->is_ended;
-            })->count() < 1;
+            return !$status->is_ended;
+        })->count() < 1;
     }
 }

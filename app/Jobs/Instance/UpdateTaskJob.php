@@ -40,9 +40,7 @@ class UpdateTaskJob extends TaskJob
             $parameters['ramMiB'] = $this->data['ram_capacity'];
             $this->instance->ram_capacity = $this->data['ram_capacity'];
 
-            if (($this->instance->ram_capacity > $this->data['ram_capacity'])
-                || ($this->instance->ram_capacity <= $ram_limit && $this->data['ram_capacity'] > $ram_limit)) {
-
+            if (($this->instance->ram_capacity > $this->data['ram_capacity']) || ($this->instance->ram_capacity <= $ram_limit && $this->data['ram_capacity'] > $ram_limit)) {
                 $reboot = true;
             }
         }
