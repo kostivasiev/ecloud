@@ -21,7 +21,7 @@ class FirewallPolicy extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName;
 
-    public $keyPrefix = 'pcy';
+    public $keyPrefix = 'fwp';
     public $incrementing = false;
     public $timestamps = true;
     protected $keyType = 'string';
