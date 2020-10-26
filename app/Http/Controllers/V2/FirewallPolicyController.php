@@ -22,7 +22,7 @@ class FirewallPolicyController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallPolicy::forUser($request);
+        $collection = FirewallPolicy::forUser($request->user);
 
         $queryTransformer->config(FirewallPolicy::class)
             ->transform($collection);
@@ -40,7 +40,7 @@ class FirewallPolicyController extends BaseController
     public function show(Request $request, string $firewallPolicyId)
     {
         return new FirewallPolicyResource(
-            FirewallPolicy::forUser($request)->findOrFail($firewallPolicyId)
+            FirewallPolicy::forUser($request->user)->findOrFail($firewallPolicyId)
         );
     }
 
