@@ -33,6 +33,7 @@ $app->configure('erd-generator');
 $app->configure('instance');
 $app->configure('volume');
 $app->configure('kingpin');
+$app->configure('job-status');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -126,6 +127,13 @@ $app->register(App\Providers\BillingServiceProvider::class);
 
 // NSX service provider
 $app->register(App\Providers\V2\NsxServiceProvider::class);
+
+// Job status
+$app->bind(\Illuminate\Queue\QueueManager::class, function ($app) {
+    return new \Illuminate\Queue\QueueManager($app);
+});
+
+$app->register(Imtigger\LaravelJobStatus\LaravelJobStatusServiceProvider::class);
 
 // ErdGenerator - Only enable on dev
 if (is_dir($app->basePath('vendor/beyondcode/laravel-er-diagram-generator'))) {

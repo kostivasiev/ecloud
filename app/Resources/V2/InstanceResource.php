@@ -26,6 +26,8 @@ use Log;
  * @property string agent_running
  * @property string platform
  * @property integer volume_capacity
+ * @property boolean task_running
+ * @property string status
  * @property string created_at
  * @property string updated_at
  */
@@ -48,6 +50,7 @@ class InstanceResource extends UKFastResource
             'locked' => $this->locked,
             'platform' => $this->platform,
             'volume_capacity' => $this->volume_capacity,
+            'status' => $this->status,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))
@@ -59,6 +62,7 @@ class InstanceResource extends UKFastResource
         ];
         if ($request->user->isAdministrator) {
             $response['appliance_version_id'] = $this->appliance_version_id;
+            $response['task_running'] = $this->task_running;
         }
         if ($request->route('instanceId')) {
             $kingpinData = null;

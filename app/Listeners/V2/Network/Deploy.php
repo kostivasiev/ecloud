@@ -14,6 +14,8 @@ class Deploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
+    public $tries = 20;
+
     const ROUTER_RETRY_ATTEMPTS = 10;
 
     const ROUTER_RETRY_DELAY = 10;
