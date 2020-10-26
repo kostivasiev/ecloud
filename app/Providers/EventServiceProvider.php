@@ -110,6 +110,8 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Nat\Saved::class => [
             \App\Listeners\V2\Nat\Deploy::class
         ],
+        \App\Events\V2\Nat\Deleted::class => [
+        ],
 
         // Nic
         \App\Events\V2\Nic\Creating::class => [
@@ -142,13 +144,6 @@ class EventServiceProvider extends ServiceProvider
 
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
-        ],
-
-
-        // Nat
-        \App\Events\V2\Nat\Created::class => [
-        ],
-        \App\Events\V2\Nat\Deleted::class => [
         ],
     ];
 }
