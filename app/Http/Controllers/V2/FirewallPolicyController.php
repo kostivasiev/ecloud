@@ -50,7 +50,7 @@ class FirewallPolicyController extends BaseController
     public function store(CreateFirewallPolicyRequest $request)
     {
         $policy = new FirewallPolicy();
-        $policy->fill($request->only(['name', 'sequence']));
+        $policy->fill($request->only(['name', 'sequence', 'router_id']));
         $policy->save();
         $policy->refresh();
         return $this->responseIdMeta($request, $policy->getKey(), 201);
@@ -64,7 +64,7 @@ class FirewallPolicyController extends BaseController
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
         $policy = FirewallPolicy::findOrFail($firewallPolicyId);
-        $policy->fill($request->only(['name', 'sequence']));
+        $policy->fill($request->only(['name', 'sequence', 'router_id']));
         $policy->save();
         return $this->responseIdMeta($request, $policy->getKey(), 200);
     }

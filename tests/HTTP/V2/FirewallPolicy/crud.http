@@ -7,7 +7,8 @@ Content-Type:  application/json
 
 {
   "name": "Test Policy",
-  "sequence": 10
+  "sequence": 10,
+  "router_id": "rtr-8240e9e5"
 }
 
 > {%
@@ -42,6 +43,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.id === client.global.get('policy_id'), "Incorrect resource ID returned");
   client.assert(response.body.data.name === "Test Policy");
+  client.assert(response.body.data.router_id === "rtr-8240e9e5");
   client.assert(response.body.data.sequence === 10);
 });
 %}

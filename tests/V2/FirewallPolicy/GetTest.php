@@ -2,7 +2,11 @@
 
 namespace Tests\V2\FirewallPolicy;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\Region;
+use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -10,12 +14,28 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $policy;
+    protected FirewallPolicy $policy;
+    protected Region $region;
+    protected Router $router;
+    protected Vpc $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->policy = factory(FirewallPolicy::class)->create()->first();
+
+        $this->region = factory(Region::class)->create();
+        factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey()
+        ]);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey()
+        ]);
+        $this->policy = factory(FirewallPolicy::class)->create([
+            'router_id' => $this->router->id,
+        ])->first();
     }
 
     public function testGetCollection()
@@ -28,9 +48,10 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'       => $this->policy->id,
-                'name'     => $this->policy->name,
-                'sequence' => $this->policy->sequence,
+                'id'        => $this->policy->getKey(),
+                'name'      => $this->policy->name,
+                'sequence'  => $this->policy->sequence,
+                'router_id' => $this->router->getKey(),
             ])
             ->assertResponseStatus(200);
     }
@@ -45,9 +66,10 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'       => $this->policy->id,
-                'name'     => $this->policy->name,
-                'sequence' => $this->policy->sequence,
+                'id'        => $this->policy->getKey(),
+                'name'      => $this->policy->name,
+                'sequence'  => $this->policy->sequence,
+                'router_id' => $this->router->getKey(),
             ])
             ->assertResponseStatus(200);
     }

@@ -11,6 +11,7 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string sequence
+ * @property string router_id
  * @property string created_at
  * @property string updated_at
  */
@@ -26,6 +27,7 @@ class FirewallPolicyResource extends UKFastResource
             'id'         => $this->id,
             'name'       => $this->name,
             'sequence'   => $this->sequence,
+            'router_id'  => $this->router_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

@@ -29,12 +29,14 @@ class FirewallPolicy extends Model implements Filterable, Sortable
     protected $fillable = [
         'name',
         'sequence',
+        'router_id',
     ];
 
     protected $visible = [
         'id',
         'name',
         'sequence',
+        'router_id',
         'created_at',
         'updated_at',
     ];
@@ -42,6 +44,11 @@ class FirewallPolicy extends Model implements Filterable, Sortable
     public function rules()
     {
         return $this->hasMany(FirewallRule::class);
+    }
+
+    public function router()
+    {
+        return $this->belongsTo(Router::class);
     }
 
     /**
@@ -54,6 +61,7 @@ class FirewallPolicy extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$enumDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('sequence', Filter::$stringDefaults),
+            $factory->create('router_id', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -70,6 +78,7 @@ class FirewallPolicy extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('sequence'),
+            $factory->create('router_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -95,6 +104,7 @@ class FirewallPolicy extends Model implements Filterable, Sortable
             'id'         => 'id',
             'name'       => 'name',
             'sequence'   => 'sequence',
+            'router_id'  => 'router_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

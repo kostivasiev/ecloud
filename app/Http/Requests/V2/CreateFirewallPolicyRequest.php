@@ -26,6 +26,12 @@ class CreateFirewallPolicyRequest extends FormRequest
         return [
             'name' => 'nullable|string|max:50',
             'sequence' => 'required|integer',
+            'router_id' => [
+                'required',
+                'string',
+                'exists:ecloud.routers,id,deleted_at,NULL',
+                new ExistsForUser(Router::class)
+            ]
         ];
     }
 
@@ -39,6 +45,8 @@ class CreateFirewallPolicyRequest extends FormRequest
             'name.max' => 'The :attribute field must be less than 50 characters',
             'sequence.required' => 'The :attribute field is required',
             'sequence.integer' => 'The specified :attribute must be an integer',
+            'router_id.required' => 'The :attribute field is required',
+            'router_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }
