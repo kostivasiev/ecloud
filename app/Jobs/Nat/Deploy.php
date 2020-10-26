@@ -61,27 +61,18 @@ class Deploy extends Job
             $this->fail(new \Exception($message));
         }
 
-        $oldRuleId = $this->data['original_destination_id'] . '-to-' . $this->data['original_translated_id'];
-        if ($oldRuleId !== '-to-') {
-            Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Deleting ' . $oldRuleId . ' NAT Rule');
-            try {
-                $response = $instance->availabilityZone->nsxService()->delete('/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/' . $nat->id . '/nat-rules/' . $nat->rule_id);
-                // TODO :- Check the response is as expected, otherwise fail
-            } catch (\Exception $exception) {
-                $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to delete the old NAT rule ' . $oldRuleId;
-                Log::error($message, ['exception' => $exception]);
-                $this->fail(new \Exception($message));
-            }
-        }
-
-        Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Adding ' . $nat->rule_id . ' NAT Rule');
+        Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Adding NAT Rule');
         try {
+            /**
+             * Deploy the USER Nat Rule
+             * @see https://185.197.63.88/policy/api_includes/method_PatchPolicyNatRule.html
+             */
             $response = $instance->availabilityZone->nsxService()->patch(
-                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/' . $nat->id . '/nat-rules/' . $nat->rule_id,
+                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $nat->id,
                 [
                     'json' => [
                         'display_name' => $nat->id,
-                        'description' => $nat->rule_id,
+                        'description' => $nat->id,
                         'action' => 'DNAT',
                         'destination_network' => $nat->destination->ip_address,
                         'translated_network' => $nat->translated->ip_address,
@@ -93,9 +84,13 @@ class Deploy extends Job
                     ]
                 ]
             );
-            // TODO :- Check the response is as expected, otherwise fail
+            if ($response->getStatusCode() !== 200) {
+                $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to add new NAT rule';
+                Log::error($message, ['response' => $response]);
+                $this->fail(new \Exception($message));
+            }
         } catch (\Exception $exception) {
-            $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to add new NAT rule ' . $nat->rule_id;
+            $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to add new NAT rule';
             Log::error($message, ['exception' => $exception]);
             $this->fail(new \Exception($message));
         }

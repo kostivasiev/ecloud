@@ -81,9 +81,4 @@ class NatTest extends TestCase
     {
         $this->assertTrue($this->nat->translated instanceof Nic);
     }
-
-    public function testRuleIdReturnsCorrectValue()
-    {
-        $this->assertTrue($this->nat->rule_id == $this->floating_ip->id . '-to-' . $this->nic->id);
-    }
 }

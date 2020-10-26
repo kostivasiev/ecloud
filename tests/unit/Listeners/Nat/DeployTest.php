@@ -77,8 +77,6 @@ class DeployTest extends TestCase
     public function testUpdatingNatWithoutEditingRulesDoesNotDeploy()
     {
         $listener = \Mockery::mock();
-        $listener->shouldReceive('delete')
-            ->never();
         $listener->shouldReceive('patch')
             ->never();
         app()->bind(NsxService::class, function () use ($listener) {
@@ -90,9 +88,6 @@ class DeployTest extends TestCase
     public function testUpdatingNatRemovesOldRuleAndAddsNewRule()
     {
         $listener = \Mockery::mock();
-        $listener->shouldReceive('delete')
-            ->once()
-            ->andReturn(new Response(200)); // TODO :- Build on this
         $listener->shouldReceive('patch')
             ->once()
             ->andReturn(new Response(200)); // TODO :- Build on this
