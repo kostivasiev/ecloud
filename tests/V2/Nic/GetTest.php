@@ -19,7 +19,8 @@ class GetTest extends TestCase
     protected \Faker\Generator $faker;
     protected $availability_zone;
     protected $instance;
-    protected $macAddress;
+    protected $mac_address;
+    protected $ip_address;
     protected $network;
     protected $nic;
     protected $region;
@@ -29,61 +30,52 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->macAddress = $this->faker->macAddress;
+        $this->ip_address = $this->faker->ipv4;
+        $this->mac_address = $this->faker->macAddress;
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
-
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
         ]);
         $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',
         ]);
         $this->nic = factory(Nic::class)->create([
-            'mac_address' => $this->macAddress,
-            'instance_id' => $this->instance->getKey(),
-            'network_id' => $this->network->getKey(),
+            'mac_address' => $this->mac_address,
+            'instance_id' => $this->instance->id,
+            'network_id' => $this->network->id,
+            'ip_address' => $this->ip_address,
         ]);
     }
 
     public function testGetCollection()
     {
-        $this->get(
-            '/v2/nics',
-            [
-                'X-consumer-custom_id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'mac_address' => $this->macAddress,
-                'instance_id' => $this->instance->getkey(),
-                'network_id' => $this->network->getKey(),
-                'ip_address' => '10.0.0.5'
-            ])
-            ->assertResponseStatus(200);
+        $this->get('/v2/nics', [
+            'X-consumer-custom_id' => '0-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ])->seeJson([
+            'mac_address' => $this->mac_address,
+            'instance_id' => $this->instance->id,
+            'network_id' => $this->network->id,
+            'ip_address' => $this->ip_address,
+        ])->assertResponseStatus(200);
     }
 
     public function testGetResource()
     {
-        $this->get(
-            '/v2/nics/' . $this->nic->getKey(),
-            [
-                'X-consumer-custom_id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'mac_address' => $this->macAddress,
-                'instance_id' => $this->instance->getkey(),
-                'network_id' => $this->network->getKey(),
-                'ip_address' => '10.0.0.5'
-            ])
-            ->assertResponseStatus(200);
+        $this->get('/v2/nics/' . $this->nic->id, [
+            'X-consumer-custom_id' => '0-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ])->seeJson([
+            'mac_address' => $this->mac_address,
+            'instance_id' => $this->instance->id,
+            'network_id' => $this->network->id,
+            'ip_address' => $this->ip_address,
+        ])->assertResponseStatus(200);
     }
 }

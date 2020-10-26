@@ -23,10 +23,10 @@ class Deploy extends Job
         $nat = Nat::findOrFail($this->data['nat_id']);
 
         // Instance lookup
-        $instanceId = collect($nat->destination_resource->getAttributes())->has('instance_id') ?
-            $nat->destination_resource->instance_id : null;
-        $instanceId = collect($nat->translated_resource->getAttributes())->has('instance_id') ?
-            $nat->translated_resource->instance_id : $instanceId;
+        $instanceId = collect($nat->destination->getAttributes())->has('instance_id') ?
+            $nat->destination->instance_id : null;
+        $instanceId = collect($nat->translated->getAttributes())->has('instance_id') ?
+            $nat->translated->instance_id : $instanceId;
         if (!$instanceId) {
             $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : No instance found for the destination or translated';
             Log::error($message, [
@@ -38,8 +38,8 @@ class Deploy extends Job
         $instance = Instance::findOrFail($instanceId);
 
         // NIC lookup
-        $nic = $nat->destination_resource instanceof Nic ? $nat->destination_resource : null;
-        $nic = $nat->translated_resource instanceof Nic ? $nat->translated_resource : $nic;
+        $nic = $nat->destination instanceof Nic ? $nat->destination : null;
+        $nic = $nat->translated instanceof Nic ? $nat->translated : $nic;
         if (!$nic) {
             $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : No NIC found for the destination or translated';
             Log::error($message, [
@@ -61,7 +61,7 @@ class Deploy extends Job
             $this->fail(new \Exception($message));
         }
 
-        $oldRuleId = $this->data['original_destination'] . '-to-' . $this->data['original_translated'];
+        $oldRuleId = $this->data['original_destination_id'] . '-to-' . $this->data['original_translated_id'];
         if ($oldRuleId !== '-to-') {
             Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Deleting ' . $oldRuleId . ' NAT Rule');
             try {
@@ -82,8 +82,8 @@ class Deploy extends Job
                         'display_name' => $nat->id,
                         'description' => $nat->rule_id,
                         'action' => 'DNAT',
-                        'destination_network' => $nat->destination_resource->ip_address,
-                        'translated_network' => $nat->translated_resource->ip_address,
+                        'destination_network' => $nat->destination->ip_address,
+                        'translated_network' => $nat->translated->ip_address,
                         'translated_ports' => '*',
                         'enabled' => true,
                         'logging' => false,

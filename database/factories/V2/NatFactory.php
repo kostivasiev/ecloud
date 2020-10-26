@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Nat::class, function (Faker $faker) {
     return [
-        'destination' => 'fip-123456',
-        'translated' => 'nic-654321',
+        'destination_id' => 'fip-123456',
+        'translated_id' => 'nic-654321',
     ];
 });

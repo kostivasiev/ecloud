@@ -3,6 +3,10 @@ properties:
     type: string
     example: fip-2b66bb79
     readOnly: true
+  name:
+    type: string
+    example: fip-2b66bb79
+    readOnly: false
   vpc_id:
     type: string
     example: vpc-2b66bb79
@@ -11,6 +15,11 @@ properties:
     description: The external IP address assigned to the floating IP.
     type: string
     example: '1.1.1.1'
+    readOnly: true
+  resource_id:
+    description: ID of the resource that the floating IP is assigned to.
+    type: string
+    example: 'nic-abc123'
     readOnly: true
   created_at:
     type: string

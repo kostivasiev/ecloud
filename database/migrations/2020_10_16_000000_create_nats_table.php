@@ -11,7 +11,9 @@ class CreateNatsTable extends Migration
         Schema::connection('ecloud')->create('nats', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('destination');
+            $table->text('destinationable_type');
             $table->uuid('translated');
+            $table->text('translatedable_type');
             $table->timestamps();
             $table->softDeletes();
         });

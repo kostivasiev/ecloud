@@ -9,11 +9,11 @@ class Deploy
     public function handle(Saved $event)
     {
         $nat = $event->model;
-        if ($nat->destination != $nat->getOriginal('destination') || $nat->translated != $nat->getOriginal('translated')) {
+        if ($nat->destination_id != $nat->getOriginal('destination_id') || $nat->translated_id != $nat->getOriginal('translated_id')) {
             dispatch(new \App\Jobs\Nat\Deploy([
                 'nat_id' => $nat->id,
-                'original_destination' => $nat->getOriginal('destination'),
-                'original_translated' => $nat->getOriginal('translated'),
+                'original_destination_id' => $nat->getOriginal('destination_id'),
+                'original_translated_id' => $nat->getOriginal('translated_id'),
             ]));
         }
     }

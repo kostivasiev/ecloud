@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\ComputeChanged;
-use App\Events\V2\Data\InstanceDeployEventData;
-use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -157,7 +154,7 @@ class InstanceController extends BaseController
         }
         $instance->save();
         if ($request->has('vcpu_cores') || $request->has('ram_capacity')) {
-            event(ComputeChanged::class, [$instance, $rebootRequired]);
+            event(new \App\Events\V2\Instance\ComputeChanged($instance, $rebootRequired));
         }
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }

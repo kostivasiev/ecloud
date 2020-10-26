@@ -12,6 +12,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Services\V2\NsxService;
+use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -21,6 +22,7 @@ class DeployTest extends TestCase
 {
     use DatabaseMigrations;
 
+    protected \Faker\Generator $faker;
     protected $region;
     protected $availability_zone;
     protected $vpc;
@@ -29,11 +31,12 @@ class DeployTest extends TestCase
     protected $instance;
     protected $floating_ip;
     protected $nic;
+    protected $nat;
 
     public function setUp(): void
     {
         parent::setUp();
-
+        $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
@@ -51,7 +54,9 @@ class DeployTest extends TestCase
             'availability_zone_id' => $this->availability_zone->id,
             'vpc_id' => $this->vpc->id,
         ]);
-        $this->floating_ip = factory(FloatingIp::class)->create();
+        $this->floating_ip = factory(FloatingIp::class)->create([
+
+        ]);
         $this->nic = factory(Nic::class)->create([
             'instance_id' => $this->instance->id,
             'network_id' => $this->network->id,
@@ -60,8 +65,10 @@ class DeployTest extends TestCase
         Model::withoutEvents(function () {
             $this->nat = factory(Nat::class)->create([
                 'id' => 'nat-123456',
-                'destination' => $this->floating_ip->id,
-                'translated' => $this->nic->id,
+                'destination_id' => $this->floating_ip->id,
+                'destinationable_type' => 'fip',
+                'translated_id' => $this->nic->id,
+                'translatedable_type' => 'nic',
             ]);
         });
     }
@@ -92,8 +99,10 @@ class DeployTest extends TestCase
             return $listener;
         });
 
-        $newFloatingIp = factory(FloatingIp::class)->create();
-        $this->nat->destination = $newFloatingIp->id;
+        $newFloatingIp = factory(FloatingIp::class)->create([
+            'ip_address' => $this->faker->ipv4,
+        ]);
+        $this->nat->destination_id = $newFloatingIp->id;
         $this->nat->save();
     }
 }

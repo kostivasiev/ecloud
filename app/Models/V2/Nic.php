@@ -44,7 +44,8 @@ class Nic extends Model implements Filterable, Sortable
         parent::boot();
 
         static::deleting(function ($instance) {
-            $instance->deleted = true;
+            $instance->attributes['deleted'] = time();
+            $instance->save();
         });
     }
 

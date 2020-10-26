@@ -12,7 +12,7 @@ class NatTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $floatingIp;
+    protected $floating_ip;
     protected $nic;
     protected $nat;
 
@@ -20,26 +20,28 @@ class NatTest extends TestCase
     {
         parent::setUp();
 
-        $this->floatingIp = factory(FloatingIp::class)->create();
+        $this->floating_ip = factory(FloatingIp::class)->create();
         $this->nic = factory(Nic::class)->create();
         $this->nat = factory(Nat::class)->create([
-            'destination' => $this->floatingIp->id,
-            'translated' => $this->nic->id,
+            'destination_id' => $this->floating_ip->id,
+            'destinationable_type' => 'fip',
+            'translated_id' => $this->nic->id,
+            'translatedable_type' => 'nic',
         ]);
     }
 
     public function testDestinationResourceReturnsFloatingIp()
     {
-        $this->assertTrue($this->nat->destination_resource instanceof FloatingIp);
+        $this->assertTrue($this->nat->destination instanceof FloatingIp);
     }
 
     public function testTranslatedResourceReturnsNic()
     {
-        $this->assertTrue($this->nat->translated_resource instanceof Nic);
+        $this->assertTrue($this->nat->translated instanceof Nic);
     }
 
     public function testRuleIdReturnsCorrectValue()
     {
-        $this->assertTrue($this->nat->rule_id == $this->floatingIp->id . '-to-' . $this->nic->id);
+        $this->assertTrue($this->nat->rule_id == $this->floating_ip->id . '-to-' . $this->nic->id);
     }
 }

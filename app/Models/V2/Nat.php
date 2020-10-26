@@ -4,17 +4,10 @@ namespace App\Models\V2;
 
 use App\Events\V2\Nat\Created;
 use App\Events\V2\Nat\Saved;
-use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Class Nat
- *
- * @property string $destination Floating IP ID
- * @property string $translated NIC ID
- */
 class Nat extends Model
 {
     use CustomKey, SoftDeletes;
@@ -26,8 +19,8 @@ class Nat extends Model
     protected $connection = 'ecloud';
     protected $fillable = [
         'id',
-        'destination',
-        'translated',
+        'destination_id',
+        'translated_id',
     ];
 
     protected $dispatchesEvents = [
@@ -35,18 +28,18 @@ class Nat extends Model
         'saved' => Saved::class,
     ];
 
+    public function destination()
+    {
+        return $this->morphTo('destinationable', null, 'destination_id', 'id');
+    }
+
+    public function translated()
+    {
+        return $this->morphTo('translatedable', null, 'translated_id', 'id');
+    }
+
     public function getRuleIdAttribute()
     {
-        return $this->destination . '-to-' . $this->translated;
-    }
-
-    public function getDestinationResourceAttribute()
-    {
-        return Resource::classFromId($this->destination)::findOrFail($this->destination);
-    }
-
-    public function getTranslatedResourceAttribute()
-    {
-        return Resource::classFromId($this->translated)::findOrFail($this->translated);
+        return $this->destination_id . '-to-' . $this->translated_id;
     }
 }
