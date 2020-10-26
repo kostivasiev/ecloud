@@ -35,6 +35,7 @@ class Deploy extends Job
             ]);
             $this->fail(new \Exception($message));
         }
+
         $instance = Instance::findOrFail($instanceId);
 
         // NIC lookup
