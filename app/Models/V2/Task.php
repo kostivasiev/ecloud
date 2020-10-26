@@ -18,7 +18,7 @@ class Task extends Model
     public $keyPrefix = 'task';
     public $incrementing = false;
     protected $fillable = [
-        "resource_id"
+        'resource_id'
     ];
     protected $keyType = 'string';
     protected $connection = 'ecloud';
@@ -33,13 +33,13 @@ class Task extends Model
 
     public function jobStatuses()
     {
-        return $this->hasMany(TaskJobStatus::class, "task_id", "id");
+        return $this->hasMany(TaskJobStatus::class, 'task_id', 'id');
     }
 
     public function getIsEndedAttribute()
     {
         return $this->jobStatuses()->count() == 0 || $this->jobStatuses()->get()->filter(function ($status) {
-            return !$status->is_ended;
-        })->count() < 1;
+                return !$status->is_ended;
+            })->count() < 1;
     }
 }

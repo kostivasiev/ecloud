@@ -26,7 +26,7 @@ class TaskEventManager extends EventManager
 
     public function after(JobProcessed $event): void
     {
-        if (!$event->job->hasFailed()) {
+        if (!$event->job->hasFailed() && !$event->job->isReleased()) {
             $this->getUpdater()->update($event, [
                 'status' => $this->getEntity()::STATUS_FINISHED,
                 'finished_at' => Carbon::now(),
@@ -37,7 +37,7 @@ class TaskEventManager extends EventManager
     public function failing(JobFailed $event): void
     {
         $this->getUpdater()->update($event, [
-            'status' => ($event->job->attempts() !== $event->job->maxTries()) ? $this->getEntity()::STATUS_FAILED : $this->getEntity()::STATUS_RETRYING,
+            'status' => $this->getEntity()::STATUS_FAILED,
             'finished_at' => Carbon::now(),
         ]);
     }
