@@ -55,20 +55,21 @@ class DeployTest extends TestCase
             'vpc_id' => $this->vpc->id,
         ]);
         $this->floating_ip = factory(FloatingIp::class)->create([
-
+            'ip_address' => $this->faker->ipv4,
         ]);
         $this->nic = factory(Nic::class)->create([
             'instance_id' => $this->instance->id,
             'network_id' => $this->network->id,
+            'ip_address' => $this->faker->ipv4,
         ]);
 
         Model::withoutEvents(function () {
             $this->nat = factory(Nat::class)->create([
                 'id' => 'nat-123456',
                 'destination_id' => $this->floating_ip->id,
-                'destinationable_type' => 'fip',
+                'destinationable_type' => FloatingIp::class,
                 'translated_id' => $this->nic->id,
-                'translatedable_type' => 'nic',
+                'translatedable_type' => Nic::class,
             ]);
         });
     }
