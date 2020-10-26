@@ -1,0 +1,8 @@
+post:
+  parameters:
+    - $ref: '../../resources/FloatingIp/parameters/fipId.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Floating IPs

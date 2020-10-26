@@ -143,6 +143,10 @@ paths:
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
     $ref: 'resources/FloatingIp/item.yaml'
+  '/ecloud/v2/floating-ips/{fipId}/assign':
+    $ref: 'resources/FloatingIp/assign.yaml'
+  '/ecloud/v2/floating-ips/{fipId}/unassign':
+    $ref: 'resources/FloatingIp/unassign.yaml'
   '/ecloud/v2/firewall-rules':
     $ref: 'resources/FirewallRule/collection.yaml'
   '/ecloud/v2/firewall-rules/{firewallRuleId}':

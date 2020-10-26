@@ -37,6 +37,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         $dispatcher->forget(\App\Events\V2\Router\Created::class);
         $dispatcher->forget(\App\Events\V2\Vpc\Created::class);
         $dispatcher->forget(\App\Events\V2\FloatingIp\Created::class);
+        $dispatcher->forget(\App\Events\V2\Nat\Created::class);
 
         // Updated
         $dispatcher->forget(\App\Events\V2\Volume\Updated::class);

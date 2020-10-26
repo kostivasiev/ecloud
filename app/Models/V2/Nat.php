@@ -2,7 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NatCreated;
+use App\Events\V2\Nat\Created;
+use App\Events\V2\Nat\Deleted;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -32,7 +33,8 @@ class Nat extends Model
     ];
 
     protected $dispatchesEvents = [
-        'created' => NatCreated::class,
+        'created' => Created::class,
+        'deleted' => Deleted::class
     ];
 
     /**
