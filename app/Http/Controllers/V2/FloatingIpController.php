@@ -121,6 +121,20 @@ class FloatingIpController extends BaseController
 
         $nat->save();
 
-        return response(null, 200);
+        return response(null, 202);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $fipId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unassign(Request $request, string $fipId)
+    {
+        $floatingIp = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
+        if ($floatingIp->nat) {
+            $floatingIp->nat->delete();
+        }
+        return response()->json(null, 202);
     }
 }

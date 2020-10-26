@@ -120,7 +120,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 204, "Response status is not 204");
 });
 %}
 
@@ -140,7 +140,37 @@ client.test("Request executed successfully", function() {
 });
 %}
 
+###
 
+POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/unassign
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+###
+
+
+GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.resource_id === null, "resource_id was returned in response, resource was NOT unassigned");
+});
+%}
 
 
 ###

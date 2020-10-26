@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events\V2;
+namespace App\Events\V2\Nat;
 
 use App\Models\V2\Nat;
 use Illuminate\Queue\SerializesModels;
 
-class NatCreated
+class Deleted
 {
     use SerializesModels;
 

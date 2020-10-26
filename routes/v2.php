@@ -113,6 +113,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('floating-ips/{fipId}', 'FloatingIpController@show');
         $router->post('floating-ips', 'FloatingIpController@store');
         $router->post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
+        $router->post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');
         $router->patch('floating-ips/{fipId}', 'FloatingIpController@update');
         $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
     });
