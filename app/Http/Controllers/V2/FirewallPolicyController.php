@@ -22,7 +22,7 @@ class FirewallPolicyController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallPolicy::query();
+        $collection = FirewallPolicy::forUser($request);
 
         $queryTransformer->config(FirewallPolicy::class)
             ->transform($collection);
@@ -33,13 +33,14 @@ class FirewallPolicyController extends BaseController
     }
 
     /**
-     * @param string $firewallPolicyId
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $firewallPolicyId
      * @return FirewallPolicyResource
      */
-    public function show(string $firewallPolicyId)
+    public function show(Request $request, string $firewallPolicyId)
     {
         return new FirewallPolicyResource(
-            FirewallPolicy::findOrFail($firewallPolicyId)
+            FirewallPolicy::forUser($request)->findOrFail($firewallPolicyId)
         );
     }
 
@@ -63,19 +64,20 @@ class FirewallPolicyController extends BaseController
      */
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::findOrFail($firewallPolicyId);
+        $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
         $policy->fill($request->only(['name', 'sequence', 'router_id']));
         $policy->save();
         return $this->responseIdMeta($request, $policy->getKey(), 200);
     }
 
     /**
-     * @param string $firewallPolicyId
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $firewallPolicyId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(string $firewallPolicyId)
+    public function destroy(Request $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::findOrFail($firewallPolicyId);
+        $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
         $policy->delete();
         return response()->json([], 204);
     }
