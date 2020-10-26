@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FloatingIp\Creating;
+use App\Events\V2\FloatingIp\Created;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +18,7 @@ use UKFast\DB\Ditto\Sortable;
  * @package App\Models\V2
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
+ * @method static forUser($user)
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
@@ -32,12 +33,40 @@ class FloatingIp extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
-        'vpc_id'
+        'vpc_id',
+        'deleted'
     ];
+
+    protected $dispatchesEvents = [
+        'created' => Created::class,
+    ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($model) {
+            $model->attributes['deleted'] = time();
+            $model->save();
+        });
+    }
 
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function nat()
+    {
+        return $this->morphOne(Nat::class, 'destinationable', null, 'destination');
+    }
+
+    public function getResourceIdAttribute()
+    {
+        return ($this->nat) ? $this->nat->translated : null;
     }
 
     public function scopeForUser($query, $user)
@@ -52,10 +81,6 @@ class FloatingIp extends Model implements Filterable, Sortable
         }
         return $query;
     }
-
-    protected $dispatchesEvents = [
-        'creating' => Creating::class,
-    ];
 
     /**
      * @param FilterFactory $factory

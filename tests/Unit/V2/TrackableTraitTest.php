@@ -15,7 +15,7 @@ use Laravel\Lumen\Testing\DatabaseMigrations;
 use Mockery;
 use Tests\TestCase;
 
-class ResourceTraitTest extends TestCase
+class TrackableTraitTest extends TestCase
 {
     use DatabaseMigrations;
 
