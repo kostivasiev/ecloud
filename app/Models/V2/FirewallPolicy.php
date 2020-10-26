@@ -2,8 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallRule\Created;
-use App\Events\V2\FirewallRule\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -15,48 +13,43 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class FirewallRule
+ * Class FirewallPolicy
  * @package App\Models\V2
- * @method static findOrFail(string $firewallRuleId)
+ * @method static findOrFail(string $firewallPolicyId)
  * @method static forUser($request)
  */
-class FirewallRule extends Model implements Filterable, Sortable
+class FirewallPolicy extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName;
 
-    public $keyPrefix = 'fwr';
+    public $keyPrefix = 'fwp';
     public $incrementing = false;
     public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
         'name',
+        'sequence',
         'router_id',
-        'deployed',
     ];
 
     protected $visible = [
         'id',
         'name',
+        'sequence',
         'router_id',
-        'deployed',
         'created_at',
         'updated_at',
     ];
 
-    protected $dispatchesEvents = [
-        'creating' => Creating::class,
-        'created' => Created::class,
-    ];
+    public function rules()
+    {
+        return $this->hasMany(FirewallRule::class);
+    }
 
     public function router()
     {
         return $this->belongsTo(Router::class);
-    }
-
-    public function policy()
-    {
-        return $this->belongsTo(FirewallPolicy::class);
     }
 
     public function scopeForUser($query, $user)
@@ -81,9 +74,10 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function filterableColumns(FilterFactory $factory)
     {
         return [
-            $factory->create('id', Filter::$stringDefaults),
+            $factory->create('id', Filter::$enumDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('router_id', Filter::$stringDefaults),
+            $factory->create('sequence', Filter::$stringDefaults),
+            $factory->create('router_id', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -99,6 +93,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('sequence'),
             $factory->create('router_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -122,9 +117,10 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id' => 'id',
-            'name' => 'name',
-            'router_id' => 'router_id',
+            'id'         => 'id',
+            'name'       => 'name',
+            'sequence'   => 'sequence',
+            'router_id'  => 'router_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

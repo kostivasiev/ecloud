@@ -118,6 +118,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
     });
 
+    /** Firewall Policy */
+    $router->group([], function () use ($router) {
+        $router->get('firewall-policies', 'FirewallPolicyController@index');
+        $router->get('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@show');
+        $router->post('firewall-policies', 'FirewallPolicyController@store');
+        $router->patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
+        $router->delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
+    });
+
     /** Firewall Rules */
     $router->group([], function () use ($router) {
         $router->get('firewall-rules', 'FirewallRuleController@index');

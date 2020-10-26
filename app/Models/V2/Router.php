@@ -64,6 +64,11 @@ class Router extends Model implements Filterable, Sortable
         return $this->hasMany(Vpn::class);
     }
 
+    public function firewallPolicies()
+    {
+        return $this->hasMany(FirewallPolicy::class);
+    }
+
     public function firewallRules()
     {
         return $this->hasMany(FirewallRule::class);
