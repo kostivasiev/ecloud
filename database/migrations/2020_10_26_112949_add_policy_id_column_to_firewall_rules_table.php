@@ -14,7 +14,7 @@ class AddPolicyIdColumnToFirewallRulesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('firewall_rules', function (Blueprint $table) {
-            $table->string('policy_id')->after('name')->nullable();
+            $table->string('firewall_policy_id')->after('name')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddPolicyIdColumnToFirewallRulesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('firewall_rules', function (Blueprint $table) {
-            $table->dropColumn('policy_id');
+            $table->dropColumn('firewall_policy_id');
         });
     }
 }
