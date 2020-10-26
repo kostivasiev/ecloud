@@ -35,7 +35,6 @@ class Deploy extends Job
             ]);
             $this->fail(new \Exception($message));
         }
-
         $instance = Instance::findOrFail($instanceId);
 
         // NIC lookup
@@ -77,7 +76,8 @@ class Deploy extends Job
 
         Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Adding ' . $nat->rule_id . ' NAT Rule');
         try {
-            $response = $instance->availabilityZone->nsxService()->patch('/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/' . $nat->id . '/nat-rules/' . $nat->rule_id,
+            $response = $instance->availabilityZone->nsxService()->patch(
+                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/' . $nat->id . '/nat-rules/' . $nat->rule_id,
                 [
                     'json' => [
                         'display_name' => $nat->id,
@@ -91,7 +91,8 @@ class Deploy extends Job
                         'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',
                         'scope' => ['infra/tier-0s/tier-0-vmc/interfaces/internet'],
                     ]
-                ]);
+                ]
+            );
             // TODO :- Check the response is as expected, otherwise fail
         } catch (\Exception $exception) {
             $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to add new NAT rule ' . $nat->rule_id;
