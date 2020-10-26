@@ -37,21 +37,21 @@ class UpdateTaskJob extends TaskJob
         $ram_limit = (($this->instance->platform == "Windows") ? 16 : 3) * 1024;
 
         if (isset($this->data['ram_capacity']) && $this->data['ram_capacity'] > 0) {
-            $parameters['ramMiB'] = $this->data['ram_capacity'];
-            $this->instance->ram_capacity = $this->data['ram_capacity'];
-
-            if (($this->instance->ram_capacity > $this->data['ram_capacity']) || ($this->instance->ram_capacity <= $ram_limit && $this->data['ram_capacity'] > $ram_limit)) {
+            if (($this->instance->ram_capacity > $this->data['ram_capacity']) || ($this->instance->ram_capacity < $ram_limit && $this->data['ram_capacity'] >= $ram_limit)) {
                 $reboot = true;
             }
+
+            $parameters['ramMiB'] = $this->data['ram_capacity'];
+            $this->instance->ram_capacity = $this->data['ram_capacity'];
         }
 
         if (isset($this->data['vcpu_cores']) && $this->data['vcpu_cores'] > 0) {
-            $parameters['numCPU'] = $this->data['vcpu_cores'];
-            $this->instance->vcpu_cores = $this->data['vcpu_cores'];
-
             if ($this->instance->vcpu_cores > $this->data['vcpu_cores']) {
                 $reboot = true;
             }
+
+            $parameters['numCPU'] = $this->data['vcpu_cores'];
+            $this->instance->vcpu_cores = $this->data['vcpu_cores'];
         }
 
         $parameters['guestShutdown'] = $reboot;
