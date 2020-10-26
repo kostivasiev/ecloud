@@ -91,7 +91,7 @@ class FloatingIpController extends BaseController
     /**
      * @param AssignRequest $request
      * @param string $fipId
-     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+* fix response     * @return Response
      */
     public function assign(AssignRequest $request, string $fipId)
     {
@@ -121,13 +121,13 @@ class FloatingIpController extends BaseController
 
         $nat->save();
 
-        return response(null, 202);
+        return new Response(null, 202);
     }
 
     /**
      * @param Request $request
      * @param string $fipId
-     * @return \Illuminate\Http\JsonResponse
+     * @return Response
      */
     public function unassign(Request $request, string $fipId)
     {
@@ -135,6 +135,7 @@ class FloatingIpController extends BaseController
         if ($floatingIp->nat) {
             $floatingIp->nat->delete();
         }
-        return response()->json(null, 202);
+
+        return new Response(null, 202);
     }
 }
