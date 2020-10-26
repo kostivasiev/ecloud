@@ -53,6 +53,11 @@ class FirewallRule extends Model implements Filterable, Sortable
         return $this->belongsTo(Router::class);
     }
 
+    public function policy()
+    {
+        return $this->belongsTo(FirewallPolicy::class);
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
