@@ -38,14 +38,18 @@ class TaskEventManager extends EventManager
     {
         $this->getUpdater()->update($event, [
             'status' => $this->getEntity()::STATUS_FAILED,
+            'output' => ['failed_message' => $event->exception->getMessage()],
             'finished_at' => Carbon::now(),
         ]);
     }
 
     public function exceptionOccurred(JobExceptionOccurred $event): void
     {
-        $this->getUpdater()->update($event, [
-            'output' => ['message' => $event->exception->getMessage()],
-        ]);
+        if (!$event->job->hasFailed()) {
+            $this->getUpdater()->update($event, [
+                'status' => $this->getEntity()::STATUS_RETRYING,
+                'output' => ['exception_message' => $event->exception->getMessage()],
+            ]);
+        }
     }
 }
