@@ -3,6 +3,7 @@
 namespace App\Rules\V2;
 
 use Illuminate\Contracts\Validation\Rule;
+use IPLib\Factory;
 use IPLib\Range\Subnet;
 
 /**
@@ -13,16 +14,14 @@ class ValidCidrSubnetArray extends ValidCidrSubnet implements Rule
 {
     public function passes($attribute, $value)
     {
-        if (!strpos($value, ",") === false) {
-            $valueArray = explode(",", $value);
-            foreach ($valueArray as $valueItem) {
-                if (!parent::passes($attribute, $valueItem)) {
-                    return false;
-                }
+        $valueArray = explode(",", $value);
+        foreach ($valueArray as $valueItem) {
+            $rangeValid = (new ValidCidrRange())->passes($attribute, $valueItem);
+            if (!$rangeValid && !parent::passes($attribute, $valueItem)) {
+                return false;
             }
-            return true;
         }
-        return parent::passes($attribute, $value);
+        return true;
     }
 
     /**
@@ -30,6 +29,6 @@ class ValidCidrSubnetArray extends ValidCidrSubnet implements Rule
      */
     public function message()
     {
-        return 'The :attribute must contain a valid CIDR subnet';
+        return 'The :attribute must contain a valid CIDR subnet or subnet range';
     }
 }
