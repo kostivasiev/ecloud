@@ -32,7 +32,7 @@ class CreateFirewallRuleRequest extends FormRequest
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class)
             ],
-            'firewall_policy_id' => 'required|string|exists:firewall_policies,id,deleted_at,NULL',
+            'firewall_policy_id' => 'required|string|exists:ecloud.firewall_policies,id,deleted_at,NULL',
             'source' => [
                 'required',
                 'string',
@@ -45,7 +45,7 @@ class CreateFirewallRuleRequest extends FormRequest
             ],
             'action' => 'required|string|in:ALLOW,DROP,REJECT',
             'direction' => 'required|string|in:IN,OUT,IN_OUT',
-            'enabled' => 'required|boolean|default:0',
+            'enabled' => 'required|boolean',
         ];
     }
 
