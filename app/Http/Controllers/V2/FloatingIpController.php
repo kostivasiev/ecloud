@@ -99,7 +99,7 @@ class FloatingIpController extends BaseController
         $request['id'] = $fipId;
         $this->validate(
             $request,
-            ['id' => 'unique:ecloud.nats,destination'],
+            ['id' => 'unique:ecloud.nats,destination_id'],
             ['id.unique' => 'The floating IP is already assigned']
         );
 
