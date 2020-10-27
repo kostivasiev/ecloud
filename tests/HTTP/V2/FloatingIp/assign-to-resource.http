@@ -22,7 +22,7 @@ Content-Type:  application/json
 {
   "code": "MAN1",
   "name": "Test availability zone (v)",
-  "datacentre_site_id": 111,
+  "datacentre_site_id": 8,
   "nsx_manager_endpoint": "https://185.197.63.88/",
   "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
   "region_id": "{{region_id}}"
@@ -174,7 +174,7 @@ client.test("Request executed successfully", function() {
 
 
 ###
-DELETE https://{{host}}/{{version}}/v2/floating-ips/{{fip_id}}
+DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0

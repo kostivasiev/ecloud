@@ -3,7 +3,6 @@
 namespace App\Listeners\V2\Nat;
 
 use App\Events\V2\Nat\Deleted;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Nic;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -20,19 +19,34 @@ class Undeploy implements ShouldQueue
      */
     public function handle(Deleted $event)
     {
-        $nat = $event->nat;
+        $nat = $event->model;
+
+        $message = 'Nat ' . $nat->getKey() . ' Undeploy : ';
+        Log::info($message . 'Started');
 
         // Load NIC from destination or translated
-        $nic = collect($nat->getRelations())->whereInstanceOf(Nic::class)->first();
+        $nic = collect($nat->load(['destination', 'translated'])->getRelations())->whereInstanceOf(Nic::class)->first();
 
         if (!$nic) {
-            exit('unsupported NAT translated type');
+            $error = $message . 'Failed. Could not find NIC for destination or translated';
+            Log::error($error, [
+                'nat' => $nat,
+            ]);
+            $this->fail(new \Exception($error));
         }
 
+        $router = $nic->network->router;
+
         try {
-            $nic->network->router->availabilityZone->nsxService()->delete(
-                'policy/api/v1/infra/tier-1s/' . $nic->network->router->getKey() . '/nat/USER/nat-rules/' . $nat->getKey()
+            $response = $router->availabilityZone->nsxService()->delete(
+                'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/nat/USER/nat-rules/' . $nat->getKey()
             );
+
+            if ($response->getStatusCode() !== 200) {
+                $error = $message . 'Failed. Delete response was not 200';
+                Log::error($error, ['response' => $response]);
+                $this->fail(new \Exception($message));
+            }
         } catch (GuzzleException $exception) {
             $error = ($exception->hasResponse()) ? $exception->getResponse()->getBody()->getContents() : $exception->getMessage();
             Log::error('Failed to undeploy NAT ' . $nat->getKey() . ': ' . $error);
@@ -40,6 +54,6 @@ class Undeploy implements ShouldQueue
             return;
         }
 
-
+        Log::info($message . 'Success');
     }
 }

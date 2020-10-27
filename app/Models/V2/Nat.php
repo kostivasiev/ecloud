@@ -30,8 +30,6 @@ class Nat extends Model
         'deleted' => Deleted::class,
     ];
 
-    protected $with = ['destination', 'translated'];
-
     /**
      * Load the associated destination resource
      * @return Model|\Illuminate\Database\Eloquent\Relations\MorphTo
