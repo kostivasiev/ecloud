@@ -33,6 +33,12 @@ class FirewallRule extends Model implements Filterable, Sortable
         'name',
         'router_id',
         'deployed',
+        'firewall_policy_id',
+        'source',
+        'destination',
+        'action',
+        'direction',
+        'enabled',
     ];
 
     protected $visible = [
@@ -40,6 +46,11 @@ class FirewallRule extends Model implements Filterable, Sortable
         'name',
         'router_id',
         'deployed',
+        'source',
+        'destination',
+        'action',
+        'direction',
+        'enabled',
         'created_at',
         'updated_at',
     ];
@@ -84,6 +95,11 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
+            $factory->create('source', Filter::$stringDefaults),
+            $factory->create('destination', Filter::$stringDefaults),
+            $factory->create('action', Filter::$stringDefaults),
+            $factory->create('direction', Filter::$stringDefaults),
+            $factory->create('enabled', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -100,6 +116,11 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_id'),
+            $factory->create('source'),
+            $factory->create('destination'),
+            $factory->create('action'),
+            $factory->create('direction'),
+            $factory->create('enabled'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -122,11 +143,16 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id' => 'id',
-            'name' => 'name',
-            'router_id' => 'router_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
+            'id'          => 'id',
+            'name'        => 'name',
+            'router_id'   => 'router_id',
+            'source'      => 'source',
+            'destination' => 'destination',
+            'action'      => 'action',
+            'direction'   => 'direction',
+            'enabled'     => 'enabled',
+            'created_at'  => 'created_at',
+            'updated_at'  => 'updated_at',
         ];
     }
 }

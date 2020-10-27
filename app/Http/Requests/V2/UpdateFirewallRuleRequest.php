@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\ValidCidrSubnetArray;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateFirewallRuleRequest extends FormRequest
@@ -22,6 +23,22 @@ class UpdateFirewallRuleRequest extends FormRequest
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class)
             ],
+            'firewall_policy_id' => 'sometimes|required|string|exists:firewall_policies,id,deleted_at,NULL',
+            'source' => [
+                'sometimes',
+                'required',
+                'string',
+                new ValidCidrSubnetArray()
+            ],
+            'destination' => [
+                'sometimes',
+                'required',
+                'string',
+                new ValidCidrSubnetArray()
+            ],
+            'action' => 'sometimes|required|string|in:ALLOW,DROP,REJECT',
+            'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',
+            'enabled' => 'sometimes|required|boolean|default:0',
         ];
     }
 

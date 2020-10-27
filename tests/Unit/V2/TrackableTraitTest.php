@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\V2;
+namespace Tests\Unit\V2;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
