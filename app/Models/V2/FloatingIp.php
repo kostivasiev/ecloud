@@ -61,12 +61,15 @@ class FloatingIp extends Model implements Filterable, Sortable
      */
     public function nat()
     {
-        return $this->morphOne(Nat::class, 'destinationable', null, 'destination');
+        return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
     }
 
+    /**
+     * TODO :- Why does this have a direct relationship to a NAT? Should never need to lookup NAT from FIP?
+     */
     public function getResourceIdAttribute()
     {
-        return ($this->nat) ? $this->nat->translated : null;
+        return ($this->nat) ? $this->nat->translated_id : null;
     }
 
     public function scopeForUser($query, $user)

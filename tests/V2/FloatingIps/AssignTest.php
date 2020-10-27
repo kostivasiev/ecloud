@@ -20,6 +20,9 @@ class AssignTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
+    protected $floatingIp;
+    protected $nic;
+    protected $nat;
 
     public function setUp(): void
     {
@@ -27,39 +30,39 @@ class AssignTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
             'reseller_id' => 1
         ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',
-            'router_id' => $this->router->getKey()
+            'router_id' => $this->router->id
         ]);
         $this->nic = factory(Nic::class)->create([
             'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance->getKey(),
-            'network_id' => $this->network->getKey(),
+            'instance_id' => $this->instance->id,
+            'network_id' => $this->network->id,
         ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
     public function testAssignIsSuccessful()
     {
         $this->post(
-            '/v2/floating-ips/' . $this->floatingIp->getKey() . '/assign',
+            '/v2/floating-ips/' . $this->floatingIp->id . '/assign',
             [
-                'resource_id' => $this->nic->getKey()
+                'resource_id' => $this->nic->id
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -68,27 +71,27 @@ class AssignTest extends TestCase
         )->seeInDatabase(
             'nats',
             [
-                'destination' => $this->floatingIp->getKey(),
+                'destination_id' => $this->floatingIp->id,
                 'destinationable_type' => 'fip',
-                'translated' => $this->nic->getKey(),
+                'translated_id' => $this->nic->id,
                 'translatedable_type' => 'nic'
             ],
             'ecloud'
         )
             ->assertResponseStatus(202);
 
-        $this->assertEquals($this->nic->getKey(), $this->floatingIp->resourceId);
+        $this->assertEquals($this->nic->id, $this->floatingIp->resourceId);
 
         $this->get(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->floatingIp->getKey(),
-                'resource_id' => $this->nic->getKey()
+                'id' => $this->floatingIp->id,
+                'resource_id' => $this->nic->id
             ])
             ->assertResponseStatus(200);
     }
@@ -97,29 +100,29 @@ class AssignTest extends TestCase
     public function testUnAssignIsSuccessful()
     {
         $nat = factory(Nat::class)->create([
-            'destination' => $this->floatingIp->getKey(),
+            'destination_id' => $this->floatingIp->id,
             'destinationable_type' => 'fip',
-            'translated' => $this->nic->getKey(),
+            'translated_id' => $this->nic->id,
             'translatedable_type' => 'nic'
         ]);
 
         $this->get(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->floatingIp->getKey(),
-                'resource_id' => $this->nic->getKey()
+                'id' => $this->floatingIp->id,
+                'resource_id' => $this->nic->id
             ])
             ->assertResponseStatus(200);
 
         $this->post(
-            '/v2/floating-ips/' . $this->floatingIp->getKey() . '/unassign',
+            '/v2/floating-ips/' . $this->floatingIp->id . '/unassign',
             [
-                'resource_id' => $this->nic->getKey()
+                'resource_id' => $this->nic->id
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -133,14 +136,14 @@ class AssignTest extends TestCase
         $this->assertNotNull($nat->deleted_at);
 
         $this->get(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->floatingIp->getKey(),
+                'id' => $this->floatingIp->id,
                 'resource_id' => null
             ])
             ->assertResponseStatus(200);

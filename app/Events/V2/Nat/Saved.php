@@ -5,7 +5,7 @@ namespace App\Events\V2\Nat;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Deleted
+class Saved
 {
     use SerializesModels;
 

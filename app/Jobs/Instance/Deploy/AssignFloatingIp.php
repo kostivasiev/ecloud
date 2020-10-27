@@ -26,38 +26,33 @@ class AssignFloatingIp extends TaskJob
     {
         Log::info('Starting AssignFloatingIp for instance ' . $this->data['instance_id']);
         $instance = Instance::findOrFail($this->data['instance_id']);
-        $destination = null;
+        $destination_id = null;
 
-        if ((!empty($this->data['floating_ip_id']) || $this->data['requires_floating_ip'])
-            && $instance->nics()->count() < 1) {
-            $this->fail(
-                new Exception('AssignFloatingIp failed for ' . $instance->getKey() . ': ' . 'Failed. Instance has no NIC')
-            );
+        if ((!empty($this->data['floating_ip_id']) || $this->data['requires_floating_ip']) && $instance->nics()->count() < 1) {
+            $this->fail(new Exception('AssignFloatingIp failed for ' . $instance->id . ': Failed. Instance has no NIC'));
             return;
         }
 
         if (!empty($this->data['floating_ip_id'])) {
-            $destination = $this->data['floating_ip_id'];
+            $destination_id = $this->data['floating_ip_id'];
         }
 
         if ($this->data['requires_floating_ip']) {
-            $floatingIp = new FloatingIp;
+            $floatingIp = app()->make(FloatingIp::class);
             $floatingIp->vpc_id = $this->data['vpc_id'];
             $floatingIp->save();
-            $destination = $floatingIp->getKey();
+            $destination_id = $floatingIp->id;
         }
 
-        if (!empty($destination)) {
+        if (!empty($destination_id)) {
             $nic = $instance->nics()->first();
-
-            $nat = new Nat;
-            $nat->destination = $destination;
+            $nat = app()->make(Nat::class);
+            $nat->destination_id = $destination_id;
             $nat->destinationable_type = 'fip';
-            $nat->translated = $nic->getKey();
+            $nat->translated_id = $nic->id;
             $nat->translatedable_type = 'nic';
             $nat->save();
-
-            Log::info('Floating IP (' . $destination . ') assigned to NIC (' . $nic->getKey() . ')');
+            Log::info('Floating IP (' . $destination_id . ') assigned to NIC (' . $nic->id . ')');
         }
     }
 }
