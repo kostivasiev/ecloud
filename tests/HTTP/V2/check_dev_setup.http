@@ -1,0 +1,35 @@
+### Make sure dev region exists
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev region", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev az exists
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev availability zone", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev vpc exists
+GET https://{{host}}/{{version}}/vpcs/{{dev_vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev vpc", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
