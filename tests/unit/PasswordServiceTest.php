@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\V2;
+namespace Tests\unit;
 
 use App\Services\V2\PasswordService;
 use Tests\TestCase;

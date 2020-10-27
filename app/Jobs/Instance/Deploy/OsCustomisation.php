@@ -3,20 +3,24 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Services\V2\PasswordService;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
-class OsCustomisation extends Job
+class OsCustomisation extends TaskJob
 {
     private $data;
 
-    public function __construct($data)
+    public function __construct(Task $task, $data)
     {
+        parent::__construct($task);
+
         $this->data = $data;
     }
 

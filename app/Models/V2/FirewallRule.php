@@ -18,6 +18,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class FirewallRule
  * @package App\Models\V2
  * @method static findOrFail(string $firewallRuleId)
+ * @method static forUser($request)
  */
 class FirewallRule extends Model implements Filterable, Sortable
 {
@@ -51,6 +52,26 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function router()
     {
         return $this->belongsTo(Router::class);
+    }
+
+    public function policy()
+    {
+        return $this->belongsTo(FirewallPolicy::class);
+    }
+
+    public function scopeForUser($query, $user)
+    {
+        if (!empty($user->resellerId)) {
+            $query->whereHas('routers', function ($query) use ($user) {
+                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($resellerId)) {
+                    $query->join('routers', 'routers.id', '=', 'firewall_policies.router_id')
+                        ->join('vpc', 'vpc.id', '=', 'routers.vpc_id')
+                        ->where('vpc.reseller_id', '=', $resellerId);
+                }
+            });
+        }
+        return $query;
     }
 
     /**

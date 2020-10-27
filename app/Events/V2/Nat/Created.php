@@ -2,23 +2,21 @@
 
 namespace App\Events\V2\Nat;
 
-use App\Models\V2\Nat;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
 class Created
 {
     use SerializesModels;
 
-    /**
-     * @var Nat
-     */
-    public $nat;
+    public $model;
 
     /**
-     * @param Nat $nat
+     * @param Model $model
+     * @return void
      */
-    public function __construct(Nat $nat)
+    public function __construct($model)
     {
-        $this->nat = $nat;
+        $this->model = $model;
     }
 }

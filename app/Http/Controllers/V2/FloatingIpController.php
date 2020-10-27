@@ -95,6 +95,7 @@ class FloatingIpController extends BaseController
      */
     public function assign(AssignRequest $request, string $fipId)
     {
+        // TODO :- Move this to the AssignRequest?
         $request['id'] = $fipId;
         $this->validate(
             $request,
@@ -105,10 +106,11 @@ class FloatingIpController extends BaseController
         $fip = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
 
         $nat = new Nat;
-        $nat->destination = $fip->getKey();
+        $nat->destination_id = $fip->id;
         $nat->destinationable_type = 'fip';
-        $nat->translated = $request->resource_id;
+        $nat->translated_id = $request->resource_id;
 
+        // TODO :- This is hack and needs addressing. The type should be discovered when assigning.
         foreach (Relation::morphMap() as $map => $model) {
             try {
                 $model::forUser(app('request')->user)->findOrFail($request->resource_id);

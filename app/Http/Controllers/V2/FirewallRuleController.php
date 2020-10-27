@@ -22,7 +22,7 @@ class FirewallRuleController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallRule::query();
+        $collection = FirewallRule::forUser($request->user);
 
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
@@ -33,13 +33,14 @@ class FirewallRuleController extends BaseController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
      * @param string $firewallRuleId
      * @return FirewallRuleResource
      */
-    public function show(string $firewallRuleId)
+    public function show(Request $request, string $firewallRuleId)
     {
         return new FirewallRuleResource(
-            FirewallRule::findOrFail($firewallRuleId)
+            FirewallRule::forUser($request->user)->findOrFail($firewallRuleId)
         );
     }
 
@@ -63,19 +64,20 @@ class FirewallRuleController extends BaseController
      */
     public function update(UpdateFirewallRuleRequest $request, string $firewallRuleId)
     {
-        $item = FirewallRule::findOrFail($firewallRuleId);
+        $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         $item->fill($request->only(['name', 'router_id', 'deployed']));
         $item->save();
         return $this->responseIdMeta($request, $item->getKey(), 200);
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
      * @param string $firewallRuleId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(string $firewallRuleId)
+    public function destroy(Request $request, string $firewallRuleId)
     {
-        $item = FirewallRule::findOrFail($firewallRuleId);
+        $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         $item->delete();
         return response()->json([], 204);
     }

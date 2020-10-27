@@ -3,22 +3,28 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
-class WaitOsCustomisation extends Job
+class WaitOsCustomisation extends TaskJob
 {
+    public $tries = 500;
+
     const RETRY_ATTEMPTS = 360; // Retry every 5 seconds for 20 minutes
 
     const RETRY_DELAY = 5;
 
     private $data;
 
-    public function __construct($data)
+    public function __construct(Task $task, $data)
     {
+        parent::__construct($task);
+
         $this->data = $data;
     }
 
