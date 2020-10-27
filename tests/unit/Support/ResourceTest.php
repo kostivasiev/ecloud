@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit;
+namespace Tests\unit\Support;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
