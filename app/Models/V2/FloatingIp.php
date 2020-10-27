@@ -61,7 +61,7 @@ class FloatingIp extends Model implements Filterable, Sortable
      */
     public function nat()
     {
-        return $this->morphOne(Nat::class, 'destinationable', null, 'destination');
+        return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
     }
 
     public function getResourceIdAttribute()
