@@ -27,8 +27,7 @@ trait Taskable
     }
 
     /**
-     * Until tasks are exposed, for now we'll compute status based on tasks associated
-     * with this resource.
+     * Until tasks are exposed, for now we'll compute status based on tasks associated with this resource.
      * If a resource has at least one task, and the latest task failed, the status will be STATUS_FAILED
      * If a resource has at least one task running, the status will be STATUS_PROVISIONING
      * else status will be STATUS_READY
