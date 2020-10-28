@@ -1,0 +1,81 @@
+###
+# Create Firewall Rule
+POST https://{{host}}/{{version}}/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Rule Test 1",
+  "router_id": "rtr-259e5f91",
+  "firewall_policy_id": "fwp-55c9cb69",
+  "source": "100.64.0.0/16",
+  "destination": "100.64.0.0-100.64.0.32",
+  "action": "ALLOW",
+  "direction": "IN",
+  "enabled": true
+}
+
+> {%
+client.global.set('rule_id', response.body.data.id);
+client.log('Rule ID: ' + response.body.data.id);
+%}
+
+###
+# Get Rules Collection
+GET https://{{host}}/{{version}}/firewall-rules
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+# Get Rule Item
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+
+PATCH https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Updated Rule Name"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+# Delete Policy
+DELETE https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}

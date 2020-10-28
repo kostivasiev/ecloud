@@ -40,6 +40,10 @@ class FirewallRule extends Model implements Filterable, Sortable
         'direction',
         'enabled',
     ];
+    protected $casts = [
+        'deployed' => 'boolean',
+        'enabled' => 'boolean',
+    ];
 
     protected $visible = [
         'id',
@@ -73,13 +77,13 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
-            $query->whereHas('routers', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->join('routers', 'routers.id', '=', 'firewall_policies.router_id')
-                        ->join('vpc', 'vpc.id', '=', 'routers.vpc_id')
-                        ->where('vpc.reseller_id', '=', $resellerId);
-                }
+            $query->whereHas('router', function ($query) use ($user) {
+                $query->whereHas('vpc', function ($query) use ($user) {
+                    $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                    if (!empty($resellerId)) {
+                        $query->where('reseller_id', '=', $resellerId);
+                    }
+                });
             });
         }
         return $query;
