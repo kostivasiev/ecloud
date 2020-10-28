@@ -4,6 +4,7 @@ namespace App\Listeners\V2\Nat;
 
 use App\Events\V2\Nat\Deleted;
 use App\Models\V2\Nic;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
