@@ -5,7 +5,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 > {%
-    client.test("Find dev region", function() {
+    client.test("Find dev_region_id", function() {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
@@ -17,7 +17,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 > {%
-    client.test("Find dev availability zone", function() {
+    client.test("Find dev_availability_zone_id", function() {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
@@ -29,7 +29,31 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 > {%
-    client.test("Find dev vpc", function() {
+    client.test("Find dev_vpc_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev creds exists
+GET https://{{host}}/{{version}}/credentials/{{dev_credentials_kingpin_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_credentials_kingpin_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev creds exists
+GET https://{{host}}/{{version}}/credentials/{{dev_credentials_nsx_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_credentials_nsx_id", function() {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
