@@ -17,7 +17,7 @@ class CreateTest extends TestCase
 
     protected $availability_zone;
     protected $faker;
-    protected $firewallPolicy;
+    protected $firewall_policy;
     protected $region;
     protected $router;
     protected $vpc;
@@ -37,9 +37,9 @@ class CreateTest extends TestCase
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey()
         ]);
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+        $this->firewall_policy = factory(FirewallPolicy::class)->create([
             'router_id' => $this->router->getKey(),
-        ])->first();
+        ]);
     }
 
     public function testNotOwnedRouterIsFailed()
@@ -69,18 +69,18 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/firewall-rules',
             [
-                'name'               => 'Demo firewall rule 1',
-                'router_id'          => $this->router->getKey(),
-                'firewall_policy_id' => $this->firewallPolicy->getKey(),
-                'source'             => '100.64.0.0/16',
-                'destination'        => '100.64.0.0-100.64.0.32',
-                'action'             => 'ALLOW',
-                'direction'          => 'IN',
-                'enabled'            => true,
+                'name' => 'Demo firewall rule 1',
+                'router_id' => $this->router->getKey(),
+                'firewall_policy_id' => $this->firewall_policy->getKey(),
+                'source' => '100.64.0.0/16',
+                'destination' => '100.64.0.0-100.64.0.32',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(201);
 

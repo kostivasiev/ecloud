@@ -3,7 +3,7 @@
 namespace App\Rules\V2;
 
 use Illuminate\Contracts\Validation\Rule;
-use IPLib\Factory as CidrRange;
+use IPLib\Factory;
 
 /**
  * Class ValidCidrRange
@@ -13,12 +13,12 @@ class ValidCidrRange implements Rule
 {
     public function passes($attribute, $value)
     {
-        $range = null;
-        if (strpos($value, '-')) {
-            list($firstPart, $secondPart) = explode("-", $value);
-            $range = CidrRange::rangeFromBoundaries($firstPart, $secondPart);
+        if (!strpos($value, '-')) {
+            return false;
         }
-        return !is_null($range);
+
+        list($from, $to) = explode('-', $value);
+        return !is_null(Factory::rangeFromBoundaries($from, $to));
     }
 
     /**

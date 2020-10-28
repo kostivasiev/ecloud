@@ -38,7 +38,7 @@ class UpdateTest extends TestCase
             'vpc_id' => $this->vpc->getKey()
         ]);
         $this->oldData = [
-            'name'      => 'Demo Firewall Policy 1',
+            'name' => 'Demo Firewall Policy 1',
             'router_id' => $this->router->getKey(),
         ];
         $this->policy = factory(FirewallPolicy::class)->create($this->oldData)->first();

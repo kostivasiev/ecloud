@@ -33,8 +33,8 @@ class FirewallPolicyController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $firewallPolicyId
+     * @param \Illuminate\Http\Request $request
+     * @param string $firewallPolicyId
      * @return FirewallPolicyResource
      */
     public function show(Request $request, string $firewallPolicyId)
@@ -71,8 +71,8 @@ class FirewallPolicyController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $firewallPolicyId
+     * @param \Illuminate\Http\Request $request
+     * @param string $firewallPolicyId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $firewallPolicyId)

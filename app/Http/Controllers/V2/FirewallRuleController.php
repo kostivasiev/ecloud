@@ -33,8 +33,8 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $firewallRuleId
+     * @param \Illuminate\Http\Request $request
+     * @param string $firewallRuleId
      * @return FirewallRuleResource
      */
     public function show(Request $request, string $firewallRuleId)
@@ -52,7 +52,14 @@ class FirewallRuleController extends BaseController
     {
         $instance = new FirewallRule();
         $instance->fill($request->only([
-            'name', 'router_id', 'deployed', 'firewall_policy_id', 'source', 'destination', 'action', 'direction',
+            'name',
+            'router_id',
+            'deployed',
+            'firewall_policy_id',
+            'source',
+            'destination',
+            'action',
+            'direction',
             'enabled'
         ]));
         $instance->save();
@@ -69,7 +76,14 @@ class FirewallRuleController extends BaseController
     {
         $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         $item->fill($request->only([
-            'name', 'router_id', 'deployed', 'firewall_policy_id', 'source', 'destination', 'action', 'direction',
+            'name',
+            'router_id',
+            'deployed',
+            'firewall_policy_id',
+            'source',
+            'destination',
+            'action',
+            'direction',
             'enabled'
         ]));
         $item->save();
@@ -77,8 +91,8 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $firewallRuleId
+     * @param \Illuminate\Http\Request $request
+     * @param string $firewallRuleId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $firewallRuleId)

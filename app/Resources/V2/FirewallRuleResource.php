@@ -29,20 +29,20 @@ class FirewallRuleResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'          => $this->id,
-            'name'        => $this->name,
-            'router_id'   => $this->router_id,
-            'deployed'    => $this->deployed,
-            'source'      => $this->source,
+            'id' => $this->id,
+            'name' => $this->name,
+            'router_id' => $this->router_id,
+            'deployed' => $this->deployed,
+            'source' => $this->source,
             'destination' => $this->destination,
-            'action'      => $this->action,
-            'direction'   => $this->direction,
-            'enabled'     => $this->enabled,
-            'created_at'  => Carbon::parse(
+            'action' => $this->action,
+            'direction' => $this->direction,
+            'enabled' => $this->enabled,
+            'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at'  => Carbon::parse(
+            'updated_at' => Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

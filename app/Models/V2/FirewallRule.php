@@ -40,23 +40,10 @@ class FirewallRule extends Model implements Filterable, Sortable
         'direction',
         'enabled',
     ];
+
     protected $casts = [
         'deployed' => 'boolean',
         'enabled' => 'boolean',
-    ];
-
-    protected $visible = [
-        'id',
-        'name',
-        'router_id',
-        'deployed',
-        'source',
-        'destination',
-        'action',
-        'direction',
-        'enabled',
-        'created_at',
-        'updated_at',
     ];
 
     protected $dispatchesEvents = [
@@ -147,16 +134,19 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'          => 'id',
-            'name'        => 'name',
-            'router_id'   => 'router_id',
-            'source'      => 'source',
+            'id' => 'id',
+            'name' => 'name',
+            'router_id' => 'router_id',
+            'deployed' => 'deployed',
+            'firewall_policy_id' => 'firewall_policy_id',
+            'source' => 'source',
             'destination' => 'destination',
-            'action'      => 'action',
-            'direction'   => 'direction',
-            'enabled'     => 'enabled',
-            'created_at'  => 'created_at',
-            'updated_at'  => 'updated_at',
+            'action' => 'action',
+            'direction' => 'direction',
+            'enabled' => 'enabled',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            'deleted_at' => 'deleted_at',
         ];
     }
 }

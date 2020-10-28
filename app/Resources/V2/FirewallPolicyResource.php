@@ -24,10 +24,10 @@ class FirewallPolicyResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
-            'sequence'   => $this->sequence,
-            'router_id'  => $this->router_id,
+            'id' => $this->id,
+            'name' => $this->name,
+            'sequence' => $this->sequence,
+            'router_id' => $this->router_id,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

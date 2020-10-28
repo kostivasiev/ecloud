@@ -37,8 +37,8 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name'      => 'Demo policy rule 1',
-            'sequence'  => 10,
+            'name' => 'Demo policy rule 1',
+            'sequence' => 10,
             'router_id' => $this->router->getKey(),
         ];
         $this->post(
