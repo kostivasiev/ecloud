@@ -83,7 +83,6 @@ client.log('VPC UUID: ' + response.body.data.id);
 
 
 ## Create fip
-
 POST https://{{host}}/{{version}}/floating-ips
 Accept: */*
 Cache-Control: no-cache
@@ -92,7 +91,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "vpc_id": "{{vpc_id}}"
+  "vpc_id": "{{dev_vpc_id}}"
 }
 
 > {%
@@ -105,8 +104,6 @@ client.log('Floating IP ID: ' + response.body.data.id);
 %}
 
 ###
-
-
 POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/assign
 Accept: */*
 Cache-Control: no-cache
@@ -125,8 +122,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
-
 GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -141,14 +136,12 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
 POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/unassign
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
-
 
 > {%
 client.test("Request executed successfully", function() {
@@ -157,8 +150,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
-
 GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -172,7 +163,6 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-
 ###
 DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
@@ -180,33 +170,3 @@ Cache-Control: no-cache
 X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
-
-###
-
-### Tear down dependancies
-
-DELETE https://{{host}}/{{version}}/regions/{{region_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-###
-DELETE https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-###
-DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-###
-
