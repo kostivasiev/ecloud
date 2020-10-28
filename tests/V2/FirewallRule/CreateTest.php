@@ -72,11 +72,14 @@ class CreateTest extends TestCase
                 'name' => 'Demo firewall rule 1',
                 'router_id' => $this->router->getKey(),
                 'firewall_policy_id' => $this->firewall_policy->getKey(),
-                'source' => '100.64.0.0/16',
-                'destination' => '100.64.0.0-100.64.0.32',
+                'service_type' => 'TCP',
+                'source' => '192.168.100.1/24',
+                'source_ports' => '80,443',
+                'destination' => '212.22.18.10/24',
+                'destination_ports' => '8080,4043',
                 'action' => 'ALLOW',
                 'direction' => 'IN',
-                'enabled' => true,
+                'enabled' => true
             ],
             [
                 'X-consumer-custom-id' => '0-0',
