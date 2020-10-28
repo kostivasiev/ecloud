@@ -33,15 +33,17 @@ class FirewallRule extends Model implements Filterable, Sortable
         'name',
         'router_id',
         'deployed',
+        'firewall_policy_id',
+        'source',
+        'destination',
+        'action',
+        'direction',
+        'enabled',
     ];
 
-    protected $visible = [
-        'id',
-        'name',
-        'router_id',
-        'deployed',
-        'created_at',
-        'updated_at',
+    protected $casts = [
+        'deployed' => 'boolean',
+        'enabled' => 'boolean',
     ];
 
     protected $dispatchesEvents = [
@@ -62,13 +64,13 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
-            $query->whereHas('routers', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->join('routers', 'routers.id', '=', 'firewall_policies.router_id')
-                        ->join('vpc', 'vpc.id', '=', 'routers.vpc_id')
-                        ->where('vpc.reseller_id', '=', $resellerId);
-                }
+            $query->whereHas('router', function ($query) use ($user) {
+                $query->whereHas('vpc', function ($query) use ($user) {
+                    $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                    if (!empty($resellerId)) {
+                        $query->where('reseller_id', '=', $resellerId);
+                    }
+                });
             });
         }
         return $query;
@@ -84,6 +86,11 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
+            $factory->create('source', Filter::$stringDefaults),
+            $factory->create('destination', Filter::$stringDefaults),
+            $factory->create('action', Filter::$stringDefaults),
+            $factory->create('direction', Filter::$stringDefaults),
+            $factory->create('enabled', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -100,6 +107,11 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_id'),
+            $factory->create('source'),
+            $factory->create('destination'),
+            $factory->create('action'),
+            $factory->create('direction'),
+            $factory->create('enabled'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -125,8 +137,16 @@ class FirewallRule extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'router_id' => 'router_id',
+            'deployed' => 'deployed',
+            'firewall_policy_id' => 'firewall_policy_id',
+            'source' => 'source',
+            'destination' => 'destination',
+            'action' => 'action',
+            'direction' => 'direction',
+            'enabled' => 'enabled',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
+            'deleted_at' => 'deleted_at',
         ];
     }
 }

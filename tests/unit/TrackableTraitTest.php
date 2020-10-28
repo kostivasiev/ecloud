@@ -1,18 +1,13 @@
 <?php
 
-namespace Tests\unit\V2;
+namespace Tests\unit;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
-use App\Models\V2\Task;
 use App\Models\V2\TaskJobStatus;
 use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Mockery;
 use Tests\TestCase;
 
 class TrackableTraitTest extends TestCase

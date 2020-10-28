@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallRule;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -14,11 +15,12 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
-    protected $vpc;
-    protected $router;
     protected $availability_zone;
+    protected $faker;
+    protected $firewall_policy;
     protected $region;
+    protected $router;
+    protected $vpc;
 
     public function setUp(): void
     {
@@ -32,9 +34,11 @@ class CreateTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey()
+        ]);
+        $this->firewall_policy = factory(FirewallPolicy::class)->create([
+            'router_id' => $this->router->getKey(),
         ]);
     }
 
@@ -66,7 +70,13 @@ class CreateTest extends TestCase
             '/v2/firewall-rules',
             [
                 'name' => 'Demo firewall rule 1',
-                'router_id' => $this->router->getKey()
+                'router_id' => $this->router->getKey(),
+                'firewall_policy_id' => $this->firewall_policy->getKey(),
+                'source' => '100.64.0.0/16',
+                'destination' => '100.64.0.0-100.64.0.32',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true,
             ],
             [
                 'X-consumer-custom-id' => '0-0',

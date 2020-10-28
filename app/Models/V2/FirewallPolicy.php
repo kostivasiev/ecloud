@@ -33,15 +33,6 @@ class FirewallPolicy extends Model implements Filterable, Sortable
         'router_id',
     ];
 
-    protected $visible = [
-        'id',
-        'name',
-        'sequence',
-        'router_id',
-        'created_at',
-        'updated_at',
-    ];
-
     public function rules()
     {
         return $this->hasMany(FirewallRule::class);
