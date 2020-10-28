@@ -10,10 +10,14 @@ use UKFast\Responses\UKFastResource;
  * @package App\Resources\V2
  * @property string id
  * @property string name
+ * @property string firewall_policy_id
  * @property string router_id
+ * @property string service_type
  * @property string deployed
  * @property string source
+ * @property string source_ports
  * @property string destination
+ * @property string destination_ports
  * @property string action
  * @property string direction
  * @property string enabled
@@ -31,10 +35,14 @@ class FirewallRuleResource extends UKFastResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'firewall_policy_id' => $this->firewall_policy_id,
             'router_id' => $this->router_id,
+            'service_type' => $this->service_type,
             'deployed' => $this->deployed,
             'source' => $this->source,
+            'source_ports' => $this->source_ports,
             'destination' => $this->destination,
+            'destination_ports' => $this->destination_ports,
             'action' => $this->action,
             'direction' => $this->direction,
             'enabled' => $this->enabled,
