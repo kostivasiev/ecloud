@@ -17,8 +17,8 @@ trait Taskable
     public function getTaskRunningAttribute()
     {
         return $this->tasks()->get()->filter(function ($task) {
-                return !$task->is_ended;
-            })->count() > 0;
+            return !$task->is_ended;
+        })->count() > 0;
     }
 
     public function tasks()
