@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(FirewallPolicy::class, function (Faker $faker) {
     return [
-        'name'     => $faker->domainWord,
+        'name' => $faker->domainWord,
         'sequence' => 10,
     ];
 });

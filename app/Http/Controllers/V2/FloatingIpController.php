@@ -99,7 +99,7 @@ class FloatingIpController extends BaseController
         $request['id'] = $fipId;
         $this->validate(
             $request,
-            ['id' => 'unique:ecloud.nats,destination_id'],
+            ['id' => 'unique:ecloud.nats,destination_id,NULL,id,deleted_at,NULL'],
             ['id.unique' => 'The floating IP is already assigned']
         );
 
@@ -133,7 +133,7 @@ class FloatingIpController extends BaseController
      */
     public function unassign(Request $request, string $fipId)
     {
-        $floatingIp = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
+        $floatingIp = FloatingIp::forUser($request->user)->findOrFail($fipId);
         if ($floatingIp->nat) {
             $floatingIp->nat->delete();
         }

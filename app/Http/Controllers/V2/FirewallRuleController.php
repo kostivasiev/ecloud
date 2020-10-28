@@ -33,8 +33,8 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $firewallRuleId
+     * @param \Illuminate\Http\Request $request
+     * @param string $firewallRuleId
      * @return FirewallRuleResource
      */
     public function show(Request $request, string $firewallRuleId)
@@ -71,8 +71,8 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $firewallRuleId
+     * @param \Illuminate\Http\Request $request
+     * @param string $firewallRuleId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $firewallRuleId)

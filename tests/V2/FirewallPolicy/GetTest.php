@@ -44,13 +44,13 @@ class GetTest extends TestCase
             '/v2/firewall-policies',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'        => $this->policy->getKey(),
-                'name'      => $this->policy->name,
-                'sequence'  => $this->policy->sequence,
+                'id' => $this->policy->getKey(),
+                'name' => $this->policy->name,
+                'sequence' => $this->policy->sequence,
                 'router_id' => $this->router->getKey(),
             ])
             ->assertResponseStatus(200);
@@ -59,16 +59,16 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/firewall-policies/'.$this->policy->getKey(),
+            '/v2/firewall-policies/' . $this->policy->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.read',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'        => $this->policy->getKey(),
-                'name'      => $this->policy->name,
-                'sequence'  => $this->policy->sequence,
+                'id' => $this->policy->getKey(),
+                'name' => $this->policy->name,
+                'sequence' => $this->policy->sequence,
                 'router_id' => $this->router->getKey(),
             ])
             ->assertResponseStatus(200);
