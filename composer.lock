@@ -2123,86 +2123,86 @@
                     "email": "taylor@laravel.com"
                 }
             ],
-            "description": "The Illuminate View package.",
-            "homepage": "https://laravel.com",
-            "support": {
-                "issues": "https://github.com/laravel/framework/issues",
-                "source": "https://github.com/laravel/framework"
-            },
-            "time": "2019-06-20T13:13:59+00:00"
+          "description": "The Illuminate View package.",
+          "homepage": "https://laravel.com",
+          "support": {
+            "issues": "https://github.com/laravel/framework/issues",
+            "source": "https://github.com/laravel/framework"
+          },
+          "time": "2019-06-20T13:13:59+00:00"
         },
-        {
-            "name": "imtigger/laravel-job-status",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/imTigger/laravel-job-status.git",
-                "reference": "8e2660721c2448f6c74082bfeea6e82cd10aa3de"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/imTigger/laravel-job-status/zipball/8e2660721c2448f6c74082bfeea6e82cd10aa3de",
-                "reference": "8e2660721c2448f6c74082bfeea6e82cd10aa3de",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "illuminate/contracts": ">=5.5",
-                "illuminate/database": ">=5.5",
-                "illuminate/queue": ">=5.5",
-                "illuminate/support": ">=5.5",
-                "nesbot/carbon": ">=1.21",
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.11",
-                "orchestra/database": ">=3.5",
-                "orchestra/testbench": ">=3.5",
-                "phpunit/phpunit": ">=5.7"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Imtigger\\LaravelJobStatus\\LaravelJobStatusServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Imtigger\\LaravelJobStatus\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Tiger Fok",
-                    "email": "tiger@tiger-workshop.com"
-                }
-            ],
-            "description": "Laravel Job Status",
-            "keywords": [
-                "job",
-                "laravel",
-                "lumen",
-                "queue"
-            ],
-            "time": "2020-09-19T16:43:44+00:00"
+      {
+        "name": "imtigger/laravel-job-status",
+        "version": "1.2.0",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/imTigger/laravel-job-status.git",
+          "reference": "8e2660721c2448f6c74082bfeea6e82cd10aa3de"
         },
-        {
-            "name": "justinrainbow/json-schema",
-            "version": "5.2.10",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/justinrainbow/json-schema.git",
-                "reference": "2ba9c8c862ecd5510ed16c6340aa9f6eadb4f31b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/2ba9c8c862ecd5510ed16c6340aa9f6eadb4f31b",
+        "dist": {
+          "type": "zip",
+          "url": "https://api.github.com/repos/imTigger/laravel-job-status/zipball/8e2660721c2448f6c74082bfeea6e82cd10aa3de",
+          "reference": "8e2660721c2448f6c74082bfeea6e82cd10aa3de",
+          "shasum": ""
+        },
+        "require": {
+          "ext-json": "*",
+          "illuminate/contracts": ">=5.5",
+          "illuminate/database": ">=5.5",
+          "illuminate/queue": ">=5.5",
+          "illuminate/support": ">=5.5",
+          "nesbot/carbon": ">=1.21",
+          "php": ">=7.1"
+        },
+        "require-dev": {
+          "friendsofphp/php-cs-fixer": "^2.11",
+          "orchestra/database": ">=3.5",
+          "orchestra/testbench": ">=3.5",
+          "phpunit/phpunit": ">=5.7"
+        },
+        "type": "library",
+        "extra": {
+          "laravel": {
+            "providers": [
+              "Imtigger\\LaravelJobStatus\\LaravelJobStatusServiceProvider"
+            ]
+          }
+        },
+        "autoload": {
+          "psr-4": {
+            "Imtigger\\LaravelJobStatus\\": "src"
+          }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+          "MIT"
+        ],
+        "authors": [
+          {
+            "name": "Tiger Fok",
+            "email": "tiger@tiger-workshop.com"
+          }
+        ],
+        "description": "Laravel Job Status",
+        "keywords": [
+          "job",
+          "laravel",
+          "lumen",
+          "queue"
+        ],
+        "time": "2020-09-19T16:43:44+00:00"
+      },
+      {
+        "name": "justinrainbow/json-schema",
+        "version": "5.2.10",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/justinrainbow/json-schema.git",
+          "reference": "2ba9c8c862ecd5510ed16c6340aa9f6eadb4f31b"
+        },
+        "dist": {
+          "type": "zip",
+          "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/2ba9c8c862ecd5510ed16c6340aa9f6eadb4f31b",
                 "reference": "2ba9c8c862ecd5510ed16c6340aa9f6eadb4f31b",
                 "shasum": ""
             },

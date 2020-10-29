@@ -30,6 +30,10 @@ class Nat extends Model
         'deleted' => Deleted::class,
     ];
 
+    /**
+     * Load the associated destination resource
+     * @return Model|\Illuminate\Database\Eloquent\Relations\MorphTo
+     */
     public function destination()
     {
         return $this->morphTo('destinationable', null, 'destination_id', 'id');
@@ -38,10 +42,5 @@ class Nat extends Model
     public function translated()
     {
         return $this->morphTo('translatedable', null, 'translated_id', 'id');
-    }
-
-    public function getRuleIdAttribute()
-    {
-        return $this->destination_id . '-to-' . $this->translated_id;
     }
 }

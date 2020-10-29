@@ -111,6 +111,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Nat\Deploy::class
         ],
         \App\Events\V2\Nat\Deleted::class => [
+            \App\Listeners\V2\Nat\Undeploy::class
         ],
 
         // Nic

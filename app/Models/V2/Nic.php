@@ -28,11 +28,8 @@ class Nic extends Model implements Filterable, Sortable
         'mac_address',
         'instance_id',
         'network_id',
-        'ip_address'
-    ];
-
-    protected $casts = [
-        'deleted' => 'boolean'  // This is for the "atomic" IP fudge. It needs replacing at some point
+        'ip_address',
+        'deleted'
     ];
 
     protected $dispatchesEvents = [

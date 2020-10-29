@@ -76,7 +76,7 @@ class Deploy extends Job
                         'action' => 'DNAT',
                         'destination_network' => $nat->destination->ip_address,
                         'translated_network' => $nat->translated->ip_address,
-                        'translated_ports' => '*',
+                        'translated_ports' => '0-65535',
                         'enabled' => true,
                         'logging' => false,
                         'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',

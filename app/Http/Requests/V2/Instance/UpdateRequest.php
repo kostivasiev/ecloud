@@ -44,19 +44,19 @@ class UpdateRequest extends FormRequest
     {
         $rules = [
             'name' => 'nullable|string',
-/*            'vpc_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.vpcs,id',
-                new ExistsForUser(Vpc::class)
-            ],*/
-/*            'appliance_id' => [
-                'sometimes',
-                'required',
-                'uuid',
-                'exists:ecloud.appliance,appliance_uuid'
-            ],*/
+            /*            'vpc_id' => [
+                            'sometimes',
+                            'required',
+                            'string',
+                            'exists:ecloud.vpcs,id',
+                            new ExistsForUser(Vpc::class)
+                        ],*/
+            /*            'appliance_id' => [
+                            'sometimes',
+                            'required',
+                            'uuid',
+                            'exists:ecloud.appliance,appliance_uuid'
+                        ],*/
             'vcpu_cores' => [
                 'sometimes',
                 'required',
