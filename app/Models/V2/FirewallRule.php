@@ -34,7 +34,6 @@ class FirewallRule extends Model implements Filterable, Sortable
         'router_id',
         'deployed',
         'firewall_policy_id',
-        'router_id',
         'service_type',
         'source',
         'source_ports',
@@ -55,11 +54,6 @@ class FirewallRule extends Model implements Filterable, Sortable
         'created' => Created::class,
     ];
 
-    public function router()
-    {
-        return $this->belongsTo(Router::class);
-    }
-
     public function firewallPolicy()
     {
         return $this->belongsTo(FirewallPolicy::class);
@@ -68,12 +62,14 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
-            $query->whereHas('router', function ($query) use ($user) {
-                $query->whereHas('vpc', function ($query) use ($user) {
-                    $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                    if (!empty($resellerId)) {
-                        $query->where('reseller_id', '=', $resellerId);
-                    }
+            $query->whereHas('firewallPolicy', function ($query) use ($user) {
+                $query->whereHas('router', function ($query) use ($user) {
+                    $query->whereHas('vpc', function ($query) use ($user) {
+                        $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
+                        if (!empty($resellerId)) {
+                            $query->where('reseller_id', '=', $resellerId);
+                        }
+                    });
                 });
             });
         }
@@ -90,7 +86,6 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$enumDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('firewall_policy_id', Filter::$enumDefaults),
-            $factory->create('router_id', Filter::$enumDefaults),
             $factory->create('deployed', Filter::$numericDefaults),
             $factory->create('service_type', Filter::$enumDefaults),
             $factory->create('source', Filter::$stringDefaults),
@@ -116,7 +111,6 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('firewall_policy_id'),
-            $factory->create('router_id'),
             $factory->create('deployed'),
             $factory->create('service_type'),
             $factory->create('source'),
@@ -150,7 +144,6 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
-            'router_id' => 'router_id',
             'firewall_policy_id' => 'firewall_policy_id',
             'service_type' => 'service_type',
             'source' => 'source',

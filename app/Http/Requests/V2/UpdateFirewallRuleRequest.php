@@ -18,13 +18,6 @@ class UpdateFirewallRuleRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:50',
-            'router_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.routers,id,deleted_at,NULL',
-                new ExistsForUser(Router::class)
-            ],
             'firewall_policy_id' => [
                 'sometimes',
                 'required',
@@ -71,8 +64,6 @@ class UpdateFirewallRuleRequest extends FormRequest
         return [
             'name.string' => 'The :attribute field must contain a string',
             'name.max' => 'The :attribute field must be less than 50 characters',
-            'router_id.required' => 'The :attribute field is required',
-            'router_id.exists' => 'The specified :attribute was not found',
             'firewall_policy_id.required' => 'The :attribute field is required',
             'firewall_policy_id.exists' => 'The specified :attribute was not found',
             'source.required' => 'The :attribute field is required',

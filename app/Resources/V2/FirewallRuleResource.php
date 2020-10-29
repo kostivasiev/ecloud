@@ -11,7 +11,6 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string firewall_policy_id
- * @property string router_id
  * @property string service_type
  * @property string deployed
  * @property string source
@@ -36,7 +35,6 @@ class FirewallRuleResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'firewall_policy_id' => $this->firewall_policy_id,
-            'router_id' => $this->router_id,
             'service_type' => $this->service_type,
             'source' => $this->source,
             'source_ports' => $this->source_ports,

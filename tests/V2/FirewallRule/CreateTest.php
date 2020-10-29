@@ -42,35 +42,12 @@ class CreateTest extends TestCase
         ]);
     }
 
-    public function testNotOwnedRouterIsFailed()
-    {
-        $this->post(
-            '/v2/firewall-rules',
-            [
-                'name' => 'Demo firewall rule 1',
-                'router_id' => $this->router->getKey()
-            ],
-            [
-                'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified router id was not found',
-                'status' => 422,
-                'source' => 'router_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testValidDataSucceeds()
     {
         $this->post(
             '/v2/firewall-rules',
             [
                 'name' => 'Demo firewall rule 1',
-                'router_id' => $this->router->getKey(),
                 'firewall_policy_id' => $this->firewall_policy->getKey(),
                 'service_type' => 'TCP',
                 'source' => '192.168.100.1/24',

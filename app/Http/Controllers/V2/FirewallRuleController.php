@@ -52,7 +52,7 @@ class FirewallRuleController extends BaseController
     {
         $instance = new FirewallRule();
         $instance->fill($request->only([
-            'name', 'router_id', 'deployed', 'firewall_policy_id', 'service_type', 'source', 'source_ports',
+            'name', 'deployed', 'firewall_policy_id', 'service_type', 'source', 'source_ports',
             'destination', 'destination_ports', 'action', 'direction', 'enabled'
         ]));
         $instance->save();
@@ -69,7 +69,7 @@ class FirewallRuleController extends BaseController
     {
         $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         $item->fill($request->only([
-            'name', 'router_id', 'deployed', 'firewall_policy_id', 'service_type', 'source', 'source_ports',
+            'name', 'deployed', 'firewall_policy_id', 'service_type', 'source', 'source_ports',
             'destination', 'destination_ports', 'action', 'direction', 'enabled'
         ]));
         $item->save();
