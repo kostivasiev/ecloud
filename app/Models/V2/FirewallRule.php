@@ -60,7 +60,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return $this->belongsTo(Router::class);
     }
 
-    public function policy()
+    public function firewallPolicy()
     {
         return $this->belongsTo(FirewallPolicy::class);
     }
