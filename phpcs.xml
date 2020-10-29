@@ -5,11 +5,14 @@
     <!-- display progress -->
     <arg value="p"/>
 
+    <!-- hide warnings -->
+    <arg value="n"/>
+
     <!-- use colors in output -->
     <arg name="colors"/>
 
     <!-- inherit rules from: -->
-    <rule ref="PSR2"/>
+    <rule ref="vendor/ukfast/rulesets/CodeSniffer/UKFDefault.xml"/>
 
     <!-- Paths to check -->
     <file>app</file>
