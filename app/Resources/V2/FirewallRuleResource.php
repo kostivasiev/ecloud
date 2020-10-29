@@ -38,7 +38,6 @@ class FirewallRuleResource extends UKFastResource
             'firewall_policy_id' => $this->firewall_policy_id,
             'router_id' => $this->router_id,
             'service_type' => $this->service_type,
-            'deployed' => $this->deployed,
             'source' => $this->source,
             'source_ports' => $this->source_ports,
             'destination' => $this->destination,
