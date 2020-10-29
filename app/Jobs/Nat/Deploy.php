@@ -80,7 +80,6 @@ class Deploy extends Job
                         'enabled' => true,
                         'logging' => false,
                         'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',
-                        'scope' => ['infra/tier-0s/tier-0-vmc/interfaces/internet'],
                     ]
                 ]
             );
@@ -90,7 +89,7 @@ class Deploy extends Job
                 $this->fail(new \Exception($message));
             }
         } catch (\Exception $exception) {
-            $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to add new NAT rule';
+            $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Exception while adding new NAT rule';
             Log::error($message, ['exception' => $exception]);
             $this->fail(new \Exception($message));
         }
