@@ -40,6 +40,8 @@ class Undeploy implements ShouldQueue
             return;
         }
 
+        $firewallPolicy->firewallRules()->delete();
+
         Log::info($message . 'Success');
     }
 }

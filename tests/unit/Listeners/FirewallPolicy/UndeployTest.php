@@ -4,6 +4,7 @@ namespace Tests\unit\Listeners\FirewallPolicy;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -26,6 +27,7 @@ class UndeployTest extends TestCase
     protected $vpc;
     protected $router;
     protected $firewallPolicy;
+    protected $firewallRule;
 
     public function setUp(): void
     {
@@ -46,6 +48,12 @@ class UndeployTest extends TestCase
             $this->firewallPolicy = factory(FirewallPolicy::class)->create([
                 'id' => 'fwp-abc123',
                 'router_id' => $this->router->getKey()
+            ]);
+
+            $this->firewallRule = factory(FirewallRule::class)->create([
+                'id' => 'fwr-abc123',
+                'router_id' => $this->router->getKey(),
+                'firewall_policy_id' => $this->firewallPolicy->getKey()
             ]);
         });
     }
@@ -69,5 +77,7 @@ class UndeployTest extends TestCase
 
         $listener = \Mockery::mock(\App\Listeners\V2\FirewallPolicy\Undeploy::class)->makePartial();
         $listener->handle(new \App\Events\V2\FirewallPolicy\Deleted($this->firewallPolicy));
+
+        $this->assertNotNull($this->firewallRule->refresh()->deleted_at);
     }
 }

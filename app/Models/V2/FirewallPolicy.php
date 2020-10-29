@@ -38,7 +38,7 @@ class FirewallPolicy extends Model implements Filterable, Sortable
         'deleted' => Deleted::class
     ];
 
-    public function rules()
+    public function firewallRules()
     {
         return $this->hasMany(FirewallRule::class);
     }
