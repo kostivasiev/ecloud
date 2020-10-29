@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events\V2\FirewallRule;
+namespace App\Events\V2\FirewallPolicy;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Creating
+class Saved
 {
     use SerializesModels;
 

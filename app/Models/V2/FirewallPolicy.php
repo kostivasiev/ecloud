@@ -33,7 +33,7 @@ class FirewallPolicy extends Model implements Filterable, Sortable
         'router_id',
     ];
 
-    public function rules()
+    public function firewallRules()
     {
         return $this->hasMany(FirewallRule::class);
     }

@@ -2,8 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallRule\Created;
-use App\Events\V2\FirewallRule\Creating;
+use App\Events\V2\FirewallRule\Deleted;
+use App\Events\V2\FirewallRule\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -47,8 +47,8 @@ class FirewallRule extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
-        'created' => Created::class,
+        'saved' => Saved::class,
+        'deleted' => Deleted::class,
     ];
 
     public function router()
@@ -56,7 +56,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return $this->belongsTo(Router::class);
     }
 
-    public function policy()
+    public function firewallPolicy()
     {
         return $this->belongsTo(FirewallPolicy::class);
     }

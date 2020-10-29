@@ -5,7 +5,7 @@ namespace App\Events\V2\FirewallRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Created
+class Saved
 {
     use SerializesModels;
 
