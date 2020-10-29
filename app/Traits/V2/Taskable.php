@@ -18,7 +18,7 @@ trait Taskable
     {
         return $this->tasks()->get()->filter(function ($task) {
                 return !$task->is_ended;
-            })->count() > 0;
+        })->count() > 0;
     }
 
     public function tasks()
