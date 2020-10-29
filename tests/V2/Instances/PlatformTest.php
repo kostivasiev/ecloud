@@ -78,7 +78,7 @@ class PlatformTest extends TestCase
         $id = json_decode($this->response->getContent())->data->id;
         $instance = Instance::findOrFail($id);
 
-        $listener = \Mockery::mock( \App\Listeners\V2\Instance\DefaultPlatform::class)->makePartial();
+        $listener = \Mockery::mock(\App\Listeners\V2\Instance\DefaultPlatform::class)->makePartial();
         $listener->handle(new \App\Events\V2\Instance\Created($instance));
 
         // Check that the platform id has been populated
