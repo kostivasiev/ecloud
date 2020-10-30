@@ -8,11 +8,57 @@ properties:
     required: true
     example: 'Internal FW Rule'
     readOnly: false
-  router_id:
+  firewall_policy_id:
     type: string
     required: true
-    example: rtr-2b66bb79
+    example: fwp-abc123xyz
     readOnly: false
+  service_type:
+    description: 'The service type, one of: IP, IGMP, ICMPv4, ALG, TCP, UDP, ICMPv6'
+    type: string
+    required: true
+    example: TCP
+    readOnly: false
+  source:
+    description: 'Source IP Address. Multiple IPs specified with comma-separator'
+    type: string
+    required: true
+    example: '1.1.1.1'
+    readOnly: false
+  source_ports:
+    description: 'Source Port(s). Multiple Ports specified with comma-separator,ranges can also be specified with 80-100'
+    type: string
+    required: true
+    example: '80'
+    readOnly: false
+  destination:
+    description: 'Destination IP Address. Multiple IPs specified with comma-separator'
+    type: string
+    required: true
+    example: '2.2.2.2'
+    readOnly: false
+  destination_ports:
+    description: 'Destination Port(s). Multiple Ports specified with comma-separator,ranges can also be specified with 80-100'
+    type: string
+    required: true
+    example: '80,443,8080'
+    readOnly: false
+  action:
+    description: 'One of ALLOW, DROP, REJECT'
+    type: string
+    required: true
+    example: 'ALLOW'
+    readOnly: false
+  direction:
+    description: 'One of IN, OUT, IN_OUT'
+    type: string
+    required: true
+    example: 'IN_OUT'
+    readOnly: false
+  enabled:
+    type: boolean
+    readOnly: true
+    example: true
   deployed:
     type: boolean
     readOnly: true
