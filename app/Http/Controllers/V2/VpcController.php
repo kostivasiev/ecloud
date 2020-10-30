@@ -5,7 +5,10 @@ namespace App\Http\Controllers\V2;
 use App\Events\V2\Network\Creating;
 use App\Http\Requests\V2\CreateVpcRequest;
 use App\Http\Requests\V2\UpdateVpcRequest;
+use App\Models\V2\Instance;
+use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
+use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
@@ -92,45 +95,53 @@ class VpcController extends BaseController
 
     /**
      * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $vpcId
      * @return \Illuminate\Http\Response
      */
-    public function volumes(Request $request, string $vpcId)
+    public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        $volumes = Vpc::forUser($request->user)->findOrFail($vpcId)->volumes();
-        return VolumeResource::collection($volumes->paginate(
+        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->volumes();
+        $queryTransformer->config(Volume::class)
+            ->transform($collection);
+
+        return VolumeResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     /**
      * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $vpcId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function instances(Request $request, string $vpcId)
+    public function instances(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        $instances = Vpc::forUser($request->user)->findOrFail($vpcId)->instances();
-        return InstanceResource::collection($instances->paginate(
+        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->instances();
+        $queryTransformer->config(Instance::class)
+            ->transform($collection);
+
+        return InstanceResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     /**
      * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $vpcId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function lbcs(Request $request, string $vpcId)
+    public function lbcs(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        return LoadBalancerClusterResource::collection(
-            Vpc::forUser($request->user)
-                ->findOrFail($vpcId)
-                ->loadBalancerClusters()
-                ->paginate(
-                    $request->input('per_page', env('PAGINATION_LIMIT'))
-                )
-        );
+        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->loadBalancerClusters();
+        $queryTransformer->config(LoadBalancerCluster::class)
+            ->transform($collection);
+
+        return LoadBalancerClusterResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**

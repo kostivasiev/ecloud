@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
 use App\Models\V2\Network;
+use App\Models\V2\Nic;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
@@ -91,17 +92,19 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $zoneId
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, string $zoneId)
+    public function nics(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        return NicResource::collection(
-            Network::forUser($request->user)
-                ->findOrFail($zoneId)
-                ->nics()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
+        $collection = Network::forUser($request->user)->findOrFail($zoneId)->nics();
+        $queryTransformer->config(Nic::class)
+            ->transform($collection);
+
+        return NicResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
