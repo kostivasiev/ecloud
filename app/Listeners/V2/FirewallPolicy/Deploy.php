@@ -31,8 +31,11 @@ class Deploy implements ShouldQueue
             $this->fail(new \Exception($message));
         }
 
-        dispatch(new \App\Jobs\FirewallPolicy\Deploy([
-            'policy_id' => $policy->id,
-        ]));
+        dispatch(new \App\Jobs\FirewallPolicy\Deploy(
+            $event->task,
+            [
+                'policy_id' => $policy->id,
+            ]
+        ));
     }
 }
