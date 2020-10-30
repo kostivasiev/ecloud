@@ -51,23 +51,19 @@ class FirewallRuleController extends BaseController
     public function store(CreateFirewallRuleRequest $request)
     {
         $instance = new FirewallRule();
-        $instance->fill(
-            $request->only(
-                [
-                    'name',
-                    'deployed',
-                    'firewall_policy_id',
-                    'service_type',
-                    'source',
-                    'source_ports',
-                    'destination',
-                    'destination_ports',
-                    'action',
-                    'direction',
-                    'enabled'
-                ]
-            )
-        );
+        $instance->fill($request->only([
+            'name',
+            'deployed',
+            'firewall_policy_id',
+            'service_type',
+            'source',
+            'source_ports',
+            'destination',
+            'destination_ports',
+            'action',
+            'direction',
+            'enabled'
+        ]));
         $instance->save();
         $instance->refresh();
         return $this->responseIdMeta($request, $instance->getKey(), 201);
@@ -81,23 +77,19 @@ class FirewallRuleController extends BaseController
     public function update(UpdateFirewallRuleRequest $request, string $firewallRuleId)
     {
         $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
-        $item->fill(
-            $request->only(
-                [
-                    'name',
-                    'deployed',
-                    'firewall_policy_id',
-                    'service_type',
-                    'source',
-                    'source_ports',
-                    'destination',
-                    'destination_ports',
-                    'action',
-                    'direction',
-                    'enabled'
-                ]
-            )
-        );
+        $item->fill($request->only([
+            'name',
+            'deployed',
+            'firewall_policy_id',
+            'service_type',
+            'source',
+            'source_ports',
+            'destination',
+            'destination_ports',
+            'action',
+            'direction',
+            'enabled'
+        ]));
         $item->save();
         return $this->responseIdMeta($request, $item->getKey(), 200);
     }
