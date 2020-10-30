@@ -34,7 +34,7 @@ class CreateFirewallRuleRequest extends FormRequest
                 'exists:ecloud.firewall_policies,id,deleted_at,NULL',
                 new ExistsForUser(FirewallPolicy::class)
             ],
-            'service_type' => 'required|string|in:IP,IGMP,ICMPv4,ALG,TCP,UDP,ICMPv6',
+            'service_type' => 'required|string|in:TCP,UDP',
             'source' => [
                 'required',
                 'string',
