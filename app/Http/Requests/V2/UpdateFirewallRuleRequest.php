@@ -18,6 +18,7 @@ class UpdateFirewallRuleRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:50',
+            'sequence' => 'sometimes|required|integer',
             'firewall_policy_id' => [
                 'sometimes',
                 'required',
@@ -70,6 +71,8 @@ class UpdateFirewallRuleRequest extends FormRequest
             'action.in' => 'The :attribute field contains an invalid option',
             'direction.in' => 'The :attribute field contains an invalid option',
             'enabled.boolean' => 'The :attribute field is not a valid boolean value',
+            'sequence.required' => 'The :attribute field, when specified, cannot be null',
+            'sequence.integer' => 'The specified :attribute must be an integer',
         ];
     }
 }

@@ -28,6 +28,7 @@ class CreateFirewallRuleRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string|max:50',
+            'sequence' => 'required|integer',
             'firewall_policy_id' => [
                 'required',
                 'string',
@@ -75,6 +76,8 @@ class CreateFirewallRuleRequest extends FormRequest
             'action.in' => 'The :attribute field contains an invalid option',
             'direction.in' => 'The :attribute field contains an invalid option',
             'enabled.boolean' => 'The :attribute field is not a valid boolean value',
+            'sequence.required' => 'The :attribute field is required',
+            'sequence.integer' => 'The specified :attribute must be an integer',
         ];
     }
 }

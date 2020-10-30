@@ -8,5 +8,6 @@ use Faker\Generator as Faker;
 $factory->define(FirewallRule::class, function (Faker $faker) {
     return [
         'name' => $faker->domainWord,
+        'sequence' => 10,
     ];
 });

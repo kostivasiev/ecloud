@@ -67,6 +67,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->firewallRule->id,
                 'name' => $this->firewallRule->name,
+                'sequence' => $this->firewallRule->sequence,
             ])
             ->assertResponseStatus(200);
     }
@@ -83,6 +84,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->firewallRule->id,
                 'name' => $this->firewallRule->name,
+                'sequence' => $this->firewallRule->sequence,
             ])
             ->assertResponseStatus(200);
     }

@@ -31,6 +31,7 @@ class FirewallRule extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $fillable = [
         'name',
+        'sequence',
         'router_id',
         'deployed',
         'firewall_policy_id',
@@ -81,6 +82,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$enumDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('sequence', Filter::$numericDefaults),
             $factory->create('firewall_policy_id', Filter::$enumDefaults),
             $factory->create('deployed', Filter::$numericDefaults),
             $factory->create('service_type', Filter::$enumDefaults),
@@ -106,6 +108,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('sequence'),
             $factory->create('firewall_policy_id'),
             $factory->create('deployed'),
             $factory->create('service_type'),
@@ -128,7 +131,7 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('name', 'asc'),
+            $factory->create('sequence'),
         ];
     }
 
@@ -140,6 +143,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
+            'sequence' => 'sequence',
             'firewall_policy_id' => 'firewall_policy_id',
             'service_type' => 'service_type',
             'source' => 'source',

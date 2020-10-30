@@ -44,30 +44,24 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $this->post(
-            '/v2/firewall-rules',
-            [
-                'name' => 'Demo firewall rule 1',
-                'firewall_policy_id' => $this->firewall_policy->getKey(),
-                'service_type' => 'TCP',
-                'source' => '192.168.100.1/24',
-                'source_ports' => '80,443',
-                'destination' => '212.22.18.10/24',
-                'destination_ports' => '8080,4043',
-                'action' => 'ALLOW',
-                'direction' => 'IN',
-                'enabled' => true
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertResponseStatus(201);
-
-        $availabilityZoneId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $availabilityZoneId,
-        ]);
+        $this->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'service_type' => 'TCP',
+            'source' => '192.168.100.1/24',
+            'source_ports' => '80,443',
+            'destination' => '212.22.18.10/24',
+            'destination_ports' => '8080,4043',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase('firewall_rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+        ], 'ecloud')->assertResponseStatus(201);
     }
-
 }

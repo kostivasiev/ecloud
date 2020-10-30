@@ -34,6 +34,7 @@ class FirewallRuleResource extends UKFastResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'sequence' => $this->sequence,
             'firewall_policy_id' => $this->firewall_policy_id,
             'service_type' => $this->service_type,
             'source' => $this->source,
