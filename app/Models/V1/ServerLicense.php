@@ -91,6 +91,12 @@ class ServerLicense extends Model
         return $query;
     }
 
+    public function scopeWithName($query, $name)
+    {
+        $query->where('server_license_name', '=', $name);
+        return $query;
+    }
+
     public function scopeWithFriendlyName($query, $friendlyName)
     {
         $query->where('server_license_friendly_name', '=', $friendlyName);
