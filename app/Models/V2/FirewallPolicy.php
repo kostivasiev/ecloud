@@ -96,7 +96,7 @@ class FirewallPolicy extends Model implements Filterable, Sortable
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('name', 'asc'),
+            $factory->create('sequence'),
         ];
     }
 

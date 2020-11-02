@@ -82,7 +82,7 @@ class FirewallRule extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$enumDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('sequence', Filter::$numericDefaults),
+            $factory->create('sequence', Filter::$stringDefaults),
             $factory->create('firewall_policy_id', Filter::$enumDefaults),
             $factory->create('deployed', Filter::$numericDefaults),
             $factory->create('service_type', Filter::$enumDefaults),
