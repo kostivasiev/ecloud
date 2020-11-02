@@ -8,13 +8,18 @@ properties:
     required: true
     example: 'Internal FW Rule'
     readOnly: false
+  sequence:
+    type: integer
+    required: true
+    example: 1
+    readOnly: false
   firewall_policy_id:
     type: string
     required: true
     example: fwp-abc123xyz
     readOnly: false
   service_type:
-    description: 'The service type, one of: IP, IGMP, ICMPv4, ALG, TCP, UDP, ICMPv6'
+    description: 'The service type, one of: TCP, UDP'
     type: string
     required: true
     example: TCP
