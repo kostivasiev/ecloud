@@ -5,7 +5,7 @@ namespace App\Http\Requests\V2;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidCidrSubnetArray;
+use App\Rules\V2\ValidRangeBoundariesOrCidrSubnetArray;
 use App\Rules\V2\ValidPortReference;
 use UKFast\FormRequests\FormRequest;
 
@@ -39,7 +39,7 @@ class CreateFirewallRuleRequest extends FormRequest
             'source' => [
                 'required',
                 'string',
-                new ValidCidrSubnetArray()
+                new ValidRangeBoundariesOrCidrSubnetArray()
             ],
             'source_ports' => [
                 'required',
@@ -49,7 +49,7 @@ class CreateFirewallRuleRequest extends FormRequest
             'destination' => [
                 'required',
                 'string',
-                new ValidCidrSubnetArray()
+                new ValidRangeBoundariesOrCidrSubnetArray()
             ],
             'destination_ports' => [
                 'required',

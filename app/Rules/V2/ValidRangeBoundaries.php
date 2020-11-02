@@ -5,11 +5,7 @@ namespace App\Rules\V2;
 use Illuminate\Contracts\Validation\Rule;
 use IPLib\Factory;
 
-/**
- * Class ValidCidrRange
- * @package App\Rules\V2
- */
-class ValidCidrRange implements Rule
+class ValidRangeBoundaries implements Rule
 {
     public function passes($attribute, $value)
     {
@@ -21,11 +17,8 @@ class ValidCidrRange implements Rule
         return !is_null(Factory::rangeFromBoundaries($from, $to));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function message()
     {
-        return 'The :attribute must be a valid CIDR range';
+        return 'The :attribute must be valid range boundaries';
     }
 }
