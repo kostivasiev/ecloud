@@ -6,14 +6,18 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Rule Test 1",
-  "router_id": "rtr-259e5f91",
-  "firewall_policy_id": "fwp-55c9cb69",
-  "source": "100.64.0.0/16",
-  "destination": "100.64.0.0-100.64.0.32",
-  "action": "ALLOW",
-  "direction": "IN",
-  "enabled": true
+    "name": "Rule Test 1",
+    "sequence": 10,
+    "router_id": "rtr-259e5f91",
+    "firewall_policy_id": "fwp-55c9cb69",
+    "service_type": "TCP",
+    "source": "100.64.0.0/16",
+    "source_ports": "80",
+    "destination": "100.64.0.0-100.64.0.32",
+    "destination_ports": "80,443,8080",
+    "action": "ALLOW",
+    "direction": "IN",
+    "enabled": true
 }
 
 > {%
@@ -45,6 +49,7 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.sequence === 10);
 });
 %}
 
@@ -57,7 +62,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "name": "Updated Rule Name"
+    "name": "Updated Rule Name"
 }
 
 > {%
