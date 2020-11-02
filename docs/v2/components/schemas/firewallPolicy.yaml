@@ -6,7 +6,7 @@ properties:
   name:
     type: string
     required: true
-    example: 'Internal FW Rule'
+    example: 'My Firewall Policy'
     readOnly: false
   sequence:
     type: integer
