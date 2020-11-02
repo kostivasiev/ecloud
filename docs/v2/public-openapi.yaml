@@ -169,8 +169,6 @@ paths:
     $ref: 'resources/Router/item.yaml'
   '/ecloud/v2/routers/{routerId}/firewall-rules':
     $ref: 'resources/Router/firewallrule-collection.yaml'
-  '/ecloud/v2/routers/{routerId}/firewall-policies':
-    $ref: 'resources/Router/firewallpolicy-collection.yaml'
   '/ecloud/v2/routers/{routerId}/networks':
     $ref: 'resources/Router/network-collection.yaml'
   '/ecloud/v2/routers/{routerId}/vpns':
