@@ -26,7 +26,7 @@ class DeleteDhcpLease implements ShouldQueue
 
         $network = $nic->network;
         $router = $nic->network->router;
-        $nsxService = $nic->instance->availabilityZone->nsxService();
+        $nsxService = $nic->instance()->withTrashed()->first()->availabilityZone->nsxService();
 
         //Delete dhcp lease for the ip to the nic's mac address on NSX
         try {

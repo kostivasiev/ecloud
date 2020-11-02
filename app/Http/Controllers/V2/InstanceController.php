@@ -182,10 +182,6 @@ class InstanceController extends BaseController
      */
     public function destroy(Request $request, string $instanceId)
     {
-        $nic = Nic::findOrFail('nic-8af0e994');
-
-
-        exit('here');
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
         if (!$this->isAdmin && $instance->locked === true) {
             return $this->isLocked();
