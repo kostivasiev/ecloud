@@ -14,12 +14,17 @@ use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Jobs\Instance\UpdateTaskJob;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\Nat;
 use App\Models\V2\Network;
+use App\Models\V2\Nic;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\VolumeResource;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -177,6 +182,10 @@ class InstanceController extends BaseController
      */
     public function destroy(Request $request, string $instanceId)
     {
+        $nic = Nic::findOrFail('nic-8af0e994');
+
+
+        exit('here');
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
         if (!$this->isAdmin && $instance->locked === true) {
             return $this->isLocked();

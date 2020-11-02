@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateNicRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
+use App\Models\V2\Nat;
 use App\Models\V2\Nic;
 use App\Resources\V2\NicResource;
 use App\Rules\V2\IpAvailable;

@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Nic\Creating;
+use App\Events\V2\Nic\Deleted;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -34,6 +35,7 @@ class Nic extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
+        'deleted' => Deleted::class
     ];
 
     public static function boot()

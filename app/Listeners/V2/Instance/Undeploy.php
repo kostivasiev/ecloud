@@ -26,7 +26,9 @@ class Undeploy implements ShouldQueue
         ];
 
         dispatch((new PowerOff($data))->chain([
-            new \App\Jobs\Instance\Undeploy\Undeploy($data)
+            new \App\Jobs\Instance\Undeploy\Undeploy($data),
+            new \App\Jobs\Instance\Undeploy\DeleteVolumes($data),
+            new \App\Jobs\Instance\Undeploy\DeleteNics($data)
         ]));
     }
 }
