@@ -23,7 +23,7 @@ class DeleteNics extends Job
         $logMessage = 'DeleteNics for instance ' . $instance->getKey() . ': ';
 
         $instance->nics()->each(function ($nic) {
-           $nic->delete();
+            $nic->delete();
         });
 
         Log::info($logMessage . 'Success');
