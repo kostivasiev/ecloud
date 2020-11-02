@@ -1,0 +1,24 @@
+properties:
+  id:
+    type: string
+    example: fwp-5b66bb79
+    readOnly: true
+  name:
+    type: string
+    required: true
+    example: 'My Firewall Policy'
+    readOnly: false
+  sequence:
+    type: integer
+    required: true
+    example: 1
+    readOnly: false
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'FirewallPolicies'

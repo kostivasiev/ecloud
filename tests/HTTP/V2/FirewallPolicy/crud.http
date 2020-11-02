@@ -52,7 +52,7 @@ client.test("Request executed successfully", function() {
 
 PATCH https://{{host}}/{{version}}/firewall-policies/{{policy_id}}
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -71,7 +71,7 @@ client.test("Request executed successfully", function() {
 # Delete Policy
 DELETE https://{{host}}/{{version}}/firewall-policies/{{policy_id}}
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 

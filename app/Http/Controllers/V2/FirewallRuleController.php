@@ -53,11 +53,14 @@ class FirewallRuleController extends BaseController
         $instance = new FirewallRule();
         $instance->fill($request->only([
             'name',
-            'router_id',
+            'sequence',
             'deployed',
             'firewall_policy_id',
+            'service_type',
             'source',
+            'source_ports',
             'destination',
+            'destination_ports',
             'action',
             'direction',
             'enabled'
@@ -77,11 +80,14 @@ class FirewallRuleController extends BaseController
         $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         $item->fill($request->only([
             'name',
-            'router_id',
+            'sequence',
             'deployed',
             'firewall_policy_id',
+            'service_type',
             'source',
+            'source_ports',
             'destination',
+            'destination_ports',
             'action',
             'direction',
             'enabled'

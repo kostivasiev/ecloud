@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidCidrSubnetArray;
+use App\Rules\V2\ValidRangeBoundariesOrCidrSubnetArray;
+use App\Rules\V2\ValidPortReference;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateFirewallRuleRequest extends FormRequest
@@ -16,25 +18,38 @@ class UpdateFirewallRuleRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:50',
-            'router_id' => [
+            'sequence' => 'sometimes|required|integer',
+            'firewall_policy_id' => [
                 'sometimes',
                 'required',
                 'string',
-                'exists:ecloud.routers,id,deleted_at,NULL',
-                new ExistsForUser(Router::class)
+                'exists:ecloud.firewall_policies,id,deleted_at,NULL',
+                new ExistsForUser(FirewallPolicy::class)
             ],
-            'firewall_policy_id' => 'sometimes|required|string|exists:ecloud.firewall_policies,id,deleted_at,NULL',
+            'service_type' => 'sometimes|required|string|in:TCP,UDP',
             'source' => [
                 'sometimes',
                 'required',
                 'string',
-                new ValidCidrSubnetArray()
+                new ValidRangeBoundariesOrCidrSubnetArray()
+            ],
+            'source_ports' => [
+                'sometimes',
+                'required',
+                'string',
+                new ValidPortReference()
             ],
             'destination' => [
                 'sometimes',
                 'required',
                 'string',
-                new ValidCidrSubnetArray()
+                new ValidRangeBoundariesOrCidrSubnetArray()
+            ],
+            'destination_ports' => [
+                'sometimes',
+                'required',
+                'string',
+                new ValidPortReference()
             ],
             'action' => 'sometimes|required|string|in:ALLOW,DROP,REJECT',
             'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',
@@ -48,11 +63,16 @@ class UpdateFirewallRuleRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The :attribute field, when specified, cannot be null',
-            'name.string' => 'The :attribute field must contain a string',
+            'required' => 'The :attribute field is required',
+            'string' => 'The :attribute field must contain a string',
             'name.max' => 'The :attribute field must be less than 50 characters',
-            'router_id.required' => 'The :attribute field, when specified, cannot be null',
-            'router_id.exists' => 'The specified :attribute was not found',
+            'firewall_policy_id.exists' => 'The specified :attribute was not found',
+            'service_type.in' => 'The :attribute field must contain one of TCP or UDP',
+            'action.in' => 'The :attribute field contains an invalid option',
+            'direction.in' => 'The :attribute field contains an invalid option',
+            'enabled.boolean' => 'The :attribute field is not a valid boolean value',
+            'sequence.required' => 'The :attribute field, when specified, cannot be null',
+            'sequence.integer' => 'The specified :attribute must be an integer',
         ];
     }
 }
