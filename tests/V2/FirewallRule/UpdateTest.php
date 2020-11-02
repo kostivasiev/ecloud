@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallRule;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
@@ -16,16 +17,16 @@ class UpdateTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected $firewall_rule;
-    protected $region;
-    protected $vpc;
-    protected $router;
+    protected FirewallPolicy $firewall_policy;
+    protected FirewallRule $firewall_rule;
+    protected Region $region;
+    protected Vpc $vpc;
+    protected Router $router;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->firewall_rule = factory(FirewallRule::class)->create();
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
@@ -37,28 +38,21 @@ class UpdateTest extends TestCase
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey()
         ]);
-    }
-
-    public function testNotOwnedRouterIdIsFailed()
-    {
-        $this->patch(
-            '/v2/firewall-rules/' . $this->firewall_rule->id,
-            [
-                'name' => $this->faker->word(),
-                'router_id' => $this->router->getKey()
-            ],
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified router id was not found',
-                'status' => 422,
-                'source' => 'router_id'
-            ])
-            ->assertResponseStatus(422);
+        $this->firewall_policy = factory(FirewallPolicy::class)->create([
+            'router_id' => $this->router->getKey(),
+        ]);
+        $this->firewall_rule = factory(FirewallRule::class)->create([
+            'name' => 'Demo firewall rule 1',
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'service_type' => 'TCP',
+            'source' => '192.168.100.1',
+            'source_ports' => '80,443',
+            'destination' => '212.22.18.10',
+            'destination_ports' => '8080,4043',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ]);
     }
 
     public function testValidDataSucceeds()
