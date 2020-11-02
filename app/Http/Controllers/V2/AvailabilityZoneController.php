@@ -5,7 +5,10 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
+use App\Models\V2\Instance;
+use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Router;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
@@ -138,7 +141,7 @@ class AvailabilityZoneController extends BaseController
     {
         $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
             ->credentials();
-        $queryTransformer->config(Dhcp::class)
+        $queryTransformer->config(Credential::class)
             ->transform($collection);
 
         return CredentialResource::collection($collection->paginate(
@@ -156,7 +159,7 @@ class AvailabilityZoneController extends BaseController
     {
         $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
             ->instances();
-        $queryTransformer->config(Dhcp::class)
+        $queryTransformer->config(Instance::class)
             ->transform($collection);
 
         return InstanceResource::collection($collection->paginate(
@@ -174,7 +177,7 @@ class AvailabilityZoneController extends BaseController
     {
         $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
             ->loadBalancerClusters();
-        $queryTransformer->config(Dhcp::class)
+        $queryTransformer->config(LoadBalancerCluster::class)
             ->transform($collection);
 
         return LoadBalancerClusterResource::collection($collection->paginate(
