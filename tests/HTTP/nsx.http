@@ -7,3 +7,8 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/Copy_of_ingress
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+### Referance Firewall Policy Rule
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/Copy_of_ingress/rules/b4822a80-eea7-11ea-bf67-554bdcb2dfaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

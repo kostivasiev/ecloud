@@ -2,18 +2,16 @@
 
 namespace App\Jobs\FirewallPolicy;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Task;
 use Illuminate\Support\Facades\Log;
 
-class Deploy extends TaskJob
+class Deploy extends Job
 {
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
         $this->data = $data;
     }
 
@@ -25,43 +23,17 @@ class Deploy extends TaskJob
         $availabilityZone = $router->availabilityZone;
 
         $rules = [];
-        $policy->rules->each(function ($rule) use ($rules) {
-            /**
-            "name": "Rule Test 1",
-            "router_id": "rtr-259e5f91",
-            "firewall_policy_id": "fwp-55c9cb69",
-            "source": "100.64.0.0/16",
-            "destination": "100.64.0.0-100.64.0.32",
-            "action": "ALLOW",
-            "direction": "IN",
-            "enabled": true
-             */
+        $policy->firewallRules->each(function ($rule) use (&$rules, $router) {
             $rules[] = [
                 'action' => $rule->action,
                 'resource_type' => 'Rule',
                 'id' => $rule->id,
                 'display_name' => $rule->name,
-
-
-
-
-                /////////////////////////////////////////////////////
-                ///
-                /// GOT TO HERE AND JUMPED ON TO #500 SINCE FIREWALL
-                /// RULES DONT HAVE `sequence`
-                ///
-                ////////////////////////////////////////////////////
-
-
-                'sequence_number' => 2,
+                'sequence_number' => $rule->sequence,
                 'sources_excluded' => false,
                 'destinations_excluded' => false,
-                'source_groups' => [
-                    '86.21.40.165'
-                ],
-                'destination_groups' => [
-                    '46.37.164.1'
-                ],
+                'source_groups' => explode(',', $rule->source),
+                'destination_groups' => explode(',', $rule->destination),
                 'services' => [
                     'ANY'
                 ],
@@ -70,11 +42,11 @@ class Deploy extends TaskJob
                 ],
                 'logged' => false,
                 'scope' => [
-                    '/infra/tier-1s/Reference_T1'
+                    '/infra/tier-1s/' . $router->id,
                 ],
-                'disabled' => false,
+                'disabled' => !$rule->enabled,
                 'notes' => '',
-                'direction' => 'IN',
+                'direction' => $rule->direction,
                 'tag' => '',
                 'ip_protocol' => 'IPV4_IPV6',
             ];
@@ -88,6 +60,9 @@ class Deploy extends TaskJob
                 '/policy/api/v1/infra/domains/default/gateway-policies/' . $policy->id,
                 [
                     'json' => [
+                        'id' => $policy->id,
+                        'display_name' => $policy->name,
+                        'description' => $policy->name,
                         'rules' => $rules,
                     ]
                 ]
@@ -98,6 +73,11 @@ class Deploy extends TaskJob
                 $this->fail(new \Exception($message));
             }
         } catch (\Exception $exception) {
+
+
+            dd($exception->getResponse()->getBody()->getContents());
+
+
             $message = 'Deploy Firewall Policy ' . $this->data['policy_id'] . ' : Exception while adding new Policy';
             Log::error($message, ['exception' => $exception]);
             $this->fail(new \Exception($message));

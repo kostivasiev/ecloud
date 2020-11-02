@@ -20,7 +20,7 @@ class Deploy implements ShouldQueue
     {
         $policy = $event->model;
         if ($policy instanceof FirewallRule) {
-            $policy = $event->model->firewallPolicy();
+            $policy = $event->model->firewallPolicy;
         }
 
         if (!$policy) {
@@ -31,11 +31,8 @@ class Deploy implements ShouldQueue
             $this->fail(new \Exception($message));
         }
 
-        dispatch(new \App\Jobs\FirewallPolicy\Deploy(
-            $event->task,
-            [
-                'policy_id' => $policy->id,
-            ]
-        ));
+        dispatch(new \App\Jobs\FirewallPolicy\Deploy([
+            'policy_id' => $policy->id,
+        ]));
     }
 }
