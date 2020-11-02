@@ -87,6 +87,13 @@ abstract class AbstractTemplate
         }
 
         foreach ($ecloudLicenses as $availableLicence) {
+            if ($availableLicence->name == $this->actual_os) {
+                $serverLicense = ServerLicense::withName($availableLicence->name);
+                if ($serverLicense->count() > 0) {
+                    return $serverLicense->first();
+                }
+            }
+
             if ($availableLicence->friendly_name == $this->guest_os) {
                 $serverLicense = ServerLicense::withFriendlyName($availableLicence->friendly_name);
                 if ($serverLicense->count() > 0) {
@@ -98,6 +105,13 @@ abstract class AbstractTemplate
         //If still no match found
         $serverLicenses = ServerLicense::withType('OS')->get();
         foreach ($serverLicenses as $availableLicence) {
+            if ($availableLicence->name == $this->actual_os) {
+                $serverLicense = ServerLicense::withName($availableLicence->name);
+                if ($serverLicense->count() > 0) {
+                    return $serverLicense->first();
+                }
+            }
+
             if ($availableLicence->friendly_name == $this->guest_os) {
                 $serverLicense = ServerLicense::withFriendlyName($availableLicence->friendly_name);
                 if ($serverLicense->count() > 0) {
@@ -109,7 +123,7 @@ abstract class AbstractTemplate
         // no matching license, try to create one
         $serverLicence = new \stdClass();
         $serverLicence->id = 0;
-        $serverLicence->name = '';
+        $serverLicence->name = (string)$this->actual_os;
         $serverLicence->friendly_name = (string)$this->guest_os;
 
         if (strpos($this->guest_os, 'Windows') !== false) {

@@ -36,6 +36,8 @@ components:
       $ref: 'components/schemas/floatingIp.yaml'
     FirewallRule:
       $ref: 'components/schemas/firewallRule.yaml'
+    FirewallPolicy:
+      $ref: 'components/schemas/firewallPolicy.yaml'
     Region:
       $ref: 'components/schemas/region.yaml'
     Router:
@@ -65,6 +67,8 @@ components:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallRuleId:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    FirewallPolicyId:
+      $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
@@ -84,6 +88,8 @@ components:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
+    FirewallPolicyIdResponse:
+      $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
     LbcIdResponse:
@@ -151,6 +157,8 @@ paths:
     $ref: 'resources/FirewallRule/collection.yaml'
   '/ecloud/v2/firewall-rules/{firewallRuleId}':
     $ref: 'resources/FirewallRule/item.yaml'
+  '/ecloud/v2/firewall-policies/{firewallPolicyId}':
+    $ref: 'resources/FirewallPolicy/item.yaml'
   '/ecloud/v2/regions':
     $ref: 'resources/Region/collection.yaml'
   '/ecloud/v2/regions/{regionId}':
