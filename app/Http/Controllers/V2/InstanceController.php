@@ -14,17 +14,15 @@ use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Jobs\Instance\UpdateTaskJob;
-use App\Models\V2\FloatingIp;
+use App\Models\V2\Credential;
 use App\Models\V2\Instance;
-use App\Models\V2\Nat;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\Volume;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\VolumeResource;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -192,43 +190,54 @@ class InstanceController extends BaseController
 
     /**
      * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $instanceId
      *
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function credentials(Request $request, string $instanceId)
+    public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        return CredentialResource::collection(
-            Instance::forUser($request->user)
-                ->findOrFail($instanceId)
-                ->credentials()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
-    }
+        $collection = Instance::forUser($request->user)->findOrFail($instanceId)->credentials();
+        $queryTransformer->config(Credential::class)
+            ->transform($collection);
 
-    public function volumes(Request $request, string $instanceId)
-    {
-        return VolumeResource::collection(
-            Instance::forUser($request->user)
-                ->findOrFail($instanceId)
-                ->volumes()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
+        return CredentialResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
      * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $instanceId
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, string $instanceId)
+    public function volumes(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        return NicResource::collection(
-            Instance::forUser($request->user)
-                ->findOrFail($instanceId)
-                ->nics()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
+        $collection = Instance::forUser($request->user)->findOrFail($instanceId)->volumes();
+        $queryTransformer->config(Volume::class)
+            ->transform($collection);
+
+        return VolumeResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $instanceId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     */
+    public function nics(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    {
+        $collection = Instance::forUser($request->user)->findOrFail($instanceId)->nics();
+        $queryTransformer->config(Nic::class)
+            ->transform($collection);
+
+        return NicResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     public function powerOn(Request $request, $instanceId)

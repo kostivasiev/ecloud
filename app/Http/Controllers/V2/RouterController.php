@@ -4,7 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
+use App\Models\V2\FirewallRule;
+use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Models\V2\Vpn;
 use App\Resources\V2\FirewallRuleResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
@@ -84,47 +87,53 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $routerId
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $routerId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function vpns(Request $request, string $routerId)
+    public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        return VpnResource::collection(
-            Router::forUser($request->user)
-                ->findOrFail($routerId)
-                ->vpns()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->vpns();
+        $queryTransformer->config(Vpn::class)
+            ->transform($collection);
+
+        return VpnResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $routerId
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $routerId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function firewallRules(Request $request, string $routerId)
+    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        return FirewallRuleResource::collection(
-            Router::forUser($request->user)
-                ->findOrFail($routerId)
-                ->firewallRules()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->firewallRules();
+        $queryTransformer->config(FirewallRule::class)
+            ->transform($collection);
+
+        return FirewallRuleResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $routerId
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $routerId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function networks(Request $request, string $routerId)
+    public function networks(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        return NetworkResource::collection(
-            Router::forUser($request->user)
-                ->findOrFail($routerId)
-                ->networks()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->networks();
+        $queryTransformer->config(Network::class)
+            ->transform($collection);
+
+        return NetworkResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
