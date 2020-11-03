@@ -71,6 +71,7 @@ class Deploy extends Job
                 $message = 'Deploy Firewall Policy ' . $this->data['policy_id'] . ' : Failed to add new Policy';
                 Log::error($message, ['response' => $response]);
                 $this->fail(new \Exception($message));
+                return;
             }
         } catch (\Exception $exception) {
             $message = 'Deploy Firewall Policy ' . $this->data['policy_id'] . ' : Exception while adding new Policy';
