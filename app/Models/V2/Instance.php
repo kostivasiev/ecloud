@@ -17,10 +17,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class Instance
- * @method static forUser($user)
- */
 class Instance extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable;
@@ -99,11 +95,6 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsToMany(Volume::class);
     }
 
-    /**
-     * @param $query
-     * @param $user
-     * @return mixed
-     */
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
