@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
+use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
@@ -120,19 +121,26 @@ class VolumeController extends BaseController
         return $this->responseIdMeta($request, $volume->getKey(), 200);
     }
 
-    public function instances(Request $request, string $volumeId)
+    /**
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $volumeId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
     {
-        return InstanceResource::collection(
-            Volume::forUser($request->user)
-                ->findOrFail($volumeId)
-                ->instances()
-                ->paginate($request->input('per_page', env('PAGINATION_LIMIT')))
-        );
+        $collection = Volume::forUser($request->user)->findOrFail($volumeId)->instances();
+        $queryTransformer->config(Instance::class)
+            ->transform($collection);
+
+        return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
      * @param Request $request
-     * @param string $routerUuid
+     * @param string $volumeId
      * @return JsonResponse
      */
     public function destroy(Request $request, string $volumeId)
