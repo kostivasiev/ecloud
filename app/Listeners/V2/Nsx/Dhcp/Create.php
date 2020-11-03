@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Listeners\V2\Dhcp;
+namespace App\Listeners\V2\Nsx\Dhcp;
 
 use App\Events\V2\Dhcp\Created;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class Deploy implements ShouldQueue
+class Create implements ShouldQueue
 {
     use InteractsWithQueue;
 
