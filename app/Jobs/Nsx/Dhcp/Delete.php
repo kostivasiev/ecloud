@@ -26,11 +26,13 @@ class Delete extends Job
                 $message = 'NSX Dhcp Delete ' . $this->data['id'] . ' : Failed';
                 Log::error($message, ['response' => $response]);
                 $this->fail(new \Exception($message));
+                return;
             }
         } catch (\Exception $exception) {
             $message = 'NSX Dhcp Delete ' . $this->data['id'] . ' : Exception';
             Log::error($message, ['exception' => $exception]);
             $this->fail(new \Exception($message));
+            return;
         }
 
         Log::info('NSX Dhcp Delete ' . $this->data['id'] . ' : Finished');
