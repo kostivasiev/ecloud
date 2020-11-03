@@ -34,6 +34,7 @@ class Deploy extends Job
                 'nat' => $nat,
             ]);
             $this->fail(new \Exception($message));
+            return;
         }
         $instance = Instance::findOrFail($instanceId);
 
@@ -47,6 +48,7 @@ class Deploy extends Job
                 'nat' => $nat,
             ]);
             $this->fail(new \Exception($message));
+            return;
         }
 
         // Router lookup
@@ -59,6 +61,7 @@ class Deploy extends Job
                 'nic' => $nic,
             ]);
             $this->fail(new \Exception($message));
+            return;
         }
 
         Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Adding NAT Rule');
@@ -87,11 +90,13 @@ class Deploy extends Job
                 $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to add new NAT rule';
                 Log::error($message, ['response' => $response]);
                 $this->fail(new \Exception($message));
+                return;
             }
         } catch (\Exception $exception) {
             $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Exception while adding new NAT rule';
             Log::error($message, ['exception' => $exception]);
             $this->fail(new \Exception($message));
+            return;
         }
 
         Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Finished');
