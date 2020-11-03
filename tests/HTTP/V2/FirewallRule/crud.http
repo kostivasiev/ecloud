@@ -6,7 +6,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "Rule Test 1",
+    "name": "Rule Test",
     "sequence": 10,
     "firewall_policy_id": "fwp-f716b264",
     "service_type": "TCP",

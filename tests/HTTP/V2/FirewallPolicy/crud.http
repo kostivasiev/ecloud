@@ -8,7 +8,7 @@ Content-Type:  application/json
 {
   "name": "Test Policy",
   "sequence": 10,
-  "router_id": {{dev_router_id}}
+  "router_id": "{{dev_router_id}}"
 }
 
 > {%

@@ -134,6 +134,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Router\Created::class => [
             \App\Listeners\V2\Router\Deploy::class,
         ],
+        \App\Events\V2\Router\Saved::class => [
+            \App\Listeners\V2\Router\Update::class,
+        ],
 
         // Volume
         \App\Events\V2\Volume\Creating::class => [

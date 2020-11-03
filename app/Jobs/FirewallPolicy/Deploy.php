@@ -73,11 +73,6 @@ class Deploy extends Job
                 $this->fail(new \Exception($message));
             }
         } catch (\Exception $exception) {
-
-
-            dd($exception->getResponse()->getBody()->getContents());
-
-
             $message = 'Deploy Firewall Policy ' . $this->data['policy_id'] . ' : Exception while adding new Policy';
             Log::error($message, ['exception' => $exception]);
             $this->fail(new \Exception($message));
