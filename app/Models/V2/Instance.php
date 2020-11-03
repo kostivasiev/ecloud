@@ -20,7 +20,6 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * Class Instance
  * @method static forUser($user)
- * @method static forVpc($vpcId)
  */
 class Instance extends Model implements Filterable, Sortable
 {
@@ -115,19 +114,6 @@ class Instance extends Model implements Filterable, Sortable
                 }
             });
         }
-        return $query;
-    }
-
-    /**
-     * @param $query
-     * @param $vpcId
-     * @return mixed
-     */
-    public function scopeForVpc($query, $vpcId)
-    {
-        $query->whereHas('vpc', function ($query) use ($vpcId) {
-            $query->where('id', '=', $vpcId);
-        });
         return $query;
     }
 

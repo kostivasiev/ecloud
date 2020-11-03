@@ -92,9 +92,6 @@ class Network extends Model implements Filterable, Sortable
                 if (!empty($resellerId)) {
                     $query->where('reseller_id', '=', $resellerId);
                 }
-                if (!empty($vpcId)) {
-                    $query->where('id', $vpcId);
-                }
             });
         }
 
