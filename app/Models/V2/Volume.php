@@ -21,6 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
  * @method static forUser(string $user)
+ * @method static forVpc(string $vpcId)
  */
 class Volume extends Model implements Filterable, Sortable
 {
@@ -76,6 +77,19 @@ class Volume extends Model implements Filterable, Sortable
                 }
             });
         }
+        return $query;
+    }
+
+    /**
+     * @param $query
+     * @param $vpcId
+     * @return mixed
+     */
+    public function scopeForVpc($query, $vpcId)
+    {
+        $query->whereHas('vpc', function ($query) use ($vpcId) {
+            $query->where('id', '=', $vpcId);
+        });
         return $query;
     }
 

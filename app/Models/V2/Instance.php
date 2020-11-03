@@ -17,6 +17,11 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
+/**
+ * Class Instance
+ * @method static forUser($user)
+ * @method static forVpc($vpcId)
+ */
 class Instance extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable;
@@ -95,6 +100,11 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsToMany(Volume::class);
     }
 
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
@@ -105,6 +115,19 @@ class Instance extends Model implements Filterable, Sortable
                 }
             });
         }
+        return $query;
+    }
+
+    /**
+     * @param $query
+     * @param $vpcId
+     * @return mixed
+     */
+    public function scopeForVpc($query, $vpcId)
+    {
+        $query->whereHas('vpc', function ($query) use ($vpcId) {
+            $query->where('id', '=', $vpcId);
+        });
         return $query;
     }
 

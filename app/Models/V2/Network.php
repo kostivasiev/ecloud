@@ -21,6 +21,7 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * @method static findOrFail(string $networkId)
  * @method static forUser(string $user)
+ * @method static forVpc($vpcId)
  * @method static find($id)
  * @method static where(string $string, string $string1, $id)
  */
@@ -92,9 +93,25 @@ class Network extends Model implements Filterable, Sortable
                 if (!empty($resellerId)) {
                     $query->where('reseller_id', '=', $resellerId);
                 }
+                if (!empty($vpcId)) {
+                    $query->where('id', $vpcId);
+                }
             });
         }
 
+        return $query;
+    }
+
+    /**
+     * @param $query
+     * @param $vpcId
+     * @return mixed
+     */
+    public function scopeForVpc($query, $vpcId)
+    {
+        $query->whereHas('router.vpc', function ($query) use ($vpcId) {
+            $query->where('id', '=', $vpcId);
+        });
         return $query;
     }
 

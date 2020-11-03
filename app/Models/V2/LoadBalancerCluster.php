@@ -19,6 +19,7 @@ use UKFast\DB\Ditto\Sortable;
  * @package App\Models\V2
  * @method static findOrFail(string $lbcId)
  * @method static forUser(string $user)
+ * @method static forVpc($vpcId)
  */
 class LoadBalancerCluster extends Model implements Filterable, Sortable
 {
@@ -72,6 +73,19 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
                 }
             });
         }
+        return $query;
+    }
+
+    /**
+     * @param $query
+     * @param $vpcId
+     * @return mixed
+     */
+    public function scopeForVpc($query, $vpcId)
+    {
+        $query->whereHas('vpc', function ($query) use ($vpcId) {
+            $query->where('id', '=', $vpcId);
+        });
         return $query;
     }
 
