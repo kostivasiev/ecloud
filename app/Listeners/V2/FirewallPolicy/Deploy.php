@@ -29,6 +29,7 @@ class Deploy implements ShouldQueue
                 'event' => $event,
             ]);
             $this->fail(new \Exception($message));
+            return;
         }
 
         dispatch(new \App\Jobs\FirewallPolicy\Deploy([

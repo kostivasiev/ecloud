@@ -68,6 +68,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallPolicy\Saved::class => [
             \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
+        \App\Events\V2\FirewallPolicy\Deleted::class => [
+            \App\Listeners\V2\FirewallPolicy\Undeploy::class
+        ],
 
         // FirewallRule
         \App\Events\V2\FirewallRule\Saved::class => [
@@ -75,11 +78,6 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallPolicy\Deploy::class,
-        ],
-
-        // FirewallPolicy
-        \App\Events\V2\FirewallPolicy\Deleted::class => [
-            \App\Listeners\V2\FirewallPolicy\Undeploy::class
         ],
 
         // FloatingIp
