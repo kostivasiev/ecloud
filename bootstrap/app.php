@@ -79,7 +79,6 @@ $app->routeMiddleware([
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'is-administrator' => \App\Http\Middleware\IsAdministrator::class,
-    'has-resources' => \App\Http\Middleware\V2\HasResources::class
 ]);
 
 /*
