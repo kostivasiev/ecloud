@@ -14,11 +14,10 @@ class VpcHasResourcesValidationTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @var Region */
-    private $region;
-
     /** @var Vpc */
     private $vpc;
+    private $validator;
+    private $availability_zone;
 
     public function setUp(): void
     {
