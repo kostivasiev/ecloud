@@ -52,7 +52,6 @@ class UndeployTest extends TestCase
 
             $this->firewallRule = factory(FirewallRule::class)->create([
                 'id' => 'fwr-abc123',
-                'router_id' => $this->router->getKey(),
                 'firewall_policy_id' => $this->firewallPolicy->getKey()
             ]);
         });
