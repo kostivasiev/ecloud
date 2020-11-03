@@ -58,6 +58,7 @@ class Undeploy implements ShouldQueue
                 $error = $message . 'Failed. Delete response was not 200';
                 Log::error($error, ['response' => $response]);
                 $this->fail(new \Exception($message));
+                return;
             }
         } catch (GuzzleException $exception) {
             $error = ($exception->hasResponse()) ? $exception->getResponse()->getBody()->getContents() : $exception->getMessage();

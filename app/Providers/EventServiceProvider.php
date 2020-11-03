@@ -64,11 +64,20 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Dhcp\Deploy::class,
         ],
 
-        // FirewallRule
-        \App\Events\V2\FirewallRule\Creating::class => [
+        // FirewallPolicy
+        \App\Events\V2\FirewallPolicy\Saved::class => [
+            \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
-        \App\Events\V2\FirewallRule\Created::class => [
-            \App\Listeners\V2\FirewallRule\Deploy::class,
+        \App\Events\V2\FirewallPolicy\Deleted::class => [
+            \App\Listeners\V2\FirewallPolicy\Undeploy::class
+        ],
+
+        // FirewallRule
+        \App\Events\V2\FirewallRule\Saved::class => [
+            \App\Listeners\V2\FirewallPolicy\Deploy::class,
+        ],
+        \App\Events\V2\FirewallRule\Deleted::class => [
+            \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
 
         // FloatingIp
@@ -131,6 +140,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Router\Created::class => [
             \App\Listeners\V2\Router\Deploy::class,
+        ],
+        \App\Events\V2\Router\Saved::class => [
+            \App\Listeners\V2\Router\Update::class,
         ],
 
         // Volume
