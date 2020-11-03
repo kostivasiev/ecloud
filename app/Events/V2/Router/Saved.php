@@ -1,21 +1,17 @@
 <?php
 
-namespace App\Events\V2\FirewallRule;
+namespace App\Events\V2\Router;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Creating
+class Saved
 {
     use SerializesModels;
 
     public $model;
 
-    /**
-     * @param Model $model
-     * @return void
-     */
-    public function __construct($model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
