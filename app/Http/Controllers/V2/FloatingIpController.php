@@ -140,4 +140,23 @@ class FloatingIpController extends BaseController
 
         return new Response(null, 202);
     }
+
+    public function forResource(Request $request, QueryTransformer $queryTransformer, string $resourceId)
+    {
+        $floatingIpIds = FloatingIp::forUser($request->user)->get()
+            ->reject(function ($floatingIp) use ($resourceId) {
+                return $floatingIp->resource_id != $resourceId;
+            })
+            ->map(function ($floatingIp) {
+                return $floatingIp->id;
+            });
+
+        $collection = FloatingIp::whereIn('id', $floatingIpIds);
+        $queryTransformer->config(FloatingIp::class)
+            ->transform($collection);
+
+        return FloatingIpResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
 }

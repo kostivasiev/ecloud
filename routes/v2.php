@@ -116,6 +116,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');
         $router->patch('floating-ips/{fipId}', 'FloatingIpController@update');
         $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
+        $router->get('floating-ips/for-resource/{resourceId}', 'FloatingIpController@forResource');
     });
 
     /** Firewall Policy */
