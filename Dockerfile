@@ -14,7 +14,7 @@ RUN apt update && \
     git \
     zip
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:1 /usr/bin/composer /usr/bin/composer
 
 # Use prestissimo until composer v2
 RUN composer global require hirak/prestissimo
