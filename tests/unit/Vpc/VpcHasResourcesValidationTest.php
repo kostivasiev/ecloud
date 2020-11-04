@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\V2\Vpc;
+namespace Tests\unit\Vpc;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
