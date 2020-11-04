@@ -17,7 +17,8 @@ class Deploy extends Job
 
     public function handle()
     {
-        Log::info('Starting Deploy Firewall Policy ' . $this->data['policy_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $policy = FirewallPolicy::findOrFail($this->data['policy_id']);
         $router = $policy->router;
         $availabilityZone = $router->availabilityZone;
@@ -52,34 +53,21 @@ class Deploy extends Job
             ];
         });
 
-        try {
-            /**
-             * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
-             */
-            $response = $availabilityZone->nsxService()->patch(
-                '/policy/api/v1/infra/domains/default/gateway-policies/' . $policy->id,
-                [
-                    'json' => [
-                        'id' => $policy->id,
-                        'display_name' => $policy->name,
-                        'description' => $policy->name,
-                        'rules' => $rules,
-                    ]
+        /**
+         * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
+         */
+        $availabilityZone->nsxService()->patch(
+            '/policy/api/v1/infra/domains/default/gateway-policies/' . $policy->id,
+            [
+                'json' => [
+                    'id' => $policy->id,
+                    'display_name' => $policy->name,
+                    'description' => $policy->name,
+                    'rules' => $rules,
                 ]
-            );
-            if ($response->getStatusCode() !== 200) {
-                $message = 'Deploy Firewall Policy ' . $this->data['policy_id'] . ' : Failed to add new Policy';
-                Log::error($message, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (\Exception $exception) {
-            $message = 'Deploy Firewall Policy ' . $this->data['policy_id'] . ' : Exception while adding new Policy';
-            Log::error($message, ['exception' => $exception]);
-            $this->fail(new \Exception($message));
-            return;
-        }
+            ]
+        );
 
-        Log::info('Deploy Firewall Policy ' . $this->data['policy_id'] . ' : Finished');
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

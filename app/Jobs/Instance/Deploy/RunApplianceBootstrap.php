@@ -2,13 +2,10 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\Job;
 use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
 class RunApplianceBootstrap extends TaskJob
@@ -27,7 +24,8 @@ class RunApplianceBootstrap extends TaskJob
      */
     public function handle()
     {
-        Log::info('Starting RunApplianceBootstrap for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
 
@@ -46,34 +44,20 @@ class RunApplianceBootstrap extends TaskJob
             return;
         }
 
-        try {
-            /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/script',
-                [
-                    'json' => [
-                        'encodedScript' => base64_encode(
-                            (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
-                                ->render(json_decode($this->data['appliance_data']))
-                        ),
-                        'username' => $guestAdminCredential->username,
-                        'password' => $guestAdminCredential->password,
-                    ],
-                ]
-            );
-            if ($response->getStatusCode() == 200) {
-                Log::info('RunApplianceBootstrap finished successfully for instance ' . $instance->id);
-                return;
-            }
-            $this->fail(new \Exception(
-                'Failed RunApplianceBootstrap for ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
-            ));
-            return;
-        } catch (GuzzleException $exception) {
-            $this->fail(new \Exception(
-                'Failed RunApplianceBootstrap for ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
-            ));
-            return;
-        }
+        $instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/script',
+            [
+                'json' => [
+                    'encodedScript' => base64_encode(
+                        (new \Mustache_Engine())->loadTemplate($instance->applianceVersion->script_template)
+                            ->render(json_decode($this->data['appliance_data']))
+                    ),
+                    'username' => $guestAdminCredential->username,
+                    'password' => $guestAdminCredential->password,
+                ],
+            ]
+        );
+
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

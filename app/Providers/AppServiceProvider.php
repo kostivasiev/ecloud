@@ -6,7 +6,12 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Nic;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 use UKFast\Helpers\Encryption\RemoteKeyStore;
 
@@ -34,10 +39,15 @@ class AppServiceProvider extends ServiceProvider
             return $key;
         });
 
-
         Relation::morphMap([
             'nic' => Nic::class,
             'fip' => FloatingIp::class
         ]);
+
+        Queue::failing(function (JobFailed $event) {
+            Log::error('Exception in ' . static::class, [
+                'event' => $event,
+            ]);
+        });
     }
 }

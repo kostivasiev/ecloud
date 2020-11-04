@@ -2,13 +2,10 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\Job;
 use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
 class PrepareOsDisk extends TaskJob
@@ -27,7 +24,8 @@ class PrepareOsDisk extends TaskJob
      */
     public function handle()
     {
-        Log::info('Starting PrepareOsDisk for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $guestAdminCredential = $instance->credentials()
@@ -41,61 +39,32 @@ class PrepareOsDisk extends TaskJob
         }
 
         // Expand disk - Single volume for MVP
-        try {
-            $volume = $instance->volumes->first();
-            $volume->capacity = $this->data['volume_capacity'];
-            $volume->save();
+        $volume = $instance->volumes->first();
+        $volume->capacity = $this->data['volume_capacity'];
+        $volume->save();
 
-            // TODO - Move to "volume.updated"
-            $response = $instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size',
-                [
-                    'json' => [
-                        'sizeGiB' => $this->data['volume_capacity'],
-                    ]
+        // TODO - Move to "volume.updated"
+        $instance->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size',
+            [
+                'json' => [
+                    'sizeGiB' => $this->data['volume_capacity'],
                 ]
-            );
-
-            if ($response->getStatusCode() != 200) {
-                $message = 'Failed PrepareOsDisk for ' . $instance->id;
-                Log::error($message, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (GuzzleException $exception) {
-            $message = 'Failed PrepareOsDisk for ' . $instance->id;
-            Log::error($message, ['exception' => $exception]);
-            $this->fail(new \Exception($message));
-            return;
-        }
+            ]
+        );
 
         // Extend to expanded size
         $endpoint = ($instance->platform == 'Linux') ? 'linux/disk/lvm/extend' : 'windows/disk/expandall';
-        try {
-            /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
-                [
-                    'json' => [
-                        'username' => $guestAdminCredential->username,
-                        'password' => $guestAdminCredential->password,
-                    ],
-                ]
-            );
+        $instance->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
+            [
+                'json' => [
+                    'username' => $guestAdminCredential->username,
+                    'password' => $guestAdminCredential->password,
+                ],
+            ]
+        );
 
-            if ($response->getStatusCode() != 200) {
-                $message = 'Failed PrepareOsDisk for ' . $instance->id;
-                Log::error($message, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (GuzzleException $exception) {
-            $message = 'Failed PrepareOsDisk for ' . $instance->id;
-            Log::error($message, ['exception' => $exception]);
-            $this->fail(new \Exception($message));
-            return;
-        }
-
-        Log::info('PrepareOsDisk finished successfully for instance ' . $instance->id);
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

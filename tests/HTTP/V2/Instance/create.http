@@ -5,8 +5,9 @@ Content-Type:  application/json
 
 {
   "name": "Test",
-  "vpc_id": "vpc-f7495118",
-  "availability_zone_id": "az-8ec58cb3",
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id": "{{dev_availability_zone_id}}",
+  "network_id": "net-33fe9bf9",
   "appliance_id": "eed603bf-d40e-47d7-bb98-66d2940e0dc2",
   "vcpu_cores": 1,
   "ram_capacity": 1024
