@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\V2;
 
 use App\Events\V2\Network\Creating;
-use App\Http\Requests\V2\CreateVpcRequest;
-use App\Http\Requests\V2\UpdateVpcRequest;
+use App\Http\Requests\V2\Vpc\CreateRequest;
+use App\Http\Requests\V2\Vpc\DeleteRequest;
+use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
@@ -53,10 +54,10 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param CreateVpcRequest $request
+     * @param CreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateVpcRequest $request)
+    public function create(CreateRequest $request)
     {
         $vpc = new Vpc($request->only(['name', 'region_id']));
         $vpc->reseller_id = $this->resellerId;
@@ -65,11 +66,11 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param UpdateVpcRequest $request
+     * @param UpdateRequest $request
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateVpcRequest $request, string $vpcId)
+    public function update(UpdateRequest $request, string $vpcId)
     {
         $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
@@ -87,9 +88,9 @@ class VpcController extends BaseController
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, string $vpcId)
+    public function destroy(DeleteRequest $request, string $vpcId)
     {
-        Vpc::forUser($request->user)->findOrFail($vpcId)->delete();
+        Vpc::forUser(app('request')->user)->findOrFail($vpcId)->delete();
         return response()->json([], 204);
     }
 
