@@ -80,7 +80,7 @@ class DeleteTest extends TestCase
     {
        factory(Router::class)->create([
            'vpc_id' => $this->vpc->getKey(),
-           'availability_zone_id' => $this->availability_zone->getKey()
+           'availability_zone_id' => $this->availabilityZone->getKey()
        ]);
 
         $this->delete('/v2/vpcs/' . $this->vpc->getKey(), [], [
