@@ -2,8 +2,9 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Vpc\Creating;
 use App\Events\V2\Vpc\Created;
+use App\Events\V2\Vpc\Creating;
+use App\Events\V2\Vpc\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -19,11 +20,10 @@ class Vpc extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'vpc';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'name',
@@ -34,6 +34,7 @@ class Vpc extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
+        'deleted' => Deleted::class,
     ];
 
     public function dhcp()

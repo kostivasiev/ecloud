@@ -61,7 +61,10 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Dhcp\Creating::class => [
         ],
         \App\Events\V2\Dhcp\Created::class => [
-            \App\Listeners\V2\Dhcp\Deploy::class,
+            \App\Listeners\V2\Nsx\Dhcp\Create::class,
+        ],
+        \App\Events\V2\Dhcp\Deleted::class => [
+            \App\Listeners\V2\Nsx\Dhcp\Delete::class,
         ],
 
         // FirewallPolicy
@@ -156,7 +159,10 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpc\Creating::class => [
         ],
         \App\Events\V2\Vpc\Created::class => [
-            \App\Listeners\V2\Vpc\DhcpCreate::class,
+            \App\Listeners\V2\Vpc\Dhcp\Create::class,
+        ],
+        \App\Events\V2\Vpc\Deleted::class => [
+            \App\Listeners\V2\Vpc\Dhcp\Delete::class,
         ],
 
         // Vpn

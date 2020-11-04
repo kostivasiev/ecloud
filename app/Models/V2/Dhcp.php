@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\Dhcp\Created;
 use App\Events\V2\Dhcp\Creating;
+use App\Events\V2\Dhcp\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +38,7 @@ class Dhcp extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
+        'deleted' => Deleted::class,
     ];
 
     public function vpc()
