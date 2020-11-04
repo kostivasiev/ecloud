@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Vpc;
 
+use App\Rules\V2\VpcHasResources;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateVirtualPrivateCloudsRequest
- * @package App\Http\Requests\V2
+ * Class DeleteRequest
+ * @package App\Http\Requests\V2\Vpc
  */
-class CreateVpcRequest extends FormRequest
+class DeleteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,9 +29,19 @@ class CreateVpcRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
-            'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL'
+            'vpc_id' => new VpcHasResources(),
         ];
+    }
+
+    // Add vpcId route parameter to validation data
+    public function all($keys = null)
+    {
+        return array_merge(
+            parent::all(),
+            [
+                'vpc_id' => app('request')->route('vpcId')
+            ]
+        );
     }
 
     /**
@@ -40,9 +51,6 @@ class CreateVpcRequest extends FormRequest
      */
     public function messages()
     {
-        return [
-            'region_id.required' => 'The :attribute field is required',
-            'region_id.exists' => 'The specified :attribute was not found'
-        ];
+        return [];
     }
 }
