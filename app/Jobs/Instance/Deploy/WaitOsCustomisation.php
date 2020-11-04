@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class WaitOsCustomisation extends TaskJob
 {
-const RETRY_ATTEMPTS = 360;
+    const RETRY_ATTEMPTS = 360;
     const RETRY_DELAY = 5; // Retry every 5 seconds for 20 minutes
     public $tries = 500;
     private $data;
