@@ -4,7 +4,9 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateRegionRequest;
 use App\Http\Requests\V2\UpdateRegionRequest;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
+use App\Models\V2\Vpc;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RegionResource;
 use App\Resources\V2\VpcResource;
@@ -82,27 +84,34 @@ class RegionController extends BaseController
 
     /**
      * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $regionId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function availabilityZones(Request $request, string $regionId)
+    public function availabilityZones(Request $request, QueryTransformer $queryTransformer, string $regionId)
     {
-        $availabilityZones = Region::forUser($request->user)->findOrFail($regionId)->availabilityZones();
+        $collection = Region::forUser(app('request')->user)->findOrFail($regionId)->availabilityZones();
+        $queryTransformer->config(AvailabilityZone::class)
+            ->transform($collection);
 
-        return AvailabilityZoneResource::collection($availabilityZones->paginate(
+        return AvailabilityZoneResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $regionId
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $regionId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function vpcs(Request $request, string $regionId)
+    public function vpcs(Request $request, QueryTransformer $queryTransformer, string $regionId)
     {
-        $vpcs = Region::forUser(app('request')->user)->findOrFail($regionId)->vpcs();
-        return VpcResource::collection($vpcs->paginate(
+        $collection = Region::forUser(app('request')->user)->findOrFail($regionId)->vpcs();
+        $queryTransformer->config(Vpc::class)
+            ->transform($collection);
+
+        return VpcResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

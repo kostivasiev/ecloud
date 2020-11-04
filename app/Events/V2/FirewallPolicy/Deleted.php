@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Events\V2\FirewallRule;
+namespace App\Events\V2\FirewallPolicy;
 
+use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Queue\SerializesModels;
 
-class Created
+class Deleted extends Event
 {
-    use SerializesModels;
-
     public $model;
 
     /**
