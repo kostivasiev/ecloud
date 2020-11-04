@@ -24,8 +24,20 @@ patch:
       application/json:
         schema:
           type: object
-          allOf:
-            - $ref: '../../components/schemas/instance.yaml'
+          properties:
+            name:
+              type: string
+              required: false
+              example: 'My Instance'
+            vcpu_cores:
+              type: integer
+              required: false
+              example: 1
+            ram_capacity:
+              type: integer
+              required: false
+              example: 1024
+          description: 'Instances'
   responses:
     200:
       $ref: '../../resources/Instance/responses/idResponse.yaml'

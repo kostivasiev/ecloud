@@ -12,6 +12,22 @@ get:
               data:
                 $ref: '../../components/schemas/volume.yaml'
               meta:
-                type: object
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/i-a63dd78c/volumes?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/i-a63dd78c/volumes?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/i-a63dd78c/volumes?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/instances/i-a63dd78c/volumes?page=2'
   tags:
     - Instances

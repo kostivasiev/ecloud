@@ -134,7 +134,7 @@ paths:
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
   '/ecloud/v2/instances/{instanceId}/nics':
-    $ref: 'resources/Instance/nics-collection.yaml'
+    $ref: 'resources/Instance/nics.yaml'
   '/ecloud/v2/instances/{instanceId}/power-on':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-off':
