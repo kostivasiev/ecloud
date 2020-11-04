@@ -14,10 +14,7 @@ RUN apt update && \
     git \
     zip
 
-COPY --from=composer:1 /usr/bin/composer /usr/bin/composer
-
-# Use prestissimo until composer v2
-RUN composer global require hirak/prestissimo
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 ARG SSH_PRIVATE_KEY
 
