@@ -126,6 +126,10 @@ class EventServiceProvider extends ServiceProvider
         // Nic
         \App\Events\V2\Nic\Creating::class => [
         ],
+        \App\Events\V2\Nic\Deleted::class => [
+            \App\Listeners\V2\Nic\DeleteDhcpLease::class,
+            \App\Listeners\V2\Nic\UnassignFloatingIp::class
+        ],
 
         // Region
         \App\Events\V2\Region\Creating::class => [

@@ -9,6 +9,7 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -53,6 +54,8 @@ class DeleteTest extends TestCase
 
     public function testValidNicSucceeds()
     {
+        Event::fake();
+
         $this->delete(
             '/v2/nics/' . $this->nic->getKey(),
             [],
