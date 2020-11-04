@@ -44,15 +44,6 @@ class Undeploy extends Job
             }
         }
 
-        $instance->volumes()->each(function ($volume) use ($instance) {
-            // If volume is only used in this instance then delete
-            if ($volume->instances()->count() == 0) {
-                Log::info('Deleting volume: ' . $volume->getKey());
-                $volume->instances()->detach($instance);
-                $volume->delete();
-            }
-        });
-
         Log::info($logMessage . 'Success');
     }
 }

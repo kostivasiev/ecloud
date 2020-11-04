@@ -26,7 +26,17 @@ class Undeploy implements ShouldQueue
         Log::info($message . 'Started');
 
         // Load NIC from destination or translated
-        $nic = collect($nat->load(['destination', 'translated'])->getRelations())->whereInstanceOf(Nic::class)->first();
+        $nic = collect(
+            $nat->load([
+                'destination' => function ($query) {
+                    $query->withTrashed();
+                },
+                'translated' => function ($query) {
+                    $query->withTrashed();
+                }
+            ])->getRelations()
+        )
+            ->whereInstanceOf(Nic::class)->first();
 
         if (!$nic) {
             $error = $message . 'Failed. Could not find NIC for destination or translated';

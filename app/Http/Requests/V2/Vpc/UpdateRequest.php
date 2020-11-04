@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Vpc;
 
 use UKFast\FormRequests\FormRequest;
 
 /**
  * Class UpdateVirtualPrivateCloudsRequest
- * @package App\Http\Requests\V2
+ * @package App\Http\Requests\V2\Vpc
  */
-class UpdateVpcRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
