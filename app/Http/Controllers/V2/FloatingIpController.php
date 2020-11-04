@@ -28,6 +28,8 @@ class FloatingIpController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
+        //$collection = FloatingIp::forUser($request->user)
+
         // "resource_id" filtering hack - start
         if ($request->has('resource_id:eq')) {
             if ($request->get('resource_id:eq') === 'null') {
@@ -66,8 +68,6 @@ class FloatingIpController extends BaseController
             $collection = FloatingIp::forUser($request->user);
         }
         // "resource_id" filtering hack - end
-
-        //$collection = FloatingIp::forUser($request->user)
 
         $queryTransformer->config(FloatingIp::class)
             ->transform($collection);
@@ -178,24 +178,5 @@ class FloatingIpController extends BaseController
         }
 
         return new Response(null, 202);
-    }
-
-    public function forResource(Request $request, QueryTransformer $queryTransformer, string $resourceId)
-    {
-        $floatingIpIds = FloatingIp::forUser($request->user)->get()
-            ->reject(function ($floatingIp) use ($resourceId) {
-                return $floatingIp->resource_id != $resourceId;
-            })
-            ->map(function ($floatingIp) {
-                return $floatingIp->id;
-            });
-
-        $collection = FloatingIp::whereIn('id', $floatingIpIds);
-        $queryTransformer->config(FloatingIp::class)
-            ->transform($collection);
-
-        return FloatingIpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
     }
 }
