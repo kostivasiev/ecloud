@@ -27,7 +27,7 @@ class ConfigureNics extends TaskJob
 
     public function handle()
     {
-        Log::info('Performing ConfigureNics for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
         Instance::findOrFail($this->data['instance_id'])->nics()
             ->whereNotNull('network_id')
@@ -60,23 +60,16 @@ class ConfigureNics extends TaskJob
                  * Get DHCP static bindings to determine used IP addresses on the network
                  * @see https://185.197.63.88/policy/api_includes/method_ListSegmentDhcpStaticBinding.html
                  */
-                try {
-                    $cursor = null;
-                    $assignedIpsNsx = collect();
-                    do {
-                        $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs?cursor=' . $cursor);
-                        $response = json_decode($response->getBody()->getContents());
-                        foreach ($response->results as $dhcpStaticBindingConfig) {
-                            $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
-                        }
-                        $cursor = $response->cursor ?? null;
-                    } while (!empty($cursor));
-                } catch (GuzzleException $exception) {
-                    $this->fail(
-                        new \Exception($logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents())
-                    );
-                    return;
-                }
+                $cursor = null;
+                $assignedIpsNsx = collect();
+                do {
+                    $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs?cursor=' . $cursor);
+                    $response = json_decode($response->getBody()->getContents());
+                    foreach ($response->results as $dhcpStaticBindingConfig) {
+                        $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
+                    }
+                    $cursor = $response->cursor ?? null;
+                } while (!empty($cursor));
 
                 // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
                 $reserved = 3;
@@ -122,27 +115,25 @@ class ConfigureNics extends TaskJob
                 }
 
 
-                //Create dhcp lease for the ip to the nic's mac address on NSX
-                //https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
-                try {
-                    $nsxService->put(
-                        '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
-                        . '/dhcp-static-binding-configs/' . $nic->getKey(),
-                        [
-                            'json' => [
-                                'resource_type' => 'DhcpV4StaticBindingConfig',
-                                'mac_address' => $nic->mac_address,
-                                'ip_address' => $nic->ip_address
-                            ]
+                /**
+                 * Create dhcp lease for the ip to the nic's mac address on NSX
+                 * @see https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
+                 */
+                $nsxService->put(
+                    '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
+                    . '/dhcp-static-binding-configs/' . $nic->getKey(),
+                    [
+                        'json' => [
+                            'resource_type' => 'DhcpV4StaticBindingConfig',
+                            'mac_address' => $nic->mac_address,
+                            'ip_address' => $nic->ip_address
                         ]
-                    );
-                } catch (GuzzleException $exception) {
-                    $this->fail(new \Exception(
-                        $logMessage . 'Failed: ' . $exception->getResponse()->getBody()->getContents()
-                    ));
-                    return;
-                }
+                    ]
+                );
+
                 Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
             });
+
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

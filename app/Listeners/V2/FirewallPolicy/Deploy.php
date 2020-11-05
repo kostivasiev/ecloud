@@ -18,6 +18,8 @@ class Deploy implements ShouldQueue
      */
     public function handle($event)
     {
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         $policy = $event->model;
         if ($policy instanceof FirewallRule) {
             $policy = $event->model->firewallPolicy;
@@ -35,5 +37,7 @@ class Deploy implements ShouldQueue
         dispatch(new \App\Jobs\FirewallPolicy\Deploy([
             'policy_id' => $policy->id,
         ]));
+
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

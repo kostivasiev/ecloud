@@ -22,11 +22,4 @@ abstract class Job implements ShouldQueue
     */
 
     use InteractsWithQueue, Queueable, SerializesModels;
-
-    public function failed(\Throwable $exception)
-    {
-        Log::error('Exception in ' . static::class, [
-            'exception' => $exception,
-        ]);
-    }
 }

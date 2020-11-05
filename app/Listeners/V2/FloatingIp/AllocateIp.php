@@ -22,7 +22,8 @@ class AllocateIp implements ShouldQueue
      */
     public function handle(Created $event)
     {
-        Log::info('Attempting to allocate IP address to floating IP ' . $event->model->getKey());
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         $floatingIp = FloatingIp::find($event->model->getKey());
         if (empty($floatingIp)) {
             $error = 'Failed to allocate floating IP to ' . $event->model->getKey() . '. Resource has been deleted';
@@ -95,5 +96,8 @@ class AllocateIp implements ShouldQueue
         $error = 'Insufficient available external IP\'s to assign to floating IP resource ' . $floatingIp->getKey();
         Log::error($error);
         $this->fail(new \Exception($error));
+        return;
+
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

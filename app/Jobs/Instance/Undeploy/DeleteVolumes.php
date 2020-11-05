@@ -17,7 +17,7 @@ class DeleteVolumes extends Job
 
     public function handle()
     {
-        Log::info('Performing DeleteVolumes for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
         $logMessage = 'DeleteVolumes for instance ' . $instance->getKey() . ': ';
@@ -31,6 +31,6 @@ class DeleteVolumes extends Job
             }
         });
 
-        Log::info($logMessage . 'Success');
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

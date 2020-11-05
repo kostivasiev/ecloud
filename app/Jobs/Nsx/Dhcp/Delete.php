@@ -17,24 +17,11 @@ class Delete extends Job
 
     public function handle()
     {
-        Log::info('NSX Dhcp Delete ' . $this->data['id'] . ' : Started');
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $dhcp = Dhcp::withTrashed()->findOrFail($this->data['id']);
+        $dhcp->availabilityZone->nsxService()->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
 
-        try {
-            $response = $dhcp->availabilityZone->nsxService()->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
-            if ($response->getStatusCode() !== 200) {
-                $message = 'NSX Dhcp Delete ' . $this->data['id'] . ' : Failed';
-                Log::error($message, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (\Exception $exception) {
-            $message = 'NSX Dhcp Delete ' . $this->data['id'] . ' : Exception';
-            Log::error($message, ['exception' => $exception]);
-            $this->fail(new \Exception($message));
-            return;
-        }
-
-        Log::info('NSX Dhcp Delete ' . $this->data['id'] . ' : Finished');
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

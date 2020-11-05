@@ -17,7 +17,7 @@ class DeleteNics extends Job
 
     public function handle()
     {
-        Log::info('Performing DeleteNics for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
         $logMessage = 'DeleteNics for instance ' . $instance->getKey() . ': ';
@@ -26,6 +26,6 @@ class DeleteNics extends Job
             $nic->delete();
         });
 
-        Log::info($logMessage . 'Success');
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

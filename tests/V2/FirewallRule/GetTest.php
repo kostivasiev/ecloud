@@ -40,7 +40,7 @@ class GetTest extends TestCase
         ]);
         $this->firewallPolicy = factory(FirewallPolicy::class)->create([
             'router_id' => $this->router->id,
-        ])->first();
+        ]);
         $this->firewallRule = factory(FirewallRule::class)->create([
             'name' => 'Demo firewall rule 1',
             'firewall_policy_id' => $this->firewallPolicy->getKey(),
@@ -52,7 +52,7 @@ class GetTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
-        ])->first();
+        ]);
     }
 
     public function testGetCollection()
@@ -67,7 +67,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->firewallRule->id,
                 'name' => $this->firewallRule->name,
-                'sequence' => $this->firewallRule->sequence,
+                'sequence' => (string)$this->firewallRule->sequence,
             ])
             ->assertResponseStatus(200);
     }
@@ -84,7 +84,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->firewallRule->id,
                 'name' => $this->firewallRule->name,
-                'sequence' => $this->firewallRule->sequence,
+                'sequence' => (string)$this->firewallRule->sequence,
             ])
             ->assertResponseStatus(200);
     }

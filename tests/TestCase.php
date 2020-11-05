@@ -30,7 +30,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Dhcp\Created::class,
-            \App\Events\V2\FirewallRule\Created::class,
             \App\Events\V2\Instance\Created::class,
             \App\Events\V2\Network\Created::class,
             \App\Events\V2\Router\Created::class,
@@ -40,10 +39,20 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Deleted
             \App\Events\V2\Nat\Deleted::class,
+            \App\Events\V2\FirewallRule\Deleted::class,
             \App\Events\V2\FirewallPolicy\Deleted::class,
+            \App\Events\V2\Vpc\Deleted::class,
+            \App\Events\V2\Dhcp\Deleted::class,
+            \App\Events\V2\Nic\Deleted::class,
 
             // Updated
             \App\Events\V2\Volume\Updated::class,
+
+            // Saved
+            \App\Events\V2\FirewallRule\Saved::class,
+            \App\Events\V2\FirewallPolicy\Saved::class,
+            \App\Events\V2\Router\Saved::class,
+            \App\Events\V2\Nat\Saved::class,
 
             // Deploy
             \App\Events\V2\Instance\Deploy::class,

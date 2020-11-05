@@ -17,6 +17,8 @@ class UnassignFloatingIp implements ShouldQueue
 
     public function handle(Deleted $event)
     {
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         $nic = $event->model;
         $logMessage = 'UnassignFloatingIp for NIC ' . $nic->getKey() . ': ';
         Log::info($logMessage . 'Started');
@@ -27,6 +29,6 @@ class UnassignFloatingIp implements ShouldQueue
             $nat->delete();
         });
 
-        Log::info($logMessage . 'Success');
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }
