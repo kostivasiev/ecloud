@@ -29,13 +29,17 @@ class Deploy implements ShouldQueue
         /** @var AvailabilityZone $availabilityZone */
         $availabilityZone = $router->availabilityZone;
         if (!$availabilityZone) {
-            $this->fail(new \Exception('Failed to find AZ for router ' . $router->id));
+            $message = 'Failed to find AZ for router ' . $router->id;
+            Log::error($message);
+            $this->fail(new \Exception($message));
             return;
         }
 
         $nsxService = $availabilityZone->nsxService();
         if (!$nsxService) {
-            $this->fail(new \Exception('Failed to find NSX Service for router ' . $router->id));
+            $message = 'Failed to find NSX Service for router ' . $router->id;
+            Log::error($message);
+            $this->fail(new \Exception($message));
             return;
         }
 
