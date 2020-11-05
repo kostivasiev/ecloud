@@ -42,10 +42,12 @@ class Update implements ShouldQueue
             $response = json_decode($response->getBody()->getContents(), true);
             $path = null;
             foreach ($response['results'] as $tier0) {
-                foreach ($tier0['tags'] as $tag) {
-                    if ($tag['scope'] == 'ukfast' && $tag['tag'] == 'az-default') {
-                        $path = $tier0['path'];
-                        break 2;
+                if (isset($tier0['tags'])) {
+                    foreach ($tier0['tags'] as $tag) {
+                        if ($tag['scope'] == 'ukfast' && $tag['tag'] == 'az-default') {
+                            $path = $tier0['path'];
+                            break 2;
+                        }
                     }
                 }
             }
