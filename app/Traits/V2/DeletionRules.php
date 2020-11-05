@@ -11,7 +11,7 @@ trait DeletionRules
         static::deleting(function ($model) {
             foreach ($model->children as $child) {
                 if ($model->$child()->count() > 0) {
-                    throw new \Exception('Child records exist for this item', 412);
+                    throw new \Exception('Active resources exist for this item', 412);
                 }
             }
         });
