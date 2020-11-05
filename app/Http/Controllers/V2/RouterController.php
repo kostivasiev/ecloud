@@ -77,12 +77,17 @@ class RouterController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $routerUuid
+     * @param string $routerId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $routerId)
     {
-        Router::forUser($request->user)->findOrFail($routerId)->delete();
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+        try {
+            $router->delete();
+        } catch (\Exception $e) {
+            return $router->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 
