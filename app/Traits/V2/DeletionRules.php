@@ -9,9 +9,11 @@ trait DeletionRules
     public static function bootDeletionRules()
     {
         static::deleting(function ($model) {
-            foreach ($model->children as $child) {
-                if ($model->$child()->count() > 0) {
-                    throw new \Exception('Active resources exist for this item', 412);
+            if (property_exists($model, 'children')) {
+                foreach ($model->children as $child) {
+                    if ($model->$child()->count() > 0) {
+                        throw new \Exception('Active resources exist for this item', 412);
+                    }
                 }
             }
         });
