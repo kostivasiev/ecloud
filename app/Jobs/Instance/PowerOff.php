@@ -22,9 +22,15 @@ class PowerOff extends Job
 
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $instance->availabilityZone->kingpinService()->delete(
+        $response = $instance->availabilityZone->kingpinService()->delete(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
         );
+
+        // Catch already deleted
+        if (json_decode($response->getBody()->getContents())->ExceptionType == 'UKFast.VimLibrary.Exception.EntityNotFoundException') {
+            Log::info('Attempted to power off, but entity was not found, skipping.');
+            return;
+        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
