@@ -27,7 +27,8 @@ class PowerOff extends Job
         );
 
         // Catch already deleted
-        if (json_decode($response->getBody()->getContents())->ExceptionType == 'UKFast.VimLibrary.Exception.EntityNotFoundException') {
+        $responseJson = json_decode($response->getBody()->getContents());
+        if (isset($responseJson->ExceptionType) && $responseJson->ExceptionType == 'UKFast.VimLibrary.Exception.EntityNotFoundException') {
             Log::info('Attempted to power off, but entity was not found, skipping.');
             return;
         }
