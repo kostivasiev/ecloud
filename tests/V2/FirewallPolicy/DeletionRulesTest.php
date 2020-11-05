@@ -1,8 +1,10 @@
 <?php
 
-namespace Tests\V2\AvailabilityZone;
+namespace Tests\V2\FirewallPolicy;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -14,35 +16,39 @@ class DeletionRulesTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
-    protected $availabilityZone;
-    protected $region;
-    protected $router;
-    protected $vpc;
+    protected FirewallPolicy $policy;
+    protected Region $region;
+    protected Router $router;
+    protected FirewallRule $rule;
+    protected Vpc $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+        factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
         $this->router = factory(Router::class)->create([
-            'name' => 'Manchester Router 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->getKey()
+        ]);
+        $this->policy = factory(FirewallPolicy::class)->create([
+            'router_id' => $this->router->getKey(),
+        ])->first();
+        $this->rule = factory(FirewallRule::class)->create([
+            'firewall_policy_id' => $this->policy->getKey(),
+            'router_id' => $this->router->getKey(),
         ]);
     }
 
     public function testFailedDeletion()
     {
         $this->delete(
-            '/v2/availability-zones/'.$this->availabilityZone->id,
+            '/v2/firewall-policies/' . $this->policy->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -51,7 +57,7 @@ class DeletionRulesTest extends TestCase
         )->seeJson([
             'detail' => 'Active resources exist for this item',
         ])->assertResponseStatus(412);
-        $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($this->availabilityZone->id);
-        $this->assertNull($availabilityZone->deleted_at);
+        $firewallPolicy = FirewallPolicy::withTrashed()->findOrFail($this->policy->getKey());
+        $this->assertNull($firewallPolicy->deleted_at);
     }
 }
