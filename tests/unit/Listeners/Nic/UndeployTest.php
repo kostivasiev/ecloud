@@ -93,6 +93,12 @@ class UndeployTest extends TestCase
                 ->andReturn(
                     new Response(200)
                 );
+
+            $mockNsxService->shouldReceive('get')
+                ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/state'])
+                ->andReturn(
+                    new Response(200)
+                );
             return $mockNsxService;
         });
 

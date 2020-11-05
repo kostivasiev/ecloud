@@ -5,9 +5,9 @@ namespace App\Listeners\V2\Router;
 use App\Events\V2\Router\Saved;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Router;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class Update implements ShouldQueue
 {
@@ -20,6 +20,8 @@ class Update implements ShouldQueue
      */
     public function handle(Saved $event)
     {
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         /** @var Router $router */
         $router = $event->model;
 
@@ -30,12 +32,11 @@ class Update implements ShouldQueue
             return;
         }
 
-        try {
-            $nsxService = $availabilityZone->nsxService();
-            if (!$nsxService) {
-                $this->fail(new \Exception('Failed to find NSX Service for router ' . $router->id));
-                return;
-            }
+        $nsxService = $availabilityZone->nsxService();
+        if (!$nsxService) {
+            $this->fail(new \Exception('Failed to find NSX Service for router ' . $router->id));
+            return;
+        }
 
             // Get the routers T0 path
             $response = $nsxService->get('policy/api/v1/infra/tier-0s');
@@ -55,46 +56,41 @@ class Update implements ShouldQueue
                 throw new \Exception('No tagged T0 could be found');
             }
 
-            $vpcTag = [
-                'scope' => config('defaults.tag.scope'),
-                'tag' => $router->vpc_id
-            ];
+        $vpcTag = [
+            'scope' => config('defaults.tag.scope'),
+            'tag' => $router->vpc_id
+        ];
 
-            // Deploy the router
-            $nsxService->patch('policy/api/v1/infra/tier-1s/' . $router->id, [
-                'json' => [
-                    'tier0_path' => $path,
-                    'tags' => [$vpcTag]
-                ],
-            ]);
+        // Deploy the router
+        $nsxService->patch('policy/api/v1/infra/tier-1s/' . $router->id, [
+            'json' => [
+                'tier0_path' => $path,
+                'tags' => [$vpcTag]
+            ],
+        ]);
 
-            // Deploy the router locale
-            $nsxService->patch('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
-                'json' => [
-                    'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $nsxService->getEdgeClusterId(),
-                    'tags' => [$vpcTag]
-                ],
-            ]);
+        // Deploy the router locale
+        $nsxService->patch('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
+            'json' => [
+                'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $nsxService->getEdgeClusterId(),
+                'tags' => [$vpcTag]
+            ],
+        ]);
 
-            // Update the routers default firewall rule to Reject
-            $response = $nsxService->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule');
-            $original = json_decode($response->getBody()->getContents(), true);
-            $original['action'] = 'REJECT';
-            $original = array_filter($original, function ($key) {
-                return strpos($key, '_') !== 0;
-            }, ARRAY_FILTER_USE_KEY);
-            $nsxService->patch(
-                'policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule',
-                [
-                    'json' => $original
-                ]
-            );
-        } catch (GuzzleException $exception) {
-            $this->fail(new \Exception($exception->getResponse()->getBody()->getContents()));
-            return;
-        } catch (\Exception $exception) {
-            $this->fail($exception);
-            return;
-        }
+        // Update the routers default firewall rule to Reject
+        $response = $nsxService->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule');
+        $original = json_decode($response->getBody()->getContents(), true);
+        $original['action'] = 'REJECT';
+        $original = array_filter($original, function ($key) {
+            return strpos($key, '_') !== 0;
+        }, ARRAY_FILTER_USE_KEY);
+        $nsxService->patch(
+            'policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule',
+            [
+                'json' => $original
+            ]
+        );
+
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

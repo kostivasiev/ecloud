@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Jobs\Instance\Undeploy;
+namespace App\Jobs\Nsx\Dhcp;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
+use App\Models\V2\Dhcp;
 use Illuminate\Support\Facades\Log;
 
-class DeleteNics extends Job
+class Delete extends Job
 {
     private $data;
 
@@ -19,12 +19,8 @@ class DeleteNics extends Job
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
-        $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
-        $logMessage = 'DeleteNics for instance ' . $instance->getKey() . ': ';
-
-        $instance->nics()->each(function ($nic) {
-            $nic->delete();
-        });
+        $dhcp = Dhcp::withTrashed()->findOrFail($this->data['id']);
+        $dhcp->availabilityZone->nsxService()->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

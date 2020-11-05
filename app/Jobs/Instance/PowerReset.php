@@ -5,8 +5,6 @@ namespace App\Jobs\Instance;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
 class PowerReset extends Job
@@ -20,27 +18,14 @@ class PowerReset extends Job
 
     public function handle()
     {
-        Log::info('Attempting to PowerReset instance '.$this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        try {
-            /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/'.$vpc->id.'/instance/'.$instance->id.'/power/reset'
-            );
-            if ($response->getStatusCode() == 200) {
-                Log::info('PowerReset finished successfully for instance '.$instance->id);
-                return;
-            }
-            $this->fail(new \Exception(
-                'Failed to PowerReset '.$instance->id.', Kingpin status was '.$response->getStatusCode()
-            ));
-            return;
-        } catch (GuzzleException $exception) {
-            $this->fail(new \Exception(
-                'Failed to PowerReset '.$instance->id.' : '.$exception->getResponse()->getBody()->getContents()
-            ));
-            return;
-        }
+        $instance->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power/reset'
+        );
+
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

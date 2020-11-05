@@ -19,7 +19,8 @@ class Deploy extends Job
 
     public function handle()
     {
-        Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Started');
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $nat = Nat::findOrFail($this->data['nat_id']);
 
         // Instance lookup
@@ -65,40 +66,27 @@ class Deploy extends Job
         }
 
         Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Adding NAT Rule');
-        try {
-            /**
-             * Deploy the USER Nat Rule
-             * @see https://185.197.63.88/policy/api_includes/method_PatchPolicyNatRule.html
-             */
-            $response = $instance->availabilityZone->nsxService()->patch(
-                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $nat->id,
-                [
-                    'json' => [
-                        'display_name' => $nat->id,
-                        'description' => $nat->id,
-                        'action' => 'DNAT',
-                        'destination_network' => $nat->destination->ip_address,
-                        'translated_network' => $nat->translated->ip_address,
-                        'translated_ports' => '0-65535',
-                        'enabled' => true,
-                        'logging' => false,
-                        'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',
-                    ]
+        /**
+         * Deploy the USER Nat Rule
+         * @see https://185.197.63.88/policy/api_includes/method_PatchPolicyNatRule.html
+         */
+        $instance->availabilityZone->nsxService()->patch(
+            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $nat->id,
+            [
+                'json' => [
+                    'display_name' => $nat->id,
+                    'description' => $nat->id,
+                    'action' => 'DNAT',
+                    'destination_network' => $nat->destination->ip_address,
+                    'translated_network' => $nat->translated->ip_address,
+                    'translated_ports' => '0-65535',
+                    'enabled' => true,
+                    'logging' => false,
+                    'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',
                 ]
-            );
-            if ($response->getStatusCode() !== 200) {
-                $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Failed to add new NAT rule';
-                Log::error($message, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (\Exception $exception) {
-            $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : Exception while adding new NAT rule';
-            Log::error($message, ['exception' => $exception]);
-            $this->fail(new \Exception($message));
-            return;
-        }
+            ]
+        );
 
-        Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Finished');
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

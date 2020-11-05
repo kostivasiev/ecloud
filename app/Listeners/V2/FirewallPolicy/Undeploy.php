@@ -19,32 +19,20 @@ class Undeploy implements ShouldQueue
      */
     public function handle(Deleted $event)
     {
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         $firewallPolicy = $event->model;
         $message = 'Undeploy Firewall Policy ' . $firewallPolicy->getKey() .': ';
         Log::info($message . 'Started');
 
-        try {
-            $response = $firewallPolicy->router->availabilityZone->nsxService()->delete(
-                'policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->getKey()
-            );
-
-            if ($response->getStatusCode() !== 200) {
-                $error = $message . 'Failed. Delete response was not 200';
-                Log::error($error, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (GuzzleException $exception) {
-            $error = ($exception->hasResponse()) ? $exception->getResponse()->getBody()->getContents() : $exception->getMessage();
-            Log::error($message . 'Failed, ' . $error);
-            $this->fail($exception);
-            return;
-        }
+        $firewallPolicy->router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->getKey()
+        );
 
         $firewallPolicy->firewallRules->each(function ($firewallRule) {
             $firewallRule->delete();
         });
 
-        Log::info($message . 'Success');
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

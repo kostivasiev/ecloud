@@ -23,7 +23,8 @@ class ActivateWindows extends TaskJob
 
     public function handle()
     {
-        Log::info('Starting ActivateWindows for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $logMessage = 'ActivateWindows for ' . $instance->getKey() . ': ';
         if ($instance->platform != 'Windows') {
@@ -41,26 +42,16 @@ class ActivateWindows extends TaskJob
             return;
         }
 
-        try {
-            /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $instance->vpc->getKey() . '/instance/' . $instance->getKey() . '/guest/windows/activate',
-                [
-                    'json' => [
-                        'username' => $guestAdminCredential->username,
-                        'password' => $guestAdminCredential->password,
-                    ],
-                ]
-            );
-            if ($response->getStatusCode() == 200) {
-                Log::info($logMessage . 'Success');
-                return;
-            }
-            $this->fail(new \Exception($logMessage . 'Failed. Kingpin status was ' . $response->getStatusCode()));
-            return;
-        } catch (GuzzleException $exception) {
-            $this->fail(new \Exception($logMessage . 'Failed. ' . $exception->getResponse()->getBody()->getContents()));
-            return;
-        }
+        $instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $instance->vpc->getKey() . '/instance/' . $instance->getKey() . '/guest/windows/activate',
+            [
+                'json' => [
+                    'username' => $guestAdminCredential->username,
+                    'password' => $guestAdminCredential->password,
+                ],
+            ]
+        );
+
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

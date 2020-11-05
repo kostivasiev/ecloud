@@ -3,6 +3,7 @@
 namespace Tests\V2\Vpc;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -16,26 +17,33 @@ class DeleteTest extends TestCase
     /** @var Region */
     private $region;
 
+    /** @var AvailabilityZone */
+    private $availabilityZone;
+
     /** @var Vpc */
     private $vpc;
 
-    private $availability_zone;
+    /** @var Dhcp */
+    private $dhcp;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
+        ]);
+        $this->dhcp = factory(Dhcp::class)->create([
+            'vpc_id' => $this->vpc->id,
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
-        $this->delete('/v2/vpcs/' . $this->vpc->getKey())->seeJson([
+        $this->delete('/v2/vpcs/' . $this->vpc->id)->seeJson([
             'title' => 'Unauthorised',
             'detail' => 'Unauthorised',
             'status' => 401,
@@ -58,7 +66,7 @@ class DeleteTest extends TestCase
     {
         $this->vpc->reseller_id = 3;
         $this->vpc->save();
-        $this->delete('/v2/vpcs/' . $this->vpc->getKey(), [], [
+        $this->delete('/v2/vpcs/' . $this->vpc->id, [], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
@@ -72,7 +80,7 @@ class DeleteTest extends TestCase
     {
        factory(Router::class)->create([
            'vpc_id' => $this->vpc->getKey(),
-           'availability_zone_id' => $this->availability_zone->getKey()
+           'availability_zone_id' => $this->availabilityZone->getKey()
        ]);
 
         $this->delete('/v2/vpcs/' . $this->vpc->getKey(), [], [
@@ -88,10 +96,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/vpcs/' . $this->vpc->getKey(), [], [
+        $this->delete('/v2/vpcs/' . $this->vpc->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(204);
-        $this->assertNotNull(Vpc::withTrashed()->findOrFail($this->vpc->getKey())->deleted_at);
+        $this->assertNotNull(Vpc::withTrashed()->findOrFail($this->vpc->id)->deleted_at);
     }
 }

@@ -52,6 +52,16 @@ class PowerOffTest extends TestCase
 
     public function testPowerOff()
     {
+        $mockKingpinService = \Mockery::mock();
+        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
+            $mockKingpinService->shouldReceive('delete')
+                ->withArgs(['/api/v2/vpc/' . $this->vpc->id . '/instance/' . $this->instance->id . '/power'])
+                ->andReturn(
+                    new Response(200)
+                );
+            return $mockKingpinService;
+        });
+
         $this->put(
             '/v2/instances/' . $this->instance->getKey() . '/power-off',
             [],
