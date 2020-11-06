@@ -136,6 +136,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
     });
 
+    /** Firewall Rule Ports */
+    $router->group([], function () use ($router) {
+        $router->get('firewall-rule-ports', 'FirewallRulePortController@index');
+        $router->get('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@show');
+        $router->post('firewall-rule-ports', 'FirewallRulePortController@store');
+        $router->patch('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@update');
+        $router->delete('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@destroy');
+    });
+
     /** Regions */
     $router->group([], function () use ($router) {
         $router->get('regions', 'RegionController@index');

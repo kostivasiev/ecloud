@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateFirewallRuleRequest;
-use App\Http\Requests\V2\UpdateFirewallRuleRequest;
+use App\Http\Requests\V2\FirewallRule\Create;
+use App\Http\Requests\V2\FirewallRule\Update;
 use App\Models\V2\FirewallRule;
 use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
@@ -45,10 +45,10 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param CreateFirewallRuleRequest $request
+     * @param Create $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateFirewallRuleRequest $request)
+    public function store(Create $request)
     {
         $instance = new FirewallRule();
         $instance->fill($request->only([
@@ -56,11 +56,8 @@ class FirewallRuleController extends BaseController
             'sequence',
             'deployed',
             'firewall_policy_id',
-            'service_type',
             'source',
-            'source_ports',
             'destination',
-            'destination_ports',
             'action',
             'direction',
             'enabled'
@@ -71,11 +68,11 @@ class FirewallRuleController extends BaseController
     }
 
     /**
-     * @param UpdateFirewallRuleRequest $request
+     * @param Update $request
      * @param string $firewallRuleId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateFirewallRuleRequest $request, string $firewallRuleId)
+    public function update(Update $request, string $firewallRuleId)
     {
         $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         $item->fill($request->only([
@@ -83,11 +80,8 @@ class FirewallRuleController extends BaseController
             'sequence',
             'deployed',
             'firewall_policy_id',
-            'service_type',
             'source',
-            'source_ports',
             'destination',
-            'destination_ports',
             'action',
             'direction',
             'enabled'
