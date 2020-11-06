@@ -28,7 +28,46 @@ class FloatingIpController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FloatingIp::forUser($request->user);
+        //$collection = FloatingIp::forUser($request->user)
+
+        // "resource_id" filtering hack - start
+        if ($request->has('resource_id:eq')) {
+            if ($request->get('resource_id:eq') === 'null') {
+                $floatingIpIds = FloatingIp::forUser($request->user)->get()
+                    ->reject(function ($floatingIp) {
+                        return $floatingIp->resource_id != null;
+                    })
+                    ->map(function ($floatingIp) {
+                        return $floatingIp->id;
+                    });
+                $collection = FloatingIp::whereIn('id', $floatingIpIds);
+            } else {
+                $resourceId = $request->get('resource_id:eq');
+                $floatingIpIds = FloatingIp::forUser($request->user)->get()
+                    ->reject(function ($floatingIp) use ($resourceId) {
+                        return $floatingIp->resource_id != $resourceId;
+                    })
+                    ->map(function ($floatingIp) {
+                        return $floatingIp->id;
+                    });
+                $collection = FloatingIp::whereIn('id', $floatingIpIds);
+            }
+            $request->query->remove('resource_id:eq');  // So Ditto doesn't try to filter by resource_id
+        } elseif ($request->has('resource_id:in')) {
+            $ids = explode(',', $request->get('resource_id:in'));
+            $floatingIpIds = FloatingIp::forUser($request->user)->get()
+                ->reject(function ($floatingIp) use ($ids) {
+                    return !in_array($floatingIp->resource_id, $ids);
+                })
+                ->map(function ($floatingIp) {
+                    return $floatingIp->id;
+                });
+            $collection = FloatingIp::whereIn('id', $floatingIpIds);
+            $request->query->remove('resource_id:in');  // So Ditto doesn't try to filter by resource_id
+        } else {
+            $collection = FloatingIp::forUser($request->user);
+        }
+        // "resource_id" filtering hack - end
 
         $queryTransformer->config(FloatingIp::class)
             ->transform($collection);

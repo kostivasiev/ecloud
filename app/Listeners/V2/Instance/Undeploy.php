@@ -6,6 +6,7 @@ use App\Events\V2\Instance\Deleted;
 use App\Jobs\Instance\Undeploy\PowerOff;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class Undeploy implements ShouldQueue
 {
@@ -18,6 +19,8 @@ class Undeploy implements ShouldQueue
      */
     public function handle(Deleted $event)
     {
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         $instance = $event->model;
 
         $data = [
@@ -30,5 +33,7 @@ class Undeploy implements ShouldQueue
             new \App\Jobs\Instance\Undeploy\DeleteVolumes($data),
             new \App\Jobs\Instance\Undeploy\DeleteNics($data)
         ]));
+
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

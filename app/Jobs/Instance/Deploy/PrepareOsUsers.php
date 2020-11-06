@@ -2,15 +2,12 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\Job;
 use App\Jobs\TaskJob;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Services\V2\PasswordService;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
 class PrepareOsUsers extends TaskJob
@@ -30,7 +27,8 @@ class PrepareOsUsers extends TaskJob
      */
     public function handle(PasswordService $passwordService)
     {
-        Log::info('Starting PrepareOsUsers for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($instance->vpc->id);
 
@@ -47,30 +45,16 @@ class PrepareOsUsers extends TaskJob
         if ($instance->platform == 'Windows') {
             // Rename the Windows "administrator" account to "graphite.rack"
             Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Rename "Administrator" user');
-            try {
-                /** @var Response $response */
-                $response = $instance->availabilityZone->kingpinService()->put(
-                    '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/windows/user/administrator/username',
-                    [
-                        'json' => [
-                            'newUsername' => $guestAdminCredential->username,
-                            'username' => 'administrator',
-                            'password' => $guestAdminCredential->password,
-                        ],
-                    ]
-                );
-                if ($response->getStatusCode() != 200) {
-                    $message = 'Failed PrepareOsUsers for ' . $instance->id;
-                    Log::error($message, ['response' => $response]);
-                    $this->fail(new \Exception($message));
-                    return;
-                }
-            } catch (GuzzleException $exception) {
-                $message = 'Failed PrepareOsUsers for ' . $instance->id;
-                Log::error($message, ['exception' => $exception]);
-                $this->fail(new \Exception($message));
-                return;
-            }
+            $instance->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/windows/user/administrator/username',
+                [
+                    'json' => [
+                        'newUsername' => $guestAdminCredential->username,
+                        'username' => 'administrator',
+                        'password' => $guestAdminCredential->password,
+                    ],
+                ]
+            );
             Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Renamed "Administrator" user');
 
             // Add Windows user accounts
@@ -89,61 +73,31 @@ class PrepareOsUsers extends TaskJob
                 Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Created Windows account "' . $username . '"');
 
                 Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushing Windows account "' . $username . '"');
-                try {
-                    /** @var Response $response */
-                    $response = $instance->availabilityZone->kingpinService()->post(
-                        '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/windows/user',
-                        [
-                            'json' => [
-                                'targetUsername' => $username,
-                                'targetPassword' => $password,
-                                'username' => $guestAdminCredential->username,
-                                'password' => $guestAdminCredential->password,
-                            ],
-                        ]
-                    );
-                    if ($response->getStatusCode() != 200) {
-                        $message = 'Failed PrepareOsUsers for ' . $instance->id .
-                            ' when creating Windows account for "' . $username . '"';
-                        Log::error($message, ['response' => $response]);
-                        $this->fail(new \Exception($message));
-                        return;
-                    }
-                } catch (GuzzleException $exception) {
-                    $message = 'Failed PrepareOsUsers for ' . $instance->id .
-                        ' when creating Windows account for "' . $username . '"';
-                    Log::error($message, ['exception' => $exception]);
-                    $this->fail(new \Exception($message));
-                    return;
-                }
-                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushed Windows account "' . $username . '"');
-            });
-        } else {
-            // Create Linux Admin Group
-            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Creating Linux admin group');
-            try {
-                /** @var Response $response */
-                $response = $instance->availabilityZone->kingpinService()->post(
-                    '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/admingroup',
+                $instance->availabilityZone->kingpinService()->post(
+                    '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/windows/user',
                     [
                         'json' => [
+                            'targetUsername' => $username,
+                            'targetPassword' => $password,
                             'username' => $guestAdminCredential->username,
                             'password' => $guestAdminCredential->password,
                         ],
                     ]
                 );
-                if ($response->getStatusCode() != 200) {
-                    $message = 'Failed PrepareOsUsers for ' . $instance->id . ' when creating Linux admin group';
-                    Log::error($message, ['response' => $response]);
-                    $this->fail(new \Exception($message));
-                    return;
-                }
-            } catch (GuzzleException $exception) {
-                $message = 'Failed PrepareOsUsers for ' . $instance->id . ' when creating Linux admin group';
-                Log::error($message, ['exception' => $exception]);
-                $this->fail(new \Exception($message));
-                return;
-            }
+                Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushed Windows account "' . $username . '"');
+            });
+        } else {
+            // Create Linux Admin Group
+            Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Creating Linux admin group');
+            $instance->availabilityZone->kingpinService()->post(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/admingroup',
+                [
+                    'json' => [
+                        'username' => $guestAdminCredential->username,
+                        'password' => $guestAdminCredential->password,
+                    ],
+                ]
+            );
             Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Created Linux admin group');
 
             // Add Linux user accounts
@@ -163,35 +117,21 @@ class PrepareOsUsers extends TaskJob
                 Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Created Linux account "' . $username . '"');
 
                 Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushing Linux account "' . $username . '"');
-                try {
-                    /** @var Response $response */
-                    $response = $instance->availabilityZone->kingpinService()->post(
-                        '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
-                        [
-                            'json' => [
-                                'targetUsername' => $username,
-                                'targetPassword' => $password,
-                                'username' => $guestAdminCredential->username,
-                                'password' => $guestAdminCredential->password,
-                            ],
-                        ]
-                    );
-                    if ($response->getStatusCode() != 200) {
-                        $message = 'Failed PrepareOsUsers for ' . $instance->id .
-                            ' when creating Linux account for "' . $username . '"';
-                        Log::error($message, ['response' => $response]);
-                        $this->fail(new \Exception($message));
-                        return;
-                    }
-                } catch (GuzzleException $exception) {
-                    $message = 'Failed PrepareOsUsers for ' . $instance->id .
-                        ' when creating Linux account for "' . $username . '"';
-                    Log::error($message, ['exception' => $exception]);
-                    $this->fail(new \Exception($message));
-                    return;
-                }
+                $instance->availabilityZone->kingpinService()->post(
+                    '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
+                    [
+                        'json' => [
+                            'targetUsername' => $username,
+                            'targetPassword' => $password,
+                            'username' => $guestAdminCredential->username,
+                            'password' => $guestAdminCredential->password,
+                        ],
+                    ]
+                );
                 Log::info('PrepareOsUsers for instance ' . $this->data['instance_id'] . ' : Pushed Linux account "' . $username . '"');
             });
         }
+
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

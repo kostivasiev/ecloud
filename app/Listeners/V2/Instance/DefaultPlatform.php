@@ -13,8 +13,6 @@ class DefaultPlatform
         /** @var Instance $model */
         $model = $event->model;
 
-        Log::info('Setting default platform on instance ' . $model->id);
-
         if (!empty($model->platform)) {
             Log::info('Platform already set to "' . $model->platform . '" on instance ' . $model->id);
             return;
@@ -34,5 +32,7 @@ class DefaultPlatform
         }
 
         Log::info('Default platform on instance ' . $model->id . ' set to ' . $model->platform);
+
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

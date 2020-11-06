@@ -4,7 +4,6 @@ namespace App\Listeners\V2\Nat;
 
 use App\Events\V2\Nat\Deleted;
 use App\Models\V2\Nic;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -20,10 +19,11 @@ class Undeploy implements ShouldQueue
      */
     public function handle(Deleted $event)
     {
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         $nat = $event->model;
 
         $message = 'Nat ' . $nat->getKey() . ' Undeploy : ';
-        Log::info($message . 'Started');
 
         // Load NIC from destination or translated
         $nic = collect(
@@ -48,25 +48,10 @@ class Undeploy implements ShouldQueue
         }
 
         $router = $nic->network->router;
+        $router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/nat/USER/nat-rules/' . $nat->getKey()
+        );
 
-        try {
-            $response = $router->availabilityZone->nsxService()->delete(
-                'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/nat/USER/nat-rules/' . $nat->getKey()
-            );
-
-            if ($response->getStatusCode() !== 200) {
-                $error = $message . 'Failed. Delete response was not 200';
-                Log::error($error, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (GuzzleException $exception) {
-            $error = ($exception->hasResponse()) ? $exception->getResponse()->getBody()->getContents() : $exception->getMessage();
-            Log::error('Failed to undeploy NAT ' . $nat->getKey() . ': ' . $error);
-            $this->fail($exception);
-            return;
-        }
-
-        Log::info($message . 'Success');
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

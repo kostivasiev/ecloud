@@ -23,7 +23,8 @@ class ConfigureWinRm extends TaskJob
 
     public function handle()
     {
-        Log::info('Starting ConfigureWinRm for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $logMessage = 'ConfigureWinRm for ' . $instance->id . ': ';
         if ($instance->platform != 'Windows') {
@@ -41,31 +42,16 @@ class ConfigureWinRm extends TaskJob
             return;
         }
 
-        try {
-            /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/winrm',
-                [
-                    'json' => [
-                        'username' => $guestAdminCredential->username,
-                        'password' => $guestAdminCredential->password,
-                    ],
-                ]
-            );
+        $instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/winrm',
+            [
+                'json' => [
+                    'username' => $guestAdminCredential->username,
+                    'password' => $guestAdminCredential->password,
+                ],
+            ]
+        );
 
-            if ($response->getStatusCode() != 200) {
-                $message = 'Failed ConfigureWinRm for ' . $instance->id;
-                Log::error($message, ['response' => $response]);
-                $this->fail(new \Exception($message));
-                return;
-            }
-        } catch (GuzzleException $exception) {
-            $message = 'Failed ConfigureWinRm for ' . $instance->id;
-            Log::error($message, ['exception' => $exception]);
-            $this->fail(new \Exception($message));
-            return;
-        }
-
-        Log::info($logMessage . 'Success');
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

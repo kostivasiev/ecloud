@@ -2,13 +2,10 @@
 
 namespace App\Jobs\Instance;
 
-use App\Jobs\Job;
 use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
 class PowerOn extends TaskJob
@@ -27,27 +24,14 @@ class PowerOn extends TaskJob
      */
     public function handle()
     {
-        Log::info('Attempting to PowerOn instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        try {
-            /** @var Response $response */
-            $response = $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
-            );
-            if ($response->getStatusCode() == 200) {
-                Log::info('PowerOn finished successfully for instance ' . $instance->id);
-                return;
-            }
-            $this->fail(new \Exception(
-                'Failed to PowerOn ' . $instance->id . ', Kingpin status was ' . $response->getStatusCode()
-            ));
-            return;
-        } catch (GuzzleException $exception) {
-            $this->fail(new \Exception(
-                'Failed to PowerOn ' . $instance->id . ' : ' . $exception->getResponse()->getBody()->getContents()
-            ));
-            return;
-        }
+        $instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
+        );
+
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

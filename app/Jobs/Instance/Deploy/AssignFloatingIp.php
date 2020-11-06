@@ -24,7 +24,8 @@ class AssignFloatingIp extends TaskJob
 
     public function handle()
     {
-        Log::info('Starting AssignFloatingIp for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $destination_id = null;
 
@@ -54,5 +55,7 @@ class AssignFloatingIp extends TaskJob
             $nat->save();
             Log::info('Floating IP (' . $destination_id . ') assigned to NIC (' . $nic->id . ')');
         }
+
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

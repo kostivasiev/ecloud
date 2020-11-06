@@ -19,6 +19,7 @@ use App\Jobs\Instance\PowerOn;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class Deploy implements ShouldQueue
 {
@@ -31,6 +32,8 @@ class Deploy implements ShouldQueue
      */
     public function handle(DeployEvent $event)
     {
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+
         /** @var DeployEventData $data */
         $data = $event->data;
 
@@ -52,5 +55,7 @@ class Deploy implements ShouldQueue
             new RunApplianceBootstrap($event->task, $data),
             new RunBootstrapScript($event->task, $data),
         ]));
+
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

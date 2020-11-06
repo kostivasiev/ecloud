@@ -2,13 +2,10 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\Job;
 use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
 class UpdateNetworkAdapter extends TaskJob
@@ -27,7 +24,8 @@ class UpdateNetworkAdapter extends TaskJob
      */
     public function handle()
     {
-        Log::info('Starting UpdateNetworkAdapter for instance ' . $this->data['instance_id']);
+        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
 
@@ -37,31 +35,16 @@ class UpdateNetworkAdapter extends TaskJob
         }
 
         foreach ($instance->nics as $nic) {
-            try {
-                /** @var Response $response */
-                $response = $instance->availabilityZone->kingpinService()->put(
-                    '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/nic/' . $nic->mac_address . '/connect',
-                    [
-                        'json' => [
-                            'networkId' => $nic->network_id,
-                        ],
-                    ]
-                );
-
-                if ($response->getStatusCode() != 200) {
-                    $message = 'Failed UpdateNetworkAdapter for ' . $instance->id;
-                    Log::error($message, ['response' => $response]);
-                    $this->fail(new \Exception($message));
-                    return;
-                }
-            } catch (GuzzleException $exception) {
-                $message = 'Failed UpdateNetworkAdapter for ' . $instance->id;
-                Log::error($message, ['exception' => $exception]);
-                $this->fail(new \Exception($message));
-                return;
-            }
+            $instance->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/nic/' . $nic->mac_address . '/connect',
+                [
+                    'json' => [
+                        'networkId' => $nic->network_id,
+                    ],
+                ]
+            );
         }
 
-        Log::info('UpdateNetworkAdapter finished successfully for instance ' . $instance->id);
+        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }
