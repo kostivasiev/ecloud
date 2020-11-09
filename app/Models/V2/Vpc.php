@@ -4,7 +4,6 @@ namespace App\Models\V2;
 
 use App\Events\V2\Vpc\Created;
 use App\Events\V2\Vpc\Creating;
-use App\Events\V2\Vpc\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -42,6 +41,7 @@ class Vpc extends Model implements Filterable, Sortable
         'instances',
         'floatingIps',
         'loadBalancerClusters',
+        'volumes',
     ];
 
     public function dhcp()
