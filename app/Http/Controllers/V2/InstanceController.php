@@ -184,7 +184,11 @@ class InstanceController extends BaseController
         if (!$this->isAdmin && $instance->locked === true) {
             return $this->isLocked();
         }
-        $instance->delete();
+        try {
+            $instance->delete();
+        } catch (\Exception $e) {
+            return $instance->getDeletionError($e);
+        }
         return response('', 204);
     }
 

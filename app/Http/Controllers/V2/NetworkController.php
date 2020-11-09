@@ -87,7 +87,11 @@ class NetworkController extends BaseController
     public function destroy(Request $request, string $networkId)
     {
         $network = Network::forUser($request->user)->findOrFail($networkId);
-        $network->delete();
+        try {
+            $network->delete();
+        } catch (\Exception $e) {
+            return $network->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 

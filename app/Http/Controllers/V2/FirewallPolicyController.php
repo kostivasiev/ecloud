@@ -78,7 +78,11 @@ class FirewallPolicyController extends BaseController
     public function destroy(Request $request, string $firewallPolicyId)
     {
         $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
-        $policy->delete();
+        try {
+            $policy->delete();
+        } catch (\Exception $e) {
+            return $policy->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 }
