@@ -62,6 +62,11 @@ class FirewallRule extends Model implements Filterable, Sortable
         return $this->belongsTo(FirewallPolicy::class);
     }
 
+    public function firewallRulePorts()
+    {
+        return $this->hasMany(FirewallRulePort::class);
+    }
+
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {

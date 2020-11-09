@@ -131,6 +131,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('firewall-rules', 'FirewallRuleController@index');
         $router->get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
+        $router->get('firewall-rules/{firewallRuleId}/ports', 'FirewallRuleController@ports');
         $router->post('firewall-rules', 'FirewallRuleController@store');
         $router->patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
         $router->delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');

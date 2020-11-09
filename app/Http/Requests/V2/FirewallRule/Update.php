@@ -15,6 +15,8 @@ class Update extends FormRequest
      */
     public function rules()
     {
+        $firewallPortRules = (new \App\Http\Requests\V2\FirewallRulePort\Create)->rules();
+
         return [
             'name' => 'sometimes|required|string|max:50',
             'sequence' => 'sometimes|required|integer',
@@ -40,6 +42,14 @@ class Update extends FormRequest
             'action' => 'sometimes|required|string|in:ALLOW,DROP,REJECT',
             'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',
             'enabled' => 'sometimes|required|boolean',
+            'ports' => [
+                'sometimes',
+                'required',
+                'array'
+            ],
+            'ports.*.protocol' => $firewallPortRules['protocol'],
+            'ports.*.source' => $firewallPortRules['source'],
+            'ports.*.destination' => $firewallPortRules['destination']
         ];
     }
 

@@ -2,8 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallRule\Deleted;
-use App\Events\V2\FirewallRule\Saved;
+use App\Events\V2\FirewallRulePort\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -38,17 +37,14 @@ class FirewallRulePort extends Model implements Filterable, Sortable
         'destination'
     ];
 
-    protected $dispatchesEvents = [];
+    protected $dispatchesEvents = [
+        'saved' => Saved::class
+    ];
 
     public function firewallRule()
     {
         return $this->belongsTo(FirewallRule::class);
     }
-
-//    public function firewallPolicy()
-//    {
-//        return $this->hasOneThrough(FirewallPolicy::class, FirewallRule::class);
-//    }
 
     public function scopeForUser($query, $user)
     {
