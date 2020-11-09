@@ -29,20 +29,11 @@ trait DeletionRules
     }
 
     /**
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeWithAll(Builder $query): Builder
-    {
-        return $query->with($this->children);
-    }
-
-    /**
      * @return Builder
      */
     public function getRelatableInstance(): Builder
     {
-        return (new self)::withAll();
+        return (new self)::with($this->children);
     }
 
     /**
