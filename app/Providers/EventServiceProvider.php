@@ -163,6 +163,8 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Vpc\Deleted::class => [
             \App\Listeners\V2\Vpc\Dhcp\Delete::class,
+            \App\Listeners\V2\Vpc\Routers\Delete::class,
+            \App\Listeners\V2\Vpc\FloatingIps\Delete::class,
         ],
 
         // Vpn

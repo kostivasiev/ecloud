@@ -46,8 +46,8 @@ trait DeletionRules
             'errors' => [
                 'title' => 'Precondition Failed',
                 'detail' => $exception->getMessage(),
-                'status' => $exception->getCode()
+                'status' => 412
             ]
-        ], $exception->getCode());
+        ], 412);
     }
 }

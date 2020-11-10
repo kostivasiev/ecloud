@@ -54,7 +54,7 @@ class Router extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
-        'saved' => Saved::class,
+        'saved' => Saved::class
     ];
 
     public $children = [
