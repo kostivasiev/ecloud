@@ -135,6 +135,16 @@ class TrackableTraitTest extends TestCase
     }
 
     /**
+     * Test resource status attribute is provisioning with task containing no jobs
+     */
+    public function testStatusProvisioningWithJoblessTask()
+    {
+        $this->instance->tasks()->create();
+
+        $this->assertEquals(Instance::STATUS_PROVISIONING, $this->instance->status);
+    }
+
+    /**
      * Test createTask() throws with running task for resource
      */
     public function testCreateTaskThrowsWithRunningTask()
