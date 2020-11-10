@@ -83,6 +83,14 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
 
+        // FirewallRulePort
+        \App\Events\V2\FirewallRulePort\Saved::class => [
+            \App\Listeners\V2\FirewallPolicy\Deploy::class,
+        ],
+        \App\Events\V2\FirewallRulePort\Deleted::class => [
+            \App\Listeners\V2\FirewallPolicy\Deploy::class,
+        ],
+
         // FloatingIp
         \App\Events\V2\FloatingIp\Created::class => [
             \App\Listeners\V2\FloatingIp\AllocateIp::class

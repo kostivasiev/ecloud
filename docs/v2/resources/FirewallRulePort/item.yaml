@@ -1,0 +1,42 @@
+get:
+  parameters:
+    - $ref: '../../resources/FirewallRulePort/parameters/firewallRulePortId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/firewallRulePort.yaml'
+              meta:
+                type: object
+  tags:
+    - Firewall Rule Ports
+patch:
+  parameters:
+    - $ref: '../../resources/FirewallRulePort/parameters/firewallRulePortId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/firewallRulePort.yaml'
+  responses:
+    200:
+      $ref: '../../resources/FirewallRulePort/responses/idResponse.yaml'
+  tags:
+    - Firewall Rule Ports
+delete:
+  parameters:
+    - $ref: '../../resources/FirewallRulePort/parameters/firewallRulePortId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Firewall Rule Ports
+

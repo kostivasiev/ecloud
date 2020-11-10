@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\V2\FirewallRule;
+namespace Tests\V2\FirewallRulePort;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
@@ -9,7 +9,6 @@ use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,9 +16,9 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
     protected FirewallPolicy $firewallPolicy;
     protected FirewallRule $firewallRule;
+    protected FirewallRulePort $firewallRulePort;
     protected Region $region;
     protected Router $router;
     protected Vpc $vpc;
@@ -27,8 +26,6 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
@@ -44,7 +41,7 @@ class GetTest extends TestCase
         ]);
         $this->firewallRule = factory(FirewallRule::class)->create([
             'firewall_policy_id' => $this->firewallPolicy->getKey(),
-        ])->first();
+        ]);
         $this->firewallRulePort = factory(FirewallRulePort::class)->create([
             'firewall_rule_id' => $this->firewallRule->getKey(),
         ]);
@@ -53,22 +50,17 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/firewall-rules',
+            '/v2/firewall-rule-ports',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'firewall_policy_id' => $this->firewallPolicy->getKey(),
-                'source' => $this->firewallRule->source,
-                'destination' => $this->firewallRule->destination,
-                'action' => $this->firewallRule->action,
-                'direction' => $this->firewallRule->direction,
-                'enabled' => $this->firewallRule->enabled,
-                'id' => $this->firewallRule->id,
-                'name' => $this->firewallRule->name,
-                'sequence' => (string)$this->firewallRule->sequence,
+                'firewall_rule_id' => $this->firewallRulePort->firewall_rule_id,
+                'protocol' => $this->firewallRulePort->protocol,
+                'source' => $this->firewallRulePort->source,
+                'destination' => $this->firewallRulePort->destination
             ])
             ->assertResponseStatus(200);
     }
@@ -76,34 +68,17 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/firewall-rules/' . $this->firewallRule->getKey(),
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->firewallRule->id,
-                'name' => $this->firewallRule->name,
-                'sequence' => (string)$this->firewallRule->sequence,
-            ])
-            ->assertResponseStatus(200);
-    }
-
-    public function testGetPortsCollection()
-    {
-        $this->get(
-            '/v2/firewall-rules/' . $this->firewallRule->getKey() . '/ports',
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'firewall_rule_id' => $this->firewallRule->getKey(),
-                'protocol' => 'TCP',
-                'source' => '443',
-                'destination' => '555'
+                'firewall_rule_id' => $this->firewallRulePort->firewall_rule_id,
+                'protocol' => $this->firewallRulePort->protocol,
+                'source' => $this->firewallRulePort->source,
+                'destination' => $this->firewallRulePort->destination
             ])
             ->assertResponseStatus(200);
     }

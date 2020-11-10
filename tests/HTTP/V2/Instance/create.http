@@ -24,8 +24,8 @@ client.test("Request executed successfully", function() {
 
 ###
 
-GET https://{{host}}/{{version}}/instances/{{instance_id}}
-X-consumer-custom-id:  0-0
+GET https://{{host}}/{{version}}/instances/i-c1ec7bf8/credentials
+X-consumer-custom-id:  1-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
