@@ -23,7 +23,6 @@ class Deploy extends Job
         $router = $policy->router;
         $availabilityZone = $router->availabilityZone;
 
-        // ANY on ports source / destination??
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
@@ -68,7 +67,7 @@ class Deploy extends Job
                             'notes' => '',
                             'direction' => $rule->direction,
                             'tag' => '',
-                            'ip_protocol' => 'IPV4_IPV6',
+                            'ip_protocol' => 'IPV4_IPV6'
                         ];
                     })->toArray()
                 ]

@@ -5,7 +5,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "Rule Test - 10/11/2020 (1)",
+    "name": "Rule Test - port editing",
     "sequence": 10,
     "firewall_policy_id": "{{dev_firewall_policy_id}}",
     "action": "ALLOW",
@@ -89,8 +89,8 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-# Delete Policy
-DELETE https://{{host}}/{{version}}/firewall-rules/fwr-f7f9f43f
+# Delete rule
+DELETE https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write

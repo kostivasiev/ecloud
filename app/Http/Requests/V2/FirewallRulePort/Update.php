@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\FirewallRulePort;
 
 use App\Models\V2\FirewallRule;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidIpFormatCsvString;
+use App\Rules\V2\ValidPortReference;
 use UKFast\FormRequests\FormRequest;
 
 class Update extends FormRequest
@@ -46,13 +46,13 @@ class Update extends FormRequest
                 'sometimes',
                 'nullable',
                 'string',
-                new ValidIpFormatCsvString()
+                new ValidPortReference()
             ],
             'destination' => [
                 'sometimes',
                 'nullable',
                 'string',
-                new ValidIpFormatCsvString()
+                new ValidPortReference()
             ]
         ];
     }

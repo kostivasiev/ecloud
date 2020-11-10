@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\FirewallRulePort\Deleted;
 use App\Events\V2\FirewallRulePort\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
@@ -38,7 +39,8 @@ class FirewallRulePort extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'saved' => Saved::class
+        'saved' => Saved::class,
+        'deleted' => Deleted::class
     ];
 
     public function firewallRule()
