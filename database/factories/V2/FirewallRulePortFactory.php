@@ -9,7 +9,7 @@ $factory->define(FirewallRulePort::class, function (Faker $faker) {
     return [
         'name' => $faker->domainWord,
         'protocol' => 'TCP',
-        'source' => '192.168.100.1',
-        'destination' => '212.22.18.10',
+        'source' => '443',
+        'destination' => '555',
     ];
 });

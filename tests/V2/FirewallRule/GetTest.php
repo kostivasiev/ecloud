@@ -93,7 +93,7 @@ class GetTest extends TestCase
     public function testGetPortsCollection()
     {
         $this->get(
-            '/v2/firewall-rules',
+            '/v2/firewall-rules/' . $this->firewallRule->getKey() . '/ports',
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -102,8 +102,8 @@ class GetTest extends TestCase
             ->seeJson([
                 'firewall_rule_id' => $this->firewallRule->getKey(),
                 'protocol' => 'TCP',
-                'source' => '192.168.100.1',
-                'destination' => '212.22.18.10'
+                'source' => '443',
+                'destination' => '555'
             ])
             ->assertResponseStatus(200);
     }

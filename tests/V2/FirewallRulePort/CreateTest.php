@@ -52,16 +52,16 @@ class CreateTest extends TestCase
         $this->post('/v2/firewall-rule-ports', [
             'firewall_rule_id' => $this->firewallRule->getKey(),
             'protocol' => 'TCP',
-            'source' => '10.0.0.1',
-            'destination' => '212.22.18.10'
+            'source' => '443',
+            'destination' => '555'
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
         ])->seeInDatabase('firewall_rule_ports', [
             'firewall_rule_id' => $this->firewallRule->getKey(),
             'protocol' => 'TCP',
-            'source' => '10.0.0.1',
-            'destination' => '212.22.18.10'
+            'source' => '443',
+            'destination' => '555'
         ],
             'ecloud')
             ->assertResponseStatus(201);

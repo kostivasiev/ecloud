@@ -30,11 +30,10 @@ class Undeploy implements ShouldQueue
         );
 
         $firewallPolicy->firewallRules->each(function ($firewallRule) {
+            $firewallRule->firewallRulePorts->each(function ($firewallRulePort) {
+                $firewallRulePort->delete();
+            });
             $firewallRule->delete();
-        });
-
-        $firewallPolicy->firewallRules->firewallRulePorts->each(function ($firewallRulePort) {
-            $firewallRulePort->delete();
         });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

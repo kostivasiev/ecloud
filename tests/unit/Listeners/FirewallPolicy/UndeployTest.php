@@ -5,6 +5,7 @@ namespace Tests\unit\Listeners\FirewallPolicy;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -53,6 +54,11 @@ class UndeployTest extends TestCase
             $this->firewallRule = factory(FirewallRule::class)->create([
                 'id' => 'fwr-abc123',
                 'firewall_policy_id' => $this->firewallPolicy->getKey()
+            ]);
+
+            $this->firewallRulePort = factory(FirewallRulePort::class)->create([
+                'id' => 'fwrp-abc123',
+                'firewall_rule_id' => 'fwr-abc123',
             ]);
         });
     }

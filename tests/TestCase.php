@@ -53,6 +53,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FirewallPolicy\Saved::class,
             \App\Events\V2\Router\Saved::class,
             \App\Events\V2\Nat\Saved::class,
+            \App\Events\V2\FirewallRulePort\Saved::class,
 
             // Deploy
             \App\Events\V2\Instance\Deploy::class,
