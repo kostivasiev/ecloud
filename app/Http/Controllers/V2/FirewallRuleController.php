@@ -116,18 +116,6 @@ class FirewallRuleController extends BaseController
     public function update(Update $request, string $firewallRuleId)
     {
         $firewallRule = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
-        $firewallRule->fill($request->only([
-            'name',
-            'sequence',
-            'deployed',
-            'firewall_policy_id',
-            'source',
-            'destination',
-            'action',
-            'direction',
-            'enabled'
-        ]));
-        $firewallRule->save();
 
         if ($request->has('ports')) {
             $firewallRule->firewallRulePorts->delete();
@@ -140,6 +128,18 @@ class FirewallRuleController extends BaseController
             }
         }
 
+        $firewallRule->fill($request->only([
+            'name',
+            'sequence',
+            'deployed',
+            'firewall_policy_id',
+            'source',
+            'destination',
+            'action',
+            'direction',
+            'enabled'
+        ]));
+        $firewallRule->save();
         return $this->responseIdMeta($request, $firewallRule->getKey(), 200);
     }
 
