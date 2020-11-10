@@ -38,7 +38,7 @@ class Task extends Model
 
     public function getIsEndedAttribute()
     {
-        return $this->jobStatuses()->count() == 0 || $this->jobStatuses()->get()->filter(function ($status) {
+        return $this->jobStatuses()->count() > 0 && $this->jobStatuses()->get()->filter(function ($status) {
             return !$status->is_ended;
         })->count() < 1;
     }
