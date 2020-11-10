@@ -36,6 +36,23 @@ client.log('Router UUID: ' + response.body.data.id);
 %}
 
 ###
+# Create a network
+#POST https://{{host}}/{{version}}/networks
+#X-consumer-custom-id:  1-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json
+#
+#{
+#    "router_id": "{{router_id}}"
+#}
+#
+#> {%
+#client.global.set('network_id', response.body.data.id);
+#client.log('Network UUID: ' + response.body.data.id);
+#%}
+#
+
+###
 # Delete VPC
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 X-consumer-custom-id:  0-0
@@ -73,3 +90,16 @@ client.test('Check that router is deleted', function () {
     client.assert(response.status === 404, 'Router found when it should be deleted');
 });
 %}
+
+###
+# Check Network is deleted
+#GET https://{{host}}/{{version}}/networks/{{network_id}}
+#X-consumer-custom-id:  0-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json
+#
+#> {%
+#client.test('Check that network is deleted', function () {
+#    client.assert(response.status === 404, 'Network found when it should be deleted');
+#});
+#%}
