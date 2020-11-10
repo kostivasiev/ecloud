@@ -13,16 +13,14 @@ trait DeletionRules
     public static function bootDeletionRules()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'getRelatableInstance')) {
-                $model = $model->getRelatableInstance()
-                    ->findOrFail($model->getKey());
-                foreach ($model->getRelations() as $relation) {
-                    if ($relation->count() > 0) {
-                        throw new \Exception(
-                            'Active resources exist for this item',
-                            412
-                        );
-                    }
+            $model = $model->getRelatableInstance()
+                ->findOrFail($model->getKey());
+            foreach ($model->getRelations() as $relation) {
+                if ($relation->count() > 0) {
+                    throw new \Exception(
+                        'Active resources exist for this item',
+                        412
+                    );
                 }
             }
         });
