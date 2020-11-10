@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\Router\Creating;
 use App\Events\V2\Router\Created;
+use App\Events\V2\Router\Deleted;
 use App\Events\V2\Router\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
@@ -54,13 +55,13 @@ class Router extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
-        'saved' => Saved::class
+        'saved' => Saved::class,
+        'deleted' => Deleted::class,
     ];
 
     public $children = [
         'vpns',
         'firewallPolicies',
-        'networks',
     ];
 
     public function availabilityZone()

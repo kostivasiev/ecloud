@@ -20,14 +20,10 @@ class DeleteRouter extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
-
         $vpc = Vpc::withTrashed()->findOrFail($this->data['vpc_id']);
-        $logMessage = 'Delete Routers for VPC ' . $vpc->getKey() . ': ';
-
         $vpc->routers()->each(function ($router) {
             $router->delete();
         });
-
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Jobs\Vpc\Undeploy;
+namespace App\Jobs\Router\Undeploy;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
 use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
-class DeleteFloatingIp extends Job
+class DeleteNetworks extends Job
 {
     private $data;
 
@@ -20,9 +18,9 @@ class DeleteFloatingIp extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
-        $vpc = Vpc::withTrashed()->findOrFail($this->data['vpc_id']);
-        $vpc->floatingIps()->each(function ($floatingIp) {
-            $floatingIp->delete();
+        $router = Router::withTrashed()->findOrFail($this->data['router_id']);
+        $router->networks()->each(function ($network) {
+            $network->delete();
         });
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

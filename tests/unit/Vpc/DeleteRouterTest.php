@@ -3,11 +3,14 @@
 namespace Tests\unit\Listeners\Vpc;
 
 use App\Events\V2\Vpc\Deleted;
+use App\Events\V2\Router\Deleted as RouterDeleted;
 use App\Listeners\V2\Vpc\Routers\Delete as DeleteRouters;
 use App\Listeners\V2\Vpc\FloatingIps\Delete as DeleteFloatingIps;
+use App\Listeners\V2\Router\Networks\Delete as DeleteNetworks;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -22,6 +25,7 @@ class DeleteRouterTest extends TestCase
     protected AvailabilityZone $availabilityZone;
     protected Dhcp $dhcp;
     protected FloatingIp $floatingIp;
+    protected Network $network;
     protected Region $region;
     protected Router $router;
     protected Vpc $vpc;
@@ -42,6 +46,9 @@ class DeleteRouterTest extends TestCase
         ]);
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey(),
+        ]);
+        $this->network = factory(Network::class)->create([
+            'router_id' => $this->router->getKey(),
         ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
@@ -64,5 +71,14 @@ class DeleteRouterTest extends TestCase
         $listener->handle(new Deleted($this->vpc));
         $this->floatingIp->refresh();
         $this->assertNotNull($this->floatingIp->deleted_at);
+    }
+
+    public function testDeletingVpcDeletesRouterNetwork()
+    {
+        Event::fake(RouterDeleted::class);
+        $listener = \Mockery::mock(DeleteNetworks::class)->makePartial();
+        $listener->handle(new RouterDeleted($this->router));
+        $this->network->refresh();
+        $this->assertNotNull($this->network->deleted_at);
     }
 }
