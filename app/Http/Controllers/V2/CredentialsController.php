@@ -22,7 +22,7 @@ class CredentialsController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Credential::filterHidden($request)->query();
+        $collection = Credential::filterHidden($request);
 
         (new QueryTransformer($request))
             ->config(Credential::class)
