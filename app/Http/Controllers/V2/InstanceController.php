@@ -173,6 +173,9 @@ class InstanceController extends BaseController
     public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
         $collection = Instance::forUser($request->user)->findOrFail($instanceId)->credentials();
+        if (!$request->user->isAdministrator) {
+            $collection->where('credentials.is_hidden', '=', 0);
+        }
         $queryTransformer->config(Credential::class)
             ->transform($collection);
 
