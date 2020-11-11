@@ -22,7 +22,7 @@ class CredentialsController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Credential::query();
+        $collection = Credential::filterHidden($request)->query();
 
         (new QueryTransformer($request))
             ->config(Credential::class)
@@ -41,7 +41,7 @@ class CredentialsController extends BaseController
     public function show(Request $request, string $credentialsId)
     {
         return new CredentialResource(
-            Credential::findOrFail($credentialsId)
+            Credential::filterHidden($request)->findOrFail($credentialsId)
         );
     }
 
