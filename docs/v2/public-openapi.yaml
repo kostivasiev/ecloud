@@ -188,7 +188,7 @@ paths:
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/public_collection.yaml'
   '/ecloud/v2/nics/{nicId}':
-    $ref: 'resources/Nic/item.yaml'
+    $ref: 'resources/Nic/public_item.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
