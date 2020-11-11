@@ -37,6 +37,7 @@ class Credential extends Model implements Filterable, Sortable
         'username',
         'password',
         'port',
+        'is_hidden',
     ];
 
     protected $dispatchesEvents = [
@@ -44,7 +45,8 @@ class Credential extends Model implements Filterable, Sortable
     ];
 
     protected $casts = [
-        'port' => 'integer'
+        'port' => 'integer',
+        'is_hidden' => 'boolean',
     ];
 
     public function setPasswordAttribute($value)
@@ -127,6 +129,7 @@ class Credential extends Model implements Filterable, Sortable
             'username' => 'username',
             'password' => 'password',
             'port' => 'port',
+            'is_hidden' => 'is_hidden',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
