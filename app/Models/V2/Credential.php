@@ -5,8 +5,10 @@ namespace App\Models\V2;
 use App\Events\V2\Credential\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -67,6 +69,19 @@ class Credential extends Model implements Filterable, Sortable
     public function instance()
     {
         return $this->belongsTo(Instance::class, 'id', 'resource_id');
+    }
+
+    /**
+     * @param Builder $query
+     * @param Request $request
+     * @return Builder
+     */
+    public function scopeFilterHidden(Builder $query, Request $request)
+    {
+        if (!empty($request->user->isAdministrator) && !$request->user->isAdministrator) {
+            $query->where('is_hidden', '=', 0);
+        }
+        return $query;
     }
 
     /**
