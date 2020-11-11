@@ -48,6 +48,7 @@ class UpdateTest extends TestCase
             'appliance_version_id' => $this->appliance_version->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'backup_enabled' => false,
         ]);
     }
 
@@ -57,6 +58,7 @@ class UpdateTest extends TestCase
             '/v2/instances/' . $this->instance->getKey(),
             [
                 'vpc_id' => $this->vpc->getKey(),
+                'backup_enabled' => true,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -67,6 +69,7 @@ class UpdateTest extends TestCase
 
         $instance = Instance::findOrFail($this->instance->getKey());
         $this->assertEquals($this->vpc->getKey(), $instance->vpc_id);
+        $this->assertTrue($instance->backup_enabled);
     }
 
     public function testAdminInstanceLocking()
