@@ -56,26 +56,30 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/instances/' . $this->instance->getKey(),
             [
-                'vpc_id' => $this->vpc->getKey(),
+                'name' => 'Changed',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
+        )->seeInDatabase(
+            'instances',
+            [
+                'id' => $this->instance->getKey(),
+                'name' => 'Changed'
+            ],
+            'ecloud'
         )
             ->assertResponseStatus(200);
-
-        $instance = Instance::findOrFail($this->instance->getKey());
-        $this->assertEquals($this->vpc->getKey(), $instance->vpc_id);
     }
 
-    public function testAdminInstanceLocking()
+    public function testAdminCanModifyLockedInstance()
     {
         // Lock the instance
         $this->instance->locked = true;
         $this->instance->save();
         $data = [
-            'name' => 'Testing Locked Instance',
+            'name' => 'Changed',
         ];
         $this->patch(
             '/v2/instances/' . $this->instance->getKey(),
@@ -84,13 +88,41 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
+        )->seeInDatabase(
+            'instances',
+            [
+                'id' => $this->instance->getKey(),
+                'name' => 'Changed'
+            ],
+            'ecloud'
         )
             ->assertResponseStatus(200);
-        $this->instance->refresh();
-        $this->assertEquals($data['name'], $this->instance->name);
     }
 
-    public function testInstanceLocking()
+    public function testScopedAdminCanNotModifyLockedInstance()
+    {
+        $this->instance->locked = true;
+        $this->instance->save();
+        $this->patch(
+            '/v2/instances/' . $this->instance->getKey(),
+            [
+                'name' => 'Testing Locked Instance',
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => '1',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Forbidden',
+                'detail' => 'The specified instance is locked',
+                'status' => 403,
+            ])
+            ->assertResponseStatus(403);
+    }
+
+    public function testLockedInstanceIsNotEditable()
     {
         // Lock the instance
         $this->instance->locked = true;
@@ -117,7 +149,7 @@ class UpdateTest extends TestCase
         $this->instance->save();
 
         $data = [
-            'name' => 'Testing Locked Instance',
+            'name' => 'Changed',
         ];
         $this->patch(
             '/v2/instances/' . $this->instance->getKey(),
@@ -126,9 +158,14 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
+        )->seeInDatabase(
+            'instances',
+            [
+                'id' => $this->instance->getKey(),
+                'name' => 'Changed'
+            ],
+            'ecloud'
         )
             ->assertResponseStatus(200);
-        $this->instance->refresh();
-        $this->assertEquals($data['name'], $this->instance->name);
     }
 }
