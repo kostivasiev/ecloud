@@ -37,6 +37,11 @@ properties:
     required: false
     example: false
     readOnly: false
+  backup_enabled:
+    type: boolean
+    required: false
+    example: false
+    readOnly: false
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
