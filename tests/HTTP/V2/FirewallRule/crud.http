@@ -1,4 +1,3 @@
-###
 # Create Firewall Rule
 POST https://{{host}}/{{version}}/firewall-rules
 X-consumer-custom-id:  0-0
@@ -6,17 +5,22 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "Rule Test",
+    "name": "Rule Test - port editing",
     "sequence": 10,
-    "firewall_policy_id": "fwp-f716b264",
-    "service_type": "TCP",
-    "source": "100.64.0.0/16",
-    "source_ports": "80",
-    "destination": "100.64.0.0-100.64.0.32",
-    "destination_ports": "80,443,8080",
+    "firewall_policy_id": "{{dev_firewall_policy_id}}",
     "action": "ALLOW",
     "direction": "IN",
-    "enabled": true
+    "enabled": true,
+    "ports": [
+        {
+           "protocol": "UDP"
+        },
+        {
+           "protocol": "TCP",
+           "source": "443",
+           "destination": "555"
+        }
+    ]
 }
 
 > {%
@@ -54,6 +58,20 @@ client.test("Request executed successfully", function() {
 
 ###
 
+# Get Rule Ports
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}/ports
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+
 PATCH https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -71,7 +89,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-# Delete Policy
+# Delete rule
 DELETE https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0

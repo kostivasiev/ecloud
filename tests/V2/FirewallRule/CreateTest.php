@@ -48,11 +48,8 @@ class CreateTest extends TestCase
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
             'firewall_policy_id' => $this->firewall_policy->getKey(),
-            'service_type' => 'TCP',
             'source' => '192.168.100.1/24',
-            'source_ports' => '80,443',
             'destination' => '212.22.18.10/24',
-            'destination_ports' => '8080,4043',
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
@@ -62,6 +59,12 @@ class CreateTest extends TestCase
         ])->seeInDatabase('firewall_rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'source' => '192.168.100.1/24',
+            'destination' => '212.22.18.10/24',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
         ], 'ecloud')->assertResponseStatus(201);
     }
 }

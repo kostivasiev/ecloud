@@ -42,16 +42,7 @@ class UpdateTest extends TestCase
             'router_id' => $this->router->getKey(),
         ]);
         $this->firewall_rule = factory(FirewallRule::class)->create([
-            'name' => 'Demo firewall rule 1',
             'firewall_policy_id' => $this->firewall_policy->getKey(),
-            'service_type' => 'TCP',
-            'source' => '192.168.100.1',
-            'source_ports' => '80,443',
-            'destination' => '212.22.18.10',
-            'destination_ports' => '8080,4043',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
         ]);
     }
 
@@ -60,19 +51,19 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/firewall-rules/' . $this->firewall_rule->id,
             [
-                'name' => 'Demo firewall rule 1',
+                'name' => 'Changed',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
+            ->seeInDatabase('firewall_rules',
+                [
+                    'id' => $this->firewall_rule->id,
+                    'name' => 'Changed'
+                ],
+                'ecloud')
             ->assertResponseStatus(200);
-
-        $availabilityZoneId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $availabilityZoneId,
-        ]);
     }
-
 }

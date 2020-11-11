@@ -65,8 +65,6 @@ components:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
     FipId:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
-    FirewallRuleId:
-      $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
@@ -86,8 +84,6 @@ components:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
     FipIdResponse:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
-    FirewallRuleIdResponse:
-      $ref: 'resources/FirewallRule/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
@@ -134,7 +130,7 @@ paths:
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
   '/ecloud/v2/instances/{instanceId}/nics':
-    $ref: 'resources/Instance/nics-collection.yaml'
+    $ref: 'resources/Instance/nics.yaml'
   '/ecloud/v2/instances/{instanceId}/power-on':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-off':
@@ -145,6 +141,10 @@ paths:
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-restart':
     $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/lock':
+    $ref: 'resources/Instance/lockUnlock.yaml'
+  '/ecloud/v2/instances/{instanceId}/unlock':
+    $ref: 'resources/Instance/lockUnlock.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
@@ -157,8 +157,14 @@ paths:
     $ref: 'resources/FirewallRule/collection.yaml'
   '/ecloud/v2/firewall-rules/{firewallRuleId}':
     $ref: 'resources/FirewallRule/item.yaml'
+  '/ecloud/v2/firewall-rules/{firewallRuleId}/ports':
+    $ref: 'resources/FirewallRule/ports.yaml'
   '/ecloud/v2/firewall-policies/{firewallPolicyId}':
     $ref: 'resources/FirewallPolicy/item.yaml'
+  '/ecloud/v2/firewall-rule-ports':
+    $ref: 'resources/FirewallRulePort/collection.yaml'
+  '/ecloud/v2/firewall-rule-ports/{firewallRulePortId}':
+    $ref: 'resources/FirewallRulePort/item.yaml'
   '/ecloud/v2/regions':
     $ref: 'resources/Region/collection.yaml'
   '/ecloud/v2/regions/{regionId}':
