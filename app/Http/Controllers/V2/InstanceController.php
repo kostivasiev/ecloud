@@ -83,7 +83,8 @@ class InstanceController extends BaseController
             'availability_zone_id',
             'vcpu_cores',
             'ram_capacity',
-            'locked'
+            'locked',
+            'backup_enabled',
         ]));
         if (!$request->has('locked')) {
             $instance->locked = false;
@@ -149,7 +150,8 @@ class InstanceController extends BaseController
 
         $instance->fill($request->only([
             'name',
-            'locked'
+            'locked',
+            'backup_enabled',
         ]))->save();
 
 
