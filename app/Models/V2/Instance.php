@@ -63,7 +63,6 @@ class Instance extends Model implements Filterable, Sortable
     ];
 
     public $children = [
-        'credentials',
         'nics',
         'volumes',
     ];
