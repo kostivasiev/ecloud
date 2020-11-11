@@ -23,7 +23,7 @@ class CreateCredentialRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => ['nullable', 'string'],
             'resource_id' => ['required', 'string'],
             'host' => ['nullable', 'string'],
@@ -31,6 +31,10 @@ class CreateCredentialRequest extends FormRequest
             'password' => ['required', 'string'],
             'port' => ['nullable', 'integer'],
         ];
+        if (app('request')->user->isAdministrator) {
+            $rules['is_hidden'] = ['required', 'boolean'];
+        }
+        return $rules;
     }
 
     /**
