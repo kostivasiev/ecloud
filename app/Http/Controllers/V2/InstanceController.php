@@ -86,9 +86,8 @@ class InstanceController extends BaseController
             'locked',
             'backup_enabled',
         ]));
-        if (!$request->has('locked')) {
-            $instance->locked = false;
-        }
+
+        $instance->locked = $request->input('locked', false);
         if ($request->has('appliance_id')) {
             $instance->setApplianceVersionId($request->get('appliance_id'));
         }
@@ -142,11 +141,6 @@ class InstanceController extends BaseController
     public function update(UpdateRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
-        if (!$this->isAdmin &&
-            (!$request->has('locked') || $request->get('locked') !== false) &&
-            $instance->locked === true) {
-            return $this->isLocked();
-        }
 
         $instance->fill($request->only([
             'name',
@@ -154,25 +148,10 @@ class InstanceController extends BaseController
             'backup_enabled',
         ]))->save();
 
-
         $task = $instance->createTask();
         dispatch(new UpdateTaskJob($task, $instance, $request->all()));
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    private function isLocked(): JsonResponse
-    {
-        return JsonResponse::create([
-            'errors' => [
-                'title' => 'Forbidden',
-                'detail' => 'The specified instance is locked',
-                'status' => 403,
-            ]
-        ], 403);
     }
 
     /**
@@ -183,9 +162,6 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-        if (!$this->isAdmin && $instance->locked === true) {
-            return $this->isLocked();
-        }
         $instance->delete();
         return response('', 204);
     }
@@ -307,5 +283,23 @@ class InstanceController extends BaseController
         ]));
 
         return response('', 202);
+    }
+
+    public function lock(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        $instance->locked = true;
+        $instance->save();
+
+        return response('', 204);
+    }
+
+    public function unlock(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        $instance->locked = false;
+        $instance->save();
+
+        return response('', 204);
     }
 }

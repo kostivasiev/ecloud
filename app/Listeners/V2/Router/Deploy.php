@@ -100,6 +100,8 @@ class Deploy implements ShouldQueue
 
         $router->networks()->each(function ($network) {
             /** @var Network $network */
+            $network->subnet = config('defaults.network.subnets.range');
+            $network->save();
             event(new \App\Events\V2\Network\Created($network));
         });
 

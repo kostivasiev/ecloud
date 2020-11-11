@@ -4,6 +4,7 @@ namespace App\Listeners\V2\Network;
 
 use App\Events\V2\Network\Created;
 use Exception;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -53,41 +54,43 @@ class Deploy implements ShouldQueue
         Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
         Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
 
-        $response = $router->availabilityZone->nsxService()->put(
-            'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
-            [
-                'json' => [
-                    'resource_type' => 'Segment',
-                    'subnets' => [
-                        [
-                            'gateway_address' => $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix(),
-                            'dhcp_config' => [
-                                'resource_type' => 'SegmentDhcpV4Config',
-                                'server_address' => $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix(),
-                                'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
-                                'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
+        try {
+            $router->availabilityZone->nsxService()->put(
+                'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
+                [
+                    'json' => [
+                        'resource_type' => 'Segment',
+                        'subnets' => [
+                            [
+                                'gateway_address' => $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix(),
+                                'dhcp_config' => [
+                                    'resource_type' => 'SegmentDhcpV4Config',
+                                    'server_address' => $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix(),
+                                    'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
+                                    'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
+                                ]
                             ]
-                        ]
-                    ],
-                    'domain_name' => config('defaults.network.domain_name'),
-                    'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->getKey(),
-                    'advanced_config' => [
-                        'connectivity' => 'ON'
-                    ],
-                    'tags' => [
-                        [
-                            'scope' => config('defaults.tag.scope'),
-                            'tag' => $router->vpc->getKey()
+                        ],
+                        'domain_name' => config('defaults.network.domain_name'),
+                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->getKey(),
+                        'advanced_config' => [
+                            'connectivity' => 'ON'
+                        ],
+                        'tags' => [
+                            [
+                                'scope' => config('defaults.tag.scope'),
+                                'tag' => $router->vpc->getKey()
+                            ]
                         ]
                     ]
                 ]
-            ]
-        );
-
-        //Segment already exists. Hacky fix, as the listener is fired twice due to rincewind
-        if (json_decode($response->getBody()->getContents())->error_code == 500127) {
-            Log::error('Attempted to create network segment ' . $network->getKey() . ' but it already exists.');
-            return;
+            );
+        } catch (RequestException $exception) {
+            //Segment already exists. Hacky fix, as the listener is fired twice due to rincewind
+            if ($exception->hasResponse() && json_decode($exception->getResponse()->getBody()->getContents())->error_code == 500127) {
+                Log::error('Attempted to create network segment ' . $network->getKey() . ' but it already exists.');
+                return;
+            }
         }
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

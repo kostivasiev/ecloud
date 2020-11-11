@@ -13,6 +13,11 @@ properties:
     required: true
     example: vpc-2b66bb79
     readOnly: false
+  availability_zone_id:
+    readOnly: false
+    type: string
+    required: false
+    example: 'az-2b66bb79'
   appliance_id:
     type: string
     required: true
@@ -28,10 +33,6 @@ properties:
     required: true
     example: 1024
     readOnly: false
-  availability_zone_id:
-    type: string
-    required: false
-    example: 'az-2b66bb79'
   locked:
     type: boolean
     required: false
@@ -42,6 +43,19 @@ properties:
     required: false
     example: false
     readOnly: false
+  platform:
+    type: string
+    required: false
+    example: Linux
+    readOnly: false
+  volume_capacity:
+    required: false
+    type: integer
+    example: 50
+  status:
+    type: string
+    example: 'ready'
+    readOnly: true
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
@@ -50,17 +64,15 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
-  volume_capacity:
-    required: false
-    type: integer
-    example: 1
   network_id:
     required: false
+    writeOnly: true
     type: string
     example: 'net-912345'
   floating_ip_id:
     description: ID of existing floating IP to assign to the instance.
     required: false
+    writeOnly: true
     type: string
     example: 'fip-912345'
   requires_floating_ip:
@@ -71,10 +83,12 @@ properties:
     example: false
   appliance_data:
     required: false
+    writeOnly: true
     type: json
     example: '{"key":"value"}'
   user_script:
     required: false
+    writeOnly: true
     type: string
     example: ''
 description: 'Instances'

@@ -98,13 +98,18 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
         $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
         $router->post('instances', 'InstanceController@store');
-        $router->patch('instances/{instanceId}', 'InstanceController@update');
-        $router->delete('instances/{instanceId}', 'InstanceController@destroy');
-        $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
-        $router->put('instances/{instanceId}/power-off', 'InstanceController@powerOff');
-        $router->put('instances/{instanceId}/power-reset', 'InstanceController@powerReset');
-        $router->put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
-        $router->put('instances/{instanceId}/power-shutdown', 'InstanceController@guestShutdown');
+        $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
+        $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
+
+        $router->group(['middleware' => 'is-locked'], function () use ($router) {
+            $router->patch('instances/{instanceId}', 'InstanceController@update');
+            $router->delete('instances/{instanceId}', 'InstanceController@destroy');
+            $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
+            $router->put('instances/{instanceId}/power-off', 'InstanceController@powerOff');
+            $router->put('instances/{instanceId}/power-reset', 'InstanceController@powerReset');
+            $router->put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
+            $router->put('instances/{instanceId}/power-shutdown', 'InstanceController@guestShutdown');
+        });
     });
 
     /** Floating Ips */

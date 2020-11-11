@@ -66,3 +66,15 @@ properties:
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
 description: 'Instances'
+allOf:
+  - $ref: '../../components/schemas/instance.yaml'
+  - type: object
+    properties:
+      online:
+        type: boolean
+        example: true
+        readOnly: true
+      agent_running:
+        type: boolean
+        example: true
+        readOnly: true

@@ -87,17 +87,13 @@ class UpdateRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field is required',
+            'required' => 'The :attribute field is required',
             'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
-            'appliance_id.required' => 'The :attribute field is required',
             'appliance_id.exists' => 'The :attribute is not a valid Appliance',
-            'vcpu_tier.required' => 'The :attribute field is required',
-            'vcpu_cores.required' => 'The :attribute field is required',
             'vcpu_cores.min' => 'Specified :attribute is below the minimum of '
                 . config('instance.cpu_cores.min'),
             'vcpu_cores.max' => 'Specified :attribute is above the maximum of '
                 . config('instance.cpu_cores.max'),
-            'ram_capacity.required' => 'The :attribute field is required',
             'ram_capacity.min' => 'Specified :attribute is below the minimum of '
                 . config('instance.ram_capacity.min'),
             'ram_capacity.max' => 'Specified :attribute is above the maximum of '
