@@ -38,7 +38,7 @@ class Create extends FormRequest
             'protocol' => [
                 'required',
                 'string',
-                'in:TCP,UDP'
+                'in:TCP,UDP,ICMPv4'
             ],
             'source' => [
                 'nullable',
@@ -61,7 +61,7 @@ class Create extends FormRequest
         return [
             'required' => 'The :attribute field is required',
             'exists' => 'The specified :attribute was not found',
-            'protocol.in' => 'The :attribute field must contain one of TCP or UDP',
+            'protocol.in' => 'The :attribute field must contain one of TCP, UDP or ICMPv4',
         ];
     }
 }
