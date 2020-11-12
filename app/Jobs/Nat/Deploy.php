@@ -54,6 +54,7 @@ class Deploy extends Job
 
         // Router lookup
         $router = $nic->network->router;
+        $this->data['router_id'] = $router->id;
         if (!$router) {
             $message = 'Nat Deploy ' . $this->data['nat_id'] . ' : No Router found on the NIC';
             Log::error($message, [
@@ -79,7 +80,6 @@ class Deploy extends Job
                     'action' => 'DNAT',
                     'destination_network' => $nat->destination->ip_address,
                     'translated_network' => $nat->translated->ip_address,
-                    'translated_ports' => '0-65535',
                     'enabled' => true,
                     'logging' => false,
                     'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',

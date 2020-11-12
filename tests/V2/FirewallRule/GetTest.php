@@ -5,6 +5,7 @@ namespace Tests\V2\FirewallRule;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -42,16 +43,10 @@ class GetTest extends TestCase
             'router_id' => $this->router->id,
         ]);
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'name' => 'Demo firewall rule 1',
             'firewall_policy_id' => $this->firewallPolicy->getKey(),
-            'service_type' => 'TCP',
-            'source' => '192.168.100.1',
-            'source_ports' => '80,443',
-            'destination' => '212.22.18.10',
-            'destination_ports' => '8080,4043',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
+        ])->first();
+        $this->firewallRulePort = factory(FirewallRulePort::class)->create([
+            'firewall_rule_id' => $this->firewallRule->getKey(),
         ]);
     }
 
@@ -65,6 +60,12 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
+                'firewall_policy_id' => $this->firewallPolicy->getKey(),
+                'source' => $this->firewallRule->source,
+                'destination' => $this->firewallRule->destination,
+                'action' => $this->firewallRule->action,
+                'direction' => $this->firewallRule->direction,
+                'enabled' => $this->firewallRule->enabled,
                 'id' => $this->firewallRule->id,
                 'name' => $this->firewallRule->name,
                 'sequence' => (string)$this->firewallRule->sequence,
@@ -89,4 +90,21 @@ class GetTest extends TestCase
             ->assertResponseStatus(200);
     }
 
+    public function testGetPortsCollection()
+    {
+        $this->get(
+            '/v2/firewall-rules/' . $this->firewallRule->getKey() . '/ports',
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'protocol' => 'TCP',
+                'source' => '443',
+                'destination' => '555'
+            ])
+            ->assertResponseStatus(200);
+    }
 }

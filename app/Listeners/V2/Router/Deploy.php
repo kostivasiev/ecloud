@@ -15,6 +15,7 @@ class Deploy implements ShouldQueue
     use InteractsWithQueue;
 
     /**
+     * @see https://185.197.63.88/policy/api_includes/method_CreateOrReplaceTier1.html
      * @param Created $event
      * @return void
      * @throws \Exception
@@ -42,11 +43,12 @@ class Deploy implements ShouldQueue
             $this->fail(new \Exception($message));
             return;
         }
-
-            // Get the routers T0 path
-            $response = $nsxService->get('policy/api/v1/infra/tier-0s');
-            $response = json_decode($response->getBody()->getContents(), true);
-            $path = null;
+        
+        // Get the routers T0 path
+        $response = $nsxService->get('policy/api/v1/infra/tier-0s');
+        $response = json_decode($response->getBody()->getContents(), true);
+        $path = null;
+        
         foreach ($response['results'] as $tier0) {
             if (isset($tier0['tags']) && is_array($tier0['tags'])) {
                 foreach ($tier0['tags'] as $tag) {
@@ -70,7 +72,12 @@ class Deploy implements ShouldQueue
         $nsxService->put('policy/api/v1/infra/tier-1s/' . $router->id, [
             'json' => [
                 'tier0_path' => $path,
-                'tags' => [$vpcTag]
+                'tags' => [$vpcTag],
+                'route_advertisement_types' => [
+                    'TIER1_IPSEC_LOCAL_ENDPOINT',
+                    'TIER1_STATIC_ROUTES',
+                    'TIER1_NAT'
+                ],
             ],
         ]);
 
@@ -100,6 +107,8 @@ class Deploy implements ShouldQueue
 
         $router->networks()->each(function ($network) {
             /** @var Network $network */
+            $network->subnet = config('defaults.network.subnets.range');
+            $network->save();
             event(new \App\Events\V2\Network\Created($network));
         });
 

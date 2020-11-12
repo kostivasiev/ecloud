@@ -35,11 +35,8 @@ class FirewallRule extends Model implements Filterable, Sortable
         'router_id',
         'deployed',
         'firewall_policy_id',
-        'service_type',
         'source',
-        'source_ports',
         'destination',
-        'destination_ports',
         'action',
         'direction',
         'enabled',
@@ -63,6 +60,11 @@ class FirewallRule extends Model implements Filterable, Sortable
     public function firewallPolicy()
     {
         return $this->belongsTo(FirewallPolicy::class);
+    }
+
+    public function firewallRulePorts()
+    {
+        return $this->hasMany(FirewallRulePort::class);
     }
 
     public function scopeForUser($query, $user)
@@ -90,11 +92,8 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('sequence', Filter::$stringDefaults),
             $factory->create('firewall_policy_id', Filter::$enumDefaults),
             $factory->create('deployed', Filter::$numericDefaults),
-            $factory->create('service_type', Filter::$enumDefaults),
             $factory->create('source', Filter::$stringDefaults),
-            $factory->create('source_ports', Filter::$stringDefaults),
             $factory->create('destination', Filter::$stringDefaults),
-            $factory->create('destination_ports', Filter::$stringDefaults),
             $factory->create('action', Filter::$stringDefaults),
             $factory->create('direction', Filter::$stringDefaults),
             $factory->create('enabled', Filter::$numericDefaults),
@@ -116,11 +115,8 @@ class FirewallRule extends Model implements Filterable, Sortable
             $factory->create('sequence'),
             $factory->create('firewall_policy_id'),
             $factory->create('deployed'),
-            $factory->create('service_type'),
             $factory->create('source'),
-            $factory->create('source_ports'),
             $factory->create('destination'),
-            $factory->create('destination_ports'),
             $factory->create('action'),
             $factory->create('direction'),
             $factory->create('enabled'),
@@ -150,11 +146,8 @@ class FirewallRule extends Model implements Filterable, Sortable
             'name' => 'name',
             'sequence' => 'sequence',
             'firewall_policy_id' => 'firewall_policy_id',
-            'service_type' => 'service_type',
             'source' => 'source',
-            'source_ports' => 'source_ports',
             'destination' => 'destination',
-            'destination_ports' => 'destination_ports',
             'action' => 'action',
             'direction' => 'direction',
             'enabled' => 'enabled',

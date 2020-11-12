@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\FirewallPolicy;
 
 use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -21,8 +22,11 @@ class Deploy implements ShouldQueue
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
         $policy = $event->model;
-        if ($policy instanceof FirewallRule) {
+        if ($event->model instanceof FirewallRule) {
             $policy = $event->model->firewallPolicy;
+        }
+        if ($event->model instanceof FirewallRulePort) {
+            $policy = $event->model->firewallRule->firewallPolicy;
         }
 
         if (!$policy) {

@@ -42,16 +42,7 @@ class DeleteTest extends TestCase
             'router_id' => $this->router->getKey(),
         ]);
         $this->firewall_rule = factory(FirewallRule::class)->create([
-            'name' => 'Demo firewall rule 1',
             'firewall_policy_id' => $this->firewall_policy->getKey(),
-            'service_type' => 'TCP',
-            'source' => '192.168.100.1',
-            'source_ports' => '80,443',
-            'destination' => '212.22.18.10',
-            'destination_ports' => '8080,4043',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
         ]);
     }
 

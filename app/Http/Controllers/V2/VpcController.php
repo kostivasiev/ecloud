@@ -137,7 +137,6 @@ class VpcController extends BaseController
      * @param \Illuminate\Http\Request $request
      * @param QueryTransformer $queryTransformer
      * @param string $vpcId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function lbcs(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
@@ -153,7 +152,7 @@ class VpcController extends BaseController
     /**
      * @param Request $request
      * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
     public function deployDefaults(Request $request, string $vpcId)
@@ -179,6 +178,6 @@ class VpcController extends BaseController
         // Deploy router and network
         //event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
 
-        return response()->json([], 202);
+        return response(null, 202);
     }
 }
