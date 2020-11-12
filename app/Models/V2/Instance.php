@@ -8,6 +8,7 @@ use App\Events\V2\Instance\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable, DeletionRules;
 
     public const STATUS_READY = 'ready';
     public const STATUS_PROVISIONING = 'provisioning';
@@ -59,6 +60,11 @@ class Instance extends Model implements Filterable, Sortable
         'creating' => Creating::class,
         'created' => Created::class,
         'deleted' => Deleted::class,
+    ];
+
+    public $children = [
+        'nics',
+        'volumes',
     ];
 
     public function vpc()

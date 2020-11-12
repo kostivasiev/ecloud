@@ -88,9 +88,14 @@ class VpcController extends BaseController
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(DeleteRequest $request, string $vpcId)
+    public function destroy(Request $request, string $vpcId)
     {
-        Vpc::forUser(app('request')->user)->findOrFail($vpcId)->delete();
+        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        try {
+            $vpc->delete();
+        } catch (\Exception $e) {
+            return $vpc->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 

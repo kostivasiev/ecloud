@@ -8,6 +8,7 @@ use App\Events\V2\Router\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,7 +28,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules;
 
     public $keyPrefix = 'rtr';
     public $incrementing = false;
@@ -54,6 +55,12 @@ class Router extends Model implements Filterable, Sortable
         'creating' => Creating::class,
         'created' => Created::class,
         'saved' => Saved::class,
+    ];
+
+    public $children = [
+        'vpns',
+        'firewallPolicies',
+        'networks',
     ];
 
     public function availabilityZone()
