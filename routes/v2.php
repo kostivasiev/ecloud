@@ -185,12 +185,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Nics */
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group([], function () use ($router) {
         $router->get('nics', 'NicController@index');
         $router->get('nics/{nicId}', 'NicController@show');
-        $router->post('nics', 'NicController@create');
-        $router->patch('nics/{nicId}', 'NicController@update');
-        $router->delete('nics/{nicId}', 'NicController@destroy');
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->post('nics', 'NicController@create');
+            $router->patch('nics/{nicId}', 'NicController@update');
+            $router->delete('nics/{nicId}', 'NicController@destroy');
+        });
     });
 
     /** Credentials */
