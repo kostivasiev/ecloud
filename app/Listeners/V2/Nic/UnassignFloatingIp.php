@@ -29,9 +29,9 @@ class UnassignFloatingIp implements ShouldQueue
                 $query->where('source_id', $nic->getKey())->withTrashed();
             })
             ->each(function ($nat) use ($logMessage) {
-            Log::info($logMessage . 'Floating IP ' . $nat->destination_id . ' unassigned');
-            $nat->delete();
-        });
+                Log::info($logMessage . 'Floating IP ' . $nat->destination_id . ' unassigned');
+                $nat->delete();
+            });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
