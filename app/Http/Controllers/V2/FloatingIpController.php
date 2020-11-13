@@ -6,6 +6,7 @@ use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Jobs\FloatingIp\Assign;
+use App\Jobs\FloatingIp\UnAssign;
 use App\Models\V2\FloatingIp;
 use App\Resources\V2\FloatingIpResource;
 use Illuminate\Http\Request;
@@ -148,9 +149,10 @@ class FloatingIpController extends BaseController
     public function unassign(Request $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user)->findOrFail($fipId);
-        if ($floatingIp->nat) {
-            $floatingIp->nat->delete();
-        }
+
+        $this->dispatch(new UnAssign([
+            'floating_ip_id' => $floatingIp->getKey()
+        ]));
 
         return new Response(null, 202);
     }
