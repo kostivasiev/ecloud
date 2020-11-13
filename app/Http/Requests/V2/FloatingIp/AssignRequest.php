@@ -26,6 +26,10 @@ class AssignRequest extends FormRequest
     public function rules()
     {
         return [
+            'id' => [
+                'unique:ecloud.nats,destination_id,NULL,id,deleted_at,NULL',
+                'unique:ecloud.nats,source_id,NULL,id,deleted_at,NULL'
+            ],
             'resource_id' =>
                 [
                     'required',
@@ -33,6 +37,17 @@ class AssignRequest extends FormRequest
                     new ExistsForUser(array_values(Relation::morphMap()))
                 ],
         ];
+    }
+
+    // Add fipId route parameter to validation data
+    public function all($keys = null)
+    {
+        return array_merge(
+            parent::all(),
+            [
+                'id' => app('request')->route('fipId')
+            ]
+        );
     }
 
     /**
@@ -44,6 +59,7 @@ class AssignRequest extends FormRequest
     {
         return [
             'resource_id.required' => 'The :attribute field is required',
+            'id.unique' => 'The floating IP is already assigned'
         ];
     }
 }
