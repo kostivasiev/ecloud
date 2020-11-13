@@ -52,6 +52,10 @@ class EventServiceProvider extends ServiceProvider
         // AvailabilityZone
         \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
+        \App\Events\V2\AvailabilityZone\Deleted::class => [
+            \App\Listeners\V2\AvailabilityZone\Credential\Delete::class,
+            \App\Listeners\V2\AvailabilityZone\Dhcp\Delete::class,
+        ],
 
         // Credential
         \App\Events\V2\Credential\Creating::class => [
@@ -72,7 +76,8 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
         \App\Events\V2\FirewallPolicy\Deleted::class => [
-            \App\Listeners\V2\FirewallPolicy\Undeploy::class
+            \App\Listeners\V2\FirewallPolicy\Undeploy::class,
+            \App\Listeners\V2\FirewallPolicy\FirewallRule\Delete::class,
         ],
 
         // FirewallRule
@@ -157,6 +162,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Router\Deleted::class => [
             \App\Listeners\V2\Router\Networks\Delete::class,
+            \App\Listeners\V2\Router\FirewallPolicies\Delete::class,
         ],
 
         // Volume
