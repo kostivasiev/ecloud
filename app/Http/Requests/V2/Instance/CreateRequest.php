@@ -61,6 +61,7 @@ class CreateRequest extends FormRequest
             ],
             'locked' => 'sometimes|required|boolean',
             'platform' => 'sometimes|required|in:Windows,Linux',
+            'backup_enabled' => 'sometimes|required|boolean',
             'network_id' => [
                 'sometimes',
                 'string',

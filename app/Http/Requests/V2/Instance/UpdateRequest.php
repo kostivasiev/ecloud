@@ -71,6 +71,8 @@ class UpdateRequest extends FormRequest
                 'min:' . config('instance.ram_capacity.min'),
                 'max:' . config('instance.ram_capacity.max'),
             ],
+            'locked' => 'sometimes|required|boolean',
+            'backup_enabled' => 'sometimes|required|boolean',
             // 'platform' => 'sometimes|required|in:Windows,Linux',
         ];
 
