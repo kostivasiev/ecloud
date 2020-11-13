@@ -42,9 +42,11 @@ trait DeletionRules
     {
         return response()->json([
             'errors' => [
-                'title' => 'Precondition Failed',
-                'detail' => $exception->getMessage(),
-                'status' => 412
+                [
+                    'title' => 'Precondition Failed',
+                    'detail' => $exception->getMessage(),
+                    'status' => 412
+                ]
             ]
         ], 412);
     }

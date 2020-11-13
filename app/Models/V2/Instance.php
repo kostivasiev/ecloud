@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable, DeletionRules;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable;
 
     public const STATUS_READY = 'ready';
     public const STATUS_PROVISIONING = 'provisioning';
@@ -62,11 +62,6 @@ class Instance extends Model implements Filterable, Sortable
         'creating' => Creating::class,
         'created' => Created::class,
         'deleted' => Deleted::class,
-    ];
-
-    public $children = [
-        'nics',
-        'volumes',
     ];
 
     public function vpc()
