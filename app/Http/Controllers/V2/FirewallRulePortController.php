@@ -73,6 +73,10 @@ class FirewallRulePortController extends BaseController
             'source',
             'destination'
         ]));
+        if ($request->has('protocol') && $request->get('protocol') === 'ICMPv4') {
+            $resource->source = null;
+            $resource->destination = null;
+        }
         $resource->save();
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
