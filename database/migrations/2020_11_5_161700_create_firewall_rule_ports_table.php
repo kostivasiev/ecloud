@@ -13,8 +13,8 @@ class CreateFirewallRulePortsTable extends Migration
             $table->string('name');
             $table->uuid('firewall_rule_id');
             $table->string('protocol');
-            $table->string('source');
-            $table->string('destination');
+            $table->string('source')->nullable();
+            $table->string('destination')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

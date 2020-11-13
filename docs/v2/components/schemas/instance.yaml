@@ -38,6 +38,11 @@ properties:
     required: false
     example: false
     readOnly: false
+  backup_enabled:
+    type: boolean
+    required: false
+    example: false
+    readOnly: false
   platform:
     type: string
     required: false

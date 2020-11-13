@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable, DeletionRules;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable;
 
     public const STATUS_READY = 'ready';
     public const STATUS_PROVISIONING = 'provisioning';
@@ -41,6 +41,7 @@ class Instance extends Model implements Filterable, Sortable
         'availability_zone_id',
         'locked',
         'platform',
+        'backup_enabled',
     ];
 
     protected $hidden = [
@@ -54,17 +55,13 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $casts = [
         'locked' => 'boolean',
+        'backup_enabled' => 'boolean',
     ];
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
         'deleted' => Deleted::class,
-    ];
-
-    public $children = [
-        'nics',
-        'volumes',
     ];
 
     public function vpc()
@@ -150,6 +147,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
             $factory->create('platform', Filter::$stringDefaults),
+            $factory->create('backup_enabled', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -172,6 +170,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('locked'),
             $factory->create('platform'),
+            $factory->create('backup_enabled'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -204,6 +203,7 @@ class Instance extends Model implements Filterable, Sortable
             'availability_zone_id' => 'availability_zone_id',
             'locked' => 'locked',
             'platform' => 'platform',
+            'backup_enabled' => 'backup_enabled',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

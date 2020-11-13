@@ -38,6 +38,8 @@ components:
       $ref: 'components/schemas/firewallRule.yaml'
     FirewallPolicy:
       $ref: 'components/schemas/firewallPolicy.yaml'
+    Nics:
+      $ref: 'components/schemas/nic.yaml'
     Region:
       $ref: 'components/schemas/region.yaml'
     Router:
@@ -183,6 +185,10 @@ paths:
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':
     $ref: 'resources/LoadBalancerCluster/item.yaml'
+  '/ecloud/v2/nics':
+    $ref: 'resources/Nic/public_collection.yaml'
+  '/ecloud/v2/nics/{nicId}':
+    $ref: 'resources/Nic/public_item.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':

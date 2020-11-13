@@ -26,7 +26,7 @@ class DeletionRulesTest extends TestCase
     protected AvailabilityZone $availability_zone;
     protected Network $network;
     protected Region $region;
-    protected Router $router;
+    protected Instance $instances;
     protected Dhcp $dhcp;
     protected Vpc $vpc;
 
@@ -43,8 +43,9 @@ class DeletionRulesTest extends TestCase
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
         ]);
-        $this->router = factory(Router::class)->create([
+        $this->instances = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availability_zone->getKey(),
         ]);
     }
 

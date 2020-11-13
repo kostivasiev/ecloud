@@ -83,7 +83,8 @@ class InstanceController extends BaseController
             'availability_zone_id',
             'vcpu_cores',
             'ram_capacity',
-            'locked'
+            'locked',
+            'backup_enabled',
         ]));
 
         $instance->locked = $request->input('locked', false);
@@ -143,6 +144,8 @@ class InstanceController extends BaseController
 
         $instance->fill($request->only([
             'name',
+            'locked',
+            'backup_enabled',
         ]))->save();
 
         $task = $instance->createTask();

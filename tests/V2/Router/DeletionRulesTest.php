@@ -2,19 +2,12 @@
 
 namespace Tests\V2\Router;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
-use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
+use App\Models\V2\Vpn;
 use Faker\Factory as Faker;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -23,10 +16,10 @@ class DeletionRulesTest extends TestCase
     use DatabaseMigrations;
 
     protected AvailabilityZone $availability_zone;
-    protected Network $network;
     protected Region $region;
     protected Router $router;
     protected Vpc $vpc;
+    protected Vpn $vpn;
 
     public function setUp(): void
     {
@@ -42,8 +35,7 @@ class DeletionRulesTest extends TestCase
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey(),
         ]);
-        $this->network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
+        $this->vpn = factory(Vpn::class)->create([
             'router_id' => $this->router->getKey(),
         ]);
     }

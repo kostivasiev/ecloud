@@ -37,7 +37,6 @@ class Update implements ShouldQueue
             $this->fail(new \Exception('Failed to find NSX Service for router ' . $router->id));
             return;
         }
-        
         // Get the routers T0 path
         $response = $nsxService->get('policy/api/v1/infra/tier-0s');
         $response = json_decode($response->getBody()->getContents(), true);

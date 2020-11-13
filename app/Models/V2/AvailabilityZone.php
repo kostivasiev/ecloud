@@ -53,7 +53,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public $children = [
         'routers',
         'dhcps',
-        'credentials',
         'instances',
         'loadBalancerClusters'
     ];

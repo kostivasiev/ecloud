@@ -57,13 +57,56 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->seeInDatabase('firewall_rule_ports', [
+        ])->seeInDatabase(
+            'firewall_rule_ports',
+            [
+                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'protocol' => 'TCP',
+                'source' => '443',
+                'destination' => '555'
+            ],
+            'ecloud'
+        )->assertResponseStatus(201);
+    }
+
+    public function testICMPValidPortReferenceRule()
+    {
+        $this->post('/v2/firewall-rule-ports', [
             'firewall_rule_id' => $this->firewallRule->getKey(),
-            'protocol' => 'TCP',
+            'protocol' => 'ICMPv4',
             'source' => '443',
             'destination' => '555'
-        ],
-            'ecloud')
-            ->assertResponseStatus(201);
+        ], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write'
+        ])->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'When using ICMPv4 protocol source must be null',
+            'status' => 422,
+            'source' => 'source',
+        ])->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'When using ICMPv4 protocol destination must be null',
+            'status' => 422,
+            'source' => 'destination',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testValidICMPDataSucceeds()
+    {
+        $this->post('/v2/firewall-rule-ports', [
+            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'protocol' => 'ICMPv4'
+        ], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write'
+        ])->seeInDatabase(
+            'firewall_rule_ports',
+            [
+                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'protocol' => 'ICMPv4',
+            ],
+            'ecloud'
+        )->assertResponseStatus(201);
     }
 }

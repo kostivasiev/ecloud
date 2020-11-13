@@ -4,6 +4,8 @@ namespace App\Models\V2;
 
 use App\Events\V2\Vpc\Created;
 use App\Events\V2\Vpc\Creating;
+use App\Events\V2\Vpc\Deleted;
+use App\Listeners\V2\Vpc\Routers\Delete;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -34,12 +36,11 @@ class Vpc extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
+        'deleted' => Deleted::class,
     ];
 
     public $children = [
-        'routers',
         'instances',
-        'floatingIps',
         'loadBalancerClusters',
         'volumes',
     ];

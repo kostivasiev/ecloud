@@ -48,6 +48,7 @@ class UpdateTest extends TestCase
             'appliance_version_id' => $this->appliance_version->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'backup_enabled' => false,
         ]);
     }
 
@@ -57,6 +58,7 @@ class UpdateTest extends TestCase
             '/v2/instances/' . $this->instance->getKey(),
             [
                 'name' => 'Changed',
+                'backup_enabled' => true,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -71,6 +73,10 @@ class UpdateTest extends TestCase
             'ecloud'
         )
             ->assertResponseStatus(200);
+
+        $instance = Instance::findOrFail($this->instance->getKey());
+        $this->assertEquals($this->vpc->getKey(), $instance->vpc_id);
+        $this->assertTrue($instance->backup_enabled);
     }
 
     public function testAdminCanModifyLockedInstance()

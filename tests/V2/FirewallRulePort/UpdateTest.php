@@ -50,25 +50,52 @@ class UpdateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $this->patch(
-            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(), [
-            'name' => 'Changed',
-            'protocol' => 'UDP',
-            'source' => '10.0.0.1',
-            'destination' => '192.168.1.2'
-        ],
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(),
+            [
+                'name' => 'Changed',
+                'protocol' => 'UDP',
+                'source' => '10.0.0.1',
+                'destination' => '192.168.1.2'
+            ],
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeInDatabase('firewall_rule_ports', [
+        )->seeInDatabase(
+            'firewall_rule_ports',
+            [
                 'id' => $this->firewallRulePort->getKey(),
                 'name' => 'Changed',
                 'protocol' => 'UDP',
                 'source' => '10.0.0.1',
                 'destination' => '192.168.1.2'
             ],
-                'ecloud')
-            ->assertResponseStatus(200);
+            'ecloud'
+        )->assertResponseStatus(200);
+    }
+
+    public function testUpdateWithICMPValues()
+    {
+        $this->patch(
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(),
+            [
+                'name' => 'Changed',
+                'protocol' => 'ICMPv4',
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeInDatabase(
+            'firewall_rule_ports',
+            [
+                'id' => $this->firewallRulePort->getKey(),
+                'name' => 'Changed',
+                'protocol' => 'ICMPv4',
+                'source' => null,
+                'destination' => null
+            ],
+            'ecloud'
+        )->assertResponseStatus(200);
     }
 }

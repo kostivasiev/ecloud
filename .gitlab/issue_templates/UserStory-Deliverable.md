@@ -50,7 +50,7 @@
 <!--- set product or project milestone - If appropriate  -->
 /milestone %
 
-<!--- set initial issue status and weight  -->
-/label ~"To Do" 
-/weight 2 <!--- see handbook on weights  -->
-/estimate 8h <!--- see handbook on estimates  -->
+<!--- set initial issue status, priority, weight & estimate - see handbook if unsure  -->
+/label ~"To Do" ~P2
+/weight 2
+/estimate 8h

@@ -60,6 +60,7 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'backup_enabled' => true,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -71,6 +72,7 @@ class CreateTest extends TestCase
         ])->seeInDatabase('instances', [
             'id' => $id,
             'name' => $id,
+            'backup_enabled' => 1,
         ], 'ecloud');
     }
 
@@ -88,6 +90,7 @@ class CreateTest extends TestCase
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
+                'backup_enabled' => true,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -102,6 +105,7 @@ class CreateTest extends TestCase
             [
                 'id' => $id,
                 'name' => $name,
+                'backup_enabled' => 1,
             ],
             'ecloud'
         );
