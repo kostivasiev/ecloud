@@ -43,7 +43,6 @@ class Deploy implements ShouldQueue
             $this->fail(new \Exception($message));
             return;
         }
-        
         // Get the routers T0 path
         $response = $nsxService->get('policy/api/v1/infra/tier-0s');
         $response = json_decode($response->getBody()->getContents(), true);

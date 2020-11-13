@@ -4,8 +4,8 @@ namespace Tests\V2\Vpc;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
+use App\Models\V2\Instance;
 use App\Models\V2\Region;
-use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -78,7 +78,7 @@ class DeleteTest extends TestCase
 
     public function testDeleteVpcWithResourcesFails()
     {
-        factory(Router::class)->create([
+        factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey()
         ]);

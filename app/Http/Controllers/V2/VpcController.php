@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Network\Creating;
 use App\Http\Requests\V2\Vpc\CreateRequest;
-use App\Http\Requests\V2\Vpc\DeleteRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
@@ -15,7 +13,6 @@ use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
-use App\Traits\V2\CustomKey;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 

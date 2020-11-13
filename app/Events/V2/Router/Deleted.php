@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\V2\Vpc;
+namespace App\Events\V2\Router;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
@@ -9,14 +9,10 @@ class Deleted
 {
     use SerializesModels;
 
-    public $id;
-    public $dhcpId;
     public $model;
 
     public function __construct(Model $model)
     {
-        $this->id = $model->id;
-        $this->dhcpId = $model->dhcp->id;
         $this->model = $model;
     }
 }
