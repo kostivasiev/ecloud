@@ -24,7 +24,11 @@ class UnassignFloatingIp implements ShouldQueue
         Log::info($logMessage . 'Started');
         Nat::whereHasMorph('translated', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
             $query->where('translated_id', $nic->getKey())->withTrashed();
-        })->each(function ($nat) use ($logMessage) {
+        })
+            ->orWhereHasMorph('source', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
+                $query->where('source_id', $nic->getKey())->withTrashed();
+            })
+            ->each(function ($nat) use ($logMessage) {
             Log::info($logMessage . 'Floating IP ' . $nat->destination_id . ' unassigned');
             $nat->delete();
         });
