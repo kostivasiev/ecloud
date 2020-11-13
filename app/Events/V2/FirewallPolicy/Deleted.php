@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Deleted extends Event
 {
     public $model;
+    public $firewallPolicyId;
 
     /**
      * @param Model $model
      * @return void
      */
-    public function __construct($model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
+        $this->firewallPolicyId = $model->getKey();
     }
 }
