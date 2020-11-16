@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Created;
+use App\Events\V2\FloatingIp\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +40,7 @@ class FloatingIp extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'created' => Created::class,
+        'deleted' => Deleted::class
     ];
 
     public static function boot()
