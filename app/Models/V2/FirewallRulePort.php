@@ -38,6 +38,8 @@ class FirewallRulePort extends Model implements Filterable, Sortable
         'destination'
     ];
 
+    const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
+
     protected $dispatchesEvents = [
         'saved' => Saved::class,
         'deleted' => Deleted::class
