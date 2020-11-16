@@ -14,6 +14,7 @@
 
 
 ### What is the expected correct behaviour? <!-- What should be happening instead -->
+<!-- ENFORCEMENT-END -->
 
 
 
@@ -24,7 +25,7 @@
 ### Possible fixes <!-- If you can, link to the code that might be causing the problem, or thoughts on what it may be to aid triage -->
 
 
-<!-- ENFORCEMENT-END -->
+
 ### How would you categorise this? <!--- Delete as appropriate -->
 
 Service Affecting - this bug is affecting the uptime of the customers solution 
