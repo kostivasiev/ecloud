@@ -22,7 +22,11 @@ class Nat extends Model
         'id',
         'destination_id',
         'translated_id',
+        'action'
     ];
+
+    const ACTION_DNAT = 'DNAT';
+    const ACTION_SNAT = 'SNAT';
 
     protected $dispatchesEvents = [
         'created' => Created::class,
@@ -37,6 +41,11 @@ class Nat extends Model
     public function destination()
     {
         return $this->morphTo('destinationable', null, 'destination_id', 'id');
+    }
+
+    public function source()
+    {
+        return $this->morphTo('sourceable', null, 'source_id', 'id');
     }
 
     public function translated()
