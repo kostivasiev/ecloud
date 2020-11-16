@@ -43,12 +43,14 @@ class Create extends FormRequest
             'source' => [
                 'nullable',
                 'string',
-                new ValidPortReference()
+                new ValidPortReference(),
+                'exclude_if:protocol,ICMPv4'
             ],
             'destination' => [
                 'nullable',
                 'string',
-                new ValidPortReference()
+                new ValidPortReference(),
+                'exclude_if:protocol,ICMPv4'
             ]
         ];
     }
