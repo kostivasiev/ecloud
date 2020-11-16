@@ -5,11 +5,10 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
+use App\Jobs\FloatingIp\Assign;
+use App\Jobs\FloatingIp\UnAssign;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Nat;
 use App\Resources\V2\FloatingIpResource;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -130,39 +129,16 @@ class FloatingIpController extends BaseController
     /**
      * @param AssignRequest $request
      * @param string $fipId
-     * @return Response
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
      */
     public function assign(AssignRequest $request, string $fipId)
     {
-        // TODO :- Move this to the AssignRequest?
-        $request['id'] = $fipId;
-        $this->validate(
-            $request,
-            ['id' => 'unique:ecloud.nats,destination_id,NULL,id,deleted_at,NULL'],
-            ['id.unique' => 'The floating IP is already assigned']
-        );
+        $this->dispatch(new Assign([
+            'floating_ip_id' => $fipId,
+            'resource_id' => $request->resource_id
+        ]));
 
-        $fip = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
-
-        $nat = new Nat;
-        $nat->destination_id = $fip->id;
-        $nat->destinationable_type = 'fip';
-        $nat->translated_id = $request->resource_id;
-
-        // TODO :- This is hack and needs addressing. The type should be discovered when assigning.
-        foreach (Relation::morphMap() as $map => $model) {
-            try {
-                $model::forUser(app('request')->user)->findOrFail($request->resource_id);
-                $nat->translatedable_type = $map;
-                break;
-            } catch (ModelNotFoundException $exception) {
-                continue;
-            }
-        }
-
-        $nat->save();
-
-        return new Response(null, 202);
+        return response(null, 202);
     }
 
     /**
@@ -173,9 +149,10 @@ class FloatingIpController extends BaseController
     public function unassign(Request $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user)->findOrFail($fipId);
-        if ($floatingIp->nat) {
-            $floatingIp->nat->delete();
-        }
+
+        $this->dispatch(new UnAssign([
+            'floating_ip_id' => $floatingIp->getKey()
+        ]));
 
         return new Response(null, 202);
     }

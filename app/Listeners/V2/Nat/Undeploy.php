@@ -33,6 +33,9 @@ class Undeploy implements ShouldQueue
                 },
                 'translated' => function ($query) {
                     $query->withTrashed();
+                },
+                'source' => function ($query) {
+                    $query->withTrashed();
                 }
             ])->getRelations()
         )
