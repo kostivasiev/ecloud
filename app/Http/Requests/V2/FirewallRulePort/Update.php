@@ -46,15 +46,13 @@ class Update extends FormRequest
                 'sometimes',
                 'nullable',
                 'string',
-                new ValidPortReference(),
-                'exclude_if:protocol,ICMPv4'
+                new ValidPortReference()
             ],
             'destination' => [
                 'sometimes',
                 'nullable',
                 'string',
                 new ValidPortReference(),
-                'exclude_if:protocol,ICMPv4'
             ]
         ];
     }
