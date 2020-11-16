@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class DeleteCredentials extends Job
 {
-    private $data;
+    public $data;
 
     public function __construct($data)
     {
