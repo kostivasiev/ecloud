@@ -53,7 +53,6 @@ class Deploy extends Job
                                         'id' => $port->getKey(),
                                         'icmp_type' => 0,
                                         'resource_type' => 'ICMPTypeServiceEntry',
-                                        'display_name' => 'echo-reply',
                                         'protocol' => 'ICMPv4',
                                     ];
                                 }
