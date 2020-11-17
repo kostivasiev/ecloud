@@ -1,21 +1,4 @@
 ###
-# Setup Dependencies
-POST https://{{host}}/{{version}}/vpcs
-X-consumer-custom-id:  1-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-    "name": "TEST VPC",
-    "region_id": "{{dev_region_id}}"
-}
-
-> {%
-client.global.set('vpc_id', response.body.data.id);
-client.log('VPC Id : ' + response.body.data.id);
-%}
-
-###
 # Create a Router
 POST https://{{host}}/{{version}}/routers
 X-consumer-custom-id:  0-0
@@ -24,7 +7,7 @@ Content-Type:  application/json
 
 {
   "name": "test router",
-  "vpc_id": "{{vpc_id}}",
+  "vpc_id": "{{dev_vpc_id}}",
   "availability_zone_id" : "{{dev_availability_zone_id}}"
 }
 
@@ -43,7 +26,7 @@ Content-Type:  application/json
 {
   "name": "Test Policy",
   "sequence": 10,
-  "router_id": "{{dev_router_id}}"
+  "router_id": "{{router_id}}"
 }
 
 > {%
@@ -102,26 +85,14 @@ client.log('firewall_rule_port_id: ' + response.body.data.id);
 %}
 
 ###
-# Delete the Vpc
-DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+# Delete the Router
+DELETE https://{{host}}/{{version}}/routers/{{router_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204 Created");
-});
-%}
-
-###
-# Check the Router is deleted
-GET https://{{host}}/{{version}}/routers/{{router_id}}
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 404, "Response status is not 404 Created");
+  client.assert(response.status === 204, "Response status is not 404 Created");
 });
 %}
 
