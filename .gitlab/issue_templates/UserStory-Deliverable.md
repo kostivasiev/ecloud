@@ -55,4 +55,4 @@
 <!--- set initial issue status, priority, weight & estimate - see handbook if unsure  -->
 /label ~"To Do" ~P2
 /weight 2
-/estimate 8h
+/estimate 4h
