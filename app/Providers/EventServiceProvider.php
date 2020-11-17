@@ -80,7 +80,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
         \App\Events\V2\FirewallRule\Deleted::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
+            \App\Listeners\V2\FirewallRule\Undeploy::class,
         ],
 
         // FirewallRulePort
