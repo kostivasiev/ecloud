@@ -52,11 +52,6 @@ class FirewallRule extends Model implements Filterable, Sortable
         'deleted' => Deleted::class,
     ];
 
-    public function router()
-    {
-        return $this->belongsTo(Router::class);
-    }
-
     public function firewallPolicy()
     {
         return $this->belongsTo(FirewallPolicy::class);
