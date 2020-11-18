@@ -4,6 +4,6 @@ post:
     - $ref: '../../resources/Router/parameters/routerId.yaml'
   responses:
     202:
-      description: success
+      description: Accepted
   tags:
     - Routers
