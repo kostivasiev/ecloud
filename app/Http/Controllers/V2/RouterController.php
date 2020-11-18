@@ -148,6 +148,8 @@ class RouterController extends BaseController
     /**
      * @param Request $request
      * @param string $routerId
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     * @throws \Exception
      */
     public function configureDefaults(Request $request, string $routerId)
     {
