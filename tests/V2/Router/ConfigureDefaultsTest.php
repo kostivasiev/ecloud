@@ -7,6 +7,7 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -39,6 +40,8 @@ class ConfigureDefaultsTest extends TestCase
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write'
         ])->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\FirewallPolicy\Saved::class);
 
         // Check the relationships are intact
         $policies = config('firewall.policies');
