@@ -34,6 +34,7 @@ $app->configure('instance');
 $app->configure('volume');
 $app->configure('kingpin');
 $app->configure('job-status');
+$app->configure('firewall');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);

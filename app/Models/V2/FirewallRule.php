@@ -32,7 +32,6 @@ class FirewallRule extends Model implements Filterable, Sortable
     protected $fillable = [
         'name',
         'sequence',
-        'router_id',
         'deployed',
         'firewall_policy_id',
         'source',

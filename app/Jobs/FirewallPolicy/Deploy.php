@@ -34,6 +34,7 @@ class Deploy extends Job
                     'id' => $policy->id,
                     'display_name' => $policy->name,
                     'description' => $policy->name,
+                    'sequence_number' => $policy->sequence,
                     'rules' => $policy->firewallRules->map(function ($rule) use ($router) {
                         return [
                             'action' => $rule->action,
