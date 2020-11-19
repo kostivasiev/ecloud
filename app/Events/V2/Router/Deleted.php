@@ -9,9 +9,9 @@ class Deleted
 {
     use SerializesModels;
 
-    public Model $model;
+    public $model;
 
-    public function __construct(Model $model)
+    public function __construct($model)
     {
         $this->model = $model;
     }
