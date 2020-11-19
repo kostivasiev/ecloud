@@ -25,20 +25,16 @@ class Undeploy implements ShouldQueue
         $message = 'Undeploy Firewall Policy ' . $firewallPolicy->getKey() .': ';
         Log::info($message . 'Started');
 
-        try {
-            $firewallPolicy->router->availabilityZone->nsxService()->delete(
-                'policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->getKey()
-            );
+        $firewallPolicy->router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->getKey()
+        );
 
-            $firewallPolicy->firewallRules->each(function ($firewallRule) {
-                $firewallRule->firewallRulePorts->each(function ($firewallRulePort) {
-                    $firewallRulePort->delete();
-                });
-                $firewallRule->delete();
+        $firewallPolicy->firewallRules->each(function ($firewallRule) {
+            $firewallRule->firewallRulePorts->each(function ($firewallRulePort) {
+                $firewallRulePort->delete();
             });
-        } catch (\Exception $e) {
-            $this->fail($e);
-        }
+            $firewallRule->delete();
+        });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
