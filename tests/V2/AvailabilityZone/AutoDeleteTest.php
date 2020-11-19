@@ -3,17 +3,13 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Events\V2\AvailabilityZone\Deleted;
-use App\Jobs\AvailabilityZone\DeleteCredentials;
-use App\Jobs\AvailabilityZone\DeleteDhcps;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -72,21 +68,7 @@ class AutoDeleteTest extends TestCase
         $fakeEvent = new Deleted($this->availabilityZone);
         event($fakeEvent);
         Event::assertDispatched(Deleted::class, function ($event) {
-            return $event->availabilityZoneId == $this->availabilityZone->getKey();
+            return $event->model->getKey() == $this->availabilityZone->getKey();
         });
-
-        // Simulate the listener for credentials
-        (new DeleteCredentials([
-            'availability_zone_id' => $fakeEvent->availabilityZoneId
-        ]))->handle();
-        $this->assertNotNull($this->availabilityZone->deleted_at);
-        $this->assertNotNull($this->credential->fresh()->deleted_at);
-
-        // Simulate the DHCP listener
-        (new DeleteDhcps([
-            'availability_zone_id' => $fakeEvent->availabilityZoneId
-        ]))->handle();
-        $this->assertNotNull($this->availabilityZone->deleted_at);
-        $this->assertNotNull($this->dhcp->fresh()->deleted_at);
     }
 }
