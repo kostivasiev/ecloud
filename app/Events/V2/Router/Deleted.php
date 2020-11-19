@@ -9,12 +9,10 @@ class Deleted
 {
     use SerializesModels;
 
-    public $model;
-    public $routerId;
+    public Model $model;
 
     public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->routerId = $model->getKey();
     }
 }
