@@ -10,14 +10,14 @@ class Deleted
 {
     use SerializesModels;
 
-    public $availabilityZoneId;
+    public AvailabilityZone $model;
 
     /**
-     * @param Model $model
+     * @param AvailabilityZone $model
      * @return void
      */
     public function __construct(AvailabilityZone $model)
     {
-        $this->availabilityZoneId = $model->getKey();
+        $this->model = $model;
     }
 }
