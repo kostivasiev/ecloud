@@ -155,22 +155,6 @@ class InstanceController extends BaseController
     }
 
     /**
-     * @return JsonResponse
-     */
-    private function isLocked(): JsonResponse
-    {
-        return JsonResponse::create([
-            'errors' => [
-                [
-                    'title' => 'Forbidden',
-                    'detail' => 'The specified instance is locked',
-                    'status' => 403,
-                ]
-            ]
-        ], 403);
-    }
-
-    /**
      * @param Request $request
      * @param string $instanceId
      * @return Response|JsonResponse
@@ -178,9 +162,6 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-        if (!$this->isAdmin && $instance->locked === true) {
-            return $this->isLocked();
-        }
         try {
             $instance->delete();
         } catch (\Exception $e) {
