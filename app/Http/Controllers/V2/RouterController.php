@@ -149,7 +149,7 @@ class RouterController extends BaseController
      * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
-    public function configureDefaults(Request $request, string $routerId)
+    public function configureDefaultPolicies(Request $request, string $routerId)
     {
         $router = Router::forUser($request->user)->findOrFail($routerId);
 
