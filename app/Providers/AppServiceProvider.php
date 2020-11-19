@@ -31,7 +31,8 @@ class AppServiceProvider extends ServiceProvider
             $client = $this->app->makeWith(Client::class, [
                 'config' => [
                     'base_uri' => config('encryption.keystore_host'),
-                    'timeout' => 2
+                    'timeout' => 2,
+                    'verify' => app()->environment() === 'production',
                 ]
             ]);
             $key = (new RemoteKeyStore($client))->getKey(config('encryption.keystore_host_key'));

@@ -52,7 +52,7 @@ class Update extends FormRequest
                 'sometimes',
                 'nullable',
                 'string',
-                new ValidPortReference()
+                new ValidPortReference(),
             ]
         ];
     }

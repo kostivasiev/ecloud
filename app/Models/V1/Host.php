@@ -377,6 +377,7 @@ class Host extends Model implements Filterable, Sortable
             'config' => [
                 'base_uri' => $conjurerUrl,
                 'timeout' => 10,
+                'verify' => app()->environment() === 'production',
             ]
         ]);
 

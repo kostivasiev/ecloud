@@ -94,7 +94,8 @@ class KingpinServiceProvider extends ServiceProvider
                 'base_uri' => $serviceBaseUri,
                 'defaults' => [
                     'auth' => [KingpinService::KINGPIN_USER, $serverDetail->server_detail_pass ?? null]
-                ]
+                ],
+                'verify' => app()->environment() === 'production',
             ]);
 
             return new KingpinService(

@@ -28,9 +28,11 @@ class IsLocked
             && $instance->locked) {
             return JsonResponse::create([
                 'errors' => [
-                    'title' => 'Forbidden',
-                    'detail' => 'The specified instance is locked',
-                    'status' => 403,
+                    [
+                        'title' => 'Forbidden',
+                        'detail' => 'The specified instance is locked',
+                        'status' => 403,
+                    ]
                 ]
             ], 403);
         }

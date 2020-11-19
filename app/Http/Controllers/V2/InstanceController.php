@@ -162,9 +162,6 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-        if (!$this->isAdmin && $instance->locked === true) {
-            return $this->isLocked();
-        }
         try {
             $instance->delete();
         } catch (\Exception $e) {

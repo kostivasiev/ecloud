@@ -40,14 +40,38 @@ use App\VM\Status;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Mustache_Engine;
+use UKFast\Admin\Devices\AdminClient;
 use UKFast\Api\Exceptions;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VirtualMachineController extends BaseController
 {
     const HDD_MAX_SIZE_GB = 2500;
+
+    /**
+     * get VM by ID
+     * @param Request $request
+     * @param $vmId
+     * @return mixed
+     * @throws Exceptions\NotFoundException
+     */
+    public static function getVirtualMachineById(Request $request, $vmId)
+    {
+        $collection = VirtualMachine::withResellerId($request->user->resellerId);
+
+        if ($request->user->resellerId != 0) {
+            $collection->where('servers_active', '=', 'y');
+        }
+
+        $VirtualMachine = $collection->find($vmId);
+        if (!$VirtualMachine) {
+            throw new Exceptions\NotFoundException('Virtual Machine ID #' . $vmId . ' not found');
+        }
+
+        return $VirtualMachine;
+    }
 
     /**
      * List all VM's
@@ -66,6 +90,35 @@ class VirtualMachineController extends BaseController
             $request,
             $virtualMachinesQuery->paginate($this->perPage)
         );
+    }
+
+    /**
+     * List VM's
+     * For admin list all except when $resellerId is passed in
+     * @param null $resellerId
+     * @param array $vmIds
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getVirtualMachines($vmIds = [])
+    {
+        $virtualMachineQuery = VirtualMachine::query();
+        if (!empty($vmIds)) {
+            $virtualMachineQuery->whereIn('servers_id', $vmIds);
+        }
+
+        if ($this->isAdmin) {
+            if (!empty($this->resellerId)) {
+                $virtualMachineQuery->withResellerId($this->resellerId);
+            }
+
+            // Return ALL VM's
+            return $virtualMachineQuery;
+        }
+
+        $virtualMachineQuery->where('servers_active', '=', 'y');
+
+        //For non-admin filter on reseller ID
+        return $virtualMachineQuery->withResellerId($this->resellerId);
     }
 
     /**
@@ -89,6 +142,19 @@ class VirtualMachineController extends BaseController
             200,
             VirtualMachineResource::class
         );
+    }
+
+    /**
+     * Validates the solution id
+     * @param Request $request
+     * @param $vmId
+     * @return void
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function validateVirtualMachineId(&$request, $vmId)
+    {
+        $request['vmId'] = $vmId;
+        $this->validate($request, ['vmId' => 'required|integer']);
     }
 
     /**
@@ -1016,7 +1082,6 @@ class VirtualMachineController extends BaseController
         return $this->respondEmpty(202, $headers);
     }
 
-
     /**
      * Clone a VM
      * @param Request $request
@@ -1198,6 +1263,22 @@ class VirtualMachineController extends BaseController
         return $respondSave;
     }
 
+    /**
+     * Get a VM (Model, not query builder - use for updates etc)
+     * @param $vmId int ID of the VM to return
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
+     * @throws Exceptions\NotFoundException
+     */
+    protected function getVirtualMachine($vmId)
+    {
+        // Load the VM
+        $virtualMachineQuery = $this->getVirtualMachines([$vmId]);
+        $VirtualMachine = $virtualMachineQuery->first();
+        if (!$VirtualMachine) {
+            throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
+        }
+        return $VirtualMachine;
+    }
 
     /**
      * Update virtual machine
@@ -1566,6 +1647,38 @@ class VirtualMachineController extends BaseController
         return $this->respondEmpty(($resizeRequired) ? 202 : 200);
     }
 
+    /**
+     * Extract contracted CPU value from Trigger
+     * @param Trigger $trigger
+     * @return int
+     */
+    protected function extractContractTriggerCPUValue(Trigger $trigger)
+    {
+        preg_match("/\sCPU: ([0-9]+)\s/", $trigger->trigger_description, $regex_matches);
+        return intval($regex_matches[1]);
+    }
+
+    /**
+     * Extract contracted RAM value from Trigger
+     * @param Trigger $trigger
+     * @return int
+     */
+    protected function extractContractTriggerRAMValue(Trigger $trigger)
+    {
+        preg_match("/\sRAM: ([0-9]+)GB\s/", $trigger->trigger_description, $regex_matches);
+        return intval($regex_matches[1]);
+    }
+
+    /**
+     * Extract contracted HDD value from Trigger
+     * @param Trigger $trigger
+     * @return int
+     */
+    protected function extractContractTriggerHDDValue(Trigger $trigger)
+    {
+        preg_match("/\sHDD: ([0-9]+)GB\s/", $trigger->trigger_description, $regex_matches);
+        return intval($regex_matches[1]);
+    }
 
     /**
      * Clone VM to template
@@ -1979,39 +2092,6 @@ class VirtualMachineController extends BaseController
     }
 
     /**
-     * Extract contracted CPU value from Trigger
-     * @param Trigger $trigger
-     * @return int
-     */
-    protected function extractContractTriggerCPUValue(Trigger $trigger)
-    {
-        preg_match("/\sCPU: ([0-9]+)\s/", $trigger->trigger_description, $regex_matches);
-        return intval($regex_matches[1]);
-    }
-
-    /**
-     * Extract contracted RAM value from Trigger
-     * @param Trigger $trigger
-     * @return int
-     */
-    protected function extractContractTriggerRAMValue(Trigger $trigger)
-    {
-        preg_match("/\sRAM: ([0-9]+)GB\s/", $trigger->trigger_description, $regex_matches);
-        return intval($regex_matches[1]);
-    }
-
-    /**
-     * Extract contracted HDD value from Trigger
-     * @param Trigger $trigger
-     * @return int
-     */
-    protected function extractContractTriggerHDDValue(Trigger $trigger)
-    {
-        preg_match("/\sHDD: ([0-9]+)GB\s/", $trigger->trigger_description, $regex_matches);
-        return intval($regex_matches[1]);
-    }
-
-    /**
      * Hard Power-on or Resume a virtual machine
      * @param Request $request
      * @param $vmId
@@ -2035,6 +2115,48 @@ class VirtualMachineController extends BaseController
         }
 
         return $this->respondEmpty();
+    }
+
+    /**
+     * Power on a virtual machine
+     * @param VirtualMachine $virtualMachine
+     * @return bool
+     * @throws KingpinException
+     */
+    protected function powerOnVirtualMachine(VirtualMachine $virtualMachine)
+    {
+        $kingpin = $this->loadKingpinService($virtualMachine);
+
+        $powerOnResult = $kingpin->powerOnVirtualMachine(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+
+        if (!$powerOnResult) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Load and configure the Kingpin service for a Virtual Machine
+     * @param VirtualMachine $virtualMachine
+     * @return \App\Services\Kingpin\V1\KingpinService
+     * @throws KingpinException
+     */
+    protected function loadKingpinService(VirtualMachine $virtualMachine)
+    {
+        try {
+            $kingpin = app()->makeWith(
+                'App\Services\Kingpin\V1\KingpinService',
+                [$virtualMachine->getPod(), $virtualMachine->type()]
+            );
+        } catch (\Exception $exception) {
+            throw new KingpinException('Unable to connect to Virtual Machine');
+        }
+
+        return $kingpin;
     }
 
     /**
@@ -2063,6 +2185,28 @@ class VirtualMachineController extends BaseController
     }
 
     /**
+     * Power off a virtual machine
+     * @param VirtualMachine $virtualMachine
+     * @return bool
+     * @throws KingpinException
+     */
+    protected function powerOffVirtualMachine(VirtualMachine $virtualMachine)
+    {
+        $kingpin = $this->loadKingpinService($virtualMachine);
+
+        $powerOffResult = $kingpin->powerOffVirtualMachine(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+
+        if (!$powerOffResult) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Gracefully shut down a virtual machine
      * @param Request $request
      * @param $vmId
@@ -2086,6 +2230,38 @@ class VirtualMachineController extends BaseController
         }
 
         return $this->respondEmpty();
+    }
+
+    /**
+     * @param VirtualMachine $virtualMachine
+     * @return bool
+     * @throws KingpinException
+     * @throws ServiceTimeoutException
+     */
+    protected function shutDownVirtualMachine(VirtualMachine $virtualMachine)
+    {
+        $kingpin = $this->loadKingpinService($virtualMachine);
+
+        $shutDownResult = $kingpin->shutDownVirtualMachine(
+            $virtualMachine->getKey(),
+            $virtualMachine->solutionId()
+        );
+
+        if (!$shutDownResult) {
+            return false;
+        }
+
+        $startTime = time();
+
+        do {
+            sleep(10);
+            $isOnline = $kingpin->checkVMOnline($virtualMachine->getKey(), $virtualMachine->solutionId());
+            if ($isOnline === false) {
+                return true;
+            }
+        } while (time() - $startTime < 120);
+
+        throw new ServiceTimeoutException('Timeout waiting for Virtual Machine to power off.');
     }
 
     /**
@@ -2203,161 +2379,6 @@ class VirtualMachineController extends BaseController
     }
 
     /**
-     * Power on a virtual machine
-     * @param VirtualMachine $virtualMachine
-     * @return bool
-     * @throws KingpinException
-     */
-    protected function powerOnVirtualMachine(VirtualMachine $virtualMachine)
-    {
-        $kingpin = $this->loadKingpinService($virtualMachine);
-
-        $powerOnResult = $kingpin->powerOnVirtualMachine(
-            $virtualMachine->getKey(),
-            $virtualMachine->solutionId()
-        );
-
-        if (!$powerOnResult) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Power off a virtual machine
-     * @param VirtualMachine $virtualMachine
-     * @return bool
-     * @throws KingpinException
-     */
-    protected function powerOffVirtualMachine(VirtualMachine $virtualMachine)
-    {
-        $kingpin = $this->loadKingpinService($virtualMachine);
-
-        $powerOffResult = $kingpin->powerOffVirtualMachine(
-            $virtualMachine->getKey(),
-            $virtualMachine->solutionId()
-        );
-
-        if (!$powerOffResult) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param VirtualMachine $virtualMachine
-     * @return bool
-     * @throws KingpinException
-     * @throws ServiceTimeoutException
-     */
-    protected function shutDownVirtualMachine(VirtualMachine $virtualMachine)
-    {
-        $kingpin = $this->loadKingpinService($virtualMachine);
-
-        $shutDownResult = $kingpin->shutDownVirtualMachine(
-            $virtualMachine->getKey(),
-            $virtualMachine->solutionId()
-        );
-
-        if (!$shutDownResult) {
-            return false;
-        }
-
-        $startTime = time();
-
-        do {
-            sleep(10);
-            $isOnline = $kingpin->checkVMOnline($virtualMachine->getKey(), $virtualMachine->solutionId());
-            if ($isOnline === false) {
-                return true;
-            }
-        } while (time() - $startTime < 120);
-
-        throw new ServiceTimeoutException('Timeout waiting for Virtual Machine to power off.');
-    }
-
-    /**
-     * Load and configure the Kingpin service for a Virtual Machine
-     * @param VirtualMachine $virtualMachine
-     * @return \App\Services\Kingpin\V1\KingpinService
-     * @throws KingpinException
-     */
-    protected function loadKingpinService(VirtualMachine $virtualMachine)
-    {
-        try {
-            $kingpin = app()->makeWith(
-                'App\Services\Kingpin\V1\KingpinService',
-                [$virtualMachine->getPod(), $virtualMachine->type()]
-            );
-        } catch (\Exception $exception) {
-            throw new KingpinException('Unable to connect to Virtual Machine');
-        }
-
-        return $kingpin;
-    }
-
-    /**
-     * Get a VM (Model, not query builder - use for updates etc)
-     * @param $vmId int ID of the VM to return
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
-     * @throws Exceptions\NotFoundException
-     */
-    protected function getVirtualMachine($vmId)
-    {
-        // Load the VM
-        $virtualMachineQuery = $this->getVirtualMachines([$vmId]);
-        $VirtualMachine = $virtualMachineQuery->first();
-        if (!$VirtualMachine) {
-            throw new Exceptions\NotFoundException("The Virtual Machine '$vmId' Not Found");
-        }
-        return $VirtualMachine;
-    }
-
-    /**
-     * List VM's
-     * For admin list all except when $resellerId is passed in
-     * @param null $resellerId
-     * @param array $vmIds
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function getVirtualMachines($vmIds = [])
-    {
-        $virtualMachineQuery = VirtualMachine::query();
-        if (!empty($vmIds)) {
-            $virtualMachineQuery->whereIn('servers_id', $vmIds);
-        }
-
-        if ($this->isAdmin) {
-            if (!empty($this->resellerId)) {
-                $virtualMachineQuery->withResellerId($this->resellerId);
-            }
-
-            // Return ALL VM's
-            return $virtualMachineQuery;
-        }
-
-        $virtualMachineQuery->where('servers_active', '=', 'y');
-
-        //For non-admin filter on reseller ID
-        return $virtualMachineQuery->withResellerId($this->resellerId);
-    }
-
-    /**
-     * Validates the solution id
-     * @param Request $request
-     * @param $vmId
-     * @return void
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function validateVirtualMachineId(&$request, $vmId)
-    {
-        $request['vmId'] = $vmId;
-        $this->validate($request, ['vmId' => 'required|integer']);
-    }
-
-    /**
      * List all VM's for a Solution
      *
      * @param Request $request
@@ -2385,31 +2406,13 @@ class VirtualMachineController extends BaseController
         );
     }
 
-    /**
-     * get VM by ID
-     * @param Request $request
-     * @param $vmId
-     * @return mixed
-     * @throws Exceptions\NotFoundException
-     */
-    public static function getVirtualMachineById(Request $request, $vmId)
-    {
-        $collection = VirtualMachine::withResellerId($request->user->resellerId);
-
-        if ($request->user->resellerId != 0) {
-            $collection->where('servers_active', '=', 'y');
-        }
-
-        $VirtualMachine = $collection->find($vmId);
-        if (!$VirtualMachine) {
-            throw new Exceptions\NotFoundException('Virtual Machine ID #' . $vmId . ' not found');
-        }
-
-        return $VirtualMachine;
-    }
-
     public function consoleSession(Request $request, $vmId)
     {
+        $response = app()->make(AdminClient::class)->devices()->getById($vmId);
+        if ($response->managed) {
+            abort(403, 'Unable to start session on a managed device');
+        }
+
         $this->validateVirtualMachineId($request, $vmId);
         $virtualMachine = $this->getVirtualMachine($vmId);
 
@@ -2431,7 +2434,7 @@ class VirtualMachineController extends BaseController
 
         $client = new Client([
             'base_uri' => $consoleResource->url,
-            'verify' => false,
+            'verify' => app()->environment() === 'production',
             'headers' => [
                 'X-API-Authentication' => $consoleResource->token,
             ],
