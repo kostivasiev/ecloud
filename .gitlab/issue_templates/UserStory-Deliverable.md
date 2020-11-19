@@ -1,3 +1,4 @@
+<!-- Title: UserStory-Deliverable.md -->
 <!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
 ### What is the Feature/Change?
@@ -31,6 +32,7 @@
  <!-- attach any flow charts and delete placeholder -->
 - no process flow required
 
+<!-- ENFORCEMENT-END -->
 
 ### Story Tasks
 - [ ] Process flow created & Requirements defined
@@ -53,4 +55,4 @@
 <!--- set initial issue status, priority, weight & estimate - see handbook if unsure  -->
 /label ~"To Do" ~P2
 /weight 2
-/estimate 8h
+/estimate 4h
