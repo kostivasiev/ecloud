@@ -65,7 +65,7 @@ class DeployDefaultsTest extends TestCase
         // Check the relationships are intact
         $policies = config('firewall.policies');
 
-        $firewallPolicies = FirewallPolicy::where('router_id', $this->router->getKey());
+        $firewallPolicies = FirewallPolicy::where('router_id', $router->getKey());
 
         $this->assertEquals(count($policies), $firewallPolicies->count());
 
