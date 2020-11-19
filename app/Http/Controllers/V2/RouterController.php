@@ -84,11 +84,7 @@ class RouterController extends BaseController
     public function destroy(Request $request, string $routerId)
     {
         $router = Router::forUser($request->user)->findOrFail($routerId);
-        try {
-            $router->delete();
-        } catch (\Exception $e) {
-            return $router->getDeletionError($e);
-        }
+        $router->delete();
         return response()->json([], 204);
     }
 
