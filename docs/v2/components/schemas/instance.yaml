@@ -14,9 +14,8 @@ properties:
     example: vpc-2b66bb79
     readOnly: false
   availability_zone_id:
-    readOnly: false
+    readOnly: true
     type: string
-    required: false
     example: 'az-2b66bb79'
   appliance_id:
     type: string
