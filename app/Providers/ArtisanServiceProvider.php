@@ -218,7 +218,10 @@ class ArtisanServiceProvider extends ServiceProvider
         }
 
         return (new ArtisanService(
-            new Client(['base_uri' => $serviceBaseUri]),
+            new Client([
+                'base_uri' => $serviceBaseUri,
+                'verify' => app()->environment() === 'production',
+            ]),
             $config['san_name'],
             $config['solution_id']
         ))
