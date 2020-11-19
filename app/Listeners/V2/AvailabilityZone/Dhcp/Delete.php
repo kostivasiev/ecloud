@@ -13,11 +13,11 @@ class Delete implements ShouldQueue
 
     public function handle(Deleted $event)
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $event->model]);
+        Log::info(get_class($this) . ' : Started', ['event' => $event]);
         $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($event->model->getKey());
         $availabilityZone->dhcps()->each(function ($dhcp) {
             $dhcp->delete();
         });
-        Log::info(get_class($this) . ' : Finished', ['data' => $event->model]);
+        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }
