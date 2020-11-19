@@ -88,7 +88,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('routers', 'RouterController@create');
         $router->patch('routers/{routerId}', 'RouterController@update');
         $router->delete('routers/{routerId}', 'RouterController@destroy');
-        $router->post('routers/{routerId}/configure-defaults', 'RouterController@configureDefaults');
+        $router->post('routers/{routerId}/configure-default-policies', 'RouterController@configureDefaultPolicies');
     });
 
     /** Instances */

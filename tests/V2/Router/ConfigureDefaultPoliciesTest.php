@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class ConfigureDefaultsTest extends TestCase
+class ConfigureDefaultPoliciesTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -36,7 +36,7 @@ class ConfigureDefaultsTest extends TestCase
 
     public function testConfigureDefaults()
     {
-        $this->post('/v2/routers/' . $this->router->getKey() . '/configure-defaults', [], [
+        $this->post('/v2/routers/' . $this->router->getKey() . '/configure-default-policies', [], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write'
         ])->assertResponseStatus(202);

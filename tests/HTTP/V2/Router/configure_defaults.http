@@ -19,7 +19,7 @@ client.log('Router ID: ' + response.body.data.id);
 ###
 
 # Create defaults
-POST https://{{host}}/{{version}}/routers/{router_id}/configure-defaults
+POST https://{{host}}/{{version}}/routers/{{router_id}}/configure-default-policies
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
