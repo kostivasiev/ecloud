@@ -52,7 +52,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 ###
 
-DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+DELETE https://{{host}}/{{version}}/vpcs/vpc-dea341f1
 X-consumer-custom-id:  1-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
