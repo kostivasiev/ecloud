@@ -1,3 +1,4 @@
+<!-- Title: Issue-Deliverable.md -->
 <!--- THIS TEMPLATE IS TO BE USED FOR BREAKING DOWN ISSUES INTO SMALLER DELIVERABLES NOT FOR BUGS OR CHANGE REQUESTS -->
 
 ### What is the Change?
@@ -14,7 +15,7 @@ checklist of the tasks required to determine this issue as done
 - [ ] Must do A for this to be complete
 - [ ] Must do B for this to be complete
 
-
+<!-- ENFORCEMENT-END -->
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~dotNET ~DevOps
 

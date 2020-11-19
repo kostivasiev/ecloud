@@ -1,4 +1,5 @@
-<!--- THIS TEMPLATE IS TO BE USED FOR BUG REPORTS -->
+<!-- Title: Bug-Report.md -->
+<!-- THIS TEMPLATE IS TO BE USED FOR BUG REPORTS -->
 
 ### Summary <!--Summarise the bug encountered concisely -->
 
@@ -13,6 +14,7 @@
 
 
 ### What is the expected correct behaviour? <!-- What should be happening instead -->
+<!-- ENFORCEMENT-END -->
 
 
 

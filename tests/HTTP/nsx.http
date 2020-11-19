@@ -1,0 +1,21 @@
+### Referance NAT Rule
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/nat/USER/nat-rules/Reference_1_to_1_NAT_DNAT
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Referance Firewall Policy
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/Copy_of_ingress
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Referance Firewall Policy Rule
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/Copy_of_ingress/rules/b4822a80-eea7-11ea-bf67-554bdcb2dfaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+
+### Firewall Policy Rule
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-aaaaaaaa/rules/fwr-edea0c4f
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

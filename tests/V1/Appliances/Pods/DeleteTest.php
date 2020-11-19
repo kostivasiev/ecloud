@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Appliances\Pods;
+namespace Tests\V1\Appliances\Pods;
 
 use App\Models\V1\AppliancePodAvailability;
+use App\Models\V1\Pod;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\ApplianceTestCase;
-use App\Models\V1\Pod;
 
 class DeleteTest extends ApplianceTestCase
 {
@@ -39,7 +39,7 @@ class DeleteTest extends ApplianceTestCase
 
         $this->assertEquals($podQry->count(), 1);
 
-        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid , [], $this->validWriteHeaders);
+        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validWriteHeaders);
 
         $this->assertResponseStatus(204);
 
@@ -57,7 +57,7 @@ class DeleteTest extends ApplianceTestCase
             'ucs_datacentre_id' => 123,
         ]);
 
-        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid , [], $this->validReadHeaders);
+        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
 
         $this->assertResponseStatus(403);
     }

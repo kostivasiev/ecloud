@@ -1,15 +1,14 @@
 <?php
 
-namespace Tests;
+namespace Tests\V1;
 
 use App\Models\V1\Solution;
-use App\Solution\Exceptions\InvalidSolutionStateException;
 use App\Solution\CanModifyResource;
+use App\Solution\Exceptions\InvalidSolutionStateException;
 use App\Solution\Status;
-
 use Illuminate\Http\Request;
-
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CanModifyResourceTest extends TestCase
 {
@@ -72,7 +71,7 @@ class CanModifyResourceTest extends TestCase
         } catch (InvalidSolutionStateException $e) {
             $this->assertEquals($status, $e->getState());
             $this->assertEquals(403, $e->getStatusCode());
-            $this->assertEquals('Cannot modify resources whilst solution state is: ' .$status, $e->detail);
+            $this->assertEquals('Cannot modify resources whilst solution state is: ' . $status, $e->detail);
             return;
         }
 

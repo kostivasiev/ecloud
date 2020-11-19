@@ -16,8 +16,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class DhcpController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -34,7 +34,7 @@ class DhcpController extends BaseController
 
     /**
      * @param string $dhcpId
-     * @return \App\Resources\V2\DhcpResource
+     * @return DhcpResource
      */
     public function show(string $dhcpId)
     {
@@ -44,26 +44,26 @@ class DhcpController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateDhcpRequest $request
+     * @param CreateDhcpRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateDhcpRequest $request)
     {
-        $dhcps = new Dhcp($request->only(['vpc_id']));
+        $dhcps = new Dhcp($request->only(['vpc_id', 'availability_zone_id']));
         $dhcps->save();
         $dhcps->refresh();
         return $this->responseIdMeta($request, $dhcps->getKey(), 201);
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateDhcpRequest $request
+     * @param UpdateDhcpRequest $request
      * @param string $dhcpId
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateDhcpRequest $request, string $dhcpId)
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
-        $dhcp->fill($request->only(['vpc_id']));
+        $dhcp->fill($request->only(['vpc_id', 'availability_zone_id']));
         $dhcp->save();
         return $this->responseIdMeta($request, $dhcp->getKey(), 200);
     }

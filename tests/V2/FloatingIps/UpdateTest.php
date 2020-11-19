@@ -20,35 +20,28 @@ class UpdateTest extends TestCase
         $this->floatingIp = factory(FloatingIp::class)->create();
     }
 
-    public function testNoPermsIsDenied()
-    {
-        $data = [];
-
-        $this->patch(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
-            $data,
-            []
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
     public function testValidDataIsSuccessful()
     {
-        $data = [];
+        $newName = $this->faker->word;
 
         $this->patch(
             '/v2/floating-ips/' . $this->floatingIp->getKey(),
-            $data,
+            [
+                'name' => $newName
+            ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
+            ->seeInDatabase(
+                'floating_ips',
+                [
+                    'id' => $this->floatingIp->getKey(),
+                    'name' => $newName
+                ],
+                'ecloud'
+            )
             ->assertResponseStatus(200);
     }
 

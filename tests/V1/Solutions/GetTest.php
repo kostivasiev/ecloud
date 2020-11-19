@@ -1,13 +1,12 @@
 <?php
 
-namespace Tests\Solutions;
-
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
+namespace Tests\V1\Solutions;
 
 use App\Models\V1\Solution;
 use App\Models\V1\Tag;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Laravel\Lumen\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -17,7 +16,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
     }
-    
+
     public function testValidCollection()
     {
         $total = rand(1, 2);

@@ -86,18 +86,16 @@ abstract class AbstractTemplate
             return $serverLicense->first();
         }
 
-        $similarText = [];
         foreach ($ecloudLicenses as $availableLicence) {
-            similar_text($availableLicence->friendly_name, $this->guest_os, $percent);
-
-            // Increase the confidence required. We need it.
-            if ($percent > 50) {
-                $similarText[$availableLicence->friendly_name] = $percent;
+            if ($availableLicence->name == $this->actual_os) {
+                $serverLicense = ServerLicense::withName($availableLicence->name);
+                if ($serverLicense->count() > 0) {
+                    return $serverLicense->first();
+                }
             }
-            if (!empty($similarText)) {
-                $mostLikelyLicence = array_keys($similarText, max($similarText));
-                $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
 
+            if ($availableLicence->friendly_name == $this->guest_os) {
+                $serverLicense = ServerLicense::withFriendlyName($availableLicence->friendly_name);
                 if ($serverLicense->count() > 0) {
                     return $serverLicense->first();
                 }
@@ -106,28 +104,26 @@ abstract class AbstractTemplate
 
         //If still no match found
         $serverLicenses = ServerLicense::withType('OS')->get();
-
-        $similarText = [];
         foreach ($serverLicenses as $availableLicence) {
-            similar_text($availableLicence->friendly_name, $this->guest_os, $percent);
-            // Increase the confidence required. We need it.
-            if ($percent > 50) {
-                $similarText[$availableLicence->id] = $percent;
+            if ($availableLicence->name == $this->actual_os) {
+                $serverLicense = ServerLicense::withName($availableLicence->name);
+                if ($serverLicense->count() > 0) {
+                    return $serverLicense->first();
+                }
             }
-        }
 
-        if (!empty($similarText)) {
-            $mostLikelyLicence = array_keys($similarText, max($similarText));
-            $serverLicense = ServerLicense::withFriendlyName($mostLikelyLicence[0]);
-            if ($serverLicense->count() > 0) {
-                return $serverLicense->first();
+            if ($availableLicence->friendly_name == $this->guest_os) {
+                $serverLicense = ServerLicense::withFriendlyName($availableLicence->friendly_name);
+                if ($serverLicense->count() > 0) {
+                    return $serverLicense->first();
+                }
             }
         }
 
         // no matching license, try to create one
         $serverLicence = new \stdClass();
         $serverLicence->id = 0;
-        $serverLicence->name = '';
+        $serverLicence->name = (string)$this->actual_os;
         $serverLicence->friendly_name = (string)$this->guest_os;
 
         if (strpos($this->guest_os, 'Windows') !== false) {
@@ -158,28 +154,28 @@ abstract class AbstractTemplate
         if (!$this->isGpuTemplate()) {
             throw new \Exception('Template is not a GPU template');
         }
-        return substr($this->name, strrpos($this->name, '-gpu-')+5);
+        return substr($this->name, strrpos($this->name, '-gpu-') + 5);
     }
 
     /**
-    * Formats the Solution and Pod templates for return by the API
-    * @return \stdClass
-    */
+     * Formats the Solution and Pod templates for return by the API
+     * @return \stdClass
+     */
     public function convertToPublicTemplate()
     {
         $tmp_template = new \stdClass;
         $tmp_template->type = $this->type;
         $tmp_template->name = $this->name;
 
-        $tmp_template->cpu = (int) $this->cpu;
-        $tmp_template->ram = (int) $this->ram;
-        $tmp_template->hdd = (int) $this->size_gb;
+        $tmp_template->cpu = (int)$this->cpu;
+        $tmp_template->ram = (int)$this->ram;
+        $tmp_template->hdd = (int)$this->size_gb;
 
         $tmp_template->license = 'Unknown';
         $tmp_template->encrypted = $this->encrypted ?? false;
 
         foreach ($this->hard_drives as $hard_drive) {
-            $tmp_template->hdd_disks[] = (object) array(
+            $tmp_template->hdd_disks[] = (object)array(
                 'name' => $hard_drive->name,
                 'capacity' => $hard_drive->capacitygb,
             );

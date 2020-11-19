@@ -1,11 +1,9 @@
 <?php
 
-namespace Tests\Appliances\ApplianceVersions;
-
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\Appliances\ApplianceVersions;
 
 use App\Models\V1\ApplianceVersion;
-
+use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\ApplianceTestCase;
 
 class PostTest extends ApplianceTestCase
@@ -39,7 +37,7 @@ class PostTest extends ApplianceTestCase
             'vm_template' => $applianceVersion->vm_template,
             'os_license_id' => 123,
             'active' => true,
-            'parameters'=> [
+            'parameters' => [
                 [
                     'name' => 'Wordpredd URL',
                     'type' => 'String',
@@ -101,7 +99,7 @@ class PostTest extends ApplianceTestCase
             'vm_template' => $applianceVersion->vm_template,
             'os_license_id' => 123,
             'active' => true,
-            'parameters'=> [
+            'parameters' => [
                 [
                     'name' => 'Wordpredd URL',
                     'type' => 'String',
@@ -128,10 +126,10 @@ class PostTest extends ApplianceTestCase
         ], $this->validWriteHeaders)
             ->seeStatusCode(400)
             ->seeJson([
-                    'title' => 'Bad Request',
-                    'detail' => "Required parameter 'MySQL Wordpress user password' with key 'THIS_REQUIRED_KEY_IS_MISSING_FROM_THE_SCRIPT' was not found in script template",
-                    'status' => 400
-        ]);
+                'title' => 'Bad Request',
+                'detail' => "Required parameter 'MySQL Wordpress user password' with key 'THIS_REQUIRED_KEY_IS_MISSING_FROM_THE_SCRIPT' was not found in script template",
+                'status' => 400
+            ]);
     }
 
     public function testCreateApplianceVersionUnauthorised()

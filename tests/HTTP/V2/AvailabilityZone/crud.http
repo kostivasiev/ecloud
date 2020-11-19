@@ -1,0 +1,180 @@
+## Setup Dependancies
+
+POST https://{{host}}/{{version}}/regions
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "TestRegion"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('region_id', response.body.data.id);
+client.log('Region ID: ' + response.body.data.id);
+%}
+
+###
+
+POST https://{{host}}/{{version}}/regions
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "TestRegion"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('region_id_2', response.body.data.id);
+client.log('Region ID 2: ' + response.body.data.id);
+%}
+
+###
+
+
+
+
+## Test Resource CRUD
+
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test AZ",
+  "code": "MAN1",
+  "datacentre_site_id": 111,
+  "is_public": true,
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('availability_zone_id', response.body.data.id);
+client.log('Availability Zone ID: ' + response.body.data.id);
+%}
+
+###
+
+GET https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+
+GET https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('availability_zone_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.name === "Test AZ", "Incorrect resource name returned");
+  client.assert(response.body.data.code === "MAN1", "Incorrect resource code returned");
+  client.assert(response.body.data.datacentre_site_id === 111, "Incorrect resource datacentre_site_id returned");
+  client.assert(response.body.data.region_id === client.global.get('region_id'), "Incorrect resource region_id returned");
+});
+%}
+
+###
+
+# Update
+PATCH https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test AZ (UPDATED) - PMC 1",
+  "code": "LON1",
+  "datacentre_site_id": 112,
+  "is_public": true,
+  "region_id": "{{region_id_2}}"
+}
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('availability_zone_id'), "Incorrect resource ID returned");
+});
+%}
+
+###
+
+
+GET https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('availability_zone_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.name === "Test AZ (UPDATED) - PMC 1", "Incorrect resource name returned");
+  client.assert(response.body.data.code === "LON1", "Incorrect resource code returned");
+  client.assert(response.body.data.datacentre_site_id === 112, "Incorrect resource datacentre_site_id returned");
+  client.assert(response.body.data.region_id === client.global.get('region_id_2'), "Incorrect resource region_id returned");
+});
+%}
+
+###
+
+
+# Delete
+DELETE https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id:0-0
+X-consumer-groups: ecloud.read, ecloud.write
+
+
+
+### Tear down dependancies
+
+DELETE https://{{host}}/{{version}}/regions/{{region_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id:0-0
+X-consumer-groups: ecloud.read, ecloud.write
+
+###
+DELETE https://{{host}}/{{version}}/regions/{{region_id_2}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id:0-0
+X-consumer-groups: ecloud.read, ecloud.write
+
+###

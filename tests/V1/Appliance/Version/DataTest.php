@@ -4,10 +4,10 @@ namespace Tests\V1\Appliance\Version;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceVersion;
+use Illuminate\Http\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\TestCase;
-use Illuminate\Http\Response;
 
 class DataTest extends TestCase
 {
@@ -33,7 +33,7 @@ class DataTest extends TestCase
      */
     protected $applianceVersion;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 

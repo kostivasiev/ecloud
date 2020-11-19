@@ -2,27 +2,24 @@
 
 namespace App\Models\V1;
 
+use App\Events\V1\ApplianceParameterDeletedEvent;
 use App\Rules\V1\IsValidUuid;
+use App\Rules\V1\IsValidValidationRule;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
-use App\Rules\V1\IsValidValidationRule;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 use UKFast\Api\Resource\Property\BooleanProperty;
-use UKFast\Api\Resource\Property\StringProperty;
-use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\DateTimeProperty;
-
+use UKFast\Api\Resource\Property\IdProperty;
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
 
 // Events
-use App\Events\V1\ApplianceParameterDeletedEvent;
 
 class ApplianceParameter extends Model implements Filterable, Sortable
 {
@@ -163,7 +160,7 @@ class ApplianceParameter extends Model implements Filterable, Sortable
         $this->attributes['appliance_script_parameters_appliance_version_id'] =
             ApplianceVersion::select('appliance_version_id')
                 ->where('appliance_version_uuid', '=', $value)
-                ->first()->appliance_version_id ;
+                ->first()->appliance_version_id;
     }
 
     /**

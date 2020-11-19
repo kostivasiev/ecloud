@@ -3,9 +3,8 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
-use Log;
-
 use GuzzleHttp\Exception\TransferException;
+use Log;
 
 abstract class AbstractApioService
 {
@@ -51,11 +50,11 @@ abstract class AbstractApioService
         }
 
         $this->headers = [
-            'Request-ID'           => app('request')->header('Request-ID'),
-            'User-Agent'           => 'service-' . env('APP_NAME') . '/1.0',
-            'Accept'               => 'application/json',
+            'Request-ID' => app('request')->header('Request-ID'),
+            'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
+            'Accept' => 'application/json',
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => $this->serviceName . '.read' . ', ' .$this->serviceName . '.write'
+            'X-consumer-groups' => $this->serviceName . '.read' . ', ' . $this->serviceName . '.write'
         ];
     }
 
@@ -84,7 +83,7 @@ abstract class AbstractApioService
      * Send the HTTP request
      * @param       $method
      * @param $endpoint
-     * @param null $data - Data payload (JSON or query string depending on the verb)
+     * @param null $data - Deploy payload (JSON or query string depending on the verb)
      * @param array $options - Any other options we want to pass to Guzzle
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -102,7 +101,7 @@ abstract class AbstractApioService
                 $method,
                 $endpoint,
                 array_merge_recursive([
-                    'debug'   => false,
+                    'debug' => false,
                     'headers' => $this->headers
                 ], $options)
             );

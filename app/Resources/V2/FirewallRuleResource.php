@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -7,6 +8,17 @@ use UKFast\Responses\UKFastResource;
 /**
  * Class FirewallRuleResource
  * @package App\Resources\V2
+ * @property string id
+ * @property string name
+ * @property string firewall_policy_id
+ * @property string deployed
+ * @property string source
+ * @property string destination
+ * @property string action
+ * @property string direction
+ * @property string enabled
+ * @property string created_at
+ * @property string updated_at
  */
 class FirewallRuleResource extends UKFastResource
 {
@@ -16,11 +28,16 @@ class FirewallRuleResource extends UKFastResource
      */
     public function toArray($request)
     {
-        // @todo Return value below
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
-            'router_id'  => $this->router_id,
+            'id' => $this->id,
+            'name' => $this->name,
+            'sequence' => $this->sequence,
+            'firewall_policy_id' => $this->firewall_policy_id,
+            'source' => $this->source,
+            'destination' => $this->destination,
+            'action' => $this->action,
+            'direction' => $this->direction,
+            'enabled' => $this->enabled,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

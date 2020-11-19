@@ -56,7 +56,7 @@ class RemoteKeyStore
 
         if (getenv('APP_ENV') !== 'local') {
             try {
-                $response  = $this->httpClient->request('GET', $url);
+                $response = $this->httpClient->request('GET', $url);
                 $this->key = trim($response->getBody());
             } catch (\Exception $exception) {
                 throw new \Exception('Failed to retrieve encryption key: ' . $exception->getMessage());
@@ -79,11 +79,11 @@ class RemoteKeyStore
     {
         $clientOptions = [
             'base_uri' => env('KEY_SERVER_HOST'),
-            'timeout'  => 2,
+            'timeout' => 2,
             'verify' => app()->environment() === 'production',
         ];
-        $httpClient    = new Client($clientOptions);
-        $keyStore      = new static($httpClient);
+        $httpClient = new Client($clientOptions);
+        $keyStore = new static($httpClient);
 
         return $keyStore->getKey('int/banner.html');
     }

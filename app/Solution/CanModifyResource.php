@@ -2,9 +2,9 @@
 
 namespace App\Solution;
 
-use App\Solution\Exceptions\InvalidSolutionStateException;
 use App\Models\V1\Solution;
-use \Illuminate\Http\Request;
+use App\Solution\Exceptions\InvalidSolutionStateException;
+use Illuminate\Http\Request;
 
 class CanModifyResource
 {
@@ -40,8 +40,7 @@ class CanModifyResource
 
         $exception = new InvalidSolutionStateException($this->solution->ucs_reseller_status);
         $exception->detail =
-            'Cannot modify resources whilst solution state is: ' . $this->solution->ucs_reseller_status
-        ;
+            'Cannot modify resources whilst solution state is: ' . $this->solution->ucs_reseller_status;
 
         throw $exception;
     }

@@ -1,11 +1,9 @@
 <?php
 
-namespace Tests\Appliances\AppplianceVersions;
+namespace Tests\V1\Appliances\ApplianceVersions;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use Ramsey\Uuid\Uuid;
-
 use Tests\ApplianceTestCase;
 
 class GetTest extends ApplianceTestCase
@@ -61,7 +59,8 @@ class GetTest extends ApplianceTestCase
         $latestVersion = $this->appliances[0]->getLatestVersion();
         $parameters = $latestVersion->parameters;
 
-        $this->json('GET', '/v1/appliance-versions/' . $latestVersion->uuid . '/parameters', [], $this->validWriteHeaders)
+        $this->json('GET', '/v1/appliance-versions/' . $latestVersion->uuid . '/parameters', [],
+            $this->validWriteHeaders)
             ->seeStatusCode(200)
             ->seeJson([
                 'id' => $parameters[0]->uuid,

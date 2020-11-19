@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
@@ -21,10 +22,10 @@ class RouterResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
-            'vpc_id'  => $this->vpc_id,
-            'deployed'  => $this->deployed,
+            'id' => $this->id,
+            'name' => $this->name,
+            'vpc_id' => $this->vpc_id,
+            'deployed' => $this->deployed,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
@@ -18,7 +18,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 */
 
 $app = new Laravel\Lumen\Application(
-    realpath(__DIR__.'/../')
+    realpath(__DIR__ . '/../')
 );
 
 $app->configure('app');
@@ -28,9 +28,13 @@ $app->configure('logging');
 $app->configure('mail');
 $app->configure('gpu');
 $app->configure('encryption');
-$app->configure('nsx');
 $app->configure('queue');
 $app->configure('erd-generator');
+$app->configure('instance');
+$app->configure('volume');
+$app->configure('kingpin');
+$app->configure('job-status');
+$app->configure('firewall');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -72,10 +76,11 @@ $app->singleton(
 */
 
 $app->routeMiddleware([
-    'auth' =>  \UKFast\Api\Auth\Middleware\Authenticate::class,
+    'auth' => \UKFast\Api\Auth\Middleware\Authenticate::class,
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
-    'is-administrator' => \App\Http\Middleware\IsAdministrator::class
+    'is-administrator' => \App\Http\Middleware\IsAdministrator::class,
+    'is-locked' => \App\Http\Middleware\IsLocked::class
 ]);
 
 /*
@@ -105,11 +110,17 @@ $app->register(UKFast\Api\Resource\ResourceServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class);
+
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
+
 
 // ecloud service providers
 $app->register(App\Providers\KingpinServiceProvider::class);
 $app->register(App\Providers\ArtisanServiceProvider::class);
+$app->register(\App\Providers\EncryptionServiceProvider::class);
+$app->register(App\Providers\V2\KingpinServiceProvider::class);
+
 
 // apio service providers
 $app->register(App\Providers\NetworkingServiceProvider::class);
@@ -117,10 +128,19 @@ $app->register(App\Providers\AccountsServiceProvider::class);
 $app->register(App\Providers\BillingServiceProvider::class);
 
 // NSX service provider
-$app->register(App\Providers\NsxServiceProvider::class);
+$app->register(App\Providers\V2\NsxServiceProvider::class);
 
-// ErdGenerator - Only enable on dev, never release this to live as the package is not installed due to --no-dev
-//$app->register(BeyondCode\ErdGenerator\ErdGeneratorServiceProvider::class);
+// Job status
+$app->bind(\Illuminate\Queue\QueueManager::class, function ($app) {
+    return new \Illuminate\Queue\QueueManager($app);
+});
+
+$app->register(Imtigger\LaravelJobStatus\LaravelJobStatusServiceProvider::class);
+
+// ErdGenerator - Only enable on dev
+if (is_dir($app->basePath('vendor/beyondcode/laravel-er-diagram-generator'))) {
+    $app->register(BeyondCode\ErdGenerator\ErdGeneratorServiceProvider::class);
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -136,7 +156,7 @@ $app->register(App\Providers\NsxServiceProvider::class);
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 return $app;

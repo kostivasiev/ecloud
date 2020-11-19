@@ -1,11 +1,10 @@
 <?php
 
-namespace Tests\Solutions;
-
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\Solutions;
 
 use App\Models\V1\Solution;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class PostTest extends TestCase
 {

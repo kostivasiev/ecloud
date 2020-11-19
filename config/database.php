@@ -35,22 +35,22 @@ return [
 
         // Default database connection
         'reseller' => [
-            'driver'    => env('DB_RESELLER_DRIVER', 'mysql'),
-            'host'      => env('DB_RESELLER_HOST'),
-            'port'      => env('DB_RESELLER_PORT', 3306),
-            'database'  => env('DB_RESELLER_DATABASE', 'reseller'),
-            'username'  => env('DB_RESELLER_USERNAME'),
-            'password'  => env('DB_RESELLER_PASSWORD')
+            'driver' => env('DB_RESELLER_DRIVER', 'mysql'),
+            'host' => env('DB_RESELLER_HOST'),
+            'port' => env('DB_RESELLER_PORT', 3306),
+            'database' => env('DB_RESELLER_DATABASE', 'reseller'),
+            'username' => env('DB_RESELLER_USERNAME'),
+            'password' => env('DB_RESELLER_PASSWORD')
         ],
 
         'ecloud' => [
-            'driver'    => env('DB_ECLOUD_DRIVER', 'mysql'),
-            'host'      => env('DB_ECLOUD_HOST'),
-            'port'      => env('DB_ECLOUD_PORT', 3306),
-            'database'  => env('DB_ECLOUD_DATABASE', 'ecloud'),
-            'username'  => env('DB_ECLOUD_USERNAME'),
-            'password'  => env('DB_ECLOUD_PASSWORD'),
-            'charset'   => 'utf8',
+            'driver' => env('DB_ECLOUD_DRIVER', 'mysql'),
+            'host' => env('DB_ECLOUD_HOST'),
+            'port' => env('DB_ECLOUD_PORT', 3306),
+            'database' => env('DB_ECLOUD_DATABASE', 'ecloud'),
+            'username' => env('DB_ECLOUD_USERNAME'),
+            'password' => env('DB_ECLOUD_PASSWORD'),
+            'charset' => 'utf8',
             'collation' => 'utf8_general_ci'
         ],
     ],

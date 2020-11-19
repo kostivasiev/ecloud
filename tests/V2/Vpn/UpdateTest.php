@@ -7,7 +7,6 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
-use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,125 +14,45 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    protected $region;
+    protected $router;
+    protected $vpc;
+    protected $vpn;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-    }
-
-    public function testNoPermsIsDenied()
-    {
-        $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
+        $this->region = factory(Region::class)->create();
+        factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
         ]);
-        $data = [
-            'router_id'            => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
-        ];
-        $this->patch(
-            '/v2/vpns/' . $vpn->getKey(),
-            $data,
-            []
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
-    public function testNullRouterIdIsDenied()
-    {
-        $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey(),
         ]);
-        $data = [
-            'router_id'            => '',
-            'availability_zone_id' => $availabilityZone->id,
-        ];
-        $this->patch(
-            '/v2/vpns/' . $vpn->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The router id field, when specified, cannot be null',
-                'status' => 422,
-                'source' => 'router_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
-    public function testNullAvailabilityZoneIdIsDenied()
-    {
-        $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey()
         ]);
-        $data = [
-            'router_id'            => $router->id,
-            'availability_zone_id' => '',
-        ];
-        $this->patch(
-            '/v2/vpns/' . $vpn->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Validation Error',
-                'detail' => 'The availability zone id field, when specified, cannot be null',
-                'status' => 422,
-                'source' => 'availability_zone_id'
-            ])
-            ->assertResponseStatus(422);
+        $this->vpn = factory(Vpn::class)->create([
+            'router_id' => $this->router->id,
+        ]);
     }
 
     public function testNotOwnedRouterResourceIsFailed()
     {
-        $vpc = factory(Vpc::class)->create(['reseller_id' => 3]);
-        $router = factory(Router::class)->create([
-            'vpc_id' => $vpc->getKey()
-        ]);
-
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
-        ]);
-
-        $data = [
-            'router_id'            => $router->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
-        ];
+        $this->vpc->reseller_id = 3;
+        $this->vpc->save();
         $this->patch(
-            '/v2/vpns/' . $vpn->getKey(),
-            $data,
+            '/v2/vpns/' . $this->vpn->getKey(),
+            [
+                'router_id' => $this->router->getKey(),
+            ],
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeJson([
-                'title'  => 'Validation Error',
+                'title' => 'Validation Error',
                 'detail' => 'The specified router id was not found',
                 'status' => 422,
                 'source' => 'router_id'
@@ -143,18 +62,11 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
-        ]);
         $data = [
-            'router_id'            => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
+            'router_id' => $this->router->id,
         ];
         $this->patch(
-            '/v2/vpns/' . $vpn->getKey(),
+            '/v2/vpns/' . $this->vpn->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -162,8 +74,7 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(200);
 
-        $vpnItem = Vpn::findOrFail($vpn->getKey());
+        $vpnItem = Vpn::findOrFail($this->vpn->getKey());
         $this->assertEquals($data['router_id'], $vpnItem->router_id);
-        $this->assertEquals($data['availability_zone_id'], $vpnItem->availability_zone_id);
     }
 }

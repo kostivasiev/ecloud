@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\Appliances\ApplianceVersions;
+namespace Tests\V1\Appliances\ApplianceVersions;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use Tests\ApplianceTestCase;
 
 class PatchTest extends ApplianceTestCase

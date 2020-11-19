@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateApplianceTables extends Migration
 {
@@ -47,7 +47,8 @@ class CreateApplianceTables extends Migration
             $table->integer('appliance_script_parameters_appliance_version_id');
             $table->string('appliance_script_parameters_name');
             $table->string('appliance_script_parameters_key');
-            $table->enum('appliance_script_parameters_type', ['String','Numeric','Boolean','Array','Password','Date','DateTime'])->default('String');
+            $table->enum('appliance_script_parameters_type',
+                ['String', 'Numeric', 'Boolean', 'Array', 'Password', 'Date', 'DateTime'])->default('String');
             $table->enum('appliance_script_parameters_required', ['Yes', 'No'])->default('Yes');
             $table->string('appliance_script_parameters_description');
             $table->string('appliance_script_parameters_validation_rule')->default('');

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\V2;
 
 use App\Models\V2\Vpc;
@@ -25,7 +26,7 @@ class UpdateRouterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'    => 'sometimes|required|string',
+            'name' => 'sometimes|required|string',
             'vpc_id' => [
                 'sometimes',
                 'required',
@@ -33,6 +34,7 @@ class UpdateRouterRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
+            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
 
@@ -47,6 +49,8 @@ class UpdateRouterRequest extends FormRequest
             'name.required' => 'The :attribute field, when specified, cannot be null',
             'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
             'vpc_id.exists' => 'The specified :attribute was not found',
+            'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
+            'availability_zone_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }

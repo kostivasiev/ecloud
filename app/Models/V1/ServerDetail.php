@@ -5,13 +5,12 @@ namespace App\Models\V1;
 use App\Encryption\AesEncryption;
 use App\Encryption\RemoteKeyStore;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Facades\Log;
+use UKFast\Api\Resource\Property\BooleanProperty;
+use UKFast\Api\Resource\Property\EncryptionProperty;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
 use UKFast\Api\Resource\Property\StringProperty;
-use UKFast\Api\Resource\Property\BooleanProperty;
-use UKFast\Api\Resource\Property\EncryptionProperty;
 
 /**
  * Creates Illuminate\Database\Eloquent\Model
@@ -47,8 +46,8 @@ class ServerDetail extends Model
      * Filters by server_detail_server_id
      * @param \Illuminate\Database\Query\Builder $query
      * @param int $serverId
-     * @throws \InvalidArgumentException
      * @return \Illuminate\Database\Query\Builder
+     * @throws \InvalidArgumentException
      */
     public function scopeWithParent($query, $serverId)
     {
@@ -122,8 +121,8 @@ class ServerDetail extends Model
 
         try {
             if (!empty($this->server_detail_random)) {
-                $encryptionKey                    = RemoteKeyStore::getEncryptionKey();
-                $encryption                       = new AESEncryption($encryptionKey, env('AES_VECTOR'));
+                $encryptionKey = RemoteKeyStore::getEncryptionKey();
+                $encryption = new AESEncryption($encryptionKey, env('AES_VECTOR'));
                 $this->attributes['server_detail_pass'] = $encryption->decrypt($this->server_detail_random);
             }
 

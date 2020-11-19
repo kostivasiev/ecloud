@@ -2,7 +2,9 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Region\Creating;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -19,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Region extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, DeletionRules;
 
     public $keyPrefix = 'reg';
     protected $keyType = 'string';
@@ -30,6 +32,20 @@ class Region extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
+        'is_public',
+    ];
+
+    protected $casts = [
+        'is_public' => 'boolean',
+    ];
+
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+    ];
+
+    public $children = [
+        'availabilityZones',
+        'vpcs',
     ];
 
     public function availabilityZones()
@@ -37,22 +53,42 @@ class Region extends Model implements Filterable, Sortable
         return $this->hasMany(AvailabilityZone::class);
     }
 
+    public function vpcs()
+    {
+        return $this->hasMany(Vpc::class);
+    }
+
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
-     * @return array|\UKFast\DB\Ditto\Filter[]
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!$user->isAdministrator) {
+            $query->where('is_public', '=', 1);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param FilterFactory $factory
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -61,13 +97,14 @@ class Region extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('is_public'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -84,8 +121,9 @@ class Region extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'name'       => 'name',
+            'id' => 'id',
+            'name' => 'name',
+            'is_public' => 'is_public',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

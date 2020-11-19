@@ -3,7 +3,9 @@
 namespace Tests\V2\Vpn;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -13,63 +15,38 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    protected \Faker\Generator $faker;
+    protected $availability_zone;
+    protected $region;
+    protected $router;
+    protected $vpc;
+    protected $vpn;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-    }
-
-    public function testNoPermsIsDenied()
-    {
-        $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
+        $this->region = factory(Region::class)->create([
+            'name' => $this->faker->country(),
         ]);
-        $this->delete(
-            '/v2/vpns/' . $vpn->getKey(),
-            [],
-            []
-        )
-            ->seeJson([
-                'title'  => 'Unauthorised',
-                'detail' => 'Unauthorised',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
-    }
-
-    public function testFailInvalidId()
-    {
-        $this->delete(
-            '/v2/vpns/' . $this->faker->uuid,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Not found',
-                'detail' => 'No Vpn with that ID was found',
-                'status' => 404,
-            ])
-            ->assertResponseStatus(404);
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+        ]);
+        $this->vpn = factory(Vpn::class)->create([
+            'router_id' => $this->router->id,
+        ]);
     }
 
     public function testSuccessfulDelete()
     {
-        $router = factory(Router::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create();
-        $vpn = factory(Vpn::class)->create([
-            'router_id' => $router->id,
-            'availability_zone_id' => $availabilityZone->id,
-        ]);
         $this->delete(
-            '/v2/vpns/' . $vpn->getKey(),
+            '/v2/vpns/' . $this->vpn->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,7 +54,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $vpnItem = Vpn::withTrashed()->findOrFail($vpn->getKey());
+        $vpnItem = Vpn::withTrashed()->findOrFail($this->vpn->getKey());
         $this->assertNotNull($vpnItem->deleted_at);
     }
 }

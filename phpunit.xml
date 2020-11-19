@@ -14,6 +14,14 @@
         <testsuite name="Application Test Suite">
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
+        <testsuite name="v1">
+            <directory suffix="Test.php">./tests/V1</directory>
+        </testsuite>
+        <testsuite name="v2">
+            <directory suffix="Test.php">./tests/V2</directory>
+            <directory suffix="Test.php">./tests/Unit/V2</directory>
+            <directory suffix="Test.php">./tests/unit</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
@@ -21,17 +29,19 @@
         </whitelist>
     </filter>
     <php>
+        <ini name="memory_limit" value="256M"/>
         <env name="APP_ENV" value="testing" force="true"/>
         <env name="CACHE_DRIVER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <!--        <env name="LOG_CHANNEL" value="stderr" force="true"/>-->
 
         <env name="APP_NAME" value="ecloud" force="true"/>
         <env name="PAGINATION_LIMIT" value="100" force="true"/>
 
-<!--        <env name="DB_RESELLER_HOST" value="127.0.0.1" force="true"/>-->
-<!--        <env name="DB_RESELLER_PORT" value="3307" force="true"/>-->
-<!--        <env name="DB_ECLOUD_HOST" value="127.0.0.1" force="true"/>-->
-<!--        <env name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
+        <!--        <env name="DB_RESELLER_HOST" value="127.0.0.1" force="true"/>-->
+        <!--        <env name="DB_RESELLER_PORT" value="3307" force="true"/>-->
+        <!--        <env name="DB_ECLOUD_HOST" value="127.0.0.1" force="true"/>-->
+        <!--        <env name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
 
         <env name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
         <env name="DB_RESELLER_HOST" value="" force="true"/>

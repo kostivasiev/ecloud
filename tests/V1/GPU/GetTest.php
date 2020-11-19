@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\GPU;
+namespace Tests\V1\GPU;
 
 use App\Models\V1\GpuProfile;
 use App\Models\V1\VirtualMachine;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 
 class GetTest extends TestCase

@@ -1,3 +1,4 @@
+<!-- Title: UserStory-Deliverable.md -->
 <!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
 ### What is the Feature/Change?
@@ -20,6 +21,7 @@
 |---|---|---|
 | End User | View all VPC's | View an overview of my VPC's |
 
+### Acceptance Criteria
 
 | GIVEN | WHEN | THEN |
 |---|---|---|
@@ -30,6 +32,7 @@
  <!-- attach any flow charts and delete placeholder -->
 - no process flow required
 
+<!-- ENFORCEMENT-END -->
 
 ### Story Tasks
 - [ ] Process flow created & Requirements defined
@@ -49,6 +52,7 @@
 <!--- set product or project milestone - If appropriate  -->
 /milestone %
 
-<!--- set initial issue status and weight  -->
-/label ~"To Do" 
-/weight 5
+<!--- set initial issue status, priority, weight & estimate - see handbook if unsure  -->
+/label ~"To Do" ~P2
+/weight 2
+/estimate 4h

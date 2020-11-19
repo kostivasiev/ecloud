@@ -24,7 +24,7 @@ return [
         //     'user'
         // ]
     ],
-    
+
     /*
      * If true, all directories specified will be scanned recursively for models.
      * Set this to false if you prefer to explicitly define each directory that should
@@ -72,7 +72,7 @@ return [
         'concentrate' => true,
         'splines' => 'polyline',
         'overlap' => false,
-        'nodesep' => 1,
+        'nodesep' => 0.5,
         'rankdir' => 'LR',
         'pad' => 0.5,
         'ranksep' => 2,

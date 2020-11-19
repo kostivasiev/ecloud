@@ -1,9 +1,13 @@
 <?php
+
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateFirewallRuleRequest;
-use App\Http\Requests\V2\UpdateFirewallRuleRequest;
+use App\Events\V2\FirewallRule\Saved;
+use App\Http\Requests\V2\FirewallRule\Create;
+use App\Http\Requests\V2\FirewallRule\Update;
 use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
+use App\Resources\V2\FirewallRulePortResource;
 use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -15,13 +19,13 @@ use UKFast\DB\Ditto\QueryTransformer;
 class FirewallRuleController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallRule::query();
+        $collection = FirewallRule::forUser($request->user);
 
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
@@ -32,49 +36,121 @@ class FirewallRuleController extends BaseController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
      * @param string $firewallRuleId
-     * @return \App\Resources\V2\FirewallRuleResource
+     * @return FirewallRuleResource
      */
-    public function show(string $firewallRuleId)
+    public function show(Request $request, string $firewallRuleId)
     {
         return new FirewallRuleResource(
-            FirewallRule::findOrFail($firewallRuleId)
+            FirewallRule::forUser($request->user)->findOrFail($firewallRuleId)
         );
     }
 
-    /**
-     * @param \App\Http\Requests\V2\CreateFirewallRuleRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(CreateFirewallRuleRequest $request)
+    public function ports(Request $request, QueryTransformer $queryTransformer, string $firewallRuleId)
     {
-        $instance = new FirewallRule();
-        $instance->fill($request->only(['name', 'router_id']));
-        $instance->save();
-        $instance->refresh();
-        return $this->responseIdMeta($request, $instance->getKey(), 201);
+        $collection = FirewallRule::forUser($request->user)->findOrFail($firewallRuleId)->firewallRulePorts();
+        $queryTransformer->config(FirewallRulePort::class)
+            ->transform($collection);
+
+        return FirewallRulePortResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateFirewallRuleRequest $request
-     * @param string $firewallRuleId
+     * @param Create $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
-    public function update(UpdateFirewallRuleRequest $request, string $firewallRuleId)
+    public function store(Create $request)
     {
-        $item = FirewallRule::findOrFail($firewallRuleId);
-        $item->fill($request->only(['name', 'router_id']));
-        $item->save();
-        return $this->responseIdMeta($request, $item->getKey(), 200);
+        $only = [
+            'name',
+            'sequence',
+            'deployed',
+            'firewall_policy_id',
+            'source',
+            'destination',
+            'action',
+            'direction',
+            'enabled'
+        ];
+
+        if ($request->has('ports')) {
+            $firewallRule = FirewallRule::withoutEvents(function () use ($request, $only) {
+                $firewallRule = new FirewallRule();
+                $firewallRule->fill($request->only($only));
+                $firewallRule::addCustomKey($firewallRule);
+                $firewallRule->name = $firewallRule->name ?? $firewallRule->id;
+                $firewallRule->save();
+
+                foreach ($request->input('ports') as $port) {
+                    FirewallRulePort::withoutEvents(function () use ($firewallRule, $port) {
+                        $firewallRulePort = new FirewallRulePort($port);
+                        $firewallRulePort::addCustomKey($firewallRulePort);
+                        $firewallRulePort->name = $firewallRulePort->id;
+                        $firewallRulePort->firewall_rule_id = $firewallRule->getKey();
+                        $firewallRulePort->save();
+                    });
+                }
+
+                return $firewallRule;
+            });
+            event(new Saved($firewallRule));
+            return $this->responseIdMeta($request, $firewallRule->getKey(), 201);
+        }
+
+        $firewallRule = new FirewallRule();
+        $firewallRule->fill($request->only($only));
+        $firewallRule->save();
+
+        return $this->responseIdMeta($request, $firewallRule->getKey(), 201);
     }
 
     /**
+     * @param Update $request
      * @param string $firewallRuleId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(string $firewallRuleId)
+    public function update(Update $request, string $firewallRuleId)
     {
-        $item = FirewallRule::findOrFail($firewallRuleId);
+        $firewallRule = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
+
+        if ($request->has('ports')) {
+            $firewallRule->firewallRulePorts->delete();
+            foreach ($request->input('ports') as $port) {
+                FirewallRulePort::withoutEvents(function () use ($port, $firewallRule) {
+                    $port['firewall_rule_id'] = $firewallRule->getKey();
+                    $firewallRulePort = new FirewallRulePort($port);
+                    $firewallRulePort->save();
+                });
+            }
+        }
+
+        $firewallRule->fill($request->only([
+            'name',
+            'sequence',
+            'deployed',
+            'firewall_policy_id',
+            'source',
+            'destination',
+            'action',
+            'direction',
+            'enabled'
+        ]));
+        $firewallRule->save();
+        return $this->responseIdMeta($request, $firewallRule->getKey(), 200);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param string $firewallRuleId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Request $request, string $firewallRuleId)
+    {
+        $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         $item->delete();
         return response()->json([], 204);
     }

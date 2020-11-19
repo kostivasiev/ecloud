@@ -1,4 +1,5 @@
-<!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
+<!-- Title: Change-Request-or-Feature.md -->
+<!-- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
 ### What is the Feature/Change?
 <!-- Enter clear and concise description of what your feature or change request is. -->
@@ -11,17 +12,18 @@
 <!-- e.g. This will save us 2 hours per week of manual effort by an engineer -->
 - 
 
-### Additional information and context 
-<!-- Add any other context or screenshots about the feature request here. -->
-<!-- If there is any technical detail on how to achieve please add it here. More detail allows us to prioritise better. -->
-
-
 ### Statement of Requirements 
 <!-- It's VERY IMPORTANT that these are populated. Add as many as you can. -->
 <!-- This forms checklist of things that the we can check off to determine if the work completed satisfies this request. --> 
 
 - [ ] <!-- e.g. Must do A for this to be complete -->
 - [ ] <!-- e.g. Must do B for this to be complete -->
+
+
+<!-- ENFORCEMENT-END -->
+### Additional information and context 
+<!-- Add any other context or screenshots about the feature request here. -->
+<!-- If there is any technical detail on how to achieve please add it here. More detail allows us to prioritise better. -->
 
 
 ### How would you categorise this?

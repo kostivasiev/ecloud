@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\RouterAvailabilityZoneAttach;
-use App\Events\V2\RouterAvailabilityZoneDetach;
+use App\Events\V2\FirewallPolicy\Saved;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Gateway;
+use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
+use App\Models\V2\Network;
 use App\Models\V2\Router;
-use App\Resources\V2\AvailabilityZoneResource;
+use App\Models\V2\Vpn;
+use App\Resources\V2\FirewallRuleResource;
+use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
+use App\Resources\V2\VpnResource;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -22,7 +26,7 @@ class RouterController extends BaseController
 {
     /**
      * Get routers collection
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -39,7 +43,7 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $routerId
      * @return RouterResource
      */
@@ -51,95 +55,130 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateRouterRequest $request
+     * @param CreateRouterRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateRouterRequest $request)
     {
-        $router = new Router($request->only(['name', 'vpc_id']));
+        $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $router->save();
-        $router->refresh();
         return $this->responseIdMeta($request, $router->getKey(), 201);
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateRouterRequest $request
+     * @param UpdateRouterRequest $request
      * @param string $routerId
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateRouterRequest $request, string $routerId)
     {
         $router = Router::forUser(app('request')->user)->findOrFail($routerId);
-        $router->fill($request->only(['name', 'vpc_id']));
+        $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $router->save();
         return $this->responseIdMeta($request, $router->getKey(), 200);
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $routerUuid
+     * @param Request $request
+     * @param string $routerId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $routerId)
     {
-        Router::forUser($request->user)->findOrFail($routerId)->delete();
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+        try {
+            $router->delete();
+        } catch (\Exception $e) {
+            return $router->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 
-    public function availabilityZones(Request $request, string $routerId, QueryTransformer $queryTransformer)
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $routerId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        $collection = Router::forUser($request->user)->findOrFail($routerId)->availabilityZones()->query();
-        $queryTransformer->config(AvailabilityZone::class)->transform($collection);
-        return AvailabilityZoneResource::collection($collection->paginate(
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->vpns();
+        $queryTransformer->config(Vpn::class)
+            ->transform($collection);
+
+        return VpnResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
-    public function availabilityZonesAttach(Request $request, string $routerId, string $availabilityZonesId)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
-        $router = Router::forUser($request->user)->findOrFail($routerId);
-        $router->availabilityZones()->attach($availabilityZone->id);
-        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
-        return response()->json([], 204);
-    }
-
-    public function availabilityZonesDetach(Request $request, string $routerUuid, string $availabilityZonesId)
-    {
-        $availabilityZone = AvailabilityZone::findOrFail($availabilityZonesId);
-        $router = Router::forUser($request->user)->findOrFail($routerUuid);
-        $router->availabilityZones()->detach($availabilityZone->id);
-        event(new RouterAvailabilityZoneDetach($router, $availabilityZone));
-        return response()->json([], 204);
-    }
-
     /**
-     * Associate a gateway with a router
      * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $routerId
-     * @param string $gatewayId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function gatewaysAttach(Request $request, string $routerId, string $gatewayId)
+    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        $router = Router::forUser($request->user)->findOrFail($routerId);
-        $gateway = Gateway::findOrFail($gatewayId);
-        $router->gateways()->attach($gateway->id);
-        return response()->json([], 204);
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->firewallRules();
+        $queryTransformer->config(FirewallRule::class)
+            ->transform($collection);
+
+        return FirewallRuleResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 
     /**
-     * Remove Association between Gateway and Router
      * @param \Illuminate\Http\Request $request
-     * @param string $routerUuid
-     * @param string $gatewaysUuid
-     * @return \Illuminate\Http\JsonResponse
+     * @param QueryTransformer $queryTransformer
+     * @param string $routerId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function gatewaysDetach(Request $request, string $routerUuid, string $gatewaysUuid)
+    public function networks(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        $router = Router::forUser($request->user)->findOrFail($routerUuid);
-        $gateway = Gateway::findOrFail($gatewaysUuid);
-        $router->gateways()->detach($gateway->id);
-        return response()->json([], 204);
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->networks();
+        $queryTransformer->config(Network::class)
+            ->transform($collection);
+
+        return NetworkResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param Request $request
+     * @param string $routerId
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     * @throws \Exception
+     */
+    public function configureDefaults(Request $request, string $routerId)
+    {
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+
+        Model::withoutEvents(function () use ($router) {
+            foreach (config('firewall.policies') as $policy) {
+                $firewallPolicy = new FirewallPolicy();
+                $firewallPolicy::addCustomKey($firewallPolicy);
+                $firewallPolicy->fill($policy);
+                $firewallPolicy->router_id = $router->getKey();
+                $firewallPolicy->save();
+
+                foreach ($policy['rules'] as $rule) {
+                    $firewallRule = $firewallPolicy->firewallRules()->make($rule);
+                    $firewallRule::addCustomKey($firewallRule);
+                    $firewallRule->save();
+
+                    foreach ($rule['ports'] as $port) {
+                        $firewallRulePort = $firewallRule->firewallRulePorts()->make($port);
+                        $firewallRulePort::addCustomKey($firewallRulePort);
+                        $firewallRulePort->name = $firewallRulePort->getKey();
+                        $firewallRulePort->save();
+                    }
+                }
+                event(new Saved($firewallPolicy));
+            }
+        });
+
+        return response(null, 202);
     }
 }

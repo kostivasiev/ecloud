@@ -1,14 +1,13 @@
 <?php
 
-namespace Tests\Hostsets;
+namespace Tests\V1\HostSets;
 
-use App\Models\V1\Storage;
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
-use App\Models\V1\Solution;
 use App\Models\V1\Pod;
 use App\Models\V1\San;
+use App\Models\V1\Solution;
+use App\Models\V1\Storage;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -32,8 +31,8 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write'
         ])->seeStatusCode(404)->seeJson([
-                'title' => 'SAN not found',
-                'detail' => "No SANS are available on the solution's pod"
+            'title' => 'SAN not found',
+            'detail' => "No SANS are available on the solution's pod"
         ]);
     }
 

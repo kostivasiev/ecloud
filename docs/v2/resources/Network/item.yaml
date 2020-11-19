@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+    - $ref: '../../resources/Network/parameters/networkId.yaml'
   responses:
     200:
       description: success
@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/Network'
+                $ref: '../../components/schemas/network.yaml'
               meta:
                 type: object
   tags:
@@ -18,7 +18,7 @@ get:
 
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+    - $ref: '../../resources/Network/parameters/networkId.yaml'
   requestBody:
     required: true
     content:
@@ -26,24 +26,22 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/Network"
+            - $ref: '../../components/schemas/network.yaml'
             - type: object
               properties:
                 name:
                   required: false
                 router_id:
                   required: false
-                availability_zone_id:
-                  required: false
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/NetworksIdResponse'
+      $ref: '../../resources/Network/responses/idResponse.yaml'
   tags:
     - Networks
 
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkId'
+    - $ref: '../../resources/Network/parameters/networkId.yaml'
   responses:
     204:
       description: Success

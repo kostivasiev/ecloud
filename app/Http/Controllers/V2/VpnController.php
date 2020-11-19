@@ -16,8 +16,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class VpnController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -35,7 +35,7 @@ class VpnController extends BaseController
     /**
      * @param Request $request
      * @param string $vpnId
-     * @return \App\Resources\V2\VpnResource
+     * @return VpnResource
      */
     public function show(Request $request, string $vpnId)
     {
@@ -45,26 +45,26 @@ class VpnController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateVpnRequest $request
+     * @param CreateVpnRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateVpnRequest $request)
     {
-        $vpns = new Vpn($request->only(['router_id', 'availability_zone_id']));
+        $vpns = new Vpn($request->only(['router_id']));
         $vpns->save();
         $vpns->refresh();
         return $this->responseIdMeta($request, $vpns->getKey(), 201);
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateVpnRequest $request
+     * @param UpdateVpnRequest $request
      * @param string $vpnId
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateVpnRequest $request, string $vpnId)
     {
         $vpns = Vpn::forUser(app('request')->user)->findOrFail($vpnId);
-        $vpns->fill($request->only(['router_id', 'availability_zone_id']));
+        $vpns->fill($request->only(['router_id']));
         $vpns->save();
         return $this->responseIdMeta($request, $vpns->getKey(), 200);
     }

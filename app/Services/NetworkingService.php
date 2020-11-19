@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Exception\RequestException;
-
 use App\Exceptions\V1\NetworkingServiceException;
+use GuzzleHttp\Exception\RequestException;
 
 class NetworkingService
 {
@@ -20,8 +19,8 @@ class NetworkingService
         $this->client = $httpClient;
 
         $this->headers = [
-            'User-Agent' => 'service-'.env('APP_NAME').'/1.0',
-            'Accept'     => 'application/json',
+            'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
+            'Accept' => 'application/json',
             'X-consumer-custom-id' => '0-0',
         ];
     }
@@ -34,7 +33,7 @@ class NetworkingService
     public function getFirewallConfig($firewallId)
     {
         try {
-            $response = $this->request('GET', '/v1/firewalls/'.$firewallId.'/config');
+            $response = $this->request('GET', '/v1/firewalls/' . $firewallId . '/config');
         } catch (RequestException $exception) {
 //            $response = $exception->getResponse();
 //            $data = $this->parseResponseData($response->getBody()->getContents());
@@ -45,12 +44,12 @@ class NetworkingService
 //            }
 //
 //            throw new NetworkingServiceException($exception_msg, null, $response->getStatusCode());
-            throw new NetworkingServiceException('Failed to load config for firewall #'.$firewallId.'', null, 502);
+            throw new NetworkingServiceException('Failed to load config for firewall #' . $firewallId . '', null, 502);
         }
 
         if ($response->getStatusCode() !== 200) {
             throw new NetworkingServiceException(
-                'Failed to load config for firewall #'.$firewallId.'',
+                'Failed to load config for firewall #' . $firewallId . '',
                 null,
                 $response->getStatusCode()
             );
@@ -78,8 +77,8 @@ class NetworkingService
         return $this->response = $this->client->request($method, $endpoint, array_merge_recursive([
             'debug' => false,
             'headers' => [
-                'User-Agent' => 'service-'.env('APP_NAME').'/1.0',
-                'Accept'     => 'application/json',
+                'User-Agent' => 'service-' . env('APP_NAME') . '/1.0',
+                'Accept' => 'application/json',
                 'X-consumer-custom-id' => '0-0',
             ]
         ], $options));

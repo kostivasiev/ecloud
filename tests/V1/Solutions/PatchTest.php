@@ -1,14 +1,13 @@
 <?php
 
-namespace Tests\Solutions;
+namespace Tests\V1\Solutions;
 
 use App\Events\V1\EncryptionEnabledOnSolutionEvent;
-use Illuminate\Support\Facades\Event;
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use App\Models\V1\Solution;
 use App\Models\V1\Tag;
+use Illuminate\Support\Facades\Event;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class PatchTest extends TestCase
 {
@@ -31,7 +30,7 @@ class PatchTest extends TestCase
             'ucs_reseller_id' => 123,
         ]);
 
-        
+
         $this->missingFromDatabase('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_solution_name' => $testString,

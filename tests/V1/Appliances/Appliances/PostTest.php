@@ -1,12 +1,9 @@
 <?php
 
-namespace Tests\Appliances\Appliances;
-
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\Appliances\Appliances;
 
 use App\Models\V1\Appliance;
-
+use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\ApplianceTestCase;
 
 class PostTest extends ApplianceTestCase

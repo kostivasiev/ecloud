@@ -1,0 +1,18 @@
+description: Success
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: fwp-4f22694
+        meta:
+          type: object
+          properties:
+            location:
+              type: string
+              example: 'https://api.ukfast.io/ecloud/v2/firewall-policies/fwp-4f22694'

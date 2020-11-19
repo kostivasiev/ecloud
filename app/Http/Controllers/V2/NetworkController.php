@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateNetworkRequest;
-use App\Http\Requests\V2\UpdateNetworkRequest;
+use App\Http\Requests\V2\Network\CreateRequest;
+use App\Http\Requests\V2\Network\UpdateRequest;
 use App\Models\V2\Network;
+use App\Models\V2\Nic;
 use App\Resources\V2\NetworkResource;
+use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -16,8 +18,8 @@ use UKFast\DB\Ditto\QueryTransformer;
 class NetworkController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \UKFast\DB\Ditto\QueryTransformer $queryTransformer
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
@@ -34,7 +36,7 @@ class NetworkController extends BaseController
     /**
      * @param Request $request
      * @param string $networkId
-     * @return \App\Resources\V2\NetworkResource
+     * @return NetworkResource
      */
     public function show(Request $request, string $networkId)
     {
@@ -44,13 +46,15 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateNetworkRequest $request
+     * @param CreateRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateNetworkRequest $request)
+    public function create(CreateRequest $request)
     {
         $network = new Network($request->only([
-            'router_id', 'availability_zone_id',  'name'
+            'router_id',
+            'name',
+            'subnet',
         ]));
         $network->save();
         $network->refresh();
@@ -58,15 +62,17 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateNetworkRequest $request
+     * @param UpdateRequest  $request
      * @param string $networkId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateNetworkRequest $request, string $networkId)
+    public function update(UpdateRequest $request, string $networkId)
     {
         $network = Network::forUser(app('request')->user)->findOrFail($networkId);
         $network->fill($request->only([
-            'router_id', 'availability_zone_id',  'name'
+            'router_id',
+            'name',
+            'subnet',
         ]));
         $network->save();
         return $this->responseIdMeta($request, $network->getKey(), 200);
@@ -81,7 +87,28 @@ class NetworkController extends BaseController
     public function destroy(Request $request, string $networkId)
     {
         $network = Network::forUser($request->user)->findOrFail($networkId);
-        $network->delete();
+        try {
+            $network->delete();
+        } catch (\Exception $e) {
+            return $network->getDeletionError($e);
+        }
         return response()->json([], 204);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function nics(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    {
+        $collection = Network::forUser($request->user)->findOrFail($zoneId)->nics();
+        $queryTransformer->config(Nic::class)
+            ->transform($collection);
+
+        return NicResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

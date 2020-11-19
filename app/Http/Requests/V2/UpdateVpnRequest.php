@@ -37,7 +37,6 @@ class UpdateVpnRequest extends FormRequest
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class)
             ],
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
 
@@ -49,7 +48,7 @@ class UpdateVpnRequest extends FormRequest
     public function messages()
     {
         return [
-            'router_id.required'            => 'The :attribute field, when specified, cannot be null',
+            'router_id.required' => 'The :attribute field, when specified, cannot be null',
             'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }

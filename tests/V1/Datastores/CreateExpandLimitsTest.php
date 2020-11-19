@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Datastores;
+namespace Tests\V1\Datastores;
 
 use App\Datastore\Status;
 use App\Models\V1\Datastore;
@@ -23,7 +23,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 1,
+            'capacity' => 1,
         ]);
         $validator = $this->getValidationFactory()
             ->make(
@@ -37,7 +37,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 0,
+            'capacity' => 0,
         ]);
         $validator = $this->getValidationFactory()
             ->make(
@@ -51,7 +51,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 16000,
+            'capacity' => 16000,
         ]);
         $validator = $this->getValidationFactory()
             ->make(
@@ -65,7 +65,7 @@ class CreateExpandLimitsTest extends TestCase
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
-            'capacity'    => 16001,
+            'capacity' => 16001,
         ]);
         $validator = $this->getValidationFactory()
             ->make(
@@ -142,7 +142,7 @@ class CreateExpandLimitsTest extends TestCase
 
     /**
      * This time valid minimum of 2, but we'll make that less than the current datastore's lun value.
-     * @throws \UKFast\Api\Exceptions\ForbiddenException
+     * @throws ForbiddenException
      */
     public function testExpandInvalidMinCapacityReturnsException()
     {
@@ -170,7 +170,7 @@ class CreateExpandLimitsTest extends TestCase
      * Create a request object
      * @param string $method
      * @param array $params
-     * @return \Illuminate\Http\Request
+     * @return Request
      */
     public function getRequest(string $method, array $params)
     {

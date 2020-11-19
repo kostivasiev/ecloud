@@ -3,18 +3,18 @@
 namespace App\Models\V1;
 
 use App\Models\V1\Pod\Location;
+use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Devices\AdminClient;
 use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\Api\Resource\Property\IntProperty;
+use UKFast\Api\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
-use UKFast\DB\Ditto\Filter;
-use GuzzleHttp\Client;
 use UKFast\SDK\Page;
 
 class Host extends Model implements Filterable, Sortable
@@ -224,7 +224,7 @@ class Host extends Model implements Filterable, Sortable
             ->pluck('ucs_specification_name')
             ->first();
 
-        return intval(substr($specificationName, strpos($specificationName, '--')+2));
+        return intval(substr($specificationName, strpos($specificationName, '--') + 2));
     }
 
     /**
@@ -304,7 +304,7 @@ class Host extends Model implements Filterable, Sortable
     {
         $fcwwns = [];
         for ($i = 0; $i < 4; $i++) {
-            $wwn = 'ucs_node_fc'. $i .'_wwpn';
+            $wwn = 'ucs_node_fc' . $i . '_wwpn';
             if (!empty($this->$wwn)) {
                 $fcwwns[] = $this->$wwn;
             }

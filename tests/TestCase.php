@@ -2,12 +2,9 @@
 
 namespace Tests;
 
-use App\Listeners\V2\DhcpCreate;
-use App\Models\V1\Datastore;
-use App\Models\V2\Dhcp;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use App\Models\V2\Network;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Lumen\Application;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
@@ -26,25 +23,51 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         parent::setUp();
 
-        // Do not dispatch default ORM events on the following models, otherwise deployments will happen
-        Datastore::flushEventListeners();
-        Router::flushEventListeners();
-        Dhcp::flushEventListeners();
+        Event::fake([
+            // V1 hack
+            \App\Events\V1\DatastoreCreatedEvent::class,
 
-        // Forget Vpc event listeners
-        $vpcDispatcher = Vpc::getEventDispatcher();
-        $vpcDispatcher->forget(DhcpCreate::class);
-        Vpc::setEventDispatcher($vpcDispatcher);
-        Network::flushEventListeners();
+            // Created
+            \App\Events\V2\AvailabilityZone\Created::class,
+            \App\Events\V2\Dhcp\Created::class,
+            \App\Events\V2\Instance\Created::class,
+            \App\Events\V2\Network\Created::class,
+            \App\Events\V2\Router\Created::class,
+            \App\Events\V2\Vpc\Created::class,
+            \App\Events\V2\FloatingIp\Created::class,
+            \App\Events\V2\Nat\Created::class,
+
+            // Deleted
+            \App\Events\V2\Nat\Deleted::class,
+            \App\Events\V2\FirewallRule\Deleted::class,
+            \App\Events\V2\FirewallPolicy\Deleted::class,
+            \App\Events\V2\Vpc\Deleted::class,
+            \App\Events\V2\Dhcp\Deleted::class,
+            \App\Events\V2\Nic\Deleted::class,
+            \App\Events\V2\FirewallRulePort\Deleted::class,
+
+            // Updated
+            \App\Events\V2\Volume\Updated::class,
+
+            // Saved
+            \App\Events\V2\FirewallRule\Saved::class,
+            \App\Events\V2\FirewallPolicy\Saved::class,
+            \App\Events\V2\Router\Saved::class,
+            \App\Events\V2\Nat\Saved::class,
+            \App\Events\V2\FirewallRulePort\Saved::class,
+
+            // Deploy
+            \App\Events\V2\Instance\Deploy::class,
+        ]);
     }
 
     /**
      * Creates the application.
      *
-     * @return \Laravel\Lumen\Application
+     * @return Application
      */
     public function createApplication()
     {
-        return require __DIR__.'/../bootstrap/app.php';
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 }

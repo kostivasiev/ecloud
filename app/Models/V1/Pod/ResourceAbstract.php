@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models\V1\Pod;
 
 use App\Traits\V1\UUIDHelper;

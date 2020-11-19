@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Appliances\AppplianceVersions;
+namespace Tests\V1\Appliances\ApplianceVersions;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\AppliancePodAvailability;
@@ -34,7 +34,7 @@ class DeleteTest extends ApplianceTestCase
 
         $this->assertNull($applianceVersion->deleted_at);
 
-        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid , [], $this->validWriteHeaders);
+        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validWriteHeaders);
 
         $this->assertResponseStatus(204);
 
@@ -52,7 +52,7 @@ class DeleteTest extends ApplianceTestCase
     {
         $applianceVersion = $this->appliances[0]->getLatestVersion();
 
-        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid , [], $this->validReadHeaders);
+        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validReadHeaders);
 
         $this->assertResponseStatus(403);
     }

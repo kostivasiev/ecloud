@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../resources/Nic/parameters/nicId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/nic.yaml'
+              meta:
+                type: object
+  tags:
+    - Nics

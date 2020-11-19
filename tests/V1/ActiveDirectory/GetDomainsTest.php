@@ -1,11 +1,10 @@
 <?php
 
-namespace Tests\Domains;
-
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\ActiveDirectory;
 
 use App\Models\V1\ActiveDirectoryDomain;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetDomainsTest extends TestCase
 {

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\V1;
 
-use UKFast\Api\Exceptions\NotFoundException;
 use App\Models\V1\ActiveDirectoryDomain;
-use UKFast\DB\Ditto\QueryTransformer;
-use UKFast\Api\Resource\Traits\ResponseHelper;
-use UKFast\Api\Resource\Traits\RequestHelper;
 use Illuminate\Http\Request;
+use UKFast\Api\Exceptions\NotFoundException;
+use UKFast\Api\Resource\Traits\RequestHelper;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class ActiveDirectoryDomainController extends BaseController
 {

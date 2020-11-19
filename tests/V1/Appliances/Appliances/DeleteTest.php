@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Appliances\Appliances;
+namespace Tests\V1\Appliances\Appliances;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\ApplianceTestCase;
@@ -33,7 +33,7 @@ class DeleteTest extends ApplianceTestCase
 
         $this->assertNull($applianceVersion->deleted_at);
 
-        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid , [], $this->validWriteHeaders);
+        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validWriteHeaders);
 
         $this->assertResponseStatus(204);
 
@@ -56,7 +56,7 @@ class DeleteTest extends ApplianceTestCase
     {
         $appliance = $this->appliances[0];
 
-        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid , [], $this->validReadHeaders);
+        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
 
         $this->assertResponseStatus(403);
     }

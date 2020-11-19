@@ -1,8 +1,7 @@
 <?php
+
 namespace Tests\V2\Router\EventTests;
 
-use App\Events\V2\NetworkCreated;
-use App\Events\V2\RouterCreated;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -28,16 +27,15 @@ class RouterNetworkCreatedTest extends TestCase
     {
         Event::fake();
 
-        $availabilityZone = $this->getAvailabilityZone();
         $router = $this->getRouter();
-        $network = $this->getNetwork($availabilityZone, $router);
+        $network = $this->getNetwork($router);
 
-        Event::assertDispatched(RouterCreated::class, function ($event) use ($router) {
-            return $event->router->id === $router->id;
+        Event::assertDispatched(\App\Events\V2\Router\Created::class, function ($event) use ($router) {
+            return $event->model->id === $router->id;
         });
 
-        Event::assertDispatched(NetworkCreated::class, function ($event) use ($network) {
-            return $event->network->id === $network->id;
+        Event::assertDispatched(\App\Events\V2\Network\Created::class, function ($event) use ($network) {
+            return $event->model->id === $network->id;
         });
     }
 
@@ -47,28 +45,28 @@ class RouterNetworkCreatedTest extends TestCase
 
         $router = $this->getRouter();
 
-        Event::assertDispatched(RouterCreated::class, function ($event) use ($router) {
-            return $event->router->id === $router->id;
+        Event::assertDispatched(\App\Events\V2\Router\Created::class, function ($event) use ($router) {
+            return $event->model->id === $router->id;
         });
 
-        Event::assertNotDispatched(NetworkCreated::class);
+        Event::assertNotDispatched(\App\Events\V2\Network\Created::class);
 
     }
 
     /**
-     * @return \App\Models\V2\AvailabilityZone
+     * @return AvailabilityZone
      */
     public function getAvailabilityZone(): AvailabilityZone
     {
         return factory(AvailabilityZone::class, 1)
             ->create([
-            'id' => 'az-1234abcd',
-        ])
+                'id' => 'az-1234abcd',
+            ])
             ->first();
     }
 
     /**
-     * @return \App\Models\V2\Router
+     * @return Router
      */
     public function getRouter(): Router
     {
@@ -80,16 +78,14 @@ class RouterNetworkCreatedTest extends TestCase
     }
 
     /**
-     * @param \App\Models\V2\AvailabilityZone $availabilityZone
-     * @param \App\Models\V2\Router|null $router
-     * @return \App\Models\V2\Network
+     * @param Router|null $router
+     * @return Network
      */
-    public function getNetwork(AvailabilityZone $availabilityZone, ?Router $router = null): Network
+    public function getNetwork(?Router $router = null): Network
     {
         $network = factory(Network::class, 1)->create([
-            'id'   => 'net-1234abcd',
+            'id' => 'net-1234abcd',
             'name' => 'net-1234abcd',
-            'availability_zone_id' => $availabilityZone->id,
         ])
             ->first();
         if (!is_null($router)) {

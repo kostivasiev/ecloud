@@ -1,11 +1,10 @@
 <?php
 
-namespace Tests\PublicSupport;
-
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\PublicSupport;
 
 use App\Models\V1\PublicSupport;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -36,7 +35,7 @@ class GetTest extends TestCase
     {
         $item = factory(PublicSupport::class)->create();
 
-        $this->get('/v1/support/'.$item->getKey(), [
+        $this->get('/v1/support/' . $item->getKey(), [
             'X-consumer-custom-id' => '0-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
@@ -62,7 +61,7 @@ class GetTest extends TestCase
     {
         $item = factory(PublicSupport::class)->create();
 
-        $this->get('/v1/support/'.$item->getKey(), [
+        $this->get('/v1/support/' . $item->getKey(), [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);

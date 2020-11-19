@@ -3,9 +3,10 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -13,19 +14,28 @@ class GetTest extends TestCase
 
     protected $faker;
 
+    protected $availabilityZones;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
+
+        $region = factory(Region::class)->create();
+        $this->availabilityZones = factory(AvailabilityZone::class, 2)->create([
+            'region_id' => $region->getKey(),
+            'name' => $this->faker->city(),
+            'is_public' => false,
+        ]);
     }
 
-    public function testGetCollection()
+
+    public function testGetCollectionAsAdmin()
     {
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Region 1',
-            'datacentre_site_id' => 1,
-        ]);
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = true;
+        $availabilityZone->save();
+
         $this->get(
             '/v2/availability-zones',
             [
@@ -34,21 +44,20 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $availabilityZone->id,
-                'code'       => $availabilityZone->code,
-                'name'       => $availabilityZone->name,
-                'datacentre_site_id'    => $availabilityZone->datacentre_site_id,
+                'id' => $this->availabilityZones->first()->getKey(),
+                'name' => $this->availabilityZones->first()->name,
             ])
             ->assertResponseStatus(200);
+
+        $this->assertCount(2, $this->response->original);
     }
 
-    public function testGetCollectionNonAdminPropertiesHidden()
+    public function testGetCollectionAsNonAdmin()
     {
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Region 1',
-            'datacentre_site_id' => 1,
-        ]);
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = true;
+        $availabilityZone->save();
+
         $this->get(
             '/v2/availability-zones',
             [
@@ -57,10 +66,109 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $availabilityZone->id,
-                'code'       => $availabilityZone->code,
-                'name'       => $availabilityZone->name,
-                'datacentre_site_id'    => $availabilityZone->datacentre_site_id,
+                'id' => $this->availabilityZones->first()->getKey(),
+                'name' => $this->availabilityZones->first()->name,
+            ])
+            ->assertResponseStatus(200);
+
+        $this->assertCount(1, $this->response->original);
+    }
+
+    public function testGetPublicAvailabilityZoneAsAdmin()
+    {
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = true;
+        $availabilityZone->save();
+
+        $this->get(
+            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $availabilityZone->getKey(),
+                'name' => $availabilityZone->name,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testGetPublicAvailabilityZoneAsNonAdmin()
+    {
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = true;
+        $availabilityZone->save();
+
+        $this->get(
+            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $availabilityZone->getKey(),
+                'name' => $availabilityZone->name,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testGetPrivateAvailabilityZoneAsAdmin()
+    {
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = false;
+        $availabilityZone->save();
+
+        $this->get(
+            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $availabilityZone->getKey(),
+                'name' => $availabilityZone->name,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testGetPrivateAvailabilityZoneAsNonAdmin()
+    {
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = false;
+        $availabilityZone->save();
+
+        $this->get(
+            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->assertResponseStatus(404);
+    }
+
+    public function testGetCollectionNonAdminPropertiesHidden()
+    {
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = true;
+        $availabilityZone->save();
+
+        $this->get(
+            '/v2/availability-zones',
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $availabilityZone->id,
+                'code' => $availabilityZone->code,
+                'name' => $availabilityZone->name,
+                'datacentre_site_id' => $availabilityZone->datacentre_site_id,
+                'region_id' => $availabilityZone->region_id
             ])
             ->dontSeeJson([
                 'is_public' => true
@@ -68,36 +176,12 @@ class GetTest extends TestCase
             ->assertResponseStatus(200);
     }
 
-    public function testGetItemDetail()
-    {
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Region 1',
-            'datacentre_site_id' => 1,
-        ]);
-        $this->get(
-            '/v2/availability-zones/' . $availabilityZone->getKey(),
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'id'         => $availabilityZone->id,
-                'code'       => $availabilityZone->code,
-                'name'       => $availabilityZone->name,
-                'datacentre_site_id' => $availabilityZone->datacentre_site_id,
-            ])
-            ->assertResponseStatus(200);
-    }
-
     public function testGetItemDetailNonAdminPropertiesHidden()
     {
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'code'    => 'MAN1',
-            'name'    => 'Manchester Region 1',
-            'datacentre_site_id' => 1,
-        ]);
+        $availabilityZone = $this->availabilityZones->first();
+        $availabilityZone->is_public = true;
+        $availabilityZone->save();
+
         $this->get(
             '/v2/availability-zones/' . $availabilityZone->getKey(),
             [
@@ -106,10 +190,11 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'         => $availabilityZone->id,
-                'code'       => $availabilityZone->code,
-                'name'       => $availabilityZone->name,
+                'id' => $availabilityZone->id,
+                'code' => $availabilityZone->code,
+                'name' => $availabilityZone->name,
                 'datacentre_site_id' => $availabilityZone->datacentre_site_id,
+                'region_id' => $availabilityZone->region_id
             ])
             ->dontSeeJson([
                 'is_public' => true

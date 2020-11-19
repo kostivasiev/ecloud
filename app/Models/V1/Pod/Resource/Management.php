@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models\V1\Pod\Resource;
 
 use App\Models\V1\Pod\ResourceAbstract;

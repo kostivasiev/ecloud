@@ -1,15 +1,14 @@
 <?php
 
-namespace Tests\Hosts;
-
-use App\Models\V1\Storage;
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\Hosts;
 
 use App\Models\V1\Host;
-use App\Models\V1\Solution;
 use App\Models\V1\Pod;
 use App\Models\V1\San;
+use App\Models\V1\Solution;
+use App\Models\V1\Storage;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
@@ -53,13 +52,13 @@ class CreateTest extends TestCase
             'ucs_node_ucs_reseller_id' => $solution->getKey()
         ])->first();
 
-       $this->json('POST', '/v1/hosts/' . $host->getKey() . '/create', [], [
+        $this->json('POST', '/v1/hosts/' . $host->getKey() . '/create', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeStatusCode(404)->seeJson([
-           'title' => 'SAN not found',
-           'detail' => "No SANS are found on the solution's pod"
-       ]);
+            'title' => 'SAN not found',
+            'detail' => "No SANS are found on the solution's pod"
+        ]);
     }
 
     /**

@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\RouterAvailabilityZoneAttach;
-use App\Http\Requests\V2\CreateVpcRequest;
-use App\Http\Requests\V2\UpdateVpcRequest;
+use App\Http\Requests\V2\Vpc\CreateRequest;
+use App\Http\Requests\V2\Vpc\UpdateRequest;
+use App\Models\V2\Instance;
+use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
+use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use App\Resources\V2\InstanceResource;
+use App\Resources\V2\LoadBalancerClusterResource;
+use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -18,7 +23,7 @@ use UKFast\DB\Ditto\QueryTransformer;
 class VpcController extends BaseController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -34,7 +39,7 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $vpcId
      * @return VpcResource
      */
@@ -46,23 +51,23 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \App\Http\Requests\V2\CreateVpcRequest $request
+     * @param CreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateVpcRequest $request)
+    public function create(CreateRequest $request)
     {
-        $virtualPrivateClouds = new Vpc($request->only(['name', 'region_id']));
-        $virtualPrivateClouds->reseller_id = $this->resellerId;
-        $virtualPrivateClouds->save();
-        return $this->responseIdMeta($request, $virtualPrivateClouds->getKey(), 201);
+        $vpc = new Vpc($request->only(['name', 'region_id']));
+        $vpc->reseller_id = $this->resellerId;
+        $vpc->save();
+        return $this->responseIdMeta($request, $vpc->getKey(), 201);
     }
 
     /**
-     * @param \App\Http\Requests\V2\UpdateVpcRequest $request
+     * @param UpdateRequest $request
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateVpcRequest $request, string $vpcId)
+    public function update(UpdateRequest $request, string $vpcId)
     {
         $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
@@ -76,20 +81,75 @@ class VpcController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $vpcId)
     {
-        Vpc::forUser($request->user)->findOrFail($vpcId)->delete();
+        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        try {
+            $vpc->delete();
+        } catch (\Exception $e) {
+            return $vpc->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
      * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
+     */
+    public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    {
+        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->volumes();
+        $queryTransformer->config(Volume::class)
+            ->transform($collection);
+
+        return VolumeResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $vpcId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function instances(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    {
+        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->instances();
+        $queryTransformer->config(Instance::class)
+            ->transform($collection);
+
+        return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $vpcId
+     */
+    public function lbcs(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    {
+        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->loadBalancerClusters();
+        $queryTransformer->config(LoadBalancerCluster::class)
+            ->transform($collection);
+
+        return LoadBalancerClusterResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param Request $request
+     * @param string $vpcId
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
     public function deployDefaults(Request $request, string $vpcId)
@@ -100,23 +160,21 @@ class VpcController extends BaseController
 
         // Create a new router
         $router = $vpc->routers()->create();
-        $router->availabilityZones()->attach($availabilityZone);
+        $router->availabilityZone()->associate($availabilityZone);
         $router->save();
 
         // Create a new network
-        $network = Network::withoutEvents(function () {
-            $instance = new Network();
-            $instance::addCustomKey($instance);
-            $instance->name = $instance->id;
-            return $instance;
+        Network::withoutEvents(function () use ($router) {
+            $network = new Network();
+            $network::addCustomKey($network);
+            $network->name = $network->id;
+            $network->router()->associate($router);
+            $network->save();
         });
-        $network->availabilityZone()->associate($availabilityZone);
-        $network->router()->associate($router);
-        $network->save();
 
         // Deploy router and network
-        event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
+        //event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
 
-        return response()->json([], 202);
+        return response(null, 202);
     }
 }

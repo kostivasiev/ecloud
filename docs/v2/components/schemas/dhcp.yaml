@@ -8,6 +8,10 @@ properties:
     required: true
     example: 'vpc-2b66bb79'
     readOnly: false
+  availability_zone_id:
+    type: string
+    required: false
+    example: 'az-2b66bb79'
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
@@ -17,4 +21,4 @@ properties:
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
 description: 'Dhcps'
-required: {  }
+required: { }

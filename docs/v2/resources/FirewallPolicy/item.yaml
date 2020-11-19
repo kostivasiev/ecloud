@@ -1,0 +1,48 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallPolicyId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/FirewallPolicy'
+              meta:
+                type: object
+  tags:
+    - Firewall Policies
+patch:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallPolicyId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../public-openapi.yaml#/components/schemas/FirewallPolicy"
+            - type: object
+              properties:
+                name:
+                  required: false
+                router_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../public-openapi.yaml#/components/responses/FirewallPolicyIdResponse'
+  tags:
+    - Firewall Policies
+delete:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallPolicyId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Firewall Policies
+

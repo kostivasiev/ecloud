@@ -2,9 +2,11 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\DhcpCreated;
-use App\Events\V2\VpcCreated;
+use App\Events\V2\Dhcp\Created;
+use App\Events\V2\Dhcp\Creating;
+use App\Events\V2\Dhcp\Deleted;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultAvailabilityZone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -20,21 +22,23 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, DefaultAvailabilityZone;
 
     public $keyPrefix = 'dhcp';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
     protected $fillable = [
         'id',
         'vpc_id',
+        'availability_zone_id',
     ];
 
     protected $dispatchesEvents = [
-        'created' => DhcpCreated::class,
+        'creating' => Creating::class,
+        'created' => Created::class,
+        'deleted' => Deleted::class,
     ];
 
     public function vpc()
@@ -42,22 +46,28 @@ class Dhcp extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
+
     /**
-     * @param \UKFast\DB\Ditto\Factories\FilterFactory $factory
-     * @return array|\UKFast\DB\Ditto\Filter[]
+     * @param FilterFactory $factory
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
@@ -66,13 +76,14 @@ class Dhcp extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('vpc_id'),
+            $factory->create('availability_zone_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
     }
 
     /**
-     * @param \UKFast\DB\Ditto\Factories\SortFactory $factory
+     * @param SortFactory $factory
      * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
@@ -88,8 +99,9 @@ class Dhcp extends Model implements Filterable, Sortable
     public function databaseNames()
     {
         return [
-            'id'         => 'id',
-            'vpc_id'     => 'vpc_id',
+            'id' => 'id',
+            'vpc_id' => 'vpc_id',
+            'availability_zone_id' => 'availability_zone_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

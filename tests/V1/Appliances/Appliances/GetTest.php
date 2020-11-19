@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Appliances\Appliances;
+namespace Tests\V1\Appliances\Appliances;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\AppliancePodAvailability;
@@ -8,9 +8,7 @@ use App\Models\V1\ApplianceVersion;
 use App\Models\V1\Pod;
 use Illuminate\Http\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use Ramsey\Uuid\Uuid;
-
 use Tests\ApplianceTestCase;
 use Tests\V1\Appliance\Version\DataTest;
 
@@ -77,8 +75,8 @@ class GetTest extends ApplianceTestCase
         $parameters = $appliance->getLatestVersion()->parameters;
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/parameters', [], $this->validWriteHeaders)
-        ->seeStatusCode(200)
-        ->seeJson([
+            ->seeStatusCode(200)
+            ->seeJson([
                 'id' => $parameters[0]->uuid,
                 'version_id' => $parameters[0]->appliance_version_uuid,
                 'name' => $parameters[0]->name,
@@ -87,7 +85,7 @@ class GetTest extends ApplianceTestCase
                 'description' => $parameters[0]->description,
                 'required' => ($parameters[0]->required === 'Yes'),
                 'validation_rule' => $parameters[0]->validation_rule
-        ]);
+            ]);
     }
 
 
@@ -104,7 +102,7 @@ class GetTest extends ApplianceTestCase
             ->seeJson([
                 'id' => $version->uuid,
                 'appliance_id' => $version->appliance_uuid,
-                'version' => (int) $version->version,
+                'version' => (int)$version->version,
                 'script_template' => $version->script_template,
                 'vm_template' => $version->vm_template,
                 'active' => ($version->active == 'Yes')
@@ -125,7 +123,7 @@ class GetTest extends ApplianceTestCase
             ->seeJson([
                 'id' => $version->uuid,
                 'appliance_id' => $version->appliance_uuid,
-                'version' => (int) $version->version,
+                'version' => (int)$version->version,
                 'script_template' => $version->script_template,
                 'vm_template' => $version->vm_template,
                 'active' => ($version->active == 'Yes')

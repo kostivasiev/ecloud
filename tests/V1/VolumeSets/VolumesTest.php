@@ -1,16 +1,16 @@
 <?php
 
-namespace Tests\VolumeSets;
+namespace Tests\V1\VolumeSets;
 
-use Mockery;
-use App\Services\Artisan\V1\ArtisanService;
-use App\Models\V1\Solution;
 use App\Models\V1\Pod;
 use App\Models\V1\San;
+use App\Models\V1\Solution;
 use App\Models\V1\Storage;
 use App\Models\V1\VolumeSet;
-use Tests\TestCase;
+use App\Services\Artisan\V1\ArtisanService;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Mockery;
+use Tests\TestCase;
 
 class VolumesTest extends TestCase
 {
@@ -33,7 +33,7 @@ class VolumesTest extends TestCase
 
         $volumeSet = (factory(VolumeSet::class, 1)->create())->first();
 
-        app()->bind(ArtisanService::class, function() {
+        app()->bind(ArtisanService::class, function () {
             return app()->instance(ArtisanService::class, Mockery::mock(ArtisanService::class, function ($mock) {
                 $mock->shouldReceive('getVolumeSet')->andReturn((object)[
                     'name' => 'myMockVolumeSet',
@@ -84,7 +84,7 @@ class VolumesTest extends TestCase
 
         $volumeSet = (factory(VolumeSet::class, 1)->create())->first();
 
-        app()->bind(ArtisanService::class, function() {
+        app()->bind(ArtisanService::class, function () {
             return app()->instance(ArtisanService::class, Mockery::mock(ArtisanService::class, function ($mock) {
                 $mock->shouldReceive('getVolumeSet')->andReturn((object)[
                     'name' => 'myMockVolumeSet',

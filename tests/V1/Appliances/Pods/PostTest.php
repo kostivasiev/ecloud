@@ -1,10 +1,9 @@
 <?php
 
-namespace Tests\Appliances\Pods;
+namespace Tests\V1\Appliances\Pods;
 
 use App\Models\V1\AppliancePodAvailability;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-
 use Tests\ApplianceTestCase;
 
 class PostTest extends ApplianceTestCase
@@ -32,7 +31,7 @@ class PostTest extends ApplianceTestCase
 
         $this->seeInDatabase('appliance_pod_availability',
             [
-                'appliance_pod_availability_appliance_id' => (int) $this->appliances[1]->id
+                'appliance_pod_availability_appliance_id' => (int)$this->appliances[1]->id
             ],
             env('DB_ECLOUD_CONNECTION')
         );

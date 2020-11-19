@@ -2,46 +2,44 @@
 
 namespace Tests\V2\Router;
 
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
+    protected \Faker\Generator $faker;
+    protected $availability_zone;
+    protected $region;
+    protected $router;
+    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-    }
-
-    public function testFailInvalidId()
-    {
-        $this->delete(
-            '/v2/routers/' . $this->faker->uuid,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title'  => 'Not found',
-                'detail' => 'No Router with that ID was found',
-                'status' => 404,
-            ])
-            ->assertResponseStatus(404);
+        $this->region = factory(Region::class)->create();
+        $this->availability_zone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->getKey(),
+        ]);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+        ]);
     }
 
     public function testSuccessfulDelete()
     {
-        $router = factory(Router::class)->create();
         $this->delete(
-            '/v2/routers/' . $router->getKey(),
+            '/v2/routers/' . $this->router->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -49,7 +47,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $routerItem = Router::withTrashed()->findOrFail($router->getKey());
+        $routerItem = Router::withTrashed()->findOrFail($this->router->getKey());
         $this->assertNotNull($routerItem->deleted_at);
     }
 

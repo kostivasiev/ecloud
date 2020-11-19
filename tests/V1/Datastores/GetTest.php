@@ -1,12 +1,11 @@
 <?php
 
-namespace Tests\Datastores;
-
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\Datastores;
 
 use App\Models\V1\Datastore;
 use App\Models\V1\Pod;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GetTest extends TestCase
 {
@@ -86,7 +85,7 @@ class GetTest extends TestCase
         ])->first();
 
         // Backup
-        $clusterName = 'MCS_P'.$pod->getKey().'_VV_VMPUBLICSTORE_SSD_BACKUP';
+        $clusterName = 'MCS_P' . $pod->getKey() . '_VV_VMPUBLICSTORE_SSD_BACKUP';
         factory(Datastore::class, 1)->create([
             'reseller_lun_name' => $clusterName,
         ]);
@@ -97,7 +96,7 @@ class GetTest extends TestCase
         );
 
         // Non-Backup
-        $clusterName = 'MCS_P'.$pod->getKey().'_VV_VMPUBLICSTORE_SSD_NONBACKUP';
+        $clusterName = 'MCS_P' . $pod->getKey() . '_VV_VMPUBLICSTORE_SSD_NONBACKUP';
         factory(Datastore::class, 1)->create([
             'reseller_lun_name' => $clusterName,
         ]);

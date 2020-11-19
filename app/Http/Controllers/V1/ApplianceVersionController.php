@@ -9,19 +9,16 @@ use App\Exceptions\V1\InvalidJsonException;
 use App\Models\V1\ApplianceParameter;
 use App\Models\V1\ApplianceVersion;
 use App\Rules\V1\IsValidUuid;
+use Illuminate\Http\Request;
+use Mustache_Engine;
+use Mustache_Tokenizer;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
-use UKFast\DB\Ditto\QueryTransformer;
-
-use UKFast\Api\Resource\Traits\ResponseHelper;
 use UKFast\Api\Resource\Traits\RequestHelper;
-
-use Illuminate\Http\Request;
-
-use Mustache_Engine;
-use Mustache_Tokenizer;
+use UKFast\Api\Resource\Traits\ResponseHelper;
+use UKFast\DB\Ditto\QueryTransformer;
 
 class ApplianceVersionController extends BaseController
 {
@@ -147,7 +144,7 @@ class ApplianceVersionController extends BaseController
         if (!$this->isAdmin) {
             throw new ForbiddenException();
         }
-        
+
         // Validates request has correct JSON format
         if (empty($request->json()->all()) || empty($request->request->all())) {
             throw new InvalidJsonException("Invalid JSON. " . json_last_error_msg());
@@ -192,7 +189,7 @@ class ApplianceVersionController extends BaseController
         } catch (\Illuminate\Database\QueryException $exception) {
             // 23000 Error code (Integrity Constraint Violation: version already exists for this application)
             if ($exception->getCode() == 23000) {
-                $errorMessage .= ' Version \'' .$request->input('version');
+                $errorMessage .= ' Version \'' . $request->input('version');
                 $errorMessage .= '\' already exists for this appliance.';
                 throw new UnprocessableEntityException($errorMessage);
             }
@@ -242,7 +239,7 @@ class ApplianceVersionController extends BaseController
             if (!$applianceParameter->save()) {
                 $database->rollback();
                 throw new DatabaseException(
-                    'Failed to save Appliance version. Invalid parameter \''.$parameter['name'].'\''
+                    'Failed to save Appliance version. Invalid parameter \'' . $parameter['name'] . '\''
                 );
             }
         }
@@ -325,7 +322,7 @@ class ApplianceVersionController extends BaseController
         } catch (\Illuminate\Database\QueryException $exception) {
             // 23000 Error code (Integrity Constraint Violation: version already exists for this application)
             if ($exception->getCode() == 23000) {
-                $errorMessage .= ' Version \'' .$request->input('version');
+                $errorMessage .= ' Version \'' . $request->input('version');
                 $errorMessage .= '\' already exists for this appliance.';
                 throw new UnprocessableEntityException($errorMessage);
             }

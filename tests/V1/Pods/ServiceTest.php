@@ -1,11 +1,10 @@
 <?php
 
-namespace Tests\Pods;
-
-use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+namespace Tests\V1\Pods;
 
 use App\Models\V1\Pod;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class ServiceTest extends TestCase
 {
