@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../public-openapi.yaml#/components/schemas/Volume'
+                items:
+                  $ref: '../../public-openapi.yaml#/components/schemas/Volume'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
