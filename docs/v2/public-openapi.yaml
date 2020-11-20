@@ -28,8 +28,8 @@ components:
       $ref: 'components/schemas/network.yaml'
     Dhcp:
       $ref: 'components/schemas/dhcp.yaml'
-    Vpn:
-      $ref: 'components/schemas/vpn.yaml'
+#    Vpn:
+#      $ref: 'components/schemas/vpn.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
     FloatingIP:
