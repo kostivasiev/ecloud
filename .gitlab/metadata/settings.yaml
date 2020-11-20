@@ -57,7 +57,7 @@ LeadEngineer: lee.spottiswood
 ProjectManager: james.littlefair
 TeamManager: gavin.taylor
 Sponsor: chris.folkerd
-Triager: gavin.taylor
+Triager: james.littlefair
 
 # Is this project a deliverable with an end goal? Will it require a one pager?
 # If so, that is a PMOProject and this should be marked as `true`.
