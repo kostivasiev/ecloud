@@ -12,7 +12,7 @@ TemplatesInjected: true
 
 # Should a comment be left on a new issue if it doesn't use a template, 
 # or if the template is not filled in correctly. 
-TemplatesEnforced: true
+TemplatesEnforced: false
 
 # If an issue is blocked by another issue, and the blocking issue is closed, 
 # this will leave a comment on the blocked issue as the issue may now be unblocked.
