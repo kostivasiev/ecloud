@@ -14,7 +14,7 @@ get:
               meta:
                 type: object
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds
 patch:
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
@@ -34,7 +34,7 @@ patch:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/VirtualPrivateCloudsIdResponse'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds
 delete:
   responses:
     204:
@@ -42,4 +42,4 @@ delete:
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds
