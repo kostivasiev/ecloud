@@ -108,10 +108,12 @@ class InstanceController extends BaseController
             if (!$defaultNetworkId) {
                 return JsonResponse::create([
                     'errors' => [
-                        'title' => 'Not Found',
-                        'detail' => 'No network_id provided and could not find a default network',
-                        'status' => 404,
-                        'source' => 'availability_zone_id'
+                        [
+                            'title' => 'Not Found',
+                            'detail' => 'No network_id provided and could not find a default network',
+                            'status' => 404,
+                            'source' => 'network_id'
+                        ]
                     ]
                 ], 404);
             }
