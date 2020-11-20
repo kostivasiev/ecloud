@@ -28,8 +28,8 @@ components:
       $ref: 'components/schemas/network.yaml'
     Dhcp:
       $ref: 'components/schemas/dhcp.yaml'
-#    Vpn:
-#      $ref: 'components/schemas/vpn.yaml'
+    Vpn:
+      $ref: 'components/schemas/vpn.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
     FloatingIP:
@@ -119,10 +119,10 @@ paths:
     $ref: 'resources/Dhcp/collection.yaml'
   '/ecloud/v2/dhcps/{dhcpId}':
     $ref: 'resources/Dhcp/item.yaml'
-  '/ecloud/v2/vpns':
-    $ref: 'resources/Vpn/collection.yaml'
-  '/ecloud/v2/vpns/{vpnId}':
-    $ref: 'resources/Vpn/item.yaml'
+#  '/ecloud/v2/vpns':
+#    $ref: 'resources/Vpn/collection.yaml'
+#  '/ecloud/v2/vpns/{vpnId}':
+#    $ref: 'resources/Vpn/item.yaml'
   '/ecloud/v2/instances':
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
