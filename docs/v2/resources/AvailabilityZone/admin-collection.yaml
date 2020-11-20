@@ -33,7 +33,7 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/availability-zones?page=2'
   tags:
-    - AvailabilityZones
+    - Availability Zones
 
 post:
   requestBody:
@@ -46,4 +46,4 @@ post:
     201:
       $ref: '../../resources/AvailabilityZone/responses/idResponse.yaml'
   tags:
-    - AvailabilityZones
+    - Availability Zones
