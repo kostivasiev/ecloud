@@ -107,10 +107,12 @@ class InstanceController extends BaseController
             if (!$defaultNetworkId) {
                 return JsonResponse::create([
                     'errors' => [
-                        'title' => 'Not Found',
-                        'detail' => 'No network_id provided and could not find a default network',
-                        'status' => 404,
-                        'source' => 'network_id'
+                        [
+                            'title' => 'Not Found',
+                            'detail' => 'No network_id provided and could not find a default network',
+                            'status' => 404,
+                            'source' => 'network_id'
+                        ]
                     ]
                 ], 404);
             }
@@ -161,9 +163,6 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-        if (!$this->isAdmin && $instance->locked === true) {
-            return $this->isLocked();
-        }
         try {
             $instance->delete();
         } catch (\Exception $e) {

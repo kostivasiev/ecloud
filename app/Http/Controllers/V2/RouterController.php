@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\FirewallPolicy\Saved;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
-use App\Models\V2\FirewallPolicy;
+use App\Jobs\FirewallPolicy\ConfigureDefaults;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -14,7 +13,6 @@ use App\Resources\V2\FirewallRuleResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\VpnResource;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -151,33 +149,13 @@ class RouterController extends BaseController
      * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
-    public function configureDefaults(Request $request, string $routerId)
+    public function configureDefaultPolicies(Request $request, string $routerId)
     {
         $router = Router::forUser($request->user)->findOrFail($routerId);
 
-        Model::withoutEvents(function () use ($router) {
-            foreach (config('firewall.policies') as $policy) {
-                $firewallPolicy = new FirewallPolicy();
-                $firewallPolicy::addCustomKey($firewallPolicy);
-                $firewallPolicy->fill($policy);
-                $firewallPolicy->router_id = $router->getKey();
-                $firewallPolicy->save();
-
-                foreach ($policy['rules'] as $rule) {
-                    $firewallRule = $firewallPolicy->firewallRules()->make($rule);
-                    $firewallRule::addCustomKey($firewallRule);
-                    $firewallRule->save();
-
-                    foreach ($rule['ports'] as $port) {
-                        $firewallRulePort = $firewallRule->firewallRulePorts()->make($port);
-                        $firewallRulePort::addCustomKey($firewallRulePort);
-                        $firewallRulePort->name = $firewallRulePort->getKey();
-                        $firewallRulePort->save();
-                    }
-                }
-                event(new Saved($firewallPolicy));
-            }
-        });
+        $this->dispatch(new ConfigureDefaults([
+            'router_id' => $router->id
+        ]));
 
         return response(null, 202);
     }

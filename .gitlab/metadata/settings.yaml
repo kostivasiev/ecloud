@@ -12,7 +12,7 @@ TemplatesInjected: true
 
 # Should a comment be left on a new issue if it doesn't use a template, 
 # or if the template is not filled in correctly. 
-TemplatesEnforced: true
+TemplatesEnforced: false
 
 # If an issue is blocked by another issue, and the blocking issue is closed, 
 # this will leave a comment on the blocked issue as the issue may now be unblocked.
@@ -53,11 +53,11 @@ Feedback:
 
 # Project Roles
 ProductManager: C.Evans
-LeadEngineer: lee.spottiswood
+LeadEngineer: gavin.taylor
 ProjectManager: james.littlefair
 TeamManager: gavin.taylor
 Sponsor: chris.folkerd
-Triager: gavin.taylor
+Triager: james.littlefair
 
 # Is this project a deliverable with an end goal? Will it require a one pager?
 # If so, that is a PMOProject and this should be marked as `true`.
