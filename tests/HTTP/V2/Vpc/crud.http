@@ -15,6 +15,13 @@ client.log('VPC Id : ' + response.body.data.id);
 %}
 
 ###
+GET https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+###
+
+
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache

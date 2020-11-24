@@ -5,9 +5,9 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "Test rule to delete",
+    "name": "Test rule 3",
     "sequence": 10,
-    "firewall_policy_id": "{{dev_firewall_policy_id}}",
+    "firewall_policy_id": "fwp-d6fa0be5",
     "action": "ALLOW",
     "direction": "IN",
     "enabled": true,
