@@ -3,6 +3,7 @@
 namespace Tests\V2\Vpc;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -58,5 +59,27 @@ class DeployDefaultsTest extends TestCase
         $router = $this->vpc->routers()->first();
         $this->assertNotNull($router);
         $this->assertNotNull(Network::where('router_id', '=', $router->getKey())->first());
+
+        Event::assertDispatched(\App\Events\V2\FirewallPolicy\Saved::class);
+
+        // Check the relationships are intact
+        $policies = config('firewall.policies');
+
+        $firewallPolicies = FirewallPolicy::where('router_id', $router->getKey());
+
+        $this->assertEquals(count($policies), $firewallPolicies->count());
+
+        $firewallPolicy = $firewallPolicies->first();
+
+        // Verify Policy
+        $this->assertEquals($policies[0]['name'], $firewallPolicy->name);
+
+        // Verify Rule
+        $firewallRule = $firewallPolicy->firewallRules()->first();
+        $this->assertEquals($policies[0]['rules'][0]['name'], $firewallRule->name);
+
+        // Verify Port
+        $firewallRulePort = $firewallRule->firewallRulePorts()->first();
+        $this->assertEquals($policies[0]['rules'][0]['ports'][0]['protocol'], $firewallRulePort->protocol);
     }
 }
