@@ -8,7 +8,7 @@ elif [ "$ROLE" = "queue" ]; then
 elif [ "$ROLE" = "scheduler" ]; then
     function signal_exit
     {
-        echo  "Caught signal, waiting for background processes to finish.."
+        echo "Caught signal, waiting for background processes to finish.."
         wait $(jobs -pr)
         exit 0
     }
