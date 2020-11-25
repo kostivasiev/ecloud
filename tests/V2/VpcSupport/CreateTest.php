@@ -44,7 +44,6 @@ class CreateTest extends TestCase
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
-                'X-Reseller-Id' => 1
             ]
         )
             ->seeInDatabase(
