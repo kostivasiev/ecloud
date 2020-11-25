@@ -6,10 +6,8 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use GuzzleHttp\Client;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
-use UKFast\Admin\Account\AdminCustomerClient;
 
 class CreateTest extends TestCase
 {
