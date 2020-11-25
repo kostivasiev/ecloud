@@ -102,7 +102,6 @@ class InstanceController extends BaseController
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
-            'availability_zone_id',
             'vcpu_cores',
             'ram_capacity',
             'locked',
