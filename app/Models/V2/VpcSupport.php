@@ -15,6 +15,7 @@ class VpcSupport extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
+    protected $table = 'vpc_support';
     public $keyPrefix = 'sup';
     public $incrementing = false;
     public $timestamps = true;

@@ -52,11 +52,6 @@ class VpcSupportController extends BaseController
      */
     public function create(CreateRequest $request)
     {
-        // Customers: If the customer's payment method is credit card, don't allow them to enable support & return a 402 Payment Required response
-
-        // If the customer is on account, allow them to toggle support
-
-
         $vpcSupport = new VpcSupport($request->only(['vpc_id']));
         $vpcSupport->save();
         return $this->responseIdMeta($request, $vpcSupport->getKey(), 201);

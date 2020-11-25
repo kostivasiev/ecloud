@@ -24,6 +24,8 @@ class CanEnableSupport
             $accountAdminClient = app()->make(\UKFast\Admin\Account\AdminClient::class);
             $paymentMethod = $accountAdminClient->customers()->getById($request->user->resellerId)->paymentMethod;
 
+            #$paymentMethod = 'Credit Card';
+
             if ($paymentMethod == 'Credit Card') {
                 return JsonResponse::create([
                     'errors' => [
@@ -33,7 +35,7 @@ class CanEnableSupport
                             'status' => 402,
                         ]
                     ]
-                ], 403);
+                ], 402);
             }
         }
 
