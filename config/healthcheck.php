@@ -11,7 +11,7 @@ return [
      * of the service
      */
     'checks' => [
-        UKFast\HealthCheck\Checks\LogHealthCheck::class,
+        //UKFast\HealthCheck\Checks\LogHealthCheck::class,
         UKFast\HealthCheck\Checks\DatabaseHealthCheck::class,
         UKFast\HealthCheck\Checks\DotEnvHealthCheck::class,
         UKFast\HealthCheck\Checks\RedisHealthCheck::class,
