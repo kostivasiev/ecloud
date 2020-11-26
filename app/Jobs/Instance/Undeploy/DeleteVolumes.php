@@ -27,12 +27,6 @@ class DeleteVolumes extends Job
         $instance->volumes()->each(function ($volume) use ($instance, $vpc) {
             // If volume is only used in this instance then delete
             if ($volume->instances()->count() == 0) {
-                Log::info('Deleting volume: ' . $volume->getKey());
-                // Send delete request to kingpin
-                $instance->availabilityZone->kingpinService()->delete(
-                    '/api/v1/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid
-                );
-                Log::info('Volume ' . $volume->getKey() . ' (' . $volume->vmware_uuid . ') deleted.');
                 $volume->instances()->detach($instance);
                 $volume->delete();
             }
