@@ -44,6 +44,7 @@ class Volume extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'updated' => Updated::class,
         'creating' => Creating::class,
+        'deleted' => Deleted::class,
     ];
 
     public function vpc()
