@@ -168,6 +168,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Updated::class => [
             \App\Listeners\V2\Volume\CapacityIncrease::class,
         ],
+        \App\Events\V2\Volume\Deleted::class => [
+            \App\Listeners\V2\Volume\Delete::class,
+        ],
 
         // Vpc
         \App\Events\V2\Vpc\Creating::class => [
