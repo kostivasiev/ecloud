@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Kingpin\Instance;
 
 use App\Models\V2\Instance;
+use App\Models\V2\Volume;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -50,6 +51,7 @@ class Delete extends Command
             exit;
         }
 
+        Volume::flushEventListeners();
         $volumes = $instance->volumes()->whereNotNull('vmware_uuid')->get();
         Log::info($volumes->count() . ' Volumes found');
 
