@@ -46,7 +46,7 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param CreateRequest  $request
+     * @param CreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateRequest $request)
@@ -62,7 +62,7 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param UpdateRequest  $request
+     * @param UpdateRequest $request
      * @param string $networkId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -74,7 +74,9 @@ class NetworkController extends BaseController
             'name',
             'subnet',
         ]));
-        $network->save();
+        if (!$network->save()) {
+            return $network->getSyncError();
+        }
         return $this->responseIdMeta($request, $network->getKey(), 200);
     }
 

@@ -26,6 +26,7 @@ class RouterResource extends UKFastResource
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
             'deployed' => $this->deployed,
+            'sync' => $this->getSyncCompleted(),
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

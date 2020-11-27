@@ -123,6 +123,12 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Created::class => [
             \App\Listeners\V2\Network\Deploy::class,
         ],
+        \App\Events\V2\Network\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Saved::class => [
+            \App\Listeners\V2\Network\Update::class
+        ],
 
         // Nat
         \App\Events\V2\Nat\Created::class => [
@@ -157,6 +163,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Router\Deleted::class => [
             \App\Listeners\V2\Router\Networks\Delete::class,
+        ],
+        \App\Events\V2\Router\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
         ],
 
         // Volume
