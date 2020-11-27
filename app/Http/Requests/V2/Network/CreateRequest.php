@@ -6,6 +6,7 @@ use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsNotOverlappingSubnet;
 use App\Rules\V2\IsPrivateSubnet;
+use App\Rules\V2\IsSubnetBigEnough;
 use App\Rules\V2\ValidCidrSubnet;
 use UKFast\FormRequests\FormRequest;
 
@@ -48,6 +49,7 @@ class CreateRequest extends FormRequest
                 new ValidCidrSubnet(),
                 new isPrivateSubnet(),
                 new isNotOverlappingSubnet(),
+                new IsSubnetBigEnough(),
             ]
         ];
     }
