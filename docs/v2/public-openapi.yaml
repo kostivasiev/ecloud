@@ -78,8 +78,6 @@ components:
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
   responses:
-    VirtualPrivateCloudsIdResponse:
-      $ref: 'resources/Vpc/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     VpnIdResponse:
@@ -197,3 +195,7 @@ paths:
     $ref: 'resources/Volume/item.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
+  '/ecloud/v2/support':
+    $ref: 'resources/VpcSupport/collection.yaml'
+  '/ecloud/v2/support/{supportId}':
+    $ref: 'resources/VpcSupport/item.yaml'

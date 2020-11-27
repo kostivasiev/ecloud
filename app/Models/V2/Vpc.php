@@ -80,6 +80,12 @@ class Vpc extends Model implements Filterable, Sortable
         return $this->hasMany(LoadBalancerCluster::class);
     }
 
+    public function vpcSupports()
+    {
+        return $this->hasMany(VpcSupport::class);
+    }
+
+
     /**
      * @param $query
      * @param $user
@@ -94,6 +100,14 @@ class Vpc extends Model implements Filterable, Sortable
             }
         }
         return $query;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSupportEnabledAttribute()
+    {
+        return $this->vpcSupports()->count() > 0;
     }
 
     /**
