@@ -46,6 +46,44 @@ class CidrValidationsTest extends TestCase
         ]);
     }
 
+    public function testCreateTooSmallSubnet()
+    {
+        $this->post(
+            '/v2/networks',
+            [
+                'name' => 'Manchester Network',
+                'router_id' => $this->router->getKey(),
+                'subnet' => '10.0.0.1/30'
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => 1
+            ]
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The range in subnet is too small and must be greater than or equal to 30'
+        ])->assertResponseStatus(422);
+    }
+
+    public function testUpdateTooSmallSubnet()
+    {
+        $this->patch(
+            '/v2/networks/'.$this->network->getKey(),
+            [
+                'subnet' => '10.0.0.1/30'
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+                'X-Reseller-Id' => 1
+            ]
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The range in subnet is too small and must be greater than or equal to 30'
+        ])->assertResponseStatus(422);
+    }
+
     public function testCreateNetworkPublicCidr()
     {
         $this->post(
