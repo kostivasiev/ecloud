@@ -30,6 +30,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
         $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
+        $router->get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
     });
 
     /** Availability Zone Capacities */

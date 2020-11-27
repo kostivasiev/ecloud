@@ -50,6 +50,14 @@ client.test("Request executed successfully", function() {
 %}
 ###
 
+
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/capacities
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+###
+
 PATCH https://{{host}}/{{version}}/availability-zone-capacities/{{capacity_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

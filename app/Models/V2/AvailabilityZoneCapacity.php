@@ -37,6 +37,13 @@ class AvailabilityZoneCapacity extends Model implements Filterable, Sortable
         'max',
     ];
 
+    protected $casts = [
+        'current' => 'integer',
+        'alert_warning' => 'integer',
+        'alert_critical' => 'integer',
+        'max' => 'integer'
+    ];
+
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
