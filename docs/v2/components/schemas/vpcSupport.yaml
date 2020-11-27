@@ -1,19 +1,12 @@
 properties:
   id:
     type: string
-    example: vpc-2b66bb79
+    example: sup-2b66bb79
     readOnly: true
-  name:
-    type: string
-    example: 'Manchester Cloud 1'
-  region_id:
+  vpc_id:
     type: string
     required: true
-    example: 'reg-a63dd78c'
-  support_enabled:
-    type: boolean
-    readOnly: true
-    example: true
+    example: 'vpc-a63dd78c'
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
@@ -22,4 +15,4 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
-description: 'Virtual Private Clouds'
+description: 'VPC Support'
