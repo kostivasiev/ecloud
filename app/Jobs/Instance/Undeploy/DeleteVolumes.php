@@ -21,9 +21,6 @@ class DeleteVolumes extends Job
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $logMessage = 'DeleteVolumes for instance ' . $instance->getKey() . ': ';
-
         $instance->volumes()->each(function ($volume) use ($instance, $vpc) {
             // If volume is only used in this instance then delete
             if ($volume->instances()->count() == 0) {
