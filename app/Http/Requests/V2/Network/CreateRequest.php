@@ -4,6 +4,8 @@ namespace App\Http\Requests\V2\Network;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsNotOverlappingSubnet;
+use App\Rules\V2\IsPrivateSubnet;
 use App\Rules\V2\ValidCidrSubnet;
 use UKFast\FormRequests\FormRequest;
 
@@ -39,7 +41,13 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(Router::class)
             ],
             'subnet' => [
-                'sometimes', 'nullable', 'string', new ValidCidrSubnet()
+                'sometimes',
+                'nullable',
+                'string',
+                'unique:ecloud.networks,subnet,NULL,id,deleted_at,NULL',
+                new ValidCidrSubnet(),
+                new isPrivateSubnet(),
+                new isNotOverlappingSubnet(),
             ]
         ];
     }
@@ -53,6 +61,7 @@ class CreateRequest extends FormRequest
     {
         return [
             'router_id.required' => 'The :attribute field is required',
+            'subnet.unique' => 'The :attribute is already assigned to another network',
         ];
     }
 }
