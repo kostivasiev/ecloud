@@ -51,22 +51,11 @@ class Delete extends Command
             exit;
         }
 
-        Volume::flushEventListeners();
         $volumes = $instance->volumes()->whereNotNull('vmware_uuid')->get();
         Log::info($volumes->count() . ' Volumes found');
 
         foreach ($volumes as $volume) {
-            try {
-                $instance->availabilityZone->kingpinService()->delete(
-                    '/api/v1/vpc/' . $instance->vpc_id . '/volume/' . $volume->vmware_uuid
-                );
-                Log::info('Volume ' . $volume->getKey() . ' (' . $volume->vmware_uuid . ') deleted.');
-                $volume->delete();
-            } catch (\Exception $e) {
-                $errorMessage = 'Failed to delete instance volume ' . $volume->vmware_uuid . ', ' . $e->getMessage();
-                $this->output->writeln($errorMessage);
-                Log::error($errorMessage);
-            }
+            $volume->delete();
         }
 
         //TODO: Unassign IP's from NSX & delete NICS
