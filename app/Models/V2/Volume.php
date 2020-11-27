@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Volume\Deleted;
 use App\Events\V2\Volume\Updated;
 use App\Events\V2\Volume\Creating;
 use App\Traits\V2\CustomKey;
