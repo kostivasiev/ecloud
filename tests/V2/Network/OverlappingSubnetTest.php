@@ -8,6 +8,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\IsNotOverlappingSubnet;
+use Illuminate\Http\Request;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -43,6 +44,13 @@ class OverlappingSubnetTest extends TestCase
             'router_id' => $this->router->getKey(),
             'subnet' => '10.0.0.1/30',
         ]);
+        app()->bind('request', function () {
+            $request = new Request();
+            $request->merge([
+                'router_id' => $this->router->getKey(),
+            ]);
+            return $request;
+        });
     }
 
     public function testNoOverlap()
