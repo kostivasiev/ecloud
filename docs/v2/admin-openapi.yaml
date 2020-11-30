@@ -151,3 +151,7 @@ paths:
     $ref: 'resources/Credential/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/lbcs':
     $ref: 'resources/Vpc/cluster-collection.yaml'
+  '/ecloud/v2/billing-metrics':
+    $ref: 'resources/BillingMetrics/collection.yaml'
+  '/ecloud/v2/billing-metrics/{billingMetricsId}':
+    $ref: 'resources/BillingMetrics/item.yaml'

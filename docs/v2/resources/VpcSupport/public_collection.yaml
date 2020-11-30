@@ -34,16 +34,3 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/support?page=2'
   tags:
     - Billing Metric
-post:
-  description: Billing Metric
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          $ref: '../../components/schemas/billingMetric.yaml'
-  responses:
-    201:
-      $ref: '../../resources/BillingMetric/responses/idResponse.yaml'
-  tags:
-    - Billing Metric

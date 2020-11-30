@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests\V2\FloatingIp;
 
+use App\Models\V2\FloatingIp;
+use App\Models\V2\Nic;
 use App\Rules\V2\ExistsForUser;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use UKFast\FormRequests\FormRequest;
 
 class AssignRequest extends FormRequest
@@ -34,7 +35,10 @@ class AssignRequest extends FormRequest
                 [
                     'required',
                     'string',
-                    new ExistsForUser(array_values(Relation::morphMap()))
+                    new ExistsForUser([
+                        Nic::class,
+                        FloatingIp::class,
+                    ])
                 ],
         ];
     }
