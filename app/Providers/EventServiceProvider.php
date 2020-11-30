@@ -96,7 +96,8 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FloatingIp\AllocateIp::class
         ],
         \App\Events\V2\FloatingIp\Deleted::class => [
-            \App\Listeners\V2\FloatingIp\Unassign::class
+            \App\Listeners\V2\FloatingIp\Unassign::class,
+            \App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class
         ],
 
         // Instance
