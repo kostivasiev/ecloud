@@ -22,6 +22,6 @@ class IsSubnetBigEnough implements Rule
      */
     public function message()
     {
-        return 'The range in :attribute is too small and must be greater than or equal to 30';
+        return 'The :attribute network size is too small and must be larger than /30';
     }
 }

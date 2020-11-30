@@ -29,6 +29,6 @@ class IsPrivateSubnet implements Rule
      */
     public function message()
     {
-        return 'The :attribute must be a private CIDR subnet';
+        return 'The :attribute must be a private CIDR range';
     }
 }

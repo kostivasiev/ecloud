@@ -62,7 +62,7 @@ class CidrValidationsTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The range in subnet is too small and must be greater than or equal to 30'
+            'detail' => 'The subnet network size is too small and must be larger than /30'
         ])->assertResponseStatus(422);
     }
 
@@ -80,7 +80,7 @@ class CidrValidationsTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The range in subnet is too small and must be greater than or equal to 30'
+            'detail' => 'The subnet network size is too small and must be larger than /30'
         ])->assertResponseStatus(422);
     }
 
@@ -100,7 +100,7 @@ class CidrValidationsTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The subnet must be a private CIDR subnet'
+            'detail' => 'The subnet must be a private CIDR range'
         ])->assertResponseStatus(422);
     }
 
@@ -118,7 +118,7 @@ class CidrValidationsTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The subnet must be a private CIDR subnet'
+            'detail' => 'The subnet must be a private CIDR range'
         ])->assertResponseStatus(422);
     }
 
@@ -138,7 +138,7 @@ class CidrValidationsTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The subnet must not overlap another CIDR subnet'
+            'detail' => 'The subnet must not overlap an existing CIDR range'
         ])->assertResponseStatus(422);
     }
 
@@ -156,7 +156,7 @@ class CidrValidationsTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The subnet must not overlap another CIDR subnet'
+            'detail' => 'The subnet must not overlap an existing CIDR range'
         ])->assertResponseStatus(422);
     }
 
