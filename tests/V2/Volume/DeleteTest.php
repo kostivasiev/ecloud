@@ -77,7 +77,7 @@ class DeleteTest extends TestCase
             '/v2/volumes/' . $this->volume->getKey(),
             [],
             [
-                'X-consumer-custom-id' => '1-0',
+                'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
