@@ -122,6 +122,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Network\Created::class => [
             \App\Listeners\V2\Network\Deploy::class,
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Network\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
@@ -157,6 +158,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Router\Created::class => [
             \App\Listeners\V2\Router\Deploy::class,
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Router\Saved::class => [
             \App\Listeners\V2\Router\Update::class,
