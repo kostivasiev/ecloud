@@ -14,7 +14,7 @@ Content-Type:  application/json
 > {%
 client.test("Test with a small subnet range", function () {
     client.assert(response.status === 422, "Response was not 422");
-    client.assert(response.body.errors[1].detail === "The range in subnet is too small and must be greater than or equal to 30", "Error message not found");
+    client.assert(response.body.errors[1].detail === "The subnet network size is too small and must be larger than /30", "Error message not found");
 });
 %}
 
@@ -54,7 +54,7 @@ Content-Type:  application/json
 > {%
 client.test("Test existing cidr cannot be reused", function () {
     client.assert(response.status === 422, "Response was not 422");
-    client.assert(response.body.errors[0].detail === "The subnet must be a private CIDR subnet", "Error message not found");
+    client.assert(response.body.errors[0].detail === "The subnet must be a private CIDR range", "Error message not found");
 });
 %}
 
@@ -74,7 +74,7 @@ Content-Type:  application/json
 > {%
 client.test("Test existing cidr cannot be reused", function () {
     client.assert(response.status === 422, "Response was not 422");
-    client.assert(response.body.errors[0].detail === "The subnet must not overlap another CIDR subnet", "Error message not found");
+    client.assert(response.body.errors[0].detail === "The subnet must not overlap an existing CIDR range", "Error message not found");
 });
 %}
 
@@ -92,7 +92,7 @@ Content-Type:  application/json
 > {%
 client.test("Test with a small subnet range", function () {
     client.assert(response.status === 422, "Response was not 422");
-    client.assert(response.body.errors[0].detail === "The range in subnet is too small and must be greater than or equal to 30", "Error message not found");
+    client.assert(response.body.errors[0].detail === "The subnet network size is too small and must be larger than /30", "Error message not found");
 });
 %}
 
@@ -128,7 +128,7 @@ Content-Type:  application/json
 > {%
 client.test("Test existing cidr cannot be reused", function () {
     client.assert(response.status === 422, "Response was not 422");
-    client.assert(response.body.errors[0].detail === "The subnet must be a private CIDR subnet", "Error message not found");
+    client.assert(response.body.errors[0].detail === "The subnet must be a private CIDR range", "Error message not found");
 });
 %}
 
@@ -146,6 +146,6 @@ Content-Type:  application/json
 > {%
 client.test("Test existing cidr cannot be reused", function () {
     client.assert(response.status === 422, "Response was not 422");
-    client.assert(response.body.errors[0].detail === "The subnet must not overlap another CIDR subnet", "Error message not found");
+    client.assert(response.body.errors[0].detail === "The subnet must not overlap an existing CIDR range", "Error message not found");
 });
 %}
