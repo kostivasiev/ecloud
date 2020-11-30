@@ -38,7 +38,7 @@ class AvailabilityZoneCapacity extends Model implements Filterable, Sortable
     ];
 
     protected $casts = [
-        'current' => 'integer',
+        'current' => 'float',
         'alert_warning' => 'integer',
         'alert_critical' => 'integer',
         'max' => 'integer'

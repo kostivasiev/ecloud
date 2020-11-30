@@ -6,7 +6,7 @@ Content-Type:  application/json
 
 {
     "availability_zone_id": "{{dev_availability_zone_id}}",
-    "type": "floating_ips",
+    "type": "floating_ip",
     "alert_warning": 60,
     "alert_critical": 80,
     "max": 95
