@@ -13,7 +13,21 @@ trait Syncable
         return $this->hasMany(Sync::class, 'resource_id', 'id');
     }
 
-    public function setSyncCompleted($value)
+    public function getStatus()
+    {
+        if (!$this->syncs()->count()) {
+            return 'complete';
+        }
+        if ($this->syncs()->latest()->first()->completed) {
+            return 'complete';
+        }
+        if ($this->getSyncFailed()) {
+            return 'failed';
+        }
+        return 'in-progress';
+    }
+
+    public function setSyncCompleted()
     {
         Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
         if (!$this->syncs()->count()) {
@@ -21,17 +35,9 @@ trait Syncable
             return;
         }
         $sync = $this->syncs()->latest()->first();
-        $sync->completed = $value;
+        $sync->completed = true;
         $sync->save();
         Log::info(get_class($this) . ' : Setting Sync to completed - Finished', ['resource_id' => $this->id]);
-    }
-
-    public function getSyncCompleted()
-    {
-        if (!$this->syncs()->count()) {
-            return true;
-        }
-        return $this->syncs()->latest()->first()->completed;
     }
 
     public function getSyncFailed()

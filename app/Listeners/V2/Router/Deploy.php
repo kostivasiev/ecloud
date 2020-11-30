@@ -101,7 +101,7 @@ class Deploy implements ShouldQueue
                 'json' => $original
             ]
         );
-        $router->setSyncCompleted(true);
+        $router->setSyncCompleted();
         $router->deployed = true;
         $router->save();
 

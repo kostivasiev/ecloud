@@ -93,7 +93,7 @@ class Update implements ShouldQueue
                 return;
             }
         }
-        $network->setSyncCompleted(true);
+        $network->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }

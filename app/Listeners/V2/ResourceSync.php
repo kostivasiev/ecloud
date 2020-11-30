@@ -11,12 +11,12 @@ class ResourceSync
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        if (!$event->model->getSyncCompleted()) {
+        if ($event->model->getStatus() !== 'complete') {
             Log::warning(get_class($this) . ' : Save blocked, resource has outstanding sync', ['event' => $event]);
             return false;
         }
 
-        if ($event->model->getSyncFailed()) {
+        if ($event->model->getStatus() === 'failed') {
             Log::warning(get_class($this) . ' : Save blocked, resource has failed sync', ['event' => $event]);
             return false;
         }

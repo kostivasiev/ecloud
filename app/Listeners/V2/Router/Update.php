@@ -90,7 +90,7 @@ class Update implements ShouldQueue
                 'json' => $original
             ]
         );
-        $router->setSyncCompleted(true);
+        $router->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
