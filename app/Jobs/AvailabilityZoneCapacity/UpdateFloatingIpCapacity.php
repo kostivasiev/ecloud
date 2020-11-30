@@ -83,8 +83,10 @@ class UpdateFloatingIpCapacity extends Job
         $this->data['running_totals'] = $runningTotal;
         $this->data['running_totals']['percent_remaining'] = $percentRemaining;
 
-        $availabilityZoneCapacity->current = $percentRemaining;
-        $availabilityZoneCapacity->save();
+        if ($availabilityZoneCapacity->current != $percentRemaining) {
+            $availabilityZoneCapacity->current = $percentRemaining;
+            $availabilityZoneCapacity->save();
+        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

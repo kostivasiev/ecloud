@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\AvailabilityZoneCapacity\Saved;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -42,6 +43,10 @@ class AvailabilityZoneCapacity extends Model implements Filterable, Sortable
         'alert_warning' => 'integer',
         'alert_critical' => 'integer',
         'max' => 'integer'
+    ];
+
+    protected $dispatchesEvents = [
+        'saved' => Saved::class,
     ];
 
     public function availabilityZone()

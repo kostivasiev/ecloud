@@ -53,6 +53,11 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
 
+        // AvailabilityZoneCapacity
+        \App\Events\V2\AvailabilityZoneCapacity\Saved::class => [
+            \App\Listeners\V2\AvailabilityZoneCapacity\SendAlert::class
+        ],
+
         // Credential
         \App\Events\V2\Credential\Creating::class => [
         ],
