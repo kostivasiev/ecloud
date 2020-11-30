@@ -4,6 +4,7 @@ namespace App\Rules\V2;
 
 use App\Models\V2\Network;
 use Illuminate\Contracts\Validation\Rule;
+use IPLib\Factory;
 
 /**
  * Class IsNotOverlappingSubnet
@@ -24,12 +25,16 @@ class IsNotOverlappingSubnet implements Rule
 
     public function passes($attribute, $value)
     {
-        $parts = explode("/", $value);
-        $query = Network::where('subnet', 'LIKE', $parts[0].'%');
-        if (!is_null($this->existingId)) {
-            $query->where('id', '!=', $this->existingId);
+        $submittedRange = Factory::rangeFromString($value);
+        $router_id = app('request')->input('router_id');
+        $networks = Network::where('router_id', '=', $router_id);
+        foreach ($networks as $network) {
+            $storedRange = Factory::rangeFromString($network->subnet);
+            if ($submittedRange->containsRange($storedRange) || $storedRange->containsRange($submittedRange)) {
+                return false;
+            }
         }
-        return $query->get()->count() === 0;
+        return true;
     }
 
     /**
@@ -37,6 +42,6 @@ class IsNotOverlappingSubnet implements Rule
      */
     public function message()
     {
-        return 'The :attribute must not overlap another CIDR subnet';
+        return 'The :attribute must not overlap an existing CIDR range';
     }
 }
