@@ -26,7 +26,7 @@ class IsNotOverlappingSubnet implements Rule
     public function passes($attribute, $value)
     {
         $submittedRange = Factory::rangeFromString($value);
-        $router_id = app('request')->input('router_id');
+        $router_id = app('request')->input('router_id') ?? Network::findOrFail($this->existingId)->router_id;
         $networks = Network::where('router_id', '=', $router_id)->get();
         foreach ($networks as $network) {
             $storedRange = Factory::rangeFromString($network->subnet);
