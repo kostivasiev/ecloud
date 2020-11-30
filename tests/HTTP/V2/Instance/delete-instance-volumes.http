@@ -51,8 +51,8 @@ X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
-###
-DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
+> {%
+client.test('Check volume has been deleted', function () {
+    client.assert(response.status === 404, 'Response was not HTTP 404');
+});
+%}
