@@ -4,7 +4,6 @@ namespace App\Jobs\Instance\Undeploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
 class DeleteVolumes extends Job
