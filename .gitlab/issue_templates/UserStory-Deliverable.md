@@ -12,8 +12,8 @@
 
 
 ### Prerequisites:
-<!-- Link to any issues/etc that are required for development to begin -->
-- none
+<!-- Link to any related/blocked/blocking issues or detail anything required for development to begin -->
+- see [Linked issues](#related-issues)
 
 
 ### User Stories
@@ -23,6 +23,7 @@
 | End User | View my VPC's | View an overview of my VPC's |
 | API User | Retrieve my VPC's | Perform actions on my vpc data |
 
+
 ### Acceptance Criteria
 
 | GIVEN | WHEN | THEN |
@@ -31,12 +32,12 @@
 | I request the vpc collection/item | the request completes | I can see the vpc id, name, status, etc |
 
 
-
 ### Process Flows
  <!-- attach any flow charts and delete placeholder -->
 - no process flow required
 
 <!-- ENFORCEMENT-END -->
+
 
 ### Story Tasks
 - [ ] Process flow created & Requirements defined
