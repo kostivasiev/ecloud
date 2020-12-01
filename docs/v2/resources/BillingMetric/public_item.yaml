@@ -14,4 +14,4 @@ get:
               meta:
                 type: object
   tags:
-    - Support
+    - Billing Metric
