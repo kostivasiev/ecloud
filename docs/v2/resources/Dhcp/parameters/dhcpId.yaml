@@ -1,5 +1,5 @@
 in: path
-name: DhcpId
+name: dhcpId
 required: true
 schema:
   type: string
