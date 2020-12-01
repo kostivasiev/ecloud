@@ -67,7 +67,7 @@ Content-Type: application/json
 {
     "availability_zone_id": "az-00488c3b",
     "type": "ram",
-    "alert_warning": 55,
+    "alert_warning": 10,
     "alert_critical": 85,
     "max": 90
 }
@@ -90,7 +90,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.availability_zone_id === 'az-00488c3b');
   client.assert(response.body.data.type === 'ram');
-  client.assert(response.body.data.alert_warning === 55);
+  client.assert(response.body.data.alert_warning === 10);
   client.assert(response.body.data.alert_critical === 85);
   client.assert(response.body.data.max === 90);
 });

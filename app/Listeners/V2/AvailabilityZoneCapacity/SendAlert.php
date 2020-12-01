@@ -20,7 +20,12 @@ class SendAlert implements ShouldQueue
         $availabilityZoneCapacity = $event->model;
 
         if ($availabilityZoneCapacity->current >= $availabilityZoneCapacity->alert_warning) {
-            Mail::send(new AvailabilityZoneCapacityAlert($availabilityZoneCapacity));
+            $alert = new AvailabilityZoneCapacityAlert($availabilityZoneCapacity);
+            Mail::send($alert);
+            Log::info(
+                get_class($this) . ': ' . $availabilityZoneCapacity->type
+                . ' capacity alert (' . $alert->alertLevel . ') email sent for Availability Zone ' . $availabilityZoneCapacity->availability_zone_id
+            );
         }
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

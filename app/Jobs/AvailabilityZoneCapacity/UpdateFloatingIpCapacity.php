@@ -78,13 +78,16 @@ class UpdateFloatingIpCapacity extends Job
             $this->data['ip-ranges'][$ipRange->id]['available_ip_count'] = $rangeAvailable;
         }
 
-        $percentRemaining = round((($runningTotal['total'] - $runningTotal['used'])/$runningTotal['total']) * 100, 2);
+
+
+        //$percentRemaining = round((($runningTotal['total'] - $runningTotal['used'])/$runningTotal['total']) * 100, 2);
+        $percentUsed = round(($runningTotal['used'] / $runningTotal['total']) * 100, 2);
 
         $this->data['running_totals'] = $runningTotal;
-        $this->data['running_totals']['percent_remaining'] = $percentRemaining;
+        $this->data['running_totals']['percent_used'] = $percentUsed;
 
-        if ($availabilityZoneCapacity->current != $percentRemaining) {
-            $availabilityZoneCapacity->current = $percentRemaining;
+        if ($availabilityZoneCapacity->current != $percentUsed) {
+            $availabilityZoneCapacity->current = $percentUsed;
             $availabilityZoneCapacity->save();
         }
 
