@@ -12,7 +12,7 @@ class CreateAvailabilityZoneCapacitiesTable extends Migration
             $table->uuid('id')->primary();
             $table->uuid('availability_zone_id');
             $table->string('type');
-            $table->float('current')->nullable();
+            $table->curent('current')->nullable();
             $table->integer('alert_warning')->nullable();
             $table->integer('alert_critical')->nullable();
             $table->integer('max')->nullable();
