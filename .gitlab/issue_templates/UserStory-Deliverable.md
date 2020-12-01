@@ -1,14 +1,12 @@
 <!-- Title: UserStory-Deliverable.md -->
-<!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
 ### What is the Feature/Change?
-<!-- Enter clear and concise description of what your feature or change request is. -->
+<!-- Enter clear and concise description of what your feature or change request is -->
 
 
 
 ### Assumptions:
 1. All success and error events will be logged in the existing logging framework
-2. All success and error events will update the status of the resource in APIO
 
 
 ### Prerequisites:
@@ -36,8 +34,8 @@
  <!-- attach any flow charts and delete placeholder -->
 - no process flow required
 
-<!-- ENFORCEMENT-END -->
 
+<!-- ENFORCEMENT-END -->
 
 ### Story Tasks
 - [ ] Process flow created & Requirements defined

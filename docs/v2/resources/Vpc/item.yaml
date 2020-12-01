@@ -14,7 +14,7 @@ get:
               meta:
                 type: object
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds
 patch:
   parameters:
     - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
@@ -34,7 +34,7 @@ patch:
     200:
       $ref: '../../resources/Vpc/responses/idResponse.yaml'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds
 delete:
   responses:
     204:
@@ -42,4 +42,4 @@ delete:
   parameters:
     - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds

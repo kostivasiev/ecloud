@@ -33,7 +33,7 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/vpcs?page=2'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds
 post:
   requestBody:
     required: true
@@ -45,4 +45,4 @@ post:
     201:
       $ref: '../../resources/Vpc/responses/idResponse.yaml'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds

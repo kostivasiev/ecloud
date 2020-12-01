@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../public-openapi.yaml#/components/schemas/Vpn'
+                items:
+                  $ref: '../../public-openapi.yaml#/components/schemas/Vpn'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

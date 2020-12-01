@@ -15,7 +15,7 @@ get:
                   region_id:
                     required: true
   tags:
-    - AvailabilityZones
+    - Availability Zones
 patch:
   parameters:
     - $ref: '../../resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
@@ -43,7 +43,7 @@ patch:
     200:
       $ref: '../../resources/AvailabilityZone/responses/idResponse.yaml'
   tags:
-    - AvailabilityZones
+    - Availability Zones
 
 delete:
   parameters:
@@ -52,4 +52,4 @@ delete:
     204:
       description: Success
   tags:
-    - AvailabilityZones
+    - Availability Zones

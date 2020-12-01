@@ -5,4 +5,4 @@ post:
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds
