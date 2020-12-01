@@ -25,6 +25,8 @@ class BillingMetric extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'resource_id',
+        'vpc_id',
+        'reseller_id',
         'key',
         'value',
         'cost',
@@ -50,6 +52,8 @@ class BillingMetric extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('resource_id', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('reseller_id', Filter::$numericDefaults),
             $factory->create('key', Filter::$stringDefaults),
             $factory->create('value', Filter::$stringDefaults),
             $factory->create('cost', Filter::$numericDefaults),
@@ -70,6 +74,8 @@ class BillingMetric extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('resource_id'),
+            $factory->create('vpc_id'),
+            $factory->create('reseller_id'),
             $factory->create('key'),
             $factory->create('value'),
             $factory->create('cost'),
@@ -99,6 +105,8 @@ class BillingMetric extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'resource_id' => 'resource_id',
+            'vpc_id' => 'vpc_id',
+            'reseller_id' => 'reseller_id',
             'key' => 'key',
             'value' => 'value',
             'cost' => 'cost',

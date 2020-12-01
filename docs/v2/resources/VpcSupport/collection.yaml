@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../components/schemas/billingMetric.yaml'
+                  $ref: '../../components/schemas/vpcSupport.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -33,17 +33,17 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/support?page=2'
   tags:
-    - Billing Metric
+    - Support
 post:
-  description: Billing Metric
+  description: Enable support for a VPC
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/billingMetric.yaml'
+          $ref: '../../components/schemas/vpcSupport.yaml'
   responses:
     201:
-      $ref: '../../resources/BillingMetric/responses/idResponse.yaml'
+      $ref: '../../resources/VpcSupport/responses/idResponse.yaml'
   tags:
-    - Billing Metric
+    - Support

@@ -30,6 +30,8 @@ class BillingMetricController extends BaseController
     {
         $model = new BillingMetric($request->only([
             'resource_id',
+            'vpc_id',
+            'reseller_id',
             'key',
             'value',
             'cost',
@@ -45,6 +47,8 @@ class BillingMetricController extends BaseController
         $model = BillingMetric::forUser(app('request')->user)->findOrFail($modelId);
         $model->fill($request->only([
             'resource_id',
+            'vpc_id',
+            'reseller_id',
             'key',
             'value',
             'cost',

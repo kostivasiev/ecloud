@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../resources/VpcSupport/parameters/vpcSupportId.yaml'
+    - $ref: '../../resources/BillingMetric/parameters/billingMetricId.yaml'
   responses:
     200:
       description: success
@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../components/schemas/vpcSupport.yaml'
+                $ref: '../../components/schemas/billingMetric.yaml'
               meta:
                 type: object
   tags:
@@ -18,7 +18,7 @@ get:
 
 patch:
   parameters:
-    - $ref: '../../resources/VpcSupport/parameters/vpcSupportId.yaml'
+    - $ref: '../../resources/BillingMetric/parameters/billingMetricId.yaml'
   requestBody:
     required: true
     content:
@@ -26,7 +26,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/vpcSupport.yaml'
+            - $ref: '../../components/schemas/billingMetric.yaml'
             - type: object
               properties:
                 name:
@@ -37,14 +37,14 @@ patch:
     200:
       $ref: '../../resources/VpcSupport/responses/idResponse.yaml'
   tags:
-    - Support
+    - Billing Metric
 
 delete:
-  description: Disable support for a VPC
+  description: Billing Metric
   parameters:
-    - $ref: '../../resources/VpcSupport/parameters/vpcSupportId.yaml'
+    - $ref: '../../resources/VpcSupport/parameters/billingMetricId.yaml'
   responses:
     204:
       description: Success
   tags:
-    - Support
+    - Billing Metric

@@ -1,12 +1,20 @@
 properties:
   id:
     type: string
-    example: 'bm-2b66bb79'
+    example: 'bm-1a2b3c4d'
     readOnly: true
   resource_id:
     type: string
     required: true
     example: 'i-1a2b3c4d'
+  vpc_id:
+    type: string
+    required: true
+    example: 'vpc-1a2b3c4d'
+  reseller_id:
+    type: integer
+    required: true
+    example: '1'
   key:
     type: string
     required: true

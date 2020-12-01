@@ -9,10 +9,10 @@ content:
           properties:
             id:
               type: string
-              example: sup-6ui8gt89
+              example: bm-6ui8gt89
         meta:
           type: object
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/support/sup-6ui8gt89'
+              example: 'https://api.ukfast.io/ecloud/v2/billing-metric/bm-6ui8gt89'

@@ -12,6 +12,8 @@ class BillingMetricResource extends UKFastResource
         return [
             'id' => $this->id,
             'resource_id' => $this->resource_id,
+            'vpc_id' => $this->vpc_id,
+            'reseller_id' => $this->reseller_id,
             'key' => $this->key,
             'value' => $this->value,
             'cost' => $this->cost,
