@@ -11,6 +11,8 @@ class CreateBillingMetricsTable extends Migration
         Schema::connection('ecloud')->create('billing_metrics', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('resource_id');
+            $table->uuid('vpc_id');
+            $table->integer('reseller_id');
             $table->string('key');
             $table->string('value');
             $table->float('cost');
