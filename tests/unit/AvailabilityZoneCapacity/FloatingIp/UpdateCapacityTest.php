@@ -98,7 +98,7 @@ class UpdateCapacityTest extends TestCase
         Queue::assertPushed(UpdateFloatingIpCapacity::class);
     }
 
-    public function testCapacityUpdated()
+    public function testCapacityUpdatedWhenFloatingIpCreated()
     {
         $this->assertEquals(null, $this->availabilityZoneCapacity->current);
 
@@ -116,11 +116,33 @@ class UpdateCapacityTest extends TestCase
         $this->assertIsNumeric($this->availabilityZoneCapacity->current);
     }
 
+    public function testCapacityUpdatedPercentageCalculation()
+    {
+        // /24 netmask for TEST-NET-3 range should give us 254 usable addresses.
+        $totalIps = 254;
+        $usedIps = 1;
+
+        $percentUsed = round(($usedIps / $totalIps) * 100, 2); // 0.39
+
+        $allocateIpListener = \Mockery::mock(AllocateIp::class)->makePartial();
+
+        $allocateIpListener->handle(new \App\Events\V2\FloatingIp\Created($this->floatingIp));
+
+        Event::assertDispatched(\App\Events\V2\AvailabilityZoneCapacity\Saved::class, function ($event) {
+            return $event->model->id === $this->availabilityZoneCapacity->getKey();
+        });
+
+        $this->availabilityZoneCapacity->refresh();
+
+        $this->assertEquals($percentUsed, $this->availabilityZoneCapacity->current);
+    }
+
     public function testCapacityUpdateNoAlertIsTriggered()
     {
         Mail::fake();
 
         $this->availabilityZoneCapacity->current = 10;
+        $this->availabilityZoneCapacity->save();
 
         $sendAlertListener = \Mockery::mock(\App\Listeners\V2\AvailabilityZoneCapacity\SendAlert::class)->makePartial();
         $sendAlertListener->handle(new \App\Events\V2\AvailabilityZoneCapacity\Saved($this->availabilityZoneCapacity));
@@ -133,6 +155,7 @@ class UpdateCapacityTest extends TestCase
         Mail::fake();
 
         $this->availabilityZoneCapacity->current = 70;
+        $this->availabilityZoneCapacity->save();
 
         $sendAlertListener = \Mockery::mock(\App\Listeners\V2\AvailabilityZoneCapacity\SendAlert::class)->makePartial();
         $sendAlertListener->handle(new \App\Events\V2\AvailabilityZoneCapacity\Saved($this->availabilityZoneCapacity));
@@ -147,6 +170,7 @@ class UpdateCapacityTest extends TestCase
         Mail::fake();
 
         $this->availabilityZoneCapacity->current = 85;
+        $this->availabilityZoneCapacity->save();
 
         $sendAlertListener = \Mockery::mock(\App\Listeners\V2\AvailabilityZoneCapacity\SendAlert::class)->makePartial();
         $sendAlertListener->handle(new \App\Events\V2\AvailabilityZoneCapacity\Saved($this->availabilityZoneCapacity));
