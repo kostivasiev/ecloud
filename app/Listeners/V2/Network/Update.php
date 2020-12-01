@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Network;
 
 use App\Events\V2\Network\Created;
+use App\Events\V2\Network\Saved;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
-class Deploy implements ShouldQueue
+class Update implements ShouldQueue
 {
     use InteractsWithQueue;
 
@@ -23,7 +24,7 @@ class Deploy implements ShouldQueue
      * @return void
      * @throws Exception
      */
-    public function handle(Created $event)
+    public function handle(Saved $event)
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
