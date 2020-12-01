@@ -33,7 +33,7 @@ client.test("Request executed successfully", function() {
 
 ###
 # Get Item
-GET https://{{host}}/{{version}}/availability-zone-capacities/{{capacity_id}}
+GET https://{{host}}/{{version}}/availability-zone-capacities/azc-108abf01
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
