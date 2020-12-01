@@ -3,8 +3,6 @@
 namespace Tests\unit\FloatingIps;
 
 use App\Events\V2\FloatingIp\Created;
-use App\Events\V2\Nat\Saved;
-use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
 use App\Listeners\V2\FloatingIp\AllocateIp;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
@@ -13,7 +11,6 @@ use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
