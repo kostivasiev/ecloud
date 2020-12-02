@@ -20,7 +20,7 @@ class Update implements ShouldQueue
     public $tries = 20;
 
     /**
-     * @param Created $event
+     * @param Saved $event
      * @return void
      * @throws Exception
      */
@@ -41,6 +41,7 @@ class Update implements ShouldQueue
                 $message = 'Timed out waiting for Router (' . $router->id .
                     ') to become available for Network (' . $network->id . ') deployment';
                 Log::error($message);
+                $network->setSyncFailureReason($message);
                 $this->fail(new Exception($message));
                 return;
             }
@@ -54,6 +55,7 @@ class Update implements ShouldQueue
         $message = 'Deploying Network: ' . $network->id . ': ';
         Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
         Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
+        Log::info($message . 'DHCP ID: ' . $router->vpc->dhcp->id);
 
         try {
             $router->availabilityZone->nsxService()->patch(

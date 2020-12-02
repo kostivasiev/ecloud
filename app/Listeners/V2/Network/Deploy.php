@@ -54,6 +54,7 @@ class Deploy implements ShouldQueue
         $message = 'Deploying Network: ' . $network->id . ': ';
         Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
         Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
+        Log::info($message . 'DHCP ID: ' . $router->vpc->dhcp->id);
 
         try {
             $router->availabilityZone->nsxService()->put(
