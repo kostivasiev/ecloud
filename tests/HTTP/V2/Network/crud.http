@@ -31,8 +31,8 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
-###
 
+###
 GET https://{{host}}/{{version}}/networks/{{network_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -49,7 +49,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
 PATCH https://{{host}}/{{version}}/networks/{{network_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -58,7 +57,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "subnet": "192.168.0.0/24"
+  "name": "blah"
 }
 
 > {%
@@ -67,9 +66,8 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.id === client.global.get('network_id'), "Incorrect resource ID returned");
 });
 %}
+
 ###
-
-
 GET https://{{host}}/{{version}}/networks/{{network_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -85,7 +83,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
 DELETE https://{{host}}/{{version}}/networks/{{network_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -98,43 +95,3 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 204, "Response status is not 204");
 });
 %}
-
-###
-
-GET https://{{host}}/{{version}}/credentials/{{credential_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 404, "Response status is not 404");
-});
-%}
-
-
-
-### Tear down dependancies
-
-DELETE https://{{host}}/{{version}}/regions/{{region_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://{{host}}/{{version}}/availability_zones/{{availability_zone_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://{{host}}/{{version}}/vpc/{{vpc_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
