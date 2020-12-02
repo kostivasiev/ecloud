@@ -100,11 +100,16 @@ class Update implements ShouldQueue
                     $network->setSyncFailureReason($message);
                     return;
                 }
+
+                $message = 'Unhandled error response for ' . $network->id;
+                Log::error($message, [$exception]);
+                $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
+                return;
             }
 
             $message = 'Unhandled error for ' . $network->id;
             Log::error($message, [$exception]);
-            $network->setSyncFailureReason($message);
+            $network->setSyncFailureReason($message . PHP_EOL . $exception->getMessage());
             return;
         }
         $network->setSyncCompleted();

@@ -57,7 +57,7 @@ class Deploy implements ShouldQueue
         Log::info($message . 'DHCP ID: ' . $router->vpc->dhcp->id);
 
         try {
-            $router->availabilityZone->nsxService()->put(
+            $response = $router->availabilityZone->nsxService()->put(
                 'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id,
                 [
                     'json' => [
@@ -99,11 +99,16 @@ class Deploy implements ShouldQueue
                     $network->setSyncFailureReason($message);
                     return;
                 }
+
+                $message = 'Unhandled error response for ' . $network->id;
+                Log::error($message, [$exception]);
+                $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
+                return;
             }
 
             $message = 'Unhandled error for ' . $network->id;
             Log::error($message, [$exception]);
-            $network->setSyncFailureReason($message);
+            $network->setSyncFailureReason($message . ' : ' . $exception->getMessage());
             return;
         }
         $network->setSyncCompleted();
