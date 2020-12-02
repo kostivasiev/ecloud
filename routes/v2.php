@@ -216,4 +216,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
         $router->delete('support/{vpcSupportId}', 'VpcSupportController@destroy');
     });
+
+    /** MRR Commitment */
+    $router->group([], function () use ($router) {
+        $router->get('mrr-commitments', 'MrrCommitmentController@index');
+        $router->get('mrr-commitments/{commitmentId}', 'MrrCommitmentController@show');
+        $router->post('mrr-commitments', 'MrrCommitmentController@store');
+        $router->patch('mrr-commitments/{commitmentId}', 'MrrCommitmentController@update');
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->delete('mrr-commitments/{commitmentId}', 'MrrCommitmentController@destroy');
+        });
+    });
 });
