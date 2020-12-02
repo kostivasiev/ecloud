@@ -6,13 +6,14 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Test",
   "vpc_id": "{{dev_vpc_id}}",
-  "availability_zone_id": "{{dev_availability_zone_id}}",
-  "network_id": "net-33fe9bf9",
-  "appliance_id": "eed603bf-d40e-47d7-bb98-66d2940e0dc2",
+  "name": "Test",
   "vcpu_cores": 1,
-  "ram_capacity": 1024
+  "ram_capacity": 1024,
+  "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
+  "requires_floating_ip": true,
+  "network_id": "net-54c46e3d",
+  "volume_capacity": 15
 }
 
 > {%
@@ -37,7 +38,6 @@ client.test('Test get volumes', function () {
     client.global.set('volume_id', response.body.data[0].id);
 });
 %}
-
 ###
 # Delete Instance
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}

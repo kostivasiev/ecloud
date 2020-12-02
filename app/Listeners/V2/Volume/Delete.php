@@ -20,10 +20,9 @@ class Delete implements ShouldQueue
     public function handle(Deleted $event)
     {
         Log::info(get_class($this).' : Started', ['event' => $event]);
-        // Get the volume along with the number of instances that are using the volume
-        $volume = ($event->model)->withCount(['instances'])->first();
-        // if there are no instances with this volume attached then it's safe to delete
-        if ($volume->instances_count == 0) {
+        $volume = $event->model;
+
+        if ($volume->instances()->count() == 0) {
             $endpoint = '/api/v1/vpc/' . $volume->vpc->id . '/volume/' . $volume->vmware_uuid;
             $volume->availabilityZone->kingpinService()->delete($endpoint);
             Log::info('Volume ' . $volume->getKey() . ' (' . $volume->vmware_uuid . ') deleted.');
