@@ -33,7 +33,7 @@ client.test("Request executed successfully", function() {
 %}
 ###
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/networks/{{network_id}}
+GET https://{{host}}/{{version}}/networks/{{network_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
