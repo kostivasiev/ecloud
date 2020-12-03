@@ -27,9 +27,17 @@ properties:
     example: 24
     description: term duration in months
   term_start_date:
-    type: datetime
-    example: 2010-12-03 12:01:00
+    type: string
+    example: '2020-12-03 10:30:00'
   term_end_date:
-    type: datetime
-    example: 2010-12-04 12:01:00
+    type: string
+    example: '2020-12-03 10:30:00'
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
 description: 'Discount Plans'
