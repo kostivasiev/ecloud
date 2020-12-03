@@ -49,7 +49,6 @@ class UpdateTest extends TestCase
             'reseller_id' => 1,
             'key' => 'ram.capacity',
             'value' => '16GB',
-            'cost' => '5.55',
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
     }

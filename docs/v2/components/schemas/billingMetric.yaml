@@ -23,10 +23,6 @@ properties:
     type: string
     required: true
     example: '16GB'
-  cost:
-    type: float
-    required: true
-    example: '5.55'
   start:
     type: string
     required: true

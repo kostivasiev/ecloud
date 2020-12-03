@@ -49,7 +49,6 @@ class GetTest extends TestCase
             'reseller_id' => 1,
             'key' => 'ram.capacity',
             'value' => '16GB',
-            'cost' => '5.55',
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
     }
@@ -67,7 +66,6 @@ class GetTest extends TestCase
                 'reseller_id' => (string)$this->billingMetric->reseller_id,
                 'key' => $this->billingMetric->key,
                 'value' => $this->billingMetric->value,
-                'cost' => $this->billingMetric->cost,
                 'start' => $this->billingMetric->start,
             ])
             ->assertResponseStatus(200);
@@ -86,7 +84,6 @@ class GetTest extends TestCase
                 'reseller_id' => (string)$this->billingMetric->reseller_id,
                 'key' => $this->billingMetric->key,
                 'value' => $this->billingMetric->value,
-                'cost' => $this->billingMetric->cost,
                 'start' => $this->billingMetric->start,
             ])
             ->assertResponseStatus(200);

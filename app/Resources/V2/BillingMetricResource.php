@@ -16,7 +16,6 @@ class BillingMetricResource extends UKFastResource
             'reseller_id' => $this->reseller_id,
             'key' => $this->key,
             'value' => $this->value,
-            'cost' => $this->cost,
             'start' => Carbon::parse(
                 $this->start,
                 new \DateTimeZone(config('app.timezone'))

@@ -34,7 +34,6 @@ class BillingMetricController extends BaseController
             'reseller_id',
             'key',
             'value',
-            'cost',
             'start',
             'end',
         ]));
@@ -51,7 +50,6 @@ class BillingMetricController extends BaseController
             'reseller_id',
             'key',
             'value',
-            'cost',
             'start',
             'end',
         ]));
