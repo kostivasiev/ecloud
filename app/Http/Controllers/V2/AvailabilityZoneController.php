@@ -206,7 +206,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param Request $request
      * @param string $zoneId
-     * @return AvailabilityZonePricesResource
+     * @return \Illuminate\Http\JsonResponse
      */
     public function prices(Request $request, string $zoneId)
     {
@@ -222,14 +222,9 @@ class AvailabilityZoneController extends BaseController
             ];
         });
 
-
         return response()->json([
             'data' => $resource,
             'meta' => (object)[],
         ]);
-
-//        return new AvailabilityZonePricesResource(
-//            $resource
-//        );
     }
 }

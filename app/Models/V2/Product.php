@@ -5,7 +5,6 @@ namespace App\Models\V2;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-
 /**
  * Class Product
  * @package App\Models\V1
