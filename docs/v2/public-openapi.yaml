@@ -199,3 +199,7 @@ paths:
     $ref: 'resources/VpcSupport/collection.yaml'
   '/ecloud/v2/support/{supportId}':
     $ref: 'resources/VpcSupport/item.yaml'
+  '/ecloud/v2/billing-metrics':
+    $ref: 'resources/BillingMetric/public_collection.yaml'
+  '/ecloud/v2/billing-metrics/{billingMetricsId}':
+    $ref: 'resources/BillingMetric/public_item.yaml'

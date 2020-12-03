@@ -15,7 +15,6 @@ class CreateBillingMetricsTable extends Migration
             $table->integer('reseller_id');
             $table->string('key');
             $table->string('value');
-            $table->float('cost');
             $table->timestamp('start')->nullable();
             $table->timestamp('end')->nullable();
             $table->timestamps();
