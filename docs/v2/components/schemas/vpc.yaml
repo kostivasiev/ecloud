@@ -10,6 +10,10 @@ properties:
     type: string
     required: true
     example: 'reg-a63dd78c'
+  support_enabled:
+    type: boolean
+    readOnly: true
+    example: true
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

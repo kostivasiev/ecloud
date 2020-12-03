@@ -53,12 +53,6 @@ class CreateRequest extends FormRequest
                 'min:' . config('instance.ram_capacity.min'),
                 'max:' . config('instance.ram_capacity.max'),
             ],
-            'availability_zone_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.availability_zones,id,deleted_at,NULL'
-            ],
             'locked' => 'sometimes|required|boolean',
             'platform' => 'sometimes|required|in:Windows,Linux',
             'backup_enabled' => 'sometimes|required|boolean',

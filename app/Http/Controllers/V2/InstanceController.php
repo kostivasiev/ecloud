@@ -16,9 +16,9 @@ use App\Jobs\Instance\PowerReset;
 use App\Jobs\Instance\UpdateTaskJob;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
-use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Volume;
+use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
@@ -77,10 +77,31 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
+        $vpc = Vpc::forUser(app('request')->user)->findOrFail($request->input('vpc_id'));
+
+        // Use the default network if there is only one and no network_id was passed in
+        $defaultNetworkId = null;
+        if (!$request->has('network_id')) {
+            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1) {
+                $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
+            }
+            if (!$defaultNetworkId) {
+                return JsonResponse::create([
+                    'errors' => [
+                        [
+                            'title' => 'Not Found',
+                            'detail' => 'No network_id provided and could not find a default network',
+                            'status' => 404,
+                            'source' => 'network_id'
+                        ]
+                    ]
+                ], 404);
+            }
+        }
+
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
-            'availability_zone_id',
             'vcpu_cores',
             'ram_capacity',
             'locked',
@@ -93,29 +114,6 @@ class InstanceController extends BaseController
         }
         $instance->save();
         $instance->refresh();
-
-        // Use the default network if there is only one and no network_id was passed in
-        $defaultNetworkId = null;
-        if (!$request->has('network_id')) {
-            $routers = $instance->vpc->routers;
-            if (count($routers) == 1) {
-                $networks = $routers->first()->networks;
-                if (count($networks) == 1) {
-                    // This could be done better, but deadlines. Should check all routers/networks for owned Networks
-                    $defaultNetworkId = Network::forUser(app('request')->user)->findOrFail($networks->first()->id)->id;
-                }
-            }
-            if (!$defaultNetworkId) {
-                return JsonResponse::create([
-                    'errors' => [
-                        'title' => 'Not Found',
-                        'detail' => 'No network_id provided and could not find a default network',
-                        'status' => 404,
-                        'source' => 'availability_zone_id'
-                    ]
-                ], 404);
-            }
-        }
 
         $instanceDeployData = new Data();
         $instanceDeployData->instance_id = $instance->id;
@@ -148,8 +146,21 @@ class InstanceController extends BaseController
             'backup_enabled',
         ]))->save();
 
-        $task = $instance->createTask();
-        dispatch(new UpdateTaskJob($task, $instance, $request->all()));
+        if ($request->hasAny(['vcpu_cores', 'ram_capacity'])) {
+            if ($instance->state != Instance::STATUS_READY) {
+                return JsonResponse::create([
+                    'errors' => [
+                        [
+                            'title' => 'Unprocessable Entity',
+                            'detail' => 'Instance status is not ' . Instance::STATUS_READY,
+                            'status' => 422,
+                        ]
+                    ]
+                ], 422);
+            }
+            $task = $instance->createTask();
+            dispatch(new UpdateTaskJob($task, $instance, $request->all()));
+        }
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }

@@ -20,7 +20,7 @@ class UnAssign extends Job
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
-        $floatingIp = FloatingIp::findOrFail($this->data['floating_ip_id']);
+        $floatingIp = FloatingIp::withTrashed()->findOrFail($this->data['floating_ip_id']);
 
         Nat::where('source_id', $floatingIp->getKey())
             ->orWhere('destination_id', $floatingIp->getKey())

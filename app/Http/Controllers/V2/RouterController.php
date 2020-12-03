@@ -72,7 +72,9 @@ class RouterController extends BaseController
     {
         $router = Router::forUser(app('request')->user)->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id']));
-        $router->save();
+        if (!$router->save()) {
+            return $router->getSyncError();
+        }
         return $this->responseIdMeta($request, $router->getKey(), 200);
     }
 
@@ -84,7 +86,13 @@ class RouterController extends BaseController
     public function destroy(Request $request, string $routerId)
     {
         $router = Router::forUser($request->user)->findOrFail($routerId);
-        $router->delete();
+        try {
+            if (!$router->delete()) {
+                return $router->getSyncError();
+            }
+        } catch (\Exception $e) {
+            return $router->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 

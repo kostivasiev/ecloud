@@ -46,6 +46,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Dhcp\Deleted::class,
             \App\Events\V2\Nic\Deleted::class,
             \App\Events\V2\FirewallRulePort\Deleted::class,
+            \App\Events\V2\FloatingIp\Deleted::class,
+            \App\Events\V2\Volume\Deleted::class,
 
             // Updated
             \App\Events\V2\Volume\Updated::class,
@@ -54,8 +56,13 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FirewallRule\Saved::class,
             \App\Events\V2\FirewallPolicy\Saved::class,
             \App\Events\V2\Router\Saved::class,
+            \App\Events\V2\Network\Saved::class,
             \App\Events\V2\Nat\Saved::class,
             \App\Events\V2\FirewallRulePort\Saved::class,
+
+            // Saving
+            \App\Events\V2\Router\Saving::class,
+            \App\Events\V2\Network\Saving::class,
 
             // Deploy
             \App\Events\V2\Instance\Deploy::class,

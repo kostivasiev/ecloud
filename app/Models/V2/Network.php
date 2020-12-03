@@ -4,9 +4,12 @@ namespace App\Models\V2;
 
 use App\Events\V2\Network\Created;
 use App\Events\V2\Network\Creating;
+use App\Events\V2\Network\Saved;
+use App\Events\V2\Network\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use App\Traits\V2\Syncable;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,7 +30,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Network extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
 
     public $keyPrefix = 'net';
     protected $keyType = 'string';
@@ -45,6 +48,8 @@ class Network extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
+        'saving' => Saving::class,
+        'saved' => Saved::class,
     ];
 
     public $children = [

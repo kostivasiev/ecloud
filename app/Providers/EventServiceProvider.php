@@ -102,6 +102,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FloatingIp\Created::class => [
             \App\Listeners\V2\FloatingIp\AllocateIp::class
         ],
+        \App\Events\V2\FloatingIp\Deleted::class => [
+            \App\Listeners\V2\FloatingIp\Unassign::class
+        ],
 
         // Instance
         \App\Events\V2\Instance\Creating::class => [
@@ -129,6 +132,13 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Network\Created::class => [
             \App\Listeners\V2\Network\Deploy::class,
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Saved::class => [
+            \App\Listeners\V2\Network\Update::class
         ],
 
         // Nat
@@ -158,6 +168,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Router\Created::class => [
             \App\Listeners\V2\Router\Deploy::class,
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Router\Saved::class => [
             \App\Listeners\V2\Router\Update::class,
@@ -166,12 +177,18 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Router\Networks\Delete::class,
             \App\Listeners\V2\Router\FirewallPolicies\Delete::class,
         ],
+        \App\Events\V2\Router\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
 
         // Volume
         \App\Events\V2\Volume\Creating::class => [
         ],
         \App\Events\V2\Volume\Updated::class => [
             \App\Listeners\V2\Volume\CapacityIncrease::class,
+        ],
+        \App\Events\V2\Volume\Deleted::class => [
+            \App\Listeners\V2\Volume\Delete::class,
         ],
 
         // Vpc

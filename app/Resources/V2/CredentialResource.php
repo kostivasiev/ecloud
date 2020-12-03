@@ -36,11 +36,9 @@ class CredentialResource extends UKFastResource
             'port' => $this->port
         ];
 
-        if ($request->user->isAdministrator) {
-            $tz = new \DateTimeZone(config('app.timezone'));
-            $data['created_at'] = Carbon::parse($this->created_at, $tz)->toIso8601String();
-            $data['updated_at'] = Carbon::parse($this->updated_at, $tz)->toIso8601String();
-        }
+        $tz = new \DateTimeZone(config('app.timezone'));
+        $data['created_at'] = Carbon::parse($this->created_at, $tz)->toIso8601String();
+        $data['updated_at'] = Carbon::parse($this->updated_at, $tz)->toIso8601String();
 
         return $data;
     }
