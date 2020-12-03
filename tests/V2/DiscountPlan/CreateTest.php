@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\V2\MrrCommitment;
+namespace Tests\V2\DiscountPlan;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -23,7 +23,7 @@ class CreateTest extends TestCase
             'term_end_date' => date('Y-m-d H:i:s', strtotime('2 days')),
         ];
         $this->post(
-            '/v2/mrr-commitments',
+            '/v2/discount-plans',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -31,7 +31,7 @@ class CreateTest extends TestCase
                 'X-Reseller-Id' => 1,
             ]
         )->seeInDatabase(
-            'mrr_commitments',
+            'discount_plans',
             $data,
             'ecloud'
         )->assertResponseStatus(201);

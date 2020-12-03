@@ -2,10 +2,10 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\MrrCommitment;
+use App\Models\V2\DiscountPlan;
 use Faker\Generator as Faker;
 
-$factory->define(MrrCommitment::class, function (Faker $faker) {
+$factory->define(DiscountPlan::class, function (Faker $faker) {
     return [
         'reseller_id' => 1,
         'name' => 'test-commitment',

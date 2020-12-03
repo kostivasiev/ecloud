@@ -2,23 +2,23 @@
 
 namespace App\Rules\V2;
 
-use App\Models\V2\MrrCommitment;
+use App\Models\V2\DiscountPlan;
 use Illuminate\Contracts\Validation\Rule;
 
 class CommitmentIsGreater implements Rule
 {
-    protected string $commitmentId;
+    protected string $discountPlanId;
 
-    public function __construct(string $commitmentId)
+    public function __construct(string $discountPlanId)
     {
-        $this->commitmentId = $commitmentId;
+        $this->discountPlanId = $discountPlanId;
     }
 
     public function passes($attribute, $value)
     {
-        $commitment = MrrCommitment::forUser(app('request')->user)
-            ->findOrFail($this->commitmentId);
-        return $value > $commitment->$attribute;
+        $discountPlan = DiscountPlan::forUser(app('request')->user)
+            ->findOrFail($this->discountPlanId);
+        return $value > $discountPlan->$attribute;
     }
 
     /**

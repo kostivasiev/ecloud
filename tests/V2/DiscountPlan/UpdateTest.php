@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\MrrCommitment;
+namespace Tests\V2\DiscountPlan;
 
-use App\Models\V2\MrrCommitment;
+use App\Models\V2\DiscountPlan;
 use App\Rules\V2\CommitmentIsGreater;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -12,12 +12,12 @@ class UpdateTest extends TestCase
 
     use DatabaseMigrations;
 
-    protected MrrCommitment $commitment;
+    protected DiscountPlan $discountPlan;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->commitment = factory(MrrCommitment::class)->create([
+        $this->discountPlan = factory(DiscountPlan::class)->create([
             'contact_id' => 1,
             'name' => 'test-commitment',
             'commitment_amount' => '2000',
@@ -31,7 +31,7 @@ class UpdateTest extends TestCase
 
     public function testCommitmentIsGreaterRule()
     {
-        $validationRule = new CommitmentIsGreater($this->commitment->getKey());
+        $validationRule = new CommitmentIsGreater($this->discountPlan->getKey());
 
         // commitment_amount
         $this->assertFalse($validationRule->passes('commitment_amount', 1000));
@@ -66,7 +66,7 @@ class UpdateTest extends TestCase
             'term_end_date' => date('Y-m-d H:i:s', strtotime('4 days')),
         ];
         $this->patch(
-            '/v2/mrr-commitments/'.$this->commitment->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->getKey(),
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -74,7 +74,7 @@ class UpdateTest extends TestCase
                 'X-Reseller-Id' => 1,
             ]
         )->seeInDatabase(
-            'mrr_commitments',
+            'discount_plans',
             $data,
             'ecloud'
         )->assertResponseStatus(200);

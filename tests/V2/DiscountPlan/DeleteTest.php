@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\MrrCommitment;
+namespace Tests\V2\DiscountPlan;
 
-use App\Models\V2\MrrCommitment;
+use App\Models\V2\DiscountPlan;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -11,12 +11,12 @@ class DeleteTest extends TestCase
 
     use DatabaseMigrations;
 
-    protected MrrCommitment $commitment;
+    protected DiscountPlan $discountPlan;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->commitment = factory(MrrCommitment::class)->create([
+        $this->discountPlan = factory(DiscountPlan::class)->create([
             'contact_id' => 1,
         ]);
     }
@@ -24,7 +24,7 @@ class DeleteTest extends TestCase
     public function testDeleteRecord()
     {
         $this->delete(
-            '/v2/mrr-commitments/'.$this->commitment->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->getKey(),
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -33,7 +33,7 @@ class DeleteTest extends TestCase
             ]
         )->assertResponseStatus(204);
 
-        $commitment = MrrCommitment::withTrashed()->findOrFail($this->commitment->getKey());
-        $this->assertNotNull($commitment->deleted_at);
+        $discountPlan = DiscountPlan::withTrashed()->findOrFail($this->discountPlan->getKey());
+        $this->assertNotNull($discountPlan->deleted_at);
     }
 }

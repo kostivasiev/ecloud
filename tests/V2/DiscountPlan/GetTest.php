@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\V2\MrrCommitment;
+namespace Tests\V2\DiscountPlan;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\MrrCommitment;
+use App\Models\V2\DiscountPlan;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -18,13 +18,13 @@ class GetTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected MrrCommitment $commitment;
+    protected DiscountPlan $discountPlan;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->commitment = factory(MrrCommitment::class)->create([
+        $this->discountPlan = factory(DiscountPlan::class)->create([
             'contact_id' => 1,
         ]);
     }
@@ -32,34 +32,34 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/mrr-commitments',
+            '/v2/discount-plans',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'name' => $this->commitment->name,
-            'commitment_amount' => $this->commitment->commitment_amount,
-            'commitment_before_discount' => $this->commitment->commitment_before_discount,
-            'discount_rate' => $this->commitment->discount_rate,
-            'term_length' => $this->commitment->term_length,
+            'name' => $this->discountPlan->name,
+            'commitment_amount' => $this->discountPlan->commitment_amount,
+            'commitment_before_discount' => $this->discountPlan->commitment_before_discount,
+            'discount_rate' => $this->discountPlan->discount_rate,
+            'term_length' => $this->discountPlan->term_length,
         ])->assertResponseStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get(
-            '/v2/mrr-commitment/'.$this->commitment->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'name' => $this->commitment->name,
-            'commitment_amount' => $this->commitment->commitment_amount,
-            'commitment_before_discount' => $this->commitment->commitment_before_discount,
-            'discount_rate' => $this->commitment->discount_rate,
-            'term_length' => $this->commitment->term_length,
+            'name' => $this->discountPlan->name,
+            'commitment_amount' => $this->discountPlan->commitment_amount,
+            'commitment_before_discount' => $this->discountPlan->commitment_before_discount,
+            'discount_rate' => $this->discountPlan->discount_rate,
+            'term_length' => $this->discountPlan->term_length,
         ])->assertResponseStatus(200);
     }
 }

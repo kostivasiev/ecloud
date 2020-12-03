@@ -12,13 +12,13 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class MrrCommitment
+ * Class DiscountPlan
  * @package App\Models\V2
- * @method static MrrCommitment forUser($user)
- * @method static MrrCommitment findOrFail(string $commitmentId)
+ * @method static DiscountPlan forUser($user)
+ * @method static DiscountPlan findOrFail(string $commitmentId)
  * @property mixed reseller_id
  */
-class MrrCommitment extends Model implements Filterable, Sortable
+class DiscountPlan extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 

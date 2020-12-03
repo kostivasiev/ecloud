@@ -5,10 +5,10 @@ namespace App\Http\Requests\V2;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateMrrCommitmentRequest
+ * Class CreateDiscountPlanRequest
  * @package App\Http\Requests\V2
  */
-class CreateMrrCommitmentRequest extends FormRequest
+class CreateDiscountPlanRequest extends FormRequest
 {
     public function authorize()
     {

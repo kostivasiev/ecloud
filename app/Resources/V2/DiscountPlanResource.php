@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
 /**
- * Class MrrCommitmentResource
+ * Class DiscountPlanResource
  * @package App\Resources\V2
  * @property string id
  * @property string reseller_id
@@ -20,7 +20,7 @@ use UKFast\Responses\UKFastResource;
  * @property string term_start_date
  * @property string term_end_date
  */
-class MrrCommitmentResource extends UKFastResource
+class DiscountPlanResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request

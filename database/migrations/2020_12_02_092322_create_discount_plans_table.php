@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMrrCommitmentsTable extends Migration
+class CreateDiscountPlansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateMrrCommitmentsTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('mrr_commitments', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('discount_plans', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->bigInteger('reseller_id')->default(0);
             $table->bigInteger('contact_id')->default(0);
@@ -37,6 +37,6 @@ class CreateMrrCommitmentsTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('mrr_commitments');
+        Schema::connection('ecloud')->dropIfExists('discount_plans');
     }
 }

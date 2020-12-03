@@ -6,10 +6,10 @@ use App\Rules\V2\CommitmentIsGreater;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateMrrCommitmentRequest
+ * Class UpdateDiscountPlanRequest
  * @package App\Http\Requests\V2
  */
-class UpdateMrrCommitmentRequest extends FormRequest
+class UpdateDiscountPlanRequest extends FormRequest
 {
     public function authorize()
     {
@@ -18,7 +18,7 @@ class UpdateMrrCommitmentRequest extends FormRequest
 
     public function rules()
     {
-        $commitmentId = $this->request->route('commitmentId');
+        $discountPlanId = app('request')->route('discountPlanId');
         return [
             'name' => 'sometimes|required|string|max:255',
             'commitment_amount' => [
@@ -26,14 +26,14 @@ class UpdateMrrCommitmentRequest extends FormRequest
                 'required',
                 'numeric',
                 'regex:/^\d+(\.\d{1,2})?$/',
-                new CommitmentIsGreater($commitmentId)
+                new CommitmentIsGreater($discountPlanId)
             ],
             'commitment_before_discount' => [
                 'sometimes',
                 'required',
                 'numeric',
                 'regex:/^\d+(\.\d{1,2})?$/',
-                new CommitmentIsGreater($commitmentId)
+                new CommitmentIsGreater($discountPlanId)
             ],
             'discount_rate' => 'sometimes|required|numeric|min:0|max:100',
             'term_length' => [
@@ -41,21 +41,21 @@ class UpdateMrrCommitmentRequest extends FormRequest
                 'required',
                 'integer',
                 'min:1',
-                new CommitmentIsGreater($commitmentId)
+                new CommitmentIsGreater($discountPlanId)
             ],
             'term_start_date' => [
                 'sometimes',
                 'required',
                 'date',
-                'after_or_equals:today',
-                new CommitmentIsGreater($commitmentId)
+                'after_or_equal:today',
+                new CommitmentIsGreater($discountPlanId)
             ],
             'term_end_date' => [
                 'sometimes',
                 'required',
                 'date',
                 'after:today',
-                new CommitmentIsGreater($commitmentId)
+                new CommitmentIsGreater($discountPlanId)
             ],
         ];
     }

@@ -217,14 +217,14 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('support/{vpcSupportId}', 'VpcSupportController@destroy');
     });
 
-    /** MRR Commitment */
+    /** Discount Plans */
     $router->group([], function () use ($router) {
-        $router->get('mrr-commitments', 'MrrCommitmentController@index');
-        $router->get('mrr-commitments/{commitmentId}', 'MrrCommitmentController@show');
-        $router->post('mrr-commitments', 'MrrCommitmentController@store');
-        $router->patch('mrr-commitments/{commitmentId}', 'MrrCommitmentController@update');
+        $router->get('discount-plans', 'DiscountPlanController@index');
+        $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
+        $router->post('discount-plans', 'DiscountPlanController@store');
+        $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->delete('mrr-commitments/{commitmentId}', 'MrrCommitmentController@destroy');
+            $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
         });
     });
 });
