@@ -1,0 +1,35 @@
+properties:
+  id:
+    type: string
+    example: disc-2b66bb79
+    readOnly: true
+  contact_id:
+    type: integer
+    example: 123456
+  employee_id:
+    type: integer
+    example: 123456
+  name:
+    type: string
+    example: 'Discount Plan Name'
+  commitment_amount:
+    type: float
+    example: 999.99
+  commitment_before_discount:
+    type: float
+    example: 999.99
+  discount_rate:
+    type: integer
+    example: 5
+    description: Numeric percentage discount
+  term_length:
+    type: integer
+    example: 24
+    description: term duration in months
+  term_start_date:
+    type: datetime
+    example: 2010-12-03 12:01:00
+  term_end_date:
+    type: datetime
+    example: 2010-12-04 12:01:00
+description: 'Discount Plans'
