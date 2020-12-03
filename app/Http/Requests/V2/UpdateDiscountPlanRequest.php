@@ -68,7 +68,7 @@ class UpdateDiscountPlanRequest extends FormRequest
             'numeric' => 'The :attribute field is not a numeric value',
             'integer' => 'The :attribute field is not an integer value',
             'commitment_amount.regex' => 'The :attribute field is not a valid monetary value',
-            'term_start_date.after_or_equals' => 'The :attribute field cannot be a date in the past',
+            'term_start_date.after_or_equal' => 'The :attribute field cannot be a date in the past',
             'term_end_date.after' => 'The :attribute field must be a date after today',
         ];
     }
