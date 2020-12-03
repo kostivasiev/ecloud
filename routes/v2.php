@@ -218,13 +218,11 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Discount Plans */
-    $router->group([], function () use ($router) {
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->get('discount-plans', 'DiscountPlanController@index');
         $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
         $router->post('discount-plans', 'DiscountPlanController@store');
         $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
-        });
+        $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
     });
 });
