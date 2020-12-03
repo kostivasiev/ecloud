@@ -121,6 +121,10 @@ paths:
     $ref: 'resources/AvailabilityZone/instance-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/lbcs':
     $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
+  '/ecloud/v2/discount-plans':
+    $ref: 'resources/DiscountPlan/admin-collection.yaml'
+  '/ecloud/v2/discount-plans/{discountPlanId}':
+    $ref: 'resources/DiscountPlan/admin-item.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
