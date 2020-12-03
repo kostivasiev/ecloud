@@ -1,4 +1,4 @@
-GET https://{{host}}/{{version}}/instances/i-7f6cb759
+GET https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -12,7 +12,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-PATCH https://{{host}}/{{version}}/instances/i-7f6cb759
+PATCH https://{{host}}/{{version}}/instances/i-d19ee53f
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

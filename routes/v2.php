@@ -225,4 +225,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
         $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
     });
+    
+    /** Billing Metrics */
+    $router->group([], function () use ($router) {
+        $router->get('billing-metrics', 'BillingMetricController@index');
+        $router->get('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@show');
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->post('billing-metrics', 'BillingMetricController@create');
+            $router->patch('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@update');
+            $router->delete('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@destroy');
+        });
+    });
 });

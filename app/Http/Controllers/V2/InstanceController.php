@@ -146,8 +146,21 @@ class InstanceController extends BaseController
             'backup_enabled',
         ]))->save();
 
-        $task = $instance->createTask();
-        dispatch(new UpdateTaskJob($task, $instance, $request->all()));
+        if ($request->hasAny(['vcpu_cores', 'ram_capacity'])) {
+            if ($instance->state != Instance::STATUS_READY) {
+                return JsonResponse::create([
+                    'errors' => [
+                        [
+                            'title' => 'Unprocessable Entity',
+                            'detail' => 'Instance status is not ' . Instance::STATUS_READY,
+                            'status' => 422,
+                        ]
+                    ]
+                ], 422);
+            }
+            $task = $instance->createTask();
+            dispatch(new UpdateTaskJob($task, $instance, $request->all()));
+        }
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
     }

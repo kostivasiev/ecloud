@@ -18,11 +18,11 @@ trait Syncable
         if (!$this->syncs()->count()) {
             return 'complete';
         }
-        if ($this->syncs()->latest()->first()->completed) {
-            return 'complete';
-        }
         if ($this->getSyncFailed()) {
             return 'failed';
+        }
+        if ($this->syncs()->latest()->first()->completed) {
+            return 'complete';
         }
         return 'in-progress';
     }
@@ -55,7 +55,7 @@ trait Syncable
         }
         $sync = $this->syncs()->latest()->first();
         $sync->failure_reason = $value;
-        $sync->save;
+        $sync->save();
     }
 
     public function getSyncFailureReason()
@@ -75,10 +75,12 @@ trait Syncable
         return \Illuminate\Http\JsonResponse::create(
             [
                 'errors' => [
-                    'title' => 'Resource unavailable',
-                    'detail' => 'The specified resource is being modified and is unavailable at this time',
-                    'status' => Response::HTTP_CONFLICT,
-                ]
+                    [
+                        'title' => 'Resource unavailable',
+                        'detail' => 'The specified resource is being modified and is unavailable at this time',
+                        'status' => Response::HTTP_CONFLICT,
+                    ],
+                ],
             ],
             Response::HTTP_CONFLICT
         );
