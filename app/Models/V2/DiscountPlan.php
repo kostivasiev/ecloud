@@ -22,7 +22,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    public $keyPrefix = 'mrrc';
+    public $keyPrefix = 'disc';
     public $incrementing = false;
     public $timestamps = true;
     protected $keyType = 'string';
