@@ -9,7 +9,9 @@ use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\Product;
 use App\Models\V2\Router;
+use App\Resources\V2\AvailabilityZonePricesResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
@@ -199,5 +201,35 @@ class AvailabilityZoneController extends BaseController
             return $availabilityZone->getDeletionError($e);
         }
         return response()->json([], 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $zoneId
+     * @return AvailabilityZonePricesResource
+     */
+    public function prices(Request $request, string $zoneId)
+    {
+        $availabilityZone = AvailabilityZone::forUser($request->user)->findOrFail($zoneId);
+
+        $products = $availabilityZone->products()->get(); // Hack - this is not an Eloquent relation.
+
+        $resource = new \StdClass();
+        $products->each(function ($product) use (&$resource) {
+            $resource->availability_zone_id = $product->availabilityZoneId;
+            $resource->{strtolower($product->product_subcategory)}[] = [
+                $product->name => $product->price
+            ];
+        });
+
+
+        return response()->json([
+            'data' => $resource,
+            'meta' => (object)[],
+        ]);
+
+//        return new AvailabilityZonePricesResource(
+//            $resource
+//        );
     }
 }

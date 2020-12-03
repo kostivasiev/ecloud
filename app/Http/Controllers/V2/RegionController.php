@@ -7,9 +7,12 @@ use App\Http\Requests\V2\UpdateRegionRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
+use App\Resources\V2\AvailabilityZonePricesResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\RegionResource;
 use App\Resources\V2\VpcResource;
+use App\Responses\PaginatedCollectionResponse;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -119,5 +122,28 @@ class RegionController extends BaseController
         return VpcResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
+    }
+
+    public function prices(Request $request, string $regionId)
+    {
+        $region = Region::forUser($request->user)->findOrFail($regionId);
+
+        $collection = collect();
+
+        $region->availabilityZones->each(function ($availabilityZone) use ($collection) {
+            $products = $availabilityZone->products()->get(); // Hack - this is not an Eloquent relation.
+
+            $resource = new \StdClass();
+            $products->each(function ($product) use (&$resource) {
+                $resource->availability_zone_id = $product->availabilityZoneId;
+                $resource->{strtolower($product->product_subcategory)}[] = [
+                    $product->name => $product->price
+                ];
+            });
+
+            $collection->add($resource);
+        });
+
+        return new PaginatedCollectionResponse($collection);
     }
 }
