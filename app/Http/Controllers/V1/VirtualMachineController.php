@@ -1324,8 +1324,8 @@ class VirtualMachineController extends BaseController
             throw new Exceptions\ForbiddenException('Access to modify UKFast managed devices is restricted');
         }
 
-        // todo remove when public/burst VMs supported, missing billing step on automation
-        if (in_array($virtualMachine->type(), ['Public', 'Burst']) && !$this->isAdmin) {
+        // todo remove when burst VMs supported, missing billing step on automation
+        if (in_array($virtualMachine->type(), ['Burst']) && !$this->isAdmin) {
             throw new Exceptions\ForbiddenException(
                 $virtualMachine->type() . ' VM updates are temporarily disabled'
             );
