@@ -131,7 +131,7 @@ class RegionController extends BaseController
         $collection = collect();
 
         $region->availabilityZones->each(function ($availabilityZone) use ($collection) {
-            $products = $availabilityZone->products()->get(); // Hack - this is not an Eloquent relation.
+            $products = $availabilityZone->products()->get(); // Cross DB Hack - this is not an Eloquent relation.
 
             $resource = new \StdClass();
             $products->each(function ($product) use (&$resource) {
