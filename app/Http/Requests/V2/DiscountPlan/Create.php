@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\DiscountPlan;
 
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateDiscountPlanRequest
+ * Class Create
  * @package App\Http\Requests\V2
  */
-class CreateDiscountPlanRequest extends FormRequest
+class Create extends FormRequest
 {
     public function authorize()
     {

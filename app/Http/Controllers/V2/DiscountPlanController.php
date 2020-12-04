@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateDiscountPlanRequest;
-use App\Http\Requests\V2\UpdateDiscountPlanRequest;
+use App\Http\Requests\V2\DiscountPlan\Create;
+use App\Http\Requests\V2\DiscountPlan\Update;
 use App\Models\V2\DiscountPlan;
 use App\Resources\V2\DiscountPlanResource;
 use Illuminate\Http\JsonResponse;
@@ -46,10 +46,10 @@ class DiscountPlanController extends BaseController
     }
 
     /**
-     * @param CreateDiscountPlanRequest $request
+     * @param Create $request
      * @return JsonResponse
      */
-    public function store(CreateDiscountPlanRequest $request)
+    public function store(Create $request)
     {
         $discountPlan = new DiscountPlan($request->only([
             'contact_id',
@@ -68,11 +68,11 @@ class DiscountPlanController extends BaseController
     }
 
     /**
-     * @param UpdateDiscountPlanRequest $request
+     * @param Update $request
      * @param string $discountPlanId
      * @return JsonResponse
      */
-    public function update(UpdateDiscountPlanRequest $request, string $discountPlanId)
+    public function update(Update $request, string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
         $discountPlan->update($request->only([

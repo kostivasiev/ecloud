@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\DiscountPlan;
 
 use App\Rules\V2\CommitmentIsGreater;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateDiscountPlanRequest
+ * Class Update
  * @package App\Http\Requests\V2
  */
-class UpdateDiscountPlanRequest extends FormRequest
+class Update extends FormRequest
 {
     public function authorize()
     {
