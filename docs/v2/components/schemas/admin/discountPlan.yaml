@@ -19,8 +19,8 @@ properties:
     type: float
     example: 999.99
   discount_rate:
-    type: integer
-    example: 5
+    type: float
+    example: 5.5
     description: Numeric percentage discount
   term_length:
     type: integer
