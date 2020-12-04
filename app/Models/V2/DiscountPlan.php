@@ -82,7 +82,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             $factory->create('commitment_amount', Filter::$numericDefaults),
             $factory->create('commitment_before_discount', Filter::$numericDefaults),
             $factory->create('discount_rate', Filter::$numericDefaults),
-            $factory->create('term_length', Filter::$dateDefaults),
+            $factory->create('term_length', Filter::$numericDefaults),
             $factory->create('term_start_date', Filter::$dateDefaults),
             $factory->create('term_end_date', Filter::$dateDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
