@@ -28,10 +28,15 @@ class DiscountPlanResource extends UKFastResource
      */
     public function toArray($request)
     {
+        $idElement = ['id' => $this->id];
+        $internalElement = [];
+        if ($request->user->isAdministrator) {
+            $internalElement = [
+                'contact_id' => $this->contact_id,
+                'employee_id' => $this->employee_id,
+            ];
+        }
         $data = [
-            'id' => $this->id,
-            'contact_id' => $this->contact_id,
-            'employee_id' => $this->employee_id,
             'name' => $this->name,
             'commitment_amount' => $this->commitment_amount,
             'commitment_before_discount' => $this->commitment_before_discount,
@@ -55,6 +60,6 @@ class DiscountPlanResource extends UKFastResource
             )->toIso8601String(),
         ];
 
-        return $data;
+        return array_merge($idElement, $internalElement, $data);
     }
 }
