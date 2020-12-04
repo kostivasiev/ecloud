@@ -11,12 +11,12 @@ use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Product;
 use App\Models\V2\Router;
-use App\Resources\V2\AvailabilityZonePricesResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
+use App\Resources\V2\ProductResource;
 use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -212,19 +212,15 @@ class AvailabilityZoneController extends BaseController
     {
         $availabilityZone = AvailabilityZone::forUser($request->user)->findOrFail($zoneId);
 
-        $products = $availabilityZone->products()->get(); // Hack - this is not an Eloquent relation.
+        $products = $availabilityZone->products();
 
-        $resource = new \StdClass();
-        $products->each(function ($product) use (&$resource) {
-            $resource->availability_zone_id = $product->availabilityZoneId;
-            $resource->{strtolower($product->product_subcategory)}[] = [
-                $product->name => $product->price
-            ];
-        });
+        // Hacky Resource specific filtering
+        (new QueryTransformer(Product::transformRequest($request)))
+            ->config(Product::class)
+            ->transform($products);
 
-        return response()->json([
-            'data' => $resource,
-            'meta' => (object)[],
-        ]);
+        return ProductResource::collection($products->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

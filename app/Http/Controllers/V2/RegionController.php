@@ -5,14 +5,13 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateRegionRequest;
 use App\Http\Requests\V2\UpdateRegionRequest;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Product;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use App\Resources\V2\AvailabilityZonePricesResource;
 use App\Resources\V2\AvailabilityZoneResource;
+use App\Resources\V2\ProductResource;
 use App\Resources\V2\RegionResource;
 use App\Resources\V2\VpcResource;
-use App\Responses\PaginatedCollectionResponse;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -124,26 +123,24 @@ class RegionController extends BaseController
         ));
     }
 
+    /**
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $regionId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
     public function prices(Request $request, string $regionId)
     {
         $region = Region::forUser($request->user)->findOrFail($regionId);
+        $products = Product::forRegion($region);
 
-        $collection = collect();
+        // Hacky Resource specific filtering
+        (new QueryTransformer(Product::transformRequest($request)))
+            ->config(Product::class)
+            ->transform($products);
 
-        $region->availabilityZones->each(function ($availabilityZone) use ($collection) {
-            $products = $availabilityZone->products()->get(); // Cross DB Hack - this is not an Eloquent relation.
-
-            $resource = new \StdClass();
-            $products->each(function ($product) use (&$resource) {
-                $resource->availability_zone_id = $product->availabilityZoneId;
-                $resource->{strtolower($product->product_subcategory)}[] = [
-                    $product->name => $product->price
-                ];
-            });
-
-            $collection->add($resource);
-        });
-
-        return new PaginatedCollectionResponse($collection);
+        return ProductResource::collection($products->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
