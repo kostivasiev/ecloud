@@ -143,7 +143,7 @@ class Product extends Model implements Filterable, Sortable
     {
         if (!empty($request->query)) {
             foreach ($request->query() as $key => $val) {
-                $parts = explode(':',$key);
+                $parts = explode(':', $key);
                 if ($parts[1] == 'eq') {
                     $request->query->remove($key);
                     $request->query->add([$parts[0] . ':lk' => '*' . $val . '*']);
