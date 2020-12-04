@@ -3,15 +3,6 @@ properties:
     type: string
     example: disc-2b66bb79
     readOnly: true
-  reseller_id:
-    type: integer
-    example: 123456
-  contact_id:
-    type: integer
-    example: 123456
-  employee_id:
-    type: integer
-    example: 123456
   name:
     type: string
     example: 'Discount Plan Name'
