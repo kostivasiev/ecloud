@@ -74,10 +74,10 @@ class DiscountPlan extends Model implements Filterable, Sortable
     public function filterableColumns(FilterFactory $factory)
     {
         return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('reseller_id', Filter::$stringDefaults),
-            $factory->create('contact_id', Filter::$stringDefaults),
-            $factory->create('employee_id', Filter::$stringDefaults),
+            $factory->create('id', Filter::$numericDefaults),
+            $factory->create('reseller_id', Filter::$numericDefaults),
+            $factory->create('contact_id', Filter::$numericDefaults),
+            $factory->create('employee_id', Filter::$numericDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('commitment_amount', Filter::$numericDefaults),
             $factory->create('commitment_before_discount', Filter::$numericDefaults),
