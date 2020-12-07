@@ -21,6 +21,7 @@ class Delete extends Job
 
         $dhcp = Dhcp::withTrashed()->findOrFail($this->data['id']);
         $dhcp->availabilityZone->nsxService()->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
+        $dhcp->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
