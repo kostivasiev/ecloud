@@ -6,6 +6,7 @@ use App\Events\V2\Dhcp\Created;
 use App\Events\V2\Dhcp\Creating;
 use App\Events\V2\Dhcp\Deleted;
 use App\Events\V2\Dhcp\Deleting;
+use App\Events\V2\Dhcp\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\Syncable;
@@ -40,6 +41,7 @@ class Dhcp extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
+        'saving' => Saving::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];
