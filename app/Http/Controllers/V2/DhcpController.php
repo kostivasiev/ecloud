@@ -65,6 +65,7 @@ class DhcpController extends BaseController
         $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->fill($request->only(['vpc_id', 'availability_zone_id']));
         $dhcp->save();
+        $dhcp->setSyncCompleted();
         return $this->responseIdMeta($request, $dhcp->getKey(), 200);
     }
 
