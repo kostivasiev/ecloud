@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../components/schemas/billingMetric.yaml'
+                  $ref: '../../components/schemas/admin/billingMetric.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -41,7 +41,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/billingMetric.yaml'
+          $ref: '../../components/schemas/admin/billingMetric.yaml'
   responses:
     201:
       $ref: '../../resources/BillingMetric/responses/idResponse.yaml'
