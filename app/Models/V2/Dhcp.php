@@ -39,7 +39,6 @@ class Dhcp extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
         'created' => Created::class,
         'saving' => Saving::class,
         'deleting' => Deleting::class,
