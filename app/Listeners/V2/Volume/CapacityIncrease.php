@@ -29,18 +29,26 @@ class CapacityIncrease implements ShouldQueue
                 $endpoint = '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size';
             }
 
-            $volume->availabilityZone->kingpinService()->put(
-                $endpoint,
-                [
-                    'json' => [
-                        'sizeGiB' => $volume->capacity
+            try {
+                $volume->availabilityZone->kingpinService()->put(
+                    $endpoint,
+                    [
+                        'json' => [
+                            'sizeGiB' => $volume->capacity
+                        ]
                     ]
-                ]
-            );
+                );
+            } catch (\Exception $exception) {
+                $message = 'Unhandled error for ' . $volume->id;
+                Log::error($message, [$exception]);
+                $volume->setSyncFailureReason($message . ' : ' . $exception->getMessage());
+                throw $exception;
+            }
 
             Log::info('Volume ' . $volume->getKey() . ' capacity increased from ' . $event->originalCapacity . ' to ' . $volume->capacity);
         }
 
+        $volume->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

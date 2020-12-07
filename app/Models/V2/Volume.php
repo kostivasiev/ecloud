@@ -3,11 +3,13 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Volume\Deleted;
+use App\Events\V2\Volume\Saving;
 use App\Events\V2\Volume\Updated;
 use App\Events\V2\Volume\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -25,7 +27,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Volume extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable;
 
     public $keyPrefix = 'vol';
     protected $keyType = 'string';
@@ -46,6 +48,7 @@ class Volume extends Model implements Filterable, Sortable
         'updated' => Updated::class,
         'creating' => Creating::class,
         'deleted' => Deleted::class,
+        'saving' => Saving::class
     ];
 
     public function vpc()
