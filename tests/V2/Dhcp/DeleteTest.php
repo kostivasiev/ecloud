@@ -2,10 +2,12 @@
 
 namespace Tests\V2\Dhcp;
 
+use App\Events\V2\Dhcp\Deleted;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -67,5 +69,9 @@ class DeleteTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(204);
         $this->assertNotNull(Dhcp::withTrashed()->findOrFail($this->dhcp->getKey())->deleted_at);
+
+        Event::assertDispatched(Deleted::class, function ($job) {
+            return $job->model->id === $this->dhcp->getKey();
+        });
     }
 }
