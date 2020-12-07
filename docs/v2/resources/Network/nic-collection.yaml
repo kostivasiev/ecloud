@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
+                items:
+                  $ref: '../../admin-openapi.yaml#/components/schemas/Nics'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

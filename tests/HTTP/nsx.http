@@ -13,7 +13,42 @@ GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/C
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
-###
+### Dev Router
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Network
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Network creation
+PUT https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "display_name":"web-tier",
+    "resource_type":"Segment",
+    "subnets": [{
+        "gateway_address": "40.1.1.1/16",
+        "dhcp_config": {
+            "resource_type": "SegmentDhcpV4Config",
+            "server_address": "40.1.0.0/16",
+            "lease_time": 604800,
+            "dns_servers": [
+                "81.201.138.244",
+                "94.229.163.244"
+            ]
+        }
+    }],
+    "domain_name" : "ecloud.ukfast",
+    "dhcp_config_path" : "/infra/dhcp-server-configs/dhcp-aaaaaaaa",
+    "advanced_config" : {
+        "connectivity" : "ON"
+    }
+}
 
 ### Firewall Policy Rule
 GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-aaaaaaaa/rules/fwr-edea0c4f

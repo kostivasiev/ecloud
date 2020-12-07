@@ -1,19 +1,17 @@
 <!-- Title: UserStory-Deliverable.md -->
-<!--- THIS TEMPLATE IS TO BE USED FOR NEW FEATURES OR CHANGE REQUESTS -->
 
 ### What is the Feature/Change?
-<!-- Enter clear and concise description of what your feature or change request is. -->
+<!-- Enter clear and concise description of what your feature or change request is -->
 
 
 
 ### Assumptions:
 1. All success and error events will be logged in the existing logging framework
-2. All success and error events will update the status of the resource in APIO
 
 
 ### Prerequisites:
-<!-- Link to any issues/etc that are required for development to begin -->
-- none
+<!-- Link to any related/blocked/blocking issues or detail anything required for development to begin -->
+- see [Linked issues](#related-issues)
 
 
 ### User Stories
@@ -23,6 +21,7 @@
 | End User | View my VPC's | View an overview of my VPC's |
 | API User | Retrieve my VPC's | Perform actions on my vpc data |
 
+
 ### Acceptance Criteria
 
 | GIVEN | WHEN | THEN |
@@ -31,10 +30,10 @@
 | I request the vpc collection/item | the request completes | I can see the vpc id, name, status, etc |
 
 
-
 ### Process Flows
  <!-- attach any flow charts and delete placeholder -->
 - no process flow required
+
 
 <!-- ENFORCEMENT-END -->
 

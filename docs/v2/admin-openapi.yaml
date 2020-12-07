@@ -157,3 +157,7 @@ paths:
     $ref: 'resources/AvailabilityZoneCapacity/collection.yaml'
   '/ecloud/v2/availability-zone-capacities/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZoneCapacity/item.yaml'
+  '/ecloud/v2/billing-metrics':
+    $ref: 'resources/BillingMetric/collection.yaml'
+  '/ecloud/v2/billing-metrics/{billingMetricsId}':
+    $ref: 'resources/BillingMetric/item.yaml'
