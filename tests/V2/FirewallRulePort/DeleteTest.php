@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallRulePort;
 
+use App\Events\V2\FirewallRulePort\Deleted;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
@@ -9,6 +10,7 @@ use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -62,6 +64,10 @@ class DeleteTest extends TestCase
             ->assertResponseStatus(204);
         $firewallRulePort = FirewallRulePort::withTrashed()->findOrFail($this->firewallRulePort->getKey());
         $this->assertNotNull($firewallRulePort->deleted_at);
+
+        Event::assertDispatched(Deleted::class, function ($job) {
+            return $job->model->id === $this->firewallRulePort->getKey();
+        });
     }
 
 }

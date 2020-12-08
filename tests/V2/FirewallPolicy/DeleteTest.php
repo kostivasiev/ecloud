@@ -2,11 +2,13 @@
 
 namespace Tests\V2\FirewallPolicy;
 
+use App\Events\V2\FirewallPolicy\Deleted;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -51,6 +53,10 @@ class DeleteTest extends TestCase
             ->assertResponseStatus(204);
         $firewallPolicy = FirewallPolicy::withTrashed()->findOrFail($this->policy->getKey());
         $this->assertNotNull($firewallPolicy->deleted_at);
+
+        Event::assertDispatched(Deleted::class, function ($job) use ($firewallPolicy) {
+            return $job->model->id === $firewallPolicy->id;
+        });
     }
 
 }

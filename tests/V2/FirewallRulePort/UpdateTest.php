@@ -2,6 +2,8 @@
 
 namespace Tests\V2\FirewallRulePort;
 
+use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
+use App\Events\V2\FirewallRulePort\Saved as FirewallRulePortSaved;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
@@ -9,6 +11,7 @@ use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -72,6 +75,14 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(200);
+
+        Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
+            return $job->model->id === $this->firewallPolicy->getKey();
+        });
+
+        Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {
+            return $job->model->id === $this->firewallRulePort->getKey();
+        });
     }
 
     public function testUpdateWithICMPValues()
@@ -97,5 +108,13 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(200);
+
+        Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
+            return $job->model->id === $this->firewallPolicy->getKey();
+        });
+
+        Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {
+            return $job->model->id === $this->firewallRulePort->getKey();
+        });
     }
 }

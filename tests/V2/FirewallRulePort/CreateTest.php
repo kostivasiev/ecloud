@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallRulePort;
 
+use App\Events\V2\FirewallPolicy\Saved;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
@@ -9,6 +10,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -85,5 +87,9 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(201);
+
+        Event::assertDispatched(Saved::class, function ($job) {
+            return $job->model->id === $this->firewallPolicy->getKey();
+        });
     }
 }

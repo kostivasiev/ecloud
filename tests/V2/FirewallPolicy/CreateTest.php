@@ -2,11 +2,13 @@
 
 namespace Tests\V2\FirewallPolicy;
 
+use App\Events\V2\FirewallPolicy\Saved;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -54,6 +56,10 @@ class CreateTest extends TestCase
         $firewallPolicy = FirewallPolicy::findOrFail($policyId);
         $this->assertEquals($firewallPolicy->name, $data['name']);
         $this->assertEquals($firewallPolicy->sequence, $data['sequence']);
+
+        Event::assertDispatched(Saved::class, function ($job) use ($firewallPolicy) {
+            return $job->model->id === $firewallPolicy->id;
+        });
     }
 
 }
