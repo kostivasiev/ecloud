@@ -31,7 +31,7 @@ class Create implements ShouldQueue
                 ]
             ]
         ]);
-
+        $dhcp->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

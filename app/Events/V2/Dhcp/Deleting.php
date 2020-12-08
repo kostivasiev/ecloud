@@ -5,11 +5,11 @@ namespace App\Events\V2\Dhcp;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Deleted
+class Deleting
 {
     use SerializesModels;
 
-    public $model;
+    public Model $model;
 
     public function __construct(Model $model)
     {
