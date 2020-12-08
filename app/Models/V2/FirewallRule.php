@@ -3,9 +3,12 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FirewallRule\Deleted;
+use App\Events\V2\FirewallRule\Deleting;
 use App\Events\V2\FirewallRule\Saved;
+use App\Events\V2\FirewallRule\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -22,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallRule extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public $keyPrefix = 'fwr';
     public $incrementing = false;
@@ -47,7 +50,9 @@ class FirewallRule extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
+        'saving' => Saving::class,
         'saved' => Saved::class,
+        'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];
 
