@@ -153,9 +153,7 @@ class VolumeController extends BaseController
         if (!$volume->delete()) {
             return $volume->getSyncError();
         }
-        $volume->setSyncCompleted();
 
         return response(null, 204);
-
     }
 }

@@ -33,7 +33,6 @@ class Volume extends Model implements Filterable, Sortable
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
-    public $timestamps = true;
 
     protected $fillable = [
         'id',
