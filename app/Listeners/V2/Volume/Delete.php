@@ -23,16 +23,9 @@ class Delete implements ShouldQueue
         $volume = $event->model;
 
         if ($volume->instances()->count() == 0) {
-            try {
-                $volume->availabilityZone->kingpinService()->delete(
-                    '/api/v1/vpc/' . $volume->vpc->id . '/volume/' . $volume->vmware_uuid
-                );
-            } catch (\Exception $exception) {
-                $message = 'Unhandled error for ' . $volume->id;
-                Log::error($message, [$exception]);
-                $volume->setSyncFailureReason($message . ' : ' . json_decode($exception->getBody()->getContents()));
-                throw $exception;
-            }
+            $volume->availabilityZone->kingpinService()->delete(
+                '/api/v1/vpc/' . $volume->vpc->id . '/volume/' . $volume->vmware_uuid
+            );
 
             Log::info('Volume ' . $volume->getKey() . ' (' . $volume->vmware_uuid . ') deleted.');
         }
