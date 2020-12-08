@@ -79,7 +79,9 @@ class FirewallPolicyController extends BaseController
     {
         $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
         try {
-            $policy->delete();
+            if (!$policy->delete()) {
+                $policy->getSyncError();
+            }
         } catch (\Exception $e) {
             return $policy->getDeletionError($e);
         }

@@ -151,7 +151,9 @@ class FirewallRuleController extends BaseController
     public function destroy(Request $request, string $firewallRuleId)
     {
         $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
-        $item->delete();
+        if (!$item->delete()) {
+            $item->getSyncError();
+        }
         return response()->json([], 204);
     }
 }
