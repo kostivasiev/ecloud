@@ -34,6 +34,7 @@ class Deploy extends Job
             Log::error($error, [
                 'nat' => $nat,
             ]);
+            $nat->setSyncFailureReason($error);
             $this->fail(new \Exception($error));
             return;
         }
@@ -47,6 +48,7 @@ class Deploy extends Job
                 'nat' => $nat,
                 'nic' => $nic,
             ]);
+            $nat->setSyncFailureReason($message);
             $this->fail(new \Exception($message));
             return;
         }
@@ -82,6 +84,7 @@ class Deploy extends Job
             ['json' => $json]
         );
 
+        $nat->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }
