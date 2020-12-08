@@ -37,6 +37,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
 
+            // Deleting
+            \App\Events\V2\Nat\Deleting::class,
+
             // Deleted
             \App\Events\V2\Nat\Deleted::class,
             \App\Events\V2\FirewallRule\Deleted::class,
@@ -62,6 +65,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Saving
             \App\Events\V2\Router\Saving::class,
             \App\Events\V2\Network\Saving::class,
+            \App\Events\V2\Nat\Saving::class,
+
 
             // Deploy
             \App\Events\V2\Instance\Deploy::class,
