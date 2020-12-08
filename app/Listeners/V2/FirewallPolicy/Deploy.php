@@ -34,6 +34,7 @@ class Deploy implements ShouldQueue
             Log::error($message, [
                 'event' => $event,
             ]);
+            $policy->setSyncFailureReason($message);
             $this->fail(new \Exception($message));
             return;
         }
@@ -42,6 +43,7 @@ class Deploy implements ShouldQueue
             'policy_id' => $policy->id,
         ]));
 
+        $policy->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

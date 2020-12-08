@@ -31,11 +31,16 @@ class Undeploy implements ShouldQueue
 
         $firewallPolicy->firewallRules->each(function ($firewallRule) {
             $firewallRule->firewallRulePorts->each(function ($firewallRulePort) {
-                $firewallRulePort->delete();
+                if (!$firewallRulePort->delete()) {
+                    $firewallRulePort->getSyncError();
+                }
             });
-            $firewallRule->delete();
+            if (!$firewallRule->delete()) {
+                $firewallRule->getSyncError();
+            }
         });
 
+        $firewallPolicy->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }
