@@ -34,7 +34,7 @@ class NicController extends BaseController
     /**
      * @param Request $request
      * @param string $nicId
-     * @return \App\Http\Resources\NicResource
+     * @return NicResource
      */
     public function show(Request $request, string $nicId)
     {
@@ -75,7 +75,9 @@ class NicController extends BaseController
             'ip_address'
         ]));
         $this->validate($request, ['ip_address' => [new IpAvailable($nic->network_id)]]);
-        $nic->save();
+        if (!$nic->save()) {
+            return $nic->getSyncError();
+        }
         return $this->responseIdMeta($request, $nic->getKey(), 200);
     }
 
@@ -87,7 +89,9 @@ class NicController extends BaseController
     public function destroy(Request $request, string $nicId)
     {
         $nic = Nic::forUser($request->user)->findOrFail($nicId);
-        $nic->delete();
-        return response()->json([], 204);
+        if (!$nic->delete()) {
+            return $nic->getSyncError();
+        }
+        return response(null, 204);
     }
 }

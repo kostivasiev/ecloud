@@ -46,6 +46,8 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        $this->markTestSkipped('Skipped create NIC endpoint - CRUD endpoint does not deploy yet');
+
         $macAddress = $this->faker->macAddress;
         $this->post(
             '/v2/nics',

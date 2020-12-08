@@ -51,6 +51,7 @@ class ConfigureNics extends TaskJob
                     } else {
                         $message = 'Timed out waiting for Network (' . $network->getKey() .
                             ') to become available for prior to NIC configuration';
+                        $nic->setSyncFailureReason($message);
                         $this->fail(new \Exception($message));
                         return;
                     }
@@ -82,7 +83,9 @@ class ConfigureNics extends TaskJob
                         continue;
                     }
                     if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                        $this->fail(new \Exception('Insufficient available IP\'s in subnet to assign to NIC'));
+                        $message = 'Insufficient available IP\'s in subnet to assign to NIC';
+                        $nic->setSyncFailureReason($message);
+                        $this->fail(new \Exception($message));
                         return;
                     }
 
@@ -131,6 +134,7 @@ class ConfigureNics extends TaskJob
                     ]
                 );
 
+                $nic->setSyncCompleted();
                 Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
             });
 
