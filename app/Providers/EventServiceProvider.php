@@ -137,8 +137,14 @@ class EventServiceProvider extends ServiceProvider
         // Nat
         \App\Events\V2\Nat\Created::class => [
         ],
+        \App\Events\V2\Nat\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
         \App\Events\V2\Nat\Saved::class => [
             \App\Listeners\V2\Nat\Deploy::class
+        ],
+        \App\Events\V2\Nat\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nat\Deleted::class => [
             \App\Listeners\V2\Nat\Undeploy::class
