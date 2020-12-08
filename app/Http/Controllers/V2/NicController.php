@@ -84,7 +84,7 @@ class NicController extends BaseController
     /**
      * @param Request $request
      * @param string $nicId
-     * @return JsonResponse
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      */
     public function destroy(Request $request, string $nicId)
     {
