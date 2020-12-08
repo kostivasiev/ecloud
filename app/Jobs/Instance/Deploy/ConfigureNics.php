@@ -3,14 +3,11 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
-use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
-class ConfigureNics extends TaskJob
+class ConfigureNics extends Job
 {
     public $tries = 20;
     const RETRY_ATTEMPTS = 10;
@@ -18,10 +15,8 @@ class ConfigureNics extends TaskJob
 
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
-
         $this->data = $data;
     }
 

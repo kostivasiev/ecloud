@@ -8,27 +8,23 @@ use App\Events\V2\Instance\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DeletionRules;
-use App\Traits\V2\Taskable;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Taskable;
-
-    public const STATUS_READY = 'ready';
-    public const STATUS_PROVISIONING = 'provisioning';
-    public const STATUS_FAILED = 'failed';
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
@@ -63,6 +59,13 @@ class Instance extends Model implements Filterable, Sortable
         'created' => Created::class,
         'deleted' => Deleted::class,
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->timestamps = true;
+    }
 
     public function vpc()
     {

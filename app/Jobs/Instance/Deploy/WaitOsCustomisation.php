@@ -2,23 +2,20 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
-class WaitOsCustomisation extends TaskJob
+class WaitOsCustomisation extends Job
 {
     const RETRY_ATTEMPTS = 360;
     const RETRY_DELAY = 5; // Retry every 5 seconds for 20 minutes
     public $tries = 500;
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
-
         $this->data = $data;
     }
 

@@ -28,6 +28,7 @@ class GuestRestart extends Job
         $instance->availabilityZone->kingpinService()->put(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power/guest/restart'
         );
+        $instance->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

@@ -114,6 +114,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Instance\ComputeChanged::class => [
             \App\Listeners\V2\Instance\ComputeChange::class
         ],
+        \App\Events\V2\Instance\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
 
         // LoadBalancerCluster
         \App\Events\V2\LoadBalancerCluster\Creating::class => [

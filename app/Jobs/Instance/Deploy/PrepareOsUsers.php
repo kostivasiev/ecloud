@@ -2,22 +2,19 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Services\V2\PasswordService;
 use Illuminate\Support\Facades\Log;
 
-class PrepareOsUsers extends TaskJob
+class PrepareOsUsers extends Job
 {
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
-
         $this->data = $data;
     }
 
