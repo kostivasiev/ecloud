@@ -31,9 +31,10 @@ class Create extends FormRequest
             'type' => [
                 'required',
                 'string',
-                Rule::unique('ecloud.availability_zone_capacities')->where(function ($query) {
-                    return $query->where('availability_zone_id', app('request')->get('availability_zone_id'));
+Rule::unique('ecloud.availability_zone_capacities')->where(function ($query) {
+                    return $query->where('availability_zone_id', app('request')->get('availability_zone_id'))->whereNull('deleted_at');
                 })
+
             ],
             'alert_warning' => [
                 'sometimes',
