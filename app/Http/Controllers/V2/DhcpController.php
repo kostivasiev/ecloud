@@ -76,7 +76,9 @@ class DhcpController extends BaseController
     public function destroy(string $dhcpId)
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
-        $dhcp->delete();
+        if (!$dhcp->delete()) {
+            return $dhcp->getSyncError();
+        }
         return response()->json([], 204);
     }
 }
