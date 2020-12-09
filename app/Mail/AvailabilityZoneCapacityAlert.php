@@ -61,6 +61,7 @@ class AvailabilityZoneCapacityAlert extends Mailable
             ->with([
                 'availability_zone_id' => $this->availabilityZoneCapacity->availability_zone_id,
                 'availability_zone_name' => $this->availabilityZoneCapacity->availabilityZone->name,
+                'availability_zone_code' => $this->availabilityZoneCapacity->availabilityZone->code,
                 'type' => $this->availabilityZoneCapacity->type,
                 'capacity' => $this->availabilityZoneCapacity->current,
                 'alert_level' => $this->alertLevel
