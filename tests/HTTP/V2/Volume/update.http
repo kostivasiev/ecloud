@@ -8,7 +8,7 @@ Content-Type: application/json
 
 
 ###
-GET https://{{host}}/{{version}}/volumes/vol-8801f2c2
+GET https://{{host}}/{{version}}/volumes/vol-43a88322
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -40,7 +40,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "capacity": 31
+  "capacity": 52
 }
 
 > {%

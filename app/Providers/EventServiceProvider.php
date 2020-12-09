@@ -206,6 +206,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\Volume\Delete::class,
         ],
+        \App\Events\V2\Volume\Synced::class => [
+            \App\Listeners\V2\Volume\UpdateBilling::class,
+        ],
 
         // Vpc
         \App\Events\V2\Vpc\Creating::class => [
@@ -222,5 +225,10 @@ class EventServiceProvider extends ServiceProvider
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
         ],
+
+        // Sync
+        \App\Events\V2\Sync\Saved::class => [
+            \App\Listeners\V2\Sync\DispatchResourceSyncedEvent::class
+        ]
     ];
 }
