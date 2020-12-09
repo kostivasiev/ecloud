@@ -5,11 +5,13 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Router;
+use App\Resources\V2\AvailabilityZoneCapacityResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
@@ -181,6 +183,24 @@ class AvailabilityZoneController extends BaseController
             ->transform($collection);
 
         return LoadBalancerClusterResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function capacities(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    {
+        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+            ->availabilityZoneCapacities();
+        $queryTransformer->config(AvailabilityZoneCapacity::class)
+            ->transform($collection);
+
+        return AvailabilityZoneCapacityResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

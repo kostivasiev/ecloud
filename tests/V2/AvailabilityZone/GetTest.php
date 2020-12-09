@@ -3,6 +3,7 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -27,8 +28,10 @@ class GetTest extends TestCase
             'name' => $this->faker->city(),
             'is_public' => false,
         ]);
+        $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+            'availability_zone_id' => $this->availabilityZones->first()->getKey()
+        ]);
     }
-
 
     public function testGetCollectionAsAdmin()
     {
@@ -200,6 +203,21 @@ class GetTest extends TestCase
                 'is_public' => true
             ])
             ->assertResponseStatus(200);
+    }
+
+    public function testGetCapacities()
+    {
+        $this->get('/v2/availability-zones/' . $this->availabilityZones->first()->getKey() . '/capacities', [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ])->seeJson([
+            'id' => $this->availabilityZoneCapacity->getKey(),
+            'availability_zone_id' => $this->availabilityZones->first()->getKey(),
+            'type' => $this->availabilityZoneCapacity->type,
+            'alert_warning' => $this->availabilityZoneCapacity->alert_warning,
+            'alert_critical' => $this->availabilityZoneCapacity->alert_critical,
+            'max' => $this->availabilityZoneCapacity->max
+        ])->assertResponseStatus(200);
     }
 
 }

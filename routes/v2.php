@@ -30,6 +30,16 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
         $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
+        $router->get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
+    });
+
+    /** Availability Zone Capacities */
+    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@index');
+        $router->get('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@show');
+        $router->post('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@create');
+        $router->patch('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@update');
+        $router->delete('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@destroy');
     });
 
     /** Virtual Private Clouds */

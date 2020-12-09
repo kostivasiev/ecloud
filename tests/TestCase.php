@@ -61,6 +61,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Network\Saved::class,
             \App\Events\V2\Nat\Saved::class,
             \App\Events\V2\FirewallRulePort\Saved::class,
+            \App\Events\V2\AvailabilityZoneCapacity\Saved::class,
 
             // Saving
             \App\Events\V2\Router\Saving::class,

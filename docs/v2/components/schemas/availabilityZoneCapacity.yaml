@@ -1,0 +1,38 @@
+properties:
+  id:
+    type: string
+    example: azc-2b66bb79
+    readOnly: true
+  availability_zone_id:
+    type: string
+    required: true
+    example: 'azc-a63dd78c'
+  type:
+    type: string
+    required: true
+    example: 'cpu'
+  current:
+    type: float
+    readOnly: true
+    example: 52.0
+  alert_warning:
+    type: integer
+    required: false
+    example: 65
+  alert_critical:
+    type: integer
+    required: false
+    example: 85
+  max:
+    type: integer
+    required: true
+    example: 95
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Availability Zone Capacity'
