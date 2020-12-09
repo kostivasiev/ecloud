@@ -3,7 +3,7 @@
 Alert Level: {{ $alert_level }}
 <br>
 <br>
-Availability Zone: {{ $availability_zone_name }} ({{ $availability_zone_id }})
+Availability Zone: {{ $availability_zone_name }} ({{ $availability_zone_id }} / {{$availability_zone_code}})
 <br>
 <br>
 Type: {{ $type }}
