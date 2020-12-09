@@ -21,25 +21,25 @@ class CapacityIncrease implements ShouldQueue
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
         $volume = $event->volume;
-//        if ($volume->capacity > $event->originalCapacity) {
-//            $endpoint = '/api/v1/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
-//
-//            if ($volume->instances()->count() > 0) {
-//                $instance = $volume->instances()->first();
-//                $endpoint = '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size';
-//            }
-//
-//            $volume->availabilityZone->kingpinService()->put(
-//                $endpoint,
-//                [
-//                    'json' => [
-//                        'sizeGiB' => $volume->capacity
-//                    ]
-//                ]
-//            );
-//
-//            Log::info('Volume ' . $volume->getKey() . ' capacity increased from ' . $event->originalCapacity . ' to ' . $volume->capacity);
-//        }
+        if ($volume->capacity > $event->originalCapacity) {
+            $endpoint = '/api/v1/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
+
+            if ($volume->instances()->count() > 0) {
+                $instance = $volume->instances()->first();
+                $endpoint = '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size';
+            }
+
+            $volume->availabilityZone->kingpinService()->put(
+                $endpoint,
+                [
+                    'json' => [
+                        'sizeGiB' => $volume->capacity
+                    ]
+                ]
+            );
+
+            Log::info('Volume ' . $volume->getKey() . ' capacity increased from ' . $event->originalCapacity . ' to ' . $volume->capacity);
+        }
 
         $volume->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
