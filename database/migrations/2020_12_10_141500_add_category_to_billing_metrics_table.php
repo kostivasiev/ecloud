@@ -16,7 +16,7 @@ class AddCategoryToBillingMetricsTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('billing_metrics', function (Blueprint $table) {
-            $table->string('category');
+            $table->dropColumn('category');
         });
     }
 }

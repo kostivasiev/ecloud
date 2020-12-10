@@ -20,7 +20,12 @@ class Product extends Model implements Filterable, Sortable
     protected $connection = 'reseller';
     protected $table = 'product';
     protected $primaryKey = 'product_id';
-    public $timestamps = false;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->timestamps = false;
+    }
 
     const PRODUCT_CATEGORIES = [
         'Compute',
