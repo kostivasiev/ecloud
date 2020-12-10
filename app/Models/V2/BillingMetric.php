@@ -16,7 +16,6 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * Class BillingMetric
  * @package App\Models\V2
- * @method static forResource($resource)
  */
 class BillingMetric extends Model implements Filterable, Sortable
 {
@@ -46,13 +45,17 @@ class BillingMetric extends Model implements Filterable, Sortable
         return $query;
     }
 
-    public function scopeForResource($query, $resource, $activeOnly = true)
+    /**
+     * @param $resource
+     * @param $key
+     * @return BillingMetric|null
+     */
+    public static function getActiveByKey($resource, $key): ?BillingMetric
     {
-        $query->where('resource_id', $resource->getKey());
-        if ($activeOnly) {
-            $query->whereNull('end');
-        }
-        return $query;
+        return self::where('resource_id', $resource->getKey())
+            ->whereNull('end')
+            ->where('key', $key)
+            ->first();
     }
 
     /**

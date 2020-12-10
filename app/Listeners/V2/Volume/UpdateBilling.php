@@ -2,27 +2,41 @@
 
 namespace App\Listeners\V2\Volume;
 
-use App\Events\V2\Volume\Synced;
+use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
+use App\Models\V2\Volume;
+use App\Support\Resource;
 use Carbon\Carbon;
 
 class UpdateBilling
 {
     /**
-     * @param Synced $event
+     * @param Updated $event
      * @return void
      * @throws \Exception
      */
-    public function handle(Synced $event)
+    public function handle(Updated $event)
     {
-        $volume = $event->model;
+        if (!$event->model->completed) {
+            return;
+        }
+
+        if (Resource::classFromId($event->model->resource_id) != Volume::class) {
+            return;
+        }
+
+        $volume = Volume::findOrFail($event->model->resource_id);
 
         $time = Carbon::now();
 
-        $existingMetric = BillingMetric::forResource($volume)->first();
-        if (!empty($existingMetric)) {
-            $existingMetric->end = $time;
-            $existingMetric->save();
+        $currentActiveMetric = BillingMetric::getActiveByKey($volume, 'disk.capacity');
+
+        if (!empty($currentActiveMetric)) {
+            if ($currentActiveMetric->value == $volume->capacity) {
+                return;
+            }
+            $currentActiveMetric->end = $time;
+            $currentActiveMetric->save();
         }
 
         $billingMetric = app()->make(BillingMetric::class);

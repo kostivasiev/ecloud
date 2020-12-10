@@ -88,7 +88,8 @@ class Deploy extends TaskJob
                 ]
             );
 
-            event(new \App\Events\V2\Volume\Synced($volume));
+            $volume->save();
+
             Log::info($logMessage . 'Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
         }
 

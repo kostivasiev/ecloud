@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Sync\Saved;
+use App\Events\V2\Sync\Updated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,6 +28,6 @@ class Sync extends Model
     ];
 
     protected $dispatchesEvents = [
-        'saved' => Saved::class
+        'updated' => Updated::class
     ];
 }

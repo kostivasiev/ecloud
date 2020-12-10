@@ -40,7 +40,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "capacity": 39
+  "capacity": 45
 }
 
 > {%
