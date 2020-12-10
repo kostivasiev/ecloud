@@ -20,6 +20,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
     $router->get('availability-zones', 'AvailabilityZoneController@index');
     $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
+    $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
 
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
@@ -168,6 +169,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('regions/{regionId}', 'RegionController@show');
         $router->get('regions/{regionId}/availability-zones', 'RegionController@availabilityZones');
         $router->get('regions/{regionId}/vpcs', 'RegionController@vpcs');
+        $router->get('regions/{regionId}/prices', 'RegionController@prices');
 
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
             $router->post('regions', 'RegionController@create');
@@ -214,7 +216,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('credentials/{credentialsId}', 'CredentialsController@update');
         $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
     });
-
 
     /** Support */
     $router->group([], function () use ($router) {

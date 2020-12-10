@@ -118,6 +118,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->kingpinService;
     }
 
+    public function products()
+    {
+        return Product::forAvailabilityZone($this);
+    }
+
     /**
      * @param $query
      * @param $user
