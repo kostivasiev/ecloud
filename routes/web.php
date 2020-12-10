@@ -25,6 +25,7 @@ $router->get('{apiVersion}/docs.yaml', function ($apiVersion) {
     return \cebe\openapi\Writer::writeToYaml(\cebe\openapi\Reader::readFromYamlFile($filePath));
 });
 
+
 // api endpoints
 require('v1.php');
 require('v2.php');
