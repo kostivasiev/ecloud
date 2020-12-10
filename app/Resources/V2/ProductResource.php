@@ -25,7 +25,6 @@ class ProductResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            //'id' => $this->product_id,
             'availability_zone_id' => $this->availabilityZoneId,
             'name' => $this->name,
             'category' => $this->product_subcategory,
