@@ -9,7 +9,7 @@ $factory->define(\App\Models\V2\Product::class, function (Faker $faker) {
     return [
         'product_name' => 'az-aaaaaaaa: vcpu-1',
         'product_category' => 'eCloud',
-        'product_subcategory' => $faker->randomElement(\App\Models\V2\Product::PRODUCT_CATEGORIES),
+        'product_subcategory' => 'Compute',
         'product_supplier' => 'UKFast',
         'product_active' => 'Yes',
         'product_duration_type' => 'Hour'
