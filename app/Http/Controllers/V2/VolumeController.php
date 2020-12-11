@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -91,6 +92,7 @@ class VolumeController extends BaseController
     public function update(UpdateVolumeRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
+
         if ($request->has('availability_zone_id')) {
             $availabilityZone = Vpc::forUser(app('request')->user)
                 ->findOrFail($request->input('vpc_id', $volume->vpc_id))

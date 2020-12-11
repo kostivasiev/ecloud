@@ -7,6 +7,7 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Volume;
 use App\Support\Resource;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UpdateBilling
 {
@@ -46,6 +47,17 @@ class UpdateBilling
         $billingMetric->key = 'disk.capacity';
         $billingMetric->value = $volume->capacity;
         $billingMetric->start = $time;
+
+        $product = $volume->availabilityZone->products()->get()->firstWhere('name', 'volume');
+        if (empty($product)) {
+            Log::error(
+                'Failed to load \'volume\' billing product for availability zone ' . $volume->availabilityZone->getKey()
+            );
+        } else {
+            $billingMetric->category = $product->category;
+            $billingMetric->price = $product->price;
+        }
+
         $billingMetric->save();
     }
 }

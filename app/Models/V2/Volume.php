@@ -3,9 +3,8 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Volume\Deleted;
+use App\Events\V2\Volume\Saved;
 use App\Events\V2\Volume\Saving;
-use App\Events\V2\Volume\Updated;
-use App\Events\V2\Volume\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -44,9 +43,9 @@ class Volume extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'updated' => Updated::class,
         'deleted' => Deleted::class,
-        'saving' => Saving::class
+        'saving' => Saving::class,
+        'saved' => Saved::class
     ];
 
     public function vpc()

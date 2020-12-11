@@ -34,6 +34,13 @@ class Product extends Model implements Filterable, Sortable
         'License'
     ];
 
+    protected $appends = [
+        'name',
+        'price',
+        'availability_zone_id',
+        'category'
+    ];
+
     /**
      * Apply a scope/filter to ** ALL ** Queries using this model to only return eCloud v2 products
      * @return void
@@ -44,7 +51,8 @@ class Product extends Model implements Filterable, Sortable
 
         static::addGlobalScope(function (Builder $builder) {
             return $builder->whereIn('product_subcategory', self::PRODUCT_CATEGORIES)
-                ->where('product_active', 'Yes');
+                ->where('product_active', 'Yes')
+                ->where('product_category', 'eCloud');
         });
     }
 
@@ -69,6 +77,11 @@ class Product extends Model implements Filterable, Sortable
     {
         preg_match("/(az-\w+[^:])(:\s)(\S[^-]+)/", $this->attributes['product_name'], $matches);
         return $matches[1] ?? null;
+    }
+
+    public function getCategoryAttribute()
+    {
+        return $this->attributes['product_subcategory'];
     }
 
     public function scopeForAvailabilityZone($query, AvailabilityZone $availabilityZone)

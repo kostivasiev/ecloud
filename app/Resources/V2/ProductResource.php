@@ -15,7 +15,7 @@ class ProductResource extends UKFastResource
         return [
             'availability_zone_id' => $this->availabilityZoneId,
             'name' => $this->name,
-            'category' => $this->product_subcategory,
+            'category' => strtolower($this->category),
             'price' => $this->price,
         ];
     }

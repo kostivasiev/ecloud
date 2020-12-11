@@ -89,7 +89,6 @@ class Deploy extends TaskJob
             );
 
             // Trigger billing
-            //TODO: This needs testing, G0 is broken at the moment, cant confirm this works.
             $volume->save();
 
             Log::info($logMessage . 'Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
