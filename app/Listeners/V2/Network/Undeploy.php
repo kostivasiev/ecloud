@@ -12,8 +12,6 @@ class Undeploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
-
-
     /**
      * @param Deleted $event
      * @return void
