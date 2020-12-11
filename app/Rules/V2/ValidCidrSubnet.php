@@ -17,7 +17,7 @@ class ValidCidrSubnet implements Rule
     public function passes($attribute, $value)
     {
         $subnet = Subnet::fromString($value);
-        return !is_null($subnet) && $subnet->getNetworkPrefix() < 30;
+        return !is_null($subnet);
     }
 
     /**
