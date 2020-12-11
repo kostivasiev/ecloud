@@ -3,6 +3,7 @@
 namespace App\Rules\V2;
 
 use App\Models\V2\Network;
+use App\Models\V2\Router;
 use Illuminate\Contracts\Validation\Rule;
 use IPLib\Factory;
 
@@ -27,7 +28,7 @@ class IsNotOverlappingSubnet implements Rule
     {
         $submittedRange = Factory::rangeFromString($value);
         $router_id = app('request')->input('router_id') ?? Network::findOrFail($this->existingId)->router_id;
-        $networks = Network::where('router_id', '=', $router_id)->get();
+        $networks = Router::find($router_id)->networks;
         foreach ($networks as $network) {
             $storedRange = Factory::rangeFromString($network->subnet);
             if ($submittedRange->containsRange($storedRange) || $storedRange->containsRange($submittedRange)) {
