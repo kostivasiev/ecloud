@@ -50,6 +50,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FirewallRulePort\Deleted::class,
             \App\Events\V2\FloatingIp\Deleted::class,
             \App\Events\V2\Volume\Deleted::class,
+            \App\Events\V2\Network\Deleted::class,
 
             // Updated
             \App\Events\V2\Volume\Updated::class,
