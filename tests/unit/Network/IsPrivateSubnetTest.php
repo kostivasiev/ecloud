@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\V2\Network;
+namespace Tests\unit\Network;
 
 use App\Rules\V2\IsPrivateSubnet;
 use Laravel\Lumen\Testing\DatabaseMigrations;
