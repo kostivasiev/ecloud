@@ -9,29 +9,34 @@ class BillingMetricResource extends UKFastResource
 {
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'resource_id' => $this->resource_id,
             'vpc_id' => $this->vpc_id,
-            'reseller_id' => $this->reseller_id,
             'key' => $this->key,
             'value' => $this->value,
-            'start' => Carbon::parse(
+            'start' => $this->start === null ? null : Carbon::parse(
                 $this->start,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'end' => Carbon::parse(
+            'end' => $this->end === null ? null : Carbon::parse(
                 $this->end,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'created_at' => Carbon::parse(
+            'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if ($request->user->isAdministrator) {
+            $data['reseller_id'] = $this->reseller_id;
+        }
+
+        return $data;
     }
 }

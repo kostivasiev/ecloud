@@ -4,18 +4,20 @@ namespace App\Models\V2;
 
 use App\Events\V2\Nat\Created;
 use App\Events\V2\Nat\Deleted;
+use App\Events\V2\Nat\Deleting;
 use App\Events\V2\Nat\Saved;
+use App\Events\V2\Nat\Saving;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Nat extends Model
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, Syncable;
 
     public $keyPrefix = 'nat';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
@@ -30,7 +32,9 @@ class Nat extends Model
 
     protected $dispatchesEvents = [
         'created' => Created::class,
+        'saving' => Saving::class,
         'saved' => Saved::class,
+        'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];
 

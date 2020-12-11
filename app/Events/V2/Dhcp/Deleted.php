@@ -9,10 +9,10 @@ class Deleted
 {
     use SerializesModels;
 
-    public $id;
+    public $model;
 
     public function __construct(Model $model)
     {
-        $this->id = $model->id;
+        $this->model = $model;
     }
 }

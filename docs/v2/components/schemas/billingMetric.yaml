@@ -11,10 +11,6 @@ properties:
     type: string
     required: true
     example: 'vpc-1a2b3c4d'
-  reseller_id:
-    type: integer
-    required: true
-    example: '1'
   key:
     type: string
     required: true

@@ -9,7 +9,7 @@ class Delete
     public function handle(Deleted $event)
     {
         dispatch(new \App\Jobs\Nsx\Dhcp\Delete([
-            'id' => $event->id,
+            'id' => $event->model->id,
         ]));
     }
 }

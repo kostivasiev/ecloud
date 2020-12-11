@@ -20,6 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
  * @method static forUser($user)
+ * @method static withRegion($regionId)
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
@@ -83,6 +84,13 @@ class FloatingIp extends Model implements Filterable, Sortable
             });
         }
         return $query;
+    }
+
+    public function scopeWithRegion($query, $regionId)
+    {
+        return $query->whereHas('vpc.region', function ($query) use ($regionId) {
+            $query->where('id', '=', $regionId);
+        });
     }
 
     /**

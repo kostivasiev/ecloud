@@ -36,6 +36,9 @@ class CreateTest extends TestCase
 
     public function testNotOwnedVpcIdIsFailed()
     {
+        // TODO: Endpoint disabled until we do the volumes milestone
+        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
+
         $this->post(
             '/v2/volumes',
             [
@@ -60,6 +63,9 @@ class CreateTest extends TestCase
 
     public function testInvalidAzIsFailed()
     {
+        // TODO: Endpoint disabled until we do the volumes milestone
+        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
+
         $region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $region->getKey()
@@ -89,6 +95,9 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        // TODO: Endpoint disabled until we do the volumes milestone
+        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
+
         $this->post(
             '/v2/volumes',
             [
@@ -111,6 +120,9 @@ class CreateTest extends TestCase
 
     public function testAzIsOptionalParameter()
     {
+        // TODO: Endpoint disabled until we do the volumes milestone
+        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
+
         $this->post(
             '/v2/volumes',
             [
