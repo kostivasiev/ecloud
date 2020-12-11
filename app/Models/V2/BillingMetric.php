@@ -34,6 +34,9 @@ class BillingMetric extends Model implements Filterable, Sortable
         'category',
         'price',
     ];
+    protected $casts = [
+        'price' => 'float',
+    ];
 
     public function scopeForUser($query, $user)
     {
