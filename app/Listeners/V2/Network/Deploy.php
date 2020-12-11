@@ -101,14 +101,16 @@ class Deploy implements ShouldQueue
                 }
 
                 $message = 'Unhandled error response for ' . $network->id;
-                Log::error($message, [$exception]);
+                Log::error($message, (array) $error);
                 $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
+                $this->fail($exception);
                 return;
             }
 
             $message = 'Unhandled error for ' . $network->id;
             Log::error($message, [$exception]);
             $network->setSyncFailureReason($message . ' : ' . $exception->getMessage());
+            $this->fail($exception);
             return;
         }
         $network->setSyncCompleted();
