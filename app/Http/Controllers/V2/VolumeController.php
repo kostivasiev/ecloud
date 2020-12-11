@@ -117,7 +117,11 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        $volume->save();
+
+        if (!$volume->save()) {
+            return $volume->getSyncError();
+        }
+
         return $this->responseIdMeta($request, $volume->getKey(), 200);
     }
 
@@ -141,11 +145,15 @@ class VolumeController extends BaseController
     /**
      * @param Request $request
      * @param string $volumeId
-     * @return JsonResponse
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
      */
     public function destroy(Request $request, string $volumeId)
     {
-        Volume::forUser($request->user)->findOrFail($volumeId)->delete();
-        return response()->json([], 204);
+        $volume = Volume::forUser($request->user)->findOrFail($volumeId);
+        if (!$volume->delete()) {
+            return $volume->getSyncError();
+        }
+
+        return response(null, 204);
     }
 }

@@ -31,6 +31,7 @@ class VolumeResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
             'capacity' => $this->capacity,
+            'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

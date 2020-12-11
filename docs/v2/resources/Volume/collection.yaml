@@ -34,15 +34,15 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/volumes?page=2'
   tags:
     - Volumes
-post:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          $ref: '../../public-openapi.yaml#/components/schemas/Volume'
-  responses:
-    201:
-      $ref: '../../public-openapi.yaml#/components/responses/VolumeIdResponse'
-  tags:
-    - Volumes
+#post:
+#  requestBody:
+#    required: true
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '../../public-openapi.yaml#/components/schemas/Volume'
+#  responses:
+#    201:
+#      $ref: '../../public-openapi.yaml#/components/responses/VolumeIdResponse'
+#  tags:
+#    - Volumes

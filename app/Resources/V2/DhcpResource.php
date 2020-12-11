@@ -25,6 +25,7 @@ class DhcpResource extends UKFastResource
             'id' => $this->id,
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
+            'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
