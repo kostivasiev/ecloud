@@ -13,22 +13,30 @@ use IPLib\Factory;
  */
 class IsNotOverlappingSubnet implements Rule
 {
-    protected ?string $networkId;
+    protected $router_id;
 
     /**
      * IsNotOverlappingSubnet constructor.
-     * @param string|null $existingId
+     * @param string|null $networkId
      */
-    public function __construct(?string $existingId = null)
+    public function __construct(?string $networkId = null)
     {
-        $this->networkId = $existingId;
+        $request = app('request');
+        if ($request->has('router_id')) {
+            $this->router_id = $request->input('router_id');
+        }
+        if (!empty($networkId)) {
+            $this->router_id = Network::findOrFail($networkId)->router_id;
+        }
     }
 
     public function passes($attribute, $value)
     {
+        if (empty($this->router_id)) {
+            return false;
+        }
         $submittedRange = Factory::rangeFromString($value);
-        $router_id = app('request')->input('router_id') ?? Network::findOrFail($this->networkId)->router_id;
-        $networks = Router::find($router_id)->networks;
+        $networks = Router::find($this->router_id)->networks;
         foreach ($networks as $network) {
             $storedRange = Factory::rangeFromString($network->subnet);
             if ($submittedRange->containsRange($storedRange) || $storedRange->containsRange($submittedRange)) {
