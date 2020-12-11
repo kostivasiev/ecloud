@@ -90,7 +90,7 @@ class FirewallRulePortController extends BaseController
     {
         $resource = FirewallRulePort::forUser($request->user)->findOrFail($firewallRulePortId);
         if (!$resource->delete()) {
-            $resource->getSyncError();
+            return $resource->getSyncError();
         }
         return response(null, 204);
     }
