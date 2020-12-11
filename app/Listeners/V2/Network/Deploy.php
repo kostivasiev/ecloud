@@ -96,7 +96,7 @@ class Deploy implements ShouldQueue
                         ' but it already exists.' . PHP_EOL .
                         'NSX Error : ' . $error->error_message;
                     Log::error($message);
-                    $network->setSyncFailureReason($message);
+                    $network->setSyncCompleted();
                     return;
                 }
 
