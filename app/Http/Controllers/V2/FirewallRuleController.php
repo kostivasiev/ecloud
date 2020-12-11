@@ -152,7 +152,7 @@ class FirewallRuleController extends BaseController
     {
         $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
         if (!$item->delete()) {
-            $item->getSyncError();
+            return $item->getSyncError();
         }
         return response()->json([], 204);
     }
