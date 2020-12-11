@@ -15,13 +15,7 @@ class IsPrivateSubnet implements Rule
     public function passes($attribute, $value)
     {
         $subnet = Subnet::fromString($value);
-        $valid = false;
-        try {
-            $valid = $subnet->getRangeType() === Type::T_PRIVATENETWORK;
-        } catch (\Exception $e) {
-            // nothing to do
-        }
-        return $valid;
+        return $subnet->getRangeType() === Type::T_PRIVATENETWORK;
     }
 
     /**
