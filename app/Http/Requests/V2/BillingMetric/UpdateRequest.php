@@ -40,7 +40,7 @@ class UpdateRequest extends FormRequest
             'start' => ['sometimes', 'required', 'date'],
             'end' => ['sometimes', 'date'],
             'category' => ['sometimes', 'string', 'max:255'],
-            'price' => ['sometimes', 'numeric', 'float', 'min:0'],
+            'price' => ['sometimes', 'numeric', 'min:0'],
         ];
     }
 }
