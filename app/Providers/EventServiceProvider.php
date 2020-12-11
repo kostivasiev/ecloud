@@ -144,6 +144,12 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Saved::class => [
             \App\Listeners\V2\Network\Update::class
         ],
+        \App\Events\V2\Network\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Deleted::class => [
+            \App\Listeners\V2\Network\Undeploy::class
+        ],
 
         // Nat
         \App\Events\V2\Nat\Created::class => [
