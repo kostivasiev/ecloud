@@ -234,6 +234,13 @@ class AvailabilityZoneController extends BaseController
 
         $products = $availabilityZone->products();
 
+
+        $product =  $products->first();
+
+        exit(print_r(
+            $product->productPriceCustom
+        ));
+
         // Hacky Resource specific filtering
         (new QueryTransformer(Product::transformRequest($request)))
             ->config(Product::class)
