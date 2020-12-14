@@ -2,11 +2,10 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\Job;
 use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
+use App\Models\V2\Nic;
 use App\Models\V2\Task;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
@@ -99,7 +98,9 @@ class ConfigureNics extends TaskJob
                     $nic->ip_address = $checkIp;
 
                     try {
-                        $nic->save();
+                        Nic::withoutEvents(function () use ($nic){
+                            $nic->save();
+                        });
                     } catch (\Exception $exception) {
                         if ($exception->getCode() == 23000) {
                             // Ip already assigned
