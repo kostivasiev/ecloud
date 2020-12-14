@@ -36,6 +36,8 @@ class BillingMetricController extends BaseController
             'value',
             'start',
             'end',
+            'category',
+            'price',
         ]));
         $model->save();
         return $this->responseIdMeta($request, $model->getKey(), 201);
@@ -52,6 +54,8 @@ class BillingMetricController extends BaseController
             'value',
             'start',
             'end',
+            'category',
+            'price',
         ]));
         $model->save();
         return $this->responseIdMeta($request, $model->getKey(), 200);
