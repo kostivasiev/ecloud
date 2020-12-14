@@ -164,7 +164,8 @@ Content-Type:  application/json
   "ram_capacity": 1024,
   "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
   "requires_floating_ip": true,
-  "network_id": "net-54c46e3d"
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30
 }
 
 > {%
@@ -188,7 +189,8 @@ Content-Type:  application/json
   "vcpu_cores": 1,
   "ram_capacity": 1024,
   "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
-  "requires_floating_ip": true
+  "requires_floating_ip": true,
+  "volume_capacity": 30
 }
 
 > {%

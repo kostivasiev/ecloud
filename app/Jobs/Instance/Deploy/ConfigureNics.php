@@ -122,17 +122,24 @@ class ConfigureNics extends TaskJob
                  * Create dhcp lease for the ip to the nic's mac address on NSX
                  * @see https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
                  */
-                $nsxService->put(
-                    '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
-                    . '/dhcp-static-binding-configs/' . $nic->getKey(),
-                    [
-                        'json' => [
-                            'resource_type' => 'DhcpV4StaticBindingConfig',
-                            'mac_address' => $nic->mac_address,
-                            'ip_address' => $nic->ip_address
+                try {
+                    $nsxService->put(
+                        '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
+                        . '/dhcp-static-binding-configs/' . $nic->getKey(),
+                        [
+                            'json' => [
+                                'resource_type' => 'DhcpV4StaticBindingConfig',
+                                'mac_address' => $nic->mac_address,
+                                'ip_address' => $nic->ip_address
+                            ]
                         ]
-                    ]
-                );
+                    );
+                } catch (\Exception $exception) {
+                    if ($exception->hasResponse()) {
+                        Log::info(get_class($this), json_decode($exception->getResponse()->getBody()->getContents(), true));
+                    }
+                    throw $exception;
+                }
 
                 $nic->setSyncCompleted();
                 Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
