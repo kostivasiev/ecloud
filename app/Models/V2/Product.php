@@ -65,11 +65,21 @@ class Product extends Model implements Filterable, Sortable
     }
 
     /**
+     * Get the price for the product, taking into account custom pricing set up for a reseller.
+     * @param int|null $resellerId
      * @return \Illuminate\Database\Eloquent\HigherOrderBuilderProxy|mixed|null
      */
-    public function getPriceAttribute()
+    public function getPrice(int $resellerId = null)
     {
+        if (!empty($resellerId)) {
+            $productPriceCustom = $this->productPriceCustom()->where('product_price_custom_reseller_id', $resellerId)->first();
+            if (!empty($productPriceCustom)) {
+                return $productPriceCustom->product_price_custom_sale_price;
+            }
+        }
+
         $productPrice = $this->productPrice()->where('product_price_type', 'Standard')->first();
+
         return $productPrice ? $productPrice->product_price_sale_price : null;
     }
 
