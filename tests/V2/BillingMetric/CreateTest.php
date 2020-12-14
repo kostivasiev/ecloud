@@ -50,6 +50,8 @@ class CreateTest extends TestCase
             'key' => 'ram.capacity',
             'value' => '16GB',
             'start' => '2020-07-07T10:30:00+01:00',
+            'category' => 'test category',
+            'price' => 9.99,
         ];
         $this->post('/v2/billing-metrics', $data, [
             'X-consumer-custom-id' => '0-0',
