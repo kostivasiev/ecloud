@@ -16,13 +16,13 @@ class ResourceSync
             return true;
         }
 
-        if ($event->model->getStatus() !== 'complete') {
-            Log::warning(get_class($this) . ' : Save blocked, resource has outstanding sync', ['event' => $event]);
+        if ($event->model->getStatus() === 'failed') {
+            Log::warning(get_class($this) . ' : Save blocked, resource has failed sync', ['event' => $event]);
             return false;
         }
 
-        if ($event->model->getStatus() === 'failed') {
-            Log::warning(get_class($this) . ' : Save blocked, resource has failed sync', ['event' => $event]);
+        if ($event->model->getStatus() !== 'complete') {
+            Log::warning(get_class($this) . ' : Save blocked, resource has outstanding sync', ['event' => $event]);
             return false;
         }
 

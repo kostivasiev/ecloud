@@ -121,6 +121,8 @@ paths:
     $ref: 'resources/AvailabilityZone/instance-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/lbcs':
     $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/capacities':
+    $ref: 'resources/AvailabilityZone/capacity-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
@@ -151,6 +153,10 @@ paths:
     $ref: 'resources/Credential/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/lbcs':
     $ref: 'resources/Vpc/cluster-collection.yaml'
+  '/ecloud/v2/availability-zone-capacities':
+    $ref: 'resources/AvailabilityZoneCapacity/collection.yaml'
+  '/ecloud/v2/availability-zone-capacities/{AvailabilityZoneId}':
+    $ref: 'resources/AvailabilityZoneCapacity/item.yaml'
   '/ecloud/v2/billing-metrics':
     $ref: 'resources/BillingMetric/collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':

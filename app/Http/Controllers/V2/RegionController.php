@@ -5,9 +5,11 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateRegionRequest;
 use App\Http\Requests\V2\UpdateRegionRequest;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Product;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Resources\V2\AvailabilityZoneResource;
+use App\Resources\V2\ProductResource;
 use App\Resources\V2\RegionResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
@@ -117,6 +119,27 @@ class RegionController extends BaseController
             ->transform($collection);
 
         return VpcResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $regionId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function prices(Request $request, string $regionId)
+    {
+        $region = Region::forUser($request->user)->findOrFail($regionId);
+        $products = Product::forRegion($region);
+
+        // Hacky Resource specific filtering
+        (new QueryTransformer(Product::transformRequest($request)))
+            ->config(Product::class)
+            ->transform($products);
+
+        return ProductResource::collection($products->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

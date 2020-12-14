@@ -41,6 +41,7 @@ class CapacityIncrease implements ShouldQueue
             Log::info('Volume ' . $volume->getKey() . ' capacity increased from ' . $event->originalCapacity . ' to ' . $volume->capacity);
         }
 
+        $volume->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

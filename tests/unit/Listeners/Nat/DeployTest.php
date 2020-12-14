@@ -105,6 +105,9 @@ class DeployTest extends TestCase
         $listener->handle(new \App\Events\V2\Nat\Saved($this->nat));
 
         $this->nat->save();
+        Event::assertDispatched(\App\Events\V2\Nat\Saving::class, function ($event) {
+            return $event->model->id === $this->nat->id;
+        });
         Event::assertDispatched(\App\Events\V2\Nat\Saved::class, function ($event) {
             return $event->model->id === $this->nat->id;
         });
