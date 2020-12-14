@@ -3,7 +3,6 @@
 namespace App\Listeners\V2\FirewallPolicy;
 
 use App\Events\V2\FirewallPolicy\Deleted;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;

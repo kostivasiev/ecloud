@@ -9,10 +9,9 @@ use IPLib\Range\Subnet;
 
 class ConfigureNics extends Job
 {
-    public $tries = 20;
     const RETRY_ATTEMPTS = 10;
     const RETRY_DELAY = 10;
-
+    public $tries = 20;
     private $data;
 
     public function __construct($data)
@@ -125,7 +124,6 @@ class ConfigureNics extends Job
                         ]
                     ]
                 );
-
                 Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
             });
 
