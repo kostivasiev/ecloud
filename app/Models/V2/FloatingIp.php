@@ -156,8 +156,8 @@ class FloatingIp extends Model implements Filterable, Sortable
 
     public function getStatus()
     {
-        $snat = $this->nat()->where('action', '=', 'SNAT')->first();
-        $dnat = $this->nat()->where('action', '=', 'DNAT')->first();
+        $snat = $this->getNatInformation("SNAT");
+        $dnat = $this->getNatInformation("DNAT");
         if ($snat && $dnat) {
             if (!$snat->syncs()->count() && !$dnat->syncs()->count()) {
                 return 'complete';
@@ -185,11 +185,11 @@ class FloatingIp extends Model implements Filterable, Sortable
 
     public function getSyncFailureReason()
     {
-        $snat = $this->nat()->where('action', '=', 'SNAT')->first();
+        $snat = $this->getNatInformation("SNAT");
         if ($snat && $snat->getSyncFailed()) {
             return $snat->getSyncFailureReason();
         }
-        $dnat = $this->nat()->where('action', '=', 'DNAT')->first();
+        $dnat = $this->getNatInformation("DNAT");
         if ($dnat && $dnat->getSyncFailed()) {
             return $dnat->getSyncFailureReason();
         }
@@ -217,5 +217,19 @@ class FloatingIp extends Model implements Filterable, Sortable
             ],
             Response::HTTP_CONFLICT
         );
+    }
+
+    /**
+     * Gets specified NAT Type
+     * @param $natType
+     * @return Nat
+     */
+    public function getNatInformation($natType): Nat
+    {
+        return Nat::where('source_id', $this->getKey())
+            ->orWhere('destination_id', $this->getKey())
+            ->orWhere('translated_id', $this->getKey())
+            ->where('action', '=', $natType)
+            ->first();
     }
 }
