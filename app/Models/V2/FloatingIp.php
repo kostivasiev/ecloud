@@ -6,8 +6,11 @@ use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -24,11 +27,10 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, HasTimestamps;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
 
@@ -150,5 +152,70 @@ class FloatingIp extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
+    }
+
+    public function getStatus()
+    {
+        $snat = $this->nat()->where('action', '=', 'SNAT')->first();
+        $dnat = $this->nat()->where('action', '=', 'DNAT')->first();
+        if ($snat && $dnat) {
+            if (!$snat->syncs()->count() && !$dnat->syncs()->count()) {
+                return 'complete';
+            }
+            if ($snat->getSyncFailed() && $dnat->getSyncFailed()) {
+                return 'failed';
+            }
+            if ($snat->syncs()->latest()->first()->completed && $dnat->syncs()->latest()->first()->completed) {
+                return 'complete';
+            }
+        }
+        if (empty($this->ip_address)) {
+            return 'failed';
+        }
+        return 'in-progress';
+    }
+
+    public function getSyncFailed()
+    {
+        if ($this->getStatus() == 'failed') {
+            return true;
+        }
+        return false;
+    }
+
+    public function getSyncFailureReason()
+    {
+        $snat = $this->nat()->where('action', '=', 'SNAT')->first();
+        if ($snat && $snat->getSyncFailed()) {
+            return $snat->getSyncFailureReason();
+        }
+        $dnat = $this->nat()->where('action', '=', 'DNAT')->first();
+        if ($dnat && $dnat->getSyncFailed()) {
+            return $dnat->getSyncFailureReason();
+        }
+        if (empty($this->ip_address)) {
+            return 'Awaiting IP Allocation';
+        }
+        return null;
+    }
+
+    /**
+     * TODO :- Come up with a nicer way to do this as this is disgusting!
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSyncError()
+    {
+        return \Illuminate\Http\JsonResponse::create(
+            [
+                'errors' => [
+                    [
+                        'title' => 'Resource unavailable',
+                        'detail' => 'The specified resource is being modified and is unavailable at this time',
+                        'status' => Response::HTTP_CONFLICT,
+                    ],
+                ],
+            ],
+            Response::HTTP_CONFLICT
+        );
     }
 }
