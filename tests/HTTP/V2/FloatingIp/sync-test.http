@@ -112,3 +112,44 @@ Cache-Control: no-cache
 X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+###
+# Delete Floating IP
+DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+
+DELETE https://{{host}}/{{version}}/credentials/{{nsx_credential_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+
+DELETE https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+
+DELETE https://{{host}}/{{version}}/regions/{{region_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
