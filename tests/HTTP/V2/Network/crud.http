@@ -6,7 +6,8 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "router_id": "{{dev_router_id}}"
+  "router_id": "{{dev_router_id}}",
+  "subnet": "172.17.2.0/29"
 }
 
 > {%

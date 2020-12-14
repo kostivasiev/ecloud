@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\FloatingIp;
 
 use App\Events\V2\FloatingIp\Created;
+use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
 use App\Models\V2\FloatingIp;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -89,6 +90,13 @@ class AllocateIp implements ShouldQueue
                 }
 
                 Log::info($logMessage . 'Success. IP ' . $floatingIp->ip_address . ' was assigned.');
+
+                $floatingIp->vpc->region->availabilityZones->each(function ($availabilityZone) {
+                    dispatch(new UpdateFloatingIpCapacity([
+                        'availability_zone_id' => $availabilityZone->getKey()
+                    ]));
+                });
+
                 return;
             }
         }

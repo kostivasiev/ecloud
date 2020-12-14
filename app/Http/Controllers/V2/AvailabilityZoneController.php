@@ -5,16 +5,20 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\Product;
 use App\Models\V2\Router;
+use App\Resources\V2\AvailabilityZoneCapacityResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
+use App\Resources\V2\ProductResource;
 use App\Resources\V2\RouterResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -187,6 +191,24 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function capacities(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    {
+        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+            ->availabilityZoneCapacities();
+        $queryTransformer->config(AvailabilityZoneCapacity::class)
+            ->transform($collection);
+
+        return AvailabilityZoneCapacityResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param Request $request
      * @param string $zoneId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -199,5 +221,26 @@ class AvailabilityZoneController extends BaseController
             return $availabilityZone->getDeletionError($e);
         }
         return response()->json([], 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $zoneId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function prices(Request $request, string $zoneId)
+    {
+        $availabilityZone = AvailabilityZone::forUser($request->user)->findOrFail($zoneId);
+
+        $products = $availabilityZone->products();
+
+        // Hacky Resource specific filtering
+        (new QueryTransformer(Product::transformRequest($request)))
+            ->config(Product::class)
+            ->transform($products);
+
+        return ProductResource::collection($products->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

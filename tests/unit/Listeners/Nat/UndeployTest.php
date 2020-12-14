@@ -77,7 +77,6 @@ class UndeployTest extends TestCase
             ]);
         });
 
-
         $this->event = new Deleted($this->nat);
 
         $this->listener = \Mockery::mock(Undeploy::class)->makePartial();
@@ -103,8 +102,12 @@ class UndeployTest extends TestCase
             return $mockNsxService;
         });
 
-        Event::Fake(Deleted::class);
-
         $this->listener->handle($this->event);
+
+        $this->nat->delete();
+
+        Event::assertDispatched(\App\Events\V2\Nat\Deleting::class, function ($event) {
+            return $event->model->id === $this->nat->id;
+        });
     }
 }

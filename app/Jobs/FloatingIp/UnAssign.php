@@ -26,7 +26,9 @@ class UnAssign extends Job
             ->orWhere('destination_id', $floatingIp->getKey())
             ->orWhere('translated_id', $floatingIp->getKey())
             ->each(function ($nat) {
-                $nat->delete();
+                if (!$nat->delete()) {
+                    throw new \Exception('Failed to delete nat resource: sync status is ' . $nat->getStatus());
+                }
                 Log::info(get_class($this) . ' : NAT ' . $nat->getKey() . ' (' . $nat->action . ') deleted');
             });
 

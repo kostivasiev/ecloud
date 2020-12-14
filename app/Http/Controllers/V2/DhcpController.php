@@ -65,6 +65,7 @@ class DhcpController extends BaseController
         $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->fill($request->only(['vpc_id', 'availability_zone_id']));
         $dhcp->save();
+        $dhcp->setSyncCompleted();
         return $this->responseIdMeta($request, $dhcp->getKey(), 200);
     }
 
@@ -75,7 +76,9 @@ class DhcpController extends BaseController
     public function destroy(string $dhcpId)
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
-        $dhcp->delete();
+        if (!$dhcp->delete()) {
+            return $dhcp->getSyncError();
+        }
         return response()->json([], 204);
     }
 }
