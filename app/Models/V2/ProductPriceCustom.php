@@ -14,6 +14,10 @@ class ProductPriceCustom extends Model
     {
         parent::__construct($attributes);
         $this->timestamps = false;
+
+        $this->casts = [
+            'product_price_custom_sale_price' => 'float'
+        ];
     }
 
     public function product()
