@@ -51,7 +51,6 @@ class OverlappingSubnetTest extends TestCase
             ]);
             return $request;
         });
-        $this->validator = new IsNotOverlappingSubnet($this->network->id);
     }
 
     public function testNoOverlap()
