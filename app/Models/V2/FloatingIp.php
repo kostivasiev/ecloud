@@ -6,10 +6,9 @@ use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
-use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -227,12 +226,26 @@ class FloatingIp extends Model implements Filterable, Sortable
      * @param $natType
      * @return Nat
      */
-    public function getNatInformation($natType): Nat
+    public function getNatInformation($natType)
     {
-        return Nat::where('source_id', $this->getKey())
-            ->orWhere('destination_id', $this->getKey())
-            ->orWhere('translated_id', $this->getKey())
-            ->where('action', '=', $natType)
+        return $res = Nat::whereHasMorph(
+            'translated',
+            [Nic::class, static::class],
+            function (Builder $query) use ($natType) {
+                $query->where('translated_id', $this->getKey())
+                    ->where('action', '=', $natType)
+                    ->withTrashed();
+            }
+        )
+            ->orWhereHasMorph(
+                'destination',
+                [Nic::class, static::class],
+                function (Builder $query) use ($natType) {
+                    $query->where('destination_id', $this->getKey())
+                        ->where('action', '=', $natType)
+                        ->withTrashed();
+                }
+            )
             ->first();
     }
 }
