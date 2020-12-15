@@ -27,7 +27,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, HasTimestamps;
+    use CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;
@@ -45,6 +45,12 @@ class FloatingIp extends Model implements Filterable, Sortable
         'created' => Created::class,
         'deleted' => Deleted::class
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->timestamps = true;
+    }
 
     public static function boot()
     {
