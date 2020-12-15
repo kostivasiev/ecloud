@@ -4,6 +4,7 @@ namespace App\Jobs\FirewallPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRulePort;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
@@ -33,6 +34,7 @@ class Deploy extends Job
                     'id' => $policy->id,
                     'display_name' => $policy->name,
                     'description' => $policy->name,
+                    'sequence_number' => $policy->sequence,
                     'rules' => $policy->firewallRules->map(function ($rule) use ($router) {
                         return [
                             'action' => $rule->action,
@@ -48,6 +50,14 @@ class Deploy extends Job
                                 'ANY'
                             ],
                             'service_entries' => $rule->firewallRulePorts->map(function ($port) {
+                                if ($port->protocol == 'ICMPv4') {
+                                    return [
+                                        'id' => $port->getKey(),
+                                        'icmp_type' => FirewallRulePort::ICMP_MESSAGE_TYPE_ECHO_REQUEST,
+                                        'resource_type' => 'ICMPTypeServiceEntry',
+                                        'protocol' => 'ICMPv4',
+                                    ];
+                                }
                                 return [
                                     'id' => $port->getKey(),
                                     'l4_protocol' => $port->protocol,

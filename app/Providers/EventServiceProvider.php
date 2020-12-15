@@ -53,15 +53,25 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
 
+        // AvailabilityZoneCapacity
+        \App\Events\V2\AvailabilityZoneCapacity\Saved::class => [
+            \App\Listeners\V2\AvailabilityZoneCapacity\SendAlert::class
+        ],
+
         // Credential
         \App\Events\V2\Credential\Creating::class => [
         ],
 
         // Dhcp
-        \App\Events\V2\Dhcp\Creating::class => [
-        ],
         \App\Events\V2\Dhcp\Created::class => [
             \App\Listeners\V2\Nsx\Dhcp\Create::class,
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Dhcp\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Dhcp\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Dhcp\Deleted::class => [
             \App\Listeners\V2\Nsx\Dhcp\Delete::class,
@@ -80,7 +90,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
         \App\Events\V2\FirewallRule\Deleted::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
+            \App\Listeners\V2\FirewallRule\Undeploy::class,
         ],
 
         // FirewallRulePort
@@ -94,6 +104,10 @@ class EventServiceProvider extends ServiceProvider
         // FloatingIp
         \App\Events\V2\FloatingIp\Created::class => [
             \App\Listeners\V2\FloatingIp\AllocateIp::class
+        ],
+        \App\Events\V2\FloatingIp\Deleted::class => [
+            \App\Listeners\V2\FloatingIp\Unassign::class,
+            \App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class
         ],
 
         // Instance
@@ -122,13 +136,33 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Network\Created::class => [
             \App\Listeners\V2\Network\Deploy::class,
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Saved::class => [
+            \App\Listeners\V2\Network\Update::class
+        ],
+        \App\Events\V2\Network\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Deleted::class => [
+            \App\Listeners\V2\Network\Undeploy::class
         ],
 
         // Nat
         \App\Events\V2\Nat\Created::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Nat\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nat\Saved::class => [
             \App\Listeners\V2\Nat\Deploy::class
+        ],
+        \App\Events\V2\Nat\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nat\Deleted::class => [
             \App\Listeners\V2\Nat\Undeploy::class
@@ -151,9 +185,16 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Router\Created::class => [
             \App\Listeners\V2\Router\Deploy::class,
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Router\Saved::class => [
             \App\Listeners\V2\Router\Update::class,
+        ],
+        \App\Events\V2\Router\Deleted::class => [
+            \App\Listeners\V2\Router\Networks\Delete::class,
+        ],
+        \App\Events\V2\Router\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
         ],
 
         // Volume
@@ -161,6 +202,15 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Volume\Updated::class => [
             \App\Listeners\V2\Volume\CapacityIncrease::class,
+        ],
+        \App\Events\V2\Volume\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Volume\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Volume\Deleted::class => [
+            \App\Listeners\V2\Volume\Delete::class,
         ],
 
         // Vpc
@@ -171,6 +221,8 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Vpc\Deleted::class => [
             \App\Listeners\V2\Vpc\Dhcp\Delete::class,
+            \App\Listeners\V2\Vpc\Routers\Delete::class,
+            \App\Listeners\V2\Vpc\FloatingIps\Delete::class,
         ],
 
         // Vpn

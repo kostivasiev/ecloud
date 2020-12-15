@@ -4,8 +4,8 @@ namespace Tests\V2\Vpc;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
+use App\Models\V2\Instance;
 use App\Models\V2\Region;
-use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -78,20 +78,19 @@ class DeleteTest extends TestCase
 
     public function testDeleteVpcWithResourcesFails()
     {
-       factory(Router::class)->create([
-           'vpc_id' => $this->vpc->getKey(),
-           'availability_zone_id' => $this->availabilityZone->getKey()
-       ]);
+        factory(Instance::class)->create([
+            'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
 
         $this->delete('/v2/vpcs/' . $this->vpc->getKey(), [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'Can not delete VPC with active resources',
-            'status' => 422,
-            'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+            'title' => 'Precondition Failed',
+            'detail' => 'Active resources exist for this item',
+            'status' => 412,
+        ])->assertResponseStatus(412);
     }
 
     public function testSuccessfulDelete()

@@ -8,6 +8,7 @@ use App\Events\V2\Instance\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -40,6 +41,7 @@ class Instance extends Model implements Filterable, Sortable
         'availability_zone_id',
         'locked',
         'platform',
+        'backup_enabled',
     ];
 
     protected $hidden = [
@@ -53,6 +55,7 @@ class Instance extends Model implements Filterable, Sortable
 
     protected $casts = [
         'locked' => 'boolean',
+        'backup_enabled' => 'boolean',
     ];
 
     protected $dispatchesEvents = [
@@ -144,6 +147,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
             $factory->create('platform', Filter::$stringDefaults),
+            $factory->create('backup_enabled', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -166,6 +170,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('locked'),
             $factory->create('platform'),
+            $factory->create('backup_enabled'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -198,6 +203,7 @@ class Instance extends Model implements Filterable, Sortable
             'availability_zone_id' => 'availability_zone_id',
             'locked' => 'locked',
             'platform' => 'platform',
+            'backup_enabled' => 'backup_enabled',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

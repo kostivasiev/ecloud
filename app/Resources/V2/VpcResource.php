@@ -12,6 +12,7 @@ use UKFast\Responses\UKFastResource;
  * @property string name
  * @property string reseller_id
  * @property string region_id
+ * @property bool support_enabled
  * @property string created_at
  * @property string updated_at
  */
@@ -27,11 +28,12 @@ class VpcResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'region_id' => $this->region_id,
-            'created_at' => Carbon::parse(
+            'support_enabled' => $this->support_enabled,
+            'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

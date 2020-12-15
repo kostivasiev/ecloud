@@ -32,4 +32,4 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/availability-zones/{AvailabilityZoneId}/instances?page=2'
   tags:
-    - AvailabilityZones
+    - Availability Zones

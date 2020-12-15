@@ -34,6 +34,8 @@ $app->configure('instance');
 $app->configure('volume');
 $app->configure('kingpin');
 $app->configure('job-status');
+$app->configure('firewall');
+$app->configure('alerts');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -79,7 +81,8 @@ $app->routeMiddleware([
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'is-administrator' => \App\Http\Middleware\IsAdministrator::class,
-    'is-locked' => \App\Http\Middleware\IsLocked::class
+    'is-locked' => \App\Http\Middleware\IsLocked::class,
+    'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class
 ]);
 
 /*

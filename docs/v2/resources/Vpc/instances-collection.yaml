@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../components/schemas/instance.yaml'
+                items:
+                  $ref: '../../components/schemas/instance.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -32,4 +32,4 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=2'
   tags:
-    - VirtualPrivateClouds
+    - Virtual Private Clouds

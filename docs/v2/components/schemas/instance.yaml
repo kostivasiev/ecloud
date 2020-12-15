@@ -13,11 +13,11 @@ properties:
     required: true
     example: vpc-2b66bb79
     readOnly: false
-  availability_zone_id:
-    readOnly: false
-    type: string
-    required: false
-    example: 'az-2b66bb79'
+#  availability_zone_id:
+#    readOnly: false
+#    type: string
+#    required: false
+#    example: 'az-2b66bb79'
   appliance_id:
     type: string
     required: true
@@ -34,6 +34,11 @@ properties:
     example: 1024
     readOnly: false
   locked:
+    type: boolean
+    required: false
+    example: false
+    readOnly: false
+  backup_enabled:
     type: boolean
     required: false
     example: false

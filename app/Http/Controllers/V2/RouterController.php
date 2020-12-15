@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
+use App\Jobs\FirewallPolicy\ConfigureDefaults;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -71,18 +72,27 @@ class RouterController extends BaseController
     {
         $router = Router::forUser(app('request')->user)->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id']));
-        $router->save();
+        if (!$router->save()) {
+            return $router->getSyncError();
+        }
         return $this->responseIdMeta($request, $router->getKey(), 200);
     }
 
     /**
      * @param Request $request
-     * @param string $routerUuid
+     * @param string $routerId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $routerId)
     {
-        Router::forUser($request->user)->findOrFail($routerId)->delete();
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+        try {
+            if (!$router->delete()) {
+                return $router->getSyncError();
+            }
+        } catch (\Exception $e) {
+            return $router->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 
@@ -135,5 +145,22 @@ class RouterController extends BaseController
         return NetworkResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
+    }
+
+    /**
+     * @param Request $request
+     * @param string $routerId
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     * @throws \Exception
+     */
+    public function configureDefaultPolicies(Request $request, string $routerId)
+    {
+        $router = Router::forUser($request->user)->findOrFail($routerId);
+
+        $this->dispatch(new ConfigureDefaults([
+            'router_id' => $router->id
+        ]));
+
+        return response(null, 202);
     }
 }

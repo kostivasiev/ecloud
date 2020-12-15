@@ -6,8 +6,8 @@ Content-Type:  application/json
 {
     "firewall_rule_id": "{{dev_firewall_rule_id}}",
     "protocol": "TCP",
-    "source": "111",
-    "destination": "222"
+    "source": "333",
+    "destination": "444"
 }
 
 > {%

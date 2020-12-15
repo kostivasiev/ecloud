@@ -46,7 +46,7 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param CreateRequest  $request
+     * @param CreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(CreateRequest $request)
@@ -62,7 +62,7 @@ class NetworkController extends BaseController
     }
 
     /**
-     * @param UpdateRequest  $request
+     * @param UpdateRequest $request
      * @param string $networkId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -74,7 +74,9 @@ class NetworkController extends BaseController
             'name',
             'subnet',
         ]));
-        $network->save();
+        if (!$network->save()) {
+            return $network->getSyncError();
+        }
         return $this->responseIdMeta($request, $network->getKey(), 200);
     }
 
@@ -87,7 +89,11 @@ class NetworkController extends BaseController
     public function destroy(Request $request, string $networkId)
     {
         $network = Network::forUser($request->user)->findOrFail($networkId);
-        $network->delete();
+        try {
+            $network->delete();
+        } catch (\Exception $e) {
+            return $network->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 

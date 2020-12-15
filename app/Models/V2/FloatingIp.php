@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Created;
+use App\Events\V2\FloatingIp\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
  * @method static forUser($user)
+ * @method static withRegion($regionId)
  */
 class FloatingIp extends Model implements Filterable, Sortable
 {
@@ -39,6 +41,7 @@ class FloatingIp extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'created' => Created::class,
+        'deleted' => Deleted::class
     ];
 
     public static function boot()
@@ -57,6 +60,7 @@ class FloatingIp extends Model implements Filterable, Sortable
     }
 
     /**
+     * DNAT destination
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function nat()
@@ -64,9 +68,6 @@ class FloatingIp extends Model implements Filterable, Sortable
         return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
     }
 
-    /**
-     * TODO :- Why does this have a direct relationship to a NAT? Should never need to lookup NAT from FIP?
-     */
     public function getResourceIdAttribute()
     {
         return ($this->nat) ? $this->nat->translated_id : null;
@@ -83,6 +84,13 @@ class FloatingIp extends Model implements Filterable, Sortable
             });
         }
         return $query;
+    }
+
+    public function scopeWithRegion($query, $regionId)
+    {
+        return $query->whereHas('vpc.region', function ($query) use ($regionId) {
+            $query->where('id', '=', $regionId);
+        });
     }
 
     /**

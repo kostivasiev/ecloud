@@ -11,7 +11,6 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string firewall_policy_id
- * @property string deployed
  * @property string source
  * @property string destination
  * @property string action
@@ -38,11 +37,11 @@ class FirewallRuleResource extends UKFastResource
             'action' => $this->action,
             'direction' => $this->direction,
             'enabled' => $this->enabled,
-            'created_at' => Carbon::parse(
+            'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

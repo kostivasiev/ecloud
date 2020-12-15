@@ -9,5 +9,6 @@ $factory->define(Nat::class, function (Faker $faker) {
     return [
         'destination_id' => 'fip-123456',
         'translated_id' => 'nic-654321',
+        'action' => 'DNAT'
     ];
 });

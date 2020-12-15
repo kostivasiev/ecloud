@@ -79,7 +79,8 @@ class RemoteKeyStore
     {
         $clientOptions = [
             'base_uri' => env('KEY_SERVER_HOST'),
-            'timeout' => 2
+            'timeout' => 2,
+            'verify' => app()->environment() === 'production',
         ];
         $httpClient = new Client($clientOptions);
         $keyStore = new static($httpClient);

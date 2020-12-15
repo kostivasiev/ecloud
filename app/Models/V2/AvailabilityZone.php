@@ -7,6 +7,7 @@ use App\Events\V2\AvailabilityZone\Creating;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -22,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class AvailabilityZone extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, DeletionRules;
 
     public $keyPrefix = 'az';
     public $incrementing = false;
@@ -47,6 +48,13 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     protected $casts = [
         'is_public' => 'boolean',
         'datacentre_site_id' => 'integer',
+    ];
+
+    public $children = [
+        'routers',
+        'dhcps',
+        'instances',
+        'loadBalancerClusters'
     ];
 
     /**
@@ -89,6 +97,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(LoadBalancerCluster::class);
     }
 
+    public function availabilityZoneCapacities()
+    {
+        return $this->hasMany(AvailabilityZoneCapacity::class);
+    }
+
     public function nsxService()
     {
         if (!$this->nsxService) {
@@ -103,6 +116,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $this->kingpinService = app()->makeWith(KingpinService::class, [$this]);
         }
         return $this->kingpinService;
+    }
+
+    public function products()
+    {
+        return Product::forAvailabilityZone($this);
     }
 
     /**

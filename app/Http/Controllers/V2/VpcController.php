@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Network\Creating;
 use App\Http\Requests\V2\Vpc\CreateRequest;
-use App\Http\Requests\V2\Vpc\DeleteRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
+use App\Jobs\FirewallPolicy\ConfigureDefaults;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
@@ -15,7 +14,6 @@ use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
-use App\Traits\V2\CustomKey;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -88,9 +86,14 @@ class VpcController extends BaseController
      * @param string $vpcId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(DeleteRequest $request, string $vpcId)
+    public function destroy(Request $request, string $vpcId)
     {
-        Vpc::forUser(app('request')->user)->findOrFail($vpcId)->delete();
+        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        try {
+            $vpc->delete();
+        } catch (\Exception $e) {
+            return $vpc->getDeletionError($e);
+        }
         return response()->json([], 204);
     }
 
@@ -172,6 +175,11 @@ class VpcController extends BaseController
 
         // Deploy router and network
         //event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
+
+        // Configure default firewall policies
+        $this->dispatch(new ConfigureDefaults([
+            'router_id' => $router->id
+        ]));
 
         return response(null, 202);
     }

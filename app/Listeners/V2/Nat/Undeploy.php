@@ -33,6 +33,9 @@ class Undeploy implements ShouldQueue
                 },
                 'translated' => function ($query) {
                     $query->withTrashed();
+                },
+                'source' => function ($query) {
+                    $query->withTrashed();
                 }
             ])->getRelations()
         )
@@ -43,6 +46,7 @@ class Undeploy implements ShouldQueue
             Log::error($error, [
                 'nat' => $nat,
             ]);
+            $nat->setSyncFailureReason($error);
             $this->fail(new \Exception($error));
             return;
         }
@@ -52,6 +56,7 @@ class Undeploy implements ShouldQueue
             'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/nat/USER/nat-rules/' . $nat->getKey()
         );
 
+        $nat->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

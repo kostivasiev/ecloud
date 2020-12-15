@@ -32,11 +32,11 @@ class LoadBalancerClusterResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'nodes' => $this->nodes,
             'config_id' => $this->config_id,
-            'created_at' => Carbon::parse(
+            'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

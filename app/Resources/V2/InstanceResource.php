@@ -27,6 +27,7 @@ use Log;
  * @property string platform
  * @property integer volume_capacity
  * @property boolean task_running
+ * @property boolean backup_enabled
  * @property string status
  * @property string created_at
  * @property string updated_at
@@ -49,13 +50,14 @@ class InstanceResource extends UKFastResource
             'ram_capacity' => $this->ram_capacity,
             'locked' => $this->locked,
             'platform' => $this->platform,
+            'backup_enabled' => $this->backup_enabled,
             'volume_capacity' => $this->volume_capacity,
             'status' => $this->status,
-            'created_at' => Carbon::parse(
+            'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
                 $this->updated_at,
                 new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),

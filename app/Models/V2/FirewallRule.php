@@ -32,7 +32,6 @@ class FirewallRule extends Model implements Filterable, Sortable
     protected $fillable = [
         'name',
         'sequence',
-        'router_id',
         'deployed',
         'firewall_policy_id',
         'source',
@@ -51,11 +50,6 @@ class FirewallRule extends Model implements Filterable, Sortable
         'saved' => Saved::class,
         'deleted' => Deleted::class,
     ];
-
-    public function router()
-    {
-        return $this->belongsTo(Router::class);
-    }
 
     public function firewallPolicy()
     {

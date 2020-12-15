@@ -12,3 +12,75 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/Copy_of_ingress/rules/b4822a80-eea7-11ea-bf67-554bdcb2dfaa
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+### Dev Router
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Network
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Network creation
+PUT https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "type": "ROUTED",
+    "subnets": [
+        {
+            "gateway_address": "10.0.0.1/24",
+            "dhcp_config": {
+                "resource_type": "SegmentDhcpV4Config",
+                "server_address": "10.0.0.2/24",
+                "lease_time": 604800,
+                "dns_servers": [
+                    "81.201.138.244",
+                    "94.229.163.244"
+                ]
+            },
+            "network": "10.0.0.0/24"
+        }
+    ],
+    "domain_name": "ecloud.ukfast",
+    "connectivity_path": "/infra/tier-1s/rtr-aaaaaaaa",
+    "advanced_config": {
+        "address_pool_paths": [],
+        "hybrid": false,
+        "inter_router": false,
+        "local_egress": false,
+        "connectivity": "ON"
+    },
+    "dhcp_config_path": "/infra/dhcp-server-configs/dhcp-8035a626",
+    "admin_state": "UP",
+    "replication_mode": "MTEP",
+    "resource_type": "Segment",
+    "id": "net-aaaaaaaa",
+    "display_name": "net-aaaaaaaa",
+    "tags": [
+        {
+            "scope": "ukfast",
+            "tag": "vpc-aaaaaaaa"
+        }
+    ],
+    "path": "/infra/tier-1s/rtr-aaaaaaaa/segments/net-c43f11d0",
+    "relative_path": "net-c43f11d0",
+    "parent_path": "/infra/tier-1s/rtr-aaaaaaaa",
+    "unique_id": "cc074cc4-cc85-44b2-a2af-7c76862ffcc9",
+    "marked_for_delete": false,
+    "overridden": false,
+    "_system_owned": false,
+    "_create_user": "ecloud.api@ecloudgov.dev",
+    "_create_time": 1606915151008,
+    "_last_modified_user": "ecloud.api@ecloudgov.dev",
+    "_last_modified_time": 1607953301778,
+    "_protection": "NOT_PROTECTED"
+}
+
+### Firewall Policy Rule
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-aaaaaaaa/rules/fwr-edea0c4f
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Instance;
 use App\Models\V2\Nic;
+use App\Models\V2\Router;
+use App\Models\V2\Volume;
+use App\Models\V2\Vpn;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
@@ -31,7 +33,8 @@ class AppServiceProvider extends ServiceProvider
             $client = $this->app->makeWith(Client::class, [
                 'config' => [
                     'base_uri' => config('encryption.keystore_host'),
-                    'timeout' => 2
+                    'timeout' => 2,
+                    'verify' => app()->environment() === 'production',
                 ]
             ]);
             $key = (new RemoteKeyStore($client))->getKey(config('encryption.keystore_host_key'));
@@ -41,7 +44,11 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::morphMap([
             'nic' => Nic::class,
-            'fip' => FloatingIp::class
+            'fip' => FloatingIp::class,
+            'i' => Instance::class,
+            'rtr' => Router::class,
+            'vol' => Volume::class,
+            'vpn' => Vpn::class,
         ]);
 
         Queue::failing(function (JobFailed $event) {

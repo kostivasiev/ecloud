@@ -3,6 +3,7 @@
 namespace Tests\V2\Volume;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -28,6 +29,8 @@ class DeleteTest extends TestCase
     /** @var AvailabilityZone */
     private $availabilityZone;
 
+    protected $instance;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -44,6 +47,10 @@ class DeleteTest extends TestCase
         $this->volume = factory(Volume::class)->create([
             'vpc_id' => $this->vpc->getKey()
         ]);
+        $this->instance = factory(Instance::class)->create([
+            'vpc_id' => $this->vpc->id,
+        ]);
+        $this->instance->volumes()->attach($this->volume);
     }
 
     public function testFailInvalidId()
@@ -70,7 +77,7 @@ class DeleteTest extends TestCase
             '/v2/volumes/' . $this->volume->getKey(),
             [],
             [
-                'X-consumer-custom-id' => '1-0',
+                'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )

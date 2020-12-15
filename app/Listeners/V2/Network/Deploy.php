@@ -33,13 +33,14 @@ class Deploy implements ShouldQueue
         if (!$router->available) {
             if ($this->attempts() <= static::ROUTER_RETRY_ATTEMPTS) {
                 $this->release(static::ROUTER_RETRY_DELAY);
-                Log::info('Attempted to create Network (' . $network->getKey() .
-                    ') but Router (' . $router->getKey() . ') was not available, will retry shortly');
+                Log::info('Attempted to create Network (' . $network->id .
+                    ') but Router (' . $router->id . ') was not available, will retry shortly');
                 return;
             } else {
-                $message = 'Timed out waiting for Router (' . $router->getKey() .
-                    ') to become available for Network (' . $network->getKey() . ') deployment';
+                $message = 'Timed out waiting for Router (' . $router->id .
+                    ') to become available for Network (' . $network->id . ') deployment';
                 Log::error($message);
+                $network->setSyncFailureReason($message);
                 $this->fail(new Exception($message));
                 return;
             }
@@ -53,10 +54,11 @@ class Deploy implements ShouldQueue
         $message = 'Deploying Network: ' . $network->id . ': ';
         Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
         Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
+        Log::info($message . 'DHCP ID: ' . $router->vpc->dhcp->id);
 
         try {
-            $router->availabilityZone->nsxService()->put(
-                'policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey(),
+            $response = $router->availabilityZone->nsxService()->put(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id,
                 [
                     'json' => [
                         'resource_type' => 'Segment',
@@ -72,14 +74,14 @@ class Deploy implements ShouldQueue
                             ]
                         ],
                         'domain_name' => config('defaults.network.domain_name'),
-                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->getKey(),
+                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->id,
                         'advanced_config' => [
                             'connectivity' => 'ON'
                         ],
                         'tags' => [
                             [
                                 'scope' => config('defaults.tag.scope'),
-                                'tag' => $router->vpc->getKey()
+                                'tag' => $router->vpc->id
                             ]
                         ]
                     ]
@@ -87,11 +89,31 @@ class Deploy implements ShouldQueue
             );
         } catch (RequestException $exception) {
             //Segment already exists. Hacky fix, as the listener is fired twice due to rincewind
-            if ($exception->hasResponse() && json_decode($exception->getResponse()->getBody()->getContents())->error_code == 500127) {
-                Log::error('Attempted to create network segment ' . $network->getKey() . ' but it already exists.');
+            if ($exception->hasResponse()) {
+                $error = json_decode($exception->getResponse()->getBody()->getContents());
+                if ($error->error_code == 500127) {
+                    $message = 'Attempted to create network segment ' . $network->id .
+                        ' but it already exists.' . PHP_EOL .
+                        'NSX Error : ' . $error->error_message;
+                    Log::error($message);
+                    $network->setSyncCompleted();
+                    return;
+                }
+
+                $message = 'Unhandled error response for ' . $network->id;
+                Log::error($message, (array) $error);
+                $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
+                $this->fail($exception);
                 return;
             }
+
+            $message = 'Unhandled error for ' . $network->id;
+            Log::error($message, [$exception]);
+            $network->setSyncFailureReason($message . ' : ' . $exception->getMessage());
+            $this->fail($exception);
+            return;
         }
+        $network->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
