@@ -202,7 +202,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('nics', 'NicController@index');
         $router->get('nics/{nicId}', 'NicController@show');
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->post('nics', 'NicController@create');
+            //$router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');
             $router->delete('nics/{nicId}', 'NicController@destroy');
         });
