@@ -27,7 +27,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
 
     public $keyPrefix = 'az';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [

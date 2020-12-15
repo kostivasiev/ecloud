@@ -20,7 +20,6 @@ class Product extends Model implements Filterable, Sortable
     protected $connection = 'reseller';
     protected $table = 'product';
     protected $primaryKey = 'product_id';
-    public $timestamps = false;
 
     const PRODUCT_CATEGORIES = [
         'Compute',
@@ -28,6 +27,12 @@ class Product extends Model implements Filterable, Sortable
         'Storage',
         'License'
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->timestamps = false;
+    }
 
     /**
      * Apply a scope/filter to ** ALL ** Queries using this model to only return eCloud v2 products
@@ -43,23 +48,53 @@ class Product extends Model implements Filterable, Sortable
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function productPrice()
     {
         return $this->hasMany(ProductPrice::class, 'product_price_product_id');
     }
 
-    public function getPriceAttribute()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function productPriceCustom()
     {
+        return $this->hasMany(ProductPriceCustom::class, 'product_price_custom_product_id');
+    }
+
+    /**
+     * Get the price for the product, taking into account custom pricing set up for a reseller.
+     * @param int|null $resellerId
+     * @return \Illuminate\Database\Eloquent\HigherOrderBuilderProxy|mixed|null
+     */
+    public function getPrice(int $resellerId = null)
+    {
+        if (!empty($resellerId)) {
+            $productPriceCustom = $this->productPriceCustom()->where('product_price_custom_reseller_id', $resellerId)->first();
+            if (!empty($productPriceCustom)) {
+                return $productPriceCustom->product_price_custom_sale_price;
+            }
+        }
+
         $productPrice = $this->productPrice()->where('product_price_type', 'Standard')->first();
+
         return $productPrice ? $productPrice->product_price_sale_price : null;
     }
 
+    /**
+     * @return string|string[]
+     */
     public function getNameAttribute()
     {
         preg_match("/(az-\w+[^:])(:\s)(\S[^-]+)/", $this->attributes['product_name'], $matches);
         return str_replace(' ', '_', $matches[3] ?? null);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getAvailabilityZoneIdAttribute()
     {
         preg_match("/(az-\w+[^:])(:\s)(\S[^-]+)/", $this->attributes['product_name'], $matches);
