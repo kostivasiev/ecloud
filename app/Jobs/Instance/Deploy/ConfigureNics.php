@@ -98,7 +98,7 @@ class ConfigureNics extends TaskJob
                     $nic->ip_address = $checkIp;
 
                     try {
-                        Nic::withoutEvents(function () use ($nic){
+                        Nic::withoutEvents(function () use ($nic) {
                             $nic->save();
                         });
                     } catch (\Exception $exception) {
