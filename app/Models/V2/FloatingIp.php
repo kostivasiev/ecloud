@@ -165,13 +165,10 @@ class FloatingIp extends Model implements Filterable, Sortable
         $snat = $this->getNatInformation("SNAT");
         $dnat = $this->getNatInformation("DNAT");
         if ($snat && $dnat) {
-            if (!$snat->syncs()->count() && !$dnat->syncs()->count()) {
-                return 'complete';
-            }
-            if ($snat->getSyncFailed() && $dnat->getSyncFailed()) {
+            if ($snat->getStatus() == 'failed' || $dnat->getStatus() == 'failed') {
                 return 'failed';
             }
-            if ($snat->syncs()->latest()->first()->completed && $dnat->syncs()->latest()->first()->completed) {
+            if ($snat->getStatus() == 'complete' && $dnat->getStatus() == 'complete') {
                 return 'complete';
             }
         }
