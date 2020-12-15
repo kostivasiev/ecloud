@@ -26,7 +26,6 @@ class OverlappingSubnetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->validator = new IsNotOverlappingSubnet();
         $this->region = factory(Region::class)->create([
             'name' => 'testregion',
         ]);
@@ -55,11 +54,13 @@ class OverlappingSubnetTest extends TestCase
 
     public function testNoOverlap()
     {
-        $this->assertTrue($this->validator->passes('', '10.0.1.1/30'));
+        $this->validator = new IsNotOverlappingSubnet();
+        $this->assertTrue($this->validator->passes('', '192.168.10.1/16'));
     }
 
     public function testOverlap()
     {
+        $this->validator = new IsNotOverlappingSubnet();
         $this->assertFalse($this->validator->passes('', '10.0.0.1/24'));
     }
 }
