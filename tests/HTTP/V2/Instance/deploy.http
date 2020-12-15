@@ -164,7 +164,8 @@ Content-Type:  application/json
   "ram_capacity": 1024,
   "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
   "requires_floating_ip": true,
-  "network_id": "net-54c46e3d"
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30
 }
 
 > {%
@@ -175,6 +176,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 201, "Response status is not 201 Created");
 });
 %}
+
 ###
 
 ## Deploy - default network
@@ -184,11 +186,12 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "vpc_id": "vpc-c05db056",
-  "vcpu_cores": 1,
-  "ram_capacity": 1024,
-  "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
-  "requires_floating_ip": true
+    "vpc_id": "{{dev_vpc_id}}",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
+    "requires_floating_ip": true,
+    "volume_capacity": 30
 }
 
 > {%
@@ -199,5 +202,16 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 201, "Response status is not 201 Created");
 });
 %}
+
 ###
-#
+
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+#DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+#X-consumer-custom-id:  0-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json

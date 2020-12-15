@@ -162,6 +162,12 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Saved::class => [
             \App\Listeners\V2\Network\Update::class
         ],
+        \App\Events\V2\Network\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Network\Deleted::class => [
+            \App\Listeners\V2\Network\Undeploy::class
+        ],
 
         // Nat
         \App\Events\V2\Nat\Created::class => [
@@ -182,6 +188,15 @@ class EventServiceProvider extends ServiceProvider
 
         // Nic
         \App\Events\V2\Nic\Creating::class => [
+        ],
+        \App\Events\V2\Nic\Created::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Nic\Saving::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Nic\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nic\Deleted::class => [
             \App\Listeners\V2\Nic\DeleteDhcpLease::class,
