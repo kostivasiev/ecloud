@@ -35,6 +35,7 @@ class DeleteDhcpLease implements ShouldQueue
             . '/dhcp-static-binding-configs/' . $nic->getKey()
         );
 
+        $nic->setSyncCompleted();
         Log::info('DHCP static binding deleted for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

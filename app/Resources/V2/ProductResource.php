@@ -16,7 +16,7 @@ class ProductResource extends UKFastResource
             'availability_zone_id' => $this->availabilityZoneId,
             'name' => $this->name,
             'category' => strtolower($this->category),
-            'price' => $this->price,
+            'price' => $this->getPrice(app('request')->user->resellerId)
         ];
     }
 }

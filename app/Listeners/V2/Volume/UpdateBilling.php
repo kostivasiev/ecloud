@@ -55,7 +55,7 @@ class UpdateBilling
             );
         } else {
             $billingMetric->category = $product->category;
-            $billingMetric->price = $product->price;
+            $billingMetric->price = $product->getPrice($volume->vpc->reseller_id);
         }
 
         $billingMetric->save();

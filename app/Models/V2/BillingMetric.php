@@ -34,6 +34,11 @@ class BillingMetric extends Model implements Filterable, Sortable
         'value',
         'start',
         'end',
+        'category',
+        'price',
+    ];
+    protected $casts = [
+        'price' => 'float',
     ];
 
     public function scopeForUser($query, $user)
@@ -73,6 +78,8 @@ class BillingMetric extends Model implements Filterable, Sortable
             $factory->create('value', Filter::$stringDefaults),
             $factory->create('start', Filter::$dateDefaults),
             $factory->create('end', Filter::$dateDefaults),
+            $factory->create('category', Filter::$stringDefaults),
+            $factory->create('price', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -94,6 +101,8 @@ class BillingMetric extends Model implements Filterable, Sortable
             $factory->create('value'),
             $factory->create('start'),
             $factory->create('end'),
+            $factory->create('category'),
+            $factory->create('price'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -124,6 +133,8 @@ class BillingMetric extends Model implements Filterable, Sortable
             'value' => 'value',
             'start' => 'start',
             'end' => 'end',
+            'category' => 'category',
+            'price' => 'price',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

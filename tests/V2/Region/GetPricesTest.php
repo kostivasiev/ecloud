@@ -60,7 +60,7 @@ class GetPricesTest extends TestCase
                 'availability_zone_id'   => $product->availability_zone_id,
                 'name' => $product->name,
                 'category'  => strtolower($product->product_subcategory),
-                'price'  => $product->price,
+                'price'  => $product->getPrice(),
             ])->assertResponseStatus(200);
     }
 }

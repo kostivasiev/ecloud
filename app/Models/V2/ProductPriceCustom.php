@@ -4,11 +4,11 @@ namespace App\Models\V2;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductPrice extends Model
+class ProductPriceCustom extends Model
 {
     protected $connection = 'reseller';
-    protected $table = 'product_price';
-    protected $primaryKey = 'product_price_id';
+    protected $table = 'product_price_custom';
+    protected $primaryKey = 'product_price_custom_id';
 
     public function __construct(array $attributes = [])
     {
@@ -16,12 +16,12 @@ class ProductPrice extends Model
         $this->timestamps = false;
 
         $this->casts = [
-            'product_price_sale_price' => 'float'
+            'product_price_custom_sale_price' => 'float'
         ];
     }
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_price_product_id');
+        return $this->belongsTo(Product::class, 'product_price_custom_product_id');
     }
 }

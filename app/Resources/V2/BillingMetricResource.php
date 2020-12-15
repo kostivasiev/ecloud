@@ -15,6 +15,8 @@ class BillingMetricResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'key' => $this->key,
             'value' => $this->value,
+            'category' => $this->category,
+            'price' => (float) $this->price,
             'start' => $this->start === null ? null : Carbon::parse(
                 $this->start,
                 new \DateTimeZone(config('app.timezone'))
