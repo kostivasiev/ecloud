@@ -215,3 +215,15 @@ Content-Type:  application/json
 #X-consumer-custom-id:  0-0
 #X-consumer-groups:  ecloud.read, ecloud.write
 #Content-Type:  application/json
+
+DELETE https://{{host}}/{{version}}/instances/i-6e8e79d1
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+
+GET https://{{host}}/{{version}}/instances/i-5a08046b/volumes
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

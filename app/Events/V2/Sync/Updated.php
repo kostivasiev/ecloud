@@ -1,21 +1,17 @@
 <?php
 
-namespace App\Events\V2\Volume;
+namespace App\Events\V2\Sync;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Creating
+class Updated
 {
     use SerializesModels;
 
     public $model;
 
-    /**
-     * @param Model $model
-     * @return void
-     */
-    public function __construct($model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
