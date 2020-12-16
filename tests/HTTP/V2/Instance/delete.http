@@ -1,4 +1,4 @@
-DELETE https://{{host}}/{{version}}/instances/i-389ceb89
+DELETE https://{{host}}/{{version}}/instances/i-442bd3f9
 X-consumer-custom-id:  1-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

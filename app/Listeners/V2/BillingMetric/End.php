@@ -17,7 +17,8 @@ class End
             return true;
         }
 
-        $billingMetric = BillingMetric::where('resource_id', $event->model->id);
+        $billingMetric = BillingMetric::where('resource_id', $event->model->id)
+            ->where('end', null);
         if (!$billingMetric) {
             Log::info(get_class($this) . ' : Nothing to do, no billing metric(s) for resource', ['event' => $event]);
             return true;
@@ -26,7 +27,8 @@ class End
         $billingMetric->each(function ($metric) use ($event) {
             $metric->end = Carbon::now();
             $metric->save();
-            Log::info(get_class($this) . ' : Updated end on billing metric ' . $metric->id . ' for resource', ['event' => $event]);
+            Log::info(get_class($this) . ' : Updated end on billing metric ' . $metric->id . ' for resource',
+                ['event' => $event]);
         });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
