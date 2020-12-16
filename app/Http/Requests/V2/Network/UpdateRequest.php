@@ -47,7 +47,6 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'nullable',
                 'string',
-                'unique:ecloud.networks,subnet,'.$networkId.',id,deleted_at,NULL',
                 new ValidCidrSubnet(),
                 new isPrivateSubnet(),
                 new isNotOverlappingSubnet($networkId),
