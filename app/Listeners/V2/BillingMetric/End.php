@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\BillingMetric;
 
 use App\Models\V2\BillingMetric;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class End
@@ -23,11 +24,9 @@ class End
         }
 
         $billingMetric->each(function ($metric) use ($event) {
-            if (!$metric->delete()) {
-                Log::warning(get_class($this) . ' : Failed to delete billing metric ' . $metric->id . ' for resource', ['event' => $event]);
-                return false;
-            }
-            Log::info(get_class($this) . ' : Deleted billing metric ' . $metric->id . ' for resource', ['event' => $event]);
+            $metric->end = Carbon::now();
+            $metric->save();
+            Log::info(get_class($this) . ' : Updated end on billing metric ' . $metric->id . ' for resource', ['event' => $event]);
         });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
