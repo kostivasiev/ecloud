@@ -18,16 +18,17 @@ class End
 
         $billingMetric = BillingMetric::where('resource_id', $event->model->id);
         if (!$billingMetric) {
-            Log::info(get_class($this) . ' : Nothing to do, no billing metric for resource', ['event' => $event]);
+            Log::info(get_class($this) . ' : Nothing to do, no billing metric(s) for resource', ['event' => $event]);
             return true;
         }
 
-        if (!$billingMetric->delete()) {
-            Log::warning(get_class($this) . ' : Failed to delete billing metric for resource', ['event' => $event]);
-            return false;
-        }
-
-        Log::info(get_class($this) . ' : Deleted billing metric for resource', ['event' => $event]);
+        $billingMetric->each(function ($metric) use ($event) {
+            if (!$metric->delete()) {
+                Log::warning(get_class($this) . ' : Failed to delete billing metric ' . $metric->id . ' for resource', ['event' => $event]);
+                return false;
+            }
+            Log::info(get_class($this) . ' : Deleted billing metric ' . $metric->id . ' for resource', ['event' => $event]);
+        });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
