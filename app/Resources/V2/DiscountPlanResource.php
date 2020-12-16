@@ -19,6 +19,7 @@ use UKFast\Responses\UKFastResource;
  * @property string term_length
  * @property string term_start_date
  * @property string term_end_date
+ * @property string approved
  */
 class DiscountPlanResource extends UKFastResource
 {
@@ -50,6 +51,16 @@ class DiscountPlanResource extends UKFastResource
                 $this->term_end_date,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
+        ];
+
+        if (!empty($this->approved)) {
+            $data['accepted'] = Carbon::parse(
+                $this->approved,
+                new \DateTimeZone(config('app.timezone'))
+            )->toIso8601String();
+        }
+
+        $timestampElements = [
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
@@ -60,6 +71,6 @@ class DiscountPlanResource extends UKFastResource
             )->toIso8601String(),
         ];
 
-        return array_merge($idElement, $internalElement, $data);
+        return array_merge($idElement, $internalElement, $data, $timestampElements);
     }
 }
