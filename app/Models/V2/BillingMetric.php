@@ -13,13 +13,16 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
+/**
+ * Class BillingMetric
+ * @package App\Models\V2
+ */
 class BillingMetric extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'bm';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
@@ -45,6 +48,19 @@ class BillingMetric extends Model implements Filterable, Sortable
         }
         $query->where('reseller_id', '=', $user->resellerId);
         return $query;
+    }
+
+    /**
+     * @param $resource
+     * @param $key
+     * @return BillingMetric|null
+     */
+    public static function getActiveByKey($resource, $key): ?BillingMetric
+    {
+        return self::where('resource_id', $resource->getKey())
+            ->whereNull('end')
+            ->where('key', $key)
+            ->first();
     }
 
     /**

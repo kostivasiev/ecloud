@@ -207,13 +207,11 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Volume
-        \App\Events\V2\Volume\Creating::class => [
-        ],
-        \App\Events\V2\Volume\Updated::class => [
-            \App\Listeners\V2\Volume\CapacityIncrease::class,
-        ],
         \App\Events\V2\Volume\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Volume\Saved::class => [
+            \App\Listeners\V2\Volume\CapacityIncrease::class,
         ],
         \App\Events\V2\Volume\Deleting::class => [
             \App\Listeners\V2\ResourceSync::class,
@@ -237,5 +235,10 @@ class EventServiceProvider extends ServiceProvider
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
         ],
+
+        // Sync
+        \App\Events\V2\Sync\Updated::class => [
+            \App\Listeners\V2\Volume\UpdateBilling::class,
+        ]
     ];
 }
