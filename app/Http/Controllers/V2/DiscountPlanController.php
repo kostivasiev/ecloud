@@ -105,4 +105,17 @@ class DiscountPlanController extends BaseController
         $discountPlan->delete();
         return response()->json([], 204);
     }
+
+    /**
+     * @param Request $request
+     * @param string $discountPlanId
+     * @return JsonResponse
+     */
+    public function approve(Request $request, string $discountPlanId)
+    {
+        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan->approved = gmdate('Y-m-d H:i:s');
+        $discountPlan->save();
+        return response()->json([], 202);
+    }
 }
