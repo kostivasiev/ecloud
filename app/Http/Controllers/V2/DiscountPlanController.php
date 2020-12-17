@@ -62,7 +62,9 @@ class DiscountPlanController extends BaseController
             'term_start_date',
             'term_end_date',
         ]));
-        $discountPlan->reseller_id = $this->resellerId;
+        if (!$request->has('reseller_id')) {
+            $discountPlan->reseller_id = $this->resellerId;
+        }
         $discountPlan->save();
         return $this->responseIdMeta($request, $discountPlan->getKey(), 201);
     }
