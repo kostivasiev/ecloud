@@ -117,9 +117,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\DefaultPlatform::class,
             \App\Listeners\V2\ResourceSync::class,
         ],
-        \App\Events\V2\Instance\Deleted::class => [
-            \App\Listeners\V2\Instance\Undeploy::class,
-        ],
         \App\Events\V2\Instance\Deploy::class => [
             \App\Listeners\V2\Instance\Deploy::class,
         ],
@@ -128,6 +125,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Instance\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Instance\Deleting::class => [
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\Instance\Deleted::class => [
+            \App\Listeners\V2\Instance\Undeploy::class,
         ],
 
         // LoadBalancerCluster

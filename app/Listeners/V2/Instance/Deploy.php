@@ -47,7 +47,7 @@ class Deploy implements ShouldQueue
             new AssignFloatingIp($data),
             new UpdateNetworkAdapter($data),
             new OsCustomisation($data),
-            new PowerOn($data),
+            new PowerOn($data, false),
             new WaitOsCustomisation($data),
             new PrepareOsUsers($data),
             new PrepareOsDisk($data),

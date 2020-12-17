@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Log;
 class PowerOn extends Job
 {
     private $data;
+    private $setSyncCompleted;
 
-    public function __construct($data)
+    public function __construct($data, $setSyncCompleted = true)
     {
         $this->data = $data;
+        $this->setSyncCompleted = $setSyncCompleted;
     }
 
     /**
@@ -28,7 +30,10 @@ class PowerOn extends Job
         $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
         );
-        $instance->setSyncCompleted();
+
+        if ($this->setSyncCompleted) {
+            $instance->setSyncCompleted();
+        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

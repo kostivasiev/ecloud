@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Instance\Created;
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
+use App\Events\V2\Instance\Deleting;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -57,6 +58,7 @@ class Instance extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
+        'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];
 
