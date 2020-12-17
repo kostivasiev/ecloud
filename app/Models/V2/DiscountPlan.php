@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\DiscountPlan\Created;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
