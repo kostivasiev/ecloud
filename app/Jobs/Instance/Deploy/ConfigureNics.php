@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Models\V2\Nic;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
