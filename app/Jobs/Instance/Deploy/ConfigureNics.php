@@ -2,25 +2,20 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Nic;
-use App\Models\V2\Task;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
-class ConfigureNics extends TaskJob
+class ConfigureNics extends Job
 {
-    public $tries = 20;
     const RETRY_ATTEMPTS = 10;
     const RETRY_DELAY = 10;
-
+    public $tries = 20;
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
-
         $this->data = $data;
     }
 

@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Log;
 class PowerOff extends Job
 {
     private $data;
+    private $setSyncCompleted;
 
-    public function __construct($data)
+    public function __construct($data, $setSyncCompleted = true)
     {
         $this->data = $data;
+        $this->setSyncCompleted = $setSyncCompleted;
     }
 
     public function handle()
@@ -31,6 +33,10 @@ class PowerOff extends Job
         if (isset($responseJson->ExceptionType) && $responseJson->ExceptionType == 'UKFast.VimLibrary.Exception.EntityNotFoundException') {
             Log::info('Attempted to power off, but entity was not found, skipping.');
             return;
+        }
+
+        if ($this->setSyncCompleted) {
+            $instance->setSyncCompleted();
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
