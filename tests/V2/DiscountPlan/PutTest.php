@@ -24,7 +24,7 @@ class PutTest extends TestCase
         ]);
     }
 
-    public function testAcceptDiscountPlan()
+    public function testApproveDiscountPlan()
     {
         $this->put(
             '/v2/discount-plans/'.$this->discountPlan->getKey().'/approve',
