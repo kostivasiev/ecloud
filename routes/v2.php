@@ -202,7 +202,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('nics', 'NicController@index');
         $router->get('nics/{nicId}', 'NicController@show');
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->post('nics', 'NicController@create');
+            //$router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');
             $router->delete('nics/{nicId}', 'NicController@destroy');
         });
@@ -228,6 +228,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('support/{vpcSupportId}', 'VpcSupportController@destroy');
     });
 
+    /** Discount Plans */
+    $router->group([], function () use ($router) {
+        $router->get('discount-plans', 'DiscountPlanController@index');
+        $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->post('discount-plans', 'DiscountPlanController@store');
+            $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
+            $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
+        });
+    });
+    
     /** Billing Metrics */
     $router->group([], function () use ($router) {
         $router->get('billing-metrics', 'BillingMetricController@index');

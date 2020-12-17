@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events\V2\Volume;
+namespace App\Events\V2\Nic;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Creating
+class Created
 {
     use SerializesModels;
 

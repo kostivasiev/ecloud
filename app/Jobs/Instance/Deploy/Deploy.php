@@ -88,6 +88,9 @@ class Deploy extends TaskJob
                 ]
             );
 
+            // Trigger billing
+            $volume->save();
+
             Log::info($logMessage . 'Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
         }
 

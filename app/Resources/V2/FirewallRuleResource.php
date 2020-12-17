@@ -11,7 +11,6 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string firewall_policy_id
- * @property string deployed
  * @property string source
  * @property string destination
  * @property string action

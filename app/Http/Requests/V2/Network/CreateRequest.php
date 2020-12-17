@@ -45,7 +45,6 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'nullable',
                 'string',
-                'unique:ecloud.networks,subnet,NULL,id,deleted_at,NULL',
                 new ValidCidrSubnet(),
                 new isPrivateSubnet(),
                 new isNotOverlappingSubnet(),

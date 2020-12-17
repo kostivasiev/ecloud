@@ -14,6 +14,7 @@ use IPLib\Factory;
 class IsNotOverlappingSubnet implements Rule
 {
     protected $router_id;
+    protected $network_id;
 
     /**
      * IsNotOverlappingSubnet constructor.
@@ -26,6 +27,7 @@ class IsNotOverlappingSubnet implements Rule
             $this->router_id = $request->input('router_id');
         }
         if (!empty($networkId)) {
+            $this->network_id = $networkId;
             $this->router_id = Network::findOrFail($networkId)->router_id;
         }
     }
@@ -38,6 +40,9 @@ class IsNotOverlappingSubnet implements Rule
         $submittedRange = Factory::rangeFromString($value);
         $networks = Router::find($this->router_id)->networks;
         foreach ($networks as $network) {
+            if (!empty($this->network_id) && $network->getKey() == $this->network_id) {
+                continue;
+            }
             $storedRange = Factory::rangeFromString($network->subnet);
             if ($submittedRange->containsRange($storedRange) || $storedRange->containsRange($submittedRange)) {
                 return false;

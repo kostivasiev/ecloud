@@ -20,6 +20,11 @@ properties:
     required: true
     description: Volume capacity in GB
     example: 250
+  sync:
+    type: string
+    readOnly: true
+    description: The current sync state of the resource
+    example: complete
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
