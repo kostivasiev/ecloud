@@ -40,6 +40,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'term_length',
         'term_start_date',
         'term_end_date',
+        'rejected',
     ];
 
     protected $casts = [
@@ -49,6 +50,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'term_length' => 'integer',
         'term_start_date' => 'datetime',
         'term_end_date' => 'datetime',
+        'rejected' => 'datetime',
     ];
 
     /**
@@ -85,6 +87,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             $factory->create('term_length', Filter::$numericDefaults),
             $factory->create('term_start_date', Filter::$dateDefaults),
             $factory->create('term_end_date', Filter::$dateDefaults),
+            $factory->create('rejected', Filter::$dateDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -109,6 +112,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             $factory->create('term_length'),
             $factory->create('term_start_date'),
             $factory->create('term_end_date'),
+            $factory->create('rejected'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
             
@@ -144,6 +148,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             'term_length' => 'term_length',
             'term_start_date' => 'term_start_date',
             'term_end_date' => 'term_end_date',
+            'rejected' => 'rejected',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
