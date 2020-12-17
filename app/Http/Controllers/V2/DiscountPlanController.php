@@ -54,6 +54,7 @@ class DiscountPlanController extends BaseController
         $discountPlan = new DiscountPlan($request->only([
             'contact_id',
             'employee_id',
+            'reseller_id',
             'name',
             'commitment_amount',
             'commitment_before_discount',
@@ -80,6 +81,7 @@ class DiscountPlanController extends BaseController
         $discountPlan->update($request->only([
             'contact_id',
             'employee_id',
+            'reseller_id',
             'name',
             'commitment_amount',
             'commitment_before_discount',
