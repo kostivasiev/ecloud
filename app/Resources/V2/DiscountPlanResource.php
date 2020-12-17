@@ -19,6 +19,7 @@ use UKFast\Responses\UKFastResource;
  * @property string term_length
  * @property string term_start_date
  * @property string term_end_date
+ * @property string pending
  * @property string approved
  */
 class DiscountPlanResource extends UKFastResource
@@ -53,8 +54,15 @@ class DiscountPlanResource extends UKFastResource
             )->toIso8601String(),
         ];
 
+        if (!empty($this->pending)) {
+            $data['pending'] = Carbon::parse(
+                $this->pending,
+                new \DateTimeZone(config('app.timezone'))
+            )->toIso8601String();
+        }
+
         if (!empty($this->approved)) {
-            $data['accepted'] = Carbon::parse(
+            $data['approved'] = Carbon::parse(
                 $this->approved,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String();

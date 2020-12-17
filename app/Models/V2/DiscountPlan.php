@@ -41,6 +41,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'term_length',
         'term_start_date',
         'term_end_date',
+        'pending',
         'approved',
     ];
 
@@ -51,6 +52,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'term_length' => 'integer',
         'term_start_date' => 'datetime',
         'term_end_date' => 'datetime',
+        'pending' => 'datetime',
         'approved' => 'datetime',
     ];
 
@@ -88,6 +90,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             $factory->create('term_length', Filter::$numericDefaults),
             $factory->create('term_start_date', Filter::$dateDefaults),
             $factory->create('term_end_date', Filter::$dateDefaults),
+            $factory->create('pending', Filter::$dateDefaults),
             $factory->create('approved', Filter::$dateDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -113,6 +116,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             $factory->create('term_length'),
             $factory->create('term_start_date'),
             $factory->create('term_end_date'),
+            $factory->create('pending'),
             $factory->create('approved'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -149,6 +153,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             'term_length' => 'term_length',
             'term_start_date' => 'term_start_date',
             'term_end_date' => 'term_end_date',
+            'pending' => 'pending',
             'accepted' => 'approved',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

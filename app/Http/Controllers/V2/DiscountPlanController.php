@@ -115,6 +115,7 @@ class DiscountPlanController extends BaseController
     {
         $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
         $discountPlan->approved = gmdate('Y-m-d H:i:s');
+        $discountPlan->pending = null;
         $discountPlan->save();
         return response()->json([], 202);
     }
