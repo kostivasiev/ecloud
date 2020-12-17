@@ -90,7 +90,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-GET https://{{host}}/{{version}}/instances/i-51ffe39c
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -104,7 +104,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-GET https://{{host}}/{{version}}/instances/i-51ffe39c
+GET https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -118,14 +118,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-PATCH https://{{host}}/{{version}}/instances/i-51ffe39c
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
-
-
-{
-  "name": "updated"
-}
-
-###
