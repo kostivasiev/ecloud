@@ -40,6 +40,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'term_length',
         'term_start_date',
         'term_end_date',
+        'reseller_id',
     ];
 
     protected $casts = [
