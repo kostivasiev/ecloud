@@ -51,7 +51,7 @@ class DiscountPlanController extends BaseController
      */
     public function store(Create $request)
     {
-        $discountPlan = new DiscountPlan($request->only($this->getAllowedFields($request)));
+        $discountPlan = new DiscountPlan($request->only($this->getAllowedFields()));
         if (!$request->has('reseller_id')) {
             $discountPlan->reseller_id = $this->resellerId;
         }
@@ -67,7 +67,7 @@ class DiscountPlanController extends BaseController
     public function update(Update $request, string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
-        $discountPlan->update($request->only($this->getAllowedFields($request)));
+        $discountPlan->update($request->only($this->getAllowedFields()));
 
         if ($this->isAdmin) {
             $discountPlan->reseller_id = $request->input('reseller_id', $discountPlan->reseller_id);
@@ -89,10 +89,9 @@ class DiscountPlanController extends BaseController
     }
 
     /**
-     * @param $request
      * @return string[]
      */
-    private function getAllowedFields($request): array
+    private function getAllowedFields(): array
     {
         $allowedFields = [
             'contact_id',
@@ -106,7 +105,7 @@ class DiscountPlanController extends BaseController
             'term_start_date',
             'term_end_date',
         ];
-        if ($request->user->isAdministrator) {
+        if (app('request')->user->isAdministrator) {
             $allowedFields[] = 'contact_id';
             $allowedFields[] = 'employee_id';
         }
