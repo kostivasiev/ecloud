@@ -22,7 +22,7 @@ class Create extends FormRequest
 //            'employee_id' => 'sometimes|required_without:contact_id|exists:holiday.employee,employee_id',
             'contact_id' => 'sometimes|required_without:employee_id|integer',
             'employee_id' => 'sometimes|required_without:contact_id|integer',
-            'reseller_id' => 'required|integer',
+            'reseller_id' => 'sometimes|required|integer',
             'name' => 'sometimes|required|string|max:255',
             'commitment_amount' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
             'commitment_before_discount' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
