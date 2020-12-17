@@ -107,13 +107,12 @@ class DiscountPlanController extends BaseController
     }
 
     /**
-     * @param Request $request
      * @param string $discountPlanId
      * @return JsonResponse
      */
-    public function approve(Request $request, string $discountPlanId)
+    public function approve(string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
         $discountPlan->approved = gmdate('Y-m-d H:i:s');
         $discountPlan->pending = null;
         $discountPlan->save();
