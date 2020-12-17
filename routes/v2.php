@@ -232,6 +232,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('discount-plans', 'DiscountPlanController@index');
         $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
+
+        $router->put('discount-plans/{discountPlanId}/reject', 'DiscountPlanController@reject');
+
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
             $router->post('discount-plans', 'DiscountPlanController@store');
             $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
