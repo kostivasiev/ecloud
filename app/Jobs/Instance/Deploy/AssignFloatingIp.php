@@ -3,21 +3,18 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\FloatingIp\Assign;
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class AssignFloatingIp extends TaskJob
+class AssignFloatingIp extends Job
 {
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
-
         $this->data = $data;
     }
 

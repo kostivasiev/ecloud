@@ -3,20 +3,17 @@
 
 namespace App\Jobs\Instance;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use Illuminate\Support\Facades\Log;
 
-class UpdateTaskJob extends TaskJob
+class Update extends Job
 {
     private $instance;
     private $data;
 
-    public function __construct(Task $task, Instance $instance, array $data)
+    public function __construct(Instance $instance, array $data)
     {
-        parent::__construct($task);
-
         $this->instance = $instance;
         $this->data = $data;
     }
@@ -59,6 +56,7 @@ class UpdateTaskJob extends TaskJob
             ]
         );
         $this->instance->save();
+        $this->instance->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
