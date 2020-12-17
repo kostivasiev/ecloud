@@ -14,7 +14,7 @@ class IsSubnetBigEnough implements Rule
     public function passes($attribute, $value)
     {
         $subnet = Subnet::fromString($value);
-        return (is_null($subnet)) ? false : $subnet->getNetworkPrefix() < 30;
+        return ($subnet) ? $subnet->getNetworkPrefix() < 30 : false;
     }
 
     /**

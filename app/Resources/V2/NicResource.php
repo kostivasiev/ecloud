@@ -30,6 +30,7 @@ class NicResource extends UKFastResource
             'instance_id' => $this->instance_id,
             'network_id' => $this->network_id,
             'ip_address' => $this->ip_address,
+            'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

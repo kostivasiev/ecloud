@@ -2,9 +2,13 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Nic\Created;
 use App\Events\V2\Nic\Creating;
 use App\Events\V2\Nic\Deleted;
+use App\Events\V2\Nic\Deleting;
+use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
@@ -17,11 +21,10 @@ use UKFast\DB\Ditto\Sortable;
 
 class Nic extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, Syncable;
 
     public $keyPrefix = 'nic';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
@@ -35,6 +38,9 @@ class Nic extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
+        'created' => Created::class,
+        'saving' => Saving::class,
+        'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
 
