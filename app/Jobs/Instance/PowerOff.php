@@ -25,6 +25,7 @@ class PowerOff extends Job
         $response = $instance->availabilityZone->kingpinService()->delete(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
         );
+        $instance->setSyncCompleted();
 
         // Catch already deleted
         $responseJson = json_decode($response->getBody()->getContents());

@@ -28,10 +28,11 @@ class Undeploy implements ShouldQueue
             'vpc_id' => $instance->vpc->getKey()
         ];
 
-        dispatch((new PowerOff($data))->chain([
+        dispatch((new PowerOff($data, false))->chain([
             new \App\Jobs\Instance\Undeploy\Undeploy($data),
             new \App\Jobs\Instance\Undeploy\DeleteVolumes($data),
-            new \App\Jobs\Instance\Undeploy\DeleteNics($data)
+            new \App\Jobs\Instance\Undeploy\DeleteNics($data),
+            new \App\Jobs\Instance\Undeploy\UndeployCompleted($data)
         ]));
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
