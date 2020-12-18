@@ -94,9 +94,6 @@ class DiscountPlanController extends BaseController
     private function getAllowedFields(): array
     {
         $allowedFields = [
-            'contact_id',
-            'employee_id',
-            'reseller_id',
             'name',
             'commitment_amount',
             'commitment_before_discount',
@@ -108,6 +105,7 @@ class DiscountPlanController extends BaseController
         if (app('request')->user->isAdministrator) {
             $allowedFields[] = 'contact_id';
             $allowedFields[] = 'employee_id';
+            $allowedFields[] = 'reseller_id';
         }
         return $allowedFields;
     }
