@@ -67,15 +67,16 @@ class BillingMetric extends Model implements Filterable, Sortable
     /**
      * Set the end date/time for a metric
      * @param null $time
+     * @return bool
      */
-    public function end($time = null)
+    public function setEndDate($time = null)
     {
         if (empty($time)) {
             $time = Carbon::now();
         }
 
         $this->attributes['end'] = $time;
-        $this->save();
+        return $this->save();
     }
 
     /**

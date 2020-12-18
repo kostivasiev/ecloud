@@ -36,7 +36,7 @@ class UpdateRamBilling
             if ($currentActiveMetric->value == $instance->ram_capacity) {
                 return;
             }
-            $currentActiveMetric->end($time);
+            $currentActiveMetric->setEndDate($time);
         }
 
         $billingMetric = app()->make(BillingMetric::class);

@@ -36,7 +36,7 @@ class UpdateVcpuBilling
             if ($currentActiveMetric->value == $instance->vcpu_cores) {
                 return;
             }
-            $currentActiveMetric->end($time);
+            $currentActiveMetric->setEndDate($time);
         }
 
         $billingMetric = app()->make(BillingMetric::class);
