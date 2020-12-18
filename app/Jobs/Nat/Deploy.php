@@ -34,6 +34,7 @@ class Deploy extends Job
             Log::error($error, [
                 'nat' => $nat,
             ]);
+            $nat->setSyncFailureReason($error);
             $this->fail(new \Exception($error));
             return;
         }
@@ -47,6 +48,7 @@ class Deploy extends Job
                 'nat' => $nat,
                 'nic' => $nic,
             ]);
+            $nat->setSyncFailureReason($message);
             $this->fail(new \Exception($message));
             return;
         }
@@ -77,11 +79,20 @@ class Deploy extends Job
 
         $router = $nic->network->router;
 
-        $router->availabilityZone->nsxService()->patch(
-            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $nat->id,
-            ['json' => $json]
-        );
+        try {
+            $router->availabilityZone->nsxService()->patch(
+                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $nat->id,
+                ['json' => $json]
+            );
+        } catch (\Exception $exception) {
+            if ($exception->hasResponse()) {
+                Log::info(get_class($this), json_decode($exception->getResponse()->getBody()->getContents(), true));
+            }
+            throw $exception;
+        }
 
+
+        $nat->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }

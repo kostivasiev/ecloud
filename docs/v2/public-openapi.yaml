@@ -28,6 +28,8 @@ components:
       $ref: 'components/schemas/network.yaml'
     Dhcp:
       $ref: 'components/schemas/dhcp.yaml'
+    DiscountPlan:
+      $ref: 'components/schemas/discountPlan.yaml'
     Vpn:
       $ref: 'components/schemas/vpn.yaml'
     Instance:
@@ -63,6 +65,8 @@ components:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
+    DiscountPlanId:
+      $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
     FipId:
@@ -80,6 +84,8 @@ components:
   responses:
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
+    DiscountPlanResponse:
+      $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
     FipIdResponse:
@@ -199,3 +205,11 @@ paths:
     $ref: 'resources/VpcSupport/collection.yaml'
   '/ecloud/v2/support/{supportId}':
     $ref: 'resources/VpcSupport/item.yaml'
+  '/ecloud/v2/billing-metrics':
+    $ref: 'resources/BillingMetric/public_collection.yaml'
+  '/ecloud/v2/billing-metrics/{billingMetricsId}':
+    $ref: 'resources/BillingMetric/public_item.yaml'
+  '/ecloud/v2/discount-plan':
+    $ref: 'resources/DiscountPlan/public_collection.yaml'
+  '/ecloud/v2/discount-plan/{discountPlanId}':
+    $ref: 'resources/DiscountPlan/public_item.yaml'

@@ -51,6 +51,8 @@ components:
       $ref: 'components/schemas/meta.yaml'
     Credentials:
       $ref: 'components/schemas/credential.yaml'
+    DiscountPlan:
+      $ref: 'components/schemas/admin/discountPlan.yaml'
 
   parameters:
     # Query Parameters
@@ -65,6 +67,8 @@ components:
       $ref: 'resources/Network/parameters/networkId.yaml'
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
+    DiscountPlanId:
+      $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
     InstanceId:
@@ -89,6 +93,8 @@ components:
       $ref: 'resources/Network/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
+    DiscountIdResponse:
+      $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
     InstanceIdResponse:
@@ -121,6 +127,12 @@ paths:
     $ref: 'resources/AvailabilityZone/instance-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/lbcs':
     $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
+  '/ecloud/v2/discount-plans':
+    $ref: 'resources/DiscountPlan/admin-collection.yaml'
+  '/ecloud/v2/discount-plans/{discountPlanId}':
+    $ref: 'resources/DiscountPlan/admin-item.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/capacities':
+    $ref: 'resources/AvailabilityZone/capacity-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
@@ -151,3 +163,11 @@ paths:
     $ref: 'resources/Credential/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/lbcs':
     $ref: 'resources/Vpc/cluster-collection.yaml'
+  '/ecloud/v2/availability-zone-capacities':
+    $ref: 'resources/AvailabilityZoneCapacity/collection.yaml'
+  '/ecloud/v2/availability-zone-capacities/{AvailabilityZoneId}':
+    $ref: 'resources/AvailabilityZoneCapacity/item.yaml'
+  '/ecloud/v2/billing-metrics':
+    $ref: 'resources/BillingMetric/collection.yaml'
+  '/ecloud/v2/billing-metrics/{billingMetricsId}':
+    $ref: 'resources/BillingMetric/item.yaml'

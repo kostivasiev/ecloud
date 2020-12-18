@@ -3,11 +3,12 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Volume\Deleted;
-use App\Events\V2\Volume\Updated;
-use App\Events\V2\Volume\Creating;
+use App\Events\V2\Volume\Saved;
+use App\Events\V2\Volume\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -25,13 +26,12 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Volume extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable;
 
     public $keyPrefix = 'vol';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
-    public $timestamps = true;
 
     protected $fillable = [
         'id',
@@ -43,9 +43,9 @@ class Volume extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'updated' => Updated::class,
-        'creating' => Creating::class,
         'deleted' => Deleted::class,
+        'saving' => Saving::class,
+        'saved' => Saved::class
     ];
 
     public function vpc()

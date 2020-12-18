@@ -23,10 +23,14 @@ class Delete implements ShouldQueue
         $volume = $event->model;
 
         if ($volume->instances()->count() == 0) {
-            $endpoint = '/api/v1/vpc/' . $volume->vpc->id . '/volume/' . $volume->vmware_uuid;
-            $volume->availabilityZone->kingpinService()->delete($endpoint);
+            $volume->availabilityZone->kingpinService()->delete(
+                '/api/v1/vpc/' . $volume->vpc->id . '/volume/' . $volume->vmware_uuid
+            );
+
             Log::info('Volume ' . $volume->getKey() . ' (' . $volume->vmware_uuid . ') deleted.');
         }
+
+        $volume->setSyncCompleted();
         Log::info(get_class($this).' : Finished', ['event' => $event]);
     }
 }

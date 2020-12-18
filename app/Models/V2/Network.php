@@ -4,6 +4,8 @@ namespace App\Models\V2;
 
 use App\Events\V2\Network\Created;
 use App\Events\V2\Network\Creating;
+use App\Events\V2\Network\Deleted;
+use App\Events\V2\Network\Deleting;
 use App\Events\V2\Network\Saved;
 use App\Events\V2\Network\Saving;
 use App\Traits\V2\CustomKey;
@@ -36,7 +38,6 @@ class Network extends Model implements Filterable, Sortable
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
-    public $timestamps = true;
 
     protected $fillable = [
         'id',
@@ -50,6 +51,8 @@ class Network extends Model implements Filterable, Sortable
         'created' => Created::class,
         'saving' => Saving::class,
         'saved' => Saved::class,
+        'deleted' => Deleted::class,
+        'deleting' => Deleting::class,
     ];
 
     public $children = [

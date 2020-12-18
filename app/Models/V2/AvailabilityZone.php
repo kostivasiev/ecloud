@@ -28,7 +28,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
 
     public $keyPrefix = 'az';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
@@ -98,6 +97,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(LoadBalancerCluster::class);
     }
 
+    public function availabilityZoneCapacities()
+    {
+        return $this->hasMany(AvailabilityZoneCapacity::class);
+    }
+
     public function nsxService()
     {
         if (!$this->nsxService) {
@@ -112,6 +116,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $this->kingpinService = app()->makeWith(KingpinService::class, [$this]);
         }
         return $this->kingpinService;
+    }
+
+    public function products()
+    {
+        return Product::forAvailabilityZone($this);
     }
 
     /**

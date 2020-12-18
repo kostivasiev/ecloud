@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Sync\Updated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,6 @@ class Sync extends Model
 
     public $keyPrefix = 'sync';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
 
@@ -25,5 +25,9 @@ class Sync extends Model
 
     protected $casts = [
         'completed' => 'boolean',
+    ];
+
+    protected $dispatchesEvents = [
+        'updated' => Updated::class
     ];
 }

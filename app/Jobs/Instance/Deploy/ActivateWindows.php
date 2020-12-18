@@ -3,21 +3,15 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
-use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
-class ActivateWindows extends TaskJob
+class ActivateWindows extends Job
 {
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
-
         $this->data = $data;
     }
 

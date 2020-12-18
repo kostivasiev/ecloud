@@ -14,6 +14,7 @@ class Deploy implements ShouldQueue
 {
     use InteractsWithQueue;
 
+    const RETRY_DELAY = 10;
     const ROUTER_RETRY_ATTEMPTS = 10;
     const ROUTER_RETRY_DELAY = 10;
     public $tries = 20;
@@ -28,8 +29,8 @@ class Deploy implements ShouldQueue
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
         $network = $event->model;
-        $router = $network->router;
 
+        $router = $network->router;
         if (!$router->available) {
             if ($this->attempts() <= static::ROUTER_RETRY_ATTEMPTS) {
                 $this->release(static::ROUTER_RETRY_DELAY);
@@ -96,19 +97,21 @@ class Deploy implements ShouldQueue
                         ' but it already exists.' . PHP_EOL .
                         'NSX Error : ' . $error->error_message;
                     Log::error($message);
-                    $network->setSyncFailureReason($message);
+                    $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
                     return;
                 }
 
                 $message = 'Unhandled error response for ' . $network->id;
-                Log::error($message, [$exception]);
+                Log::error($message, (array) $error);
                 $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
+                $this->fail($exception);
                 return;
             }
 
             $message = 'Unhandled error for ' . $network->id;
             Log::error($message, [$exception]);
             $network->setSyncFailureReason($message . ' : ' . $exception->getMessage());
+            $this->fail($exception);
             return;
         }
         $network->setSyncCompleted();

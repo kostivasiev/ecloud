@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\Volume;
 
-use App\Events\V2\Volume\Updated;
+use App\Events\V2\Volume\Saved;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -12,15 +12,15 @@ class CapacityIncrease implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @param Updated $event
+     * @param Saved $event
      * @return void
      * @throws \Exception
      */
-    public function handle(Updated $event)
+    public function handle(Saved $event)
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        $volume = $event->volume;
+        $volume = $event->model;
         if ($volume->capacity > $event->originalCapacity) {
             $endpoint = '/api/v1/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
 
@@ -41,6 +41,7 @@ class CapacityIncrease implements ShouldQueue
             Log::info('Volume ' . $volume->getKey() . ' capacity increased from ' . $event->originalCapacity . ' to ' . $volume->capacity);
         }
 
+        $volume->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }
 }

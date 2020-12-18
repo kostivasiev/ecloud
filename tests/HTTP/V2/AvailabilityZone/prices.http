@@ -1,0 +1,45 @@
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices
+X-consumer-custom-id:  1-1
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+
+# Test standard pricing
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].price === 0.0069452);
+
+});
+%}
+###
+
+# Test custom pricing
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
+X-consumer-custom-id:  1-1
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].price === 99.99);
+
+});
+%}
+###
+

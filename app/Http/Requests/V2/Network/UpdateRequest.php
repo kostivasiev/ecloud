@@ -4,6 +4,9 @@ namespace App\Http\Requests\V2\Network;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsNotOverlappingSubnet;
+use App\Rules\V2\IsPrivateSubnet;
+use App\Rules\V2\IsSubnetBigEnough;
 use App\Rules\V2\ValidCidrSubnet;
 use UKFast\FormRequests\FormRequest;
 
@@ -30,6 +33,7 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $networkId = app()->make('request')->route('networkId');
         return [
             'name' => 'sometimes|required|string',
             'router_id' => [
@@ -40,7 +44,13 @@ class UpdateRequest extends FormRequest
                 new ExistsForUser(Router::class)
             ],
             'subnet' => [
-                'sometimes', 'nullable', 'string', new ValidCidrSubnet()
+                'sometimes',
+                'nullable',
+                'string',
+                new ValidCidrSubnet(),
+                new isPrivateSubnet(),
+                new isNotOverlappingSubnet($networkId),
+                new IsSubnetBigEnough(),
             ]
         ];
     }
@@ -56,6 +66,7 @@ class UpdateRequest extends FormRequest
             'name.required' => 'The :attribute field, when specified, cannot be null',
             'router_id.required' => 'The :attribute field, when specified, cannot be null',
             'router_id.exists' => 'The specified :attribute was not found',
+            'subnet.unique' => 'The :attribute is already assigned to another network',
         ];
     }
 }
