@@ -155,7 +155,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
             'term_start_date' => 'term_start_date',
             'term_end_date' => 'term_end_date',
             'pending' => 'pending',
-            'accepted' => 'approved',
+            'approved' => 'approved',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
