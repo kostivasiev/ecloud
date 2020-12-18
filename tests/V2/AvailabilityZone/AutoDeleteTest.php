@@ -58,15 +58,15 @@ class AutoDeleteTest extends TestCase
 
     public function testDeleteCredentialAndDhcp()
     {
-        // Delete the record
-        $this->availabilityZone->delete();
+        $this->delete(
+            '/v2/availability-zones/'.$this->availabilityZone->getKey(),
+            [],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(204);
 
-        // Refresh the model
-        $this->availabilityZone->refresh();
-
-        // Simulate the event
-        $fakeEvent = new Deleted($this->availabilityZone);
-        event($fakeEvent);
         Event::assertDispatched(Deleted::class, function ($event) {
             return $event->model->getKey() == $this->availabilityZone->getKey();
         });
