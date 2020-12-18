@@ -1,4 +1,4 @@
-GET https://{{host}}/{{version}}/volumes/vol-43a88322
+GET https://{{host}}/{{version}}/volumes/vol-e5083b12
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -8,7 +8,7 @@ Content-Type: application/json
 
 
 ###
-GET https://{{host}}/{{version}}/volumes/vol-8801f2c2
+GET https://{{host}}/{{version}}/volumes/vol-e5083b12
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -32,7 +32,15 @@ client.log('New Capacity: ' + client.global.get('new_capacity'));
 
 ###
 
-PATCH https://{{host}}/{{version}}/volumes/vol-43a88322
+#GET https://{{host}}/{{version}}/instances/i-522ff6ff/volumes
+#Accept: */*
+#Cache-Control: no-cache
+#X-consumer-custom-id: 1-0
+#X-consumer-groups: ecloud.read, ecloud.write
+#Content-Type: application/json
+####
+
+PATCH https://{{host}}/{{version}}/volumes/vol-8733f44f
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -40,7 +48,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "capacity": 31
+  "capacity": 51
 }
 
 > {%

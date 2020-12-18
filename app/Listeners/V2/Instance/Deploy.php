@@ -8,6 +8,7 @@ use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
+use App\Jobs\Instance\Deploy\DeployCompleted;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
@@ -41,19 +42,20 @@ class Deploy implements ShouldQueue
         $data = (array)$data;
 
         // Create the chained jobs for deployment
-        dispatch((new \App\Jobs\Instance\Deploy\Deploy($event->task, $data))->chain([
-            new ConfigureNics($event->task, $data),
-            new AssignFloatingIp($event->task, $data),
-            new UpdateNetworkAdapter($event->task, $data),
-            new OsCustomisation($event->task, $data),
-            new PowerOn($event->task, $data),
-            new WaitOsCustomisation($event->task, $data),
-            new PrepareOsUsers($event->task, $data),
-            new PrepareOsDisk($event->task, $data),
-            new ConfigureWinRm($event->task, $data),
-            new ActivateWindows($event->task, $data),
-            new RunApplianceBootstrap($event->task, $data),
-            new RunBootstrapScript($event->task, $data),
+        dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
+            new ConfigureNics($data),
+            new AssignFloatingIp($data),
+            new UpdateNetworkAdapter($data),
+            new OsCustomisation($data),
+            new PowerOn($data, false),
+            new WaitOsCustomisation($data),
+            new PrepareOsUsers($data),
+            new PrepareOsDisk($data),
+            new ConfigureWinRm($data),
+            new ActivateWindows($data),
+            new RunApplianceBootstrap($data),
+            new RunBootstrapScript($data),
+            new DeployCompleted($data),
         ]));
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

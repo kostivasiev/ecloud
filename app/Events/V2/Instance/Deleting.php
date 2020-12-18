@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events\V2\Volume;
+namespace App\Events\V2\Instance;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Creating
+class Deleting
 {
     use SerializesModels;
 
