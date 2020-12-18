@@ -15,14 +15,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class FloatingIp
- * @package App\Models\V2
- * @method static find(string $routerId)
- * @method static findOrFail(string $routerUuid)
- * @method static forUser($user)
- * @method static withRegion($regionId)
- */
 class FloatingIp extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable;
@@ -44,12 +36,6 @@ class FloatingIp extends Model implements Filterable, Sortable
         'deleted' => Deleted::class
     ];
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->timestamps = true;
-    }
-
     public static function boot()
     {
         parent::boot();
@@ -60,17 +46,25 @@ class FloatingIp extends Model implements Filterable, Sortable
         });
     }
 
-    public function vpc()
-    {
-        return $this->belongsTo(Vpc::class);
-    }
-
     /**
      * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
      */
     public function nat()
     {
         return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
+    }
+
+    /**
+     * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
+     */
+    public function getResourceIdAttribute()
+    {
+        return ($this->nat) ? $this->nat->translated_id : null;
+    }
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
     }
 
     public function sourceNat()
@@ -81,11 +75,6 @@ class FloatingIp extends Model implements Filterable, Sortable
     public function destinationNat()
     {
         return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
-    }
-
-    public function getResourceIdAttribute()
-    {
-        return ($this->nat) ? $this->nat->translated_id : null;
     }
 
     public function scopeForUser($query, $user)
