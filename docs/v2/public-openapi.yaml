@@ -213,3 +213,5 @@ paths:
     $ref: 'resources/DiscountPlan/public_collection.yaml'
   '/ecloud/v2/discount-plan/{discountPlanId}':
     $ref: 'resources/DiscountPlan/public_item.yaml'
+  '/ecloud/v2/discount-plan/{discountPlanId}/reject':
+    $ref: 'resources/DiscountPlan/reject-item.yaml'
