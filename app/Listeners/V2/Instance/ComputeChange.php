@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Instance\ComputeChanged;
+use App\Events\V2\Instance\Saved;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -12,34 +12,50 @@ class ComputeChange implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @param ComputeChanged $event
+     * @param Saved $event
      * @return void
      * @throws \Exception
      */
-    public function handle(ComputeChanged $event)
+    public function handle(Saved $event)
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        $instance = $event->instance;
-        Log::info('Attempting to update compute for instance ' . $instance->getKey());
-        $reboot = $event->rebootRequired;
+        $instance = $event->model;
 
-        // Handle ram_capacity
-        $limit = ($instance->platform == "Windows") ? 16 : 3;
-        $reboot = ((!$reboot) && (($instance->ram_capacity / 1024) <= $limit)) ? false : true;
+        if ($event->original['vcpu_cores'] == $instance->vcpu_cores && $event->original['ram_capacity'] == $instance->ram_capacity) {
+            Log::info(get_class($this) . ' : Finished: No changes required', ['event' => $event]);
+            $instance->setSyncCompleted();
+            return;
+        }
+
+        $reboot = false;
+
+        $ram_limit = (($instance->platform == 'Windows') ? 16 : 3) * 1024;
+
+        if ($instance->ram_capacity > $event->original['ram_capacity']) {
+            $reboot = true;
+        }
+
+        if ($instance->ram_capacity < $ram_limit && $event->original['ram_capacity'] >= $ram_limit) {
+            $reboot = true;
+        }
+
+        if ($instance->vcpu_cores > $event->original['vcpu_cores']) {
+            $reboot = true;
+        }
 
         $instance->availabilityZone->kingpinService()->put(
             '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey() . '/resize',
             [
                 'json' => [
-                    'numCPU' => $instance->vcpu_cores,
                     'ramMiB' => $instance->ram_capacity,
+                    'numCPU' => $instance->vcpu_cores,
                     'guestShutdown' => $reboot
-                ]
+                ],
             ]
         );
 
-        Log::info('Instance ' . $instance->getKey() . ' Compute updated. CPU: ' . $instance->vcpu_cores . ', RAM: ' . $instance->ram_capacity);
+        $instance->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }

@@ -6,6 +6,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsValidRamMultiple;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -52,6 +53,7 @@ class CreateRequest extends FormRequest
                 'numeric',
                 'min:' . config('instance.ram_capacity.min'),
                 'max:' . config('instance.ram_capacity.max'),
+                new IsValidRamMultiple()
             ],
             'locked' => 'sometimes|required|boolean',
             'platform' => 'sometimes|required|in:Windows,Linux',

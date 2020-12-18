@@ -50,7 +50,7 @@ class UpdateVcpuBilling
         $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'vcpu');
         if (empty($product)) {
             Log::error(
-                'Failed to load \'vCpu\' billing product for availability zone ' . $instance->availabilityZone->getKey()
+                'Failed to load \'vcpu\' billing product for availability zone ' . $instance->availabilityZone->getKey()
             );
         } else {
             $billingMetric->category = $product->category;
