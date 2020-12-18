@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Instance\Saved;
+use App\Events\V2\Instance\Updated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -12,11 +12,11 @@ class ComputeChange implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @param Saved $event
+     * @param Updated $event
      * @return void
      * @throws \Exception
      */
-    public function handle(Saved $event)
+    public function handle(Updated $event)
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 

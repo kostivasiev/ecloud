@@ -117,9 +117,9 @@ class EventServiceProvider extends ServiceProvider
 
         // Instance
         \App\Events\V2\Instance\Creating::class => [
+            \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
         \App\Events\V2\Instance\Created::class => [
-            \App\Listeners\V2\Instance\DefaultPlatform::class,
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Instance\Deploy::class => [
@@ -128,7 +128,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Instance\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
         ],
-        \App\Events\V2\Instance\Saved::class => [
+        \App\Events\V2\Instance\Updated::class => [
             \App\Listeners\V2\Instance\ComputeChange::class
         ],
 

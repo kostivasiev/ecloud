@@ -2,13 +2,13 @@
 
 namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Instance\Created;
+use App\Events\V2\Instance\Creating;
 use App\Models\V2\Instance;
 use Illuminate\Support\Facades\Log;
 
 class DefaultPlatform
 {
-    public function handle(Created $event)
+    public function handle(Creating $event)
     {
         /** @var Instance $model */
         $model = $event->model;
@@ -25,7 +25,6 @@ class DefaultPlatform
 
         try {
             $model->platform = $model->applianceVersion->serverLicense()->category;
-            $model->save();
         } catch (\Exception $exception) {
             Log::error('Failed to determine default platform from appliance version', [$exception]);
             throw $exception;

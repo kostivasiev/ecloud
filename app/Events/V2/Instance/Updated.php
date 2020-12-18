@@ -5,7 +5,7 @@ namespace App\Events\V2\Instance;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Saved
+class Updated
 {
     use SerializesModels;
 
