@@ -1,5 +1,25 @@
 ###
-# Assign floating ip
+POST https://{{host}}/{{version}}/floating-ips
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('fip_id', response.body.data.id);
+client.log('Floating IP ID: ' + response.body.data.id);
+%}
+
+###
 POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/assign
 Accept: */*
 Cache-Control: no-cache
@@ -8,7 +28,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "resource_id": "{{dev_nics_id}}"
+    "resource_id": "{{dev_nic_id}}"
 }
 
 > {%
@@ -18,7 +38,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-# Check sync attribute
 GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -27,7 +46,6 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 ###
-# Unassign floating ip
 POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/unassign
 Accept: */*
 Cache-Control: no-cache
@@ -36,7 +54,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "resource_id": "{{dev_nics_id}}"
+    "resource_id": "{{dev_nic_id}}"
 }
 
 > {%
@@ -46,7 +64,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-# Delete Floating IP
 DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
