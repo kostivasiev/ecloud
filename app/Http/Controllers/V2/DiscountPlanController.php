@@ -118,5 +118,4 @@ class DiscountPlanController extends BaseController
         $discountPlan->save();
         return response()->json([], 202);
     }
-
 }
