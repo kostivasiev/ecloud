@@ -22,7 +22,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    public $keyPrefix = 'disc';
+    public $keyPrefix = 'dplan';
     public $incrementing = false;
     public $timestamps = true;
     protected $keyType = 'string';
@@ -41,6 +41,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'term_start_date',
         'term_end_date',
         'rejected',
+        'reseller_id',
     ];
 
     protected $casts = [
