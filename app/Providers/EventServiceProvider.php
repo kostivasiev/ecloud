@@ -257,6 +257,7 @@ class EventServiceProvider extends ServiceProvider
         // Sync
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
+            \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
         ]
     ];
 }
