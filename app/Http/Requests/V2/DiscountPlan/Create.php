@@ -30,6 +30,7 @@ class Create extends FormRequest
             'term_length' => 'required|integer|min:1',
             'term_start_date' => 'required|date|after_or_equal:today',
             'term_end_date' => [
+                'sometimes',
                 'required',
                 'date',
                 'after:today',
