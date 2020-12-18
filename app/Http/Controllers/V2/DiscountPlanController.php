@@ -51,18 +51,10 @@ class DiscountPlanController extends BaseController
      */
     public function store(Create $request)
     {
-        $discountPlan = new DiscountPlan($request->only([
-            'contact_id',
-            'employee_id',
-            'name',
-            'commitment_amount',
-            'commitment_before_discount',
-            'discount_rate',
-            'term_length',
-            'term_start_date',
-            'term_end_date',
-        ]));
-        $discountPlan->reseller_id = $this->resellerId;
+        $discountPlan = new DiscountPlan($request->only($this->getAllowedFields()));
+        if (!$request->has('reseller_id')) {
+            $discountPlan->reseller_id = $this->resellerId;
+        }
         $discountPlan->save();
         return $this->responseIdMeta($request, $discountPlan->getKey(), 201);
     }
@@ -75,17 +67,7 @@ class DiscountPlanController extends BaseController
     public function update(Update $request, string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
-        $discountPlan->update($request->only([
-            'contact_id',
-            'employee_id',
-            'name',
-            'commitment_amount',
-            'commitment_before_discount',
-            'discount_rate',
-            'term_length',
-            'term_start_date',
-            'term_end_date',
-        ]));
+        $discountPlan->update($request->only($this->getAllowedFields()));
 
         if ($this->isAdmin) {
             $discountPlan->reseller_id = $request->input('reseller_id', $discountPlan->reseller_id);
@@ -104,5 +86,29 @@ class DiscountPlanController extends BaseController
         $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
         $discountPlan->delete();
         return response()->json([], 204);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAllowedFields(): array
+    {
+        $allowedFields = [
+            'contact_id',
+            'employee_id',
+            'reseller_id',
+            'name',
+            'commitment_amount',
+            'commitment_before_discount',
+            'discount_rate',
+            'term_length',
+            'term_start_date',
+            'term_end_date',
+        ];
+        if (app('request')->user->isAdministrator) {
+            $allowedFields[] = 'contact_id';
+            $allowedFields[] = 'employee_id';
+        }
+        return $allowedFields;
     }
 }
