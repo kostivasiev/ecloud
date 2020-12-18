@@ -14,8 +14,8 @@ class AddCategoryAndPriceColumnsToBillingMetricsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('billing_metrics', function (Blueprint $table) {
-            $table->string('category')->after('end')->default('');
-            $table->float('price')->after('category')->default(0.00);
+            $table->string('category')->after('end')->nullable();
+            $table->float('price')->after('category')->nullable();
         });
     }
 

@@ -55,7 +55,12 @@ class Update extends FormRequest
                 'required',
                 'date',
                 'after:today',
-                new CommitmentIsGreater($discountPlanId)
+                new CommitmentIsGreater($discountPlanId),
+                function ($attribute, $value, $fail) {
+                    if (strtotime($value) <= strtotime($this->request->get('term_start_date'))) {
+                        $fail('The '.$attribute.' must be greater than the term_start_date');
+                    }
+                }
             ],
         ];
     }

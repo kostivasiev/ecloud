@@ -31,6 +31,107 @@ client.log('three_days_from_now = ' + three_days_from_now);
 %}
 
 ###
+# Create Discount Plan (Invalid)
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{term_start_date}}",
+    "term_end_date": "{{term_start_date}}"
+}
+
+> {%
+client.test('Test invalid creation', function () {
+    client.assert(response.status === 422, '422 response not received');
+    client.assert(response.body.errors[0].source === 'term_end_date', 'term_end_date was not received as invalid');
+});
+%}
+
+###
+# Create Discount Plan (Scoped Reseller)
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-Reseller-Id: 1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{term_start_date}}",
+    "term_end_date": "{{term_end_date}}"
+}
+
+> {%
+client.test('Test Discount Created with scoped reseller', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('scoped_id', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+
+###
+# Get Discount Plan (Admin)
+GET https://{{host}}/{{version}}/discount-plans/{{scoped_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.hasOwnProperty('reseller_id'), 'Cannot find reseller_id in output');
+    client.assert(response.body.data.hasOwnProperty('contact_id'), 'Cannot find contact_id in output');
+    client.assert(response.body.data.hasOwnProperty('employee_id'), 'Cannot find employee_id in output');
+});
+%}
+
+###
+# Get Discount Plan (Scoped)
+GET https://{{host}}/{{version}}/discount-plans/{{scoped_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test no reseller_id, contact_id or employee_id in response', function() {
+    client.assert(!response.body.data.hasOwnProperty('reseller_id'), 'Cannot find reseller_id in output');
+    client.assert(!response.body.data.hasOwnProperty('contact_id'), 'Cannot find contact_id in output');
+    client.assert(!response.body.data.hasOwnProperty('employee_id'), 'Cannot find employee_id in output');
+});
+%}
+
+###
+# Delete Discount Plan (Scoped Reseller)
+DELETE https://{{host}}/{{version}}/discount-plans/{{scoped_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 204, '204 Response not received');
+});
+%}
+
+###
 # Create Discount Plan
 POST https://{{host}}/{{version}}/discount-plans
 Cache-Control: no-cache
@@ -40,6 +141,7 @@ Content-Type: application/json
 
 {
     "contact_id": 1,
+    "reseller_id": 1,
     "name": "test-commitment",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,

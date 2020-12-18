@@ -52,9 +52,9 @@ properties:
     required: false
     type: integer
     example: 50
-  status:
+  sync:
     type: string
-    example: 'ready'
+    example: 'completed'
     readOnly: true
   created_at:
     type: string

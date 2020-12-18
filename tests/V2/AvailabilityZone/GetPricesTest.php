@@ -64,7 +64,7 @@ class GetPricesTest extends TestCase
             ->seeJson([
                 'availability_zone_id'   => $this->product->availability_zone_id,
                 'name' => $this->product->name,
-                'category'  => $this->product->product_subcategory,
+                'category'  => strtolower($this->product->product_subcategory),
                 'price'  => 0.999,
             ])->assertResponseStatus(200);
     }
@@ -81,7 +81,7 @@ class GetPricesTest extends TestCase
             ->seeJson([
                 'availability_zone_id'   => $this->product->availability_zone_id,
                 'name' => $this->product->name,
-                'category'  => $this->product->product_subcategory,
+                'category'  => strtolower($this->product->product_subcategory),
                 'price'  => 0.111,
             ])->assertResponseStatus(200);
     }

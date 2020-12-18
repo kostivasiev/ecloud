@@ -36,6 +36,7 @@ class DiscountPlanResource extends UKFastResource
             $internalElement = [
                 'contact_id' => $this->contact_id,
                 'employee_id' => $this->employee_id,
+                'reseller_id' => $this->reseller_id,
             ];
         }
         $data = [

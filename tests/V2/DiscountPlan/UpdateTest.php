@@ -79,4 +79,29 @@ class UpdateTest extends TestCase
             'ecloud'
         )->assertResponseStatus(200);
     }
+
+    public function testUpdateItemInvalid()
+    {
+        $data = [
+            'name' => 'updated-test-commitment',
+            'commitment_amount' => '3000',
+            'commitment_before_discount' => '2000',
+            'discount_rate' => '10',
+            'term_length' => '36',
+            'term_start_date' => date('Y-m-d H:i:s', strtotime('tomorrow')),
+            'term_end_date' => date('Y-m-d H:i:s', strtotime('tomorrow')),
+        ];
+        $this->patch(
+            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read, ecloud.write',
+                'X-Reseller-Id' => 1,
+            ]
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The term_end_date must be greater than the term_start_date',
+        ])->assertResponseStatus(422);
+    }
 }
