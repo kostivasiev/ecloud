@@ -10,7 +10,7 @@ class Deleted
 {
     use SerializesModels;
 
-    public AvailabilityZone $model;
+    public $model;
 
     /**
      * @param AvailabilityZone $model
