@@ -143,13 +143,12 @@ class InstanceController extends BaseController
             'name',
             'locked',
             'backup_enabled',
-        ]))->save();
+            'vcpu_cores',
+            'ram_capacity'
+        ]));
 
-        if ($request->hasAny(['vcpu_cores', 'ram_capacity'])) {
-            if ($instance->getStatus() != 'complete') {
-                return $instance->getSyncError();
-            }
-            dispatch(new Update($instance, $request->all()));
+        if (!$instance->save()) {
+            return $instance->getSyncError();
         }
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
@@ -163,8 +162,11 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+
         try {
-            $instance->delete();
+            if (!$instance->delete()) {
+                return $instance->getSyncError();
+            }
         } catch (\Exception $e) {
             return $instance->getDeletionError($e);
         }

@@ -123,20 +123,21 @@ class EventServiceProvider extends ServiceProvider
 
         // Instance
         \App\Events\V2\Instance\Creating::class => [
+            \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
         \App\Events\V2\Instance\Created::class => [
-            \App\Listeners\V2\Instance\DefaultPlatform::class,
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Instance\Deploy::class => [
             \App\Listeners\V2\Instance\Deploy::class,
         ],
-        \App\Events\V2\Instance\ComputeChanged::class => [
-            \App\Listeners\V2\Instance\ComputeChange::class,
-        ],
         \App\Events\V2\Instance\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
         ],
+        \App\Events\V2\Instance\Updated::class => [
+            \App\Listeners\V2\Instance\ComputeChange::class
+        ],
+
         \App\Events\V2\Instance\Deleting::class => [
             \App\Listeners\V2\ResourceSync::class,
         ],
@@ -264,6 +265,9 @@ class EventServiceProvider extends ServiceProvider
         // Sync
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
+            \App\Listeners\V2\Instance\UpdateRamBilling::class,
+            \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
+            \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
         ]
     ];
 }

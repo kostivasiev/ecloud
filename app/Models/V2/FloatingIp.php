@@ -6,6 +6,7 @@ use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -14,21 +15,12 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class FloatingIp
- * @package App\Models\V2
- * @method static find(string $routerId)
- * @method static findOrFail(string $routerUuid)
- * @method static forUser($user)
- * @method static withRegion($regionId)
- */
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
 
@@ -54,23 +46,35 @@ class FloatingIp extends Model implements Filterable, Sortable
         });
     }
 
-    public function vpc()
-    {
-        return $this->belongsTo(Vpc::class);
-    }
-
     /**
-     * DNAT destination
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
      */
     public function nat()
     {
         return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
     }
 
+    /**
+     * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
+     */
     public function getResourceIdAttribute()
     {
         return ($this->nat) ? $this->nat->translated_id : null;
+    }
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
+
+    public function sourceNat()
+    {
+        return $this->morphOne(Nat::class, 'translatedable', null, 'translated_id');
+    }
+
+    public function destinationNat()
+    {
+        return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
     }
 
     public function scopeForUser($query, $user)
@@ -91,6 +95,68 @@ class FloatingIp extends Model implements Filterable, Sortable
         return $query->whereHas('vpc.region', function ($query) use ($regionId) {
             $query->where('id', '=', $regionId);
         });
+    }
+
+    public function syncs()
+    {
+        throw new \Exception(__METHOD__ . ' not supported on ' . __CLASS__);
+    }
+
+    public function setSyncCompleted()
+    {
+        throw new \Exception(__METHOD__ . ' not supported on ' . __CLASS__);
+    }
+
+    public function setSyncFailureReason($value)
+    {
+        throw new \Exception(__METHOD__ . ' not supported on ' . __CLASS__);
+    }
+
+    public function getSyncFailed()
+    {
+        return ($this->getStatus() === 'failed');
+    }
+
+    public function getStatus()
+    {
+        if (empty($this->ip_address)) {
+            return 'failed';
+        }
+
+        if (!$this->sourceNat && !$this->destinationNat) {
+            return 'complete';
+        }
+
+        if (!$this->sourceNat || !$this->destinationNat) {
+            return 'in-progress';
+        }
+
+        if ($this->sourceNat->getStatus() !== 'complete') {
+            return $this->sourceNat->getStatus();
+        }
+
+        if ($this->destinationNat->getStatus() !== 'complete') {
+            return $this->destinationNat->getStatus();
+        }
+
+        return 'complete';
+    }
+
+    public function getSyncFailureReason()
+    {
+        if (empty($this->ip_address)) {
+            return 'Awaiting IP Allocation';
+        }
+
+        if ($this->sourceNat->getSyncFailureReason() !== null) {
+            return $this->sourceNat->getSyncFailureReason();
+        }
+
+        if ($this->destinationNat->getSyncFailureReason() !== null) {
+            return $this->destinationNat->getSyncFailureReason();
+        }
+
+        return null;
     }
 
     /**

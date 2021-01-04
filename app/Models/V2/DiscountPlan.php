@@ -48,8 +48,8 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'commitment_before_discount' => 'float',
         'discount_rate' => 'float',
         'term_length' => 'integer',
-        'term_start_date' => 'datetime',
-        'term_end_date' => 'datetime',
+        'term_start_date' => 'date',
+        'term_end_date' => 'date',
     ];
 
     /**
