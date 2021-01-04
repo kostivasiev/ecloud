@@ -14,8 +14,7 @@ class AddApprovedColumnToDiscountPlansTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('discount_plans', function (Blueprint $table) {
-            $table->dateTime('pending')->nullable()->after('term_end_date');
-            $table->dateTime('approved')->nullable()->after('pending');
+            $table->dateTime('approved')->nullable()->after('term_end_date');
         });
     }
 
@@ -27,7 +26,7 @@ class AddApprovedColumnToDiscountPlansTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('discount_plans', function (Blueprint $table) {
-            $table->dropColumn(['approved','pending']);
+            $table->dropColumn(['approved']);
         });
     }
 }

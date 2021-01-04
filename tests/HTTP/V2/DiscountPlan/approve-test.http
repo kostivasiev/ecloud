@@ -59,7 +59,7 @@ client.test('Test Discount Created', function () {
 
 ###
 # Approve Discount Plan
-PUT https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}/approve
+POST https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}/approve
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write

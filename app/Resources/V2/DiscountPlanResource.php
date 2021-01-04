@@ -30,16 +30,8 @@ class DiscountPlanResource extends UKFastResource
      */
     public function toArray($request)
     {
-        $idElement = ['id' => $this->id];
-        $internalElement = [];
-        if ($request->user->isAdministrator) {
-            $internalElement = [
-                'contact_id' => $this->contact_id,
-                'employee_id' => $this->employee_id,
-                'reseller_id' => $this->reseller_id,
-            ];
-        }
         $data = [
+            'id' => $this->id,
             'name' => $this->name,
             'commitment_amount' => $this->commitment_amount,
             'commitment_before_discount' => $this->commitment_before_discount,
@@ -53,23 +45,6 @@ class DiscountPlanResource extends UKFastResource
                 $this->term_end_date,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-        ];
-
-        if (!empty($this->pending)) {
-            $data['pending'] = Carbon::parse(
-                $this->pending,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String();
-        }
-
-        if (!empty($this->approved)) {
-            $data['approved'] = Carbon::parse(
-                $this->approved,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String();
-        }
-
-        $timestampElements = [
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
@@ -80,6 +55,14 @@ class DiscountPlanResource extends UKFastResource
             )->toIso8601String(),
         ];
 
-        return array_merge($idElement, $internalElement, $data, $timestampElements);
+        if ($request->user->isAdministrator) {
+            $data = $data + [
+                'contact_id' => $this->contact_id,
+                'employee_id' => $this->employee_id,
+                'reseller_id' => $this->reseller_id,
+            ];
+        }
+
+        return $data;
     }
 }

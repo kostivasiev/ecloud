@@ -78,19 +78,19 @@ class DiscountPlanController extends BaseController
 
     /**
      * @param string $discountPlanId
-     * @return JsonResponse
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
     public function destroy(string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
         $discountPlan->delete();
-        return response()->json([], 204);
+        return response(null, 204);
     }
 
     /**
      * @param string $discountPlanId
-     * @return JsonResponse
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
      */
     public function approve(string $discountPlanId)
     {
@@ -98,7 +98,7 @@ class DiscountPlanController extends BaseController
         $discountPlan->approved = gmdate('Y-m-d H:i:s');
         $discountPlan->pending = null;
         $discountPlan->save();
-        return response()->json([], 202);
+        return response(null, 202);
     }
 
     /**
