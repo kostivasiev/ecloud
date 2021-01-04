@@ -52,6 +52,10 @@ class EventServiceProvider extends ServiceProvider
         // AvailabilityZone
         \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
+        \App\Events\V2\AvailabilityZone\Deleted::class => [
+            \App\Listeners\V2\AvailabilityZone\Credential\Delete::class,
+            \App\Listeners\V2\AvailabilityZone\Dhcp\Delete::class,
+        ],
 
         // AvailabilityZoneCapacity
         \App\Events\V2\AvailabilityZoneCapacity\Saved::class => [
@@ -84,6 +88,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\FirewallPolicy\Deleted::class => [
             \App\Listeners\V2\FirewallPolicy\Undeploy::class,
+            \App\Listeners\V2\FirewallPolicy\FirewallRule\Delete::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
@@ -92,6 +97,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
         \App\Events\V2\FirewallRule\Deleted::class => [
+            \App\Listeners\V2\FirewallPolicy\FirewallRule\FirewallRulePort\Delete::class,
             \App\Listeners\V2\FirewallRule\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -218,6 +224,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Router\Deleted::class => [
             \App\Listeners\V2\Router\Networks\Delete::class,
+            \App\Listeners\V2\Router\FirewallPolicies\Delete::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
         \App\Events\V2\Router\Saving::class => [
