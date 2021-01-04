@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Deleted extends Event
 {
-    public Model $model;
+    public $model;
 
     /**
      * @param Model $model

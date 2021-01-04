@@ -9,7 +9,7 @@ class Saving
 {
     use SerializesModels;
 
-    public Model $model;
+    public $model;
 
     /**
      * @param Model $model
