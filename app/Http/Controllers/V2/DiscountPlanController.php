@@ -125,6 +125,18 @@ class DiscountPlanController extends BaseController
     }
 
     /**
+     * @param Request $request
+     * @param string $discountPlanId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     */
+    public function reject(Request $request, string $discountPlanId)
+    {
+        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan->reject();
+        return response(null, 200);
+    }
+
+    /**
      * @return string[]
      */
     private function getAllowedFields(): array

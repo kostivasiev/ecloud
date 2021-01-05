@@ -236,7 +236,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         $router->group(['middleware' => 'is-pending'], function () use ($router) {
             $router->post('discount-plans/{discountPlanId}/approve', 'DiscountPlanController@approve');
-            // TODO: add reject endpoint here
+            $router->post('discount-plans/{discountPlanId}/reject', 'DiscountPlanController@reject');
         });
 
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {

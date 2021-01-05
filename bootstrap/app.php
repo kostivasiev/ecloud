@@ -83,7 +83,7 @@ $app->routeMiddleware([
     'is-administrator' => \App\Http\Middleware\IsAdministrator::class,
     'is-locked' => \App\Http\Middleware\IsLocked::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
-    'is-pending' => \App\Http\Middleware\IsPending::class
+    'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class
 ]);
 
 /*

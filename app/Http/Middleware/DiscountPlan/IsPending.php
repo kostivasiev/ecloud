@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Http\Middleware\DiscountPlan;
 
 use App\Models\V2\DiscountPlan;
 use Closure;
@@ -9,8 +9,6 @@ use Illuminate\Http\JsonResponse;
 /**
  * Class IsPending
  * @package App\Http\Middleware
- *
- * Is an instance locked from updating
  */
 class IsPending
 {

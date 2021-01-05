@@ -13,21 +13,22 @@ class AcceptRejectTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected DiscountPlan $discountPlan;
+    protected $discountPlan;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->discountPlan = factory(DiscountPlan::class)->create([
+        $this->discountPlan = factory(DiscountPlan::class, 2)->create([
             'contact_id' => 1,
         ]);
     }
 
     public function testApproveDiscountPlan()
     {
+        $discountPlan = $this->discountPlan->first();
         $this->post(
-            '/v2/discount-plans/'.$this->discountPlan->getKey().'/approve',
+            '/v2/discount-plans/' . $discountPlan->first()->getKey() . '/approve',
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -36,9 +37,29 @@ class AcceptRejectTest extends TestCase
             ]
         )->assertResponseStatus(200);
 
-        $this->discountPlan->refresh();
+        $discountPlan->refresh();
 
-        $this->assertEquals('approved', $this->discountPlan->status);
-        $this->assertNotNull($this->discountPlan->response_date);
+        $this->assertEquals('approved', $discountPlan->status);
+        $this->assertNotNull($discountPlan->response_date);
     }
+
+    public function testRejectDiscountPlan()
+    {
+        $discountPlan = $this->discountPlan[1];
+        $this->post(
+            '/v2/discount-plans/' . $discountPlan->getKey() . '/reject',
+            [],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read, ecloud.write',
+                'X-Reseller-Id' => 1,
+            ]
+        )->assertResponseStatus(200);
+
+        $discountPlan->refresh();
+
+        $this->assertEquals('rejected', $discountPlan->status);
+        $this->assertNotNull($discountPlan->response_date);
+    }
+
 }
