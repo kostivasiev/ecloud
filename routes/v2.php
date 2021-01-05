@@ -95,7 +95,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('routers/{routerId}', 'RouterController@show');
         $router->get('routers/{routerId}/networks', 'RouterController@networks');
         $router->get('routers/{routerId}/vpns', 'RouterController@vpns');
-        $router->get('routers/{routerId}/firewall-rules', 'RouterController@firewallRules');
+        $router->get('routers/{routerId}/firewall-policies', 'RouterController@firewallPolicies');
         $router->post('routers', 'RouterController@create');
         $router->patch('routers/{routerId}', 'RouterController@update');
         $router->delete('routers/{routerId}', 'RouterController@destroy');
@@ -139,6 +139,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('firewall-policies', 'FirewallPolicyController@index');
         $router->get('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@show');
+        $router->get('firewall-policies/{firewallPolicyId}/firewall-rules', 'FirewallPolicyController@firewallRules');
         $router->post('firewall-policies', 'FirewallPolicyController@store');
         $router->patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
         $router->delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
