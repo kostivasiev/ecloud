@@ -8,6 +8,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
+    public function delete()
+    {
+        // Delete as normal firing the undeploy event
+        $response = parent::delete();
+        if (!$response) {
+            return $response;
+        }
+
+        // The delete was successful but we need to restore so it's
+        // available until undeploy completes, deleting it for good
+        $this->restore();
+    }
+
     public function syncs()
     {
         return $this->hasMany(Sync::class, 'resource_id', 'id');

@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Network;
 
 use App\Events\V2\Network\Deleted;
+use App\Models\V2\Network;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -28,6 +29,14 @@ class Undeploy implements ShouldQueue
         );
 
         $network->setSyncCompleted();
+
+        /**
+         * Now un-deployed correctly, delete the resource
+         * @see \App\Traits\V2\Syncable::delete()
+         */
+        Network::withoutEvents(function () use ($network) {
+            $network->delete();
+        });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }

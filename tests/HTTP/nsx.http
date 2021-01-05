@@ -84,10 +84,18 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-aaaaaaaa/rules/fwr-edea0c4f
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
 ###
-
-
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-76bf77cb/segments/net-54c46e3d/state
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-130aad74
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-130aad74
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
