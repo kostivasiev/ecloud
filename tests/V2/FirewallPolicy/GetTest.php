@@ -15,7 +15,7 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected FirewallPolicy $policy;
+    protected FirewallPolicy $firewallPolicy;
     protected FirewallRule $firewallRule;
     protected Region $region;
     protected Router $router;
