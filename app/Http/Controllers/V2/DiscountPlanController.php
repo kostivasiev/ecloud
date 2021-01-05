@@ -102,14 +102,26 @@ class DiscountPlanController extends BaseController
 
     /**
      * @param string $discountPlanId
-     * @return JsonResponse
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
     public function destroy(string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
         $discountPlan->delete();
-        return response()->json([], 204);
+        return response(null, 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $discountPlanId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     */
+    public function approve(Request $request, string $discountPlanId)
+    {
+        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan->approve();
+        return response(null, 200);
     }
 
     /**
