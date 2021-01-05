@@ -25,8 +25,7 @@ class End
         }
 
         $billingMetric->each(function ($metric) use ($event) {
-            $metric->end = Carbon::now();
-            $metric->save();
+            $metric->setEndDate();
             Log::info(get_class($this) . ' : Updated end on billing metric ' . $metric->id . ' for resource', [
                 'event' => $event
             ]);

@@ -7,7 +7,7 @@ use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class PutTest extends TestCase
+class AcceptRejectTest extends TestCase
 {
 
     use DatabaseMigrations;
@@ -26,7 +26,7 @@ class PutTest extends TestCase
 
     public function testApproveDiscountPlan()
     {
-        $this->put(
+        $this->post(
             '/v2/discount-plans/'.$this->discountPlan->getKey().'/approve',
             [],
             [
@@ -34,9 +34,11 @@ class PutTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->assertResponseStatus(202);
+        )->assertResponseStatus(200);
 
-        $discountPlan = DiscountPlan::findOrFail($this->discountPlan->getKey());
-        $this->assertNotNull($discountPlan->approved);
+        $this->discountPlan->refresh();
+
+        $this->assertEquals('approved', $this->discountPlan->status);
+        $this->assertNotNull($this->discountPlan->response_date);
     }
 }
