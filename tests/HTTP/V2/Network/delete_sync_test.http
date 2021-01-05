@@ -1,0 +1,34 @@
+POST https://{{host}}/{{version}}/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "router_id": "{{dev_router_id}}",
+  "subnet": "10.0.5.1/29"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('network_id', response.body.data.id);
+client.log('Network ID: ' + response.body.data.id);
+%}
+
+###
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}
