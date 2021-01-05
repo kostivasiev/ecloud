@@ -9,7 +9,7 @@ class Deleting
 {
     use SerializesModels;
 
-    public Model $model;
+    public $model;
 
     /**
      * @param Model $model

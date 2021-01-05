@@ -29,6 +29,7 @@ properties:
     example: 1
     readOnly: false
   ram_capacity:
+    description: RAM capacity MiB
     type: integer
     required: true
     example: 1024

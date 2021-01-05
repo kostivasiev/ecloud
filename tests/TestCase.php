@@ -27,6 +27,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // V1 hack
             \App\Events\V1\DatastoreCreatedEvent::class,
 
+            // Creating
+            \App\Events\V2\Instance\Creating::class,
+
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Dhcp\Created::class,
@@ -42,6 +45,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Nat\Deleting::class,
 
             // Deleted
+            \App\Events\V2\AvailabilityZone\Deleted::class,
             \App\Events\V2\Nat\Deleted::class,
             \App\Events\V2\FirewallRule\Deleted::class,
             \App\Events\V2\FirewallPolicy\Deleted::class,
@@ -66,6 +70,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Updated
             \App\Events\V2\Sync\Updated::class,
+            \App\Events\V2\Instance\Updated::class,
 
             // Saving
             \App\Events\V2\Router\Saving::class,
@@ -73,6 +78,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Nic\Saving::class,
             \App\Events\V2\Nat\Saving::class,
             \App\Events\V2\Volume\Saving::class,
+            \App\Events\V2\Instance\Saving::class,
 
             // Deploy
             \App\Events\V2\Instance\Deploy::class,
