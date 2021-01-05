@@ -56,10 +56,27 @@ client.test('Test Discount Created', function () {
     client.log('Discount Plan Id: ' + response.body.data.id);
 });
 %}
+###
+
+# Get the DP
+GET https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Check Plan is Approved', function() {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.status == 'pending', 'Status is not pending');
+    client.assert(response.body.data.response_date === null, 'response_date is not null');
+});
+%}
+
 
 ###
-# Approve Discount Plan
-PUT https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}/reject
+# Reject Discount Plan
+POST https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}/reject
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
@@ -67,7 +84,7 @@ Content-Type: application/json
 
 > {%
 client.test('Check the correct response is received after approval', function () {
-    client.assert(response.status === 202, '202 response not received');
+    client.assert(response.status === 200, '200 response not received');
 });
 %}
 
@@ -82,8 +99,8 @@ Content-Type: application/json
 > {%
 client.test('Check Plan is Approved', function() {
     client.assert(response.status === 200, '200 response not received');
-    client.assert(response.body.data.hasOwnProperty('rejected'), 'Rejected property not found');
-    client.assert(!response.body.data.hasOwnProperty('pending'), 'Pending property found');
+    client.assert(response.body.data.status === 'rejected', 'status was not set to rejected');
+    client.assert(response.body.data.response_date !== null, 'response_date was not updated');
 });
 %}
 

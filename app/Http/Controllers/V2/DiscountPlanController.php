@@ -125,16 +125,15 @@ class DiscountPlanController extends BaseController
     }
 
     /**
+     * @param Request $request
      * @param string $discountPlanId
-     * @return JsonResponse
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
      */
-    public function reject(string $discountPlanId)
+    public function reject(Request $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
-        $discountPlan->rejected = gmdate('Y-m-d H:i:s');
-        $discountPlan->pending = null;
-        $discountPlan->save();
-        return response()->json([], 202);
+        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan->reject();
+        return response(null, 200);
     }
 
     /**
