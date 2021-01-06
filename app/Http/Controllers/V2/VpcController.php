@@ -88,12 +88,11 @@ class VpcController extends BaseController
      */
     public function destroy(Request $request, string $vpcId)
     {
-        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
-        try {
-            $vpc->delete();
-        } catch (\Exception $e) {
-            return $vpc->getDeletionError($e);
+        $model = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        if (!$model->canDelete()) {
+            return $model->getDeletionError();
         }
+        $model->delete();
         return response()->json([], 204);
     }
 

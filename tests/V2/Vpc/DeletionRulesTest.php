@@ -59,7 +59,7 @@ class DeletionRulesTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->seeJson([
-            'detail' => 'Active resources exist for this item',
+            'detail' => 'The specified resource has dependant relationships and cannot be deleted',
         ])->assertResponseStatus(412);
         $vpc = Vpc::withTrashed()->findOrFail($this->vpc->getKey());
         $this->assertNull($vpc->deleted_at);
