@@ -8,24 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
-    public function delete()
-    {
-        // Delete as normal firing the undeploy event
-        $response = parent::delete();
-        if (!$response) {
-            return $response;
-        }
-
-        // The delete was successful but we need to restore so it's
-        // available until undeploy completes, deleting it for good
-        $this->restore();
-    }
-
-    public function syncs()
-    {
-        return $this->hasMany(Sync::class, 'resource_id', 'id');
-    }
-
     public function getStatus()
     {
         if (!$this->syncs()->count()) {
@@ -40,17 +22,9 @@ trait Syncable
         return 'in-progress';
     }
 
-    public function setSyncCompleted()
+    public function syncs()
     {
-        Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
-        if (!$this->syncs()->count()) {
-            Log::info(get_class($this) . ' : Setting Sync to completed - Not found, skipped', ['resource_id' => $this->id]);
-            return;
-        }
-        $sync = $this->syncs()->latest()->first();
-        $sync->completed = true;
-        $sync->save();
-        Log::info(get_class($this) . ' : Setting Sync to completed - Finished', ['resource_id' => $this->id]);
+        return $this->hasMany(Sync::class, 'resource_id', 'id');
     }
 
     public function getSyncFailed()
@@ -59,6 +33,20 @@ trait Syncable
             return false;
         }
         return $this->syncs()->latest()->first()->failure_reason !== null;
+    }
+
+    public function setSyncCompleted()
+    {
+        Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
+        if (!$this->syncs()->count()) {
+            Log::info(get_class($this) . ' : Setting Sync to completed - Not found, skipped',
+                ['resource_id' => $this->id]);
+            return;
+        }
+        $sync = $this->syncs()->latest()->first();
+        $sync->completed = true;
+        $sync->save();
+        Log::info(get_class($this) . ' : Setting Sync to completed - Finished', ['resource_id' => $this->id]);
     }
 
     public function setSyncFailureReason($value)

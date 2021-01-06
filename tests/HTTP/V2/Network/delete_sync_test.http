@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
   "router_id": "{{dev_router_id}}",
-  "subnet": "10.0.11.1/29"
+  "subnet": "10.0.25.1/29"
 }
 
 > {%
@@ -32,3 +32,11 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 204, "Response status is not 204");
 });
 %}
+
+###
+GET https://{{host}}/{{version}}/networks/{{network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

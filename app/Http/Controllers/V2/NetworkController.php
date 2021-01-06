@@ -4,8 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
+use App\Jobs\Network\Undeploy;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\Sync;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
@@ -89,13 +91,24 @@ class NetworkController extends BaseController
     public function destroy(Request $request, string $networkId)
     {
         $model = Network::forUser($request->user)->findOrFail($networkId);
-        try {
-            if (!$model->delete()) {
-                return $model->getSyncError();
-            }
-        } catch (\Exception $e) {
-            return $model->getDeletionError($e);
+
+        if (!$model->canDelete()) {
+            return $model->getDeletionError();
         }
+
+        if ($model->getStatus() !== 'complete') {
+            return $model->getSyncError();
+        }
+
+        $sync = app()->make(Sync::class);
+        $sync->resource_id = $model->id;
+        $sync->completed = false;
+        $sync->save();
+
+        $this->dispatch(new Undeploy([
+            'network_id' => $model->id,
+        ]));
+
         return response()->json([], 204);
     }
 
