@@ -19,16 +19,15 @@ class Undeploy extends Job
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
-        $network = Network::findOrFail($this->data['network_id']);
+        $model = Network::findOrFail($this->data['network_id']);
 
-        $network->router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/tier-1s/' . $network->router->id . '/segments/' . $network->id
+        $model->router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/tier-1s/' . $model->router->id . '/segments/' . $model->id
         );
 
-        // TODO :- Work out how to monitor NSX to confirm the delete has taken place before deleting the model.
-        // Can't wait in this job so make a chain in the controller OR dispatch another job from in here?
-        $network->setSyncCompleted();
-        $network->delete();
+        dispatch(new UndeployCheck([
+            'network_id' => $model->id,
+        ]));
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
