@@ -47,7 +47,6 @@ class DeleteTest extends TestCase
             'name' => 'Manchester Network',
             'router_id' => $this->router->id,
         ]);
-
         $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
