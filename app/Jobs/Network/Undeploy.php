@@ -25,6 +25,8 @@ class Undeploy extends Job
             'policy/api/v1/infra/tier-1s/' . $network->router->id . '/segments/' . $network->id
         );
 
+        // TODO :- Work out how to monitor NSX to confirm the delete has taken place before deleting the model.
+        // Can't wait in this job so make a chain in the controller OR dispatch another job from in here?
         $network->setSyncCompleted();
         $network->delete();
 
