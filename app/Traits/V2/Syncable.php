@@ -39,8 +39,10 @@ trait Syncable
     {
         Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
         if (!$this->syncs()->count()) {
-            Log::info(get_class($this) . ' : Setting Sync to completed - Not found, skipped',
-                ['resource_id' => $this->id]);
+            Log::info(
+                get_class($this) . ' : Setting Sync to completed - Not found, skipped',
+                ['resource_id' => $this->id]
+            );
             return;
         }
         $sync = $this->syncs()->latest()->first();
