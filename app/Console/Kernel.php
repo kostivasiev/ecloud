@@ -13,12 +13,13 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\Nsx\TestAuth::class,
-        \App\Console\Commands\Nsx\UndeployDeletedNetworks::class,
-        \App\Console\Commands\Kingpin\TestAuth::class,
-        \App\Console\Commands\Kingpin\Instance\Delete::class,
-        \App\Console\Commands\Queue\TestRead::class,
-        \App\Console\Commands\Credentials\Show::class,
+        Commands\Nsx\TestAuth::class,
+        Commands\Nsx\UndeployDeletedNetworks::class,
+        Commands\Kingpin\TestAuth::class,
+        Commands\Kingpin\Instance\Delete::class,
+        Commands\Queue\TestRead::class,
+        Commands\Credentials\Show::class,
+        Commands\VPC\ProcessBilling::class,
     ];
 
     /**
@@ -31,6 +32,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command('vpc:process-billing')->monthlyOn(1, '01:00');
     }
 }
