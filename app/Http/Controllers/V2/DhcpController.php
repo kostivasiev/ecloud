@@ -4,7 +4,9 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
+use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Models\V2\Dhcp;
+use App\Models\V2\Sync;
 use App\Resources\V2\DhcpResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -75,10 +77,21 @@ class DhcpController extends BaseController
      */
     public function destroy(string $dhcpId)
     {
-        $dhcp = Dhcp::findOrFail($dhcpId);
-        if (!$dhcp->delete()) {
-            return $dhcp->getSyncError();
+        $model = Dhcp::findOrFail($dhcpId);
+
+        if ($model->getStatus() !== 'complete') {
+            return $model->getSyncError();
         }
+
+        $sync = app()->make(Sync::class);
+        $sync->resource_id = $model->id;
+        $sync->completed = false;
+        $sync->save();
+
+        $this->dispatch(new Undeploy([
+            'id' => $model->id,
+        ]));
+
         return response()->json([], 204);
     }
 }

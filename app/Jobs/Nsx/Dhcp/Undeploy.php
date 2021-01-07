@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Jobs\Network;
+namespace App\Jobs\Nsx\Dhcp;
 
 use App\Jobs\Job;
-use App\Models\V2\Network;
+use App\Models\V2\Dhcp;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
@@ -19,14 +19,14 @@ class Undeploy extends Job
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
-        $model = Network::findOrFail($this->data['network_id']);
+        $model = Dhcp::findOrFail($this->data['id']);
 
-        $model->router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/tier-1s/' . $model->router->id . '/segments/' . $model->id
+        $model->availabilityZone->nsxService()->delete(
+            '/policy/api/v1/infra/dhcp-server-configs/' . $model->id
         );
 
         dispatch(new UndeployCheck([
-            'network_id' => $model->id,
+            'id' => $model->id,
         ]));
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
-use App\Jobs\Network\Undeploy;
+use App\Jobs\Nsx\Network\Undeploy;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Sync;
@@ -106,7 +106,7 @@ class NetworkController extends BaseController
         $sync->save();
 
         $this->dispatch(new Undeploy([
-            'network_id' => $model->id,
+            'id' => $model->id,
         ]));
 
         return response()->json([], 204);
