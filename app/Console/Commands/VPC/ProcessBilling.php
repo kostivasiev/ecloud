@@ -3,6 +3,7 @@
 namespace App\Console\Commands\VPC;
 
 use App\Models\V2\BillingMetric;
+use App\Models\V2\DiscountPlan;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use Carbon\Carbon;
@@ -19,6 +20,8 @@ class ProcessBilling extends Command
 
     protected Carbon $startDate;
     protected Carbon $endDate;
+
+    protected array $billing;
 
     /**
      * Billable metrics - Add any metrics to this array that we want to bill for.
@@ -41,7 +44,6 @@ class ProcessBilling extends Command
 
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
-
         $vpcs->each(function($vpc) {
             $metrics = $this->getVpcMetrics($vpc->id);
 
@@ -51,9 +53,8 @@ class ProcessBilling extends Command
 
             $this->line('---------- ' . $vpc->id . ' ----------' . PHP_EOL);
 
-            $billing = [];
 
-            $metrics->keys()->each(function ($key) use (&$billing, $metrics) {
+            $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
                 if (!in_array($key, $this->billableMetrics)) {
                     return true;
                 }
@@ -62,9 +63,9 @@ class ProcessBilling extends Command
                     $this->line(PHP_EOL . 'Billing Metric: ' . $key . PHP_EOL);
                 }
 
-                $billing[$key] = 0;
+                $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
 
-                $metrics->get($key)->each(function($metric) use (&$billing, $key) {
+                $metrics->get($key)->each(function($metric) use ($key, $vpc) {
                     //$this->info(print_r($metric->toArray()));
 
                     $start = $this->startDate;
@@ -96,44 +97,72 @@ class ProcessBilling extends Command
                         $this->info('cost: £' . $cost . PHP_EOL);
                     }
 
-                    $billing[$key] += $cost;
+                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
+
                 });
 
-                    $this->line($key . ': £' . number_format($billing[$key], 2));
-
+                $this->line($key . ': £' . number_format($this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key], 2));
 
             });
 
             $this->info(PHP_EOL);
 
-            $total = array_sum($billing);
+            $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
+
+            $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
 
             $this->line('Total: £' . number_format($total, 2) . PHP_EOL);
+        }); //vpc each
 
+        $this->info(print_r(
+            $this->billing
+        ));
+
+
+
+
+        // Calculate the total for all VPC's for each reseller
+        foreach ($this->billing as $resellerId => $vpcs) {
+            $total = 0;
+            foreach ($vpcs as $vpc) {
+                $total += $vpc['total'];
+            }
+
+            // Min £1 surcharge
+            $total = ($total < 1) ? 1 : $total;
+
+            //exit(print_r($total));
 
             // Apply any discount plans
 
 
+            $discountPlans = DiscountPlan::where('reseller_id', $resellerId)
+                ->where(function ($query) {
+                    $query->where('term_start_date', '<=', $this->startDate);
+                    $query->orWhereBetween('term_start_date', [$this->startDate, $this->endDate]);
+                })
+                ->where('term_end_date', '>=', $this->endDate)
+
+                ->get();
+
+            exit(print_r(
+                $discountPlans
+            ));
+
+        }
 
 
 
 
 
 
-// min £1 surcharge
+        // Push acc.log entries over to the billing apio the billing apio endpoint is: POST /v1/payments
+        // instead of creating entries for each resource like v1 or collated resources like flex, we only require a single entry per vpc with the total cost
+        // the description should be:  eCloud vpc-abc123de from 01/11/2020 to 30/11/2020
+        // the category set to eCloud
+        // the nominal code set to:  TBC
+        // source set to: myukfast
 
-
-
-
-
-            // Push acc.log entries over to the billing apio the billing apio endpoint is: POST /v1/payments
-            // instead of creating entries for each resource like v1 or collated resources like flex, we only require a single entry per vpc with the total cost
-            // the description should be:  eCloud vpc-abc123de from 01/11/2020 to 30/11/2020
-            // the category set to eCloud
-            // the nominal code set to:  TBC
-            // source set to: myukfast
-
-        });
     }
 
     /**
