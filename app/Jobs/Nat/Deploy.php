@@ -3,10 +3,8 @@
 namespace App\Jobs\Nat;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
@@ -28,7 +26,11 @@ class Deploy extends Job
 
         $nat = Nat::findOrFail($this->data['nat_id']);
 
-        $nic = collect((clone $nat)->load(['destination', 'translated', 'source'])->getRelations())->whereInstanceOf(Nic::class)->first();
+        $nic = collect((clone $nat)->load([
+            'destination',
+            'translated',
+            'source'
+        ])->getRelations())->whereInstanceOf(Nic::class)->first();
         if (!$nic) {
             $error = 'Nat Deploy Failed. Could not find NIC for source, destination or translated';
             Log::error($error, [
@@ -54,7 +56,7 @@ class Deploy extends Job
         }
         $this->data['router_id'] = $router->id;
 
-        Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Adding NAT ('.$nat->action.') Rule');
+        Log::info('Nat Deploy ' . $this->data['nat_id'] . ' : Adding NAT (' . $nat->action . ') Rule');
 
         $json = [
             'display_name' => $nat->id,
@@ -90,7 +92,6 @@ class Deploy extends Job
             }
             throw $exception;
         }
-
 
         $nat->setSyncCompleted();
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
