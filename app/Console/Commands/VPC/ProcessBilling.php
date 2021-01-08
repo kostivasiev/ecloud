@@ -51,23 +51,14 @@ class ProcessBilling extends Command
                 return true;
             }
 
-            $this->line('---------- ' . $vpc->id . ' ----------' . PHP_EOL);
-
-
             $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
                 if (!in_array($key, $this->billableMetrics)) {
                     return true;
                 }
 
-                if ($this->option('debug')) {
-                    $this->line(PHP_EOL . 'Billing Metric: ' . $key . PHP_EOL);
-                }
-
                 $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
 
                 $metrics->get($key)->each(function($metric) use ($key, $vpc) {
-                    //$this->info(print_r($metric->toArray()));
-
                     $start = $this->startDate;
                     $end = $this->endDate;
 
@@ -86,83 +77,139 @@ class ProcessBilling extends Command
 
                     $cost = ($hours * $metric->price) * $metric->value;
 
-                    if ($this->option('debug')) {
-                        $this->info('metric: ' . $metric->id);
-                        $this->info('resource_id: ' . $metric->resource_id);
-                        $this->info('start: ' . $start);
-                        $this->info('end: ' . $end);
-                        $this->info('hours: ' . $hours);
-                        $this->info('value / multiplier: ' . $metric->value);
-                        $this->info('hourly price: £' . $metric->price);
-                        $this->info('cost: £' . $cost . PHP_EOL);
-                    }
-
                     $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
 
                 });
-
-                $this->line($key . ': £' . number_format($this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key], 2));
-
             });
-
-            $this->info(PHP_EOL);
 
             $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
 
             $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
-
-            $this->line('Total: £' . number_format($total, 2) . PHP_EOL);
-        }); //vpc each
-
-        $this->info(print_r(
-            $this->billing
-        ));
-
-
-
+        });
 
         // Calculate the total for all VPC's for each reseller
         foreach ($this->billing as $resellerId => $vpcs) {
             $total = 0;
-            foreach ($vpcs as $vpc) {
+            $this->line('Reseller ID: ' . $resellerId . PHP_EOL);
+
+            foreach ($vpcs as $vpcId => $vpc) {
+                $this->line('---------- ' . $vpcId . ' ----------' . PHP_EOL);
+
+                foreach ($vpc['metrics'] as $name => $val) {
+                    $this->line($name . ': £' . number_format($val, 2));
+                }
+                $this->line(PHP_EOL . 'Total: £' . number_format($val, 2));
+
+
                 $total += $vpc['total'];
             }
 
-            // Min £1 surcharge
-            $total = ($total < 1) ? 1 : $total;
-
-            //exit(print_r($total));
+            $this->line('-----------------------------------');
+            $this->line('Reseller ' . $resellerId . ' VPC\'s Usage Total: £' . number_format($total, 2) . PHP_EOL);
 
             // Apply any discount plans
-
-
             $discountPlans = DiscountPlan::where('reseller_id', $resellerId)
+                ->where('status', 'accepted')
                 ->where(function ($query) {
                     $query->where('term_start_date', '<=', $this->startDate);
                     $query->orWhereBetween('term_start_date', [$this->startDate, $this->endDate]);
                 })
                 ->where('term_end_date', '>=', $this->endDate)
-
                 ->get();
 
-            exit(print_r(
-                $discountPlans
-            ));
+                $discountsToApply = collect();
 
+                $discountPlans->each(function ($discountPlan) use ($total, &$discountsToApply) {
+                    if ($discountPlan->term_start_date <= $this->startDate) {
+                        $discountsToApply->add($discountPlan);
+                    }
+
+                    if ($discountPlan->term_start_date > $this->startDate) {
+                        // Discount plan start date is mid-month for the billing period, calculate pro rata discount
+                        $hoursInBillingPeriod = $this->startDate->diffInHours($this->endDate);
+
+                        $hoursRemainingInBillingPeriodFromTermStart = $discountPlan->term_start_date->diffInHours($this->endDate);
+
+                        $percentHoursRemaining = ($hoursRemainingInBillingPeriodFromTermStart / $hoursInBillingPeriod) * 100;
+
+                        $proRataCommitmentAmount = ($discountPlan->commitment_amount / 100) * $percentHoursRemaining;
+
+                        $proRataCommitmentBeforeDiscount = ($discountPlan->commitment_before_discount / 100) * $percentHoursRemaining;
+
+                        $proRataDiscountRate = ($discountPlan->discount_rate / 100) * $percentHoursRemaining;
+
+                        if ($this->option('debug')) {
+                            $this->info('Discount plan ' . $discountPlan->id . ' starts mid billing period. Calculating pro rata discount for this billing period.');
+                            $this->info(
+                                    'Term start: 2020-12-20 13:12:10'
+                                    . PHP_EOL .round($percentHoursRemaining) . '% of Billing period remaining'
+                                    . PHP_EOL .'Original Commitment Amount: £'. number_format($discountPlan->commitment_amount, 2)
+                                    . PHP_EOL .'Calculated Pro Rata Commitment Amount: £'. number_format($proRataCommitmentAmount, 2)
+                                    . PHP_EOL .'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
+                                    . PHP_EOL .'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount, 2)
+                                    . PHP_EOL .'Original Discount Rate: ' .$discountPlan->discount_rate
+                                    . PHP_EOL .'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
+                            );
+                            $this->info(PHP_EOL);
+                        }
+
+                        $discountPlan->commitment_amount = $proRataCommitmentAmount;
+                        $discountPlan->commitment_before_discount = $proRataCommitmentBeforeDiscount;
+                        $discountPlan->discount_rate = $proRataDiscountRate;
+
+                        $discountsToApply->add($discountPlan);
+                    }
+                });
+
+                if ($discountsToApply->count() > 0) {
+                    $this->line('Applying ' . $discountsToApply->count() . ' discounts...');
+
+                    if ($total < $discountsToApply->max('commitment_amount')) {
+                        // Charge at least the largest commitment amount
+                        $discountedTotal = $discountsToApply->max('commitment_amount');
+                        $total = $discountedTotal;
+                    } else {
+                        foreach ($discountsToApply as $discountPlan) {
+                            if ($total <= $discountPlan->commitment_before_discount) {
+                                $discountedTotal = $discountPlan->commitment_amount;
+                            } else {
+                                //$total > $discountPlan->commitment_before_discount
+                                $difference = $total - $discountPlan->commitment_before_discount;
+
+                                $discountedTotal = $discountPlan->commitment_amount + $difference;
+
+                                if ($this->option('debug')) {
+                                    $this->info('Applying discount ' . $discountPlan->id. '...' . PHP_EOL
+                                        .'New Total: £' . $discountedTotal
+                                    );
+                                }
+
+                            }
+                            $total = $discountedTotal;
+                        }
+                    }
+
+                    $this->line(PHP_EOL . 'Total after discounts: £' . number_format($total, 2));
+
+                } else {
+                    if ($this->option('debug')) {
+                        $this->info('No discounts found');
+                    }
+                }
+
+
+
+            // Min £1 surcharge
+            $total = ($total < 1) ? 1 : $total;
+
+
+            // Push acc.log entries over to the billing apio the billing apio endpoint is: POST /v1/payments
+            // instead of creating entries for each resource like v1 or collated resources like flex, we only require a single entry per vpc with the total cost
+            // the description should be:  eCloud vpc-abc123de from 01/11/2020 to 30/11/2020
+            // the category set to eCloud
+            // the nominal code set to:  TBC
+            // source set to: myukfast
         }
-
-
-
-
-
-
-        // Push acc.log entries over to the billing apio the billing apio endpoint is: POST /v1/payments
-        // instead of creating entries for each resource like v1 or collated resources like flex, we only require a single entry per vpc with the total cost
-        // the description should be:  eCloud vpc-abc123de from 01/11/2020 to 30/11/2020
-        // the category set to eCloud
-        // the nominal code set to:  TBC
-        // source set to: myukfast
-
     }
 
     /**
