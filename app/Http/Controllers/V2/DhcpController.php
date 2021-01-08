@@ -83,10 +83,7 @@ class DhcpController extends BaseController
             return $model->getSyncError();
         }
 
-        $sync = app()->make(Sync::class);
-        $sync->resource_id = $model->id;
-        $sync->completed = false;
-        $sync->save();
+        $model->createSync();
 
         $this->dispatch(new Undeploy([
             'id' => $model->id,

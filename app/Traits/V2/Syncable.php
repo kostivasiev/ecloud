@@ -8,6 +8,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
+    public function delete()
+    {
+        throw new \Exception('Cannot directly delete Syncable resources ' . __CLASS__);
+    }
+
+    public function syncDelete()
+    {
+        parent::delete();
+    }
+
     public function getStatus()
     {
         if (!$this->syncs()->count()) {
@@ -33,6 +43,26 @@ trait Syncable
             return false;
         }
         return $this->syncs()->latest()->first()->failure_reason !== null;
+    }
+
+    public function createSync()
+    {
+        Log::info(get_class($this) . ' : Creating new sync - Started', ['resource_id' => $this->id]);
+
+        if ($this->getStatus() !== 'complete') {
+            Log::info(get_class($this) . ' : Tried to create a new sync on ' . __CLASS__ . ' with outstanding sync', [
+                'resource_id' => $this->id
+            ]);
+            return false;
+        }
+
+        $sync = app()->make(Sync::class);
+        $sync->resource_id = $this->id;
+        $sync->completed = false;
+        $sync->save();
+        Log::info(get_class($this) . ' : Creating new sync - Finished', ['resource_id' => $this->id]);
+
+        return $sync;
     }
 
     public function setSyncCompleted()

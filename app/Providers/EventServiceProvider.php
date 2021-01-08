@@ -112,7 +112,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FloatingIp\AllocateIp::class,
         ],
         \App\Events\V2\FloatingIp\Deleted::class => [
-            \App\Listeners\V2\FloatingIp\Unassign::class,
             \App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -174,11 +173,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Nat\Saved::class => [
             \App\Listeners\V2\Nat\Deploy::class,
         ],
-        \App\Events\V2\Nat\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Nat\Deleted::class => [
-            \App\Listeners\V2\Nat\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
