@@ -10,12 +10,47 @@ trait Syncable
 {
     public function delete()
     {
-        throw new \Exception('Cannot directly delete Syncable resources ' . __CLASS__);
+        $class = explode('\\', __CLASS__);
+        $class = 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
+        if (!class_exists($class)) {
+            throw new \Exception('Syncable "Delete" job not found for ' . __CLASS__);
+        }
+
+        if (!$this->createSync()) {
+            return $this->getSyncError();
+        }
+
+        dispatch(new $class($this));
     }
 
     public function syncDelete()
     {
-        parent::delete();
+        $deleteResponse = parent::delete();
+        if (!$deleteResponse) {
+            Log::error(get_class($this) . ' : Failed to delete', ['resource_id' => $this->id]);
+            return $deleteResponse;
+        }
+        Log::info(get_class($this) . ' : Deleted', ['resource_id' => $this->id]);
+    }
+
+    public function createSync()
+    {
+        Log::info(get_class($this) . ' : Creating new sync - Started', ['resource_id' => $this->id]);
+
+        if ($this->getStatus() !== 'complete') {
+            Log::info(get_class($this) . ' : Tried to create a new sync on ' . __CLASS__ . ' with outstanding sync', [
+                'resource_id' => $this->id
+            ]);
+            return false;
+        }
+
+        $sync = app()->make(Sync::class);
+        $sync->resource_id = $this->id;
+        $sync->completed = false;
+        $sync->save();
+        Log::info(get_class($this) . ' : Creating new sync - Finished', ['resource_id' => $this->id]);
+
+        return $sync;
     }
 
     public function getStatus()
@@ -43,26 +78,6 @@ trait Syncable
             return false;
         }
         return $this->syncs()->latest()->first()->failure_reason !== null;
-    }
-
-    public function createSync()
-    {
-        Log::info(get_class($this) . ' : Creating new sync - Started', ['resource_id' => $this->id]);
-
-        if ($this->getStatus() !== 'complete') {
-            Log::info(get_class($this) . ' : Tried to create a new sync on ' . __CLASS__ . ' with outstanding sync', [
-                'resource_id' => $this->id
-            ]);
-            return false;
-        }
-
-        $sync = app()->make(Sync::class);
-        $sync->resource_id = $this->id;
-        $sync->completed = false;
-        $sync->save();
-        Log::info(get_class($this) . ' : Creating new sync - Finished', ['resource_id' => $this->id]);
-
-        return $sync;
     }
 
     public function setSyncCompleted()

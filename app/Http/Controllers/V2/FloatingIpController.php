@@ -6,7 +6,6 @@ use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Jobs\FloatingIp\Assign;
-use App\Jobs\Job;
 use App\Jobs\Nsx\FloatingIp\Undeploy as FloatingIpUndeploy;
 use App\Jobs\Nsx\Nat\Undeploy as NatUndeploy;
 use App\Jobs\Nsx\Nat\UndeployCheck as NatUndeployCheck;
@@ -99,27 +98,9 @@ class FloatingIpController extends BaseController
     public function destroy(Request $request, string $fipId)
     {
         $model = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
-        if (!$model->createSync()) {
+        if (!$model->delete()) {
             return $model->getSyncError();
         }
-
-        $jobs = [];
-        $nats = Nat::where('source_id', $model->id)
-            ->orWhere('destination_id', $model->id)
-            ->orWhere('translated_id', $model->id)
-            ->get()
-            ->filter(function ($model) {
-                return $model instanceof Nat;
-            });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeploy($nat);
-        });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeployCheck($nat);
-        });
-        $jobs[] = new FloatingIpUndeploy($model);
-
-        dispatch(array_shift($jobs)->chain($jobs));
 
         return response()->json([], 204);
     }

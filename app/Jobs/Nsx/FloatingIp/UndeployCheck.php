@@ -6,7 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use Illuminate\Support\Facades\Log;
 
-class Undeploy extends Job
+class UndeployCheck extends Job
 {
     /** @var FloatingIp */
     private $model;
