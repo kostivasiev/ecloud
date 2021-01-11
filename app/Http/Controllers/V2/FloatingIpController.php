@@ -119,11 +119,7 @@ class FloatingIpController extends BaseController
         });
         $jobs[] = new FloatingIpUndeploy($model);
 
-        if (count($jobs) > 0) {
-            dispatch(array_shift($jobs)->chain($jobs));
-        } else {
-            dispatch(array_shift($jobs));
-        }
+        dispatch(array_shift($jobs)->chain($jobs));
 
         return response()->json([], 204);
     }
