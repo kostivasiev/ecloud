@@ -21,6 +21,8 @@ trait Syncable
         }
 
         dispatch(new $class($this));
+
+        return true;
     }
 
     public function syncDelete()

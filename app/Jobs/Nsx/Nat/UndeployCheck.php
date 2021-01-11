@@ -38,8 +38,7 @@ class UndeployCheck extends Job
                     $query->withTrashed();
                 }
             ])->getRelations()
-        )
-            ->whereInstanceOf(Nic::class)->first();
+        )->whereInstanceOf(Nic::class)->first();
 
         if (!$nic) {
             $error = 'Failed. Could not find NIC for destination or translated';

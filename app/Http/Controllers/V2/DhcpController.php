@@ -6,7 +6,6 @@ use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Sync;
 use App\Resources\V2\DhcpResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
