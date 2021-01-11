@@ -46,8 +46,8 @@ class FirewallPolicy extends Model implements Filterable, Sortable
         'deleted' => Deleted::class
     ];
 
-    public $children = [
-        'firewallRules',
+    protected $casts = [
+        'sequence' => 'integer'
     ];
 
     public function firewallRules()

@@ -2,52 +2,35 @@
 
 namespace App\Traits\V2;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 trait DeletionRules
 {
-    /**
-     * @throws \Exception
-     */
-    public static function bootDeletionRules()
+    public function canDelete()
     {
-        static::deleting(function ($model) {
-            $model = $model->getRelatableInstance()
-                ->findOrFail($model->getKey());
-            foreach ($model->getRelations() as $relation) {
-                if ($relation->count() > 0) {
-                    throw new \Exception(
-                        'Active resources exist for this item',
-                        412
-                    );
-                }
-            }
+        $relationships = collect(
+            $this->with($this->children)
+                ->findOrFail($this->id)
+                ->getRelations()
+        )->sum(function ($relation) {
+            return $relation->count();
         });
+        return $relationships === 0;
     }
 
-    /**
-     * @return Builder
-     */
-    public function getRelatableInstance(): Builder
+    public function getDeletionError()
     {
-        return (new self)::with($this->children);
-    }
-
-    /**
-     * @param \Exception $exception
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getDeletionError(\Exception $exception)
-    {
-        return response()->json([
-            'errors' => [
-                [
-                    'title' => 'Precondition Failed',
-                    'detail' => $exception->getMessage(),
-                    'status' => 412
-                ]
-            ]
-        ], 412);
+        return \Illuminate\Http\JsonResponse::create(
+            [
+                'errors' => [
+                    [
+                        'title' => 'Precondition Failed',
+                        'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+                        'status' => Response::HTTP_PRECONDITION_FAILED,
+                    ],
+                ],
+            ],
+            Response::HTTP_PRECONDITION_FAILED
+        );
     }
 }

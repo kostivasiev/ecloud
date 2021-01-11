@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FloatingIps;
 
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
@@ -40,5 +41,10 @@ class CreateTest extends TestCase
             ]
         )
             ->assertResponseStatus(201);
+
+        $id = (json_decode($this->response->getContent()))->data->id;
+        $floatingIp = FloatingIp::findOrFail($id);
+        $this->assertEquals('failed', $floatingIp->getStatus());
+        $this->assertEquals('Awaiting IP Allocation', $floatingIp->getSyncFailureReason());
     }
 }

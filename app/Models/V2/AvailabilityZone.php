@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\AvailabilityZone\Created;
 use App\Events\V2\AvailabilityZone\Creating;
+use App\Events\V2\AvailabilityZone\Deleted;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
@@ -42,6 +43,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
+        'deleted' => Deleted::class,
     ];
 
     protected $casts = [
@@ -51,7 +53,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
 
     public $children = [
         'routers',
-        'dhcps',
         'instances',
         'loadBalancerClusters'
     ];

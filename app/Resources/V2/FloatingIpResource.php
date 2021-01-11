@@ -30,6 +30,7 @@ class FloatingIpResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'ip_address' => $this->ip_address,
             'resource_id' => $this->resource_id,
+            'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

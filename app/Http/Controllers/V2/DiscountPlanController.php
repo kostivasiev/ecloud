@@ -52,6 +52,12 @@ class DiscountPlanController extends BaseController
     public function store(Create $request)
     {
         $discountPlan = new DiscountPlan($request->only($this->getAllowedFields()));
+        if (!$request->has('term_end_date')) {
+            $discountPlan->term_end_date = $this->calculateNewEndDate(
+                $request->get('term_start_date'),
+                $request->get('term_length')
+            );
+        }
         if (!$request->has('reseller_id')) {
             $discountPlan->reseller_id = $this->resellerId;
         }
@@ -72,20 +78,62 @@ class DiscountPlanController extends BaseController
         if ($this->isAdmin) {
             $discountPlan->reseller_id = $request->input('reseller_id', $discountPlan->reseller_id);
         }
+
+        // if start date specified then use existing term_length or newly submitted one
+        if ($request->has('term_start_date')) {
+            $termLength = $request->get('term_length', $discountPlan->term_length);
+            $discountPlan->term_end_date = $this->calculateNewEndDate(
+                $request->get('term_start_date'),
+                $termLength
+            );
+        }
+
+        // if term_length specified but no start date, then auto calculate new term_end_date based on existing start_date
+        if (!$request->has('term_start_date') && $request->has('term_length')) {
+            $discountPlan->term_end_date = $this->calculateNewEndDate(
+                $discountPlan->term_start_date,
+                $request->has('term_length')
+            );
+        }
+
         $discountPlan->save();
         return $this->responseIdMeta($request, $discountPlan->getKey(), 200);
     }
 
     /**
      * @param string $discountPlanId
-     * @return JsonResponse
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
     public function destroy(string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
         $discountPlan->delete();
-        return response()->json([], 204);
+        return response(null, 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $discountPlanId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     */
+    public function approve(Request $request, string $discountPlanId)
+    {
+        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan->approve();
+        return response(null, 200);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $discountPlanId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     */
+    public function reject(Request $request, string $discountPlanId)
+    {
+        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan->reject();
+        return response(null, 200);
     }
 
     /**
@@ -94,9 +142,6 @@ class DiscountPlanController extends BaseController
     private function getAllowedFields(): array
     {
         $allowedFields = [
-            'contact_id',
-            'employee_id',
-            'reseller_id',
             'name',
             'commitment_amount',
             'commitment_before_discount',
@@ -108,7 +153,18 @@ class DiscountPlanController extends BaseController
         if (app('request')->user->isAdministrator) {
             $allowedFields[] = 'contact_id';
             $allowedFields[] = 'employee_id';
+            $allowedFields[] = 'reseller_id';
         }
         return $allowedFields;
+    }
+
+    /**
+     * @param $startDate
+     * @param $termLength
+     * @return string
+     */
+    private function calculateNewEndDate($startDate, $termLength): string
+    {
+        return date('Y-m-d', strtotime('+ '.$termLength.' months', strtotime($startDate)));
     }
 }

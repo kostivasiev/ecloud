@@ -165,8 +165,12 @@ paths:
     $ref: 'resources/FirewallRule/item.yaml'
   '/ecloud/v2/firewall-rules/{firewallRuleId}/ports':
     $ref: 'resources/FirewallRule/ports.yaml'
+  '/ecloud/v2/firewall-policies':
+    $ref: 'resources/FirewallPolicy/collection.yaml'
   '/ecloud/v2/firewall-policies/{firewallPolicyId}':
     $ref: 'resources/FirewallPolicy/item.yaml'
+  /ecloud/v2/firewall-policies/{firewallPolicyId}/firewall-rules:
+    $ref: 'resources/FirewallPolicy/firewall-rules-collection.yaml'
   '/ecloud/v2/firewall-rule-ports':
     $ref: 'resources/FirewallRulePort/collection.yaml'
   '/ecloud/v2/firewall-rule-ports/{firewallRulePortId}':
@@ -179,8 +183,8 @@ paths:
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/item.yaml'
-  '/ecloud/v2/routers/{routerId}/firewall-rules':
-    $ref: 'resources/Router/firewallrule-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/firewall-policies':
+    $ref: 'resources/Router/firewall-policies-collection.yaml'
   '/ecloud/v2/routers/{routerId}/networks':
     $ref: 'resources/Router/network-collection.yaml'
   '/ecloud/v2/routers/{routerId}/vpns':
@@ -213,3 +217,7 @@ paths:
     $ref: 'resources/DiscountPlan/public_collection.yaml'
   '/ecloud/v2/discount-plan/{discountPlanId}':
     $ref: 'resources/DiscountPlan/public_item.yaml'
+  '/ecloud/v2/discount-plan/{discountPlanId}/approve':
+    $ref: 'resources/DiscountPlan/approve-item.yaml'
+  '/ecloud/v2/discount-plan/{discountPlanId}/reject':
+    $ref: 'resources/DiscountPlan/reject-item.yaml'

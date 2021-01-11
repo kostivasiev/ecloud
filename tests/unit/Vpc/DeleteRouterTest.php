@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Listeners\Vpc;
+namespace Tests\unit\Vpc;
 
 use App\Events\V2\Vpc\Deleted;
 use App\Events\V2\Router\Deleted as RouterDeleted;
@@ -8,12 +8,16 @@ use App\Listeners\V2\Vpc\Routers\Delete as DeleteRouters;
 use App\Listeners\V2\Vpc\FloatingIps\Delete as DeleteFloatingIps;
 use App\Listeners\V2\Router\Networks\Delete as DeleteNetworks;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\NsxService;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -33,6 +37,15 @@ class DeleteRouterTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncryptionServiceProvider;
+        });
+
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
@@ -40,6 +53,18 @@ class DeleteRouterTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
+        factory(Credential::class)->create([
+            'name' => 'NSX',
+            'resource_id' => $this->availabilityZone->getKey(),
+        ]);
+
+        $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
+        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
+        app()->bind(NsxService::class, function () use ($mockNsxService) {
+            $result = new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]));
+            $mockNsxService->shouldReceive('get')->andReturn($result);
+            return $mockNsxService;
+        });
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey(),

@@ -80,12 +80,11 @@ class RegionController extends BaseController
      */
     public function destroy(Request $request, string $regionId)
     {
-        $region = Region::findOrFail($regionId);
-        try {
-            $region->delete();
-        } catch (\Exception $e) {
-            return $region->getDeletionError($e);
+        $model = Region::findOrFail($regionId);
+        if (!$model->canDelete()) {
+            return $model->getDeletionError();
         }
+        $model->delete();
         return response()->json([], 204);
     }
 

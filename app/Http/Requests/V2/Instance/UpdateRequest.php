@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
@@ -70,6 +71,7 @@ class UpdateRequest extends FormRequest
                 'numeric',
                 'min:' . config('instance.ram_capacity.min'),
                 'max:' . config('instance.ram_capacity.max'),
+                new IsValidRamMultiple()
             ],
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
