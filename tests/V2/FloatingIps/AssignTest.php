@@ -74,12 +74,6 @@ class AssignTest extends TestCase
         $this->floatingIp = factory(FloatingIp::class)->create([
             'vpc_id' => $this->vpc->id
         ]);
-        $this->nat = factory(Nat::class)->create([
-            'destination_id' => $this->floatingIp->id,
-            'destinationable_type' => 'fip',
-            'translated_id' => $this->nic->id,
-            'translatedable_type' => 'nic'
-        ]);
         $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
@@ -120,9 +114,14 @@ class AssignTest extends TestCase
         ])->assertResponseStatus(200);
     }
 
-
     public function testUnAssignIsSuccessful()
     {
+        $this->nat = factory(Nat::class)->create([
+            'destination_id' => $this->floatingIp->id,
+            'destinationable_type' => 'fip',
+            'translated_id' => $this->nic->id,
+            'translatedable_type' => 'nic'
+        ]);
         $this->post('/v2/floating-ips/' . $this->floatingIp->id . '/unassign', [
             'resource_id' => $this->nic->id
         ], [
