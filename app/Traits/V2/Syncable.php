@@ -17,7 +17,7 @@ trait Syncable
         }
 
         if (!$this->createSync()) {
-            return $this->getSyncError();
+            return false;
         }
 
         dispatch(new $class($this));

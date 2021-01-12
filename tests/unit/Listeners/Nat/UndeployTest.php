@@ -66,34 +66,20 @@ class UndeployTest extends TestCase
             'network_id' => $this->network->id,
             'ip_address' => $this->faker->ipv4,
         ]);
+        $this->nat = factory(Nat::class)->create([
+            'destination_id' => $this->floating_ip->id,
+            'destinationable_type' => FloatingIp::class,
+            'translated_id' => $this->nic->id,
+            'translatedable_type' => Nic::class,
+        ]);
 
-        Model::withoutEvents(function () {
-            $this->nat = factory(Nat::class)->create([
-                'id' => 'nat-123456',
-                'destination_id' => $this->floating_ip->id,
-                'destinationable_type' => FloatingIp::class,
-                'translated_id' => $this->nic->id,
-                'translatedable_type' => Nic::class,
-            ]);
-        });
-
-        $this->event = new Deleted($this->nat);
-
-        $this->listener = \Mockery::mock(Undeploy::class)->makePartial();
-    }
-
-
-    public function testDeletingNatRemovesRule()
-    {
         $mockNsxService = \Mockery::mock(new NsxService(new Client(), $this->faker->uuid()))->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
-
             $mockNsxService->shouldReceive('delete')
                 ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/nat/USER/nat-rules/' . $this->nat->getKey()])
                 ->andReturn(
                     new Response(200)
                 );
-
             $mockNsxService->shouldReceive('get')
                 ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/state'])
                 ->andReturn(
@@ -101,11 +87,11 @@ class UndeployTest extends TestCase
                 );
             return $mockNsxService;
         });
+    }
 
-        $this->listener->handle($this->event);
-
+    public function testDeletingNatRemovesRule()
+    {
         $this->nat->delete();
-
         Event::assertDispatched(\App\Events\V2\Nat\Deleting::class, function ($event) {
             return $event->model->id === $this->nat->id;
         });

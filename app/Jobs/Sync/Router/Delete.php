@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Jobs\Sync\Nat;
+namespace App\Jobs\Sync\Router;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\Nat\Undeploy;
-use App\Jobs\Nsx\Nat\UndeployCheck;
-use App\Models\V2\Nat;
+use App\Jobs\Nsx\Router\Undeploy;
+use App\Jobs\Nsx\Router\UndeployCheck;
+use App\Models\V2\Router;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    /** @var Nat */
+    /** @var Router */
     private $model;
 
-    public function __construct(Nat $model)
+    public function __construct(Router $model)
     {
         $this->model = $model;
     }
@@ -24,8 +24,9 @@ class Delete extends Job
 
         $jobs = [
             new Undeploy($this->model),
-            new UndeployCheck($this->model)
+            new UndeployCheck($this->model),
         ];
+
         dispatch(array_shift($jobs)->chain($jobs));
 
         Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);

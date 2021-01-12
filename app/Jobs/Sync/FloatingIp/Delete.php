@@ -3,7 +3,7 @@
 namespace App\Jobs\Sync\FloatingIp;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\FloatingIp\UndeployCheck as FloatingIpUndeployCheck;
+use App\Jobs\Nsx\FloatingIp\UndeployCheck;
 use App\Jobs\Nsx\Nat\Undeploy as NatUndeploy;
 use App\Jobs\Nsx\Nat\UndeployCheck as NatUndeployCheck;
 use App\Models\V2\FloatingIp;
@@ -38,7 +38,7 @@ class Delete extends Job
         $nats->each(function ($nat) use (&$jobs) {
             $jobs[] = new NatUndeployCheck($nat);
         });
-        $jobs[] = new FloatingIpUndeployCheck($this->model);
+        $jobs[] = new UndeployCheck($this->model);
 
         dispatch(array_shift($jobs)->chain($jobs));
 

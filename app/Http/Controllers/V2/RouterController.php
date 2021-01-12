@@ -5,13 +5,12 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Jobs\FirewallPolicy\ConfigureDefaults;
+use App\Jobs\Nsx\Router\Undeploy;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Vpn;
 use App\Resources\V2\FirewallPolicyResource;
-use App\Resources\V2\FirewallRuleResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\VpnResource;
@@ -87,14 +86,16 @@ class RouterController extends BaseController
      */
     public function destroy(Request $request, string $routerId)
     {
-        $router = Router::forUser($request->user)->findOrFail($routerId);
-        try {
-            if (!$router->delete()) {
-                return $router->getSyncError();
-            }
-        } catch (\Exception $e) {
-            return $router->getDeletionError($e);
+        $model = Router::forUser($request->user)->findOrFail($routerId);
+
+        if (!$model->canDelete()) {
+            return $model->getDeletionError();
         }
+
+        if (!$model->delete()) {
+            return $model->getSyncError();
+        }
+
         return response()->json([], 204);
     }
 
