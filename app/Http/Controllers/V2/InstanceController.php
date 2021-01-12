@@ -28,6 +28,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -74,9 +75,11 @@ class InstanceController extends BaseController
     /**
      * @param CreateRequest $request
      * @return JsonResponse
+     * @throws ValidationException
      */
     public function store(CreateRequest $request)
     {
+        $this->validateApplianceData($request);
         $vpc = Vpc::forUser(app('request')->user)->findOrFail($request->input('vpc_id'));
 
         // Use the default network if there is only one and no network_id was passed in
@@ -128,6 +131,42 @@ class InstanceController extends BaseController
         event(new Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
+    }
+
+    /**
+     * @param $request
+     * @return $this
+     * @throws ValidationException
+     */
+    public function validateApplianceData($request): InstanceController
+    {
+        $scriptRules = [];
+        if ($this->request->has('appliance_data')) {
+            $parameters = json_decode($this->request->get('appliance_data'));
+
+            foreach ($parameters as $parameterKey => $parameter) {
+                $key = 'appliance_param_' . $parameterKey;
+                $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
+                //validation rules regex
+                if (!empty($parameters[$parameterKey]->validation_rule)) {
+                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->validation_rule;
+                }
+
+                // For data types String,Numeric,Boolean we can use Laravel validation
+                switch ($parameters[$parameterKey]->type) {
+                    case 'String':
+                    case 'Numeric':
+                    case 'Boolean':
+                        $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
+                        break;
+                    case 'Password':
+                        $scriptRules[$key][] = 'string';
+                }
+            }
+
+            $this->validate($request, $scriptRules);
+        }
+        return $this;
     }
 
     /**
