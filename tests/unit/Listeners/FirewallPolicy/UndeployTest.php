@@ -3,12 +3,14 @@
 namespace Tests\unit\Listeners\FirewallPolicy;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\NsxService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
@@ -33,10 +35,23 @@ class UndeployTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncryptionServiceProvider;
+        });
+
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
+        ]);
+        factory(Credential::class)->create([
+            'name' => 'NSX',
+            'resource_id' => $this->availability_zone->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->id,

@@ -57,14 +57,6 @@ class DeleteRouterTest extends TestCase
             'name' => 'NSX',
             'resource_id' => $this->availabilityZone->getKey(),
         ]);
-
-        $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
-        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
-        app()->bind(NsxService::class, function () use ($mockNsxService) {
-            $result = new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]));
-            $mockNsxService->shouldReceive('get')->andReturn($result);
-            return $mockNsxService;
-        });
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey(),
@@ -78,6 +70,22 @@ class DeleteRouterTest extends TestCase
         $this->floatingIp = factory(FloatingIp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
         ]);
+
+        $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
+        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
+        app()->bind(NsxService::class, function () use ($mockNsxService) {
+            $mockNsxService->shouldReceive('get')->withArgs([
+                'policy/api/v1/infra/tier-1s/' . $this->router->id . '/state'
+            ])->andReturn(
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]))
+            );
+            return $mockNsxService;
+        });
     }
 
     public function testDeletingVpcDeletesRouter()
