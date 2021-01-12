@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\Nsx\TestAuth::class,
         \App\Console\Commands\Nsx\UndeployDeletedNetworks::class,
+        \App\Console\Commands\Nsx\UndeployDeletedDhcps::class,
         \App\Console\Commands\Kingpin\TestAuth::class,
         \App\Console\Commands\Kingpin\Instance\Delete::class,
         \App\Console\Commands\Queue\TestRead::class,
