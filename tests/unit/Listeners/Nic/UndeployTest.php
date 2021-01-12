@@ -80,44 +80,4 @@ class UndeployTest extends TestCase
             ]);
         });
     }
-
-    public function testDeletingNicRemovesDhcpLease()
-    {
-        $mockNsxService = \Mockery::mock(new NsxService(new Client(), $this->faker->uuid()))->makePartial();
-        app()->bind(NsxService::class, function () use ($mockNsxService) {
-
-            $mockNsxService->shouldReceive('delete')
-                ->withArgs(['/policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/segments/' . $this->network->getKey()
-                    . '/dhcp-static-binding-configs/' . $this->nic->getKey()
-                ])
-                ->andReturn(
-                    new Response(200)
-                );
-
-            $mockNsxService->shouldReceive('get')
-                ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/state'])
-                ->andReturn(
-                    new Response(200)
-                );
-            return $mockNsxService;
-        });
-
-        Event::Fake(Deleted::class);
-
-        $listener = \Mockery::mock(DeleteDhcpLease::class)->makePartial();
-        $listener->handle(new \App\Events\V2\Nic\Deleted($this->nic));
-    }
-
-    public function testDeletingNicUnassignsFloatingIps()
-    {
-        Event::Fake(Deleted::class);
-
-        $this->assertNull($this->nat->deleted_at);
-
-        $listener = \Mockery::mock(UnassignFloatingIp::class)->makePartial();
-
-        $listener->handle(new \App\Events\V2\Nic\Deleted($this->nic));
-
-        $this->assertNotNull($this->nat->refresh()->deleted_at);
-    }
 }

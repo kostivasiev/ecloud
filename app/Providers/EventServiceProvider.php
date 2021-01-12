@@ -137,7 +137,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Instance\Deleted::class => [
-            \App\Listeners\V2\Instance\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
@@ -229,7 +228,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Volume\Deleted::class => [
-            \App\Listeners\V2\Volume\Delete::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 

@@ -99,12 +99,4 @@ class UndeployTest extends TestCase
             return $mockNsxService;
         });
     }
-
-    public function testDeletingNatRemovesRule()
-    {
-        $this->nat->delete();
-        Event::assertDispatched(\App\Events\V2\Nat\Deleting::class, function ($event) {
-            return $event->model->id === $this->nat->id;
-        });
-    }
 }

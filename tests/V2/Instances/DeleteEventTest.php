@@ -69,36 +69,4 @@ class DeleteEventTest extends TestCase
             return $mockKingpinService;
         });
     }
-
-    public function testInstanceDeleteEventFired()
-    {
-        Event::fake();
-
-        $this->delete(
-            '/v2/instances/' . $this->instance->getKey(),
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
-
-        Event::assertDispatched(Deleted::class, function ($event) {
-            return $event->model->id === $this->instance->getKey();
-        });
-    }
-
-    public function testDeleteInstanceListener()
-    {
-        $this->expectsJobs([
-            \App\Jobs\Instance\Undeploy\PowerOff::class,
-            //\App\Jobs\Instance\Undeploy\Undeploy::class,
-        ]);
-
-        $event = new Deleted($this->instance);
-        /** @var Undeploy $listener */
-        $listener = \Mockery::mock(Undeploy::class)->makePartial();
-        $listener->handle($event);
-    }
 }

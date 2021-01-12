@@ -78,14 +78,18 @@ class UndeployTest extends TestCase
                 new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
                 new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]))
             );
+            $mockNsxService->shouldReceive('delete')->andReturn(
+                new Response(204, [], ''),
+            );
             return $mockNsxService;
         });
     }
 
     public function testDeletingUndeploys()
     {
-        $this->assertNull($this->firewallRule->refresh()->deleted_at);
+        $this->assertNull($this->firewallRule->deleted_at);
         $this->firewallPolicy->delete();
-        $this->assertNotNull($this->firewallRule->refresh()->deleted_at);
+        $this->firewallRule->refresh();
+        $this->assertNotNull($this->firewallRule->deleted_at);
     }
 }

@@ -74,24 +74,4 @@ class DeleteTest extends TestCase
             ]);
         });
     }
-
-
-    public function testDeletingFloatingIpTriggersUnassign()
-    {
-        Queue::fake();
-
-        $this->floatingIp->delete();
-
-        Event::assertDispatched(\App\Events\V2\FloatingIp\Deleted::class, function ($event) {
-            return $event->model->id === $this->floatingIp->getKey();
-        });
-
-        $listener = \Mockery::mock(\App\Listeners\V2\FloatingIp\Unassign::class)->makePartial();
-
-        $listener->handle(new \App\Events\V2\FloatingIp\Deleted($this->floatingIp));
-
-        Queue::assertPushed(UnAssign::class);
-
-        $this->assertNotNull($this->floatingIp->refresh()->deleted_at);
-    }
 }
