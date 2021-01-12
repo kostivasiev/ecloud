@@ -4,7 +4,6 @@ namespace Tests\V2\FloatingIps;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
-use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Nat;
@@ -27,6 +26,7 @@ class AssignTest extends TestCase
     protected $nic;
     protected $nat;
     protected $region;
+    protected $router;
     protected $vpc;
     protected $dhcp;
     protected $availability_zone;
@@ -56,7 +56,7 @@ class AssignTest extends TestCase
         ]);
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availability_zone->id
+            'availability_zone_id' => $this->availability_zone->id,
         ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->id,
@@ -78,6 +78,12 @@ class AssignTest extends TestCase
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
             $mockNsxService->shouldReceive('delete')->andReturn(new Response(204, [], ''));
+            $mockNsxService->shouldReceive('get')->withArgs([
+                'policy/api/v1/infra/tier-1s/' . $this->router->id . '/state'
+            ])->andReturn(
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]))
+            );
             $mockNsxService->shouldReceive('get')->andReturn(new Response(
                 200,
                 [],
