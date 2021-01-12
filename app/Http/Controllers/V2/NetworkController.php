@@ -7,7 +7,6 @@ use App\Http\Requests\V2\Network\UpdateRequest;
 use App\Jobs\Nsx\Network\Undeploy;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
-use App\Models\V2\Sync;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;

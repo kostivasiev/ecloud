@@ -51,6 +51,8 @@ class Undeploy extends Job
             'policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->model->id
         );
 
+        // TODO :- Retry job on failure to delete
+
         Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
     }
 }

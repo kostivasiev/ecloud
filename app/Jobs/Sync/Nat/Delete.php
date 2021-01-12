@@ -3,10 +3,8 @@
 namespace App\Jobs\Sync\Nat;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\FloatingIp\UndeployCheck as FloatingIpUndeployCheck;
 use App\Jobs\Nsx\Nat\Undeploy as NatUndeploy;
 use App\Jobs\Nsx\Nat\UndeployCheck as NatUndeployCheck;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use Illuminate\Support\Facades\Log;
 
