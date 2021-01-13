@@ -76,11 +76,6 @@ class CreateRequest extends FormRequest
                 'required_without:floating_ip_id',
                 'boolean',
             ],
-            'appliance_data' => [
-                'sometimes',
-                'required',
-                'string',
-            ],
             'user_script' => [
                 'sometimes',
                 'required',
