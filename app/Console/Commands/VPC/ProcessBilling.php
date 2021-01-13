@@ -183,9 +183,7 @@ class ProcessBilling extends Command
                             $discountedTotal = $discountPlan->commitment_amount + $difference;
 
                             if ($this->option('debug')) {
-                                $this->info('Applying discount ' . $discountPlan->id . '...' . PHP_EOL
-                                    . 'New Total: £' . $discountedTotal
-                                );
+                                $this->info('Applying discount ' . $discountPlan->id . '...' . PHP_EOL . 'New Total: £' . $discountedTotal);
                             }
                         }
                         $total = $discountedTotal;
