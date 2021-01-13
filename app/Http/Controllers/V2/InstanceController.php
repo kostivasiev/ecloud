@@ -141,8 +141,8 @@ class InstanceController extends BaseController
     public function validateApplianceData($request): InstanceController
     {
         $scriptRules = [];
-        if ($this->request->has('appliance_data')) {
-            $parameters = json_decode($this->request->get('appliance_data'));
+        if ($request->has('appliance_data')) {
+            $parameters = json_decode($request->get('appliance_data'));
 
             foreach ($parameters as $parameterKey => $parameter) {
                 $key = 'appliance_param_' . $parameterKey;
