@@ -217,7 +217,7 @@ class ProcessBilling extends Command
                 'dateFrom' => $this->startDate->format('c'),
                 'dateTo' => $this->endDate->format('c'),
                 'netpg' => '', // no payment taken, payment required
-                'nominalCode' => '41003', //throws exception: The nominal code must be a string :/
+                'nominalCode' => '41003',
                 'source' => 'myukfast',
                 'cost' => number_format($total, 2),
                 'vat' => 00.00
