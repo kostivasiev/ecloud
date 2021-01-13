@@ -12,37 +12,34 @@ class UndeployCheck extends Job
 
     public $tries = 500;
 
-    private $data;
+    private $model;
 
-    public function __construct($data)
+    public function __construct(Network $model)
     {
-        $this->data = $data;
+        $this->model = $model;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
 
-        /** @var Network $model */
-        $model = Network::findOrFail($this->data['id']);
-
-        $response = $model->router->availabilityZone->nsxService()->get(
-            'policy/api/v1/infra/tier-1s/' . $model->router->id . '/segments/?include_mark_for_delete_objects=true'
+        $response = $this->model->router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/?include_mark_for_delete_objects=true'
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
-            if ($model->id === $result->id) {
+            if ($this->model->id === $result->id) {
                 $this->release(static::RETRY_DELAY);
                 Log::info(
-                    'Waiting for ' . $model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
                 );
                 return;
             }
         }
 
-        $model->setSyncCompleted();
-        $model->syncDelete();
+        $this->model->setSyncCompleted();
+        $this->model->syncDelete();
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
     }
 }

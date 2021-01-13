@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Jobs\Sync\Router;
+namespace App\Jobs\Sync\FirewallPolicy;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\Router\Undeploy;
-use App\Jobs\Nsx\Router\UndeployCheck;
-use App\Models\V2\Router;
+use App\Jobs\Nsx\FirewallPolicy\Undeploy;
+use App\Jobs\Nsx\FirewallPolicy\UndeployCheck;
+use App\Models\V2\FirewallPolicy;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    /** @var Router */
+    /** @var FirewallPolicy */
     private $model;
 
-    public function __construct(Router $model)
+    public function __construct(FirewallPolicy $model)
     {
         $this->model = $model;
     }
@@ -26,8 +26,6 @@ class Delete extends Job
             new Undeploy($this->model),
             new UndeployCheck($this->model),
         ];
-
-        // TODO :- Delete linked Networks and FirewallPolicies
 
         dispatch(array_shift($jobs)->chain($jobs));
 

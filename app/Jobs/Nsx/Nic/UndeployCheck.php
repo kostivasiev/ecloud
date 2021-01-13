@@ -12,7 +12,6 @@ class UndeployCheck extends Job
 
     public $tries = 500;
 
-    /** @var Nic */
     private $model;
 
     public function __construct(Nic $model)

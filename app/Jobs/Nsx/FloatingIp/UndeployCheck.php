@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\Log;
 
 class UndeployCheck extends Job
 {
-    /** @var FloatingIp */
+    const RETRY_DELAY = 5;
+
+    public $tries = 500;
+
     private $model;
 
     public function __construct(FloatingIp $model)

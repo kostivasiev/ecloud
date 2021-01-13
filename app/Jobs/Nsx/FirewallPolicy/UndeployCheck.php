@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Jobs\Nsx\Dhcp;
+namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Job;
-use App\Models\V2\Dhcp;
+use App\Models\V2\FirewallPolicy;
 use Illuminate\Support\Facades\Log;
 
 class UndeployCheck extends Job
@@ -14,7 +14,7 @@ class UndeployCheck extends Job
 
     private $model;
 
-    public function __construct(Dhcp $model)
+    public function __construct(FirewallPolicy $model)
     {
         $this->model = $model;
     }
@@ -23,8 +23,8 @@ class UndeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
 
-        $response = $this->model->availabilityZone->nsxService()->get(
-            '/policy/api/v1/infra/dhcp-server-configs/?include_mark_for_delete_objects=true'
+        $response = $this->model->router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {

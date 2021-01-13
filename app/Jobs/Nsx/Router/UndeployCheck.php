@@ -3,8 +3,6 @@
 namespace App\Jobs\Nsx\Router;
 
 use App\Jobs\Job;
-use App\Models\V2\Nat;
-use App\Models\V2\Nic;
 use App\Models\V2\Router;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +12,6 @@ class UndeployCheck extends Job
 
     public $tries = 500;
 
-    /** @var Router */
     private $model;
 
     public function __construct(Router $model)

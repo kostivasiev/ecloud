@@ -13,7 +13,6 @@ class UndeployCheck extends Job
 
     public $tries = 500;
 
-    /** @var Nat */
     private $model;
 
     public function __construct(Nat $model)

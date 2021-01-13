@@ -38,32 +38,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-###
-POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/unassign
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-    "resource_id": "{{dev_nic_id}}"
-}
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 202");
-});
-%}
-
-###
 DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache

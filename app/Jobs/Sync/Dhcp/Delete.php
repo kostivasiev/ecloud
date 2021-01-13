@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Jobs\Nsx\Dhcp;
+namespace App\Jobs\Sync\Dhcp;
 
 use App\Jobs\Job;
+use App\Jobs\Nsx\Dhcp\Undeploy;
+use App\Jobs\Nsx\Dhcp\UndeployCheck;
 use App\Models\V2\Dhcp;
 use Illuminate\Support\Facades\Log;
 
-class Undeploy extends Job
+class Delete extends Job
 {
-    const RETRY_DELAY = 5;
-
-    public $tries = 500;
-
     private $model;
 
     public function __construct(Dhcp $model)
@@ -23,9 +21,11 @@ class Undeploy extends Job
     {
         Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
 
-        $this->model->availabilityZone->nsxService()->delete(
-            '/policy/api/v1/infra/dhcp-server-configs/' . $this->model->id
-        );
+        $jobs = [
+            new Undeploy($this->model),
+            new UndeployCheck($this->model)
+        ];
+        dispatch(array_shift($jobs)->chain($jobs));
 
         Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
     }

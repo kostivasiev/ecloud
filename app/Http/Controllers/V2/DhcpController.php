@@ -78,15 +78,9 @@ class DhcpController extends BaseController
     {
         $model = Dhcp::findOrFail($dhcpId);
 
-        if ($model->getStatus() !== 'complete') {
+        if (!$model->delete()) {
             return $model->getSyncError();
         }
-
-        $model->createSync();
-
-        $this->dispatch(new Undeploy([
-            'id' => $model->id,
-        ]));
 
         return response()->json([], 204);
     }

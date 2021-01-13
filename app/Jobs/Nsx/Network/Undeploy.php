@@ -8,27 +8,25 @@ use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    private $data;
+    const RETRY_DELAY = 5;
 
-    public function __construct($data)
+    public $tries = 500;
+
+    private $model;
+
+    public function __construct(Network $model)
     {
-        $this->data = $data;
+        $this->model = $model;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
 
-        $model = Network::findOrFail($this->data['id']);
-
-        $model->router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/tier-1s/' . $model->router->id . '/segments/' . $model->id
+        $this->model->router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/' . $this->model->id
         );
 
-        dispatch(new UndeployCheck([
-            'id' => $model->id,
-        ]));
-
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
     }
 }

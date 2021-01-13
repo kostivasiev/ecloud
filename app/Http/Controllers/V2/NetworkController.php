@@ -95,15 +95,9 @@ class NetworkController extends BaseController
             return $model->getDeletionError();
         }
 
-        if ($model->getStatus() !== 'complete') {
+        if (!$model->delete()) {
             return $model->getSyncError();
         }
-
-        $model->createSync();
-
-        $this->dispatch(new Undeploy([
-            'id' => $model->id,
-        ]));
 
         return response()->json([], 204);
     }
