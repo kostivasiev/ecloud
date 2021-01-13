@@ -10,6 +10,7 @@ use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\NsxService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
@@ -34,6 +35,14 @@ class UndeployTest extends TestCase
 
     public function setUp(): void
     {
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncryptionServiceProvider;
+        });
+
         parent::setUp();
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
