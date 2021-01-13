@@ -136,10 +136,10 @@ class InstanceController extends BaseController
 
     /**
      * @param $request
-     * @return $this
+     * @return bool
      * @throws ValidationException
      */
-    public function validateApplianceData($request): InstanceController
+    public function validateApplianceData($request): bool
     {
         $scriptRules = [];
         if ($request->has('appliance_id')) {
@@ -172,9 +172,10 @@ class InstanceController extends BaseController
                 'boolean' => 'The :attribute must be a boolean (true/false) value',
                 'regex' => 'The :attribute does not validate against the regular expression pattern',
             ];
+
             $this->validate($request, $scriptRules, $messages);
         }
-        return $this;
+        return true;
     }
 
     /**
