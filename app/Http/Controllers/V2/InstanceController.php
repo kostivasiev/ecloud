@@ -165,7 +165,14 @@ class InstanceController extends BaseController
                         $scriptRules[$key][] = 'string';
                 }
             }
-            $this->validate($request, $scriptRules);
+            $messages = [
+                'required' => 'The :attribute is required',
+                'string' => 'The :attribute must be a valid string',
+                'numeric' => 'The :attribute must be a numeric value',
+                'boolean' => 'The :attribute must be a boolean (true/false) value',
+                'regex' => 'The :attribute does not validate against the regular expression pattern',
+            ];
+            $this->validate($request, $scriptRules, $messages);
         }
         return $this;
     }
