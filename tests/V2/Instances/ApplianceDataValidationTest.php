@@ -40,7 +40,7 @@ class ApplianceDataValidationTest extends TestCase
             $type = ($key == 'mysql_root_password' || $key == 'mysql_gogs_user_password') ? 'Password' : 'String';
             factory(ApplianceScriptParameters::class)->create([
                 'appliance_script_parameters_appliance_version_id' => $this->appliance_version->appliance_version_id,
-                'appliance_script_parameters_name' => 'Random Parameter Name',
+                'appliance_script_parameters_name' => $key,
                 'appliance_script_parameters_key' => $key,
                 'appliance_script_parameters_type' => $type,
                 'appliance_script_parameters_validation_rule' => '/.*/'
@@ -48,21 +48,14 @@ class ApplianceDataValidationTest extends TestCase
         }
         $this->request = Request::create('', 'POST', [
             'appliance_id' => $this->appliance->getKey(),
-            'appliance_data' => json_encode($this->applianceData)
+            'appliance_data' => $this->applianceData
         ]);
         $this->instanceController = \Mockery::mock(InstanceController::class)->makePartial();
     }
 
     public function testSuccessfulValidation()
     {
-        $this->instanceController
-            ->shouldReceive('validate')
-            ->with($this->request, \Mockery::capture($rules));
-        $this->instanceController->validateApplianceData($this->request);
-        foreach ($rules as $ruleName => $rule) {
-            $key = str_replace('appliance_data.', '', $ruleName);
-            $this->assertArrayHasKey($key, $this->applianceData);
-        }
+        $this->assertTrue($this->instanceController->validateApplianceData($this->request));
     }
 
     public function testFailedValidation()
