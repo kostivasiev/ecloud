@@ -8,6 +8,9 @@ use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use UKFast\Admin\Billing\AdminClient;
+use UKFast\Admin\Billing\Entities\Payment;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class ProcessBilling
@@ -18,6 +21,7 @@ class ProcessBilling extends Command
     protected $signature = 'vpc:process-billing {--D|debug}';
     protected $description = 'Process eCloud VPC Billing';
 
+    protected \DateTimeZone $timeZone;
     protected Carbon $startDate;
     protected Carbon $endDate;
 
@@ -39,11 +43,13 @@ class ProcessBilling extends Command
         /** @var Instance $instance */
         $vpcs = Vpc::get();
 
-        $this->startDate = Carbon::createFromTimeString("First day of last month 00:00:00");
-        $this->endDate = Carbon::createFromTimeString("First day of this month 00:00:00");
+        $this->timeZone = new \DateTimeZone(config('app.timezone'));
+        $this->startDate = Carbon::createFromTimeString("First day of last month 00:00:00", $this->timeZone);
+        $this->endDate = Carbon::createFromTimeString("First day of this month 00:00:00", $this->timeZone);
 
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
+        // Collect and sort VPC metrics by reseller
         $vpcs->each(function($vpc) {
             $metrics = $this->getVpcMetrics($vpc->id);
 
@@ -63,11 +69,11 @@ class ProcessBilling extends Command
                     $end = $this->endDate;
 
                     if ($metric->start > $this->startDate) {
-                        $start = Carbon::parse($metric->start);
+                        $start = Carbon::parse($metric->start, $this->timeZone);
                     }
 
                     if (!empty($metric->end) && $metric->end < $this->endDate) {
-                        $end = Carbon::parse($metric->end);
+                        $end = Carbon::parse($metric->end, $this->timeZone);
                     }
 
                     $hours = $start->diffInHours($end);
@@ -78,7 +84,6 @@ class ProcessBilling extends Command
                     $cost = ($hours * $metric->price) * $metric->value;
 
                     $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
-
                 });
             });
 
@@ -95,11 +100,10 @@ class ProcessBilling extends Command
             foreach ($vpcs as $vpcId => $vpc) {
                 $this->line('---------- ' . $vpcId . ' ----------' . PHP_EOL);
 
-                foreach ($vpc['metrics'] as $name => $val) {
-                    $this->line($name . ': £' . number_format($val, 2));
+                foreach ($vpc['metrics'] as $key => $val) {
+                    $this->line($key . ': £' . number_format($val, 2));
                 }
                 $this->line(PHP_EOL . 'Total: £' . number_format($val, 2));
-
 
                 $total += $vpc['total'];
             }
@@ -202,13 +206,39 @@ class ProcessBilling extends Command
             // Min £1 surcharge
             $total = ($total < 1) ? 1 : $total;
 
+            $bilingAdminClient = app()->make(AdminClient::class);
+            $payment = new Payment([
+                'description' => 'eCloud VPC from ' . $this->startDate->format('d/m/Y') .' to ' . $this->endDate->format('d/m/Y'),
+                'category' => 'eCloud',
+                //'productId' => '',
+                'resellerId' => $resellerId,
+                'quantity' => 1,
+                'date' => Carbon::now($this->timeZone)->format('c'),
+                'dateFrom' => $this->startDate->format('c'),
+                'dateTo' => $this->endDate->format('c'),
+                'netpg' => '', // no payment taken, payment required
+                'nominalCode' => '41003', //throws exception: The nominal code must be a string :/
+                'source' => 'myukfast',
+                'cost' => number_format($total, 2),
+                'vat' => 00.00
+            ]);
 
-            // Push acc.log entries over to the billing apio the billing apio endpoint is: POST /v1/payments
-            // instead of creating entries for each resource like v1 or collated resources like flex, we only require a single entry per vpc with the total cost
-            // the description should be:  eCloud vpc-abc123de from 01/11/2020 to 30/11/2020
-            // the category set to eCloud
-            // the nominal code set to:  TBC
-            // source set to: myukfast
+            $this->info(print_r(
+                $payment
+            ));
+
+            // Create acc.log entries
+            try {
+                $response = $bilingAdminClient->payments()->create($payment);
+                if ($this->option('debug')) {
+                    $this->info('Accounts Log ' . $response->getId() . ' created.');
+                }
+            } catch (\Exception $exception) {
+                $error = 'Failed to crate accounts log for reseller ' . $resellerId ;
+                $this->error($error . $exception->getMessage());
+                Log::error($error, [$exception->getMessage()]);
+            }
+
         }
     }
 
@@ -220,11 +250,11 @@ class ProcessBilling extends Command
     protected function getVpcMetrics($vpcId)
     {
         $metrics = BillingMetric::where('vpc_id', $vpcId)
-            // any metrics that start before the billing period and end within it
             ->where(function ($query) {
                 // any billing metrics for the vpc that start within the billing period
                 $query->whereBetween('start', [$this->startDate, $this->endDate]);
 
+                // any metrics that start before the billing period and end within it
                 $query->orWhere('start', '<=', $this->startDate)
                     ->where('end', '<=', $this->endDate);
 
