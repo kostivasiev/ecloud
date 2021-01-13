@@ -62,6 +62,18 @@ class ApplianceVersion extends Model
         );
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function scriptParameters()
+    {
+        return $this->hasMany(
+            ApplianceScriptParameters::class,
+            'appliance_script_parameters_appliance_version_id',
+            'appliance_version_id'
+        );
+    }
+
     public function serverLicense()
     {
         $devicesAdminClient = app()->make(AdminClient::class);
