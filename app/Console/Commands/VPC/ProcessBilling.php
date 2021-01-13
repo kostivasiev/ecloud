@@ -40,7 +40,6 @@ class ProcessBilling extends Command
 
     public function handle()
     {
-        /** @var Instance $instance */
         $vpcs = Vpc::get();
 
         $this->timeZone = new \DateTimeZone(config('app.timezone'));
