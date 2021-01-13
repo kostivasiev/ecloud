@@ -143,7 +143,6 @@ class InstanceController extends BaseController
         $scriptRules = [];
         if ($request->has('appliance_data')) {
             $parameters = json_decode($request->get('appliance_data'));
-
             foreach ($parameters as $parameterKey => $parameter) {
                 $key = 'appliance_param_' . $parameterKey;
                 $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
