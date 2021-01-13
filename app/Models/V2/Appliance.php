@@ -38,6 +38,17 @@ class Appliance extends Model
         );
     }
 
+    public function getScriptParameters(): array
+    {
+        $params = [];
+        $parameters = $this->getLatestVersion()->scriptParameters()->get();
+        foreach ($parameters as $parameter) {
+            $params[$parameter->key] = $parameter;
+        }
+
+        return $params;
+    }
+
     /**
      * Get the latest version of the appliance.
      * @return Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null
