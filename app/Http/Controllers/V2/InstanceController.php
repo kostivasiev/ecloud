@@ -14,6 +14,7 @@ use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Jobs\Instance\Update;
+use App\Models\V2\Appliance;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
@@ -141,28 +142,29 @@ class InstanceController extends BaseController
     public function validateApplianceData($request): InstanceController
     {
         $scriptRules = [];
-        if ($request->has('appliance_data')) {
-            $parameters = json_decode($request->get('appliance_data'));
+        if ($request->has('appliance_id')) {
+            // So, we need to retrieve the validation rules
+            $parameters = (Appliance::findOrFail($request->get('appliance_id')))
+                ->getScriptParameters();
             foreach ($parameters as $parameterKey => $parameter) {
-                $key = 'appliance_param_' . $parameterKey;
-                $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
+                $key = 'appliance_data.' . $parameterKey;
+                $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
                 //validation rules regex
-                if (!empty($parameters[$parameterKey]->validation_rule)) {
-                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->validation_rule;
+                if (!empty($parameters[$parameterKey]->appliance_script_parameters_validation_rule)) {
+                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->appliance_script_parameters_validation_rule;
                 }
 
                 // For data types String,Numeric,Boolean we can use Laravel validation
-                switch ($parameters[$parameterKey]->type) {
+                switch ($parameters[$parameterKey]->appliance_script_parameters_type) {
                     case 'String':
                     case 'Numeric':
                     case 'Boolean':
-                        $scriptRules[$key][] = strtolower($parameters[$parameterKey]->type);
+                        $scriptRules[$key][] = strtolower($parameters[$parameterKey]->appliance_script_parameters_type);
                         break;
                     case 'Password':
                         $scriptRules[$key][] = 'string';
                 }
             }
-
             $this->validate($request, $scriptRules);
         }
         return $this;
