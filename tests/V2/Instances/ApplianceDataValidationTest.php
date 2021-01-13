@@ -2,91 +2,81 @@
 namespace Tests\V2\Instances;
 
 use App\Http\Controllers\V2\InstanceController;
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceScriptParameters;
+use App\Models\V2\ApplianceVersion;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class ApplianceDataValidationTest extends TestCase
 {
 
+    use DatabaseMigrations;
+
+    protected Appliance $appliance;
+    protected ApplianceVersion $appliance_version;
     protected Request $request;
     protected $instanceController;
-    protected $generatedRules;
     protected array $applianceData;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->applianceData = [
-            [
-                'id' => 'e79f5dbe-9e9b-42cc-8dff-2a4dc555f476',
-                'version_id' => '2c396d59-5446-4e98-9523-b4cef692ccd0',
-                'name' => 'MySQL root password',
-                'key' => 'mysql_root_password',
-                'type' => 'Password',
-                'description' => 'The root password for the MySQL database',
-                'required' => true,
-                'validation_rule' => '\/\\w+\/'
-            ],
-            [
-                'id' => 'a996f6be-930f-452e-822f-12bb4c9583bd',
-                'version_id' => '2c396d59-5446-4e98-9523-b4cef692ccd0',
-                'name' => 'MySQL Gogs user password',
-                'key' => 'mysql_gogs_user_password',
-                'type' => 'Password',
-                'description' => 'The Gogs mysql user password',
-                'required' => true,
-                'validation_rule' => '\/\\w+\/'
-            ],
-            [
-                'id' => '70edd019-3811-4383-89dc-97e056365f9e',
-                'version_id' => '2c396d59-5446-4e98-9523-b4cef692ccd0',
-                'name' => 'Gogs URL',
-                'key' => 'gogs_url',
-                'type' => 'String',
-                'description' => 'Domain name to access your Gogs installation',
-                'required' => true,
-                'validation_rule' => '\/\\w+\/'
-            ],
-            [
-                'id' => 'bce66294-e0c8-4b9a-90f9-ad4feb01997f',
-                'version_id' => '2c396d59-5446-4e98-9523-b4cef692ccd0',
-                'name' => 'Gogs Secret Key',
-                'key' => 'gogs_secret_key',
-                'type' => 'String',
-                'description' => 'Global secret key for your server security',
-                'required' => true,
-                'validation_rule' => null
-            ]
+            'mysql_root_password' => 'EnCrYpTeD-PaSsWoRd',
+            'mysql_gogs_user_password' => 'EnCrYpTeD-PaSsWoRd',
+            'gogs_url' => 'mydomain.com',
+            'gogs_secret_key' => 'EnCrYpTeD-sEcReT-kEy'
         ];
+        $this->appliance = factory(Appliance::class)->create([
+            'appliance_name' => 'Test Appliance',
+        ])->refresh();  // Hack needed since this is a V1 resource
+        $this->appliance_version = factory(ApplianceVersion::class)->create([
+            'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ])->refresh();  // Hack needed since this is a V1 resource
+        foreach ($this->applianceData as $key => $value) {
+            $type = ($key == 'mysql_root_password' || $key == 'mysql_gogs_user_password') ? 'Password' : 'String';
+            factory(ApplianceScriptParameters::class)->create([
+                'appliance_script_parameters_appliance_version_id' => $this->appliance_version->appliance_version_id,
+                'appliance_script_parameters_name' => 'Random Parameter Name',
+                'appliance_script_parameters_key' => $key,
+                'appliance_script_parameters_type' => $type,
+                'appliance_script_parameters_validation_rule' => '/.*/'
+            ]);
+        }
         $this->request = Request::create('', 'POST', [
-           'appliance_data' => json_encode($this->applianceData)
+            'appliance_id' => $this->appliance->getKey(),
+            'appliance_data' => json_encode($this->applianceData)
         ]);
+        $this->instanceController = \Mockery::mock(InstanceController::class)->makePartial();
     }
 
-    public function testGeneratedValidation()
+    public function testSuccessfulValidation()
     {
-        $this->instanceController = \Mockery::mock(InstanceController::class)->makePartial();
         $this->instanceController
             ->shouldReceive('validate')
             ->with($this->request, \Mockery::capture($rules));
         $this->instanceController->validateApplianceData($this->request);
-        $counter = 0;
-        foreach ($rules as $rule) {
-            if ($this->applianceData[$counter]['required'] === true) {
-                $this->assertEquals('required', $rule[0]);
-            }
-            if (!empty($this->applianceData[$counter]['validation_rule'])) {
-                $this->assertEquals('regex:', substr($rule[1], 0, 6));
-            }
-            if (strtolower($this->applianceData[$counter]['type']) == 'password') {
-                $this->applianceData[$counter]['type'] = 'string';
-            }
-            if (empty($this->applianceData[$counter]['validation_rule'])) {
-                $this->assertEquals($rule[1], strtolower($this->applianceData[$counter]['type']));
-            } else {
-                $this->assertEquals($rule[2], strtolower($this->applianceData[$counter]['type']));
-            }
-            $counter++;
+        foreach ($rules as $ruleName => $rule) {
+            $key = str_replace('appliance_data.', '', $ruleName);
+            $this->assertArrayHasKey($key, $this->applianceData);
         }
+    }
+
+    public function testFailedValidation()
+    {
+        $this->expectException(ValidationException::class);
+        $request = Request::create('', 'POST', [
+            'appliance_id' => $this->appliance->getKey(),
+            'appliance_data' => json_encode([
+                'mysql_root_password' => null,
+                'mysql_gogs_user_password' => null,
+                'gogs_url' => null,
+                'gogs_secret_key' => null
+            ])
+        ]);
+        $this->instanceController->validateApplianceData($request);
     }
 }
