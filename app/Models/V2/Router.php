@@ -104,6 +104,10 @@ class Router extends Model implements Filterable, Sortable
      */
     public function getAvailableAttribute()
     {
+        if (is_null($this->availabilityZone)) {
+            return false;
+        }
+
         try {
             $response = $this->availabilityZone->nsxService()->get(
                 'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
