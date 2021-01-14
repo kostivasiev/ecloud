@@ -2,10 +2,11 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallPolicy\Saved;
 use App\Events\V2\FirewallPolicy\Deleted;
+use App\Events\V2\FirewallPolicy\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -22,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallPolicy extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public $keyPrefix = 'fwp';
     public $incrementing = false;

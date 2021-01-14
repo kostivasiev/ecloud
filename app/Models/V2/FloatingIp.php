@@ -4,8 +4,10 @@ namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
+use App\Jobs\Nsx\FloatingIp\Undeploy;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -97,30 +99,14 @@ class FloatingIp extends Model implements Filterable, Sortable
         });
     }
 
-    public function syncs()
-    {
-        throw new \Exception(__METHOD__ . ' not supported on ' . __CLASS__);
-    }
-
-    public function setSyncCompleted()
-    {
-        throw new \Exception(__METHOD__ . ' not supported on ' . __CLASS__);
-    }
-
-    public function setSyncFailureReason($value)
-    {
-        throw new \Exception(__METHOD__ . ' not supported on ' . __CLASS__);
-    }
-
-    public function getSyncFailed()
-    {
-        return ($this->getStatus() === 'failed');
-    }
-
     public function getStatus()
     {
         if (empty($this->ip_address)) {
             return 'failed';
+        }
+
+        if ($this->syncs()->count() && !$this->syncs()->latest()->first()->completed) {
+            return 'in-progress';
         }
 
         if (!$this->sourceNat && !$this->destinationNat) {

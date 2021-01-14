@@ -6,7 +6,7 @@ use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Jobs\FloatingIp\Assign;
-use App\Jobs\FloatingIp\UnAssign;
+use App\Jobs\FloatingIp\Unassign;
 use App\Models\V2\FloatingIp;
 use App\Resources\V2\FloatingIpResource;
 use Illuminate\Http\Request;
@@ -19,16 +19,8 @@ use UKFast\DB\Ditto\QueryTransformer;
  */
 class FloatingIpController extends BaseController
 {
-    /**
-     * Get resource collection
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        //$collection = FloatingIp::forUser($request->user)
-
         // "resource_id" filtering hack - start
         if ($request->has('resource_id:eq')) {
             if ($request->get('resource_id:eq') === 'null') {
@@ -76,11 +68,6 @@ class FloatingIpController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string fipId
-     * @return FloatingIpResource
-     */
     public function show(Request $request, string $fipId)
     {
         return new FloatingIpResource(
@@ -88,10 +75,6 @@ class FloatingIpController extends BaseController
         );
     }
 
-    /**
-     * @param CreateRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(CreateRequest $request)
     {
         $resource = new FloatingIp(
@@ -101,11 +84,6 @@ class FloatingIpController extends BaseController
         return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
 
-    /**
-     * @param UpdateRequest $request
-     * @param string $instanceId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(UpdateRequest $request, string $fipId)
     {
         $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
@@ -114,25 +92,17 @@ class FloatingIpController extends BaseController
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $instanceId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $fipId)
     {
         $model = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
+
         if (!$model->delete()) {
             return $model->getSyncError();
         }
+
         return response()->json([], 204);
     }
 
-    /**
-     * @param AssignRequest $request
-     * @param string $fipId
-     * @return Response|\Laravel\Lumen\Http\ResponseFactory
-     */
     public function assign(AssignRequest $request, string $fipId)
     {
         $this->dispatch(new Assign([
@@ -143,18 +113,11 @@ class FloatingIpController extends BaseController
         return response(null, 202);
     }
 
-    /**
-     * @param Request $request
-     * @param string $fipId
-     * @return Response
-     */
     public function unassign(Request $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user)->findOrFail($fipId);
 
-        $this->dispatch(new UnAssign([
-            'floating_ip_id' => $floatingIp->getKey()
-        ]));
+        $this->dispatch(new Unassign($floatingIp));
 
         return new Response(null, 202);
     }
