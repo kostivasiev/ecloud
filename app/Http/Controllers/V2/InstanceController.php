@@ -163,13 +163,10 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
 
-        try {
-            if (!$instance->delete()) {
-                return $instance->getSyncError();
-            }
-        } catch (\Exception $e) {
-            return $instance->getDeletionError($e);
+        if (!$instance->delete()) {
+            return $instance->getSyncError();
         }
+
         return response('', 204);
     }
 
