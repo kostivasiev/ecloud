@@ -27,3 +27,9 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 204, "Response status is not 204");
 });
 %}
+###
+
+GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
