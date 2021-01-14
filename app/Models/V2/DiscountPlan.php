@@ -2,9 +2,12 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\DiscountPlan\Created;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use phpDocumentor\Reflection\Types\Boolean;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -40,6 +43,8 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'term_length',
         'term_start_date',
         'term_end_date',
+        'status',
+        'response_date',
         'reseller_id',
     ];
 
@@ -48,7 +53,7 @@ class DiscountPlan extends Model implements Filterable, Sortable
         'commitment_before_discount' => 'float',
         'discount_rate' => 'float',
         'term_length' => 'integer',
-        'term_start_date' => 'datetime',
+        'term_start_date' => 'date',
         'term_end_date' => 'datetime',
     ];
 
@@ -69,6 +74,26 @@ class DiscountPlan extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return bool
+     */
+    public function approve() : bool
+    {
+        $this->attributes['status'] = 'approved';
+        $this->attributes['response_date'] = Carbon::now();
+        return $this->save();
+    }
+
+    /**
+     * @return bool
+     */
+    public function reject() : bool
+    {
+        $this->attributes['status'] = 'rejected';
+        $this->attributes['response_date'] = Carbon::now();
+        return $this->save();
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */
@@ -86,6 +111,8 @@ class DiscountPlan extends Model implements Filterable, Sortable
             $factory->create('term_length', Filter::$numericDefaults),
             $factory->create('term_start_date', Filter::$dateDefaults),
             $factory->create('term_end_date', Filter::$dateDefaults),
+            $factory->create('status', Filter::$stringDefaults),
+            $factory->create('response_date', Filter::$dateDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -110,6 +137,8 @@ class DiscountPlan extends Model implements Filterable, Sortable
             $factory->create('term_length'),
             $factory->create('term_start_date'),
             $factory->create('term_end_date'),
+            $factory->create('status'),
+            $factory->create('response_date'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
             
@@ -145,6 +174,8 @@ class DiscountPlan extends Model implements Filterable, Sortable
             'term_length' => 'term_length',
             'term_start_date' => 'term_start_date',
             'term_end_date' => 'term_end_date',
+            'status' => 'status',
+            'response_date' => 'response_date',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

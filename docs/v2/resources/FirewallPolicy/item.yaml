@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallPolicyId'
+    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/FirewallPolicy'
+                $ref: '../../components/schemas/firewallPolicy.yaml'
               meta:
                 type: object
   tags:
     - Firewall Policies
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallPolicyId'
+    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
   requestBody:
     required: true
     content:
@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/FirewallPolicy"
+            - $ref: '../../components/schemas/firewallPolicy.yaml'
             - type: object
               properties:
                 name:
@@ -34,12 +34,12 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/FirewallPolicyIdResponse'
+      $ref: '../../resources/FirewallPolicy/responses/idResponse.yaml'
   tags:
     - Firewall Policies
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/FirewallPolicyId'
+    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
   responses:
     204:
       description: Success

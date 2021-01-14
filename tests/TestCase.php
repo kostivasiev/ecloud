@@ -46,6 +46,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Nat\Deleting::class,
 
             // Deleted
+            \App\Events\V2\AvailabilityZone\Deleted::class,
             \App\Events\V2\Nat\Deleted::class,
             \App\Events\V2\FirewallRule\Deleted::class,
             \App\Events\V2\FirewallPolicy\Deleted::class,

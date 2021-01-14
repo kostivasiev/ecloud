@@ -3,10 +3,15 @@
 namespace Tests\V2\Router;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Credential;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\NsxService;
 use Faker\Factory as Faker;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -23,11 +28,33 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->faker = Faker::create();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncryptionServiceProvider;
+        });
+
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
+        factory(Credential::class)->create([
+            'name' => 'NSX',
+            'resource_id' => $this->availability_zone->getKey(),
+        ]);
+
+        $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
+        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
+        app()->bind(NsxService::class, function () use ($mockNsxService) {
+            $result = new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]));
+            $mockNsxService->shouldReceive('get')->andReturn($result);
+            return $mockNsxService;
+        });
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);

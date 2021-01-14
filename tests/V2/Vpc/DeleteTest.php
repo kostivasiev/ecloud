@@ -88,7 +88,7 @@ class DeleteTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
             'title' => 'Precondition Failed',
-            'detail' => 'Active resources exist for this item',
+            'detail' => 'The specified resource has dependant relationships and cannot be deleted',
             'status' => 412,
         ])->assertResponseStatus(412);
     }

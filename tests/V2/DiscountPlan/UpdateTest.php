@@ -24,8 +24,8 @@ class UpdateTest extends TestCase
             'commitment_before_discount' => '1000',
             'discount_rate' => '5',
             'term_length' => '24',
-            'term_start_date' => date('Y-m-d H:i:s', strtotime('now')),
-            'term_end_date' => date('Y-m-d H:i:s', strtotime('2 days')),
+            'term_start_date' => date('Y-m-d 00:00:00', strtotime('now')),
+            'term_end_date' => date('Y-m-d 00:00:00', strtotime('2 days')),
         ]);
     }
 
@@ -62,8 +62,8 @@ class UpdateTest extends TestCase
             'commitment_before_discount' => '2000',
             'discount_rate' => '10',
             'term_length' => '36',
-            'term_start_date' => date('Y-m-d H:i:s', strtotime('tomorrow')),
-            'term_end_date' => date('Y-m-d H:i:s', strtotime('4 days')),
+            'term_start_date' => date('Y-m-d', strtotime('tomorrow')),
+            'term_end_date' => date('Y-m-d', strtotime('4 days')),
         ];
         $this->patch(
             '/v2/discount-plans/'.$this->discountPlan->getKey(),
@@ -73,11 +73,23 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->seeInDatabase(
-            'discount_plans',
-            $data,
-            'ecloud'
         )->assertResponseStatus(200);
+
+        $endDate = date(
+            'Y-m-d',
+            strtotime(
+                '+'.$data['term_length'].' months',
+                strtotime($data['term_start_date'])
+            )
+        );
+        $plan = DiscountPlan::findOrFail($this->discountPlan->getKey());
+        $this->assertEquals($data['name'], $plan->name);
+        $this->assertEquals($data['commitment_amount'], $plan->commitment_amount);
+        $this->assertEquals($data['commitment_before_discount'], $plan->commitment_before_discount);
+        $this->assertEquals($data['discount_rate'], $plan->discount_rate);
+        $this->assertEquals($data['term_length'], $plan->term_length);
+        $this->assertEquals($data['term_start_date'], $plan->term_start_date->format('Y-m-d'));
+        $this->assertEquals($endDate, $plan->term_end_date->format('Y-m-d'));
     }
 
     public function testUpdateItemInvalid()
@@ -88,8 +100,8 @@ class UpdateTest extends TestCase
             'commitment_before_discount' => '2000',
             'discount_rate' => '10',
             'term_length' => '36',
-            'term_start_date' => date('Y-m-d H:i:s', strtotime('tomorrow')),
-            'term_end_date' => date('Y-m-d H:i:s', strtotime('tomorrow')),
+            'term_start_date' => date('Y-m-d 00:00:00', strtotime('tomorrow')),
+            'term_end_date' => date('Y-m-d 00:00:00', strtotime('tomorrow')),
         ];
         $this->patch(
             '/v2/discount-plans/'.$this->discountPlan->getKey(),

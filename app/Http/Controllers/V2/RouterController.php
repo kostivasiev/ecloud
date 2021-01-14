@@ -5,10 +5,12 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateRouterRequest;
 use App\Http\Requests\V2\UpdateRouterRequest;
 use App\Jobs\FirewallPolicy\ConfigureDefaults;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Vpn;
+use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
@@ -119,23 +121,6 @@ class RouterController extends BaseController
      * @param string $routerId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
-    {
-        $collection = Router::forUser($request->user)->findOrFail($routerId)->firewallRules();
-        $queryTransformer->config(FirewallRule::class)
-            ->transform($collection);
-
-        return FirewallRuleResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
-    }
-
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $routerId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function networks(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
         $collection = Router::forUser($request->user)->findOrFail($routerId)->networks();
@@ -162,5 +147,22 @@ class RouterController extends BaseController
         ]));
 
         return response(null, 202);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $routerId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function firewallPolicies(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    {
+        $collection = Router::forUser($request->user)->findOrFail($routerId)->firewallPolicies();
+        $queryTransformer->config(FirewallPolicy::class)
+            ->transform($collection);
+
+        return FirewallPolicyResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
