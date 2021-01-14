@@ -26,7 +26,11 @@ class UpdateRamBilling
             return;
         }
 
-        $instance = Instance::findOrFail($event->model->resource_id);
+        $instance = Instance::find($event->model->resource_id);
+
+        if (empty($instance)) {
+            return;
+        }
 
         $time = Carbon::now();
 

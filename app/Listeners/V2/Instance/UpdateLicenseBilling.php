@@ -26,7 +26,11 @@ class UpdateLicenseBilling
             return;
         }
 
-        $instance = Instance::findOrFail($event->model->resource_id);
+        $instance = Instance::find($event->model->resource_id);
+
+        if (empty($instance)) {
+            return;
+        }
 
         if ($instance->platform != 'Windows') {
             return;
