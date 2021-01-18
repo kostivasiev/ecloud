@@ -74,6 +74,14 @@ return [
         'stderr' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
+            'with' => [
+                'stream' => 'php://stderr',
+            ],
+        ],
+
+        'ukfastjson' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
             'formatter' => \UKFast\Logging\JsonFormatter::class,
             'with' => [
                 'stream' => 'php://stderr',
