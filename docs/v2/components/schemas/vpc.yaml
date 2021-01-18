@@ -6,6 +6,10 @@ properties:
   name:
     type: string
     example: 'Manchester Cloud 1'
+  sync:
+    type: string
+    example: 'completed'
+    readOnly: true
   region_id:
     type: string
     required: true
