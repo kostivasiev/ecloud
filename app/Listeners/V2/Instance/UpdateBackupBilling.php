@@ -5,6 +5,7 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
+use App\Models\V2\Volume;
 use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -22,11 +23,17 @@ class UpdateBackupBilling
             return;
         }
 
-        if (Resource::classFromId($event->model->resource_id) != Instance::class) {
+        if (!in_array(Resource::classFromId($event->model->resource_id), [Instance::class, Volume::class])) {
             return;
         }
 
-        $instance = Instance::find($event->model->resource_id);
+        if (Resource::classFromId($event->model->resource_id) == Volume::class) {
+            $volume = Volume::withTrashed()->find($event->model->resource_id);
+            // TODO: We will need to look at this when we support volumes being attached to multiple instances.
+            $instance = $volume->instances()->first();
+        } else {
+            $instance = Instance::find($event->model->resource_id);
+        }
 
         if (empty($instance)) {
             return;
