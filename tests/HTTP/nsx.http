@@ -23,8 +23,13 @@ GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
+### Dev Network
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entity?realized_path=/infra/tier-1s/rtr-aaaaaaaa/segments/net-c43f11d0
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
 ### Dev Network creation
-PUT https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaaa
+PUT https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaab
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
@@ -32,17 +37,17 @@ Content-Type:  application/json
     "type": "ROUTED",
     "subnets": [
         {
-            "gateway_address": "10.0.0.1/24",
+            "gateway_address": "10.0.2.1/24",
             "dhcp_config": {
                 "resource_type": "SegmentDhcpV4Config",
-                "server_address": "10.0.0.2/24",
+                "server_address": "10.0.2.2/24",
                 "lease_time": 604800,
                 "dns_servers": [
                     "81.201.138.244",
                     "94.229.163.244"
                 ]
             },
-            "network": "10.0.0.0/24"
+            "network": "10.0.2.0/24"
         }
     ],
     "domain_name": "ecloud.ukfast",
@@ -112,5 +117,15 @@ Content-Type:  application/json
 
 ###
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/nat/USER/nat-rules/?include_mark_for_delete_objects=true
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/tier-1s/rtr-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entity?realized_path=/infra/realized-state/enforcement-points/default/logical-ports/rtr-aaaaaaaa-net-49648e59-dlrp
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json

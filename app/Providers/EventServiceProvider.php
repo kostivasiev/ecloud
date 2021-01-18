@@ -76,10 +76,8 @@ class EventServiceProvider extends ServiceProvider
 
         // FirewallPolicy
         \App\Events\V2\FirewallPolicy\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\FirewallPolicy\Saved::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
         \App\Events\V2\FirewallPolicy\Deleting::class => [
             \App\Listeners\V2\ResourceSync::class,
@@ -90,10 +88,8 @@ class EventServiceProvider extends ServiceProvider
 
         // FirewallRule
         \App\Events\V2\FirewallRule\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\FirewallRule\Saved::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
         \App\Events\V2\FirewallRule\Deleting::class => [
             \App\Listeners\V2\ResourceSync::class,
@@ -105,16 +101,13 @@ class EventServiceProvider extends ServiceProvider
 
         // FirewallRulePort
         \App\Events\V2\FirewallRulePort\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\FirewallRulePort\Saved::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
         ],
         \App\Events\V2\FirewallRulePort\Deleting::class => [
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\FirewallRulePort\Deleted::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
@@ -144,7 +137,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\ComputeChange::class
         ],
         \App\Events\V2\Instance\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Instance\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
@@ -196,7 +188,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nic\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nic\Deleted::class => [
             \App\Listeners\V2\Nic\DeleteDhcpLease::class,       // TODO :- Needs moving to the Sync Nic delete
@@ -233,7 +224,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Volume\CapacityIncrease::class,
         ],
         \App\Events\V2\Volume\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\FirewallPolicy;
+namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
@@ -9,33 +9,32 @@ use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    private $data;
+    private $model;
 
-    public function __construct($data)
+    public function __construct(FirewallPolicy $model)
     {
-        $this->data = $data;
+        $this->model = $model;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
 
-        $policy = FirewallPolicy::findOrFail($this->data['policy_id']);
-        $router = $policy->router;
+        $router = $this->model->router;
         $availabilityZone = $router->availabilityZone;
 
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
         $availabilityZone->nsxService()->patch(
-            '/policy/api/v1/infra/domains/default/gateway-policies/' . $policy->id,
+            '/policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id,
             [
                 'json' => [
-                    'id' => $policy->id,
-                    'display_name' => $policy->name,
-                    'description' => $policy->name,
-                    'sequence_number' => $policy->sequence,
-                    'rules' => $policy->firewallRules->map(function ($rule) use ($router) {
+                    'id' => $this->model->id,
+                    'display_name' => $this->model->name,
+                    'description' => $this->model->name,
+                    'sequence_number' => $this->model->sequence,
+                    'rules' => $this->model->firewallRules->map(function ($rule) use ($router) {
                         return [
                             'action' => $rule->action,
                             'resource_type' => 'Rule',
@@ -63,7 +62,8 @@ class Deploy extends Job
                                     'l4_protocol' => $port->protocol,
                                     'resource_type' => 'L4PortSetServiceEntry',
                                     'source_ports' => empty($port->source) ? [] : explode(',', $port->source),
-                                    'destination_ports' => empty($port->destination) ? [] : explode(',', $port->destination),
+                                    'destination_ports' => empty($port->destination) ? [] : explode(',',
+                                        $port->destination),
                                 ];
                             })->toArray(),
                             'profiles' => [
@@ -84,6 +84,6 @@ class Deploy extends Job
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
     }
 }
