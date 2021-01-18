@@ -8,7 +8,8 @@ Content-Type: application/json
 {
   "name": "test router",
   "vpc_id": "{{dev_vpc_id}}",
-  "availability_zone_id" : "{{dev_availability_zone_id}}"
+  "availability_zone_id" : "{{dev_availability_zone_id}}",
+  "throughput": 20
 }
 
 > {%

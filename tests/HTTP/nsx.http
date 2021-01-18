@@ -114,3 +114,9 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/nat/USER/nat-rules/?include_mark_for_delete_objects=true
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+###
+
+GET https://185.197.63.88/policy/api/v1/infra/qos-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+

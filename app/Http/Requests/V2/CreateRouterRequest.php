@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
@@ -33,6 +34,11 @@ class CreateRouterRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
+            'throughput' => [
+                'required',
+                'integer',
+                'in:' . implode(',', Router::THROUGHPUT_OPTIONS),
+            ],
             'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
@@ -49,6 +55,7 @@ class CreateRouterRequest extends FormRequest
             'vpc_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.required' => 'The :attribute field is required',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
+            'throughput.in' => 'The specified :attribute is not valid. Allowed values are ' . implode(',', Router::THROUGHPUT_OPTIONS)
         ];
     }
 }

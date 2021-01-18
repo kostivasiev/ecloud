@@ -38,12 +38,16 @@ class Router extends Model implements Filterable, Sortable
     public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
+
+    const THROUGHPUT_OPTIONS = [20,50,100,250,500,1000,2500,5000,10000];
+
     protected $fillable = [
         'id',
         'name',
         'vpc_id',
         'availability_zone_id',
         'deployed',
+        'throughput',
     ];
 
     protected $appends = [
@@ -52,6 +56,7 @@ class Router extends Model implements Filterable, Sortable
 
     protected $casts = [
         'deployed' => 'boolean',
+        'throughput' => 'integer'
     ];
 
     protected $dispatchesEvents = [
@@ -153,6 +158,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('throughput', Filter::$numericDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('deployed', Filter::$enumDefaults),
@@ -171,6 +177,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('throughput'),
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
             $factory->create('deployed'),
@@ -196,6 +203,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
+            'throughput' => 'throughput',
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
             'deployed' => 'deployed',

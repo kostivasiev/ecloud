@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
@@ -27,6 +28,12 @@ class UpdateRouterRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string',
+            'throughput' => [
+                'sometimes',
+                'required',
+                'integer',
+                'in:' . implode(',', Router::THROUGHPUT_OPTIONS),
+            ],
             'vpc_id' => [
                 'sometimes',
                 'required',
@@ -51,6 +58,7 @@ class UpdateRouterRequest extends FormRequest
             'vpc_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
+            'throughput.in' => 'The specified :attribute is not valid. Allowed values are ' . implode(',', Router::THROUGHPUT_OPTIONS)
         ];
     }
 }
