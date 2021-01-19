@@ -23,16 +23,16 @@ class UndeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['model' => ['id' => $this->model->id]]);
 
-        // TODO :- Undeploy Router
-        $response = $this->model->availabilityZone->nsxService()->get(
-            'policy/api/v1/infra/tier-1s/' . $this->model->id . '?include_mark_for_delete_objects=true'
+        $router = Router::withTrashed()->findOrFail($this->model->id);
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/?include_mark_for_delete_objects=true'
         );
         $response = json_decode($response->getBody()->getContents());
-        foreach ($response->results as $segment) {
-            if ($this->model->id === $segment->id) {
+        foreach ($response->results as $result) {
+            if ($this->model->id === $result->id) {
                 $this->release(static::RETRY_DELAY);
                 Log::info(
-                    'Waiting for segment ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
                 );
                 return;
             }
