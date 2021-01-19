@@ -1,24 +1,4 @@
 ###
-# Create a VPC
-POST https://{{host}}/{{version}}/vpcs
-X-consumer-custom-id:  1-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-    "name": "DELTEST VPC",
-    "region_id": "{{dev_region_id}}"
-}
-
-> {%
-client.test('Create VPC', function () {
-    client.assert(response.status === 201, '201 status not received');
-    client.global.set('vpc_id', response.body.data.id);
-    client.log('VPC ID : ' + response.body.data.id);
-});
-%}
-
-###
 # create new router
 POST https://{{host}}/{{version}}/routers
 Accept: */*
@@ -29,8 +9,8 @@ Content-Type: application/json
 
 {
   "name": "test router",
-  "vpc_id": "{{vpc_id}}",
-  "availability_zone_id" : "az-a4df6d3b"
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id" : "{{dev_availability_zone_id}}"
 }
 
 > {%
@@ -65,7 +45,9 @@ client.test('Delete Router', function () {
 });
 %}
 
+
 ###
+# Check that router has been deleted directly on NSX
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/{{router_id}}
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
