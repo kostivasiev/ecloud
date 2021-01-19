@@ -44,7 +44,7 @@ class ProcessBilling extends Command
 
         $this->timeZone = new \DateTimeZone(config('app.timezone'));
         $this->startDate = Carbon::createFromTimeString("First day of last month 00:00:00", $this->timeZone);
-        $this->endDate = Carbon::createFromTimeString("First day of this month 00:00:00", $this->timeZone);
+        $this->endDate = Carbon::createFromTimeString("last day of last month 23:59:59", $this->timeZone);
 
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
