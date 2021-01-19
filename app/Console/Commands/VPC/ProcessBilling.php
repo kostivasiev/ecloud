@@ -200,7 +200,7 @@ class ProcessBilling extends Command
 
             $bilingAdminClient = app()->make(AdminClient::class);
             $payment = new Payment([
-                'description' => 'eCloud VPC from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
+                'description' => 'eCloud resource usage from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
                 'category' => 'eCloud v2',
                 //'productId' => '',
                 'resellerId' => $resellerId,
