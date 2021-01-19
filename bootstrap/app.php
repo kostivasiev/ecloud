@@ -114,6 +114,7 @@ $app->register(UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider
 $app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class);
 
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
 
