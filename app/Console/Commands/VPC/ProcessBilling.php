@@ -102,7 +102,8 @@ class ProcessBilling extends Command
                 foreach ($vpc['metrics'] as $key => $val) {
                     $this->line($key . ': £' . number_format($val, 2));
                 }
-                $this->line(PHP_EOL . 'Total: £' . number_format($val, 2));
+
+                $this->line(PHP_EOL . 'Total: £' . number_format($vpc['total'], 2));
 
                 $total += $vpc['total'];
             }
