@@ -107,6 +107,7 @@ paths:
     $ref: 'resources/Vpc/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
     $ref: 'resources/Vpc/deploy-defaults.yaml'
+
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Vpc/volumes-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/instances':
@@ -115,6 +116,8 @@ paths:
 #    $ref: 'resources/AvailabilityZone/collection.yaml'
 #  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
 #    $ref: 'resources/AvailabilityZone/item.yaml'
+#  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/router-throughputs':
+#    $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
   '/ecloud/v2/networks':
     $ref: 'resources/Network/collection.yaml'
   '/ecloud/v2/networks/{networkId}':

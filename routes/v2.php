@@ -32,6 +32,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
         $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
         $router->get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
+        $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
     });
 
     /** Availability Zone Capacities */

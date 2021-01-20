@@ -44,6 +44,14 @@ class RouterThroughput extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */

@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+    - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
   responses:
     200:
       description: Success
@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/Volume'
+                  $ref: '../../components/schemas/volume.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
