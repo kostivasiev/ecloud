@@ -192,7 +192,7 @@ class InstanceController extends BaseController
     {
         $collection = Instance::forUser($request->user)->findOrFail($instanceId)->credentials();
         if (!$request->user->isAdministrator) {
-            $collection->where('credentials.is_hidden', '=', 0);
+            $collection->where('credentials.is_hidden', 0);
         }
         $queryTransformer->config(Credential::class)
             ->transform($collection);
