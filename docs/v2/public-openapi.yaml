@@ -50,6 +50,8 @@ components:
       $ref: 'components/schemas/lbc.yaml'
     Volume:
       $ref: 'components/schemas/volume.yaml'
+    RouterThroughput:
+      $ref: 'components/schemas/routerThroughput.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
   parameters:
@@ -221,3 +223,8 @@ paths:
     $ref: 'resources/DiscountPlan/approve-item.yaml'
   '/ecloud/v2/discount-plan/{discountPlanId}/reject':
     $ref: 'resources/DiscountPlan/reject-item.yaml'
+
+  '/ecloud/v2/router-throughputs':
+    $ref: 'resources/RouterThroughput/collection.yaml'
+  '/ecloud/v2/router-throughputs/{routerThroughputId}':
+    $ref: 'resources/RouterThroughput/item.yaml'
