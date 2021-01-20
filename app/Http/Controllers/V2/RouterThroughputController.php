@@ -9,8 +9,7 @@ use App\Resources\V2\RouterThroughputResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Validation\ValidationException;
-use Laravel\Lumen\Http\ResponseFactory;
+use Illuminate\Http\Response;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class RouterThroughputController extends BaseController
@@ -63,7 +62,6 @@ class RouterThroughputController extends BaseController
      * @param UpdateRequest $request
      * @param string $routerThroughputId
      * @return JsonResponse
-     * @throws ValidationException
      */
     public function update(UpdateRequest $request, string $routerThroughputId): JsonResponse
     {
@@ -81,9 +79,9 @@ class RouterThroughputController extends BaseController
     /**
      * @param Request $request
      * @param string $routerThroughputId
-     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, string $routerThroughputId): ResponseFactory
+    public function destroy(Request $request, string $routerThroughputId): Response
     {
         $routerThroughput = RouterThroughput::findOrFail($routerThroughputId);
         $routerThroughput->delete();
