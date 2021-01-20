@@ -24,15 +24,21 @@ class RouterThroughput extends Model implements Filterable, Sortable
 
     public function __construct(array $attributes = [])
     {
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+
+        $this->casts = [
+            'committed_bandwidth' => 'integer',
+            'burst_size' => 'integer'
+        ];
+
         $this->fillable([
             'availability_zone_id',
             'name',
             'committed_bandwidth',
             'burst_size'
         ]);
-        $this->incrementing = false;
-        $this->keyType = 'string';
-        $this->connection = 'ecloud';
 
         parent::__construct($attributes);
     }
