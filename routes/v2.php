@@ -256,4 +256,16 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->delete('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@destroy');
         });
     });
+
+    /** Router Throughput */
+    $router->group([], function () use ($router) {
+        $router->get('router-throughputs', 'RouterThroughputController@index');
+        $router->get('router-throughputs/{routerThroughputId}', 'RouterThroughputController@show');
+
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->post('router-throughputs', 'RouterThroughputController@store');
+            $router->patch('router-throughputs/{routerThroughputId}', 'RouterThroughputController@update');
+            $router->delete('router-throughputs/{routerThroughputId}', 'RouterThroughputController@destroy');
+        });
+    });
 });

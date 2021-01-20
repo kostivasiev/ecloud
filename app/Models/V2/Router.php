@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class Routers
+ * Class Router
  * @package App\Models\V2
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
