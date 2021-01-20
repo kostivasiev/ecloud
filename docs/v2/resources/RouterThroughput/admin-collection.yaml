@@ -1,7 +1,7 @@
 get:
   parameters:
-    - $ref: '../../admin-openapi.yaml#/components/parameters/PerPage'
-    - $ref: '../../admin-openapi.yaml#/components/parameters/Page'
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
   responses:
     200:
       description: Success
@@ -13,10 +13,10 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../admin-openapi.yaml#/components/schemas/Volume'
+                  $ref: '../../components/schemas/routerThroughput.yaml'
               meta:
                 allOf:
-                  - $ref: "../../admin-openapi.yaml#/components/schemas/Meta"
+                  - $ref: '../../components/schemas/meta.yaml'
                   - type: object
                     properties:
                       pagination:
@@ -25,24 +25,24 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=2'
   tags:
-    - Volumes
+    - Router Throughput
 post:
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: '../../admin-openapi.yaml#/components/schemas/Volume'
+          $ref: '../../components/schemas/routerThroughput.yaml'
   responses:
     201:
-      $ref: '../../admin-openapi.yaml#/components/responses/VolumeIdResponse'
+      $ref: '../../resources/RouterThroughput/responses/idResponse.yaml'
   tags:
-    - Volumes
+    - Router Throughput

@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../admin-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: '../../resources/RouterThroughput/parameters/routerThroughputId.yaml'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../admin-openapi.yaml#/components/schemas/Volume'
+                $ref: '../../components/schemas/routerThroughput.yaml'
               meta:
                 type: object
   tags:
-    - Volumes
+    - Router Throughput
 patch:
   parameters:
-    - $ref: '../../admin-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: '../../resources/RouterThroughput/parameters/routerThroughputId.yaml'
   requestBody:
     required: true
     content:
@@ -25,23 +25,17 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../admin-openapi.yaml#/components/schemas/Volume"
-            - type: object
-              properties:
-                name:
-                  required: false
-                vpc_id:
-                  required: false
+            - $ref: '../../components/schemas/routerThroughput.yaml'
   responses:
     200:
-      $ref: '../../admin-openapi.yaml#/components/responses/VolumeIdResponse'
+      $ref: '../../resources/RouterThroughput/responses/idResponse.yaml'
   tags:
-    - Volumes
+    - Router Throughput
 delete:
   parameters:
-    - $ref: '../../admin-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: '../../resources/RouterThroughput/parameters/routerThroughputId.yaml'
   responses:
     204:
       description: Success
   tags:
-    - Volumes
+    - Router Throughput
