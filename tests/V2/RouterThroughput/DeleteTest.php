@@ -33,7 +33,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/billing-metrics/' . $this->routerThroughput->getKey(), [], [
+        $this->delete('/v2/router-throughputs/' . $this->routerThroughput->getKey(), [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])
