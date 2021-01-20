@@ -79,7 +79,7 @@ class PlatformTest extends TestCase
         $instance = Instance::findOrFail($id);
 
         $listener = \Mockery::mock(\App\Listeners\V2\Instance\DefaultPlatform::class)->makePartial();
-        $listener->handle(new \App\Events\V2\Instance\Created($instance));
+        $listener->handle(new \App\Events\V2\Instance\Creating($instance));
 
         // Check that the platform id has been populated
         $this->assertEquals('Linux', $instance->platform);

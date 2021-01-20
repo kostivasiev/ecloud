@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Network\Created;
 use App\Events\V2\Network\Creating;
 use App\Events\V2\Network\Deleted;
+use App\Events\V2\Network\Deleting;
 use App\Events\V2\Network\Saved;
 use App\Events\V2\Network\Saving;
 use App\Traits\V2\CustomKey;
@@ -23,39 +24,30 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * @method static findOrFail(string $networkId)
- * @method static forUser(string $user)
- * @method static find($id)
- * @method static where(string $string, string $string1, $id)
- */
 class Network extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
 
     public $keyPrefix = 'net';
+    public $incrementing = false;
+    public $children = [
+        'nics',
+    ];
     protected $keyType = 'string';
     protected $connection = 'ecloud';
-    public $incrementing = false;
-
     protected $fillable = [
         'id',
         'name',
         'router_id',
         'subnet'
     ];
-
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
         'saving' => Saving::class,
         'saved' => Saved::class,
         'deleted' => Deleted::class,
-        'deleting' => Deleted::class,
-    ];
-
-    public $children = [
-        'nics',
+        'deleting' => Deleting::class,
     ];
 
     public function router()
@@ -70,7 +62,7 @@ class Network extends Model implements Filterable, Sortable
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/9e1c6bcc-85db-46b6-bc38-d6d2431e7c17/30af91b5-3a91-4d5d-8ed5-a7d806764a16/api_includes/method_GetSegmentState.html
      * When the configuration is actually in effect, the state will change to "success".
      */

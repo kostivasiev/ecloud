@@ -22,13 +22,13 @@ class Deploy implements ShouldQueue
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
         $policy = $event->model;
+
         if ($event->model instanceof FirewallRule) {
             $policy = $event->model->firewallPolicy;
         }
         if ($event->model instanceof FirewallRulePort) {
             $policy = $event->model->firewallRule->firewallPolicy;
         }
-
         if (!$policy) {
             $message = 'Deploy called with invalid policy';
             Log::error($message, [
@@ -37,7 +37,6 @@ class Deploy implements ShouldQueue
             $this->fail(new \Exception($message));
             return;
         }
-
         dispatch(new \App\Jobs\FirewallPolicy\Deploy([
             'policy_id' => $policy->id,
         ]));

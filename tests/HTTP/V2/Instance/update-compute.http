@@ -1,4 +1,4 @@
-GET https://{{host}}/{{version}}/instances
+GET https://{{host}}/{{version}}/instances/i-34df3a0b
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -12,14 +12,14 @@ client.test("Request executed successfully", function() {
 
 ###
 
-PATCH https://{{host}}/{{version}}/instances/i-d19ee53f
+PATCH https://{{host}}/{{version}}/instances/i-1c0975b1
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "vcpu_cores": 3,
-  "ram_capacity": 3072
+  "vcpu_cores": 2,
+  "ram_capacity": 2048
 }
 
 > {%

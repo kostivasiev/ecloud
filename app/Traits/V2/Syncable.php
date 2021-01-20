@@ -8,9 +8,51 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
-    public function syncs()
+    public function delete()
     {
-        return $this->hasMany(Sync::class, 'resource_id', 'id');
+        $class = explode('\\', __CLASS__);
+        $class = 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
+        if (!class_exists($class)) {
+            throw new \Exception('Syncable "Delete" job not found for ' . __CLASS__);
+        }
+
+        if (!$this->createSync()) {
+            return false;
+        }
+
+        dispatch(new $class($this));
+
+        return true;
+    }
+
+    public function syncDelete()
+    {
+        $deleteResponse = parent::delete();
+        if (!$deleteResponse) {
+            Log::error(get_class($this) . ' : Failed to delete', ['resource_id' => $this->id]);
+            return $deleteResponse;
+        }
+        Log::info(get_class($this) . ' : Deleted', ['resource_id' => $this->id]);
+    }
+
+    public function createSync()
+    {
+        Log::info(get_class($this) . ' : Creating new sync - Started', ['resource_id' => $this->id]);
+
+        if ($this->getStatus() !== 'complete') {
+            Log::info(get_class($this) . ' : Tried to create a new sync on ' . __CLASS__ . ' with outstanding sync', [
+                'resource_id' => $this->id
+            ]);
+            return false;
+        }
+
+        $sync = app()->make(Sync::class);
+        $sync->resource_id = $this->id;
+        $sync->completed = false;
+        $sync->save();
+        Log::info(get_class($this) . ' : Creating new sync - Finished', ['resource_id' => $this->id]);
+
+        return $sync;
     }
 
     public function getStatus()
@@ -27,17 +69,9 @@ trait Syncable
         return 'in-progress';
     }
 
-    public function setSyncCompleted()
+    public function syncs()
     {
-        Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
-        if (!$this->syncs()->count()) {
-            Log::info(get_class($this) . ' : Setting Sync to completed - Not found, skipped', ['resource_id' => $this->id]);
-            return;
-        }
-        $sync = $this->syncs()->latest()->first();
-        $sync->completed = true;
-        $sync->save();
-        Log::info(get_class($this) . ' : Setting Sync to completed - Finished', ['resource_id' => $this->id]);
+        return $this->hasMany(Sync::class, 'resource_id', 'id');
     }
 
     public function getSyncFailed()
@@ -46,6 +80,22 @@ trait Syncable
             return false;
         }
         return $this->syncs()->latest()->first()->failure_reason !== null;
+    }
+
+    public function setSyncCompleted()
+    {
+        Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
+        if (!$this->syncs()->count()) {
+            Log::info(
+                get_class($this) . ' : Setting Sync to completed - Not found, skipped',
+                ['resource_id' => $this->id]
+            );
+            return;
+        }
+        $sync = $this->syncs()->latest()->first();
+        $sync->completed = true;
+        $sync->save();
+        Log::info(get_class($this) . ' : Setting Sync to completed - Finished', ['resource_id' => $this->id]);
     }
 
     public function setSyncFailureReason($value)

@@ -25,6 +25,7 @@ class PowerReset extends Job
         $instance->availabilityZone->kingpinService()->put(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power/reset'
         );
+        $instance->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

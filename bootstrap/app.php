@@ -82,7 +82,8 @@ $app->routeMiddleware([
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'is-administrator' => \App\Http\Middleware\IsAdministrator::class,
     'is-locked' => \App\Http\Middleware\IsLocked::class,
-    'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class
+    'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
+    'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class
 ]);
 
 /*
@@ -113,6 +114,7 @@ $app->register(UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider
 $app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class);
 
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
 
@@ -136,8 +138,6 @@ $app->register(App\Providers\V2\NsxServiceProvider::class);
 $app->bind(\Illuminate\Queue\QueueManager::class, function ($app) {
     return new \Illuminate\Queue\QueueManager($app);
 });
-
-$app->register(Imtigger\LaravelJobStatus\LaravelJobStatusServiceProvider::class);
 
 // ErdGenerator - Only enable on dev
 if (is_dir($app->basePath('vendor/beyondcode/laravel-er-diagram-generator'))) {

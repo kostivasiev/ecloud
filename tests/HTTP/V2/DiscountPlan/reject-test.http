@@ -1,0 +1,119 @@
+###
+# Get Commitment & Set some default variables
+GET https://{{host}}/{{version}}/discount-plans
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+var theDate = new Date();
+var today = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() - 1);
+var yesterday = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() + 3);
+var day_after_tomorrow = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() + 1);
+var two_days_from_now = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() + 1);
+var three_days_from_now = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+client.global.set('term_start_date', today);
+client.global.set('term_end_date', day_after_tomorrow);
+client.global.set('yesterday', yesterday);
+client.global.set('two_days_from_now', two_days_from_now);
+client.global.set('three_days_from_now', three_days_from_now);
+client.log('term_start_date = ' + today);
+client.log('term_end_date = ' + day_after_tomorrow);
+client.log('yesterday = ' + yesterday);
+client.log('two_days_from_now = ' + two_days_from_now);
+client.log('three_days_from_now = ' + three_days_from_now);
+%}
+
+###
+# Create Discount Plan
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{term_start_date}}",
+    "term_end_date": "{{term_end_date}}"
+}
+
+> {%
+client.test('Test Discount Created', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('discount_plan_id', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+###
+
+# Get the DP
+GET https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Check Plan is Approved', function() {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.status == 'pending', 'Status is not pending');
+    client.assert(response.body.data.response_date === null, 'response_date is not null');
+});
+%}
+
+
+###
+# Reject Discount Plan
+POST https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}/reject
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Check the correct response is received after approval', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+###
+# Verify Update
+GET https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Check Plan is Approved', function() {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.status === 'rejected', 'status was not set to rejected');
+    client.assert(response.body.data.response_date !== null, 'response_date was not updated');
+});
+%}
+
+###
+# Delete Plan
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Check plan has been deleted', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}

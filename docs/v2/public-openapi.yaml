@@ -28,6 +28,8 @@ components:
       $ref: 'components/schemas/network.yaml'
     Dhcp:
       $ref: 'components/schemas/dhcp.yaml'
+    DiscountPlan:
+      $ref: 'components/schemas/discountPlan.yaml'
     Vpn:
       $ref: 'components/schemas/vpn.yaml'
     Instance:
@@ -63,6 +65,8 @@ components:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
+    DiscountPlanId:
+      $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
     FipId:
@@ -80,6 +84,8 @@ components:
   responses:
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
+    DiscountPlanResponse:
+      $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
     FipIdResponse:
@@ -159,8 +165,12 @@ paths:
     $ref: 'resources/FirewallRule/item.yaml'
   '/ecloud/v2/firewall-rules/{firewallRuleId}/ports':
     $ref: 'resources/FirewallRule/ports.yaml'
+  '/ecloud/v2/firewall-policies':
+    $ref: 'resources/FirewallPolicy/collection.yaml'
   '/ecloud/v2/firewall-policies/{firewallPolicyId}':
     $ref: 'resources/FirewallPolicy/item.yaml'
+  /ecloud/v2/firewall-policies/{firewallPolicyId}/firewall-rules:
+    $ref: 'resources/FirewallPolicy/firewall-rules-collection.yaml'
   '/ecloud/v2/firewall-rule-ports':
     $ref: 'resources/FirewallRulePort/collection.yaml'
   '/ecloud/v2/firewall-rule-ports/{firewallRulePortId}':
@@ -173,8 +183,8 @@ paths:
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':
     $ref: 'resources/Router/item.yaml'
-  '/ecloud/v2/routers/{routerId}/firewall-rules':
-    $ref: 'resources/Router/firewallrule-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/firewall-policies':
+    $ref: 'resources/Router/firewall-policies-collection.yaml'
   '/ecloud/v2/routers/{routerId}/networks':
     $ref: 'resources/Router/network-collection.yaml'
   '/ecloud/v2/routers/{routerId}/vpns':
@@ -203,3 +213,11 @@ paths:
     $ref: 'resources/BillingMetric/public_collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':
     $ref: 'resources/BillingMetric/public_item.yaml'
+  '/ecloud/v2/discount-plan':
+    $ref: 'resources/DiscountPlan/public_collection.yaml'
+  '/ecloud/v2/discount-plan/{discountPlanId}':
+    $ref: 'resources/DiscountPlan/public_item.yaml'
+  '/ecloud/v2/discount-plan/{discountPlanId}/approve':
+    $ref: 'resources/DiscountPlan/approve-item.yaml'
+  '/ecloud/v2/discount-plan/{discountPlanId}/reject':
+    $ref: 'resources/DiscountPlan/reject-item.yaml'

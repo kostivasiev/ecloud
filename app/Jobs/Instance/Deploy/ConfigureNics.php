@@ -3,25 +3,20 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
-use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
-use GuzzleHttp\Exception\GuzzleException;
+use App\Models\V2\Nic;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
-class ConfigureNics extends TaskJob
+class ConfigureNics extends Job
 {
-    public $tries = 20;
     const RETRY_ATTEMPTS = 10;
     const RETRY_DELAY = 10;
-
+    public $tries = 20;
     private $data;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data)
     {
-        parent::__construct($task);
-
         $this->data = $data;
     }
 
@@ -51,6 +46,7 @@ class ConfigureNics extends TaskJob
                     } else {
                         $message = 'Timed out waiting for Network (' . $network->getKey() .
                             ') to become available for prior to NIC configuration';
+                        $nic->setSyncFailureReason($message);
                         $this->fail(new \Exception($message));
                         return;
                     }
@@ -82,7 +78,9 @@ class ConfigureNics extends TaskJob
                         continue;
                     }
                     if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                        $this->fail(new \Exception('Insufficient available IP\'s in subnet to assign to NIC'));
+                        $message = 'Insufficient available IP\'s in subnet to assign to NIC';
+                        $nic->setSyncFailureReason($message);
+                        $this->fail(new \Exception($message));
                         return;
                     }
 
@@ -96,11 +94,13 @@ class ConfigureNics extends TaskJob
                     $nic->ip_address = $checkIp;
 
                     try {
-                        $nic->save();
+                        Nic::withoutEvents(function () use ($nic) {
+                            $nic->save();
+                        });
                     } catch (\Exception $exception) {
                         if ($exception->getCode() == 23000) {
                             // Ip already assigned
-                            Log::error('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': IP is already used.');
+                            Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': IP is already used.');
                             continue;
                         }
 
@@ -119,18 +119,26 @@ class ConfigureNics extends TaskJob
                  * Create dhcp lease for the ip to the nic's mac address on NSX
                  * @see https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
                  */
-                $nsxService->put(
-                    '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
-                    . '/dhcp-static-binding-configs/' . $nic->getKey(),
-                    [
-                        'json' => [
-                            'resource_type' => 'DhcpV4StaticBindingConfig',
-                            'mac_address' => $nic->mac_address,
-                            'ip_address' => $nic->ip_address
+                try {
+                    $nsxService->put(
+                        '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
+                        . '/dhcp-static-binding-configs/' . $nic->getKey(),
+                        [
+                            'json' => [
+                                'resource_type' => 'DhcpV4StaticBindingConfig',
+                                'mac_address' => $nic->mac_address,
+                                'ip_address' => $nic->ip_address
+                            ]
                         ]
-                    ]
-                );
+                    );
+                } catch (\Exception $exception) {
+                    if ($exception->hasResponse()) {
+                        Log::info(get_class($this), json_decode($exception->getResponse()->getBody()->getContents(), true));
+                    }
+                    throw $exception;
+                }
 
+                $nic->setSyncCompleted();
                 Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
             });
 

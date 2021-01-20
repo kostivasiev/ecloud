@@ -13,7 +13,7 @@ class Deleted extends Event
      * @param Model $model
      * @return void
      */
-    public function __construct($model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }

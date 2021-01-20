@@ -13,7 +13,7 @@ use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
-use App\Jobs\Instance\UpdateTaskJob;
+use App\Jobs\Instance\Update;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
@@ -125,8 +125,7 @@ class InstanceController extends BaseController
         $instanceDeployData->appliance_data = $request->input('appliance_data');
         $instanceDeployData->user_script = $request->input('user_script');
 
-        $task = $instance->createTask();
-        event(new Deploy($task, $instanceDeployData));
+        event(new Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->getKey(), 201);
     }
@@ -144,22 +143,12 @@ class InstanceController extends BaseController
             'name',
             'locked',
             'backup_enabled',
-        ]))->save();
+            'vcpu_cores',
+            'ram_capacity'
+        ]));
 
-        if ($request->hasAny(['vcpu_cores', 'ram_capacity'])) {
-            if ($instance->state != Instance::STATUS_READY) {
-                return JsonResponse::create([
-                    'errors' => [
-                        [
-                            'title' => 'Unprocessable Entity',
-                            'detail' => 'Instance status is not ' . Instance::STATUS_READY,
-                            'status' => 422,
-                        ]
-                    ]
-                ], 422);
-            }
-            $task = $instance->createTask();
-            dispatch(new UpdateTaskJob($task, $instance, $request->all()));
+        if (!$instance->save()) {
+            return $instance->getSyncError();
         }
 
         return $this->responseIdMeta($request, $instance->getKey(), 200);
@@ -173,11 +162,11 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-        try {
-            $instance->delete();
-        } catch (\Exception $e) {
-            return $instance->getDeletionError($e);
+
+        if (!$instance->delete()) {
+            return $instance->getSyncError();
         }
+
         return response('', 204);
     }
 
@@ -241,8 +230,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user)
             ->findOrFail($instanceId);
 
-        $task = $instance->createTask();
-        $this->dispatch(new PowerOn($task, [
+        $this->dispatch(new PowerOn([
             'instance_id' => $instance->id,
             'vpc_id' => $instance->vpc->id
         ]));

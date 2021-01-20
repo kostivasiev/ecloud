@@ -2,21 +2,20 @@
 
 namespace App\Jobs\Instance;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
-class PowerOn extends TaskJob
+class PowerOn extends Job
 {
     private $data;
+    private $setSyncCompleted;
 
-    public function __construct(Task $task, $data)
+    public function __construct($data, $setSyncCompleted = true)
     {
-        parent::__construct($task);
-
         $this->data = $data;
+        $this->setSyncCompleted = $setSyncCompleted;
     }
 
     /**
@@ -31,6 +30,10 @@ class PowerOn extends TaskJob
         $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
         );
+
+        if ($this->setSyncCompleted) {
+            $instance->setSyncCompleted();
+        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

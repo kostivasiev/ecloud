@@ -52,7 +52,7 @@ class InstanceResource extends UKFastResource
             'platform' => $this->platform,
             'backup_enabled' => $this->backup_enabled,
             'volume_capacity' => $this->volume_capacity,
-            'status' => $this->status,
+            'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))

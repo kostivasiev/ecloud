@@ -9,7 +9,7 @@ class Deleting
 {
     use SerializesModels;
 
-    public Model $model;
+    public $model;
 
     public function __construct(Model $model)
     {

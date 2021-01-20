@@ -64,7 +64,6 @@ class Router extends Model implements Filterable, Sortable
 
     public $children = [
         'vpns',
-        'firewallPolicies',
     ];
 
     public function availabilityZone()
@@ -105,11 +104,18 @@ class Router extends Model implements Filterable, Sortable
      */
     public function getAvailableAttribute()
     {
+        if (is_null($this->availabilityZone)) {
+            return false;
+        }
+
         try {
             $response = $this->availabilityZone->nsxService()->get(
                 'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
+            if (!isset($response->tier1_state->state)) {
+                throw new \Exception('Failed to get state for ' . $this->id);
+            }
             return $response->tier1_state->state == 'in_sync';
         } catch (GuzzleException $exception) {
             Log::info('Router available state response', [

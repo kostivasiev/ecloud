@@ -5,7 +5,9 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateFirewallPolicyRequest;
 use App\Http\Requests\V2\UpdateFirewallPolicyRequest;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
 use App\Resources\V2\FirewallPolicyResource;
+use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -45,6 +47,23 @@ class FirewallPolicyController extends BaseController
     }
 
     /**
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $routerId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    {
+        $collection = FirewallPolicy::forUser($request->user)->findOrFail($routerId)->firewallRules();
+        $queryTransformer->config(FirewallRule::class)
+            ->transform($collection);
+
+        return FirewallRuleResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
      * @param CreateFirewallPolicyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -78,11 +97,7 @@ class FirewallPolicyController extends BaseController
     public function destroy(Request $request, string $firewallPolicyId)
     {
         $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
-        try {
-            $policy->delete();
-        } catch (\Exception $e) {
-            return $policy->getDeletionError($e);
-        }
+        $policy->delete();
         return response()->json([], 204);
     }
 }

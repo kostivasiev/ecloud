@@ -95,7 +95,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('routers/{routerId}', 'RouterController@show');
         $router->get('routers/{routerId}/networks', 'RouterController@networks');
         $router->get('routers/{routerId}/vpns', 'RouterController@vpns');
-        $router->get('routers/{routerId}/firewall-rules', 'RouterController@firewallRules');
+        $router->get('routers/{routerId}/firewall-policies', 'RouterController@firewallPolicies');
         $router->post('routers', 'RouterController@create');
         $router->patch('routers/{routerId}', 'RouterController@update');
         $router->delete('routers/{routerId}', 'RouterController@destroy');
@@ -139,6 +139,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('firewall-policies', 'FirewallPolicyController@index');
         $router->get('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@show');
+        $router->get('firewall-policies/{firewallPolicyId}/firewall-rules', 'FirewallPolicyController@firewallRules');
         $router->post('firewall-policies', 'FirewallPolicyController@store');
         $router->patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
         $router->delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
@@ -202,7 +203,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('nics', 'NicController@index');
         $router->get('nics/{nicId}', 'NicController@show');
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->post('nics', 'NicController@create');
+            //$router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');
             $router->delete('nics/{nicId}', 'NicController@destroy');
         });
@@ -228,6 +229,23 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('support/{vpcSupportId}', 'VpcSupportController@destroy');
     });
 
+    /** Discount Plans */
+    $router->group([], function () use ($router) {
+        $router->get('discount-plans', 'DiscountPlanController@index');
+        $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
+
+        $router->group(['middleware' => 'is-pending'], function () use ($router) {
+            $router->post('discount-plans/{discountPlanId}/approve', 'DiscountPlanController@approve');
+            $router->post('discount-plans/{discountPlanId}/reject', 'DiscountPlanController@reject');
+        });
+
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->post('discount-plans', 'DiscountPlanController@store');
+            $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
+            $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
+        });
+    });
+    
     /** Billing Metrics */
     $router->group([], function () use ($router) {
         $router->get('billing-metrics', 'BillingMetricController@index');

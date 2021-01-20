@@ -3,6 +3,7 @@
 namespace Tests\V2\Router;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -18,6 +19,7 @@ class GetTest extends TestCase
     protected $region;
     protected $router;
     protected $vpc;
+    protected FirewallPolicy $policy;
 
     public function setUp(): void
     {
@@ -33,6 +35,9 @@ class GetTest extends TestCase
         ]);
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey()
+        ]);
+        $this->policy = factory(FirewallPolicy::class)->create([
+            'router_id' => $this->router->getKey(),
         ]);
     }
 
@@ -70,4 +75,21 @@ class GetTest extends TestCase
             ->assertResponseStatus(200);
     }
 
+    public function testRouterFirewallPolicies()
+    {
+        $this->get(
+            '/v2/routers/' . $this->router->getKey() . '/firewall-policies',
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => $this->policy->getKey(),
+                'name' => $this->policy->name,
+                'router_id' => $this->router->getKey(),
+                'sequence' => $this->policy->sequence,
+            ])
+            ->assertResponseStatus(200);
+    }
 }

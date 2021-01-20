@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
@@ -13,13 +14,16 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
+/**
+ * Class BillingMetric
+ * @package App\Models\V2
+ */
 class BillingMetric extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'bm';
     public $incrementing = false;
-    public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
@@ -45,6 +49,34 @@ class BillingMetric extends Model implements Filterable, Sortable
         }
         $query->where('reseller_id', '=', $user->resellerId);
         return $query;
+    }
+
+    /**
+     * @param $resource
+     * @param $key
+     * @return BillingMetric|null
+     */
+    public static function getActiveByKey($resource, $key): ?BillingMetric
+    {
+        return self::where('resource_id', $resource->getKey())
+            ->whereNull('end')
+            ->where('key', $key)
+            ->first();
+    }
+
+    /**
+     * Set the end date/time for a metric
+     * @param null $time
+     * @return bool
+     */
+    public function setEndDate($time = null)
+    {
+        if (empty($time)) {
+            $time = Carbon::now();
+        }
+
+        $this->attributes['end'] = $time;
+        return $this->save();
     }
 
     /**
