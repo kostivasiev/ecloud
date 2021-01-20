@@ -121,7 +121,7 @@ Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 ###
-GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/tier-1s/rtr-aaaaaaaa
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/domains/default/gateway-policies/fwp-df3f063e
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 

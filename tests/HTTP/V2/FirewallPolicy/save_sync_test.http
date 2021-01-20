@@ -19,3 +19,9 @@ GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
+
+###
+DELETE https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

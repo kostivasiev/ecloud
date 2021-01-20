@@ -24,7 +24,7 @@ class DeployCheck extends Job
         Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
 
         $response = $this->model->router->availabilityZone->nsxService()->get(
-            '/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/domains/default/gateway-policies/' . $this->model->id
+            '/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/' . $this->model->id
         );
         $response = json_decode($response->getBody()->getContents());
 
