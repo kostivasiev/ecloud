@@ -90,7 +90,7 @@ class Credential extends Model implements Filterable, Sortable
      */
     public function filterableColumns(FilterFactory $factory)
     {
-        return [
+        $filters = [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('resource_id', Filter::$stringDefaults),
@@ -101,6 +101,10 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
+        if (app('request')->user->isAdministrator) {
+            $filters[] = $factory->create('is_hidden', Filter::$numericDefaults);
+        }
+        return $filters;
     }
 
     /**
@@ -117,6 +121,7 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('host'),
             $factory->create('username'),
             $factory->create('port'),
+            $factory->create('is_hidden'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
