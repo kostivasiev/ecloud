@@ -59,7 +59,7 @@ class RouterController extends BaseController
      */
     public function create(CreateRouterRequest $request)
     {
-        $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'throughput']));
+        $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
         $router->save();
         return $this->responseIdMeta($request, $router->getKey(), 201);
     }
@@ -72,7 +72,7 @@ class RouterController extends BaseController
     public function update(UpdateRouterRequest $request, string $routerId)
     {
         $router = Router::forUser(app('request')->user)->findOrFail($routerId);
-        $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'throughput']));
+        $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
         if (!$router->save()) {
             return $router->getSyncError();
         }

@@ -120,3 +120,7 @@ GET https://185.197.63.88/policy/api/v1/infra/qos-profiles
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
+### Router Throughput QoS profiles
+GET https://185.197.63.88/policy/api/v1/infra/gateway-qos-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

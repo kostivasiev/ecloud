@@ -39,8 +39,6 @@ class Router extends Model implements Filterable, Sortable
     protected $keyType = 'string';
     protected $connection = 'ecloud';
 
-    const THROUGHPUT_OPTIONS = [20,50,100,250,500,1000,2500,5000,10000];
-
     protected $fillable = [
         'id',
         'name',

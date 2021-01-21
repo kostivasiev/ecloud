@@ -34,12 +34,10 @@ class CreateRouterRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
-            'throughput' => [
+            'router_throughput_id' => [
                 'required',
-                'integer',
-                'in:' . implode(',', Router::THROUGHPUT_OPTIONS),
-            ],
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
+                'exists:ecloud.router_throughputs,id,deleted_at,NULL'
+            ]
         ];
     }
 
@@ -53,9 +51,6 @@ class CreateRouterRequest extends FormRequest
         return [
             'vpc_id.required' => 'The :attribute field is required',
             'vpc_id.exists' => 'The specified :attribute was not found',
-            'availability_zone_id.required' => 'The :attribute field is required',
-            'availability_zone_id.exists' => 'The specified :attribute was not found',
-            'throughput.in' => 'The specified :attribute is not valid. Allowed values are ' . implode(',', Router::THROUGHPUT_OPTIONS)
         ];
     }
 }
