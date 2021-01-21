@@ -33,7 +33,7 @@ class CreateRequest extends FormRequest
         $this->config = Appliance::findOrFail($this->request->get('appliance_id'))
             ->getLatestVersion()
             ->applianceVersionData
-            ->pluck('key','value')
+            ->pluck('key', 'value')
             ->flip();
 
         return [

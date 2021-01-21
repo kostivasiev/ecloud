@@ -46,7 +46,7 @@ class UpdateRequest extends FormRequest
         $instance = Instance::forUser(app('request')->user)
             ->findOrFail($this->instanceId);
 
-        $this->config = $instance->applianceVersion->applianceVersionData->pluck('key','value')->flip();
+        $this->config = $instance->applianceVersion->applianceVersionData->pluck('key', 'value')->flip();
 
         $rules = [
             'name' => 'nullable|string',
