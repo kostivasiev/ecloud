@@ -34,6 +34,10 @@ class UndeployDeletedRouters extends Command
             }
 
             $router->availabilityZone->nsxService()->delete(
+                'policy/api/v1/infra/tier-1s/'.$router->id.'/locale-services/'.$router->id
+            );
+
+            $router->availabilityZone->nsxService()->delete(
                 'policy/api/v1/infra/tier-1s/' . $router->id
             );
 
