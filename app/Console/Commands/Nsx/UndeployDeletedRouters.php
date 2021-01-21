@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console\Commands\Nsx;
 
 use App\Models\V2\Router;
@@ -44,7 +45,6 @@ class UndeployDeletedRouters extends Command
 
             return true;
         });
-
     }
 
     /**
@@ -89,7 +89,7 @@ class UndeployDeletedRouters extends Command
                     $this->cascadeDelete($nsxService, 'policy/api/v1' . $childPath);
                 }
             }
-        } while(!$deleted);
+        } while (!$deleted);
 
         $this->info('Deleted "' . $resource . '"');
     }
