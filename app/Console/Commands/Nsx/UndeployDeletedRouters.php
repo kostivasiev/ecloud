@@ -81,8 +81,7 @@ class UndeployDeletedRouters extends Command
                 }
 
                 foreach ($childPaths as $childPath) {
-                    $childPath = 'policy/api/v1' . $childPath;
-                    $this->drillDelete($nsxService, $childPath);
+                    $this->drillDelete($nsxService, 'policy/api/v1' . $childPath);
                 }
             }
         } while(!$deleted);
