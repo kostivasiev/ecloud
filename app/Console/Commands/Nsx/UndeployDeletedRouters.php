@@ -79,6 +79,9 @@ class UndeployDeletedRouters extends Command
                 foreach ($childPaths as $childPath) {
                     $childPath = 'policy/api/v1' . $childPath;
                     $this->warn('Failed to delete due to dependant "' . $childPath . '"');
+                }
+
+                foreach ($childPaths as $childPath) {
                     $this->drillDelete($nsxService, $childPath);
                 }
             }
