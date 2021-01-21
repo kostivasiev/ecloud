@@ -99,7 +99,7 @@ class CreateRequest extends FormRequest
                 'required',
                 'integer',
                 'min:' . ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.min')),
-                'max:' . ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.max')),
+                'max:' . ($this->config->get('ukfast.spec.volume.max') ?? config('volume.capacity.max')),
             ],
         ];
     }
