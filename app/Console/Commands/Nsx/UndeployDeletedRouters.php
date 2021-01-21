@@ -38,7 +38,7 @@ class UndeployDeletedRouters extends Command
                 }
             }
 
-            $this->drillDelete($router->availabilityZone->nsxService(), 'policy/api/v1/infra/tier-1s/' . $router->id);
+            $this->cascadeDelete($router->availabilityZone->nsxService(), 'policy/api/v1/infra/tier-1s/' . $router->id);
 
             $this->info('Router ' . $router->id . ' Undeployed.');
 
@@ -47,7 +47,12 @@ class UndeployDeletedRouters extends Command
 
     }
 
-    private function drillDelete($nsxService, $resource)
+    /**
+     * Deletes a resource and all it's children from NSX
+     * @param $nsxService
+     * @param $resource
+     */
+    private function cascadeDelete($nsxService, $resource)
     {
         $deleted = false;
         do {
@@ -81,7 +86,7 @@ class UndeployDeletedRouters extends Command
                 }
 
                 foreach ($childPaths as $childPath) {
-                    $this->drillDelete($nsxService, 'policy/api/v1' . $childPath);
+                    $this->cascadeDelete($nsxService, 'policy/api/v1' . $childPath);
                 }
             }
         } while(!$deleted);
