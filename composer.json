@@ -28,7 +28,7 @@
     "ukfast/api-encryption": "^4.1",
     "ukfast/api-exceptions": "2.*",
     "ukfast/api-helper-datetime": "2.0.*",
-    "ukfast/api-internal-communication": "^1.4",
+    "ukfast/api-internal-communication": "^1.5",
     "ukfast/api-paginator": "^2.1",
     "ukfast/api-resources": "^4.2",
     "ukfast/api-validation": "~1.0",
