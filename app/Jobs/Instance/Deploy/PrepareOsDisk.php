@@ -42,6 +42,7 @@ class PrepareOsDisk extends Job
             $volume = $instance->volumes->first();
             $volume->capacity = $this->data['volume_capacity'];
             $volume->save();
+            $volume->setSyncCompleted();
             return $volume;
         });
 
