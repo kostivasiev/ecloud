@@ -77,7 +77,6 @@ class UndeployDeletedRouters extends Command
 
                 $childPaths = explode(',', $childPaths);
                 foreach ($childPaths as $childPath) {
-                    $childPath = 'policy/api/v1' . $childPath;
                     $this->warn('Failed to delete due to dependant "' . $childPath . '"');
                 }
 
