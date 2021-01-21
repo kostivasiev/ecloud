@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests\V2\Instance;
 
-use App\Models\V2\Vpc;
-use App\Rules\V2\ExistsForUser;
+use App\Models\V2\Instance;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
-
     protected $instanceId;
+
+    protected $config;
 
     public function __construct(
         array $query = [],
@@ -43,6 +43,11 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $instance = Instance::forUser(app('request')->user)
+            ->findOrFail($this->instanceId);
+
+        $this->config = $instance->applianceVersion->applianceVersionData->pluck('key','value')->flip();
+
         $rules = [
             'name' => 'nullable|string',
             /*            'vpc_id' => [
@@ -62,15 +67,15 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'numeric',
-                'min:' . config('instance.cpu_cores.min'),
-                'max:' . config('instance.cpu_cores.max'),
+                'min:' . ($this->config->get('ukfast.spec.cpu_cores.min') ?? config('instance.cpu_cores.min')),
+                'max:' . ($this->config->get('ukfast.spec.cpu_cores.max') ?? config('instance.cpu_cores.max')),
             ],
             'ram_capacity' => [
                 'sometimes',
                 'required',
                 'numeric',
-                'min:' . config('instance.ram_capacity.min'),
-                'max:' . config('instance.ram_capacity.max'),
+                'min:' . ($this->config->get('ukfast.spec.ram.min') ?? config('instance.ram_capacity.min')),
+                'max:' . ($this->config->get('ukfast.spec.ram.max') ?? config('instance.ram_capacity.max')),
                 new IsValidRamMultiple()
             ],
             'locked' => 'sometimes|required|boolean',
@@ -93,13 +98,13 @@ class UpdateRequest extends FormRequest
             'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
             'appliance_id.exists' => 'The :attribute is not a valid Appliance',
             'vcpu_cores.min' => 'Specified :attribute is below the minimum of '
-                . config('instance.cpu_cores.min'),
+                . ($this->config->get('ukfast.spec.cpu_cores.min') ?? config('instance.cpu_cores.min')),
             'vcpu_cores.max' => 'Specified :attribute is above the maximum of '
-                . config('instance.cpu_cores.max'),
+                . ($this->config->get('ukfast.spec.cpu_cores.max') ?? config('instance.cpu_cores.max')),
             'ram_capacity.min' => 'Specified :attribute is below the minimum of '
-                . config('instance.ram_capacity.min'),
+                . ($this->config->get('ukfast.spec.ram.min') ?? config('instance.ram_capacity.min')),
             'ram_capacity.max' => 'Specified :attribute is above the maximum of '
-                . config('instance.ram_capacity.max'),
+                . ($this->config->get('ukfast.spec.ram.max') ?? config('instance.ram_capacity.max')),
         ];
     }
 }

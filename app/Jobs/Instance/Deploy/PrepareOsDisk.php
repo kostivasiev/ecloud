@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
@@ -36,11 +37,15 @@ class PrepareOsDisk extends Job
         }
 
         // Expand disk - Single volume for MVP
-        $volume = $instance->volumes->first();
-        $volume->capacity = $this->data['volume_capacity'];
-        $volume->save();
+        // Todo: we need a better way of doing this, but we don't want the capacity increase listener to trigger here
+        $volume = Volume::withoutEvents(function () use ($instance) {
+            $volume = $instance->volumes->first();
+            $volume->capacity = $this->data['volume_capacity'];
+            $volume->save();
+            return $volume;
+        });
 
-        // TODO - Move to "volume.updated"
+        // Expand the volume
         $instance->availabilityZone->kingpinService()->put(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size',
             [
