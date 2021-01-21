@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
+use App\Models\V2\ApplianceVersionData;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
@@ -19,7 +20,7 @@ class UpdateTest extends TestCase
     protected \Faker\Generator $faker;
     protected $vpc;
     protected $appliance;
-    protected $appliance_version;
+    protected $applianceVersion;
     protected $instance;
     protected $region;
     protected $availability_zone;
@@ -39,13 +40,13 @@ class UpdateTest extends TestCase
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
         ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
+        $this->applianceVersion = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'UpdateTest Default',
-            'appliance_version_id' => $this->appliance_version->uuid,
+            'appliance_version_id' => $this->applianceVersion->uuid,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'backup_enabled' => false,
@@ -173,5 +174,61 @@ class UpdateTest extends TestCase
             'ecloud'
         )
             ->assertResponseStatus(200);
+    }
+
+    public function testApplianceSpecRamMax()
+    {
+        factory(ApplianceVersionData::class)->create([
+            'key' => 'ukfast.spec.ram.max',
+            'value' => 2048,
+            'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+        ]);
+
+        $data = [
+            'ram_capacity' => 3072,
+        ];
+
+        $this->patch(
+            '/v2/instances/' . $this->instance->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'Specified ram capacity is above the maximum of 2048',
+                'status' => 422,
+                'source' => 'ram_capacity'
+            ])->assertResponseStatus(422);
+    }
+
+    public function testApplianceSpecVcpuMax()
+    {
+        factory(ApplianceVersionData::class)->create([
+            'key' => 'ukfast.spec.cpu_cores.max',
+            'value' => 5,
+            'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+        ]);
+
+        $data = [
+            'vcpu_cores' => 6,
+        ];
+
+        $this->patch(
+            '/v2/instances/' . $this->instance->getKey(),
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'Specified vcpu cores is above the maximum of 5',
+                'status' => 422,
+                'source' => 'vcpu_cores'
+            ])->assertResponseStatus(422);
     }
 }
