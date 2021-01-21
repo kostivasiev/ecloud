@@ -36,8 +36,11 @@ class UndeployDeletedRouters extends Command
 
             $this->drillDelete($router->availabilityZone->nsxService(), 'policy/api/v1/infra/tier-1s/' . $router->id);
 
-            $this->info('Network ' . $router->id . ' Undeployed.');
+            $this->info('Router ' . $router->id . ' Undeployed.');
+
+            return true;
         });
+
     }
 
     private function drillDelete($nsxService, $resource)
