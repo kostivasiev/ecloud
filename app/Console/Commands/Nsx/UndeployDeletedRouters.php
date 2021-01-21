@@ -24,9 +24,13 @@ class UndeployDeletedRouters extends Command
             }
 
             try {
-                $router->availabilityZone->nsxService()->get(
-                    'policy/api/v1/infra/tier-1s/' . $router->id
-                );
+                $nsxService = $router->availabilityZone->nsxService();
+            } catch (\Exception $exception) {
+                return true;
+            }
+
+            try {
+                $nsxService->get('policy/api/v1/infra/tier-1s/' . $router->id);
             } catch (ClientException $exception) {
                 $response = $exception->getResponse();
                 if ($response->getStatusCode() == 404) {
@@ -65,19 +69,19 @@ class UndeployDeletedRouters extends Command
                     throw $exception;
                 }
 
-                $childPath = preg_replace(
+                $childPaths = preg_replace(
                     '/The object path=\[[^\]]+\] cannot be deleted as either it has children or it is being referenced by other objects path=\[([^\]]+)\]/',
                     '$1',
                     $json->error_message
                 );
 
-                $childPath = 'policy/api/v1' . $childPath;
-
-                $this->warn('Failed to delete due to dependant "' . $childPath . '"');
-
-                $this->drillDelete($nsxService, $childPath);
+                $childPaths = explode(',', $childPaths);
+                foreach ($childPaths as $childPath) {
+                    $childPath = 'policy/api/v1' . $childPath;
+                    $this->warn('Failed to delete due to dependant "' . $childPath . '"');
+                    $this->drillDelete($nsxService, $childPath);
+                }
             }
-            sleep(1);
         } while(!$deleted);
 
         $this->info('Deleted "' . $resource . '"');
