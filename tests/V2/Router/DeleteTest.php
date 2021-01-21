@@ -60,11 +60,11 @@ class DeleteTest extends TestCase
                 ->andReturn(
                     new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
                     new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
                 );
+            $mockNsxService->shouldReceive('delete')
+                ->andReturn(new Response(204, [], ''));
+            $mockNsxService->shouldReceive('get')
+                ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
             return $mockNsxService;
         });
     }
