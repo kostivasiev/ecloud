@@ -5,6 +5,7 @@ namespace Tests\V2\Router;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\RouterThroughput;
 use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -25,6 +26,8 @@ class CreateTest extends TestCase
     /** @var Router */
     private $router;
 
+    private $routerThroughput;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -38,6 +41,10 @@ class CreateTest extends TestCase
         ]);
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey()
+        ]);
+
+        $this->routerThroughput = factory(RouterThroughput::class)->create([
+            'availability_zone_id' => $this->availabilityZone->getKey(),
         ]);
     }
 
@@ -95,6 +102,7 @@ class CreateTest extends TestCase
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->getKey(),
+            'router_throughput_id' => $this->routerThroughput->id
         ];
         $this->post(
             '/v2/routers',
@@ -104,11 +112,8 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
+           ->seeInDatabase('routers', $data, 'ecloud')
             ->assertResponseStatus(201);
-
-        $routerId = (json_decode($this->response->getContent()))->data->id;
-        $router = Router::find($routerId);
-        $this->assertNotNull($router);
     }
 
 }
