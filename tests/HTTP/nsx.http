@@ -114,3 +114,23 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/nat/USER/nat-rules/?include_mark_for_delete_objects=true
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/domains/default/gateway-policies/fwp-df3f063e
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entity?realized_path=/infra/realized-state/enforcement-points/default/logical-ports/rtr-aaaaaaaa-net-49648e59-dlrp
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-06e080ef
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-c6e4e1bd/rules/fwr-ad7adf8e
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
