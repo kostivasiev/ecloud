@@ -16,7 +16,7 @@ trait Syncable
             throw new \Exception('Syncable "Delete" job not found for ' . __CLASS__);
         }
 
-        if (!$this->createSync()) {
+        if (!$this->createSync(true)) {
             return false;
         }
 
@@ -35,11 +35,14 @@ trait Syncable
         Log::info(get_class($this) . ' : Deleted', ['resource_id' => $this->id]);
     }
 
-    public function createSync()
+    public function createSync($forced = false)
     {
-        Log::info(get_class($this) . ' : Creating new sync - Started', ['resource_id' => $this->id]);
+        Log::info(get_class($this) . ' : Creating new sync - Started', [
+            'resource_id' => $this->id,
+            'forced' => $forced
+        ]);
 
-        if ($this->getStatus() !== 'complete') {
+        if (!$forced && $this->getStatus() !== 'complete') {
             Log::info(get_class($this) . ' : Tried to create a new sync on ' . __CLASS__ . ' with outstanding sync', [
                 'resource_id' => $this->id
             ]);
@@ -50,7 +53,10 @@ trait Syncable
         $sync->resource_id = $this->id;
         $sync->completed = false;
         $sync->save();
-        Log::info(get_class($this) . ' : Creating new sync - Finished', ['resource_id' => $this->id]);
+        Log::info(get_class($this) . ' : Creating new sync - Finished', [
+            'resource_id' => $this->id,
+            'forced' => $forced
+        ]);
 
         return $sync;
     }
