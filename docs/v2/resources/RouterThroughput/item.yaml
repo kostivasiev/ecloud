@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../resources/RouterThroughput/parameters/routerThroughputId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/routerThroughput.yaml'
+              meta:
+                type: object
+  tags:
+    - Router Throughput

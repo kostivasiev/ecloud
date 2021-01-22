@@ -50,6 +50,8 @@ components:
       $ref: 'components/schemas/lbc.yaml'
     Volume:
       $ref: 'components/schemas/volume.yaml'
+    RouterThroughput:
+      $ref: 'components/schemas/routerThroughput.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
   parameters:
@@ -105,6 +107,7 @@ paths:
     $ref: 'resources/Vpc/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
     $ref: 'resources/Vpc/deploy-defaults.yaml'
+
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Vpc/volumes-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/instances':
@@ -113,6 +116,8 @@ paths:
 #    $ref: 'resources/AvailabilityZone/collection.yaml'
 #  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
 #    $ref: 'resources/AvailabilityZone/item.yaml'
+#  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/router-throughputs':
+#    $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
   '/ecloud/v2/networks':
     $ref: 'resources/Network/collection.yaml'
   '/ecloud/v2/networks/{networkId}':
@@ -221,3 +226,7 @@ paths:
     $ref: 'resources/DiscountPlan/approve-item.yaml'
   '/ecloud/v2/discount-plan/{discountPlanId}/reject':
     $ref: 'resources/DiscountPlan/reject-item.yaml'
+  '/ecloud/v2/router-throughputs':
+    $ref: 'resources/RouterThroughput/collection.yaml'
+  '/ecloud/v2/router-throughputs/{routerThroughputId}':
+    $ref: 'resources/RouterThroughput/item.yaml'

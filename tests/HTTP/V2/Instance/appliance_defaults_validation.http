@@ -1,3 +1,32 @@
+# Test config default min volume capacity for linux appliance of 20GB
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "name": "Test",
+  "vcpu_cores": 1,
+  "ram_capacity": 2048,
+  "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
+  "requires_floating_ip": true,
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 10
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 422, "default linux volume capacity validation failed");
+});
+
+client.global.set('instance_id', response.body.data.id);
+client.log('Instance ID: ' + response.body.data.id);
+
+%}
+
+###
+
 ###
 # Populate Default Ram Parameter (Centos 7 latest version)
 POST https://{{host}}/v1/appliance-versions/4e8b8108-25bf-4b16-877b-97b8166a212c/data
@@ -122,7 +151,7 @@ Content-Type:  application/json
   "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
   "requires_floating_ip": true,
   "network_id": "{{dev_network_id}}",
-  "volume_capacity": 50
+  "volume_capacity": 10
 }
 
 > {%

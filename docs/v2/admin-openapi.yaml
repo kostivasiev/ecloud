@@ -171,3 +171,7 @@ paths:
     $ref: 'resources/BillingMetric/collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':
     $ref: 'resources/BillingMetric/item.yaml'
+  '/ecloud/v2/router-throughputs':
+    $ref: 'resources/RouterThroughput/admin-collection.yaml'
+  '/ecloud/v2/router-throughputs/{routerThroughputId}':
+    $ref: 'resources/RouterThroughput/admin-item.yaml'

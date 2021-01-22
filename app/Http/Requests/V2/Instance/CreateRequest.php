@@ -8,11 +8,14 @@ use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsValidRamMultiple;
+use Illuminate\Support\Facades\Log;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
 {
     protected $config;
+
+    protected string $platform;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -30,11 +33,16 @@ class CreateRequest extends FormRequest
      */
     public function rules()
     {
-        $this->config = Appliance::findOrFail($this->request->get('appliance_id'))
-            ->getLatestVersion()
-            ->applianceVersionData
-            ->pluck('key', 'value')
-            ->flip();
+        $applianceVersion = Appliance::findOrFail($this->request->get('appliance_id'))->getLatestVersion();
+
+        $this->config = $applianceVersion->applianceVersionData->pluck('key', 'value')->flip();
+
+        try {
+            $this->platform = strtolower($applianceVersion->serverLicense()->category);
+        } catch (\Exception $exception) {
+            Log::error('Failed to load server license for appliance version', [$exception]);
+            throw $exception;
+        }
 
         return [
             'name' => 'nullable|string',
@@ -98,7 +106,7 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'integer',
-                'min:' . ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.min')),
+                'min:' . ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.' . $this->platform . '.min')),
                 'max:' . ($this->config->get('ukfast.spec.volume.max') ?? config('volume.capacity.max')),
             ],
         ];
@@ -126,11 +134,10 @@ class CreateRequest extends FormRequest
             'user_script.required' => 'The :attribute field, when specified, cannot be null',
             'volume_capacity.required' => 'The :attribute field, when specified, cannot be null',
             'ram_capacity.required' => 'The :attribute field is required',
-
             'volume_capacity.min' => 'Specified :attribute is below the minimum of ' .
-                ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.min')),
+                ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.' . $this->platform . '.min')),
             'volume_capacity.max' => 'Specified :attribute is above the maximum of ' .
-                ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.max')),
+                ($this->config->get('ukfast.spec.volume.max') ?? config('volume.capacity.max')),
             'vcpu_cores.min' => 'Specified :attribute is below the minimum of '
                 . ($this->config->get('ukfast.spec.cpu_cores.min') ?? config('instance.cpu_cores.min')),
             'vcpu_cores.max' => 'Specified :attribute is above the maximum of '
