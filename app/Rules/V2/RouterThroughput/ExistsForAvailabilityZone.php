@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Rules\V2;
+namespace App\Rules\V2\RouterThroughput;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,20 +14,18 @@ class ExistsForAvailabilityZone implements Rule
 
     public function passes($attribute, $value)
     {
-        if (!is_array($this->model)) {
-            $this->model = [$this->model];
-        }
+        exit(print_r(
+            app()->request->
+        ));
 
-        foreach ($this->model as $model) {
-            try {
-                $model::forUser(app('request')->user)->findOrFail($value);
-                return true;
-            } catch (ModelNotFoundException $exception) {
-                continue;
-            }
-        }
+            exit(print_r(
+                [
+                    $attribute, $value, $this->model
+                ]
+            ));
 
-        return false;
+
+
     }
 
     /**

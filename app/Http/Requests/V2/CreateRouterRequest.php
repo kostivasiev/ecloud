@@ -5,6 +5,7 @@ namespace App\Http\Requests\V2;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRouterRequest extends FormRequest
@@ -35,8 +36,10 @@ class CreateRouterRequest extends FormRequest
                 new ExistsForUser(Vpc::class)
             ],
             'router_throughput_id' => [
+                'sometimes',
                 'required',
-                'exists:ecloud.router_throughputs,id,deleted_at,NULL'
+                'exists:ecloud.router_throughputs,id,deleted_at,NULL',
+                new ExistsForAvailabilityZone($this->request->get('vpc_id'))
             ]
         ];
     }

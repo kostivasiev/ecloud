@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddApprovedColumnToDiscountPlansTable extends Migration
+class AddThroughputColumnToRoutersPlansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddApprovedColumnToDiscountPlansTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('routers', function (Blueprint $table) {
-            $table->integer('throughput')->default(0)->after('name');
+            $table->uuid('router_thoughput_id')->default(0)->after('name');
         });
     }
 
@@ -26,7 +26,7 @@ class AddApprovedColumnToDiscountPlansTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('routers', function (Blueprint $table) {
-            $table->dropColumn('throughput');
+            $table->dropColumn('router_throughput_id');
         });
     }
 }
