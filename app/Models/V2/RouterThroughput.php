@@ -62,7 +62,7 @@ class RouterThroughput extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('committed_bandwidth', Filter::$numericDefaults),
-            $factory->create('burst_size', Filter::$enumDefaults),
+            $factory->create('burst_size', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];

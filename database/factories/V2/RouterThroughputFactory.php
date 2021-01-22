@@ -10,6 +10,6 @@ $factory->define(RouterThroughput::class, function (Faker $faker) {
         'name' => '10Gb',
         'availability_zone_id' => 'az-aaaaaaaa',
         "committed_bandwidth" => 10240,
-        "burst_size" => 1024000000
+        "burst_size" => 1024
     ];
 });

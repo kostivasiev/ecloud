@@ -18,10 +18,10 @@ properties:
     required: true
     example: 10240
   burst_size:
-    description: Burst size in bytes
+    description: Burst size in MB
     type: integer
     required: true
-    example: 1024000000
+    example: 1024
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
