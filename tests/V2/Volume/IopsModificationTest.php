@@ -90,7 +90,7 @@ class IopsModificationTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The iops does not contain a valid iops value',
+            'detail' => 'The specified iops field is not a valid Iops value (300, 600, 1200, 2500)',
             'source' => 'iops',
         ])->assertResponseStatus(422);
     }

@@ -33,13 +33,6 @@ class Volume extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     public $incrementing = false;
 
-    public static $iopsValues = [
-        300 => 'x2',
-        600 => 'x4',
-        1200 => 'x8',
-        2500 => 'x16',
-    ];
-
     protected $fillable = [
         'id',
         'name',
@@ -153,13 +146,5 @@ class Volume extends Model implements Filterable, Sortable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-    }
-
-    public function getIopsAttribute($iops)
-    {
-        if (in_array($iops, array_keys(static::$iopsValues))) {
-            return static::$iopsValues[$iops];
-        }
-        return null;
     }
 }
