@@ -70,7 +70,7 @@ class IopsModificationTest extends TestCase
             'volumes',
             [
                 'id' => $this->volume->getKey(),
-                'iops' => Volume::$iopsValues[$data['iops']],
+                'iops' => $data['iops'],
             ],
             'ecloud'
         )->assertResponseStatus(200);
