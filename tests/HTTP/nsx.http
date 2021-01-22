@@ -134,3 +134,8 @@ Content-Type:  application/json
 DELETE https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-c6e4e1bd/rules/fwr-ad7adf8e
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+### Router Throughput QoS profiles
+GET https://185.197.63.88/policy/api/v1/infra/gateway-qos-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

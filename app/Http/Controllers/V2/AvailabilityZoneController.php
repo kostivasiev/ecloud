@@ -12,6 +12,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Product;
 use App\Models\V2\Router;
+use App\Models\V2\RouterThroughput;
 use App\Resources\V2\AvailabilityZoneCapacityResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
@@ -20,6 +21,7 @@ use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\ProductResource;
 use App\Resources\V2\RouterResource;
+use App\Resources\V2\RouterThroughputResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -113,6 +115,24 @@ class AvailabilityZoneController extends BaseController
             ->transform($collection);
 
         return RouterResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $zoneId
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    public function routerThroughputs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    {
+        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+            ->routerThroughputs();
+        $queryTransformer->config(RouterThroughput::class)
+            ->transform($collection);
+
+        return RouterThroughputResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
