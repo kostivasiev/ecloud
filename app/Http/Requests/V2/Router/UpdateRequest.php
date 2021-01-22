@@ -11,6 +11,8 @@ use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
+    protected $routerId;
+
     public function __construct(
         array $query = [],
         array $request = [],
@@ -42,14 +44,23 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $router = Router::forUser(app('request')->user)->findOrFail($this->routerId);
+        $availabilityZoneId = null;
+        if ($this->request->has('availability_zone_id')) {
+            $availabilityZoneId = $this->request->get('availability_zone_id');
+        }
+        if (empty($availabilityZoneId)) {
+            $router = Router::forUser(app('request')->user)->find($this->routerId);
+            if (!empty($router)) {
+                $availabilityZoneId = $router->availability_zone_id;
+            }
+        }
 
         return [
             'name' => 'sometimes|required|string',
             'router_throughput_id' => [
                 'sometimes',
                 'required',
-                new ExistsForAvailabilityZone($this->request->get('availability_zone_id') ?? $router->availability_zone_id)
+                new ExistsForAvailabilityZone($availabilityZoneId)
             ],
             'vpc_id' => [
                 'sometimes',
@@ -75,7 +86,7 @@ class UpdateRequest extends FormRequest
             'vpc_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
-            'throughput.in' => 'The specified :attribute is not valid. Allowed values are ' . implode(',', Router::THROUGHPUT_OPTIONS)
+            'router_throughput_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }
