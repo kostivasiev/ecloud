@@ -19,7 +19,7 @@ class Save extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $jobs = [
             new Deploy($this->model->firewallRule->firewallPolicy),
@@ -28,6 +28,6 @@ class Save extends Job
 
         dispatch(array_shift($jobs)->chain($jobs));
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

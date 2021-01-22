@@ -18,7 +18,7 @@ class Deploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $router = $this->model->router;
         $availabilityZone = $router->availabilityZone;
@@ -84,6 +84,6 @@ class Deploy extends Job
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

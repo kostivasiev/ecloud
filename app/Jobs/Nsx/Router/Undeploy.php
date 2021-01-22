@@ -17,7 +17,7 @@ class Undeploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => ['id' => $this->model->id]]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         # Delete Locale Rules associated with the router first, or the router won't delete
         $this->model->availabilityZone->nsxService()->delete('policy/api/v1/infra/tier-1s/'.$this->model->id.'/locale-services/'.$this->model->id);
@@ -25,6 +25,6 @@ class Undeploy extends Job
         # Delete the router
         $this->model->availabilityZone->nsxService()->delete('policy/api/v1/infra/tier-1s/' . $this->model->id);
 
-        Log::info(get_class($this) . ' : Finished', ['model' => ['id' => $this->model->id]]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
