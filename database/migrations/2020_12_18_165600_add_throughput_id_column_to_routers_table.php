@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddThroughputColumnToRoutersPlansTable extends Migration
+class AddThroughputIdColumnToRoutersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddThroughputColumnToRoutersPlansTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('routers', function (Blueprint $table) {
-            $table->uuid('router_thoughput_id')->default(0)->after('name');
+            $table->uuid('router_throughput_id')->default('')->after('name');
         });
     }
 

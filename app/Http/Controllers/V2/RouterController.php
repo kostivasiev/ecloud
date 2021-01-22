@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateRouterRequest;
-use App\Http\Requests\V2\UpdateRouterRequest;
+use App\Http\Requests\V2\Router\CreateRequest;
+use App\Http\Requests\V2\Router\UpdateRequest;
 use App\Jobs\FirewallPolicy\ConfigureDefaults;
-use App\Jobs\Nsx\Router\Undeploy;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -14,6 +13,7 @@ use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\VpnResource;
+use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -54,10 +54,10 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param CreateRouterRequest $request
+     * @param CreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CreateRouterRequest $request)
+    public function create(CreateRequest $request)
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
         $router->save();
@@ -65,11 +65,11 @@ class RouterController extends BaseController
     }
 
     /**
-     * @param UpdateRouterRequest $request
+     * @param UpdateRequest $request
      * @param string $routerId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateRouterRequest $request, string $routerId)
+    public function update(UpdateRequest $request, string $routerId)
     {
         $router = Router::forUser(app('request')->user)->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));

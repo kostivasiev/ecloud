@@ -2,30 +2,25 @@
 
 namespace App\Rules\V2\RouterThroughput;
 
+use App\Models\V2\AvailabilityZone;
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ExistsForAvailabilityZone implements Rule
 {
-    public function __construct($model)
+    protected $routerThroughputs = [];
+
+    public function __construct($availabilityZoneId)
     {
-        $this->model = $model;
+        $availabilityZone = AvailabilityZone::forUser(app('request')->user)->find($availabilityZoneId);
+
+        if (!empty($availabilityZone)) {
+            $this->routerThroughputs = $availabilityZone->routerThroughputs->pluck('id')->toArray();
+        }
     }
 
     public function passes($attribute, $value)
     {
-        exit(print_r(
-            app()->request->
-        ));
-
-            exit(print_r(
-                [
-                    $attribute, $value, $this->model
-                ]
-            ));
-
-
-
+        return in_array($value, $this->routerThroughputs);
     }
 
     /**

@@ -1,14 +1,30 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Router;
 
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
+use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
-class UpdateRouterRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
+    public function __construct(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ) {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+        $this->routerId = Request::route('routerId');
+    }
+
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,13 +42,14 @@ class UpdateRouterRequest extends FormRequest
      */
     public function rules()
     {
+        $router = Router::forUser(app('request')->user)->findOrFail($this->routerId);
+
         return [
             'name' => 'sometimes|required|string',
-            'throughput' => [
+            'router_throughput_id' => [
                 'sometimes',
                 'required',
-                'integer',
-                'in:' . implode(',', Router::THROUGHPUT_OPTIONS),
+                new ExistsForAvailabilityZone($this->request->get('availability_zone_id') ?? $router->availability_zone_id)
             ],
             'vpc_id' => [
                 'sometimes',
