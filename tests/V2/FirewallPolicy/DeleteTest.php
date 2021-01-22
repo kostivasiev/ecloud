@@ -18,11 +18,11 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $policy;
+    protected $firewallPolicy;
     protected $region;
     protected $router;
     protected $vpc;
-    protected $availability_zone;
+    protected $availabilityZone;
 
     public function setUp(): void
     {
@@ -37,12 +37,12 @@ class DeleteTest extends TestCase
         });
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
         factory(Credential::class)->create([
             'name' => 'NSX',
-            'resource_id' => $this->availability_zone->id,
+            'resource_id' => $this->availabilityZone->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->id
@@ -50,13 +50,15 @@ class DeleteTest extends TestCase
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->id
         ]);
-        $this->policy = factory(FirewallPolicy::class)->create([
+        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
             'router_id' => $this->router->id,
         ]);
 
-        $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
+        $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
+            $mockNsxService->shouldReceive('patch')
+                ->andReturn(new Response(200, [], ''));
             $mockNsxService->shouldReceive('get')
                 ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->id . '/state'])
                 ->andReturn(
@@ -76,12 +78,11 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/firewall-policies/' . $this->policy->id, [], [
+        $this->delete('/v2/firewall-policies/' . $this->firewallPolicy->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(204);
-        $this->policy->refresh();
-        $this->assertNotNull($this->policy->deleted_at);
+        $this->firewallPolicy->refresh();
+        $this->assertNotNull($this->firewallPolicy->deleted_at);
     }
-
 }

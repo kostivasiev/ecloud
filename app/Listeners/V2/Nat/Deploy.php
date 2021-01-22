@@ -10,9 +10,7 @@ class Deploy
     {
         $nat = $event->model;
         if ($nat->destination_id != $nat->getOriginal('destination_id') || $nat->translated_id != $nat->getOriginal('translated_id')) {
-            dispatch(new \App\Jobs\Nat\Deploy([
-                'nat_id' => $nat->id
-            ]));
+            dispatch(new \App\Jobs\Nsx\Nat\Deploy($nat));
         }
     }
 }
