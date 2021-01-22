@@ -35,7 +35,8 @@ class ProcessBilling extends Command
         'vcpu.count',
         'ram.capacity',
         'disk.capacity',
-        'license.windows'
+        'license.windows',
+        'volume.iops',
     ];
 
     public function handle()

@@ -33,6 +33,13 @@ class Volume extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     public $incrementing = false;
 
+    public static $iopsValues = [
+        300 => 'x2',
+        600 => 'x4',
+        1200 => 'x8',
+        2500 => 'x16',
+    ];
+
     protected $fillable = [
         'id',
         'name',
@@ -40,6 +47,7 @@ class Volume extends Model implements Filterable, Sortable
         'availability_zone_id',
         'capacity',
         'vmware_uuid',
+        'iops',
     ];
 
     protected $dispatchesEvents = [
@@ -94,6 +102,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('capacity', Filter::$stringDefaults),
             $factory->create('vmware_uuid', Filter::$stringDefaults),
+            $factory->create('iops', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -113,6 +122,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('capacity'),
             $factory->create('vmware_uuid'),
+            $factory->create('iops'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -139,8 +149,17 @@ class Volume extends Model implements Filterable, Sortable
             'availability_zone_id' => 'availability_zone_id',
             'capacity' => 'capacity',
             'vmware_uuid' => 'vmware_uuid',
+            'iops' => 'iops',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
+    }
+
+    public function getIopsAttribute($iops)
+    {
+        if (in_array($iops, array_keys(static::$iopsValues))) {
+            return static::$iopsValues[$iops];
+        }
+        return null;
     }
 }
