@@ -13,6 +13,7 @@ use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Admin\Devices\AdminClient;
 
 class CreateTest extends TestCase
 {
@@ -49,6 +50,14 @@ class CreateTest extends TestCase
             'appliance_version_id' => $this->applianceVersion->uuid,
             'availability_zone_id' => $this->availability_zone->getKey(),
         ]);
+        $mockAdminDevices = \Mockery::mock(AdminClient::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
+            $mockedResponse = new \stdClass();
+            $mockedResponse->category = "Linux";
+            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
+            return $mockAdminDevices;
+        });
         $this->network = factory(Network::class)->create();
     }
 
@@ -161,7 +170,7 @@ class CreateTest extends TestCase
         $this->assertEquals($this->applianceVersion->uuid, $instance->appliance_version_id);
     }
 
-    public function testApplianceSpecDefaultFallbacks()
+    public function testApplianceSpecDefaultConfigFallbacks()
     {
         $data = [
             'vpc_id' => $this->vpc->getKey(),
@@ -169,7 +178,7 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 11,
             'ram_capacity' => 512,
-            'volume_capacity' => 30
+            'volume_capacity' => 10
         ];
 
         $this->post(
@@ -189,6 +198,12 @@ class CreateTest extends TestCase
             ->seeJson([
                 'title' => 'Validation Error',
                 'detail' => 'Specified ram capacity is below the minimum of ' . config('instance.ram_capacity.min'),
+                'status' => 422,
+                'source' => 'ram_capacity'
+            ])
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'Specified volume capacity is below the minimum of ' . config('volume.capacity.linux.min'),
                 'status' => 422,
                 'source' => 'ram_capacity'
             ])
