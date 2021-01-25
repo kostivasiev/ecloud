@@ -95,7 +95,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('capacity', Filter::$stringDefaults),
             $factory->create('vmware_uuid', Filter::$stringDefaults),
-            $factory->create('iops', Filter::$stringDefaults),
+            $factory->create('iops', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
