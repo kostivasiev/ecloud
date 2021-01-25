@@ -68,6 +68,16 @@ class PrepareOsDisk extends Job
             ]
         );
 
+        // Set the volume iops
+        $instance->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/iops',
+            [
+                'json' => [
+                    'limit' => $this->data['iops'],
+                ]
+            ]
+        );
+
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
 }
