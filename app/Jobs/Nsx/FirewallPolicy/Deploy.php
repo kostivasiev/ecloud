@@ -27,7 +27,7 @@ class Deploy extends Job
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
         $availabilityZone->nsxService()->patch(
-            '/policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id,
+            'policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id,
             [
                 'json' => [
                     'id' => $this->model->id,

@@ -11,7 +11,6 @@ use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -52,41 +51,28 @@ class DeleteTest extends TestCase
             'vpc_id' => $this->vpc->id
         ]);
 
-        $this->expectsJobs(
-            \App\Jobs\Sync\FirewallPolicy\Save::class,
-            \App\Jobs\Nsx\FirewallPolicy\Deploy::class,
-        );
-
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->id,
-        ]);
-        $this->firewallPolicy->setSyncCompleted();
-
         $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
-//            $mockNsxService->shouldReceive('get')
-//                ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->id . '/state'])
-//                ->andReturn(
-//                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-//                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-//                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-//                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]))
-//                );
+            $mockNsxService->shouldReceive('patch')
+                ->andReturn(new Response(200, [], ''));
             $mockNsxService->shouldReceive('get')
-                ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'])
                 ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
             $mockNsxService->shouldReceive('delete')
                 ->andReturn(new Response(204, [], ''));
             return $mockNsxService;
         });
+
+        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+            'router_id' => $this->router->id,
+        ]);
     }
 
     public function testSuccessfulDelete()
     {
-        $this->expectsJobs(
-            \App\Jobs\Sync\FirewallPolicy\Delete::class,
-        );
+//        $this->expectsJobs(
+//            \App\Jobs\Sync\FirewallPolicy\Delete::class,
+//        );
 
         $this->delete('/v2/firewall-policies/' . $this->firewallPolicy->id, [], [
             'X-consumer-custom-id' => '0-0',

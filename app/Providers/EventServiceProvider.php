@@ -80,7 +80,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallPolicy\Saved::class => [
         ],
         \App\Events\V2\FirewallPolicy\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\FirewallPolicy\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
@@ -92,7 +91,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallRule\Saved::class => [
         ],
         \App\Events\V2\FirewallRule\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallRule\Undeploy::class,
@@ -105,7 +103,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallRulePort\Saved::class => [
         ],
         \App\Events\V2\FirewallRulePort\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\FirewallRulePort\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,

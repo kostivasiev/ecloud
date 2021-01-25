@@ -80,12 +80,6 @@ class AssignTest extends TestCase
             $mockNsxService->shouldReceive('delete')
                 ->andReturn(new Response(204, [], ''));
             $mockNsxService->shouldReceive('get')
-                ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->id . '/state'])
-                ->andReturn(
-                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
-                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]))
-                );
-            $mockNsxService->shouldReceive('get')
                 ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
             return $mockNsxService;
         });
