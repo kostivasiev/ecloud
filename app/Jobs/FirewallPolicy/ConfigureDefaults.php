@@ -24,29 +24,23 @@ class ConfigureDefaults extends Job
 
         $router = Router::findOrFail($this->data['router_id']);
 
-        Model::withoutEvents(function () use ($router) {
-            foreach (config('firewall.policies') as $policy) {
-                $firewallPolicy = new FirewallPolicy();
-                $firewallPolicy::addCustomKey($firewallPolicy);
-                $firewallPolicy->fill($policy);
-                $firewallPolicy->router_id = $router->getKey();
-                $firewallPolicy->save();
+        foreach (config('firewall.policies') as $policy) {
+            $firewallPolicy = app()->make(FirewallPolicy::class);
+            $firewallPolicy->fill($policy);
+            $firewallPolicy->router_id = $router->id;
+            $firewallPolicy->save();
 
-                foreach ($policy['rules'] as $rule) {
-                    $firewallRule = $firewallPolicy->firewallRules()->make($rule);
-                    $firewallRule::addCustomKey($firewallRule);
-                    $firewallRule->save();
+            foreach ($policy['rules'] as $rule) {
+                $firewallRule = $firewallPolicy->firewallRules()->make($rule);
+                $firewallRule->save();
 
-                    foreach ($rule['ports'] as $port) {
-                        $firewallRulePort = $firewallRule->firewallRulePorts()->make($port);
-                        $firewallRulePort::addCustomKey($firewallRulePort);
-                        $firewallRulePort->name = $firewallRulePort->getKey();
-                        $firewallRulePort->save();
-                    }
+                foreach ($rule['ports'] as $port) {
+                    $firewallRulePort = $firewallRule->firewallRulePorts()->make($port);
+                    $firewallRulePort->name = $firewallRulePort->id;
+                    $firewallRulePort->save();
                 }
-                event(new Saved($firewallPolicy));
             }
-        });
+        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

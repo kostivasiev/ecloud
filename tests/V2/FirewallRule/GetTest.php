@@ -31,22 +31,22 @@ class GetTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->firewallPolicy = factory(FirewallPolicy::class)->create([
             'router_id' => $this->router->id,
         ]);
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy->id,
         ])->first();
         $this->firewallRulePort = factory(FirewallRulePort::class)->create([
-            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'firewall_rule_id' => $this->firewallRule->id,
         ]);
     }
 
@@ -60,7 +60,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'firewall_policy_id' => $this->firewallPolicy->getKey(),
+                'firewall_policy_id' => $this->firewallPolicy->id,
                 'source' => $this->firewallRule->source,
                 'destination' => $this->firewallRule->destination,
                 'action' => $this->firewallRule->action,
@@ -76,7 +76,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/firewall-rules/' . $this->firewallRule->getKey(),
+            '/v2/firewall-rules/' . $this->firewallRule->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -93,14 +93,14 @@ class GetTest extends TestCase
     public function testGetPortsCollection()
     {
         $this->get(
-            '/v2/firewall-rules/' . $this->firewallRule->getKey() . '/ports',
+            '/v2/firewall-rules/' . $this->firewallRule->id . '/ports',
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'firewall_rule_id' => $this->firewallRule->id,
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555'

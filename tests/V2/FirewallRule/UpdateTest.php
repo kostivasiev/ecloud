@@ -32,20 +32,20 @@ class UpdateTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->firewall_policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ]);
         $this->firewall_rule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'firewall_policy_id' => $this->firewall_policy->id,
         ]);
     }
 
@@ -70,11 +70,11 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(200);
 
         Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewall_policy->getKey();
+            return $job->model->id === $this->firewall_policy->id;
         });
 
         Event::assertDispatched(FirewallRuleSaved::class, function ($job) {
-            return $job->model->id === $this->firewall_rule->getKey();
+            return $job->model->id === $this->firewall_rule->id;
         });
     }
 }

@@ -26,13 +26,13 @@ class CreateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
@@ -41,7 +41,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Demo policy rule 1',
             'sequence' => 10,
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ];
         $this->post(
             '/v2/firewall-policies',

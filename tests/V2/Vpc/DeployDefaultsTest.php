@@ -2,11 +2,10 @@
 
 namespace Tests\V2\Vpc;
 
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
+use App\Models\V2\Router;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -15,26 +14,45 @@ class DeployDefaultsTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @var Region */
-    private $region;
-
-    /** @var AvailabilityZone */
-    private $availabilityZone;
-
-    /** @var Vpc */
-    private $vpc;
-
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withArgs([
+                'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
+                [
+                    'json' => [
+                        'id' => 'fwp-test',
+                        'display_name' => 'name',
+                        'description' => 'name',
+                        'sequence_number' => 10,
+                        'rules' => [],
+                    ]
+                ]
+            ])
+            ->andReturn(new Response(200, [], ''));
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'])
+            ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->withArgs(['/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'])
+            ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/fwp-test'])
+            ->andReturn(new Response(204, [], ''));
+
+        app()->bind(Router::class, function () {
+            return new Router([
+                'id' => 'rtr-test',
+            ]);
+        });
+
+        app()->bind(FirewallPolicy::class, function () {
+            return new FirewallPolicy([
+                'id' => 'fwp-test',
+            ]);
+        });
     }
 
     public function testInvalidVpcId()
@@ -50,22 +68,22 @@ class DeployDefaultsTest extends TestCase
 
     public function testValidDeploy()
     {
-        $this->post('/v2/vpcs/' . $this->vpc->getKey() . '/deploy-defaults', [], [
+        $this->post('/v2/vpcs/' . $this->vpc()->id . '/deploy-defaults', [], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write'
         ])->assertResponseStatus(202);
 
         // Check the relationships are intact
-        $router = $this->vpc->routers()->first();
+        $router = $this->vpc()->routers()->first();
         $this->assertNotNull($router);
-        $this->assertNotNull(Network::where('router_id', '=', $router->getKey())->first());
+        $this->assertNotNull(Network::where('router_id', '=', $router->id)->first());
 
         Event::assertDispatched(\App\Events\V2\FirewallPolicy\Saved::class);
 
         // Check the relationships are intact
         $policies = config('firewall.policies');
 
-        $firewallPolicies = FirewallPolicy::where('router_id', $router->getKey());
+        $firewallPolicies = FirewallPolicy::where('router_id', $router->id);
 
         $this->assertEquals(count($policies), $firewallPolicies->count());
 

@@ -31,29 +31,29 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ]);
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy->id,
         ]);
         $this->firewallRulePort = factory(FirewallRulePort::class)->create([
-            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'firewall_rule_id' => $this->firewallRule->id,
         ]);
     }
 
     public function testValidDataSucceeds()
     {
         $this->patch(
-            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(),
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
             [
                 'name' => 'Changed',
                 'protocol' => 'UDP',
@@ -67,7 +67,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'firewall_rule_ports',
             [
-                'id' => $this->firewallRulePort->getKey(),
+                'id' => $this->firewallRulePort->id,
                 'name' => 'Changed',
                 'protocol' => 'UDP',
                 'source' => '10.0.0.1',
@@ -77,18 +77,18 @@ class UpdateTest extends TestCase
         )->assertResponseStatus(200);
 
         Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy->getKey();
+            return $job->model->id === $this->firewallPolicy->id;
         });
 
         Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {
-            return $job->model->id === $this->firewallRulePort->getKey();
+            return $job->model->id === $this->firewallRulePort->id;
         });
     }
 
     public function testUpdateWithICMPValues()
     {
         $this->patch(
-            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(),
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
             [
                 'name' => 'Changed',
                 'protocol' => 'ICMPv4',
@@ -100,7 +100,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'firewall_rule_ports',
             [
-                'id' => $this->firewallRulePort->getKey(),
+                'id' => $this->firewallRulePort->id,
                 'name' => 'Changed',
                 'protocol' => 'ICMPv4',
                 'source' => null,
@@ -110,11 +110,11 @@ class UpdateTest extends TestCase
         )->assertResponseStatus(200);
 
         Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy->getKey();
+            return $job->model->id === $this->firewallPolicy->id;
         });
 
         Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {
-            return $job->model->id === $this->firewallRulePort->getKey();
+            return $job->model->id === $this->firewallRulePort->id;
         });
     }
 }

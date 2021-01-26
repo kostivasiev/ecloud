@@ -31,20 +31,20 @@ class DeleteTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->firewall_policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ]);
         $this->firewall_rule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'firewall_policy_id' => $this->firewall_policy->id,
         ]);
     }
 
@@ -69,7 +69,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/firewall-rules/' . $this->firewall_rule->getKey(),
+            '/v2/firewall-rules/' . $this->firewall_rule->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -77,11 +77,11 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $instance = FirewallRule::withTrashed()->findOrFail($this->firewall_rule->getKey());
+        $instance = FirewallRule::withTrashed()->findOrFail($this->firewall_rule->id);
         $this->assertNotNull($instance->deleted_at);
 
         Event::assertDispatched(Deleted::class, function ($job) {
-            return $job->model->id === $this->firewall_rule->getKey();
+            return $job->model->id === $this->firewall_rule->id;
         });
     }
 

@@ -32,16 +32,16 @@ class CreateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->firewall_policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ]);
     }
 
@@ -50,7 +50,7 @@ class CreateTest extends TestCase
         $this->post('/v2/firewall-rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'firewall_policy_id' => $this->firewall_policy->id,
             'source' => '192.168.100.1/24',
             'destination' => '212.22.18.10/24',
             'action' => 'ALLOW',
@@ -62,7 +62,7 @@ class CreateTest extends TestCase
         ])->seeInDatabase('firewall_rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'firewall_policy_id' => $this->firewall_policy->id,
             'source' => '192.168.100.1/24',
             'destination' => '212.22.18.10/24',
             'action' => 'ALLOW',
@@ -73,7 +73,7 @@ class CreateTest extends TestCase
         $firewallRuleId = (json_decode($this->response->getContent()))->data->id;
 
         Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewall_policy->getKey();
+            return $job->model->id === $this->firewall_policy->id;
         });
 
         Event::assertDispatched(FirewallRuleSaved::class, function ($job) use ($firewallRuleId) {

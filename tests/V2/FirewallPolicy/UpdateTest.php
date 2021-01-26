@@ -31,17 +31,17 @@ class UpdateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->oldData = [
             'name' => 'Demo Firewall Policy 1',
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ];
         $this->policy = factory(FirewallPolicy::class)->create($this->oldData)->first();
     }

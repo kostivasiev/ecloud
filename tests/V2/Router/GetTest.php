@@ -28,16 +28,16 @@ class GetTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ]);
     }
 
@@ -51,7 +51,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->router->getKey(),
+                'id' => $this->router->id,
                 'name' => $this->router->name,
                 'vpc_id' => $this->router->vpc_id,
             ])
@@ -61,7 +61,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/routers/' . $this->router->getKey(),
+            '/v2/routers/' . $this->router->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -78,16 +78,16 @@ class GetTest extends TestCase
     public function testRouterFirewallPolicies()
     {
         $this->get(
-            '/v2/routers/' . $this->router->getKey() . '/firewall-policies',
+            '/v2/routers/' . $this->router->id . '/firewall-policies',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->policy->getKey(),
+                'id' => $this->policy->id,
                 'name' => $this->policy->name,
-                'router_id' => $this->router->getKey(),
+                'router_id' => $this->router->id,
                 'sequence' => $this->policy->sequence,
             ])
             ->assertResponseStatus(200);

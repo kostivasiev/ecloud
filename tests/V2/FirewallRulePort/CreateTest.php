@@ -33,26 +33,26 @@ class CreateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
         $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ]);
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy->id,
         ]);
     }
 
     public function testValidDataSucceeds()
     {
         $this->post('/v2/firewall-rule-ports', [
-            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'firewall_rule_id' => $this->firewallRule->id,
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555'
@@ -62,7 +62,7 @@ class CreateTest extends TestCase
         ])->seeInDatabase(
             'firewall_rule_ports',
             [
-                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'firewall_rule_id' => $this->firewallRule->id,
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555'
@@ -74,7 +74,7 @@ class CreateTest extends TestCase
     public function testValidICMPDataSucceeds()
     {
         $this->post('/v2/firewall-rule-ports', [
-            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'firewall_rule_id' => $this->firewallRule->id,
             'protocol' => 'ICMPv4'
         ], [
             'X-consumer-custom-id' => '1-0',
@@ -82,14 +82,14 @@ class CreateTest extends TestCase
         ])->seeInDatabase(
             'firewall_rule_ports',
             [
-                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'firewall_rule_id' => $this->firewallRule->id,
                 'protocol' => 'ICMPv4',
             ],
             'ecloud'
         )->assertResponseStatus(201);
 
         Event::assertDispatched(Saved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy->getKey();
+            return $job->model->id === $this->firewallPolicy->id;
         });
     }
 }

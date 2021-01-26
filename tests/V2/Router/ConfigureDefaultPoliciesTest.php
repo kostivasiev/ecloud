@@ -24,19 +24,19 @@ class ConfigureDefaultPoliciesTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
     public function testConfigureDefaults()
     {
-        $this->post('/v2/routers/' . $this->router->getKey() . '/configure-default-policies', [], [
+        $this->post('/v2/routers/' . $this->router->id . '/configure-default-policies', [], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write'
         ])->assertResponseStatus(202);
@@ -46,7 +46,7 @@ class ConfigureDefaultPoliciesTest extends TestCase
         // Check the relationships are intact
         $policies = config('firewall.policies');
 
-        $firewallPolicies = FirewallPolicy::where('router_id', $this->router->getKey());
+        $firewallPolicies = FirewallPolicy::where('router_id', $this->router->id);
 
         $this->assertEquals(count($policies), $firewallPolicies->count());
 
