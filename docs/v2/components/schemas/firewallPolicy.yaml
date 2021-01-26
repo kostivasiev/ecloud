@@ -13,6 +13,11 @@ properties:
     required: true
     example: 1
     readOnly: false
+  router_id:
+    type: string
+    required: true
+    example: 'rtr-4c63cf58'
+    readOnly: true
   sync:
     type: string
     example: 'completed'
