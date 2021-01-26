@@ -3,6 +3,7 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Listeners\V2\Volume\IopsChange;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -65,16 +66,6 @@ class PrepareOsDisk extends Job
                     'username' => $guestAdminCredential->username,
                     'password' => $guestAdminCredential->password,
                 ],
-            ]
-        );
-
-        // Set the volume iops
-        $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/iops',
-            [
-                'json' => [
-                    'limit' => $this->data['iops'],
-                ]
             ]
         );
 
