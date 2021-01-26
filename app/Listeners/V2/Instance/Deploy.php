@@ -6,6 +6,7 @@ use App\Events\V2\Instance\Deploy as DeployEvent;
 use App\Events\V2\Instance\Deploy\Data as DeployEventData;
 use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
+use App\Jobs\Instance\Deploy\AssignVolumeIops;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\DeployCompleted;
@@ -56,6 +57,7 @@ class Deploy implements ShouldQueue
             new RunApplianceBootstrap($data),
             new RunBootstrapScript($data),
             new DeployCompleted($data),
+            new AssignVolumeIops($data),
         ]));
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

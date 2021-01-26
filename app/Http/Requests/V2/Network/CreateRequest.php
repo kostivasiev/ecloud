@@ -42,8 +42,7 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(Router::class)
             ],
             'subnet' => [
-                'sometimes',
-                'nullable',
+                'required',
                 'string',
                 new ValidCidrSubnet(),
                 new isPrivateSubnet(),

@@ -72,6 +72,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Router::class);
     }
 
+    public function routerThroughputs()
+    {
+        return $this->hasMany(RouterThroughput::class);
+    }
+
     public function dhcps()
     {
         return $this->hasMany(Dhcp::class);
