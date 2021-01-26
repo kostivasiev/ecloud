@@ -28,5 +28,4 @@ class AssignVolumeIops extends Job
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }
-
 }
