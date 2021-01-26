@@ -59,6 +59,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->credential) {
             $this->credential = factory(Credential::class)->create([
+                'id' => 'cred-test',
                 'name' => 'NSX',
                 'resource_id' => $this->availabilityZone()->id,
             ]);
@@ -78,7 +79,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->availabilityZone) {
             $this->availabilityZone = factory(AvailabilityZone::class)->create([
-                'region_id' => $this->region()->id
+                'id' => 'az-test',
+                'region_id' => $this->region()->id,
             ]);
         }
         return $this->availabilityZone;
@@ -88,6 +90,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->router) {
             $this->router = factory(Router::class)->create([
+                'id' => 'rtr-test',
                 'vpc_id' => $this->vpc()->id
             ]);
         }
@@ -97,7 +100,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function region()
     {
         if (!$this->region) {
-            $this->region = factory(Region::class)->create();
+            $this->region = factory(Region::class)->create([
+                'id' => 'reg-test',
+            ]);
         }
         return $this->region;
     }
@@ -106,6 +111,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->vpc) {
             $this->vpc = factory(Vpc::class)->create([
+                'id' => 'vpc-test',
                 'region_id' => $this->region()->id
             ]);
         }

@@ -5,6 +5,7 @@ namespace Tests\V2\Vpc;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Services\V2\NsxService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -45,12 +46,15 @@ class DeployDefaultsTest extends TestCase
         app()->bind(Router::class, function () {
             return new Router([
                 'id' => 'rtr-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
             ]);
         });
 
         app()->bind(FirewallPolicy::class, function () {
             return new FirewallPolicy([
                 'id' => 'fwp-test',
+                'router_id' => 'rtr-test',
             ]);
         });
     }
