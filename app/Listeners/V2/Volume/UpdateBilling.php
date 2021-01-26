@@ -32,6 +32,10 @@ class UpdateBilling
             return;
         }
 
+        if (empty($volume->iops)) {
+            $volume->iops = config('volume.iops.default', 300);
+        }
+
         $time = Carbon::now();
 
         $currentActiveMetric = BillingMetric::getActiveByKey($volume, 'disk.capacity');
@@ -49,10 +53,13 @@ class UpdateBilling
         $billingMetric->vpc_id = $volume->vpc->getKey();
         $billingMetric->reseller_id = $volume->vpc->reseller_id;
         $billingMetric->key = 'disk.capacity';
-        $billingMetric->value = $volume->capacity;
+        $billingMetric->value = $volume->capacity.'@'.$volume->iops;
         $billingMetric->start = $time;
 
-        $product = $volume->availabilityZone->products()->get()->firstWhere('name', 'volume');
+        $product = $volume->availabilityZone
+            ->products()
+            ->where('product_name', 'LIKE', '%volume%'.$volume->iops)
+            ->first();
         if (empty($product)) {
             Log::error(
                 'Failed to load \'volume\' billing product for availability zone ' . $volume->availabilityZone->getKey()
