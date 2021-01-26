@@ -110,7 +110,7 @@ class Router extends Model implements Filterable, Sortable
 
         try {
             $response = $this->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
+                'policy/api/v1/infra/tier-1s/' . $this->id . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
             if (!isset($response->tier1_state->state)) {
@@ -119,7 +119,7 @@ class Router extends Model implements Filterable, Sortable
             return $response->tier1_state->state == 'in_sync';
         } catch (GuzzleException $exception) {
             Log::info('Router available state response', [
-                'id' => $this->getKey(),
+                'id' => $this->id,
                 'response' => json_decode($exception->getResponse()->getBody()->getContents())->details,
             ]);
             return false;

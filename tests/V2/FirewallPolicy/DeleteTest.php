@@ -55,8 +55,24 @@ class DeleteTest extends TestCase
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
             $mockNsxService->shouldReceive('patch')
+                ->withArgs([
+                    'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
+                    [
+                        'json' => [
+                            'id' => 'fwp-test',
+                            'display_name' => 'name',
+                            'description' => 'name',
+                            'sequence_number' => 10,
+                            'rules' => [],
+                        ]
+                    ]
+                ])
                 ->andReturn(new Response(200, [], ''));
             $mockNsxService->shouldReceive('get')
+                ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'])
+                ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+            $mockNsxService->shouldReceive('get')
+                ->withArgs(['/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'])
                 ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
             $mockNsxService->shouldReceive('delete')
                 ->andReturn(new Response(204, [], ''));
@@ -64,16 +80,13 @@ class DeleteTest extends TestCase
         });
 
         $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+            'id' => 'fwp-test',
             'router_id' => $this->router->id,
         ]);
     }
 
     public function testSuccessfulDelete()
     {
-//        $this->expectsJobs(
-//            \App\Jobs\Sync\FirewallPolicy\Delete::class,
-//        );
-
         $this->delete('/v2/firewall-policies/' . $this->firewallPolicy->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
