@@ -35,14 +35,14 @@ class DefaultRouterThroughputTest extends TestCase
     {
         $routerThroughput = factory(RouterThroughput::class)->create([
             'availability_zone_id' => $this->availabilityZone->getKey(),
-            'committed_bandwidth' => config('router.throughput.default.bandwidth'),
+            'committed_bandwidth' => config('router.throughput.default.bandwidth')
         ]);
 
         $defaultThroughputListener = \Mockery::mock(DefaultRouterThroughput::class)->makePartial();
 
         $router = factory(Router::class)->make([
-            'id' => 'rtr-abc123',
             'availability_zone_id' => $this->availabilityZone->getKey(),
+            'router_throughput_id' => null
         ]);
 
         $defaultThroughputListener->handle(new \App\Events\V2\Router\Creating($router));
