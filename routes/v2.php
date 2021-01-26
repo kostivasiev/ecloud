@@ -32,6 +32,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
         $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
         $router->get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
+        $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
     });
 
     /** Availability Zone Capacities */
@@ -254,6 +255,18 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->post('billing-metrics', 'BillingMetricController@create');
             $router->patch('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@update');
             $router->delete('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@destroy');
+        });
+    });
+
+    /** Router Throughput */
+    $router->group([], function () use ($router) {
+        $router->get('router-throughputs', 'RouterThroughputController@index');
+        $router->get('router-throughputs/{routerThroughputId}', 'RouterThroughputController@show');
+
+        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+            $router->post('router-throughputs', 'RouterThroughputController@store');
+            $router->patch('router-throughputs/{routerThroughputId}', 'RouterThroughputController@update');
+            $router->delete('router-throughputs/{routerThroughputId}', 'RouterThroughputController@destroy');
         });
     });
 });
