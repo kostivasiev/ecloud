@@ -4,10 +4,9 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
-class ExpandGuest extends Job
+class ExpandOsDisk extends Job
 {
     const RETRY_DELAY = 5;
     public $tries = 60;
@@ -35,7 +34,6 @@ class ExpandGuest extends Job
             return;
         }
 
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
         $guestAdminCredential = $instance->credentials()
             ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
@@ -49,7 +47,7 @@ class ExpandGuest extends Job
         // Extend volume to expanded size
         $endpoint = ($instance->platform == 'Linux') ? 'linux/disk/lvm/extend' : 'windows/disk/expandall';
         $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
+            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
             [
                 'json' => [
                     'username' => $guestAdminCredential->username,
