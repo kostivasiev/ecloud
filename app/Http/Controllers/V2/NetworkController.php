@@ -25,7 +25,6 @@ class NetworkController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        // "resource_id" filtering hack - start
         if ($request->has('vpc_id:eq')) {
             if ($request->get('vpc_id:eq') === 'null') {
                 $networkIds = Network::forUser($request->user)->get()
@@ -47,7 +46,7 @@ class NetworkController extends BaseController
                     });
                 $collection = Network::whereIn('id', $networkIds);
             }
-            $request->query->remove('vpc_id:eq');  // So Ditto doesn't try to filter by resource_id
+            $request->query->remove('vpc_id:eq');
         } elseif ($request->has('vpc_id:in')) {
             $ids = explode(',', $request->get('vpc_id:in'));
             $networkIds = Network::forUser($request->user)->get()
@@ -58,11 +57,10 @@ class NetworkController extends BaseController
                     return $network->id;
                 });
             $collection = Network::whereIn('id', $networkIds);
-            $request->query->remove('vpc_id:in');  // So Ditto doesn't try to filter by resource_id
+            $request->query->remove('vpc_id:in');
         } else {
             $collection = Network::forUser($request->user);
         }
-        // "resource_id" filtering hack - end
 
         $queryTransformer->config(Network::class)
             ->transform($collection);
