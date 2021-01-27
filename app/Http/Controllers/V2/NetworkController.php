@@ -25,7 +25,32 @@ class NetworkController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Network::forUser($request->user);
+        if ($request->has('vpc_id:eq')) {
+            $vpcId = $request->get('vpc_id:eq');
+            $networkIds = Network::forUser($request->user)->get()
+                ->reject(function ($network) use ($vpcId) {
+                    return !$network->router || $network->router->vpc_id != $vpcId;
+                })
+                ->map(function ($network) {
+                    return $network->id;
+                });
+            $collection = Network::whereIn('id', $networkIds);
+            $request->query->remove('vpc_id:eq');
+        } elseif ($request->has('vpc_id:in')) {
+            $ids = explode(',', $request->get('vpc_id:in'));
+            $networkIds = Network::forUser($request->user)->get()
+                ->reject(function ($network) use ($ids) {
+                    return !$network->router || !in_array($network->router->vpc_id, $ids);
+                })
+                ->map(function ($network) {
+                    return $network->id;
+                });
+            $collection = Network::whereIn('id', $networkIds);
+            $request->query->remove('vpc_id:in');
+        } else {
+            $collection = Network::forUser($request->user);
+        }
+
         $queryTransformer->config(Network::class)
             ->transform($collection);
 
