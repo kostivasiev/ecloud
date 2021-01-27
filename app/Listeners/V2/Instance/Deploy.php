@@ -9,6 +9,7 @@ use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\DeployCompleted;
+use App\Jobs\Instance\Deploy\ExpandGuest;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
@@ -51,6 +52,7 @@ class Deploy implements ShouldQueue
             new WaitOsCustomisation($data),
             new PrepareOsUsers($data),
             new PrepareOsDisk($data),
+            new ExpandGuest($data),
             new ConfigureWinRm($data),
             new ActivateWindows($data),
             new RunApplianceBootstrap($data),

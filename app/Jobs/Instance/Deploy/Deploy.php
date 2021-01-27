@@ -58,6 +58,11 @@ class Deploy extends Job
         Log::info($logMessage . 'Instance was deployed');
 
         Log::info($logMessage . count($deployResponse->volumes) . ' volume(s) found');
+
+        if (count($deployResponse->volumes) > 1) {
+            throw new \Exception('Deploy failed for ' . $instance->id . ', Multi volume instance deploy detected. Multiple volumes are not currently supported.');
+        }
+
         // Create Volumes from kingpin
         foreach ($deployResponse->volumes as $volumeData) {
             $volume = Volume::withoutEvents(function () use ($instance, $volumeData) {
@@ -84,9 +89,6 @@ class Deploy extends Job
                     ]
                 ]
             );
-
-            // Trigger billing
-            $volume->save();
 
             Log::info($logMessage . 'Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
         }
