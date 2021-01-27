@@ -25,8 +25,12 @@ class UpdateVcpuBilling
         if (Resource::classFromId($event->model->resource_id) != Instance::class) {
             return;
         }
+        
+        $instance = Instance::find($event->model->resource_id);
 
-        $instance = Instance::findOrFail($event->model->resource_id);
+        if (empty($instance)) {
+            return;
+        }
 
         $time = Carbon::now();
 

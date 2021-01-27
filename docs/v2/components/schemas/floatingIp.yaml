@@ -21,6 +21,10 @@ properties:
     type: string
     example: 'nic-abc123'
     readOnly: true
+  sync:
+    type: string
+    example: 'completed'
+    readOnly: true
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

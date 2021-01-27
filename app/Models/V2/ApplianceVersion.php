@@ -74,6 +74,15 @@ class ApplianceVersion extends Model
         );
     }
 
+    public function applianceVersionData()
+    {
+        return $this->hasMany(
+            ApplianceVersionData::class,
+            'appliance_version_uuid',
+            'appliance_version_uuid'
+        );
+    }
+
     public function serverLicense()
     {
         $devicesAdminClient = app()->make(AdminClient::class);

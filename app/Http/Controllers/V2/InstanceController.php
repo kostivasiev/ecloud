@@ -122,7 +122,7 @@ class InstanceController extends BaseController
         $instanceDeployData = new Data();
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
-        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
+        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min'));
         $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
@@ -211,13 +211,10 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
 
-        try {
-            if (!$instance->delete()) {
-                return $instance->getSyncError();
-            }
-        } catch (\Exception $e) {
-            return $instance->getDeletionError($e);
+        if (!$instance->delete()) {
+            return $instance->getSyncError();
         }
+
         return response('', 204);
     }
 

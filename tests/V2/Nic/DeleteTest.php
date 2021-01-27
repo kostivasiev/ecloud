@@ -54,16 +54,9 @@ class DeleteTest extends TestCase
 
     public function testValidNicSucceeds()
     {
-        Event::fake();
-
-        $this->delete(
-            '/v2/nics/' . $this->nic->getKey(),
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
+        $this->delete('/v2/nics/' . $this->nic->getKey(), [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(204);
     }
 }

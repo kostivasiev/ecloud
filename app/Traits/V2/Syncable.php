@@ -8,6 +8,57 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
+    public function delete()
+    {
+        $class = explode('\\', __CLASS__);
+        $class = 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
+        if (!class_exists($class)) {
+            throw new \Exception('Syncable "Delete" job not found for ' . __CLASS__);
+        }
+
+        if (!$this->createSync()) {
+            return false;
+        }
+
+        dispatch(new $class($this));
+
+        return true;
+    }
+
+    public function syncDelete()
+    {
+        $deleteResponse = parent::delete();
+        if (!$deleteResponse) {
+            Log::error(get_class($this) . ' : Failed to delete', ['resource_id' => $this->id]);
+            return $deleteResponse;
+        }
+        Log::info(get_class($this) . ' : Deleted', ['resource_id' => $this->id]);
+    }
+
+    public function createSync()
+    {
+        Log::info(get_class($this) . ' : Creating new sync - Started', [
+            'resource_id' => $this->id,
+        ]);
+
+        if ($this->getStatus() === 'in-progress') {
+            Log::info(get_class($this) . ' : Failed creating new sync on ' . __CLASS__ . ' with an outstanding sync', [
+                'resource_id' => $this->id,
+            ]);
+            return false;
+        }
+
+        $sync = app()->make(Sync::class);
+        $sync->resource_id = $this->id;
+        $sync->completed = false;
+        $sync->save();
+        Log::info(get_class($this) . ' : Creating new sync - Finished', [
+            'resource_id' => $this->id,
+        ]);
+
+        return $sync;
+    }
+
     public function getStatus()
     {
         if (!$this->syncs()->count()) {

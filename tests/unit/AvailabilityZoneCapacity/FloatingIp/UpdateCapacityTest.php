@@ -2,7 +2,6 @@
 
 namespace Tests\unit\AvailabilityZoneCapacity\FloatingIp;
 
-use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
 use App\Listeners\V2\FloatingIp\AllocateIp;
 use App\Mail\AvailabilityZoneCapacityAlert;
 use App\Models\V2\AvailabilityZone;
@@ -12,6 +11,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -43,7 +43,7 @@ class UpdateCapacityTest extends TestCase
             'region_id' => $this->region->getKey()
         ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
-            'ip_address' => null,
+            'ip_address' => '1.1.1.1',
             'vpc_id' => $this->vpc->getKey()
         ]);
 
@@ -88,14 +88,6 @@ class UpdateCapacityTest extends TestCase
             );
             return $mockAdminNetworking;
         });
-    }
-
-    public function testAllocateFloatingIpDispatchesCapacityUpdate()
-    {
-        Queue::fake();
-        $allocateIpListener = \Mockery::mock(AllocateIp::class)->makePartial();
-        $allocateIpListener->handle(new \App\Events\V2\FloatingIp\Created($this->floatingIp));
-        Queue::assertPushed(UpdateFloatingIpCapacity::class);
     }
 
     public function testCapacityUpdatedWhenFloatingIpCreated()
@@ -178,22 +170,5 @@ class UpdateCapacityTest extends TestCase
         Mail::assertSent(AvailabilityZoneCapacityAlert::class, function ($alert) {
             return $alert->alertLevel = AvailabilityZoneCapacityAlert::ALERT_LEVEL_CRITICAL;
         });
-    }
-
-    public function testDeleteFloatingIpDispatchesCapacityUpdate()
-    {
-        Event::fake();
-        Queue::fake();
-
-        $this->floatingIp->delete();
-
-        Event::assertDispatched(\App\Events\V2\FloatingIp\Deleted::class, function ($event) {
-            return $event->model->id === $this->floatingIp->getKey();
-        });
-
-        $updateFloatingIpCapacityListener = \Mockery::mock(\App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class)->makePartial();
-        $updateFloatingIpCapacityListener->handle(new \App\Events\V2\FloatingIp\Deleted($this->floatingIp));
-
-        Queue::assertPushed(UpdateFloatingIpCapacity::class);
     }
 }

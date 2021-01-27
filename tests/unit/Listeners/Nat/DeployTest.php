@@ -64,16 +64,12 @@ class DeployTest extends TestCase
             'network_id' => $this->network->id,
             'ip_address' => $this->faker->ipv4,
         ]);
-
-        Model::withoutEvents(function () {
-            $this->nat = factory(Nat::class)->create([
-                'id' => 'nat-123456',
-                'destination_id' => $this->floating_ip->id,
-                'destinationable_type' => FloatingIp::class,
-                'translated_id' => $this->nic->id,
-                'translatedable_type' => Nic::class,
-            ]);
-        });
+        $this->nat = factory(Nat::class)->create([
+            'destination_id' => $this->floating_ip->id,
+            'destinationable_type' => FloatingIp::class,
+            'translated_id' => $this->nic->id,
+            'translatedable_type' => Nic::class,
+        ]);
     }
 
     public function testUpdatingNatWithoutEditingRulesDoesNotDeploy()

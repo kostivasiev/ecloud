@@ -79,6 +79,15 @@ return [
             ],
         ],
 
+        'ukfastjson' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => \UKFast\Logging\JsonFormatter::class,
+            'with' => [
+                'stream' => 'php://stderr',
+            ],
+        ],
+
         'syslog' => [
             'driver' => 'syslog',
             'level' => 'debug',
