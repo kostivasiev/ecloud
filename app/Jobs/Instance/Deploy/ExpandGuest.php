@@ -5,28 +5,18 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class ExpandGuest extends Job
 {
     const RETRY_DELAY = 5;
+    public $tries = 60;
 
     private $data;
 
     public function __construct($data)
     {
         $this->data = $data;
-    }
-
-    /**
-     * Determine the time at which the job should timeout.
-     *
-     * @return \DateTime
-     */
-    public function retryUntil(): \DateTime
-    {
-        return Carbon::now()->addMinutes(5);
     }
 
     /**
