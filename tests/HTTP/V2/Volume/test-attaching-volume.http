@@ -26,56 +26,102 @@ client.test("SETUP: Create Instance", function() {
 %}
 
 ###
-# Create Volume
-POST https://{{host}}/{{version}}/volumes
-X-consumer-custom-id: 0-0
+# Get Instance Information - Check the sync-state
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
 X-consumer-groups: ecloud.read, ecloud.write
 X-Reseller-Id: 1
-Content-Type: application/json
-
-{
-  "name": "Test",
-  "vpc_id": "{{dev_vpc_id}}",
-  "capacity": 25,
-  "availability_zone_id": "{{dev_availability_zone_id}}"
-}
+Content-Type:  application/json
 
 > {%
-client.test("SETUP: Create Volume", function() {
-    client.assert(response.status === 201, "Response status is not 201 Created");
-    client.global.set("volume_id", response.body.data.id);
-    client.log("Volume ID: " + response.body.data.id);
+client.test('SETUP: Check Instance Status', function () {
+    client.assert(response.status === 200, '200 Response not received');
+    client.assert(response.body.data.sync === 'complete', 'Sync Status is not yet complete');
 });
 %}
 
 ###
-# Attach Volume
-PUT https://{{host}}/{{version}}/volumes/vol-8ec00258/attach
+# Get Volume Information
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/volumes
+X-consumer-custom-id:  0-0
+X-consumer-groups: ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type:  application/json
+
+> {%
+client.test('SETUP: Get Volume Information', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.length > 0, 'No volumes returned in results');
+    if (response.body.data.length > 0) {
+        client.global.set('volume_id', response.body.data[0].id);
+        client.global.set('volume_uuid', response.body.data[0].vmware_uuid);
+        client.log('Volume ID: ' + response.body.data[0].id);
+        client.log('Volume VMWare UUID: ' + response.body.data[0].vmware_uuid);
+    }
+});
+%}
+
+###
+# Detach Volume
+POST https://mgmt-20.ecloud-service.ukfast.co.uk:8443/api/v2/vpc/{{dev_vpc_id}}/instance/{{instance_id}}/volume/{{volume_uuid}}/detach
+Accept: application/json
+Content-Type: application/json
+Authorization: Basic {{kingpin_auth}}
+
+> {%
+client.test('SETUP: Detach Volume', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+###
+# Attach Volume (Will Fail)
+POST https://{{host}}/{{version}}/volumes/{{volume_id}}/attach
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 X-Reseller-Id: 1
 Content-Type: application/json
 
 {
-    "instance_id": "i-2458216d"
+    "instance_id": "{{instance_id}}"
 }
 
 > {%
-client.test('Attach Volume', function () {
+client.test('Attach Volume (Failure)', function () {
+    client.assert(response.status === 400, "400 Response not received");
+    client.log('Execute the following SQL:-');
+    client.log('DELETE FROM instance_volume WHERE instance_id = \'' + client.global.get('instance_id') + '\';');
+});
+%}
+
+###
+# Attach Volume (Will Succeed)
+POST https://{{host}}/{{version}}/volumes/{{volume_id}}/attach
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type: application/json
+
+{
+    "instance_id": "{{instance_id}}"
+}
+
+> {%
+client.test('Attach Volume (Failure)', function () {
     client.assert(response.status === 202, "202 Response not received");
 });
 %}
 
 ###
 # Verify Volume Attached
-GET https://{{host}}/{{version}}/instances/i-2458216d/volumes
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/volumes
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 X-Reseller-Id: 1
 Content-Type: application/json
 
 > {%
-client.test('Test Volume is present', function () {
+client.test('Test Volume has been attached', function () {
     const volumeId = client.global.get('volume_id');
     function checkVolumePresent(arr, value) {
         return arr.some(function (arrValue) {
@@ -91,14 +137,6 @@ client.test('Test Volume is present', function () {
 %}
 
 ###
-# Cleanup - Delete Volume
-DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-X-Reseller-Id: 1
-Content-Type: application/json
-
-###
 # Cleanup - Delete Instance
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id: 0-0
@@ -106,34 +144,24 @@ X-consumer-groups: ecloud.read, ecloud.write
 X-Reseller-Id: 1
 Content-Type: application/json
 
+> {%
+client.test('CLEANUP: Delete Instance', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
 ###
 # Cleanup - Get Instance
-GET https://{{host}}/{{version}}/instances
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 X-Reseller-Id: 1
 Content-Type: application/json
 
-
-###
-
-# curl -X POST "https://mgmt-20.ecloud-service.ukfast.co.uk:8443/api/v2/vpc/vpc-aaaaaaaa/instance/i-2458216d/volume/attach" -H "Authorization: Basic a2luZ3BpbmFwaTp0S20/Yzc/T3Yhb2Y=" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"volumeUUID\": \"9db01446-dfcd-4045-9563-d5e1501fa513\",  \"shared\": true,  \"unitNumber\": 0}"
-POST https://mgmt-20.ecloud-service.ukfast.co.uk:8443/api/v2/vpc/vpc-aaaaaaaa/instance/i-2458216d/volume/attach
-Accept: application/json
-Content-Type: application/json
-Authorization: Basic a2luZ3BpbmFwaTp0S20/Yzc/T3Yhb2Y=
-
-{
-    "volumeUUID": "9db01446-dfcd-4045-9563-d5e1501fa513",
-    "shared": true,
-    "unitNumber": 0
-}
-
-###
-GET https://{{host}}/{{version}}/instances/i-2458216d
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-X-Reseller-Id: 1
-Content-Type: application/json
+> {%
+client.test('CLEANUP: Check instance has been deleted', function () {
+    client.assert(response.status === 404, '404 response not received');
+});
+%}
 
 
