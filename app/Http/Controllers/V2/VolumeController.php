@@ -163,7 +163,7 @@ class VolumeController extends BaseController
     /**
      * @param Request $request
      * @param string $volumeId
-     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     * @return JsonResponse|Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Illuminate\Validation\ValidationException
      */
     public function attachToInstance(Request $request, string $volumeId)
@@ -177,13 +177,22 @@ class VolumeController extends BaseController
             ]
         ]);
         $instance = Instance::forUser($request->user)->findOrFail($request->get('instance_id'));
-        $volume = Volume::withoutEvents(function () use ($request, $volumeId, $instance) {
-            $volume = Volume::forUser($request->user)->findOrFail($volumeId);
-            $volume->instances()->attach($instance);
-            $volume->save();
-            return $volume;
-        });
+        $volume = Volume::forUser($request->user)->findOrFail($volumeId);
 
+        if ($volume->instances->contains($instance->id)) {
+            return response()->json([
+                'errors' => [
+                    [
+                        'title' => 'Duplicated Request',
+                        'detail' => 'The volume has already been attached to the specified instance',
+                        'status' => 400,
+                    ],
+                ],
+            ])->setStatusCode(400);
+        }
+
+        $volume->instances()->attach($instance);
+        $volume->save();
         $this->dispatch(new AttachToInstance($volume, $instance));
 
         return response('', 202);
