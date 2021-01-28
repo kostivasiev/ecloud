@@ -197,7 +197,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         //$router->post('volumes', 'VolumeController@store');
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
-        $router->put('volumes/{volumeId}/attach', 'VolumeController@attachToInstance');
+        $router->post('volumes/{volumeId}/attach', 'VolumeController@attachToInstance');
     });
 
     /** Nics */
