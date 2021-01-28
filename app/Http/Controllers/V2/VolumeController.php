@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Events\V2\Volume\Data;
 use App\Http\Requests\V2\CreateVolumeRequest;
 use App\Http\Requests\V2\UpdateVolumeRequest;
+use App\Jobs\Volume\AttachToInstance;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
+use App\Rules\V2\ExistsForUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -155,5 +158,34 @@ class VolumeController extends BaseController
         }
 
         return response(null, 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $volumeId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function attachToInstance(Request $request, string $volumeId)
+    {
+        $this->validate($request, [
+            'instance_id' => [
+                'required',
+                'string',
+                'exists:ecloud.instances,id,deleted_at,NULL',
+                new ExistsForUser(Instance::class)
+            ]
+        ]);
+        $instance = Instance::forUser($request->user)->findOrFail($request->get('instance_id'));
+        $volume = Volume::withoutEvents(function () use ($request, $volumeId, $instance) {
+            $volume = Volume::forUser($request->user)->findOrFail($volumeId);
+            $volume->instances()->attach($instance);
+            $volume->save();
+            return $volume;
+        });
+
+        $this->dispatch(new AttachToInstance($volume, $instance));
+
+        return response('', 202);
     }
 }
