@@ -34,6 +34,7 @@ class FirewallRulePort extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
 
     protected $fillable = [
+        'id',
         'name',
         'firewall_rule_id',
         'protocol',

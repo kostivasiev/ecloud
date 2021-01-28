@@ -33,6 +33,7 @@ class FirewallRule extends Model implements Filterable, Sortable
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
+        'id',
         'name',
         'sequence',
         'deployed',

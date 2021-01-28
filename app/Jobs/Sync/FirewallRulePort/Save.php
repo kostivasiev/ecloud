@@ -21,12 +21,12 @@ class Save extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        $jobs = [
-            new Deploy($this->model->firewallRule->firewallPolicy),
-            new DeployCheck($this->model->firewallRule->firewallPolicy),
-        ];
-
-        dispatch(array_shift($jobs)->chain($jobs));
+//        $jobs = [
+//            new Deploy($this->model->firewallRule->firewallPolicy),
+//            new DeployCheck($this->model->firewallRule->firewallPolicy),
+//        ];
+//
+//        dispatch(array_shift($jobs)->chain($jobs));
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

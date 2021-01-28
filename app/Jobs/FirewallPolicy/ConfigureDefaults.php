@@ -5,9 +5,12 @@ namespace App\Jobs\FirewallPolicy;
 use App\Events\V2\FirewallPolicy\Saved;
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Router;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use phpDocumentor\GraphViz\Exception;
 
 class ConfigureDefaults extends Job
 {
@@ -28,18 +31,22 @@ class ConfigureDefaults extends Job
             $firewallPolicy = app()->make(FirewallPolicy::class);
             $firewallPolicy->fill($policy);
             $firewallPolicy->router_id = $router->id;
-            $firewallPolicy->save();
 
             foreach ($policy['rules'] as $rule) {
-                $firewallRule = $firewallPolicy->firewallRules()->make($rule);
+                $firewallRule = app()->make(FirewallRule::class);
+                $firewallRule->fill($rule);
+                $firewallRule->firewallPolicy()->associate($firewallPolicy);
                 $firewallRule->save();
 
                 foreach ($rule['ports'] as $port) {
-                    $firewallRulePort = $firewallRule->firewallRulePorts()->make($port);
-                    $firewallRulePort->name = $firewallRulePort->id;
+                    $firewallRulePort = app()->make(FirewallRulePort::class);
+                    $firewallRulePort->fill($port);
+                    $firewallRulePort->firewallRule()->associate($firewallRule);
                     $firewallRulePort->save();
                 }
             }
+
+            $firewallPolicy->save();
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
