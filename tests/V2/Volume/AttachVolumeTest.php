@@ -71,7 +71,6 @@ class AttachVolumeTest extends TestCase
             'availability_zone_id' => $this->availability_zone->getKey(),
         ]);
 
-
         app()->bind(KingpinService::class, function () {
             $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
             $mockKingpinService->shouldReceive('post')
@@ -81,7 +80,9 @@ class AttachVolumeTest extends TestCase
                     '/volume/attach',
                     [
                         'json' => [
-                            'volumeUUID' => $this->volume->vmware_uuid
+                            'volumeUUID' => $this->volume->vmware_uuid,
+                            'shared' => true,
+                            'unitNumber' => 0
                         ]
                     ]
                 ])
@@ -115,7 +116,7 @@ class AttachVolumeTest extends TestCase
             'Volumes are attached to the instance'
         );
 
-        $this->put(
+        $this->post(
             '/v2/volumes/'.$this->volume->id.'/attach',
             [
                 'instance_id' => $this->instance->id,
@@ -131,5 +132,19 @@ class AttachVolumeTest extends TestCase
             $this->instance->volumes()->get()->count(),
             'No volumes are attached to the instance'
         );
+
+        $this->post(
+            '/v2/volumes/'.$this->volume->id.'/attach',
+            [
+                'instance_id' => $this->instance->id,
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson([
+            'title' => 'Duplicated Request',
+            'detail' => 'The volume is already attached to the specified instance',
+        ])->assertResponseStatus(400);
     }
 }
