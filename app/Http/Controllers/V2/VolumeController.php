@@ -184,7 +184,7 @@ class VolumeController extends BaseController
                 'errors' => [
                     [
                         'title' => 'Duplicated Request',
-                        'detail' => 'The volume has already been attached to the specified instance',
+                        'detail' => 'The volume is already attached to the specified instance',
                         'status' => 400,
                     ],
                 ],
