@@ -107,6 +107,8 @@ class ConfigureNics extends Job
                 $nic->ip_address = $checkIp;
 
                 try {
+                    // We're using withoutEvents here so we can prevent sync issues because we're
+                    // using a database level constraint for atomic inserts of ip addresses .
                     Nic::withoutEvents(function () use ($nic) {
                         $nic->save();
                     });
