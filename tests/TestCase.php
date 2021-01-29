@@ -10,7 +10,6 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\NsxService;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 
@@ -126,27 +125,11 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function credential()
     {
         if (!$this->credential) {
-            $mockCredential = \Mockery::mock(Credential::class)->makePartial();
-            $mockCredential->shouldReceive('setPasswordAttribute');
-            $mockCredential->shouldReceive('getPasswordAttribute')
-                ->andReturn('somepassword');
-            app()->bind(Credential::class, function () use ($mockCredential) {
-                return $mockCredential;
-            });
-
             $this->credential = factory(Credential::class)->create([
                 'id' => 'cred-test',
                 'name' => 'NSX',
                 'resource_id' => $this->availabilityZone->id,
             ]);
-
-//            $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-//                ->shouldAllowMockingProtectedMethods();
-//            app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-//                $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-//                $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-//                return $mockEncryptionServiceProvider;
-//            });
         }
         return $this->credential;
     }
@@ -154,6 +137,15 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncryptionServiceProvider;
+        });
 
         Event::fake([
             // V1 hack
