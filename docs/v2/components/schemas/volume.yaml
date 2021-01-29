@@ -23,7 +23,7 @@ properties:
   iops:
     type: integer
     required: false
-    description: iops value 300, 600, 1200 or 2500 only
+    description: IOPS value 300, 600, 1200 or 2500 only
     example: 300
   sync:
     type: string
