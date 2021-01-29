@@ -80,7 +80,7 @@ class UpdateVolumeRequest extends FormRequest
             'capacity.required' => 'The :attribute field, when specified, cannot be null',
             'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
-            'iops.in' => 'The specified :attribute field is not a valid Iops value (300, 600, 1200, 2500)',
+            'iops.in' => 'The specified :attribute field is not a valid IOPS value (300, 600, 1200, 2500)',
         ];
     }
 }
