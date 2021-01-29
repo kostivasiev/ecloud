@@ -134,6 +134,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
                 ->shouldAllowMockingProtectedMethods();
             app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+                $mockEncryptionServiceProvider->shouldReceive('registerEncryptionKey')->andReturn('somekey');
                 $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
                 $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
                 return $mockEncryptionServiceProvider;
