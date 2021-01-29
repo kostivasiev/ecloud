@@ -126,20 +126,27 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function credential()
     {
         if (!$this->credential) {
+            $mockCredential = \Mockery::mock(Credential::class)->makePartial();
+            $mockCredential->shouldReceive('setPasswordAttribute');
+            $mockCredential->shouldReceive('getPasswordAttribute')
+                ->andReturn('somepassword');
+            app()->bind(Credential::class, function () use ($mockCredential) {
+                return $mockCredential;
+            });
+
             $this->credential = factory(Credential::class)->create([
                 'id' => 'cred-test',
                 'name' => 'NSX',
                 'resource_id' => $this->availabilityZone->id,
             ]);
 
-            Cache::put(md5('encryption-key'), 'somekey', new \DateInterval('PT120S'));
-            $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-                ->shouldAllowMockingProtectedMethods();
-            app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-                $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-                $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-                return $mockEncryptionServiceProvider;
-            });
+//            $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+//                ->shouldAllowMockingProtectedMethods();
+//            app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+//                $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+//                $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+//                return $mockEncryptionServiceProvider;
+//            });
         }
         return $this->credential;
     }

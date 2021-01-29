@@ -4,7 +4,6 @@ namespace Tests\V2\FirewallRule;
 
 use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
 use App\Events\V2\FirewallRule\Saved as FirewallRuleSaved;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
