@@ -108,10 +108,8 @@ class ToggleBackupTest extends TestCase
 
     public function testDisableBackupUpdatesBillingMetrics()
     {
-        Model::withoutEvents(function () {
-            $this->instance->backup_enabled = true;
-            $this->instance->save();
-        });
+        $this->instance->backup_enabled = true;
+        $this->instance->save();
 
         $billingMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->instance->id,
