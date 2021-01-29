@@ -26,14 +26,12 @@ class ToggleBackupTest extends TestCase
     {
         parent::setUp();
 
-        Model::withoutEvents(function () {
-            $this->volume = factory(Volume::class)->create([
-                'id' => 'vol-aaaaaaaa',
-                'vpc_id' => $this->vpc()->id,
-                'capacity' => 10,
-                'availability_zone_id' => $this->availabilityZone()->id
-            ]);
-        });
+        $this->volume = factory(Volume::class)->create([
+            'id' => 'vol-aaaaaaaa',
+            'vpc_id' => $this->vpc()->id,
+            'capacity' => 10,
+            'availability_zone_id' => $this->availabilityZone()->id
+        ]);
 
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
