@@ -10,6 +10,7 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\NsxService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 
@@ -131,10 +132,10 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'resource_id' => $this->availabilityZone->id,
             ]);
 
+            Cache::put(md5('encryption-key'), 'somekey', new \DateInterval('PT120S'));
             $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
                 ->shouldAllowMockingProtectedMethods();
             app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-                $mockEncryptionServiceProvider->shouldReceive('registerEncryptionKey')->andReturn('somekey');
                 $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
                 $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
                 return $mockEncryptionServiceProvider;
