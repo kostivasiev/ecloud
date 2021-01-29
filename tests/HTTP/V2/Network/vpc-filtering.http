@@ -1,0 +1,40 @@
+###
+# Test without filtering
+GET https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Test network collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+###
+# Test with filtering for vpc-aaaaaaaa (should be larger number of results)
+GET https://{{host}}/{{version}}/networks?vpc_id:eq=vpc-aaaaaaaa
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Test network collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.meta.pagination.count > 5);
+});
+%}
+
+###
+# Test filtering with only one result
+GET https://{{host}}/{{version}}/networks?vpc_id:eq=vpc-402d7565
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Test network collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.meta.pagination.count === 1);
+});
+%}

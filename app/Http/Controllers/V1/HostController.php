@@ -253,7 +253,7 @@ class HostController extends BaseController
 
         return Response::create([
             'data' => $hardware,
-            'meta' => [],
+            'meta' => (object)[],
         ], 200);
     }
 
