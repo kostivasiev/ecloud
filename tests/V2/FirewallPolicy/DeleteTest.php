@@ -32,8 +32,8 @@ class DeleteTest extends TestCase
             ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'])
             ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
         $this->nsxServiceMock()->shouldReceive('get')
-            ->withArgs(['/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'])
-            ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'])
+            ->andReturn(new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
         $this->nsxServiceMock()->shouldReceive('delete')
             ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/fwp-test'])
             ->andReturn(new Response(204, [], ''));

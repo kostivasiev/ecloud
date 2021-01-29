@@ -4,13 +4,9 @@ namespace Tests\V2\FirewallRulePort;
 
 use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
 use App\Events\V2\FirewallRulePort\Saved as FirewallRulePortSaved;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -19,32 +15,31 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $firewallPolicy;
     protected $firewallRule;
     protected $firewallRulePort;
-    protected $region;
-    protected $vpc;
-    protected $router;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id
-        ]);
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->id,
-        ]);
+
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturn(
+                new Response(200, [], ''),
+            );
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturn(
+                new Response(200, [], json_encode(['publish_status' => 'REALIZED']))
+            );
+
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->id,
+            'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
+
         $this->firewallRulePort = factory(FirewallRulePort::class)->create([
             'firewall_rule_id' => $this->firewallRule->id,
         ]);
@@ -77,7 +72,7 @@ class UpdateTest extends TestCase
         )->assertResponseStatus(200);
 
         Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy->id;
+            return $job->model->id === $this->firewallPolicy()->id;
         });
 
         Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {
@@ -110,7 +105,7 @@ class UpdateTest extends TestCase
         )->assertResponseStatus(200);
 
         Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy->id;
+            return $job->model->id === $this->firewallPolicy()->id;
         });
 
         Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {

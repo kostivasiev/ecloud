@@ -179,7 +179,7 @@ class DeployDefaultsTest extends TestCase
 
         $this->nsxServiceMock()->shouldReceive('get')
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test-1'])
-            ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+            ->andReturn(new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
 
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
@@ -257,7 +257,7 @@ class DeployDefaultsTest extends TestCase
 
         $this->nsxServiceMock()->shouldReceive('get')
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test-2'])
-            ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+            ->andReturn(new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
 
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
@@ -306,7 +306,7 @@ class DeployDefaultsTest extends TestCase
 
         $this->nsxServiceMock()->shouldReceive('get')
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test-3'])
-            ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+            ->andReturn(new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
 
         app()->bind(Router::class, function () {
             return new Router([

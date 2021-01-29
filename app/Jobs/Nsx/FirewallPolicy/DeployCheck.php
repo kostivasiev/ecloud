@@ -27,14 +27,12 @@ class DeployCheck extends Job
             'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/' . $this->model->id
         );
         $response = json_decode($response->getBody()->getContents());
-        foreach ($response->results as $result) {
-            if ($this->model->id === $result->id) {
-                $this->release(static::RETRY_DELAY);
-                Log::info(
-                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
-                );
-                return;
-            }
+        if ($response->publish_status !== 'REALIZED') {
+            $this->release(static::RETRY_DELAY);
+            Log::info(
+                'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+            );
+            return;
         }
 
         $this->model->setSyncCompleted();

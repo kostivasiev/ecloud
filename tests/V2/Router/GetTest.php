@@ -2,12 +2,7 @@
 
 namespace Tests\V2\Router;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,34 +10,29 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected $region;
-    protected $router;
-    protected $vpc;
-    protected FirewallPolicy $policy;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id
-        ]);
-        $this->policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->id,
-        ]);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturn(
+                new Response(200, [], ''),
+            );
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturn(
+                new Response(200, [], json_encode(['publish_status' => 'REALIZED']))
+            );
     }
 
     public function testGetCollection()
     {
+        $this->router();
+
         $this->get(
             '/v2/routers',
             [
@@ -51,9 +41,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->router->id,
-                'name' => $this->router->name,
-                'vpc_id' => $this->router->vpc_id,
+                'id' => $this->router()->id,
+                'name' => $this->router()->name,
+                'vpc_id' => $this->router()->vpc_id,
             ])
             ->assertResponseStatus(200);
     }
@@ -61,34 +51,36 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/routers/' . $this->router->id,
+            '/v2/routers/' . $this->router()->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->router->id,
-                'name' => $this->router->name,
-                'vpc_id' => $this->router->vpc_id
+                'id' => $this->router()->id,
+                'name' => $this->router()->name,
+                'vpc_id' => $this->router()->vpc_id
             ])
             ->assertResponseStatus(200);
     }
 
     public function testRouterFirewallPolicies()
     {
+        $this->firewallPolicy();
+
         $this->get(
-            '/v2/routers/' . $this->router->id . '/firewall-policies',
+            '/v2/routers/' . $this->router()->id . '/firewall-policies',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->policy->id,
-                'name' => $this->policy->name,
-                'router_id' => $this->router->id,
-                'sequence' => $this->policy->sequence,
+                'id' => $this->firewallPolicy()->id,
+                'name' => $this->firewallPolicy()->name,
+                'router_id' => $this->router()->id,
+                'sequence' => $this->firewallPolicy()->sequence,
             ])
             ->assertResponseStatus(200);
     }

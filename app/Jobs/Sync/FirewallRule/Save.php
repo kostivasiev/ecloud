@@ -28,6 +28,9 @@ class Save extends Job
 //
 //        dispatch(array_shift($jobs)->chain($jobs));
 
+        // TODO - MOVE TO DEPLOY CHECK JOB
+        $this->model->setSyncCompleted();
+
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

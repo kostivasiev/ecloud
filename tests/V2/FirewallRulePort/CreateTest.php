@@ -3,13 +3,8 @@
 namespace Tests\V2\FirewallRulePort;
 
 use App\Events\V2\FirewallPolicy\Saved;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -18,34 +13,28 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
-    protected $availabilityZone;
-    protected $firewallPolicy;
     protected $firewallRule;
-    protected $region;
-    protected $router;
-    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id
-        ]);
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->id,
-        ]);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturn(
+                new Response(200, [], ''),
+            );
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturn(
+                new Response(200, [], json_encode(['publish_status' => 'REALIZED']))
+            );
+
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->id,
+            'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
     }
 
@@ -89,7 +78,7 @@ class CreateTest extends TestCase
         )->assertResponseStatus(201);
 
         Event::assertDispatched(Saved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy->id;
+            return $job->model->id === $this->firewallPolicy()->id;
         });
     }
 }

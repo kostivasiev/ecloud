@@ -154,3 +154,8 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/gateway-qos-profiles
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/tier-1s/rtr-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

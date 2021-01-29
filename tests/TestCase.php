@@ -55,35 +55,15 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return require __DIR__ . '/../bootstrap/app.php';
     }
 
-    public function credential()
+    public function firewallPolicy($id = 'fwp-test')
     {
-        if (!$this->credential) {
-            $this->credential = factory(Credential::class)->create([
-                'id' => 'cred-test',
-                'name' => 'NSX',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-
-            $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-                ->shouldAllowMockingProtectedMethods();
-            app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-                $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-                $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-                return $mockEncryptionServiceProvider;
-            });
-        }
-        return $this->credential;
-    }
-
-    public function availabilityZone()
-    {
-        if (!$this->availabilityZone) {
-            $this->availabilityZone = factory(AvailabilityZone::class)->create([
-                'id' => 'az-test',
-                'region_id' => $this->region()->id,
+        if (!$this->firewallPolicy) {
+            $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+                'id' => $id,
+                'router_id' => $this->router()->id,
             ]);
         }
-        return $this->availabilityZone;
+        return $this->firewallPolicy;
     }
 
     public function router()
@@ -97,16 +77,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->router;
     }
 
-    public function region()
-    {
-        if (!$this->region) {
-            $this->region = factory(Region::class)->create([
-                'id' => 'reg-test',
-            ]);
-        }
-        return $this->region;
-    }
-
     public function vpc()
     {
         if (!$this->vpc) {
@@ -118,15 +88,14 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->vpc;
     }
 
-    public function firewallPolicy($id = 'fwp-test')
+    public function region()
     {
-        if (!$this->firewallPolicy) {
-            $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-                'id' => $id,
-                'router_id' => $this->router()->id,
+        if (!$this->region) {
+            $this->region = factory(Region::class)->create([
+                'id' => 'reg-test',
             ]);
         }
-        return $this->firewallPolicy;
+        return $this->region;
     }
 
     public function nsxServiceMock()
@@ -141,11 +110,41 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->nsxServiceMock;
     }
 
+    public function availabilityZone()
+    {
+        if (!$this->availabilityZone) {
+            $this->availabilityZone = factory(AvailabilityZone::class)->create([
+                'id' => 'az-test',
+                'region_id' => $this->region()->id,
+            ]);
+            $this->credential();
+        }
+        return $this->availabilityZone;
+    }
+
+    public function credential()
+    {
+        if (!$this->credential) {
+            $this->credential = factory(Credential::class)->create([
+                'id' => 'cred-test',
+                'name' => 'NSX',
+                'resource_id' => $this->availabilityZone->id,
+            ]);
+
+            $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+                ->shouldAllowMockingProtectedMethods();
+            app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+                $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+                $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+                return $mockEncryptionServiceProvider;
+            });
+        }
+        return $this->credential;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->credential();
 
         Event::fake([
             // V1 hack
