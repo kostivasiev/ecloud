@@ -64,6 +64,7 @@ class ToggleBackupTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'backup_enabled' => false,
+            'appliance_version_id' => $this->applianceVersion->uuid
         ]);
 
         $this->volume->vpc()->associate($this->vpc);
