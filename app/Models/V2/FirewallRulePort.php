@@ -3,12 +3,9 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FirewallRulePort\Deleted;
-use App\Events\V2\FirewallRulePort\Deleting;
 use App\Events\V2\FirewallRulePort\Saved;
-use App\Events\V2\FirewallRulePort\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -25,14 +22,14 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallRulePort extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable;
+    use CustomKey, SoftDeletes, DefaultName;
 
+    const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
     public $keyPrefix = 'fwrp';
     public $incrementing = false;
     public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
-
     protected $fillable = [
         'id',
         'name',
@@ -41,13 +38,8 @@ class FirewallRulePort extends Model implements Filterable, Sortable
         'source',
         'destination'
     ];
-
-    const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
-
     protected $dispatchesEvents = [
-        'saving' => Saving::class,
         'saved' => Saved::class,
-        'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
 

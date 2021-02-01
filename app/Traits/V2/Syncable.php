@@ -43,8 +43,6 @@ trait Syncable
         // Only do this for Firewall's at the moment
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
-            FirewallRule::class,
-            FirewallRulePort::class,
         ])) {
             return parent::save($options);
         }

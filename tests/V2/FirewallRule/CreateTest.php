@@ -56,15 +56,5 @@ class CreateTest extends TestCase
             'direction' => 'IN',
             'enabled' => true
         ], 'ecloud')->assertResponseStatus(201);
-
-        $firewallRuleId = (json_decode($this->response->getContent()))->data->id;
-
-        Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy()->id;
-        });
-
-        Event::assertDispatched(FirewallRuleSaved::class, function ($job) use ($firewallRuleId) {
-            return $job->model->id === $firewallRuleId;
-        });
     }
 }

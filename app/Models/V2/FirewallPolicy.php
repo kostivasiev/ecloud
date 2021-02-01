@@ -3,9 +3,6 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FirewallPolicy\Deleted;
-use App\Events\V2\FirewallPolicy\Deleting;
-use App\Events\V2\FirewallPolicy\Saved;
-use App\Events\V2\FirewallPolicy\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -41,9 +38,6 @@ class FirewallPolicy extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
 

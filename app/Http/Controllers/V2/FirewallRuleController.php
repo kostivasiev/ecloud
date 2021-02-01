@@ -76,17 +76,15 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
+        $firewallRule->save();
 
         if ($request->has('ports')) {
             foreach ($request->input('ports') as $port) {
                 $port['firewall_rule_id'] = $firewallRule->id;
                 $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->removeObservableEvents('saved');
                 $firewallRulePort->save();
             }
         }
-
-        $firewallRule->save();
 
         return $this->responseIdMeta($request, $firewallRule->id, 201);
     }
@@ -110,18 +108,16 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
+        $firewallRule->save();
 
         if ($request->has('ports')) {
             $firewallRule->firewallRulePorts->delete();
             foreach ($request->input('ports') as $port) {
                 $port['firewall_rule_id'] = $firewallRule->id;
                 $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->removeObservableEvents('saved');
                 $firewallRulePort->save();
             }
         }
-
-        $firewallRule->save();
 
         return $this->responseIdMeta($request, $firewallRule->id, 200);
     }

@@ -52,10 +52,5 @@ class CreateTest extends TestCase
         $firewallPolicy = FirewallPolicy::findOrFail($policyId);
         $this->assertEquals($firewallPolicy->name, $data['name']);
         $this->assertEquals($firewallPolicy->sequence, $data['sequence']);
-
-        Event::assertDispatched(Saved::class, function ($job) use ($firewallPolicy) {
-            return $job->model->id === $firewallPolicy->id;
-        });
     }
-
 }

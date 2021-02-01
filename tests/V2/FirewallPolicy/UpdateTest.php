@@ -60,10 +60,6 @@ class UpdateTest extends TestCase
         $firewallPolicy = FirewallPolicy::findOrFail((json_decode($this->response->getContent()))->data->id);
         $this->assertEquals($data['name'], $firewallPolicy->name);
         $this->assertNotEquals($this->oldData['name'], $firewallPolicy->name);
-
-        Event::assertDispatched(Saved::class, function ($job) use ($firewallPolicy) {
-            return $job->model->id === $firewallPolicy->id;
-        });
     }
 
 }

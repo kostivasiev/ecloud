@@ -28,25 +28,27 @@ class ConfigureDefaults extends Job
         $router = Router::findOrFail($this->data['router_id']);
 
         foreach (config('firewall.policies') as $policy) {
+            Log::debug('FirewallPolicy', $policy);
             $firewallPolicy = app()->make(FirewallPolicy::class);
             $firewallPolicy->fill($policy);
             $firewallPolicy->router_id = $router->id;
+            $firewallPolicy->save();
 
             foreach ($policy['rules'] as $rule) {
+                Log::debug('FirewallRule', $rule);
                 $firewallRule = app()->make(FirewallRule::class);
                 $firewallRule->fill($rule);
                 $firewallRule->firewallPolicy()->associate($firewallPolicy);
                 $firewallRule->save();
 
                 foreach ($rule['ports'] as $port) {
+                    Log::debug('FirewallRulePort', $port);
                     $firewallRulePort = app()->make(FirewallRulePort::class);
                     $firewallRulePort->fill($port);
                     $firewallRulePort->firewallRule()->associate($firewallRule);
                     $firewallRulePort->save();
                 }
             }
-
-            $firewallPolicy->save();
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

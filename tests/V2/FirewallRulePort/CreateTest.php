@@ -76,9 +76,5 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(201);
-
-        Event::assertDispatched(Saved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy()->id;
-        });
     }
 }

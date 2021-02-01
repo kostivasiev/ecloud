@@ -8,7 +8,6 @@ use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -23,16 +22,28 @@ class DeployDefaultsTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+    }
 
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'])
-            ->andReturn(
-                new Response(200, [], json_encode(['results' => [['id' => 0]]])),
-                new Response(200, [], json_encode(['results' => [['id' => 0]]])),
-                new Response(200, [], json_encode(['results' => [['id' => 0]]]))
-            );
+    public function tearDown(): void
+    {
+        \Mockery::close();
+    }
 
-        $this->nsxServiceMock()->shouldReceive('patch')
+    public function testInvalidVpcId()
+    {
+        $this->post('/v2/vpcs/x/deploy-defaults', [], [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write'
+        ])->seeJson([
+            'title' => 'Not found',
+            'detail' => 'No Vpc with that ID was found'
+        ])->assertResponseStatus(404);
+    }
+
+    public function testValidDeploy()
+    {
+        // Firewall Policy "Infrastructure" - The final patch with all rules and ports
+        $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 'policy/api/v1/infra/domains/default/gateway-policies/fwp-test-1',
                 [
@@ -175,13 +186,26 @@ class DeployDefaultsTest extends TestCase
                     ]
                 ]
             ])
-            ->andReturn(new Response(200, [], ''));
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
 
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test-1'])
-            ->andReturn(new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
-
+        // Firewall Policy "Infrastructure" - The catch-all patch with no/some rules and ports
         $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('policy/api/v1/infra/domains/default/gateway-policies/fwp-test-1')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // Firewall Policy "Infrastructure" - The publish status (DeployCheck)
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->with('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test-1')
+            ->andReturnUsing(function () {
+                return (new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
+            });
+
+        // Firewall Policy "Remote Access" - The final patch with all rules and ports
+        $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 'policy/api/v1/infra/domains/default/gateway-policies/fwp-test-2',
                 [
@@ -253,13 +277,26 @@ class DeployDefaultsTest extends TestCase
                     ]
                 ]
             ])
-            ->andReturn(new Response(200, [], ''));
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
 
+        // Firewall Policy "Remote Access" - The catch-all patch with no/some rules and ports
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('policy/api/v1/infra/domains/default/gateway-policies/fwp-test-2')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // Firewall Policy "Remote Access" - The publish status (DeployCheck)
         $this->nsxServiceMock()->shouldReceive('get')
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test-2'])
-            ->andReturn(new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
 
-        $this->nsxServiceMock()->shouldReceive('patch')
+        // Firewall Policy "Web Services" - The final patch with all rules and ports
+        $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 'policy/api/v1/infra/domains/default/gateway-policies/fwp-test-3',
                 [
@@ -302,12 +339,25 @@ class DeployDefaultsTest extends TestCase
                     ]
                 ]
             ])
-            ->andReturn(new Response(200, [], ''));
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
 
+        // Firewall Policy "Web Services" - The catch-all patch with no/some rules and ports
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('policy/api/v1/infra/domains/default/gateway-policies/fwp-test-3')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // Firewall Policy "Web Services" - The publish status (DeployCheck)
         $this->nsxServiceMock()->shouldReceive('get')
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test-3'])
-            ->andReturn(new Response(200, [], json_encode(['publish_status' => 'REALIZED'])));
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
 
+        // Test Bindings
         app()->bind(Router::class, function () {
             return new Router([
                 'id' => 'rtr-test',
@@ -338,26 +388,6 @@ class DeployDefaultsTest extends TestCase
             ]);
         });
 
-        app()->bind(Network::class, function () {
-            return new Network([
-                'id' => 'net-test',
-            ]);
-        });
-    }
-
-    public function testInvalidVpcId()
-    {
-        $this->post('/v2/vpcs/x/deploy-defaults', [], [
-            'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups' => 'ecloud.write'
-        ])->seeJson([
-            'title' => 'Not found',
-            'detail' => 'No Vpc with that ID was found'
-        ])->assertResponseStatus(404);
-    }
-
-    public function testValidDeploy()
-    {
         $this->post('/v2/vpcs/' . $this->vpc()->id . '/deploy-defaults', [], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write'
@@ -367,8 +397,6 @@ class DeployDefaultsTest extends TestCase
         $router = $this->vpc()->routers()->first();
         $this->assertNotNull($router);
         $this->assertNotNull(Network::where('router_id', '=', $router->id)->first());
-
-        Event::assertDispatched(\App\Events\V2\FirewallPolicy\Saved::class);
 
         // Check the relationships are intact
         $policies = config('firewall.policies');

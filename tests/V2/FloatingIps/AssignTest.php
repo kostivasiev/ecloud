@@ -78,9 +78,13 @@ class AssignTest extends TestCase
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
             $mockNsxService->shouldReceive('delete')
-                ->andReturn(new Response(204, [], ''));
+                ->andReturnUsing(function () {
+                    return new Response(204, [], '');
+                });
             $mockNsxService->shouldReceive('get')
-                ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
+                });
             return $mockNsxService;
         });
     }

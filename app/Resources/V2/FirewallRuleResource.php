@@ -37,7 +37,6 @@ class FirewallRuleResource extends UKFastResource
             'action' => $this->action,
             'direction' => $this->direction,
             'enabled' => $this->enabled,
-            'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

@@ -70,14 +70,6 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(200);
-
-        Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy()->id;
-        });
-
-        Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {
-            return $job->model->id === $this->firewallRulePort->id;
-        });
     }
 
     public function testUpdateWithICMPValues()
@@ -103,13 +95,5 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(200);
-
-        Event::assertDispatched(FirewallPolicySaved::class, function ($job) {
-            return $job->model->id === $this->firewallPolicy()->id;
-        });
-
-        Event::assertDispatched(FirewallRulePortSaved::class, function ($job) {
-            return $job->model->id === $this->firewallRulePort->id;
-        });
     }
 }
