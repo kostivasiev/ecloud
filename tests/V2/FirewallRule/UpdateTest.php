@@ -24,15 +24,15 @@ class UpdateTest extends TestCase
 
         // TODO - Replace with real mock
         $this->nsxServiceMock()->shouldReceive('patch')
-            ->andReturn(
-                new Response(200, [], ''),
-            );
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
 
         // TODO - Replace with real mock
         $this->nsxServiceMock()->shouldReceive('get')
-            ->andReturn(
-                new Response(200, [], json_encode(['publish_status' => 'REALIZED']))
-            );
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
 
         $this->firewall_rule = factory(FirewallRule::class)->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
