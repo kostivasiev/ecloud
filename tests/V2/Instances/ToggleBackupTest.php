@@ -2,6 +2,8 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
@@ -22,6 +24,8 @@ class ToggleBackupTest extends TestCase
     protected \Faker\Generator $faker;
     protected $vpc;
     protected $instance;
+    protected $appliance;
+    protected $applianceVersion;
     protected $region;
     protected $availabilityZone;
     protected $volume;
@@ -48,10 +52,18 @@ class ToggleBackupTest extends TestCase
             ]);
         });
 
+        $this->appliance = factory(Appliance::class)->create([
+            'appliance_name' => 'Test Appliance',
+        ])->refresh();
+        $this->applianceVersion = factory(ApplianceVersion::class)->create([
+            'appliance_version_appliance_id' => $this->appliance->id,
+        ])->refresh();
+
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'appliance_version_id' => $this->applianceVersion->uuid,
             'backup_enabled' => false,
         ]);
 
