@@ -46,7 +46,7 @@ post:
               type: string
               required: true
               example: 'rtr-4c63cf58'
-              readOnly: false
+              readOnly: falses
   responses:
     201:
       $ref: '../../resources/FirewallPolicy/responses/idResponse.yaml'
