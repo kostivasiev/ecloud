@@ -217,6 +217,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Saved::class => [
             \App\Listeners\V2\Volume\CapacityIncrease::class,
             \App\Listeners\V2\Volume\IopsChange::class,
+            \App\Listeners\V2\Volume\UpdateBilling::class,
         ],
         \App\Events\V2\Volume\Deleting::class => [
             \App\Listeners\V2\ResourceSync::class,
