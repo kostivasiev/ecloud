@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../public-openapi.yaml#/components/schemas/Dhcp'
+                items:
+                  $ref: '../../public-openapi.yaml#/components/schemas/Dhcp'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
