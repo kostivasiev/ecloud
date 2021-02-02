@@ -30,7 +30,7 @@ class DeployCheck extends Job
         if ($response->publish_status !== 'REALIZED') {
             $this->release(static::RETRY_DELAY);
             Log::info(
-                'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                'Waiting for ' . $this->model->id . ' being deployed, retrying in ' . static::RETRY_DELAY . ' seconds'
             );
             return;
         }
