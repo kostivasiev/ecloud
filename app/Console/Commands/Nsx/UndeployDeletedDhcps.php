@@ -21,10 +21,17 @@ class UndeployDeletedDhcps extends Command
             if (empty($dhcp->availabilityZone)) {
                 return true;
             }
+
+            try {
+                $nsxService = $dhcp->availabilityZone->nsxService();
+            } catch (\Exception $exception) {
+                return true;
+            }
+
             $this->info('Starting Undeploy of Dhcp ' . $dhcp->id);
 
             try {
-                $dhcp->availabilityZone->nsxService()->get(
+                $nsxService->get(
                     '/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id
                 );
             } catch (ClientException $exception) {
@@ -33,7 +40,7 @@ class UndeployDeletedDhcps extends Command
                 }
             }
 
-            $dhcp->availabilityZone->nsxService()->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
+            $nsxService->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
             $this->info('Dhcp ' . $dhcp->id . ' Undeployed.');
         });
     }
