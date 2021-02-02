@@ -95,7 +95,7 @@ class BillingMetricTest extends TestCase
         $metric = BillingMetric::where('resource_id', $this->volume->getKey())->first();
 
         $this->assertNotNull($metric);
-        $this->assertEquals('disk.capacity', $metric->key);
+        $this->assertStringStartsWith('disk.capacity', $metric->key);
     }
 
     public function testResizingVolumeEndsExistingBillingMetric()
