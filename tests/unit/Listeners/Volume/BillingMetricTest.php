@@ -43,6 +43,7 @@ class BillingMetricTest extends TestCase
                 'id' => 'vol-aaaaaaaa',
                 'vpc_id' => $this->vpc->getKey(),
                 'capacity' => 10,
+                'iops' => 300,
                 'availability_zone_id' => $this->availabilityZone->getKey()
             ]);
         });
@@ -103,7 +104,7 @@ class BillingMetricTest extends TestCase
         $metric = factory(BillingMetric::class)->create([
             'resource_id' => 'vol-aaaaaaaa',
             'vpc_id' => $this->vpc->getKey(),
-            'key' => 'disk.capacity',
+            'key' => 'disk.capacity.300',
             'value' => 10,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
@@ -112,6 +113,7 @@ class BillingMetricTest extends TestCase
         $this->assertNull($metric->end);
 
         $this->volume->capacity = 15;
+        $this->volume->iops = 600;
         $this->volume->save();
 
         $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
