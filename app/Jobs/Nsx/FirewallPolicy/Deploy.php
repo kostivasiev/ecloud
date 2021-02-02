@@ -26,7 +26,7 @@ class Deploy extends Job
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
-        $availabilityZone->nsxService()->patch(
+        $response = $availabilityZone->nsxService()->patch(
             'policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id,
             [
                 'json' => [
@@ -84,6 +84,16 @@ class Deploy extends Job
                 ]
             ]
         );
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::error(get_class($this) . ' : Failed', [
+                'id' => $this->model->id,
+                'status_code' => $response->getStatusCode(),
+                'content' => $response->getBody()->getContents()
+            ]);
+            $this->fail(new \Exception('Failed to create "' . $this->model->id . '"'));
+            return false;
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

@@ -23,6 +23,13 @@ class DeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
+        // NSX doesn't try to "realise" a FirewallPolicy until it has rules
+        if (!count($this->model->firewallRules)) {
+            Log::info('No rules on the policy. Ignoring deploy check and marking policy as in sync');
+            $this->model->setSyncCompleted();
+            return;
+        }
+
         $response = $this->model->router->availabilityZone->nsxService()->get(
             'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/' . $this->model->id
         );

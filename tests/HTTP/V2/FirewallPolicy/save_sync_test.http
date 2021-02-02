@@ -4,7 +4,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Test Policy - Delete Rules",
+  "name": "Sync Test",
   "sequence": 10,
   "router_id": "{{dev_router_id}}"
 }
