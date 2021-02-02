@@ -57,7 +57,6 @@ class Deploy implements ShouldQueue
             new RunApplianceBootstrap($data),
             new RunBootstrapScript($data),
             new DeployCompleted($data),
-            new AssignVolumeIops($data),
         ]));
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
