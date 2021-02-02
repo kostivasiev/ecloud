@@ -50,11 +50,8 @@ class UpdateBilling
         $currentActiveMetric = BillingMetric::getActiveByKey($volume, 'disk.capacity.%', 'LIKE');
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->key == 'disk.capacity.'.$volume->iops) {
-                return;
-            }
             if (($currentActiveMetric->value == $volume->capacity) &&
-                ($currentActiveMetric->key != 'disk.capacity.'.$volume->iops)) {
+                ($currentActiveMetric->key == 'disk.capacity.'.$volume->iops)) {
                 return;
             }
             $currentActiveMetric->end = $time;
