@@ -13,6 +13,15 @@ properties:
     required: true
     example: 1
     readOnly: false
+  router_id:
+    type: string
+    required: true
+    example: 'rtr-4c63cf58'
+    readOnly: true
+  sync:
+    type: string
+    example: 'completed'
+    readOnly: true
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

@@ -16,10 +16,12 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Nsx\TestAuth::class,
         \App\Console\Commands\Nsx\UndeployDeletedNetworks::class,
         \App\Console\Commands\Nsx\UndeployDeletedDhcps::class,
+        \App\Console\Commands\Nsx\UndeployDeletedRouters::class,
         \App\Console\Commands\Kingpin\TestAuth::class,
         \App\Console\Commands\Kingpin\Instance\Delete::class,
         \App\Console\Commands\Queue\TestRead::class,
         \App\Console\Commands\Credentials\Show::class,
+        \App\Console\Commands\VPC\ProcessBilling::class,
     ];
 
     /**
@@ -32,6 +34,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command('vpc:process-billing')->monthlyOn(1, '01:00')->emailOutputTo(config('alerts.billing.to'));
     }
 }

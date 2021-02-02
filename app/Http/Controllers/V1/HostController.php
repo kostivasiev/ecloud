@@ -145,7 +145,7 @@ class HostController extends BaseController
                     'solution_id' => $host->solution->getKey()
                 ]
             );
-            throw new ServiceUnavailableException('Unable to delete host at this time');
+            throw new ServiceUnavailableException('Unable to delete host: missing host set');
         }
 
         // eCloud solutions should only have a single host set
@@ -162,7 +162,7 @@ class HostController extends BaseController
                 $request->user->type
             );
         } catch (IntapiServiceException $exception) {
-            throw new ServiceUnavailableException('Failed to delete host.');
+            throw new ServiceUnavailableException('Failed to delete host: unable to schedule deletion');
         }
 
         $headers = [];
@@ -253,7 +253,7 @@ class HostController extends BaseController
 
         return Response::create([
             'data' => $hardware,
-            'meta' => [],
+            'meta' => (object)[],
         ], 200);
     }
 

@@ -26,7 +26,11 @@ class UpdateBilling
             return;
         }
 
-        $volume = Volume::findOrFail($event->model->resource_id);
+        $volume = Volume::find($event->model->resource_id);
+
+        if (empty($volume)) {
+            return;
+        }
 
         $time = Carbon::now();
 

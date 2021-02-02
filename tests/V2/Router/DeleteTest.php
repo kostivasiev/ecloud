@@ -19,7 +19,6 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
     protected $availability_zone;
     protected $region;
     protected $router;
@@ -28,8 +27,6 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->faker = Faker::create();
 
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
             ->shouldAllowMockingProtectedMethods();
@@ -41,41 +38,45 @@ class DeleteTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         factory(Credential::class)->create([
             'name' => 'NSX',
-            'resource_id' => $this->availability_zone->getKey(),
+            'resource_id' => $this->availability_zone->id,
+        ]);
+        $this->vpc = factory(Vpc::class)->create([
+            'region_id' => $this->region->id,
+        ]);
+        $this->router = factory(Router::class)->create([
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availability_zone->id,
         ]);
 
         $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
-            $result = new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']]));
-            $mockNsxService->shouldReceive('get')->andReturn($result);
+            $mockNsxService->shouldReceive('get')
+                ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router->id . '/state'])
+                ->andReturn(
+                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                    new Response(200, [], json_encode(['tier1_state' => ['state' => 'in_sync']])),
+                );
+            $mockNsxService->shouldReceive('delete')
+                ->andReturn(new Response(204, [], ''));
+            $mockNsxService->shouldReceive('get')
+                ->andReturn(new Response(200, [], json_encode(['results' => [['id' => 0]]])));
             return $mockNsxService;
         });
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-        ]);
     }
 
     public function testSuccessfulDelete()
     {
-        $this->delete(
-            '/v2/routers/' . $this->router->getKey(),
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
-        $routerItem = Router::withTrashed()->findOrFail($this->router->getKey());
-        $this->assertNotNull($routerItem->deleted_at);
+        $this->assertNull($this->router->deleted_at);
+        $this->delete('/v2/routers/' . $this->router->id, [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(204);
+        $this->router->refresh();
+        $this->assertNotNull($this->router->deleted_at);
     }
-
 }

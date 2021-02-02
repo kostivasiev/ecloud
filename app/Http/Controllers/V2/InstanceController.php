@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Data\InstanceDeployEventData;
 use App\Events\V2\Instance\Deploy;
 use App\Events\V2\Instance\Deploy\Data;
-use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -13,7 +11,6 @@ use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
-use App\Jobs\Instance\Update;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
@@ -118,7 +115,7 @@ class InstanceController extends BaseController
         $instanceDeployData = new Data();
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
-        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.min'));
+        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min'));
         $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
@@ -163,13 +160,10 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
 
-        try {
-            if (!$instance->delete()) {
-                return $instance->getSyncError();
-            }
-        } catch (\Exception $e) {
-            return $instance->getDeletionError($e);
+        if (!$instance->delete()) {
+            return $instance->getSyncError();
         }
+
         return response('', 204);
     }
 

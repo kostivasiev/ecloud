@@ -28,6 +28,7 @@ class VpcResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'region_id' => $this->region_id,
+            'sync' => 'complete',
             'support_enabled' => $this->support_enabled,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

@@ -10,6 +10,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Sync;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
@@ -32,6 +33,15 @@ class ComputeBillingTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods();
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncryptionServiceProvider;
+        });
+
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
