@@ -41,6 +41,7 @@ class PrepareOsDisk extends Job
         $volume = Volume::withoutEvents(function () use ($instance) {
             $volume = $instance->volumes->first();
             $volume->capacity = $this->data['volume_capacity'];
+            $volume->iops = $this->data['iops'];
             $volume->save();
             $volume->setSyncCompleted();
             return $volume;
@@ -65,6 +66,17 @@ class PrepareOsDisk extends Job
                     'username' => $guestAdminCredential->username,
                     'password' => $guestAdminCredential->password,
                 ],
+            ]
+        );
+
+        // Update the volume iops
+        $endpoint = '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/iops';
+        $volume->availabilityZone->kingpinService()->put(
+            $endpoint,
+            [
+                'json' => [
+                    'limit' => $volume->iops
+                ]
             ]
         );
 
