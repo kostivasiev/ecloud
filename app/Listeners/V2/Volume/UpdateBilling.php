@@ -38,10 +38,14 @@ class UpdateBilling
 
         $time = Carbon::now();
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($volume, 'disk.capacity');
+        $currentActiveMetric = BillingMetric::getActiveByKey($volume, 'disk.capacity.%', 'LIKE');
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == $volume->capacity) {
+            if ($currentActiveMetric->key == 'disk.capacity.'.$volume->iops) {
+                return;
+            }
+            if (($currentActiveMetric->value == $volume->capacity) &&
+                ($currentActiveMetric->key != 'disk.capacity.'.$volume->iops)) {
                 return;
             }
             $currentActiveMetric->end = $time;
@@ -52,8 +56,8 @@ class UpdateBilling
         $billingMetric->resource_id = $volume->getKey();
         $billingMetric->vpc_id = $volume->vpc->getKey();
         $billingMetric->reseller_id = $volume->vpc->reseller_id;
-        $billingMetric->key = 'disk.capacity';
-        $billingMetric->value = $volume->capacity.'@'.$volume->iops;
+        $billingMetric->key = 'disk.capacity.'.$volume->iops;
+        $billingMetric->value = $volume->capacity;
         $billingMetric->start = $time;
 
         $product = $volume->availabilityZone
