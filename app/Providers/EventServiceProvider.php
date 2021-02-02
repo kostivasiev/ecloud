@@ -208,6 +208,9 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Volume
+        \App\Events\V2\Volume\Created::class => [
+            \App\Listeners\V2\Volume\UpdateBilling::class,
+        ],
         \App\Events\V2\Volume\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
         ],
@@ -244,6 +247,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
+            \App\Listeners\V2\Instance\UpdateBackupBilling::class,
         ]
     ];
 }

@@ -4,6 +4,7 @@ namespace App\Listeners\V2\Volume;
 
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
+use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use App\Support\Resource;
 use Carbon\Carbon;
@@ -16,17 +17,25 @@ class UpdateBilling
      * @return void
      * @throws \Exception
      */
-    public function handle(Updated $event)
+    public function handle($event)
     {
-        if (!$event->model->completed) {
-            return;
+        Log::info(get_class($this) . ' : Started', ['model' => $event->model]);
+
+        if ($event->model instanceof Volume) {
+            $volume = $event->model;
         }
 
-        if (Resource::classFromId($event->model->resource_id) != Volume::class) {
-            return;
-        }
+        if ($event->model instanceof Sync) {
+            if (!$event->model->completed) {
+                return;
+            }
 
-        $volume = Volume::find($event->model->resource_id);
+            if (Resource::classFromId($event->model->resource_id) != Volume::class) {
+                return;
+            }
+
+            $volume = Volume::find($event->model->resource_id);
+        }
 
         if (empty($volume)) {
             return;

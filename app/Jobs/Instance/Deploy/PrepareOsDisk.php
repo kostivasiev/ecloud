@@ -5,7 +5,6 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
 class PrepareOsDisk extends Job
@@ -17,68 +16,60 @@ class PrepareOsDisk extends Job
         $this->data = $data;
     }
 
-    /**
-     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/332
-     */
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
         $instance = Instance::findOrFail($this->data['instance_id']);
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $guestAdminCredential = $instance->credentials()
-            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
-            ->firstOrFail();
-        if (!$guestAdminCredential) {
-            $message = 'PrepareOsDisk failed for ' . $instance->id . ', no admin credentials found';
-            Log::error($message);
-            $this->fail(new \Exception($message));
-            return;
+
+        $getInstanceResponse = $instance->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id
+        );
+
+        $instanceData = json_decode($getInstanceResponse->getBody()->getContents());
+        if (!$instanceData) {
+            throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
         }
 
-        // Expand disk - Single volume for MVP
-        // Todo: we need a better way of doing this, but we don't want the capacity increase listener to trigger here
-        $volume = Volume::withoutEvents(function () use ($instance) {
-            $volume = $instance->volumes->first();
+        if (count($instanceData->volumes) > 1) {
+            throw new \Exception('Deploy failed for ' . $instance->id . ', Multi volume instance deploy detected. Multiple volumes are not currently supported.');
+        }
+
+        // Create Volumes from kingpin
+        foreach ($instanceData->volumes as $volumeData) {
+            $volume = app()->make(Volume::class);
+            $volume->vpc()->associate($instance->vpc);
+            $volume->availability_zone_id = $instance->availability_zone_id;
             $volume->capacity = $this->data['volume_capacity'];
             $volume->iops = $this->data['iops'];
+            $volume->vmware_uuid = $volumeData->uuid;
             $volume->save();
-            $volume->setSyncCompleted();
-            return $volume;
-        });
+            $volume->instances()->attach($instance);
 
-        // Expand the volume
-        $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size',
-            [
-                'json' => [
-                    'sizeGiB' => $this->data['volume_capacity'],
+            Log::info(get_class($this) . ' : Created volume resource ' . $volume->getKey() . ' for volume ' . $volume->vmware_uuid);
+
+            // Send created Volume ID's to Kinpin
+            $instance->availabilityZone->kingpinService()->put(
+                '/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid',
+                [
+                    'json' => [
+                        'volumeId' => $volume->getKey()
+                    ]
                 ]
-            ]
-        );
+            );
 
-        // Extend to expanded size
-        $endpoint = ($instance->platform == 'Linux') ? 'linux/disk/lvm/extend' : 'windows/disk/expandall';
-        $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/' . $endpoint,
-            [
-                'json' => [
-                    'username' => $guestAdminCredential->username,
-                    'password' => $guestAdminCredential->password,
-                ],
-            ]
-        );
-
-        // Update the volume iops
-        $endpoint = '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/iops';
-        $volume->availabilityZone->kingpinService()->put(
-            $endpoint,
-            [
-                'json' => [
-                    'limit' => $volume->iops
+            // Update the volume iops
+            $volume->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/iops',
+                [
+                    'json' => [
+                        'limit' => $volume->iops
+                    ]
                 ]
-            ]
-        );
+            );
+
+            Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
+        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

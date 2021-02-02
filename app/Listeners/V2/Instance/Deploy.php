@@ -10,6 +10,7 @@ use App\Jobs\Instance\Deploy\AssignVolumeIops;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\DeployCompleted;
+use App\Jobs\Instance\Deploy\ExpandOsDisk;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
@@ -44,6 +45,7 @@ class Deploy implements ShouldQueue
 
         // Create the chained jobs for deployment
         dispatch((new \App\Jobs\Instance\Deploy\Deploy($data))->chain([
+            new PrepareOsDisk($data),
             new ConfigureNics($data),
             new AssignFloatingIp($data),
             new UpdateNetworkAdapter($data),
@@ -51,7 +53,7 @@ class Deploy implements ShouldQueue
             new PowerOn($data, false),
             new WaitOsCustomisation($data),
             new PrepareOsUsers($data),
-            new PrepareOsDisk($data),
+            new ExpandOsDisk($data),
             new ConfigureWinRm($data),
             new ActivateWindows($data),
             new RunApplianceBootstrap($data),

@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Volume\Created;
 use App\Events\V2\Volume\Deleted;
 use App\Events\V2\Volume\Saved;
 use App\Events\V2\Volume\Saving;
@@ -44,6 +45,7 @@ class Volume extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
+        'created' => Created::class,
         'deleted' => Deleted::class,
         'saving' => Saving::class,
         'saved' => Saved::class
