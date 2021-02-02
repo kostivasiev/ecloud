@@ -67,4 +67,90 @@ class CreateTest extends TestCase
             'enabled' => true
         ], 'ecloud')->assertResponseStatus(201);
     }
+
+    public function testSourceANYSucceeds()
+    {
+        $this->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'source' => 'ANY',
+            'destination' => '212.22.18.10/24',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase('firewall_rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'source' => 'ANY',
+            'destination' => '212.22.18.10/24',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ], 'ecloud')->assertResponseStatus(201);
+    }
+
+    public function testDestinationANYSucceeds()
+    {
+        $this->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'source' => '212.22.18.10/24',
+            'destination' => 'ANY',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase('firewall_rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'source' => '212.22.18.10/24',
+            'destination' => 'ANY',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ], 'ecloud')->assertResponseStatus(201);
+    }
+
+    public function testMissingSourceFails()
+    {
+        $this->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'source' => '',
+            'destination' => '212.22.18.10/24',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testMissingDestinationFails()
+    {
+        $this->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'source' => '212.22.18.10/24',
+            'destination' => '',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'enabled' => true
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(422);
+    }
 }

@@ -44,8 +44,8 @@ class Deploy extends Job
                             'sequence_number' => $rule->sequence,
                             'sources_excluded' => false,
                             'destinations_excluded' => false,
-                            'source_groups' => empty($rule->source) ? ['ANY'] : explode(',', $rule->source),
-                            'destination_groups' => empty($rule->source) ? ['ANY'] : explode(',', $rule->destination),
+                            'source_groups' => explode(',', $rule->source),
+                            'destination_groups' => explode(',', $rule->destination),
                             'services' => [
                                 'ANY'
                             ],
