@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancerCluster'
+                items:
+                  $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancerCluster'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
