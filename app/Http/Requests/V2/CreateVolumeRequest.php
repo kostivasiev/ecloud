@@ -47,6 +47,11 @@ class CreateVolumeRequest extends FormRequest
                 'min:' . config('volume.capacity.min'),
                 'max:' . config('volume.capacity.max')
             ],
+            'iops' => [
+                'required',
+                'integer',
+                'in:300,600,1200,2500',
+            ]
         ];
     }
 
@@ -62,6 +67,7 @@ class CreateVolumeRequest extends FormRequest
             'vpc_id.exists' => 'The specified :attribute was not found',
             'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
+            'iops.in' => 'The specified :attribute field is not a valid IOPS value (300, 600, 1200, 2500)',
         ];
     }
 }
