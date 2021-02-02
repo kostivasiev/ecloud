@@ -40,8 +40,8 @@ post:
     content:
       application/json:
         schema:
+          $ref: '../../components/schemas/firewallPolicy.yaml'
           properties:
-            $ref: '../../components/schemas/firewallPolicy.yaml'
             router_id:
               type: string
               required: true
