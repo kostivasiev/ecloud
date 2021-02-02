@@ -8,7 +8,6 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
