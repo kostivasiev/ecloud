@@ -23,18 +23,17 @@ class DeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // Currently this is disabled due to https://gitlab.devops.ukfast.co.uk/ukfast/eCloud/ecloud-issues/-/issues/406
-//        $response = $this->model->router->availabilityZone->nsxService()->get(
-//            'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/' . $this->model->id
-//        );
-//        $response = json_decode($response->getBody()->getContents());
-//        if ($response->publish_status !== 'REALIZED') {
-//            $this->release(static::RETRY_DELAY);
-//            Log::info(
-//                'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
-//            );
-//            return;
-//        }
+        $response = $this->model->router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/' . $this->model->id
+        );
+        $response = json_decode($response->getBody()->getContents());
+        if ($response->publish_status !== 'REALIZED') {
+            $this->release(static::RETRY_DELAY);
+            Log::info(
+                'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+            );
+            return;
+        }
 
         $this->model->setSyncCompleted();
 
