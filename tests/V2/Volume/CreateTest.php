@@ -13,38 +13,26 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $availabilityZone;
-    protected $region;
     protected $volume;
-    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
+        $this->availabilityZone();
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc()->getKey()
         ]);
     }
 
     public function testNotOwnedVpcIdIsFailed()
     {
-        // TODO: Endpoint disabled until we do the volumes milestone
-        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
-
         $this->post(
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availabilityZone->getKey()
+                'vpc_id' => $this->vpc()->getKey(),
+                'availability_zone_id' => $this->availabilityZone()->getKey()
             ],
             [
                 'X-consumer-custom-id' => '2-0',
@@ -63,9 +51,6 @@ class CreateTest extends TestCase
 
     public function testInvalidAzIsFailed()
     {
-        // TODO: Endpoint disabled until we do the volumes milestone
-        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
-
         $region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $region->getKey()
@@ -75,7 +60,7 @@ class CreateTest extends TestCase
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc()->getKey(),
                 'availability_zone_id' => $availabilityZone->getKey(),
                 'capacity' => (config('volume.capacity.min') + 1),
             ],
@@ -95,23 +80,19 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        // TODO: Endpoint disabled until we do the volumes milestone
-        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
-
         $this->post(
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availabilityZone->getKey(),
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'capacity' => (config('volume.capacity.min') + 1),
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(201);
+        )->assertResponseStatus(201);
 
         $volumeId = (json_decode($this->response->getContent()))->data->id;
         $volume = Volume::find($volumeId);
@@ -120,14 +101,11 @@ class CreateTest extends TestCase
 
     public function testAzIsOptionalParameter()
     {
-        // TODO: Endpoint disabled until we do the volumes milestone
-        $this->markTestSkipped('Create volume tests skipped until we do the volumes milestone');
-
         $this->post(
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc()->getKey(),
                 'capacity' => (config('volume.capacity.min') + 1),
             ],
             [

@@ -72,5 +72,6 @@ class UpdateBilling
         }
 
         $billingMetric->save();
+        $volume->setSyncCompleted();
     }
 }

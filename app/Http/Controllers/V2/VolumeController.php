@@ -79,10 +79,7 @@ class VolumeController extends BaseController
             }
         }
 
-        $volume = app()->make(
-            Volume::class,
-            $request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity', 'iops'])
-        );
+        $volume = new Volume($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity', 'iops']));
         $volume->save();
         $volume->refresh();
         return $this->responseIdMeta($request, $volume->getKey(), 201);
@@ -160,30 +157,5 @@ class VolumeController extends BaseController
         }
 
         return response(null, 204);
-    }
-
-    /**
-     * @param Request $request
-     * @param string $volumeId
-     * @return Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function attach(Request $request, string $volumeId)
-    {
-        $volume = Volume::forUser($request->user)
-            ->findOrFail($volumeId);
-        $this->validate($request, [
-            'instance_id' => [
-                'required',
-                'string',
-                'exists:ecloud.instances,id,deleted_at,NULL',
-                new ExistsForUser(Instance::class),
-                new VolumeNotAttached($volume)
-            ]
-        ]);
-        $instance = Instance::forUser($request->user)
-            ->findOrFail($request->get('instance_id'));
-        $instance->volumes()->attach($volume);
-        return response(null, 202);
     }
 }

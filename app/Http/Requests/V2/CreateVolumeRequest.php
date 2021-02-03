@@ -48,6 +48,7 @@ class CreateVolumeRequest extends FormRequest
                 'max:' . config('volume.capacity.max')
             ],
             'iops' => [
+                'sometimes',
                 'required',
                 'integer',
                 'in:300,600,1200,2500',
@@ -63,7 +64,7 @@ class CreateVolumeRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field is required',
+            'required' => 'The :attribute field is required',
             'vpc_id.exists' => 'The specified :attribute was not found',
             'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
