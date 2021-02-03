@@ -27,8 +27,10 @@ class AddActiveDatesToVpcSupportTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('vpc_support', function (Blueprint $table) {
-            $table->dropColumn('start_date');
-            $table->dropColumn('end_date');
+            $table->dropColumn([
+                'start_date',
+                'end_date',
+            ]);
         });
     }
 }
