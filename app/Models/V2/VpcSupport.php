@@ -55,25 +55,29 @@ class VpcSupport extends Model implements Filterable, Sortable
     public function getActiveAttribute()
     {
         if (is_null($this->start_date)) {
-            // no start date
+            // no start date yet
             return false;
         }
 
         if (strtotime($this->start_date) > time()) {
-            // start date in the future
+            // start date is in the future
             return false;
         }
 
+        // start date is in the past
+
         if (is_null($this->end_date)) {
-            // no end date
+            // no end date yet
             return true;
         }
 
         if (strtotime($this->end_date) < time()) {
+            // end date is in the past
             return false;
         }
 
         if (strtotime($this->end_date) > time()) {
+            // end date is in the future
             return true;
         }
 
