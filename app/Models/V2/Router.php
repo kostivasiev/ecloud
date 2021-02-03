@@ -46,7 +46,6 @@ class Router extends Model implements Filterable, Sortable
         'availability_zone_id',
         'router_throughput_id',
         'deployed',
-        'throughput',
     ];
 
     protected $appends = [

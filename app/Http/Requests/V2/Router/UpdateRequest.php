@@ -11,22 +11,6 @@ use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
-    protected $routerId;
-
-    public function __construct(
-        array $query = [],
-        array $request = [],
-        array $attributes = [],
-        array $cookies = [],
-        array $files = [],
-        array $server = [],
-        $content = null
-    ) {
-        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
-        $this->routerId = Request::route('routerId');
-    }
-
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -49,7 +33,7 @@ class UpdateRequest extends FormRequest
             $availabilityZoneId = $this->request->get('availability_zone_id');
         }
         if (empty($availabilityZoneId)) {
-            $router = Router::forUser(app('request')->user)->find($this->routerId);
+            $router = Router::forUser(app('request')->user)->find(Request::route('routerId'));
             if (!empty($router)) {
                 $availabilityZoneId = $router->availability_zone_id;
             }
