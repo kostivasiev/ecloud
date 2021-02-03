@@ -6,7 +6,6 @@ use App\Events\V2\FirewallRule\Deleted;
 use App\Events\V2\FirewallRule\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -31,6 +30,7 @@ class FirewallRule extends Model implements Filterable, Sortable
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
+        'id',
         'name',
         'sequence',
         'deployed',

@@ -5,6 +5,7 @@ namespace Tests\V2\Router\EventTests;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\RouterThroughput;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Faker\Generator;
@@ -16,7 +17,7 @@ class DefaultAvailabilityZoneTest extends TestCase
     use DatabaseMigrations;
 
     protected Generator $faker;
-    protected AvailabilityZone $availability_zone;
+    protected AvailabilityZone $availabilityZone;
     protected Region $region;
     protected Vpc $vpc;
 
@@ -27,7 +28,7 @@ class DefaultAvailabilityZoneTest extends TestCase
         $this->region = factory(Region::class)->create([
             'name' => $this->faker->country(),
         ]);
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
@@ -42,7 +43,7 @@ class DefaultAvailabilityZoneTest extends TestCase
             [
                 'name' => 'Manchester Network',
                 'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availability_zone->getKey(),
+                'availability_zone_id' => $this->availabilityZone->getKey(),
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -53,6 +54,6 @@ class DefaultAvailabilityZoneTest extends TestCase
         $id = json_decode($this->response->getContent())->data->id;
         $router = Router::findOrFail($id);
         // verify that the availability_zone_id equals the one in the data array
-        $this->assertEquals($router->availability_zone_id, $this->availability_zone->getKey());
+        $this->assertEquals($router->availability_zone_id, $this->availabilityZone->getKey());
     }
 }

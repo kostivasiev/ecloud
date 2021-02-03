@@ -2,12 +2,10 @@
 
 namespace Tests\V2\FirewallRule;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
+use App\Events\V2\FirewallRule\Saved as FirewallRuleSaved;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,31 +13,23 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $availability_zone;
-    protected $faker;
-    protected $firewall_policy;
-    protected $region;
-    protected $router;
-    protected $vpc;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
-        $this->firewall_policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
-        ]);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
     }
 
     public function testValidDataSucceeds()
@@ -47,7 +37,7 @@ class CreateTest extends TestCase
         $this->post('/v2/firewall-rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy()->id,
             'source' => '192.168.100.1/24',
             'destination' => '212.22.18.10/24',
             'action' => 'ALLOW',
@@ -59,7 +49,7 @@ class CreateTest extends TestCase
         ])->seeInDatabase('firewall_rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy()->id,
             'source' => '192.168.100.1/24',
             'destination' => '212.22.18.10/24',
             'action' => 'ALLOW',

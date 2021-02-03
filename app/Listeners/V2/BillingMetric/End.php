@@ -10,17 +10,17 @@ class End
 {
     public function handle($event)
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         if ($event->model->id === null) {
-            Log::info(get_class($this) . ' : Nothing to do, resource ID not found', ['event' => $event]);
+            Log::info(get_class($this) . ' : Nothing to do, resource ID not found', ['id' => $event->model->id]);
             return true;
         }
 
         $billingMetric = BillingMetric::where('resource_id', $event->model->id)
             ->where('end', null);
         if (!$billingMetric) {
-            Log::info(get_class($this) . ' : Nothing to do, no billing metric(s) for resource', ['event' => $event]);
+            Log::info(get_class($this) . ' : Nothing to do, no billing metric(s) for resource', ['id' => $event->model->id]);
             return true;
         }
 
@@ -31,6 +31,6 @@ class End
             ]);
         });
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }

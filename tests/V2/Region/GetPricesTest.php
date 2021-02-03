@@ -61,6 +61,7 @@ class GetPricesTest extends TestCase
                 'name' => $product->name,
                 'category'  => strtolower($product->product_subcategory),
                 'price'  => $product->getPrice(),
+                'rate'  => strtolower($product->product_duration_type),
             ])->assertResponseStatus(200);
     }
 }

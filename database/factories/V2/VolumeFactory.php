@@ -3,9 +3,8 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\Volume;
-use Faker\Generator as Faker;
 
-$factory->define(Volume::class, function (Faker $faker) {
+$factory->define(Volume::class, function () {
     return [
         'name' => 'Primary Volume',
         'capacity' => '100',

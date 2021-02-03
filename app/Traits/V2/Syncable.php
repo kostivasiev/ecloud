@@ -2,6 +2,9 @@
 
 namespace App\Traits\V2;
 
+use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Sync;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,12 +30,42 @@ trait Syncable
 
     public function syncDelete()
     {
-        $deleteResponse = parent::delete();
-        if (!$deleteResponse) {
+        $response = parent::delete();
+        if (!$response) {
             Log::error(get_class($this) . ' : Failed to delete', ['resource_id' => $this->id]);
-            return $deleteResponse;
+            return $response;
         }
         Log::info(get_class($this) . ' : Deleted', ['resource_id' => $this->id]);
+    }
+
+    public function save(array $options = [])
+    {
+        // Only do this for Firewall's at the moment
+        if (!in_array(__CLASS__, [
+            FirewallPolicy::class,
+        ])) {
+            return parent::save($options);
+        }
+
+        $response = parent::save($options);
+        if (!$response) {
+            Log::error(get_class($this) . ' : Failed to save', ['resource_id' => $this->id]);
+            return $response;
+        }
+
+        $class = explode('\\', __CLASS__);
+        $class = 'App\\Jobs\\Sync\\' . end($class) . '\\Save';
+        if (!class_exists($class)) {
+            throw new \Exception('Syncable "Save" job not found for ' . __CLASS__);
+        }
+
+        if (!$this->createSync()) {
+            return false;
+        }
+
+        dispatch(new $class($this));
+
+        return $response;
     }
 
     public function createSync()

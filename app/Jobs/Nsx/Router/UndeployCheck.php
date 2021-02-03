@@ -21,7 +21,7 @@ class UndeployCheck extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => ['id' => $this->model->id]]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $router = Router::withTrashed()->findOrFail($this->model->id);
         $response = $router->availabilityZone->nsxService()->get(
@@ -41,6 +41,6 @@ class UndeployCheck extends Job
         $this->model->setSyncCompleted();
         $this->model->syncDelete();
 
-        Log::info(get_class($this) . ' : Finished', ['model' => ['id' => $this->model->id]]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
