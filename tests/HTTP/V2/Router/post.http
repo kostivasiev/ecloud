@@ -60,7 +60,12 @@ client.log('Router ID: ' + response.body.data.id);
 %}
 
 ###
+GET https://{{host}}/{{version}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
 
+###
 DELETE https://{{host}}/{{version}}/routers/{{router_id}}
 Accept: */*
 Cache-Control: no-cache

@@ -2,13 +2,10 @@
 
 namespace Tests\V2\FirewallRule;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
+use App\Events\V2\FirewallRule\Deleted;
 use App\Models\V2\FirewallRule;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -16,58 +13,35 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected FirewallPolicy $firewall_policy;
     protected FirewallRule $firewall_rule;
-    protected Region $region;
-    protected Vpc $vpc;
-    protected Router $router;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
-        $this->firewall_policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
-        ]);
-        $this->firewall_rule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
-        ]);
-    }
 
-    public function testFailInvalidId()
-    {
-        $this->delete(
-            '/v2/firewall-rules/' . $this->faker->uuid,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Not found',
-                'detail' => 'No Firewall Rule with that ID was found',
-                'status' => 404,
-            ])
-            ->assertResponseStatus(404);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+
+        $this->firewall_rule = factory(FirewallRule::class)->create([
+            'firewall_policy_id' => $this->firewallPolicy()->id,
+        ]);
     }
 
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/firewall-rules/' . $this->firewall_rule->getKey(),
+            '/v2/firewall-rules/' . $this->firewall_rule->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -75,8 +49,12 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $instance = FirewallRule::withTrashed()->findOrFail($this->firewall_rule->getKey());
+        $instance = FirewallRule::withTrashed()->findOrFail($this->firewall_rule->id);
         $this->assertNotNull($instance->deleted_at);
+
+        Event::assertDispatched(Deleted::class, function ($job) {
+            return $job->model->id === $this->firewall_rule->id;
+        });
     }
 
 }

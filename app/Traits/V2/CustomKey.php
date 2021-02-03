@@ -28,6 +28,11 @@ trait CustomKey
             throw new \Exception('Invalid key prefix');
         }
 
+        if (!empty($model->id)) {
+            Log::info('ID already set to "' . $model->id . '" for ' . get_class($model));
+            return;
+        }
+
         try {
             do {
                 $model->id = $model->keyPrefix . '-' . bin2hex(random_bytes(4));

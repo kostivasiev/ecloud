@@ -3,11 +3,10 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\FirewallRulePort;
-use Faker\Generator as Faker;
 
-$factory->define(FirewallRulePort::class, function (Faker $faker) {
+$factory->define(FirewallRulePort::class, function () {
     return [
-        'name' => $faker->domainWord,
+        'name' => 'name',
         'protocol' => 'TCP',
         'source' => '443',
         'destination' => '555',

@@ -24,22 +24,20 @@ class FirewallRulePort extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName;
 
+    const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
     public $keyPrefix = 'fwrp';
     public $incrementing = false;
     public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
-
     protected $fillable = [
+        'id',
         'name',
         'firewall_rule_id',
         'protocol',
         'source',
         'destination'
     ];
-
-    const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
-
     protected $dispatchesEvents = [
         'saved' => Saved::class,
         'deleted' => Deleted::class

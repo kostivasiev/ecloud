@@ -2,14 +2,20 @@
 
 namespace App\Events\V2\FirewallRulePort;
 
-use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\SerializesModels;
 
-class Saved extends Event
+class Saved
 {
+    use SerializesModels;
+
     public $model;
 
-    public function __construct(Model $model)
+    /**
+     * @param Model $model
+     * @return void
+     */
+    public function __construct($model)
     {
         $this->model = $model;
     }

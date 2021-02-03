@@ -2,13 +2,10 @@
 
 namespace Tests\V2\FirewallRulePort;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
+use App\Events\V2\FirewallPolicy\Saved;
 use App\Models\V2\FirewallRule;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -16,41 +13,35 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
-    protected $availabilityZone;
-    protected $firewallPolicy;
     protected $firewallRule;
-    protected $region;
-    protected $router;
-    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
-        ]);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
     }
 
     public function testValidDataSucceeds()
     {
         $this->post('/v2/firewall-rule-ports', [
-            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'firewall_rule_id' => $this->firewallRule->id,
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555'
@@ -60,7 +51,7 @@ class CreateTest extends TestCase
         ])->seeInDatabase(
             'firewall_rule_ports',
             [
-                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'firewall_rule_id' => $this->firewallRule->id,
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555'
@@ -72,7 +63,7 @@ class CreateTest extends TestCase
     public function testValidICMPDataSucceeds()
     {
         $this->post('/v2/firewall-rule-ports', [
-            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'firewall_rule_id' => $this->firewallRule->id,
             'protocol' => 'ICMPv4'
         ], [
             'X-consumer-custom-id' => '1-0',
@@ -80,7 +71,7 @@ class CreateTest extends TestCase
         ])->seeInDatabase(
             'firewall_rule_ports',
             [
-                'firewall_rule_id' => $this->firewallRule->getKey(),
+                'firewall_rule_id' => $this->firewallRule->id,
                 'protocol' => 'ICMPv4',
             ],
             'ecloud'

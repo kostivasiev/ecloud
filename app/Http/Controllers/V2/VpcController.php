@@ -8,6 +8,7 @@ use App\Jobs\FirewallPolicy\ConfigureDefaults;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
+use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
@@ -159,21 +160,15 @@ class VpcController extends BaseController
         $availabilityZone = $vpc->region()->first()->availabilityZones()->first();
 
         // Create a new router
-        $router = $vpc->routers()->create();
+        $router = app()->make(Router::class);
+        $router->vpc()->associate($vpc);
         $router->availabilityZone()->associate($availabilityZone);
         $router->save();
 
         // Create a new network
-        Network::withoutEvents(function () use ($router) {
-            $network = new Network();
-            $network::addCustomKey($network);
-            $network->name = $network->id;
-            $network->router()->associate($router);
-            $network->save();
-        });
-
-        // Deploy router and network
-        //event(new RouterAvailabilityZoneAttach($router, $availabilityZone));
+        $network = app()->make(Network::class);
+        $network->router()->associate($router);
+        $network->save();
 
         // Configure default firewall policies
         $this->dispatch(new ConfigureDefaults([

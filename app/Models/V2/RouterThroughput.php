@@ -34,6 +34,7 @@ class RouterThroughput extends Model implements Filterable, Sortable
         ];
 
         $this->fillable([
+            'id',
             'availability_zone_id',
             'name',
             'committed_bandwidth',
