@@ -7,6 +7,7 @@ use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Models\V2\RouterThroughput;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -19,9 +20,16 @@ class DeployDefaultsTest extends TestCase
     private $firewallRuleCount;
     private $firewallRulePortCount;
 
+    private RouterThroughput $routerThroughput;
+
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->routerThroughput = factory(RouterThroughput::class)->create([
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'committed_bandwidth' => config('router.throughput.default.bandwidth')
+        ]);
     }
 
     public function tearDown(): void
@@ -397,6 +405,7 @@ class DeployDefaultsTest extends TestCase
         $router = $this->vpc()->routers()->first();
         $this->assertNotNull($router);
         $this->assertNotNull(Network::where('router_id', '=', $router->id)->first());
+        $this->assertEquals($this->routerThroughput->id, $router->router_throughput_id);
 
         // Check the relationships are intact
         $policies = config('firewall.policies');

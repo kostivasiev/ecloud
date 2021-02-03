@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Router;
 
+use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
+use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
-class UpdateRouterRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +28,24 @@ class UpdateRouterRequest extends FormRequest
      */
     public function rules()
     {
+        $availabilityZoneId = null;
+        if ($this->request->has('availability_zone_id')) {
+            $availabilityZoneId = $this->request->get('availability_zone_id');
+        }
+        if (empty($availabilityZoneId)) {
+            $router = Router::forUser(app('request')->user)->find(Request::route('routerId'));
+            if (!empty($router)) {
+                $availabilityZoneId = $router->availability_zone_id;
+            }
+        }
+
         return [
             'name' => 'sometimes|required|string',
+            'router_throughput_id' => [
+                'sometimes',
+                'required',
+                new ExistsForAvailabilityZone($availabilityZoneId)
+            ],
             'vpc_id' => [
                 'sometimes',
                 'required',
@@ -51,6 +70,7 @@ class UpdateRouterRequest extends FormRequest
             'vpc_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
+            'router_throughput_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }

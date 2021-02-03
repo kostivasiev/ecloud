@@ -164,6 +164,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
             \App\Events\V2\Nic\Created::class,
+            \App\Events\V2\Volume\Created::class,
 
             // Deleting
             \App\Events\V2\Nat\Deleting::class,

@@ -32,18 +32,21 @@ class UpdateTest extends TestCase
         ]);
     }
 
-    public function testNotOwnedVpcIdIdIsFailed()
+    public function testNotOwnedVpcIdIsFailed()
     {
-        $this->post(
-            '/v2/routers',
-            [
-                'name' => 'Manchester Router 2',
-                'vpc_id' => 'x',
-            ],
+        $data = [
+            'name' => 'Manchester Network',
+            'vpc_id' => $this->vpc->getKey(),
+        ];
+
+        $this->patch(
+            '/v2/routers/' . $this->router->getKey(),
+            $data,
             [
                 'X-consumer-custom-id' => '2-0',
                 'X-consumer-groups' => 'ecloud.write',
-            ])
+            ]
+        )
             ->seeJson([
                 'title' => 'Validation Error',
                 'detail' => 'The specified vpc id was not found',
