@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../public-openapi.yaml#/components/schemas/VirtualPrivateCloud'
+                items:
+                  $ref: '../../public-openapi.yaml#/components/schemas/VirtualPrivateCloud'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

@@ -192,6 +192,7 @@ class EventServiceProvider extends ServiceProvider
 
         // Router
         \App\Events\V2\Router\Creating::class => [
+            \App\Listeners\V2\Router\DefaultRouterThroughput::class
         ],
         \App\Events\V2\Router\Created::class => [
             \App\Listeners\V2\Router\Deploy::class,
@@ -208,6 +209,9 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Volume
+        \App\Events\V2\Volume\Created::class => [
+            \App\Listeners\V2\Volume\UpdateBilling::class,
+        ],
         \App\Events\V2\Volume\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
         ],

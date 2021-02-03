@@ -4,36 +4,37 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2012e9e93502ac93847dca5a098d759",
+    "content-hash": "ae75a936ca3b268607e2cde08d6741e6",
     "packages": [
         {
             "name": "cebe/php-openapi",
-            "version": "1.5.0",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cebe/php-openapi.git",
-                "reference": "310de0290cfa9597f8bd3444cb7f8e1682bbbeeb"
+                "reference": "672aea69aaeb0c8305ff64b6d6034d9eaadbebf4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cebe/php-openapi/zipball/310de0290cfa9597f8bd3444cb7f8e1682bbbeeb",
-                "reference": "310de0290cfa9597f8bd3444cb7f8e1682bbbeeb",
+                "url": "https://api.github.com/repos/cebe/php-openapi/zipball/672aea69aaeb0c8305ff64b6d6034d9eaadbebf4",
+                "reference": "672aea69aaeb0c8305ff64b6d6034d9eaadbebf4",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "justinrainbow/json-schema": "^5.0",
                 "php": ">=7.1.0",
-                "symfony/yaml": "^3.4 | ^4.0 | ^5.0"
+                "symfony/yaml": "^3.0 | ^4.0 | ^5.0"
             },
             "require-dev": {
                 "apis-guru/openapi-directory": "1.0.0",
                 "cebe/indent": "*",
+                "friendsofphp/php-cs-fixer": "~2.16.1",
                 "mermade/openapi3-examples": "1.0.0",
                 "nexmo/api-specification": "1.0.0",
-                "oai/openapi-specification": "3.0.3",
+                "oai/openapi-specification": "3.0.2",
                 "phpstan/phpstan": "^0.12.0",
-                "phpunit/phpunit": "^6.5 || ^7.5 || ^8.5 || ^9.4"
+                "phpunit/phpunit": "^6.5"
             },
             "bin": [
                 "bin/php-openapi"
@@ -41,7 +42,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.5.x-dev"
+                    "dev-master": "1.4.x-dev"
                 }
             },
             "autoload": {
@@ -61,7 +62,7 @@
                     "role": "Creator"
                 }
             ],
-            "description": "Read and write OpenAPI yaml/json files and make the content accessable in PHP objects.",
+            "description": "READ OpenAPI yaml files and make the content accessable in PHP objects.",
             "homepage": "https://github.com/cebe/php-openapi#readme",
             "keywords": [
                 "openapi"
@@ -70,7 +71,7 @@
                 "issues": "https://github.com/cebe/php-openapi/issues",
                 "source": "https://github.com/cebe/php-openapi"
             },
-            "time": "2020-12-31T00:41:54+00:00"
+            "time": "2020-05-27T15:32:36+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -6265,16 +6266,16 @@
         },
         {
             "name": "ukfast/sdk",
-            "version": "v1.3.24",
+            "version": "v1.3.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ukfast/sdk-php.git",
-                "reference": "9a9493fb548d35b11eb4e79874b1669b18ab26cd"
+                "reference": "a0007161bb0bb559d17cff2ee8d7e25bf26080f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ukfast/sdk-php/zipball/9a9493fb548d35b11eb4e79874b1669b18ab26cd",
-                "reference": "9a9493fb548d35b11eb4e79874b1669b18ab26cd",
+                "url": "https://api.github.com/repos/ukfast/sdk-php/zipball/a0007161bb0bb559d17cff2ee8d7e25bf26080f8",
+                "reference": "a0007161bb0bb559d17cff2ee8d7e25bf26080f8",
                 "shasum": ""
             },
             "require": {
@@ -6301,9 +6302,9 @@
             "support": {
                 "email": "support@ukfast.co.uk",
                 "issues": "https://github.com/ukfast/sdk-php/issues",
-                "source": "https://github.com/ukfast/sdk-php/tree/v1.3.24"
+                "source": "https://github.com/ukfast/sdk-php/tree/v1.3.26"
             },
-            "time": "2021-01-28T16:09:11+00:00"
+            "time": "2021-02-02T08:44:41+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
