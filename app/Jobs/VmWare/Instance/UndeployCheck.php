@@ -22,13 +22,13 @@ class UndeployCheck extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         // TODO :- Undeploy
 
         $this->model->setSyncCompleted();
         $this->model->syncDelete();
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

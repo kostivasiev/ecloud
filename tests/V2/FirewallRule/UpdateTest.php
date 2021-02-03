@@ -2,13 +2,11 @@
 
 namespace Tests\V2\FirewallRule;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
+use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
+use App\Events\V2\FirewallRule\Saved as FirewallRuleSaved;
 use App\Models\V2\FirewallRule;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -16,33 +14,28 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected FirewallPolicy $firewall_policy;
     protected FirewallRule $firewall_rule;
-    protected Region $region;
-    protected Vpc $vpc;
-    protected Router $router;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
-        $this->firewall_policy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
-        ]);
+
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+
         $this->firewall_rule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewall_policy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
     }
 

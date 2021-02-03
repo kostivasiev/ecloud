@@ -11,8 +11,8 @@ get:
             properties:
               data:
                 type: array
-                  items:
-                    $ref: '../../components/schemas/routerThroughput.yaml'
+                items:
+                  $ref: '../../components/schemas/routerThroughput.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Router;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
 use UKFast\FormRequests\FormRequest;
 
-class CreateRouterRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,6 +27,20 @@ class CreateRouterRequest extends FormRequest
      */
     public function rules()
     {
+        $availabilityZoneId = null;
+        if ($this->request->has('availability_zone_id')) {
+            $availabilityZoneId = $this->request->get('availability_zone_id');
+        }
+        // Default AZ
+        if (empty($availabilityZoneId) && $this->request->has('vpc_id')) {
+            $vpc = Vpc::forUser(app('request')->user)->find($this->request->get('vpc_id'));
+            if (!empty($vpc)) {
+                $availabilityZoneId = $vpc->region
+                    ->availabilityZones
+                    ->first()->id;
+            }
+        }
+
         return [
             'name' => 'nullable|string',
             'vpc_id' => [
@@ -33,7 +49,12 @@ class CreateRouterRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
+            'router_throughput_id' => [
+                'sometimes',
+                'required',
+                'exists:ecloud.router_throughputs,id,deleted_at,NULL',
+                new ExistsForAvailabilityZone($availabilityZoneId)
+            ]
         ];
     }
 
@@ -45,10 +66,9 @@ class CreateRouterRequest extends FormRequest
     public function messages()
     {
         return [
+
             'vpc_id.required' => 'The :attribute field is required',
             'vpc_id.exists' => 'The specified :attribute was not found',
-            'availability_zone_id.required' => 'The :attribute field is required',
-            'availability_zone_id.exists' => 'The specified :attribute was not found',
         ];
     }
 }

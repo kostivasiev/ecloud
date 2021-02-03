@@ -40,7 +40,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "name": "Test VPC - Test network deploy",
+  "name": "Test VPC - test default router throughput",
   "region_id": "{{dev_region_id}}",
   "availability_zone_id": "{{dev_availability_zone_id}}"
 }
