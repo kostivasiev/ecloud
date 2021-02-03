@@ -3,13 +3,12 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\Nic;
-use Faker\Generator as Faker;
 
-$factory->define(Nic::class, function (Faker $faker) {
+$factory->define(Nic::class, function () {
     return [
-        'mac_address' => $faker->macAddress,
+        'mac_address' => '01-23-45-67-89-AB',
         'instance_id' => 'i-' . bin2hex(random_bytes(4)),
         'network_id' => 'net-' . bin2hex(random_bytes(4)),
-        'ip_address' => $faker->ipv4,
+        'ip_address' => '127.0.0.1',
     ];
 });

@@ -21,12 +21,12 @@ class Undeploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $this->model->router->availabilityZone->nsxService()->delete(
             'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/' . $this->model->id
         );
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

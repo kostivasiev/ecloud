@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class CidrSubnetValidationTest extends TestCase
 {
-    protected $faker;
     protected $validator;
 
     public function setUp(): void

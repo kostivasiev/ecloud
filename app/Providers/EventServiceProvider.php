@@ -75,29 +75,25 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // FirewallPolicy
-        \App\Events\V2\FirewallPolicy\Saved::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
-        ],
         \App\Events\V2\FirewallPolicy\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // FirewallRule
-        \App\Events\V2\FirewallRule\Saved::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
-        ],
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallRule\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
+        \App\Events\V2\FirewallRule\Saved::class => [
+            \App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
+        ],
 
         // FirewallRulePort
-        \App\Events\V2\FirewallRulePort\Saved::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
-        ],
         \App\Events\V2\FirewallRulePort\Deleted::class => [
-            \App\Listeners\V2\FirewallPolicy\Deploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
+        ],
+        \App\Events\V2\FirewallRulePort\Saved::class => [
+            \App\Listeners\V2\FirewallRulePort\UpdateFirewallPolicy::class,
         ],
 
         // FloatingIp
@@ -126,7 +122,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\ComputeChange::class
         ],
         \App\Events\V2\Instance\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Instance\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
@@ -178,7 +173,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nic\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Nic\Deleted::class => [
             \App\Listeners\V2\Nic\DeleteDhcpLease::class,       // TODO :- Needs moving to the Sync Nic delete
@@ -192,6 +186,7 @@ class EventServiceProvider extends ServiceProvider
 
         // Router
         \App\Events\V2\Router\Creating::class => [
+            \App\Listeners\V2\Router\DefaultRouterThroughput::class
         ],
         \App\Events\V2\Router\Created::class => [
             \App\Listeners\V2\Router\Deploy::class,
@@ -211,6 +206,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Created::class => [
             \App\Listeners\V2\Volume\Deploy::class,
             \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\Volume\UpdateBilling::class,
         ],
         \App\Events\V2\Volume\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,
@@ -219,7 +215,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Volume\CapacityIncrease::class,
         ],
         \App\Events\V2\Volume\Deleting::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,

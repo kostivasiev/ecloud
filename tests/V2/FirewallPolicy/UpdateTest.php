@@ -2,12 +2,10 @@
 
 namespace Tests\V2\FirewallPolicy;
 
-use App\Models\V2\AvailabilityZone;
+use App\Events\V2\FirewallPolicy\Saved;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,31 +13,31 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
     protected FirewallPolicy $policy;
-    protected Region $region;
-    protected Router $router;
-    protected Vpc $vpc;
     protected array $oldData;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturn(
+                new Response(200, [], ''),
+            );
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturn(
+                new Response(200, [], json_encode(['publish_status' => 'REALIZED'])),
+                new Response(200, [], json_encode(['publish_status' => 'REALIZED'])),
+            );
+
         $this->oldData = [
             'name' => 'Demo Firewall Policy 1',
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router()->id,
         ];
         $this->policy = factory(FirewallPolicy::class)->create($this->oldData)->first();
     }

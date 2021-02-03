@@ -31,12 +31,14 @@ class Product extends Model implements Filterable, Sortable
         'Compute',
         'Networking',
         'Storage',
-        'License'
+        'License',
+        'Support',
     ];
 
     protected $appends = [
         'name',
         'price',
+        'rate',
         'availability_zone_id',
         'category'
     ];
@@ -112,6 +114,11 @@ class Product extends Model implements Filterable, Sortable
     public function getCategoryAttribute()
     {
         return $this->attributes['product_subcategory'];
+    }
+
+    public function getRateAttribute()
+    {
+        return $this->attributes['product_duration_type'];
     }
 
     public function scopeForAvailabilityZone($query, AvailabilityZone $availabilityZone)
