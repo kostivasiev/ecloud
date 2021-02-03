@@ -38,11 +38,13 @@ class Router extends Model implements Filterable, Sortable
     public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
+
     protected $fillable = [
         'id',
         'name',
         'vpc_id',
         'availability_zone_id',
+        'router_throughput_id',
         'deployed',
     ];
 
@@ -94,6 +96,11 @@ class Router extends Model implements Filterable, Sortable
     public function networks()
     {
         return $this->hasMany(Network::class);
+    }
+
+    public function routerThroughput()
+    {
+        return $this->hasOne(RouterThroughput::class);
     }
 
     /**
@@ -153,6 +160,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('router_throughput_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('deployed', Filter::$enumDefaults),
@@ -171,6 +179,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('router_throughput_id'),
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
             $factory->create('deployed'),
@@ -196,6 +205,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
+            'router_throughput_id' => 'router_throughput_id',
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
             'deployed' => 'deployed',

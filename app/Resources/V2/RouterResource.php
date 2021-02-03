@@ -25,6 +25,7 @@ class RouterResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
+            'router_throughput_id' => $this->router_throughput_id,
             'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

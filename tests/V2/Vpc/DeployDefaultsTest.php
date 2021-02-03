@@ -6,6 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
+use App\Models\V2\RouterThroughput;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -24,6 +25,8 @@ class DeployDefaultsTest extends TestCase
     /** @var Vpc */
     private $vpc;
 
+    private RouterThroughput $routerThroughput;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -34,6 +37,10 @@ class DeployDefaultsTest extends TestCase
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
+        ]);
+        $this->routerThroughput = factory(RouterThroughput::class)->create([
+            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'committed_bandwidth' => config('router.throughput.default.bandwidth')
         ]);
     }
 
@@ -59,6 +66,7 @@ class DeployDefaultsTest extends TestCase
         $router = $this->vpc->routers()->first();
         $this->assertNotNull($router);
         $this->assertNotNull(Network::where('router_id', '=', $router->getKey())->first());
+        $this->assertEquals($this->routerThroughput->id, $router->router_throughput_id);
 
         Event::assertDispatched(\App\Events\V2\FirewallPolicy\Saved::class);
 
