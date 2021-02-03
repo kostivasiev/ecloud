@@ -4,7 +4,6 @@ namespace App\Services\V2;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
-use phpDocumentor\GraphViz\Exception;
 
 final class NsxService
 {
