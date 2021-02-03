@@ -128,7 +128,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             $this->credential = factory(Credential::class)->create([
                 'id' => 'cred-test',
                 'name' => 'NSX',
-                'resource_id' => $this->availabilityZone->id,
+                'resource_id' => $this->availabilityZone()->id,
             ]);
         }
         return $this->credential;

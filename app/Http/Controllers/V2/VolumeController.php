@@ -9,6 +9,8 @@ use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
+use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\VolumeNotAttached;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -158,5 +160,30 @@ class VolumeController extends BaseController
         }
 
         return response(null, 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $volumeId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function attach(Request $request, string $volumeId)
+    {
+        $volume = Volume::forUser($request->user)
+            ->findOrFail($volumeId);
+        $this->validate($request, [
+            'instance_id' => [
+                'required',
+                'string',
+                'exists:ecloud.instances,id,deleted_at,NULL',
+                new ExistsForUser(Instance::class),
+                new VolumeNotAttached($volume)
+            ]
+        ]);
+        $instance = Instance::forUser($request->user)
+            ->findOrFail($request->get('instance_id'));
+        $instance->volumes()->attach($volume);
+        return response(null, 202);
     }
 }
