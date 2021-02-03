@@ -10,7 +10,6 @@ use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Router;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
-use phpDocumentor\GraphViz\Exception;
 
 class ConfigureDefaults extends Job
 {
