@@ -199,17 +199,16 @@ class ProcessBilling extends Command
             // Don't create accounts logs for staff/internal accounts
             try {
                 $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
+                if ($customer->accountStatus == 'Internal Account') {
+                    if ($this->option('debug')) {
+                        $this->info('Reseller #' . $resellerId . ' is an internal account - skipping accounts log entry.');
+                    }
+                    continue;
+                }
             } catch (\Exception $exception) {
                 $error = 'Failed to load customer details for for reseller ' . $resellerId;
                 $this->error($error . $exception->getMessage());
                 Log::error($error, [$exception->getMessage()]);
-            }
-
-            if ($customer->accountStatus == 'Internal Account') {
-                if ($this->option('debug')) {
-                    $this->info('Reseller #' . $resellerId . ' is an internal account - skipping accounts log entry.');
-                }
-                continue;
             }
 
             // Min £1 surcharge
