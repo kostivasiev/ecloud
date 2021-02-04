@@ -12,6 +12,8 @@ return [
                     'sequence' => 0,
                     'direction' => 'OUT',
                     'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
                     'ports' => [
                         [
                             'protocol' => 'ICMPv4'
@@ -24,6 +26,8 @@ return [
                     'sequence' => 0,
                     'direction' => 'OUT',
                     'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
                     'ports' => [
                         [
                             'protocol' => 'UDP',
@@ -43,6 +47,8 @@ return [
                     'sequence' => 0,
                     'direction' => 'OUT',
                     'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
                     'ports' => [
                         [
                             'protocol' => 'UDP',
@@ -62,6 +68,8 @@ return [
                     'sequence' => 0,
                     'direction' => 'OUT',
                     'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
                     'ports' => [
                         [
                             'protocol' => 'TCP',
@@ -82,6 +90,8 @@ return [
                     'sequence' => 0,
                     'direction' => 'IN',
                     'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
                     'ports' => [
                         [
                             'protocol' => 'TCP',
@@ -96,6 +106,8 @@ return [
                     'sequence' => 0,
                     'direction' => 'IN',
                     'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
                     'ports' => [
                         [
                             'protocol' => 'TCP',
@@ -117,6 +129,8 @@ return [
                     'sequence' => 0,
                     'direction' => 'IN',
                     'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
                     'ports' => [
                         [
                             'protocol' => 'TCP',
