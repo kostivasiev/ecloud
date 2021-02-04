@@ -3,9 +3,8 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\DiscountPlan;
-use Faker\Generator as Faker;
 
-$factory->define(DiscountPlan::class, function (Faker $faker) {
+$factory->define(DiscountPlan::class, function () {
     return [
         'reseller_id' => 1,
         'name' => 'test-commitment',

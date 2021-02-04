@@ -3,9 +3,8 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\ApplianceVersion;
-use Faker\Generator as Faker;
 
-$factory->define(ApplianceVersion::class, function (Faker $faker) {
+$factory->define(ApplianceVersion::class, function () {
     return [
         'appliance_version_version' => 1,
         'appliance_version_script_template' => '',

@@ -2,11 +2,10 @@
 
 namespace Tests\V2\FirewallPolicy;
 
-use App\Models\V2\AvailabilityZone;
+use App\Events\V2\FirewallPolicy\Saved;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,24 +13,23 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Region $region;
-    protected Router $router;
-    protected Vpc $vpc;
-
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturn(
+                new Response(200, [], ''),
+            );
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturn(
+                new Response(200, [], json_encode(['publish_status' => 'REALIZED']))
+            );
     }
 
     public function testValidDataSucceeds()
@@ -39,7 +37,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Demo policy rule 1',
             'sequence' => 10,
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router()->id,
         ];
         $this->post(
             '/v2/firewall-policies',
@@ -55,5 +53,4 @@ class CreateTest extends TestCase
         $this->assertEquals($firewallPolicy->name, $data['name']);
         $this->assertEquals($firewallPolicy->sequence, $data['sequence']);
     }
-
 }

@@ -17,7 +17,7 @@ class Undeploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         // TODO :- Move this to the \App\Jobs\Sync\FirewallPolicy\Delete as chained jobs BEFORE deleting the policy!
         // See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/590#note_712450
@@ -32,6 +32,6 @@ class Undeploy extends Job
             'policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id
         );
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

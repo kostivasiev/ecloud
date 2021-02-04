@@ -2,9 +2,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use Faker\Generator as Faker;
-
-$factory->define(\App\Models\V2\AvailabilityZoneCapacity::class, function (Faker $faker) {
+$factory->define(\App\Models\V2\AvailabilityZoneCapacity::class, function () {
     return [
         'type' => 'floating_ip',
         'current' => 20,

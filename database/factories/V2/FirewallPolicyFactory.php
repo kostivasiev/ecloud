@@ -3,11 +3,10 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\FirewallPolicy;
-use Faker\Generator as Faker;
 
-$factory->define(FirewallPolicy::class, function (Faker $faker) {
+$factory->define(FirewallPolicy::class, function () {
     return [
-        'name' => $faker->domainWord,
+        'name' => 'name',
         'sequence' => 10,
     ];
 });

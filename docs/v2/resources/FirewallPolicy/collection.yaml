@@ -40,7 +40,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/firewallPolicy.yaml'
+          allOf:
+          - $ref: '../../components/schemas/firewallPolicy.yaml'
+          - properties:
+              router_id:
+                type: string
+                required: true
+                example: 'rtr-4c63cf58'
+                readOnly: false
   responses:
     201:
       $ref: '../../resources/FirewallPolicy/responses/idResponse.yaml'

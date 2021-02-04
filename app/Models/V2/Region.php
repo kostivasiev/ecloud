@@ -81,7 +81,7 @@ class Region extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('is_public', Filter::$numericDefaults),
+            $factory->boolean()->create('is_public', '1', '0'),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];

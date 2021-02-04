@@ -46,12 +46,12 @@ properties:
           required: false
           description: Comma separated list of ports and/or port ranges
           type: string
-          example: 443
+          example: '443'
         destination:
           required: false
           description: Comma separated list of ports and/or port ranges
           type: string
-          example: 555
+          example: '555'
   action:
     description: 'One of ALLOW, DROP, REJECT'
     type: string
@@ -66,7 +66,8 @@ properties:
     readOnly: false
   enabled:
     type: boolean
-    readOnly: true
+    required: true
+    readOnly: false
     example: true
   created_at:
     type: string

@@ -17,7 +17,7 @@ class Undeploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         if ($this->model->instances()->count() !== 0) {
             // TODO :- Move this to a deleation rule, it's not right doing it here?
@@ -28,6 +28,6 @@ class Undeploy extends Job
             '/api/v1/vpc/' . $this->model->vpc->id . '/volume/' . $this->model->vmware_uuid
         );
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
