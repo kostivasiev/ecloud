@@ -41,7 +41,7 @@ class Appliance extends Model
     public function getScriptParameters(): array
     {
         $params = [];
-        $parameters = $this->getLatestVersion()->scriptParameters()->get();
+        $parameters = $this->getLatestVersion()->applianceScriptParameters()->get();
         foreach ($parameters as $parameter) {
             $params[$parameter->key] = $parameter;
         }

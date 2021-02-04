@@ -65,7 +65,7 @@ class ApplianceVersion extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function scriptParameters()
+    public function applianceScriptParameters()
     {
         return $this->hasMany(
             ApplianceScriptParameters::class,
