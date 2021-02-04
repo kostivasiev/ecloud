@@ -5,6 +5,7 @@ namespace App\Http\Requests\V2\FirewallRulePort;
 use App\Models\V2\FirewallRule;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
+use Illuminate\Validation\Rules\RequiredIf;
 use UKFast\FormRequests\FormRequest;
 
 class Update extends FormRequest
@@ -44,11 +45,15 @@ class Update extends FormRequest
             ],
             'source' => [
                 'sometimes',
+                new RequiredIf($this->protocol == 'TCP'),
+                new RequiredIf($this->protocol == 'UDP'),
                 'string',
                 new ValidFirewallRulePortSourceDestination()
             ],
             'destination' => [
                 'sometimes',
+                new RequiredIf($this->protocol == 'TCP'),
+                new RequiredIf($this->protocol == 'UDP'),
                 'string',
                 new ValidFirewallRulePortSourceDestination(),
             ]

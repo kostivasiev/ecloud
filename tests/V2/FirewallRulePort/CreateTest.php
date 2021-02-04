@@ -65,8 +65,6 @@ class CreateTest extends TestCase
         $this->post('/v2/firewall-rule-ports', [
             'firewall_rule_id' => $this->firewallRule->id,
             'protocol' => 'ICMPv4',
-            'source' => 'ANY',
-            'destination' => 'ANY',
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'

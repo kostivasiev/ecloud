@@ -27,10 +27,12 @@ return [
                     'ports' => [
                         [
                             'protocol' => 'UDP',
+                            'source' => 'ANY',
                             'destination' => 53
                         ],
                         [
                             'protocol' => 'TCP',
+                            'source' => 'ANY',
                             'destination' => 53
                         ]
                     ]
@@ -44,10 +46,12 @@ return [
                     'ports' => [
                         [
                             'protocol' => 'UDP',
+                            'source' => 'ANY',
                             'destination' => 123
                         ],
                         [
                             'protocol' => 'TCP',
+                            'source' => 'ANY',
                             'destination' => 123
                         ]
                     ]
@@ -61,6 +65,7 @@ return [
                     'ports' => [
                         [
                             'protocol' => 'TCP',
+                            'source' => 'ANY',
                             'destination' => '80,443'
                         ]
                     ]
@@ -80,6 +85,7 @@ return [
                     'ports' => [
                         [
                             'protocol' => 'TCP',
+                            'source' => 'ANY',
                             'destination' => 3389
                         ]
                     ]
@@ -93,6 +99,7 @@ return [
                     'ports' => [
                         [
                             'protocol' => 'TCP',
+                            'source' => 'ANY',
                             'destination' => 2020
                         ]
                     ]
@@ -113,6 +120,7 @@ return [
                     'ports' => [
                         [
                             'protocol' => 'TCP',
+                            'source' => 'ANY',
                             'destination' => '80,443'
                         ]
                     ]
