@@ -98,7 +98,7 @@ class VpcSupport extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
-            'vpc_id' => 'reseller_id',
+            'vpc_id' => 'vpc_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

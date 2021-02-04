@@ -38,11 +38,13 @@ class Router extends Model implements Filterable, Sortable
     public $timestamps = true;
     protected $keyType = 'string';
     protected $connection = 'ecloud';
+
     protected $fillable = [
         'id',
         'name',
         'vpc_id',
         'availability_zone_id',
+        'router_throughput_id',
         'deployed',
     ];
 
@@ -96,6 +98,11 @@ class Router extends Model implements Filterable, Sortable
         return $this->hasMany(Network::class);
     }
 
+    public function routerThroughput()
+    {
+        return $this->hasOne(RouterThroughput::class);
+    }
+
     /**
      * @return bool
      * @throws \Exception
@@ -110,7 +117,7 @@ class Router extends Model implements Filterable, Sortable
 
         try {
             $response = $this->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->getKey() . '/state'
+                'policy/api/v1/infra/tier-1s/' . $this->id . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
             if (!isset($response->tier1_state->state)) {
@@ -119,7 +126,7 @@ class Router extends Model implements Filterable, Sortable
             return $response->tier1_state->state == 'in_sync';
         } catch (GuzzleException $exception) {
             Log::info('Router available state response', [
-                'id' => $this->getKey(),
+                'id' => $this->id,
                 'response' => json_decode($exception->getResponse()->getBody()->getContents())->details,
             ]);
             return false;
@@ -153,6 +160,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('router_throughput_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('deployed', Filter::$enumDefaults),
@@ -171,6 +179,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('router_throughput_id'),
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
             $factory->create('deployed'),
@@ -196,6 +205,7 @@ class Router extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
+            'router_throughput_id' => 'router_throughput_id',
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
             'deployed' => 'deployed',

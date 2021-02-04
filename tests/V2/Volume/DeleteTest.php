@@ -61,7 +61,10 @@ class DeleteTest extends TestCase
         $kingpinService = app()->makeWith(KingpinService::class, [$this->availability_zone]);
         $mockKingpinService = \Mockery::mock($kingpinService)->makePartial();
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            $mockKingpinService->shouldReceive('delete')->andReturn(new Response(204, [], ''));
+            $mockKingpinService->shouldReceive('delete')
+                ->andReturnUsing(function () {
+                    return new Response(204, [], '');
+                });
             return $mockKingpinService;
         });
     }

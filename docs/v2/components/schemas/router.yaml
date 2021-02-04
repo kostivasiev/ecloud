@@ -11,6 +11,11 @@ properties:
     type: string
     required: true
     example: 'vpc-2b66bb79'
+  router_throughput_id:
+    description: ID of the router throughput profile to assign to the router
+    type: string
+    required: true
+    example: 'rtp-2b66bb79'
 #  availability_zone_id:
 #    type: string
 #    required: false

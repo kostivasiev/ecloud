@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Data\InstanceDeployEventData;
 use App\Events\V2\Instance\Deploy;
 use App\Events\V2\Instance\Deploy\Data;
-use App\Events\V2\InstanceDeployEvent;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -13,7 +11,6 @@ use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
-use App\Jobs\Instance\Update;
 use App\Models\V2\Appliance;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;

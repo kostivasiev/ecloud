@@ -19,17 +19,14 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @var Region */
-    private $region;
-
-    /** @var Vpc */
-    private $vpc;
-
-    /** @var Dhcp */
-    private $dhcp;
-
     /** @var AvailabilityZone */
     protected $availability_zone;
+    /** @var Region */
+    private $region;
+    /** @var Vpc */
+    private $vpc;
+    /** @var Dhcp */
+    private $dhcp;
 
     public function setUp(): void
     {
@@ -60,12 +57,14 @@ class DeleteTest extends TestCase
         $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
-            $mockNsxService->shouldReceive('delete')->andReturn(new Response(204, [], ''));
-            $mockNsxService->shouldReceive('get')->andReturn(new Response(
-                200,
-                [],
-                json_encode(['results' => [['id' => 0]]])
-            ));
+            $mockNsxService->shouldReceive('delete')
+                ->andReturnUsing(function () {
+                    return new Response(204, [], '');
+                });
+            $mockNsxService->shouldReceive('get')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
+                });
             return $mockNsxService;
         });
     }

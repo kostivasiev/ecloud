@@ -22,7 +22,7 @@ class UndeployCheck extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         // Load NIC from destination or translated
         $nic = collect(
@@ -67,6 +67,6 @@ class UndeployCheck extends Job
         $this->model->setSyncCompleted();
         $this->model->syncDelete();
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $this->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
