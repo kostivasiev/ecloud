@@ -27,6 +27,12 @@ class ProcessBilling extends Command
 
     protected array $billing;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->billing = [];
+    }
+
     /**
      * Billable metrics - Add any metrics to this array that we want to bill for.
      * @var array|string[]
