@@ -2,10 +2,8 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\Vpc;
-use Faker\Generator as Faker;
 
-$factory->define(\App\Models\V2\Product::class, function (Faker $faker) {
+$factory->define(\App\Models\V2\Product::class, function () {
     return [
         'product_name' => 'az-aaaaaaaa: vcpu-1',
         'product_category' => 'eCloud',

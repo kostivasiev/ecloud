@@ -4,11 +4,11 @@ namespace App\Console\Commands\VPC;
 
 use App\Models\V2\BillingMetric;
 use App\Models\V2\DiscountPlan;
-use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use UKFast\Admin\Billing\AdminClient;
+use UKFast\Admin\Account\AdminClient as AccountAdminClient;
+use UKFast\Admin\Billing\AdminClient as BillingAdminClient;
 use UKFast\Admin\Billing\Entities\Payment;
 use Illuminate\Support\Facades\Log;
 
@@ -196,10 +196,25 @@ class ProcessBilling extends Command
                 }
             }
 
+            // Don't create accounts logs for staff/internal accounts
+            try {
+                $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
+                if ($customer->accountStatus == 'Internal Account') {
+                    if ($this->option('debug')) {
+                        $this->info('Reseller #' . $resellerId . ' is an internal account - skipping accounts log entry.');
+                    }
+                    continue;
+                }
+            } catch (\Exception $exception) {
+                $error = 'Failed to load customer details for for reseller ' . $resellerId;
+                $this->error($error . $exception->getMessage());
+                Log::error($error, [$exception->getMessage()]);
+            }
+
             // Min £1 surcharge
             $total = ($total < 1) ? 1 : $total;
 
-            $bilingAdminClient = app()->make(AdminClient::class);
+            $bilingAdminClient = app()->make(BillingAdminClient::class);
             $payment = new Payment([
                 'description' => 'eCloud VPCs from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
                 'category' => 'eCloud v2',

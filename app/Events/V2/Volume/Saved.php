@@ -15,6 +15,6 @@ class Saved
     public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->originalCapacity = $model->getOriginal('capacity');
+        $this->originalCapacity = $model->getOriginal('capacity') ?? $this->model->capacity;
     }
 }

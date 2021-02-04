@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
@@ -24,123 +25,137 @@ class ConfigureNics extends Job
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
-        Instance::findOrFail($this->data['instance_id'])->nics()
-            ->whereNotNull('network_id')
-            ->where('network_id', '!=', '')
-            ->each(function ($nic) {
-                Log::info('Starting ConfigureNic job for NIC ' . $nic->getKey());
+        $network = Network::findOrFail($this->data['network_id']);
+        if (!$network->available) {
+            if ($this->attempts() <= static::RETRY_ATTEMPTS) {
+                $this->release(static::RETRY_DELAY);
+                Log::info('Attempted to configure NICs on Network (' . $network->getKey()
+                    . ') but Network was not available, will retry shortly');
+                return;
+            } else {
+                $message = 'Timed out waiting for Network (' . $network->getKey() .
+                    ') to become available for prior to NIC configuration';
+                $this->fail(new \Exception($message));
+                return;
+            }
+        }
 
-                $logMessage = 'ConfigureNic ' . $nic->getKey() . ': ';
+        $instance = Instance::findOrFail($this->data['instance_id']);
 
-                $network = $nic->network;
-                $router = $nic->network->router;
-                $subnet = Subnet::fromString($network->subnet);
-                $nsxService = $nic->instance->availabilityZone->nsxService();
+        $getInstanceResponse = $instance->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id
+        );
 
-                if (!$network->available) {
-                    if ($this->attempts() <= static::RETRY_ATTEMPTS) {
-                        $this->release(static::RETRY_DELAY);
-                        Log::info('Attempted to configure NIC (' . $nic->getKey() . ') on Network (' . $network->getKey() .
-                            ') but Network was not available, will retry shortly');
-                        return;
-                    } else {
-                        $message = 'Timed out waiting for Network (' . $network->getKey() .
-                            ') to become available for prior to NIC configuration';
-                        $nic->setSyncFailureReason($message);
-                        $this->fail(new \Exception($message));
-                        return;
-                    }
+        $instanceData = json_decode($getInstanceResponse->getBody()->getContents());
+        if (!$instanceData) {
+            throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+        }
+
+        Log::info(get_class($this) . ' : ' . count($instanceData->nics) . ' NIC\'s found');
+
+        foreach ($instanceData->nics as $nicData) {
+            $nic = app()->make(Nic::class);
+            $nic->mac_address = $nicData->macAddress;
+            $nic->instance_id = $instance->id;
+            $nic->network_id = $network->id;
+            $nic->save();
+            Log::info(get_class($this) . ' : Created NIC resource ' . $nic->getKey());
+
+            $router = $network->router;
+            $subnet = Subnet::fromString($network->subnet);
+            $nsxService = $nic->instance->availabilityZone->nsxService();
+
+            /**
+             * Get DHCP static bindings to determine used IP addresses on the network
+             * @see https://185.197.63.88/policy/api_includes/method_ListSegmentDhcpStaticBinding.html
+             */
+            $cursor = null;
+            $assignedIpsNsx = collect();
+            do {
+                $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs?cursor=' . $cursor);
+                $response = json_decode($response->getBody()->getContents());
+                foreach ($response->results as $dhcpStaticBindingConfig) {
+                    $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
+                }
+                $cursor = $response->cursor ?? null;
+            } while (!empty($cursor));
+
+            // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
+            $reserved = 3;
+            $iterator = 0;
+
+            $ip = $subnet->getStartAddress(); //First reserved IP
+            while ($ip = $ip->getNextAddress()) {
+                $iterator++;
+                if ($iterator <= $reserved) {
+                    continue;
+                }
+                if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
+                    $message = 'Insufficient available IP\'s in subnet to assign to NIC';
+                    $nic->setSyncFailureReason($message);
+                    $this->fail(new \Exception($message));
+                    return;
                 }
 
-                /**
-                 * Get DHCP static bindings to determine used IP addresses on the network
-                 * @see https://185.197.63.88/policy/api_includes/method_ListSegmentDhcpStaticBinding.html
-                 */
-                $cursor = null;
-                $assignedIpsNsx = collect();
-                do {
-                    $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs?cursor=' . $cursor);
-                    $response = json_decode($response->getBody()->getContents());
-                    foreach ($response->results as $dhcpStaticBindingConfig) {
-                        $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
-                    }
-                    $cursor = $response->cursor ?? null;
-                } while (!empty($cursor));
+                $checkIp = $ip->toString();
 
-                // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
-                $reserved = 3;
-                $iterator = 0;
-
-                $ip = $subnet->getStartAddress(); //First reserved IP
-                while ($ip = $ip->getNextAddress()) {
-                    $iterator++;
-                    if ($iterator <= $reserved) {
-                        continue;
-                    }
-                    if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                        $message = 'Insufficient available IP\'s in subnet to assign to NIC';
-                        $nic->setSyncFailureReason($message);
-                        $this->fail(new \Exception($message));
-                        return;
-                    }
-
-                    $checkIp = $ip->toString();
-
-                    //check NSX that the IP isn't in use.
-                    if ($assignedIpsNsx->contains($checkIp)) {
-                        continue;
-                    }
-
-                    $nic->ip_address = $checkIp;
-
-                    try {
-                        Nic::withoutEvents(function () use ($nic) {
-                            $nic->save();
-                        });
-                    } catch (\Exception $exception) {
-                        if ($exception->getCode() == 23000) {
-                            // Ip already assigned
-                            Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': IP is already used.');
-                            continue;
-                        }
-
-                        $this->fail(new \Exception(
-                            $logMessage . 'Failed: ' . $exception->getMessage()
-                        ));
-                        return;
-                    }
-
-                    Log::info('Ip Address ' . $nic->ip_address . ' assigned to ' . $nic->getKey());
-                    break;
+                //check NSX that the IP isn't in use.
+                if ($assignedIpsNsx->contains($checkIp)) {
+                    continue;
                 }
 
+                $nic->ip_address = $checkIp;
 
-                /**
-                 * Create dhcp lease for the ip to the nic's mac address on NSX
-                 * @see https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
-                 */
                 try {
-                    $nsxService->put(
-                        '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
-                        . '/dhcp-static-binding-configs/' . $nic->getKey(),
-                        [
-                            'json' => [
-                                'resource_type' => 'DhcpV4StaticBindingConfig',
-                                'mac_address' => $nic->mac_address,
-                                'ip_address' => $nic->ip_address
-                            ]
-                        ]
-                    );
+                    // We're using withoutEvents here so we can prevent sync issues because we're
+                    // using a database level constraint for atomic inserts of ip addresses .
+                    Nic::withoutEvents(function () use ($nic) {
+                        $nic->save();
+                    });
                 } catch (\Exception $exception) {
-                    if ($exception->hasResponse()) {
-                        Log::info(get_class($this), json_decode($exception->getResponse()->getBody()->getContents(), true));
+                    if ($exception->getCode() == 23000) {
+                        // Ip already assigned
+                        Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': IP is already used.');
+                        continue;
                     }
-                    throw $exception;
+
+                    $this->fail(new \Exception(
+                        'Configuring NIC ' . $nic->getKey() . ': Failed: ' . $exception->getMessage()
+                    ));
+                    return;
                 }
 
-                $nic->setSyncCompleted();
-                Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
-            });
+                Log::info('Ip Address ' . $nic->ip_address . ' assigned to ' . $nic->getKey());
+                break;
+            }
+
+
+            /**
+             * Create dhcp lease for the ip to the nic's mac address on NSX
+             * @see https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
+             */
+            try {
+                $nsxService->put(
+                    '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
+                    . '/dhcp-static-binding-configs/' . $nic->getKey(),
+                    [
+                        'json' => [
+                            'resource_type' => 'DhcpV4StaticBindingConfig',
+                            'mac_address' => $nic->mac_address,
+                            'ip_address' => $nic->ip_address
+                        ]
+                    ]
+                );
+            } catch (\Exception $exception) {
+                if ($exception->hasResponse()) {
+                    Log::info(get_class($this), json_decode($exception->getResponse()->getBody()->getContents(), true));
+                }
+                throw $exception;
+            }
+
+            $nic->setSyncCompleted();
+            Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
+        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

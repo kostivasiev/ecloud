@@ -2,12 +2,8 @@
 
 namespace Tests\V2\FirewallPolicy;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,31 +11,28 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected FirewallPolicy $firewallPolicy;
     protected FirewallRule $firewallRule;
-    protected Region $region;
-    protected Router $router;
-    protected Vpc $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->id,
-        ]);
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
     }
 
@@ -53,10 +46,10 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->firewallPolicy->getKey(),
-                'name' => $this->firewallPolicy->name,
-                'sequence' => $this->firewallPolicy->sequence,
-                'router_id' => $this->router->getKey(),
+                'id' => $this->firewallPolicy()->id,
+                'name' => $this->firewallPolicy()->name,
+                'sequence' => $this->firewallPolicy()->sequence,
+                'router_id' => $this->router()->id,
             ])
             ->assertResponseStatus(200);
     }
@@ -64,17 +57,17 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/firewall-policies/' . $this->firewallPolicy->getKey(),
+            '/v2/firewall-policies/' . $this->firewallPolicy()->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->firewallPolicy->getKey(),
-                'name' => $this->firewallPolicy->name,
-                'sequence' => $this->firewallPolicy->sequence,
-                'router_id' => $this->router->getKey(),
+                'id' => $this->firewallPolicy()->id,
+                'name' => $this->firewallPolicy()->name,
+                'sequence' => $this->firewallPolicy()->sequence,
+                'router_id' => $this->router()->id,
             ])
             ->assertResponseStatus(200);
     }
@@ -82,15 +75,15 @@ class GetTest extends TestCase
     public function testGetFirewallPolicyFirewallRules()
     {
         $this->get(
-            '/v2/firewall-policies/' . $this->firewallPolicy->getKey() . '/firewall-rules',
+            '/v2/firewall-policies/' . $this->firewallPolicy()->id . '/firewall-rules',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->firewallRule->getKey(),
-                'firewall_policy_id' => $this->firewallPolicy->getKey()
+                'id' => $this->firewallRule->id,
+                'firewall_policy_id' => $this->firewallPolicy()->id
             ])
             ->assertResponseStatus(200);
     }

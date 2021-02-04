@@ -21,6 +21,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('availability-zones', 'AvailabilityZoneController@index');
     $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
     $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
+    $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
 
     $router->group(['middleware' => 'is-administrator'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
@@ -32,7 +33,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
         $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
         $router->get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
-        $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
     });
 
     /** Availability Zone Capacities */

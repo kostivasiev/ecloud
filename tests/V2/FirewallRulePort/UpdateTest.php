@@ -2,13 +2,12 @@
 
 namespace Tests\V2\FirewallRulePort;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\FirewallPolicy;
+use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
+use App\Events\V2\FirewallRulePort\Saved as FirewallRulePortSaved;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -16,41 +15,40 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $firewallPolicy;
     protected $firewallRule;
     protected $firewallRulePort;
-    protected $region;
-    protected $vpc;
-    protected $router;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
-        ]);
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'router_id' => $this->router->getKey(),
-        ]);
+
+        $this->availabilityZone();
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // TODO - Replace with real mock
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+
         $this->firewallRule = factory(FirewallRule::class)->create([
-            'firewall_policy_id' => $this->firewallPolicy->getKey(),
+            'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
+
         $this->firewallRulePort = factory(FirewallRulePort::class)->create([
-            'firewall_rule_id' => $this->firewallRule->getKey(),
+            'firewall_rule_id' => $this->firewallRule->id,
         ]);
     }
 
     public function testValidDataSucceeds()
     {
         $this->patch(
-            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(),
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
             [
                 'name' => 'Changed',
                 'protocol' => 'UDP',
@@ -64,7 +62,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'firewall_rule_ports',
             [
-                'id' => $this->firewallRulePort->getKey(),
+                'id' => $this->firewallRulePort->id,
                 'name' => 'Changed',
                 'protocol' => 'UDP',
                 'source' => '10.0.0.1',
@@ -77,7 +75,7 @@ class UpdateTest extends TestCase
     public function testUpdateWithICMPValues()
     {
         $this->patch(
-            '/v2/firewall-rule-ports/' . $this->firewallRulePort->getKey(),
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
             [
                 'name' => 'Changed',
                 'protocol' => 'ICMPv4',
@@ -89,7 +87,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'firewall_rule_ports',
             [
-                'id' => $this->firewallRulePort->getKey(),
+                'id' => $this->firewallRulePort->id,
                 'name' => 'Changed',
                 'protocol' => 'ICMPv4',
                 'source' => null,

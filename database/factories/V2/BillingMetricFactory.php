@@ -3,12 +3,11 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\BillingMetric;
-use Faker\Generator as Faker;
 
-$factory->define(BillingMetric::class, function (Faker $faker) {
+$factory->define(BillingMetric::class, function () {
     return [
-        'resource_id' => $faker->uuid,
-        'vpc_id' => $faker->uuid,
+        'resource_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        'vpc_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         'reseller_id' => 1,
         'key' => 'ram.capacity',
         'value' => '16GB',
