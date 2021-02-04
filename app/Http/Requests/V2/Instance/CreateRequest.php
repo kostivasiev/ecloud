@@ -44,7 +44,7 @@ class CreateRequest extends FormRequest
             throw $exception;
         }
 
-        return [
+        $rules = [
             'name' => 'nullable|string',
             'vpc_id' => [
                 'sometimes',
@@ -105,6 +105,40 @@ class CreateRequest extends FormRequest
                 'max:' . ($this->config->get('ukfast.spec.volume.max') ?? config('volume.capacity.max')),
             ],
         ];
+
+        $rules = array_merge($rules, $this->generateApplianceRules());
+        return $rules;
+    }
+
+    public function generateApplianceRules()
+    {
+        // Now for the dynamic rules for the appliance data
+        $scriptRules = [];
+        if ($this->has('appliance_id')) {
+            // So, we need to retrieve the validation rules
+            $parameters = (Appliance::findOrFail($this->get('appliance_id')))
+                ->getScriptParameters();
+            foreach ($parameters as $parameterKey => $parameter) {
+                $key = 'appliance_data.' . $parameterKey;
+                $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
+                //validation rules regex
+                if (!empty($parameters[$parameterKey]->appliance_script_parameters_validation_rule)) {
+                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->appliance_script_parameters_validation_rule;
+                }
+
+                // For data types String,Numeric,Boolean we can use Laravel validation
+                switch ($parameters[$parameterKey]->appliance_script_parameters_type) {
+                    case 'String':
+                    case 'Numeric':
+                    case 'Boolean':
+                        $scriptRules[$key][] = strtolower($parameters[$parameterKey]->appliance_script_parameters_type);
+                        break;
+                    case 'Password':
+                        $scriptRules[$key][] = 'string';
+                }
+            }
+        }
+        return $scriptRules;
     }
 
     /**

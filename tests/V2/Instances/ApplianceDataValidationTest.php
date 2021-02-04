@@ -1,14 +1,15 @@
 <?php
 namespace Tests\V2\Instances;
 
-use App\Http\Controllers\V2\InstanceController;
+use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceScriptParameters;
 use App\Models\V2\ApplianceVersion;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Admin\Devices\AdminClient;
 
 class ApplianceDataValidationTest extends TestCase
 {
@@ -18,7 +19,6 @@ class ApplianceDataValidationTest extends TestCase
     protected Appliance $appliance;
     protected ApplianceVersion $appliance_version;
     protected Request $request;
-    protected $instanceController;
     protected array $applianceData;
 
     public function setUp(): void
@@ -46,22 +46,43 @@ class ApplianceDataValidationTest extends TestCase
                 'appliance_script_parameters_validation_rule' => '/.*/'
             ]);
         }
-        $this->request = Request::create('', 'POST', [
+        $this->request = CreateRequest::create('', 'POST', [
             'appliance_id' => $this->appliance->getKey(),
             'appliance_data' => $this->applianceData
         ]);
-        $this->instanceController = \Mockery::mock(InstanceController::class)->makePartial();
+
+        // Admin Client Mock
+        app()->bind(AdminClient::class, function () {
+            $adminClientMock = \Mockery::mock(AdminClient::class)
+                ->makePartial()
+                ->shouldAllowMockingProtectedMethods();
+            $adminClientMock->shouldReceive('licenses')->andReturnSelf();
+            $adminClientMock->shouldReceive('getById')->andReturnUsing(function () {
+                $obj = new \StdClass;
+                $obj->category = 'Linux';
+                return $obj;
+            });
+            return $adminClientMock;
+        });
     }
 
     public function testSuccessfulValidation()
     {
-        $this->assertTrue($this->instanceController->validateApplianceData($this->request));
+        $this->request->rules();
+        $validator = app('validator')
+            ->make(
+                $this->request->all(),
+                $this->request->generateApplianceRules(),
+                $this->request->messages()
+            );
+        $validator->validate();
+        $this->assertTrue($validator->passes());
     }
 
     public function testFailedValidation()
     {
         $this->expectException(ValidationException::class);
-        $request = Request::create('', 'POST', [
+        $request = CreateRequest::create('', 'POST', [
             'appliance_id' => $this->appliance->getKey(),
             'appliance_data' => json_encode([
                 'mysql_root_password' => null,
@@ -70,6 +91,14 @@ class ApplianceDataValidationTest extends TestCase
                 'gogs_secret_key' => null
             ])
         ]);
-        $this->instanceController->validateApplianceData($request);
+        $request->rules();
+        $validator = app('validator')
+            ->make(
+                $request->all(),
+                $request->generateApplianceRules(),
+                $request->messages()
+            );
+        $validator->validate();
+        $this->assertFalse($validator->passes());
     }
 }
