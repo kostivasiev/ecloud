@@ -20,12 +20,12 @@ properties:
     example: TCP
   source:
     required: true
-    description: "ANY" or comma separated list of ports and/or port ranges
+    description: '"ANY" or comma separated list of ports and/or port ranges'
     type: string
     example: 443
   destination:
     required: true
-    description: "ANY" or comma separated list of ports and/or port ranges
+    description: '"ANY" or comma separated list of ports and/or port ranges'
     type: string
     example: 555
   created_at:
