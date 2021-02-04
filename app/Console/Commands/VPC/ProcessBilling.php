@@ -36,7 +36,10 @@ class ProcessBilling extends Command
         'ram.capacity',
         'disk.capacity',
         'license.windows',
-        'volume.iops',
+        'disk.capacity.300',
+        'disk.capacity.600',
+        'disk.capacity.1200',
+        'disk.capacity.2500',
     ];
 
     public function handle()
