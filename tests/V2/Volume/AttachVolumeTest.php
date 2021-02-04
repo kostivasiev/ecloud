@@ -22,36 +22,14 @@ class AttachVolumeTest extends TestCase
 
     protected Appliance $appliance;
     protected ApplianceVersion $applianceVersion;
-    protected AvailabilityZone $availability_zone;
-    protected Credential $credential;
     protected Instance $instance;
     protected Region $region;
     protected Volume $volume;
-    protected Vpc $vpc;
-
-    protected $kingpinService;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        app()->bind('encrypter', function () {
-            $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-                ->shouldAllowMockingProtectedMethods();
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')
-                ->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')
-                ->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
-        });
-
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
         ])->refresh();  // Hack needed since this is a V1 resource
@@ -59,53 +37,52 @@ class AttachVolumeTest extends TestCase
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();  // Hack needed since this is a V1 resource
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'appliance_version_id' => $this->applianceVersion->uuid,
-            'availability_zone_id' => $this->availability_zone->getKey(),
-        ]);
-        $this->credential = factory(Credential::class)->create([
-            'resource_id' => $this->availability_zone->getKey()
+            'availability_zone_id' => $this->availabilityZone()->getKey(),
         ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availability_zone->getKey(),
+            'vpc_id' => $this->vpc()->getKey(),
+            'availability_zone_id' => $this->availabilityZone()->getKey(),
         ]);
 
-        app()->bind(KingpinService::class, function () {
-            $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
-            $mockKingpinService->shouldReceive('post')
-                ->withArgs([
-                    '/api/v2/vpc/'.$this->instance->vpc_id.
-                    '/instance/'.$this->instance->id.
-                    '/volume/attach',
-                    [
-                        'json' => [
-                            'volumeUUID' => $this->volume->vmware_uuid,
-                            'shared' => true,
-                            'unitNumber' => 0
-                        ]
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/' . $this->instance->vpc_id .
+                '/instance/' . $this->instance->id .
+                '/volume/attach',
+                [
+                    'json' => [
+                        'volumeUUID' => $this->volume->vmware_uuid,
+                        'shared' => true,
+                        'unitNumber' => 0
                     ]
-                ])
-                ->andReturn(
-                    new Response(200)
-                );
-            $mockKingpinService->shouldReceive('put')
-                ->withArgs([
-                    '/api/v2/vpc/'.$this->instance->vpc_id.
-                    '/instance/'.$this->instance->id.
-                    '/volume/'.$this->volume->vmware_uuid.
-                    '/iops',
-                    [
-                        'json' => [
-                            'limit' => $this->volume->iops
-                        ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                new Response(200);
+            });
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/' . $this->instance->vpc_id .
+                '/instance/' . $this->instance->id .
+                '/volume/' . $this->volume->vmware_uuid .
+                '/iops',
+                [
+                    'json' => [
+                        'limit' => $this->volume->iops
                     ]
-                ])
-                ->andReturn(
-                    new Response(200)
-                );
-            return $mockKingpinService;
-        });
+                ]
+            ])
+            ->andReturnUsing(function () {
+                new Response(200);
+            });
+    }
+
+    protected function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
     }
 
     public function testAttachingVolumeAndSettingIops()
@@ -143,8 +120,10 @@ class AttachVolumeTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->seeJson([
-            'title' => 'Duplicated Request',
-            'detail' => 'The volume is already attached to the specified instance',
-        ])->assertResponseStatus(400);
+            'title' => 'Validation Error',
+            'detail' => 'The specified volume is already mounted on this instance',
+            'status' => 422,
+            'source' => 'instance_id',
+        ])->assertResponseStatus(422);
     }
 }
