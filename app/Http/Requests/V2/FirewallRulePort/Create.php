@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\FirewallRulePort;
 
 use App\Models\V2\FirewallRule;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidPortReference;
+use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use UKFast\FormRequests\FormRequest;
 
 class Create extends FormRequest
@@ -41,14 +41,14 @@ class Create extends FormRequest
                 'in:TCP,UDP,ICMPv4'
             ],
             'source' => [
-                'nullable',
+                'required',
                 'string',
-                new ValidPortReference()
+                new ValidFirewallRulePortSourceDestination()
             ],
             'destination' => [
-                'nullable',
+                'required',
                 'string',
-                new ValidPortReference()
+                new ValidFirewallRulePortSourceDestination()
             ]
         ];
     }

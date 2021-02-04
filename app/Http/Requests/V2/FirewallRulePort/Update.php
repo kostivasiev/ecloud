@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\FirewallRulePort;
 
 use App\Models\V2\FirewallRule;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidPortReference;
+use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use UKFast\FormRequests\FormRequest;
 
 class Update extends FormRequest
@@ -44,15 +44,13 @@ class Update extends FormRequest
             ],
             'source' => [
                 'sometimes',
-                'nullable',
                 'string',
-                new ValidPortReference()
+                new ValidFirewallRulePortSourceDestination()
             ],
             'destination' => [
                 'sometimes',
-                'nullable',
                 'string',
-                new ValidPortReference(),
+                new ValidFirewallRulePortSourceDestination(),
             ]
         ];
     }

@@ -96,4 +96,38 @@ class UpdateTest extends TestCase
             'ecloud'
         )->assertResponseStatus(200);
     }
+
+    public function testEmptySourceFails()
+    {
+        $this->patch(
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
+            [
+                'name' => 'Changed',
+                'protocol' => 'UDP',
+                'source' => '',
+                'destination' => '80'
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(200);
+    }
+
+    public function testEmptyDestinationFails()
+    {
+        $this->patch(
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
+            [
+                'name' => 'Changed',
+                'protocol' => 'UDP',
+                'source' => '444',
+                'destination' => ''
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(200);
+    }
 }
