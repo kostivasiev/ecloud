@@ -68,7 +68,7 @@ class UpdateBilling
 
         $product = $volume->availabilityZone
             ->products()
-            ->where('product_name', 'LIKE', '%volume%'.$volume->iops)
+            ->where('product_name', 'LIKE', '%volume@'.$volume->iops.'%')
             ->first();
         if (empty($product)) {
             Log::error(
