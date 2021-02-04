@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Queue\TestRead::class,
         \App\Console\Commands\Credentials\Show::class,
         \App\Console\Commands\VPC\ProcessBilling::class,
+        \App\Console\Commands\Billing\RouterThroughput\ProductPopulation::class,
     ];
 
     /**
