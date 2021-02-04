@@ -12,6 +12,7 @@ use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\VolumeNotAttached;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -168,33 +169,20 @@ class VolumeController extends BaseController
      */
     public function attachToInstance(Request $request, string $volumeId)
     {
+        $volume = Volume::forUser($request->user)
+            ->findOrFail($volumeId);
         $this->validate($request, [
             'instance_id' => [
                 'required',
                 'string',
                 'exists:ecloud.instances,id,deleted_at,NULL',
-                new ExistsForUser(Instance::class)
+                new ExistsForUser(Instance::class),
+                new VolumeNotAttached($volume)
             ]
         ]);
         $instance = Instance::forUser($request->user)->findOrFail($request->get('instance_id'));
-        $volume = Volume::forUser($request->user)->findOrFail($volumeId);
-
-        if ($volume->instances->contains($instance->id)) {
-            return response()->json([
-                'errors' => [
-                    [
-                        'title' => 'Duplicated Request',
-                        'detail' => 'The volume is already attached to the specified instance',
-                        'status' => 400,
-                    ],
-                ],
-            ])->setStatusCode(400);
-        }
-
-        $volume->instances()->attach($instance);
-        $volume->save();
+        $instance->volumes()->attach($volume);
         $this->dispatch(new AttachToInstance($volume, $instance));
-
         return response('', 202);
     }
 }
