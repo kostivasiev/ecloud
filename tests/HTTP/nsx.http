@@ -125,11 +125,6 @@ GET https://185.197.63.88/policy/api/v1/infra/qos-profiles
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
-### Router Throughput QoS profiles
-GET https://185.197.63.88/policy/api/v1/infra/gateway-qos-profiles
-Authorization: Basic {{nsx_username}} {{nsx_password}}
-Content-Type:  application/json
-
 ###
 GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/domains/default/gateway-policies/fwp-df3f063e
 Authorization: Basic {{nsx_username}} {{nsx_password}}
@@ -165,7 +160,22 @@ GET https://185.197.63.88/policy/api/v1/infra/gateway-qos-profiles
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
+### Router Throughput QoS profiles search. Search Query: resource_type = GatewayQosProfile & committed_bandwitdth = 500 & burst_size = 1024000000
+GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:GatewayQosProfile%20AND%20committed_bandwitdth:20%20AND%20burst_size:2048000
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
 ###
 GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/tier-1s/rtr-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/tier-1s/rtr-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Search AZ default T0
+GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
