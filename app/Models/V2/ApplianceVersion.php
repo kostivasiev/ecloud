@@ -100,4 +100,15 @@ class ApplianceVersion extends Model
             ->first()
             ->appliance_version_uuid;
     }
+
+    public function getScriptParameters(): array
+    {
+        $params = [];
+        $parameters = $this->applianceScriptParameters()->get();
+        foreach ($parameters as $parameter) {
+            $params[$parameter->key] = $parameter;
+        }
+
+        return $params;
+    }
 }

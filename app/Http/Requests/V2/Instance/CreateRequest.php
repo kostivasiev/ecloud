@@ -117,6 +117,7 @@ class CreateRequest extends FormRequest
 
         // So, we need to retrieve the validation rules
         $parameters = (Appliance::findOrFail($this->get('appliance_id')))
+            ->getLatestVersion()
             ->getScriptParameters();
         foreach ($parameters as $parameterKey => $parameter) {
             $key = 'appliance_data.' . $parameterKey;
