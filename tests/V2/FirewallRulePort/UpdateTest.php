@@ -52,8 +52,8 @@ class UpdateTest extends TestCase
             [
                 'name' => 'Changed',
                 'protocol' => 'UDP',
-                'source' => '10.0.0.1',
-                'destination' => '192.168.1.2'
+                'source' => 'ANY',
+                'destination' => '80'
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -65,8 +65,8 @@ class UpdateTest extends TestCase
                 'id' => $this->firewallRulePort->id,
                 'name' => 'Changed',
                 'protocol' => 'UDP',
-                'source' => '10.0.0.1',
-                'destination' => '192.168.1.2'
+                'source' => 'ANY',
+                'destination' => '80'
             ],
             'ecloud'
         )->assertResponseStatus(200);
@@ -111,7 +111,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(422);
     }
 
     public function testEmptyDestinationFails()
@@ -128,6 +128,6 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(422);
     }
 }

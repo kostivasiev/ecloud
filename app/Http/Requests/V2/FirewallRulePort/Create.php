@@ -42,14 +42,12 @@ class Create extends FormRequest
                 'in:TCP,UDP,ICMPv4'
             ],
             'source' => [
-                new RequiredIf($this->protocol == 'TCP'),
-                new RequiredIf($this->protocol == 'UDP'),
+                new RequiredIf(in_array($this->protocol, ['TCP', 'UDP'])),
                 'string',
                 new ValidFirewallRulePortSourceDestination()
             ],
             'destination' => [
-                new RequiredIf($this->protocol == 'TCP'),
-                new RequiredIf($this->protocol == 'UDP'),
+                new RequiredIf(in_array($this->protocol, ['TCP', 'UDP'])),
                 'string',
                 new ValidFirewallRulePortSourceDestination()
             ]

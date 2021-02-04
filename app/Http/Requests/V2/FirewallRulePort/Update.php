@@ -45,15 +45,13 @@ class Update extends FormRequest
             ],
             'source' => [
                 'sometimes',
-                new RequiredIf($this->protocol == 'TCP'),
-                new RequiredIf($this->protocol == 'UDP'),
+                new RequiredIf(in_array($this->protocol, ['TCP', 'UDP'])),
                 'string',
                 new ValidFirewallRulePortSourceDestination()
             ],
             'destination' => [
                 'sometimes',
-                new RequiredIf($this->protocol == 'TCP'),
-                new RequiredIf($this->protocol == 'UDP'),
+                new RequiredIf(in_array($this->protocol, ['TCP', 'UDP'])),
                 'string',
                 new ValidFirewallRulePortSourceDestination(),
             ]
