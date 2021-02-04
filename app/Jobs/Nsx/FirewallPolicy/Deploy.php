@@ -61,8 +61,10 @@ class Deploy extends Job
                                     'id' => $port->getKey(),
                                     'l4_protocol' => $port->protocol,
                                     'resource_type' => 'L4PortSetServiceEntry',
-                                    'source_ports' => empty($port->source) ? [] : explode(',', $port->source),
-                                    'destination_ports' => empty($port->destination) ?
+                                    'source_ports' => $port->source == 'ANY' ?
+                                        [] :
+                                        explode(',', $port->source),
+                                    'destination_ports' => $port->destination == 'ANY' ?
                                         [] :
                                         explode(',', $port->destination),
                                 ];
