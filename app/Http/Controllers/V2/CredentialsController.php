@@ -22,7 +22,7 @@ class CredentialsController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Credential::query();
+        $collection = Credential::filterHidden($request);
 
         (new QueryTransformer($request))
             ->config(Credential::class)
@@ -41,7 +41,7 @@ class CredentialsController extends BaseController
     public function show(Request $request, string $credentialsId)
     {
         return new CredentialResource(
-            Credential::findOrFail($credentialsId)
+            Credential::filterHidden($request)->findOrFail($credentialsId)
         );
     }
 
@@ -52,6 +52,10 @@ class CredentialsController extends BaseController
     public function store(CreateCredentialRequest $request)
     {
         $credential = new Credential($request->only(['name', 'resource_id', 'host', 'username', 'password', 'port']));
+        $credential->is_hidden = false;
+        if ($this->isAdmin) {
+            $credential->is_hidden = $request->get('is_hidden', false);
+        }
         $credential->save();
         return $this->responseIdMeta($request, $credential->getKey(), 201);
     }
@@ -65,6 +69,9 @@ class CredentialsController extends BaseController
     {
         $credential = Credential::findOrFail($credentialsId);
         $credential->fill($request->only(['name', 'resource_id', 'host', 'username', 'password', 'port']));
+        if ($this->isAdmin) {
+            $credential->is_hidden = $request->get('is_hidden', $credential->is_hidden);
+        }
         $credential->save();
         return $this->responseIdMeta($request, $credential->getKey(), 200);
     }

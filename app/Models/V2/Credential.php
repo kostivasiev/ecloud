@@ -5,8 +5,10 @@ namespace App\Models\V2;
 use App\Events\V2\Credential\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -37,6 +39,7 @@ class Credential extends Model implements Filterable, Sortable
         'username',
         'password',
         'port',
+        'is_hidden',
     ];
 
     protected $dispatchesEvents = [
@@ -44,7 +47,8 @@ class Credential extends Model implements Filterable, Sortable
     ];
 
     protected $casts = [
-        'port' => 'integer'
+        'port' => 'integer',
+        'is_hidden' => 'boolean',
     ];
 
     public function setPasswordAttribute($value)
@@ -68,12 +72,25 @@ class Credential extends Model implements Filterable, Sortable
     }
 
     /**
+     * @param Builder $query
+     * @param Request $request
+     * @return Builder
+     */
+    public function scopeFilterHidden(Builder $query, Request $request)
+    {
+        if (!empty($request->user->isAdministrator) && !$request->user->isAdministrator) {
+            $query->where('is_hidden', '=', 0);
+        }
+        return $query;
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
-        return [
+        $filters = [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('resource_id', Filter::$stringDefaults),
@@ -84,6 +101,10 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
+        if (app('request')->user->isAdministrator) {
+            $filters[] = $factory->create('is_hidden', Filter::$numericDefaults);
+        }
+        return $filters;
     }
 
     /**
@@ -100,6 +121,7 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('host'),
             $factory->create('username'),
             $factory->create('port'),
+            $factory->create('is_hidden'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -127,6 +149,7 @@ class Credential extends Model implements Filterable, Sortable
             'username' => 'username',
             'password' => 'password',
             'port' => 'port',
+            'is_hidden' => 'is_hidden',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
