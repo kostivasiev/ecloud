@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Listeners\Volume;
 
-use App\Listeners\V2\Volume\CapacityIncrease;
+use App\Listeners\V2\Volume\ModifyVolume;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Region;
@@ -77,7 +77,7 @@ class BillingMetricTest extends TestCase
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();
 
-        $capacityIncreaseListener = \Mockery::mock(CapacityIncrease::class)->makePartial();
+        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
         $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
 
         // sync set to complete by the CapacityIncrease listener
@@ -121,7 +121,7 @@ class BillingMetricTest extends TestCase
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();
 
-        $capacityIncreaseListener = \Mockery::mock(CapacityIncrease::class)->makePartial();
+        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
         $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
 
         $sync->refresh();
