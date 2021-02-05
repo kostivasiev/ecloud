@@ -41,6 +41,7 @@ class PrepareOsDisk extends Job
             $volume->vpc()->associate($instance->vpc);
             $volume->availability_zone_id = $instance->availability_zone_id;
             $volume->capacity = $this->data['volume_capacity'];
+            $volume->iops = $this->data['iops'];
             $volume->vmware_uuid = $volumeData->uuid;
             $volume->save();
             $volume->instances()->attach($instance);
@@ -53,6 +54,16 @@ class PrepareOsDisk extends Job
                 [
                     'json' => [
                         'volumeId' => $volume->getKey()
+                    ]
+                ]
+            );
+
+            // Update the volume iops
+            $volume->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/iops',
+                [
+                    'json' => [
+                        'limit' => $volume->iops
                     ]
                 ]
             );
