@@ -128,7 +128,7 @@ class Product extends Model implements Filterable, Sortable
 
     public function scopeForRegion($query, Region $region)
     {
-        foreach ($region->availabilityZones() as $availabilityZone) {
+        foreach ($region->availabilityZones as $availabilityZone) {
             $query->orWhere('product_name', 'like', $availabilityZone->getKey() . '%');
         }
 
