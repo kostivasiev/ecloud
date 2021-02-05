@@ -23,9 +23,19 @@ class Undeploy extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        $this->model->router->availabilityZone->nsxService()->delete(
+        $response = $this->model->router->availabilityZone->nsxService()->delete(
             'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/' . $this->model->id
         );
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::error(get_class($this) . ' : Failed', [
+                'id' => $this->model->id,
+                'status_code' => $response->getStatusCode(),
+                'content' => $response->getBody()->getContents()
+            ]);
+            $this->model->setSyncFailureReason('Failed to delete "' . $this->model->id . '"');
+            $this->fail(new \Exception('Failed to delete "' . $this->model->id . '"'));
+            return;
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

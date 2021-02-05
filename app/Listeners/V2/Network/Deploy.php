@@ -2,7 +2,8 @@
 
 namespace App\Listeners\V2\Network;
 
-use App\Events\V2\Network\Created;
+use App\Events\V2\Network\Saved;
+use App\Models\V2\Network;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,14 +21,15 @@ class Deploy implements ShouldQueue
     public $tries = 20;
 
     /**
-     * @param Created $event
+     * @param Saved $event
      * @return void
      * @throws Exception
      */
-    public function handle(Created $event)
+    public function handle(Saved $event)
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
+        /** @var Network $network */
         $network = $event->model;
 
         $router = $network->router;
@@ -58,7 +60,7 @@ class Deploy implements ShouldQueue
         Log::info($message . 'DHCP ID: ' . $router->vpc->dhcp->id);
 
         try {
-            $response = $router->availabilityZone->nsxService()->put(
+            $router->availabilityZone->nsxService()->patch(
                 'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id,
                 [
                     'json' => [
@@ -71,8 +73,8 @@ class Deploy implements ShouldQueue
                                     'server_address' => $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix(),
                                     'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
                                     'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
-                                ]
-                            ]
+                                ],
+                            ],
                         ],
                         'domain_name' => config('defaults.network.domain_name'),
                         'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->id,
@@ -83,10 +85,23 @@ class Deploy implements ShouldQueue
                             [
                                 'scope' => config('defaults.tag.scope'),
                                 'tag' => $router->vpc->id
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                        'children' => [
+                            'SegmentDiscoveryProfileBindingMap' => [
+                                'ip_discovery_profile_path' => '/infra/ip-discovery-profiles/ecloud-ip-discovery-profile',
+                                'mac_discovery_profile_path' => '/infra/mac-discovery-profiles/ecloud-mac-discovery-profile',
+                            ],
+                            'SegmentSecurityProfileBindingMap' => [
+                                'segment_security_profile_path' => '/infra/segment-security-profiles/ecloud-segment-security-profile',
+                                'spoofguard_profile_path' => '/infra/spoofguard-profiles/ecloud-spoofguard-profile',
+                            ],
+                            'SegmentQoSProfileBindingMap' => [
+                                'qos_profile_path' => '',
+                            ],
+                        ],
+                    ],
+                ],
             );
         } catch (RequestException $exception) {
             //Segment already exists. Hacky fix, as the listener is fired twice due to rincewind
@@ -102,7 +117,7 @@ class Deploy implements ShouldQueue
                 }
 
                 $message = 'Unhandled error response for ' . $network->id;
-                Log::error($message, (array) $error);
+                Log::error($message, (array)$error);
                 $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
                 $this->fail($exception);
                 return;
@@ -110,7 +125,7 @@ class Deploy implements ShouldQueue
 
             $message = 'Unhandled error for ' . $network->id;
             Log::error($message, [$exception]);
-            $network->setSyncFailureReason($message . ' : ' . $exception->getMessage());
+            $network->setSyncFailureReason($message . PHP_EOL . $exception->getMessage());
             $this->fail($exception);
             return;
         }
