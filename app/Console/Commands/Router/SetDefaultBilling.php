@@ -18,7 +18,9 @@ class SetDefaultBilling extends Command
         $listener = new DefaultRouterThroughput();
         Router::all()->each(function ($router) use ($listener) {
             $this->info('Running default billing listener against ' . $router->id);
-            $listener->handle(new Creating($router));
+            $event = new Creating($router);
+            $listener->handle($event);
+            $event->model->save();
         });
     }
 }
