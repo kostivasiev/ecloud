@@ -106,7 +106,17 @@ class Vpc extends Model implements Filterable, Sortable
      */
     public function getSupportEnabledAttribute()
     {
-        return $this->vpcSupports()->count() > 0;
+        if ($this->vpcSupports()->count() == 0) {
+            return false;
+        }
+
+        foreach ($this->vpcSupports() as $support) {
+            if ($support->active) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
