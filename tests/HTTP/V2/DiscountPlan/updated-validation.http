@@ -154,7 +154,6 @@ Content-Type: application/json
 
 {
     "name": "test-commitment",
-    "status": "approved",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,
     "discount_rate": 5,
@@ -181,7 +180,6 @@ Content-Type: application/json
 
 {
     "name": "test-commitment",
-    "status": "approved",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,
     "discount_rate": 5,
@@ -208,7 +206,6 @@ Content-Type: application/json
 
 {
     "name": "test-commitment",
-    "status": "approved",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,
     "discount_rate": 5,
@@ -226,7 +223,7 @@ client.test('I am a standard user - I create a plan with a start date of the fir
 %}
 
 ###
-# I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is created
+# I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is rejected
 POST https://{{host}}/{{version}}/discount-plans
 Cache-Control: no-cache
 X-consumer-custom-id: 1-1
@@ -235,7 +232,6 @@ Content-Type: application/json
 
 {
     "name": "test-commitment",
-    "status": "approved",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,
     "discount_rate": 5,
