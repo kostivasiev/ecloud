@@ -54,13 +54,14 @@ class BillingMetric extends Model implements Filterable, Sortable
     /**
      * @param $resource
      * @param $key
+     * @param string $operator
      * @return BillingMetric|null
      */
-    public static function getActiveByKey($resource, $key): ?BillingMetric
+    public static function getActiveByKey($resource, $key, $operator = '='): ?BillingMetric
     {
         return self::where('resource_id', $resource->getKey())
             ->whereNull('end')
-            ->where('key', $key)
+            ->where('key', $operator, $key)
             ->first();
     }
 

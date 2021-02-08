@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Listeners\Volume;
 
-use App\Listeners\V2\Volume\CapacityIncrease;
+use App\Listeners\V2\Volume\ModifyVolume;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Region;
@@ -43,6 +43,7 @@ class BillingMetricTest extends TestCase
                 'id' => 'vol-aaaaaaaa',
                 'vpc_id' => $this->vpc->getKey(),
                 'capacity' => 10,
+                'iops' => 300,
                 'availability_zone_id' => $this->availabilityZone->getKey()
             ]);
         });
@@ -76,7 +77,7 @@ class BillingMetricTest extends TestCase
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();
 
-        $capacityIncreaseListener = \Mockery::mock(CapacityIncrease::class)->makePartial();
+        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
         $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
 
         // sync set to complete by the CapacityIncrease listener
@@ -95,7 +96,7 @@ class BillingMetricTest extends TestCase
         $metric = BillingMetric::where('resource_id', $this->volume->getKey())->first();
 
         $this->assertNotNull($metric);
-        $this->assertEquals('disk.capacity', $metric->key);
+        $this->assertStringStartsWith('disk.capacity', $metric->key);
     }
 
     public function testResizingVolumeEndsExistingBillingMetric()
@@ -103,7 +104,7 @@ class BillingMetricTest extends TestCase
         $metric = factory(BillingMetric::class)->create([
             'resource_id' => 'vol-aaaaaaaa',
             'vpc_id' => $this->vpc->getKey(),
-            'key' => 'disk.capacity',
+            'key' => 'disk.capacity.300',
             'value' => 10,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
@@ -112,6 +113,7 @@ class BillingMetricTest extends TestCase
         $this->assertNull($metric->end);
 
         $this->volume->capacity = 15;
+        $this->volume->iops = 600;
         $this->volume->save();
 
         $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
@@ -119,7 +121,7 @@ class BillingMetricTest extends TestCase
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();
 
-        $capacityIncreaseListener = \Mockery::mock(CapacityIncrease::class)->makePartial();
+        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
         $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
 
         $sync->refresh();

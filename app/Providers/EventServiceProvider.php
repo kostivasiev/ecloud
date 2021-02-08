@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\V2\Volume\ModifyVolume;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -83,6 +84,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallRule\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
+            \App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
         ],
         \App\Events\V2\FirewallRule\Saved::class => [
             \App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
@@ -91,6 +93,7 @@ class EventServiceProvider extends ServiceProvider
         // FirewallRulePort
         \App\Events\V2\FirewallRulePort\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
+            \App\Listeners\V2\FirewallRulePort\UpdateFirewallPolicy::class,
         ],
         \App\Events\V2\FirewallRulePort\Saved::class => [
             \App\Listeners\V2\FirewallRulePort\UpdateFirewallPolicy::class,
@@ -212,7 +215,8 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Volume\Saved::class => [
-            \App\Listeners\V2\Volume\CapacityIncrease::class,
+            \App\Listeners\V2\Volume\ModifyVolume::class,
+            \App\Listeners\V2\Volume\UpdateBilling::class,
         ],
         \App\Events\V2\Volume\Deleting::class => [
         ],

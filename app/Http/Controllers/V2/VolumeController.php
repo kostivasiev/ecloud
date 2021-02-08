@@ -114,12 +114,11 @@ class VolumeController extends BaseController
             }
         }
 
-        $only = ['name', 'vpc_id', 'capacity', 'availability_zone_id'];
+        $only = ['name', 'vpc_id', 'capacity', 'availability_zone_id', 'iops'];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-
         if (!$volume->save()) {
             return $volume->getSyncError();
         }

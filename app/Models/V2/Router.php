@@ -100,7 +100,7 @@ class Router extends Model implements Filterable, Sortable
 
     public function routerThroughput()
     {
-        return $this->hasOne(RouterThroughput::class);
+        return $this->belongsTo(RouterThroughput::class);
     }
 
     /**
