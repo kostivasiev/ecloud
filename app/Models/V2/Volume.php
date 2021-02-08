@@ -85,6 +85,18 @@ class Volume extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return bool
+     */
+    public function getMountedAttribute()
+    {
+        if ($this->instances()->count() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */

@@ -25,6 +25,11 @@ properties:
     required: false
     description: IOPS value 300, 600, 1200 or 2500 only
     example: 300
+  mounted:
+    type: boolean
+    readOnly: true
+    description: Is the volume mounted to a resource
+    example: true
   sync:
     type: string
     readOnly: true
