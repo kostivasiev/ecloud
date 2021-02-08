@@ -11,7 +11,6 @@ use UKFast\FormRequests\FormRequest;
  */
 class Create extends FormRequest
 {
-
     public function authorize()
     {
         return true;
@@ -50,7 +49,7 @@ class Create extends FormRequest
 
         if (app('request')->user->isAdministrator) {
             $rules['term_start_date'] = 'required|date';
-            $rules['status'] = 'sometimes|required|string|in:accepted,approved,rejected';
+            $rules['status'] = 'sometimes|required|string|in:approved,rejected';
         }
 
         return $rules;
