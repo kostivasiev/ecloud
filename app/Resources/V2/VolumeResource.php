@@ -33,6 +33,7 @@ class VolumeResource extends UKFastResource
             'availability_zone_id' => $this->availability_zone_id,
             'capacity' => $this->capacity,
             'iops' => $this->iops,
+            'mounted' => $this->mounted,
             'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
