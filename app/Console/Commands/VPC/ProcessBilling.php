@@ -113,7 +113,7 @@ class ProcessBilling extends Command
 
             // Apply any discount plans
             $discountPlans = DiscountPlan::where('reseller_id', $resellerId)
-                ->where('status', 'accepted')
+                ->where('status', 'approved')
                 ->where(function ($query) {
                     $query->where('term_start_date', '<=', $this->startDate);
                     $query->orWhereBetween('term_start_date', [$this->startDate, $this->endDate]);
