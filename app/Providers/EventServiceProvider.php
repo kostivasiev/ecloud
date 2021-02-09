@@ -206,10 +206,12 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Volume
+        \App\Events\V2\Volume\Creating::class => [
+            \App\Listeners\V2\Volume\DefaultIops::class,
+        ],
         \App\Events\V2\Volume\Created::class => [
             \App\Listeners\V2\Volume\Deploy::class,
             \App\Listeners\V2\ResourceSync::class,
-            \App\Listeners\V2\Volume\UpdateBilling::class,
         ],
         \App\Events\V2\Volume\Saving::class => [
             \App\Listeners\V2\ResourceSync::class,

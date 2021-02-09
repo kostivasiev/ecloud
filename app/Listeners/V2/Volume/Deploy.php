@@ -24,7 +24,7 @@ class Deploy implements ShouldQueue
                     'json' => [
                         'volumeId' => $volume->id,
                         'sizeGiB' => $volume->capacity,
-                        'shared' => true,
+                        'shared' => false,
                     ]
                 ]
             );
