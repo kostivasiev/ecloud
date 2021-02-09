@@ -21,7 +21,7 @@ class AttachToInstance extends Job
     {
         Log::info(get_class($this) . ' : Started');
 
-        if ($this->instance->volumes()->get()->count() < 15) {
+        if ($this->instance->volumes()->get()->count() < config('volume.instance.limit', 15)) {
             $this->instance->availabilityZone->kingpinService()->post(
                 '/api/v2/vpc/'.$this->instance->vpc_id.'/instance/'.$this->instance->id.'/volume/attach',
                 [
