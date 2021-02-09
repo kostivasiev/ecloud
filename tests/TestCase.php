@@ -9,7 +9,9 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 
@@ -41,6 +43,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var NsxService */
     private $nsxServiceMock;
+
+    /** @var KingpinService */
+    private $kingpinServiceMock;
 
     /** @var Credential */
     private $credential;
@@ -108,6 +113,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->nsxServiceMock;
+    }
+
+    public function kingpinServiceMock()
+    {
+        if (!$this->kingpinServiceMock) {
+            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+            app()->bind(KingpinService::class, function () {
+                return $this->kingpinServiceMock;
+            });
+        }
+        return $this->kingpinServiceMock;
     }
 
     public function availabilityZone()

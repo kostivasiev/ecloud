@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateVolumeRequest;
-use App\Http\Requests\V2\UpdateVolumeRequest;
+use App\Events\V2\Volume\Data;
+use App\Http\Requests\V2\Volume\AttachRequest;
+use App\Http\Requests\V2\Volume\CreateRequest;
+use App\Http\Requests\V2\Volume\UpdateRequest;
+use App\Jobs\Volume\AttachToInstance;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -76,10 +79,10 @@ class VolumeController extends BaseController
     }
 
     /**
-     * @param CreateVolumeRequest $request
+     * @param CreateRequest $request
      * @return JsonResponse|Response
      */
-    public function store(CreateVolumeRequest $request)
+    public function store(CreateRequest $request)
     {
         if ($request->has('availability_zone_id')) {
             $availabilityZone = Vpc::forUser(app('request')->user)
@@ -109,11 +112,11 @@ class VolumeController extends BaseController
     }
 
     /**
-     * @param UpdateVolumeRequest $request
+     * @param UpdateRequest $request
      * @param string $volumeId
      * @return JsonResponse|Response
      */
-    public function update(UpdateVolumeRequest $request, string $volumeId)
+    public function update(UpdateRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
         if ($request->has('availability_zone_id')) {
@@ -179,5 +182,19 @@ class VolumeController extends BaseController
         }
 
         return response(null, 204);
+    }
+
+    /**
+     * @param AttachRequest $request
+     * @param string $volumeId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     */
+    public function attachToInstance(AttachRequest $request, string $volumeId)
+    {
+        $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
+        $instance = Instance::forUser(app('request')->user)->findOrFail($request->get('instance_id'));
+        $instance->volumes()->attach($volume);
+        $this->dispatch(new AttachToInstance($volume, $instance));
+        return response('', 202);
     }
 }

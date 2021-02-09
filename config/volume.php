@@ -11,6 +11,9 @@ return [
         'min' => env('VOLUME_CAPACITY_MIN', 1),
         'max' => env('VOLUME_CAPACITY_MAX', 1000),
     ],
+    'instance' => [
+        'limit' => 15,
+    ],
     'iops' => [
         'default' => env('VOLUME_IOPS_DEFAULT', 300),
     ],
