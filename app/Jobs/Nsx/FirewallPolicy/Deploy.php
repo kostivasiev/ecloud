@@ -43,8 +43,8 @@ class Deploy extends Job
                             'sequence_number' => $rule->sequence,
                             'sources_excluded' => false,
                             'destinations_excluded' => false,
-                            'source_groups' => empty($rule->source) ? ['ANY'] : explode(',', $rule->source),
-                            'destination_groups' => empty($rule->source) ? ['ANY'] : explode(',', $rule->destination),
+                            'source_groups' => explode(',', $rule->source),
+                            'destination_groups' => explode(',', $rule->destination),
                             'services' => [
                                 'ANY'
                             ],
@@ -61,8 +61,10 @@ class Deploy extends Job
                                     'id' => $port->getKey(),
                                     'l4_protocol' => $port->protocol,
                                     'resource_type' => 'L4PortSetServiceEntry',
-                                    'source_ports' => empty($port->source) ? [] : explode(',', $port->source),
-                                    'destination_ports' => empty($port->destination) ?
+                                    'source_ports' => $port->source == 'ANY' ?
+                                        [] :
+                                        explode(',', $port->source),
+                                    'destination_ports' => $port->destination == 'ANY' ?
                                         [] :
                                         explode(',', $port->destination),
                                 ];

@@ -4,8 +4,7 @@ namespace App\Http\Requests\V2\FirewallRule;
 
 use App\Models\V2\FirewallPolicy;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidIpFormatCsvString;
-use App\Rules\V2\ValidPortReference;
+use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
 
 class Update extends FormRequest
@@ -29,15 +28,15 @@ class Update extends FormRequest
             ],
             'source' => [
                 'sometimes',
-                'nullable',
+                'required',
                 'string',
-                new ValidIpFormatCsvString()
+                new ValidFirewallRuleSourceDestination()
             ],
             'destination' => [
                 'sometimes',
-                'nullable',
+                'required',
                 'string',
-                new ValidIpFormatCsvString()
+                new ValidFirewallRuleSourceDestination()
             ],
             'action' => 'sometimes|required|string|in:ALLOW,DROP,REJECT',
             'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',
