@@ -53,9 +53,7 @@ class AttachVolumeTest extends TestCase
                 '/volume/attach',
                 [
                     'json' => [
-                        'volumeUUID' => $this->volume->vmware_uuid,
-                        'shared' => true,
-                        'unitNumber' => 0
+                        'volumeUUID' => $this->volume->vmware_uuid
                     ]
                 ]
             ])
