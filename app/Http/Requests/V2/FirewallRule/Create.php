@@ -25,8 +25,6 @@ class Create extends FormRequest
      */
     public function rules()
     {
-        $firewallPortRules = (new \App\Http\Requests\V2\FirewallRulePort\Create)->rules();
-
         return [
             'name' => 'nullable|string|max:50',
             'sequence' => 'required|integer',
