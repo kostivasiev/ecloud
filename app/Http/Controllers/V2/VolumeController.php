@@ -29,7 +29,30 @@ class VolumeController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Volume::forUser($request->user);
+        if ($request->hasAny([
+            'mounted', 'mounted:eq', 'mounted:neq',
+        ])) {
+            if ($request->has('mounted') || $request->has('mounted:eq')) {
+                if ($request->has('mounted')) {
+                    $mounted = filter_var($request->get('mounted'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('mounted');
+                } else {
+                    $mounted = filter_var($request->get('mounted:eq'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('mounted:eq');
+                }
+            } elseif ($request->has('mounted:neq')) {
+                $mounted = !filter_var($request->get('mounted:neq'), FILTER_VALIDATE_BOOLEAN);
+                $request->query->remove('mounted:neq');
+            }
+
+            if ($mounted) {
+                $collection = Volume::forUser($request->user)->has('instances', '>', 0);
+            } else {
+                $collection = Volume::forUser($request->user)->has('instances', '=', 0);
+            }
+        } else {
+            $collection = Volume::forUser($request->user);
+        }
 
         (new QueryTransformer($request))
             ->config(Volume::class)
