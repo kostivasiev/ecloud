@@ -27,8 +27,6 @@ class AttachToInstance extends Job
                 [
                     'json' => [
                         'volumeUUID' => $this->volume->vmware_uuid,
-                        'shared' => true,
-                        'unitNumber' => 0
                     ]
                 ]
             );
