@@ -7,20 +7,20 @@ use Illuminate\Contracts\Validation\Rule;
 
 class VolumeNotAttached implements Rule
 {
-    protected Volume $volume;
+    protected string $volumeId;
 
-    public function __construct(Volume $volume)
+    public function __construct(string $volumeId)
     {
-        $this->volume = $volume;
+        $this->volumeId = $volumeId;
     }
 
     public function passes($attribute, $value)
     {
-        $instance = Instance::findOrFail($value);
+        $instance = Instance::forUser(app('request')->user)->findOrFail($value);
         if ($instance->volumes()->count() == 0) {
             return true;
         }
-        return ($instance->volumes()->where('volume_id', '=', $this->volume->id)->count() == 0);
+        return ($instance->volumes()->where('volume_id', '=', $this->volumeId)->count() == 0);
     }
 
     public function message()
