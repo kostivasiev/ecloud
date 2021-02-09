@@ -17,6 +17,10 @@ class ValidPortReference implements Rule
      */
     public function passes($attribute, $value)
     {
+        if (empty($value)) {
+            return false;
+        }
+
         foreach (explode(",", $value) as $port) {
             if (strpos($port, '-')) {
                 if (!preg_match('/\d+\-\d+/', $port)) {
