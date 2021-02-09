@@ -146,11 +146,7 @@ class CreateTest extends TestCase
         ])->assertResponseStatus(422);
     }
 
-
-
-
-
-    public function testPortsValidationSucceeds()
+    public function testPortsValidSucceeds()
     {
         $this->post('/v2/firewall-rules', [
             'name' => 'Demo firewall rule 1',
@@ -174,8 +170,7 @@ class CreateTest extends TestCase
         ])->assertResponseStatus(201);
     }
 
-
-    public function testPortsValidationFails()
+    public function testPortsInvalidFails()
     {
         $this->post('/v2/firewall-rules', [
             'name' => 'Demo firewall rule 1',
