@@ -73,8 +73,8 @@ class Deploy implements ShouldQueue
                                     'server_address' => $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix(),
                                     'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
                                     'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
-                                ],
-                            ],
+                                ]
+                            ]
                         ],
                         'domain_name' => config('defaults.network.domain_name'),
                         'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->id,
@@ -85,24 +85,52 @@ class Deploy implements ShouldQueue
                             [
                                 'scope' => config('defaults.tag.scope'),
                                 'tag' => $router->vpc->id
-                            ],
-                        ],
-                        'children' => [
-                            'SegmentDiscoveryProfileBindingMap' => [
-                                'ip_discovery_profile_path' => '/infra/ip-discovery-profiles/ecloud-ip-discovery-profile',
-                                'mac_discovery_profile_path' => '/infra/mac-discovery-profiles/ecloud-mac-discovery-profile',
-                            ],
-                            'SegmentSecurityProfileBindingMap' => [
-                                'segment_security_profile_path' => '/infra/segment-security-profiles/ecloud-segment-security-profile',
-                                'spoofguard_profile_path' => '/infra/spoofguard-profiles/ecloud-spoofguard-profile',
-                            ],
-                            'SegmentQoSProfileBindingMap' => [
-                                'qos_profile_path' => '',
-                            ],
-                        ],
-                    ],
-                ],
+                            ]
+                        ]
+                    ]
+                ]
             );
+
+            // Security profile
+            Log::info('Updating security profile');
+            $response = $router->availabilityZone->nsxService()->get(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-security-profile-binding-maps',
+            );
+            $response = json_decode($response->getBody()->getContents(), true);
+            $response['results'][0]['segment_security_profile_path'] = '/infra/segment-security-profiles/ecloud-segment-security-profile';
+            $response['results'][0]['spoofguard_profile_path'] = '/infra/spoofguard-profiles/ecloud-spoofguard-profile';
+            $router->availabilityZone->nsxService()->patch(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-security-profile-binding-maps/' . $response['results'][0]['id'],
+                ['json' => $response['results'][0]]
+            );
+            Log::info('Updated security profile ' . $response['results'][0]['id']);
+
+            // Discovery profile
+            Log::info('Updating discovery profile');
+            $response = $router->availabilityZone->nsxService()->get(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-discovery-profile-binding-maps',
+            );
+            $response = json_decode($response->getBody()->getContents(), true);
+            $response['results'][0]['ip_discovery_profile_path'] = '/infra/ip-discovery-profiles/ecloud-ip-discovery-profile';
+            $response['results'][0]['mac_discovery_profile_path'] = '/infra/mac-discovery-profiles/ecloud-mac-discovery-profile';
+            $router->availabilityZone->nsxService()->patch(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-discovery-profile-binding-maps/' . $response['results'][0]['id'],
+                ['json' => $response['results'][0]]
+            );
+            Log::info('Updated discovery profile ' . $response['results'][0]['id']);
+
+            // QOS profile
+            Log::info('Updating QOS profile');
+            $response = $router->availabilityZone->nsxService()->get(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-qos-profile-binding-maps',
+            );
+            $response = json_decode($response->getBody()->getContents(), true);
+            $response['results'][0]['qos_profile_path'] = '';
+            $router->availabilityZone->nsxService()->patch(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-qos-profile-binding-maps/' . $response['results'][0]['id'],
+                ['json' => $response['results'][0]]
+            );
+            Log::info('Updated QOS profile ' . $response['results'][0]['id']);
         } catch (RequestException $exception) {
             //Segment already exists. Hacky fix, as the listener is fired twice due to rincewind
             if ($exception->hasResponse()) {
@@ -129,6 +157,7 @@ class Deploy implements ShouldQueue
             $this->fail($exception);
             return;
         }
+
         $network->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
