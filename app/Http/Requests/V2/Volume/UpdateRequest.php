@@ -4,6 +4,8 @@ namespace App\Http\Requests\V2\Volume;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsVolumeAttached;
+use App\Rules\V2\ValidVolumeIops;
 use App\Rules\V2\VolumeCapacityIsGreater;
 use UKFast\FormRequests\FormRequest;
 
@@ -53,7 +55,14 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'uuid'
-            ]
+            ],
+            'iops' => [
+                'sometimes',
+                'required',
+                'numeric',
+                'in:300,600,1200,2500',
+                new IsVolumeAttached(),
+            ],
         ];
     }
 
@@ -71,6 +80,7 @@ class UpdateRequest extends FormRequest
             'capacity.required' => 'The :attribute field, when specified, cannot be null',
             'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
+            'iops.in' => 'The specified :attribute field is not a valid IOPS value (300, 600, 1200, 2500)',
         ];
     }
 }

@@ -11,10 +11,13 @@ class Saved
 
     public $model;
     public $originalCapacity;
+    public $originalIops;
 
     public function __construct(Model $model)
     {
         $this->model = $model;
+
         $this->originalCapacity = $model->getOriginal('capacity') ?? $this->model->capacity;
+        $this->originalIops = $model->getOriginal('iops') ?? $this->model->iops;
     }
 }

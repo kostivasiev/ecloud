@@ -24,7 +24,9 @@ class VpcSupport extends Model implements Filterable, Sortable
 
     protected $fillable = [
         'id',
-        'vpc_id'
+        'vpc_id',
+        'start_date',
+        'end_date',
     ];
 
     public function vpc()
@@ -50,6 +52,39 @@ class VpcSupport extends Model implements Filterable, Sortable
         return $query;
     }
 
+    public function getActiveAttribute()
+    {
+        if (is_null($this->start_date)) {
+            // no start date yet
+            return false;
+        }
+
+        if (strtotime($this->start_date) > time()) {
+            // start date is in the future
+            return false;
+        }
+
+        // start date is in the past
+
+        if (is_null($this->end_date)) {
+            // no end date yet
+            return true;
+        }
+
+        if (strtotime($this->end_date) < time()) {
+            // end date is in the past
+            return false;
+        }
+
+        if (strtotime($this->end_date) > time()) {
+            // end date is in the future
+            return true;
+        }
+
+        //should never hit this point but just in case
+        return false;
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -59,6 +94,8 @@ class VpcSupport extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('start_date', Filter::$dateDefaults),
+            $factory->create('end_date', Filter::$dateDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -74,6 +111,8 @@ class VpcSupport extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('vpc_id'),
+            $factory->create('start_date'),
+            $factory->create('end_date'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -99,6 +138,8 @@ class VpcSupport extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'vpc_id' => 'vpc_id',
+            'start_date' => 'start_date',
+            'end_date' => 'end_date',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

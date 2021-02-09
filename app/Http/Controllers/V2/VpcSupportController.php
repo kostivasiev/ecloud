@@ -52,7 +52,11 @@ class VpcSupportController extends BaseController
      */
     public function create(CreateRequest $request)
     {
-        $vpcSupport = new VpcSupport($request->only(['vpc_id']));
+        $vpcSupport = new VpcSupport($request->only([
+            'vpc_id',
+            'start_date',
+            'end_date',
+        ]));
         $vpcSupport->save();
         return $this->responseIdMeta($request, $vpcSupport->getKey(), 201);
     }
@@ -68,6 +72,8 @@ class VpcSupportController extends BaseController
 
         $vpcSupport->fill($request->only([
             'vpc_id',
+            'start_date',
+            'end_date',
         ]))->save();
 
         return $this->responseIdMeta($request, $vpcSupport->getKey(), 200);

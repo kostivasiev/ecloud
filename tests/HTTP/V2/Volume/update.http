@@ -59,3 +59,14 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
+
+PATCH https://{{host}}/{{version}}/volumes/vol-e5083b12
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "iops": 300
+}

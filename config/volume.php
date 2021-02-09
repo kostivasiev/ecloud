@@ -13,5 +13,8 @@ return [
     ],
     'instance' => [
         'limit' => 15,
-    ]
+    ],
+    'iops' => [
+        'default' => env('VOLUME_IOPS_DEFAULT', 300),
+    ],
 ];

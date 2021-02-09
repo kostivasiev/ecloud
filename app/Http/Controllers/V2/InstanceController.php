@@ -115,6 +115,7 @@ class InstanceController extends BaseController
         $instanceDeployData = new Data();
         $instanceDeployData->instance_id = $instance->id;
         $instanceDeployData->vpc_id = $instance->vpc->id;
+        $instanceDeployData->iops = $request->input('iops', config('volume.iops.default'));
         $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min'));
         $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
@@ -177,6 +178,9 @@ class InstanceController extends BaseController
     public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
         $collection = Instance::forUser($request->user)->findOrFail($instanceId)->credentials();
+        if (!$request->user->isAdministrator) {
+            $collection->where('credentials.is_hidden', 0);
+        }
         $queryTransformer->config(Credential::class)
             ->transform($collection);
 
