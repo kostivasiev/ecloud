@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Volume;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\VolumeCapacityIsGreater;
+use App\Rules\V2\ExistsForVpc;
+use App\Rules\V2\IsValidAvailabilityZoneId;
 use UKFast\FormRequests\FormRequest;
 
-class UpdateVolumeRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +28,8 @@ class UpdateVolumeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['sometimes', 'required', 'string'],
+            'name' => ['nullable', 'string'],
             'vpc_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
@@ -42,18 +42,11 @@ class UpdateVolumeRequest extends FormRequest
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
             ],
             'capacity' => [
-                'sometimes',
                 'required',
                 'integer',
                 'min:' . config('volume.capacity.min'),
-                'max:' . config('volume.capacity.max'),
-                new VolumeCapacityIsGreater(),
+                'max:' . config('volume.capacity.max')
             ],
-            'vmware_uuid' => [
-                'sometimes',
-                'required',
-                'uuid'
-            ]
         ];
     }
 
@@ -65,10 +58,8 @@ class UpdateVolumeRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
+            'vpc_id.required' => 'The :attribute field is required',
             'vpc_id.exists' => 'The specified :attribute was not found',
-            'vmware_uuid.required' => 'The :attribute field, when specified, cannot be null',
-            'capacity.required' => 'The :attribute field, when specified, cannot be null',
             'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
         ];
