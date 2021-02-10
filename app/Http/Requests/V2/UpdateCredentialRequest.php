@@ -23,7 +23,7 @@ class UpdateCredentialRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => ['sometimes', 'required', 'string'],
             'resource_id' => ['sometimes', 'nullable', 'string'],
             'host' => ['sometimes', 'nullable', 'string'],
@@ -31,6 +31,10 @@ class UpdateCredentialRequest extends FormRequest
             'password' => ['sometimes', 'required', 'string'],
             'port' => ['sometimes', 'nullable', 'integer'],
         ];
+        if (app('request')->user->isAdministrator) {
+            $rules['is_hidden'] = ['sometimes', 'boolean'];
+        }
+        return $rules;
     }
 
     /**

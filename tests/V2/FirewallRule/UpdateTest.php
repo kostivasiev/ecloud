@@ -59,4 +59,32 @@ class UpdateTest extends TestCase
                 'ecloud')
             ->assertResponseStatus(200);
     }
+
+    public function testEmptySourceFails()
+    {
+        $this->patch(
+            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            [
+                'source' => '',
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(422);
+    }
+
+    public function testEmptyDestinationFails()
+    {
+        $this->patch(
+            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            [
+                'destination' => '',
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(422);
+    }
 }

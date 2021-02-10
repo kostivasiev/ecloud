@@ -36,6 +36,11 @@ class Deploy implements ShouldQueue
             return;
         }
 
+        if (empty($router->routerThroughput)) {
+            $this->fail(new \Exception('Failed determine router throughput settings for router ' . $router->id));
+            return;
+        }
+
         $nsxService = $availabilityZone->nsxService();
         if (!$nsxService) {
             $message = 'Failed to find NSX Service for router ' . $router->id;
@@ -43,40 +48,54 @@ class Deploy implements ShouldQueue
             $this->fail(new \Exception($message));
             return;
         }
-        // Get the routers T0 path
-        $response = $nsxService->get('policy/api/v1/infra/tier-0s');
-        $response = json_decode($response->getBody()->getContents(), true);
-        $path = null;
-        
-        foreach ($response['results'] as $tier0) {
-            if (isset($tier0['tags']) && is_array($tier0['tags'])) {
-                foreach ($tier0['tags'] as $tag) {
-                    if ($tag['scope'] == 'ukfast' && $tag['tag'] == 'az-default') {
-                        $path = $tier0['path'];
-                        break 2;
-                    }
-                }
-            }
+
+        // Load default T0 for the AZ
+        $tier0SearchResponse = $nsxService->get(
+            '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default'
+        );
+        $tier0SearchResponse = json_decode($tier0SearchResponse->getBody()->getContents());
+
+        if ($tier0SearchResponse->result_count != 1) {
+            $this->fail(new \Exception('No tagged T0 could be found'));
+            return;
         }
-        if (empty($path)) {
-            throw new \Exception('No tagged T0 could be found');
-        }
+
+        $tier0 = $tier0SearchResponse->results[0];
 
         $vpcTag = [
             'scope' => config('defaults.tag.scope'),
             'tag' => $router->vpc_id
         ];
 
+        $gatewayQosProfileSearchResponse = $nsxService->get(
+            'policy/api/v1/search/query?query=resource_type:GatewayQosProfile'
+            . '%20AND%20committed_bandwitdth:' . $router->routerThroughput->committed_bandwidth
+            . '%20AND%20burst_size:' . ($router->routerThroughput->burst_size * 1000)
+        );
+
+        $gatewayQosProfileSearchResponse = json_decode($gatewayQosProfileSearchResponse->getBody()->getContents());
+
+        if ($gatewayQosProfileSearchResponse->result_count != 1) {
+            $message = 'Failed to determine gateway QoS profile for router ' . $router->id . ', with router_throughput_id ' . $router->routerThroughput->id;
+            Log::error($message);
+            $this->fail(new \Exception($message));
+            return;
+        }
+
         // Deploy the router
         $nsxService->put('policy/api/v1/infra/tier-1s/' . $router->id, [
             'json' => [
-                'tier0_path' => $path,
+                'tier0_path' => $tier0->path,
                 'tags' => [$vpcTag],
                 'route_advertisement_types' => [
                     'TIER1_IPSEC_LOCAL_ENDPOINT',
                     'TIER1_STATIC_ROUTES',
                     'TIER1_NAT'
                 ],
+                'qos_profile' => [
+                    'egress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path,
+                    'ingress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path
+                ]
             ],
         ]);
 

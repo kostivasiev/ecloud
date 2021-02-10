@@ -23,6 +23,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Credentials\Show::class,
         \App\Console\Commands\VPC\ProcessBilling::class,
         \App\Console\Commands\Billing\RouterThroughput\ProductPopulation::class,
+        \App\Console\Commands\Router\SetDefaultBilling::class,
     ];
 
     /**

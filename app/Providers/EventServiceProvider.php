@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\V2\Volume\ModifyVolume;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -212,7 +213,8 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Volume\Saved::class => [
-            \App\Listeners\V2\Volume\CapacityIncrease::class,
+            \App\Listeners\V2\Volume\ModifyVolume::class,
+            \App\Listeners\V2\Volume\UpdateBilling::class,
         ],
         \App\Events\V2\Volume\Deleting::class => [
         ],

@@ -70,6 +70,7 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'iops' => 600,
             'backup_enabled' => true,
         ], [
             'X-consumer-custom-id' => '0-0',
@@ -100,6 +101,7 @@ class CreateTest extends TestCase
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
+                'iops' => 600,
                 'backup_enabled' => true,
             ],
             [
@@ -131,6 +133,7 @@ class CreateTest extends TestCase
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
+                'iops' => 600,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -153,6 +156,7 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'iops' => 600,
         ];
         $this->post(
             '/v2/instances',
@@ -178,7 +182,8 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 11,
             'ram_capacity' => 512,
-            'volume_capacity' => 10
+            'volume_capacity' => 10,
+            'iops' => 600,
         ];
 
         $this->post(
@@ -224,7 +229,8 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
-            'volume_capacity' => 30
+            'volume_capacity' => 30,
+            'iops' => 600,
         ];
 
         $this->post(
@@ -257,7 +263,8 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
-            'volume_capacity' => 30
+            'volume_capacity' => 30,
+            'iops' => 600,
         ];
 
         $this->post(
@@ -290,7 +297,8 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
-            'volume_capacity' => 30
+            'volume_capacity' => 30,
+            'iops' => 600,
         ];
 
         $this->post(

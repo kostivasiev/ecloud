@@ -41,6 +41,7 @@ class Volume extends Model implements Filterable, Sortable
         'availability_zone_id',
         'capacity',
         'vmware_uuid',
+        'iops',
     ];
 
     protected $dispatchesEvents = [
@@ -84,6 +85,18 @@ class Volume extends Model implements Filterable, Sortable
     }
 
     /**
+     * @return bool
+     */
+    public function getMountedAttribute()
+    {
+        if ($this->instances()->count() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */
@@ -96,6 +109,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('capacity', Filter::$stringDefaults),
             $factory->create('vmware_uuid', Filter::$stringDefaults),
+            $factory->create('iops', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -115,6 +129,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('capacity'),
             $factory->create('vmware_uuid'),
+            $factory->create('iops'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -141,6 +156,7 @@ class Volume extends Model implements Filterable, Sortable
             'availability_zone_id' => 'availability_zone_id',
             'capacity' => 'capacity',
             'vmware_uuid' => 'vmware_uuid',
+            'iops' => 'iops',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

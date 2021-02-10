@@ -109,6 +109,12 @@ class CreateRequest extends FormRequest
                 'min:' . ($this->config->get('ukfast.spec.volume.min') ?? config('volume.capacity.' . $this->platform . '.min')),
                 'max:' . ($this->config->get('ukfast.spec.volume.max') ?? config('volume.capacity.max')),
             ],
+            'iops' => [
+                'sometimes',
+                'required',
+                'numeric',
+                'in:300,600,1200,2500',
+            ],
         ];
     }
 
