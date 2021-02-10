@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/AclPolicy'
+    - $ref: '../../public-openapi.yaml#/components/parameters/AclPolicyId'
   responses:
     200:
       description: success
@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/AclPolicyId'
+                $ref: '../../public-openapi.yaml#/components/schemas/AclPolicy'
               meta:
                 type: object
   tags:
