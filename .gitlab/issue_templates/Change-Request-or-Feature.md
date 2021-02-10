@@ -31,11 +31,9 @@
 
 Business Critical - It's a must for the Business to Continue 
 /label ~"Business Critical" ~Triage 
-/weight 5
 
 Business Enhancing - Improves a product or service and increase its value, efficiency or effectiveness 
 /label ~"Business Enhancing" ~"Awaiting Prioritisation" 
-/weight 2
 
 Nice to Have - It's not a critical update, for a rainy day 
 /label ~"Nice to Have" ~"Awaiting Manager Authorisation"
