@@ -19,18 +19,51 @@ class Undeploy extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        $response = $this->model->router->availabilityZone->nsxService()->delete(
+        $router = $this->model->router;
+
+        // Delete Security profile
+        Log::info('Deleting security profile');
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->model->id . '/segment-security-profile-binding-maps',
+        );
+        $response = json_decode($response->getBody()->getContents(), true);
+        if (isset($response['results'][0])) {
+            $router->availabilityZone->nsxService()->delete(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->model->id . '/segment-security-profile-binding-maps/' . $response['results'][0]['id']
+            );
+            Log::info('Deleted security profile ' . $response['results'][0]['id']);
+        }
+
+        // Delete Discovery profile
+        Log::info('Deleting discovery profile');
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->model->id . '/segment-discovery-profile-binding-maps',
+        );
+        $response = json_decode($response->getBody()->getContents(), true);
+        if (isset($response['results'][0])) {
+            $router->availabilityZone->nsxService()->delete(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->model->id . '/segment-discovery-profile-binding-maps/' . $response['results'][0]['id'],
+            );
+            Log::info('Deleted discovery profile ' . $response['results'][0]['id']);
+        }
+
+        // Delete QOS profile
+        Log::info('Deleting QOS profile');
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->model->id . '/segment-qos-profile-binding-maps',
+        );
+        $response = json_decode($response->getBody()->getContents(), true);
+        if (isset($response['results'][0])) {
+            $router->availabilityZone->nsxService()->delete(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->model->id . '/segment-qos-profile-binding-maps/' . $response['results'][0]['id'],
+            );
+            Log::info('Deleted QOS profile ' . $response['results'][0]['id']);
+        }
+
+        // Delete Network
+        $this->model->router->availabilityZone->nsxService()->delete(
             'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/' . $this->model->id
         );
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->model->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Failed to delete "' . $this->model->id . '"'));
-            return;
-        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
