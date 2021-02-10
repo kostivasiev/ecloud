@@ -4,7 +4,9 @@ namespace App\Console\Commands\VPC;
 
 use App\Models\V2\BillingMetric;
 use App\Models\V2\DiscountPlan;
+use App\Models\V2\Product;
 use App\Models\V2\Vpc;
+use App\Models\V2\VpcSupport;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use UKFast\Admin\Account\AdminClient as AccountAdminClient;
@@ -27,12 +29,6 @@ class ProcessBilling extends Command
 
     protected array $billing;
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->billing = [];
-    }
-
     /**
      * Billable metrics - Add any metrics to this array that we want to bill for.
      * @var array|string[]
@@ -48,18 +44,21 @@ class ProcessBilling extends Command
         'disk.capacity.2500',
     ];
 
-    public function handle()
+    public function __construct()
     {
-        $vpcs = Vpc::get();
-
+        parent::__construct();
+        $this->billing = [];
         $this->timeZone = new \DateTimeZone(config('app.timezone'));
         $this->startDate = Carbon::createFromTimeString("First day of last month 00:00:00", $this->timeZone);
         $this->endDate = Carbon::createFromTimeString("last day of last month 23:59:59", $this->timeZone);
+    }
 
+    public function handle()
+    {
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
         // Collect and sort VPC metrics by reseller
-        $vpcs->each(function ($vpc) {
+        Vpc::get()->each(function ($vpc) {
             $metrics = $this->getVpcMetrics($vpc->id);
 
             if ($metrics->count() == 0) {
@@ -96,6 +95,23 @@ class ProcessBilling extends Command
                 });
             });
 
+            // VPC Support
+            $this->billing[$vpc->reseller_id][$vpc->id]['support'] = [
+                'enabled' => false,
+                'pro-rata' => false
+            ];
+
+            $vpcSupport = $this->getVpcSupport($vpc->id);
+
+            if (!empty($vpcSupport)) {
+                $this->billing[$vpc->reseller_id][$vpc->id]['support']['enabled'] = true;
+
+                // Incomplete month
+                if ($vpcSupport->start_date > $this->startDate) {
+                    $this->billing[$vpc->reseller_id][$vpc->id]['support']['pro-rata'] = true;
+                }
+            }
+
             $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
 
             $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
@@ -113,9 +129,38 @@ class ProcessBilling extends Command
                     $this->line($key . ': £' . number_format($val, 2));
                 }
 
-                $this->line(PHP_EOL . 'Total: £' . number_format($vpc['total'], 2));
+                $this->line(PHP_EOL . 'Usage Total: £' . number_format($vpc['total'], 2));
 
                 $total += $vpc['total'];
+
+                if ($vpc['support']['enabled'] === true) {
+                    if ($this->option('debug')) {
+                        $this->info('VPC ' . $vpcId .' has support enabled');
+                    }
+
+                    try {
+                        $supportMinimumProduct = $this->getSupportMinimumProduct($vpcId);
+                    } catch (\Exception $exception) {
+                        $this->error($exception->getMessage());
+                        Log::error(get_class($this) . ' : ' . $exception->getMessage());
+                    }
+
+                    $supportMinimumPrice = $supportMinimumProduct->getPrice($resellerId);
+
+exit(print_r($supportMinimumPrice));
+
+
+                    if ($vpc['support']['pro-rata']) {
+                        if ($this->option('debug')) {
+                            $this->info('Support started during this billing cycle - applying pro-rata billing' . PHP_EOL);
+                        }
+                    }
+
+                    $this->line('Support: £00.00');
+
+                }
+
+
             }
 
             $this->line('-----------------------------------');
@@ -133,7 +178,7 @@ class ProcessBilling extends Command
 
             $discountsToApply = collect();
 
-            $discountPlans->each(function ($discountPlan) use ($total, &$discountsToApply) {
+            $discountPlans->each(function ($discountPlan) use (&$discountsToApply) {
                 if ($discountPlan->term_start_date <= $this->startDate) {
                     $discountsToApply->add($discountPlan);
                 }
@@ -218,7 +263,7 @@ class ProcessBilling extends Command
             } catch (\Exception $exception) {
                 $error = 'Failed to load customer details for for reseller ' . $resellerId;
                 $this->error($error . $exception->getMessage());
-                Log::error($error, [$exception->getMessage()]);
+                Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
             }
 
             // Min £1 surcharge
@@ -251,7 +296,7 @@ class ProcessBilling extends Command
                 } catch (\Exception $exception) {
                     $error = 'Failed to crate accounts log for reseller ' . $resellerId;
                     $this->error($error . $exception->getMessage());
-                    Log::error($error, [$exception->getMessage()]);
+                    Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
                 }
             }
         }
@@ -289,5 +334,50 @@ class ProcessBilling extends Command
         return $metrics->mapToGroups(function ($item, $key) {
             return [$item['key'] => $item];
         });
+    }
+
+    /**
+     * @param $vpcId
+     * @return VpcSupport|null
+     */
+    protected function getVpcSupport($vpcId): ?VpcSupport
+    {
+        return VpcSupport::where('vpc_id', $vpcId)
+            ->where(function ($query) {
+                $query->where('start_date', '<=', $this->startDate);
+                $query->orWhereBetween('start_date', [$this->startDate, $this->endDate]);
+            })
+            ->where(function ($query) {
+                $query->where('end_date', '>=', $this->endDate);
+                $query->orWhereNull('end_date');
+            })
+            ->first();
+    }
+
+    /**
+     * @param $vpcId
+     * @return Product
+     * @throws \Exception
+     */
+    protected function getSupportMinimumProduct($vpcId): Product
+    {
+        $availabilityZone = Vpc::findorFail($vpcId)
+            ->region
+            ->availabilityZones
+            ->first();
+
+        if (!$availabilityZone) {
+            throw new \Exception('Failed to load default availability zone for VPC ' . $vpcId);
+        }
+
+        $supportProduct = $availabilityZone->products()
+            ->where('product_name', 'LIKE', '%support minimum%')
+            ->first();
+
+        if (empty($supportProduct)) {
+            throw new \Exception('Failed to load \'support minimum\' product for availability zone ' . $availabilityZone->id);;
+        }
+
+        return $supportProduct;
     }
 }
