@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/AclPolicy'
+                  $ref: '../../public-openapi.yaml#/components/schemas/NetworkAclPolicy'
               meta:
                 allOf:
                   - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
@@ -41,9 +41,9 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/aclPolicy.yaml'
+          $ref: '../../components/schemas/networkAclPolicy.yaml'
   responses:
     201:
-      $ref: '../../resources/AclPolicy/responses/idResponse.yaml'
+      $ref: '../../resources/NetworkAclPolicy/responses/idResponse.yaml'
   tags:
     - ACL Policy

@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
 /**
- * Class AclPolicyResource
+ * Class NetworkAclPolicyResource
  * @package App\Resources\V2
  * @property string id
  * @property string network_id
@@ -16,7 +16,7 @@ use UKFast\Responses\UKFastResource;
  * @property string created_at
  * @property string updated_at
  */
-class AclPolicyResource extends UKFastResource
+class NetworkAclPolicyResource extends UKFastResource
 {
     public function toArray($request)
     {

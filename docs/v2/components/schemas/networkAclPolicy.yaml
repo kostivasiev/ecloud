@@ -5,7 +5,7 @@ properties:
     readOnly: true
   name:
     type: string
-    example: 'Default ACL'
+    example: 'Default Network ACL'
   network_id :
     required : false
     writeOnly : true

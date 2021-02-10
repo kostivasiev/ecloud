@@ -50,10 +50,6 @@ class EventServiceProvider extends ServiceProvider
         // V2
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
-        // AclPolicy
-        \App\Events\V2\AclPolicy\Updated::class => [
-        ],
-
         // AvailabilityZone
         \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
@@ -154,6 +150,10 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Network\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
+        // NetworkAclPolicy
+        \App\Events\V2\NetworkAclPolicy\Updated::class => [
         ],
 
         // Nat

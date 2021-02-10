@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Requests\V2\AclPolicy;
+namespace App\Http\Requests\V2\NetworkAclPolicy;
 
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;

@@ -1,14 +1,14 @@
 <?php
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\AclPolicy\CreateRequest;
-use App\Http\Requests\V2\AclPolicy\UpdateRequest;
-use App\Models\V2\AclPolicy;
-use App\Resources\V2\AclPolicyResource;
+use App\Http\Requests\V2\NetworkAclPolicy\CreateRequest;
+use App\Http\Requests\V2\NetworkAclPolicy\UpdateRequest;
+use App\Models\V2\NetworkAclPolicy;
+use App\Resources\V2\NetworkAclPolicyResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
-class AclPolicyController extends BaseController
+class NetworkAclPolicyController extends BaseController
 {
     /**
      * @param Request $request
@@ -17,11 +17,11 @@ class AclPolicyController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = AclPolicy::forUser($request->user);
-        $queryTransformer->config(AclPolicy::class)
+        $collection = NetworkAclPolicy::forUser($request->user);
+        $queryTransformer->config(NetworkAclPolicy::class)
             ->transform($collection);
 
-        return AclPolicyResource::collection($collection->paginate(
+        return NetworkAclPolicyResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -29,11 +29,11 @@ class AclPolicyController extends BaseController
     /**
      * @param Request $request
      * @param string $aclPolicyId
-     * @return AclPolicyResource
+     * @return NetworkAclPolicyResource
      */
     public function show(Request $request, string $aclPolicyId)
     {
-        return new AclPolicyResource(AclPolicy::forUser($request->user)->findOrFail($aclPolicyId));
+        return new NetworkAclPolicyResource(NetworkAclPolicy::forUser($request->user)->findOrFail($aclPolicyId));
     }
 
     /**
@@ -42,7 +42,7 @@ class AclPolicyController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $aclPolicy = new AclPolicy($request->only([
+        $aclPolicy = new NetworkAclPolicy($request->only([
             'name',
             'network_id',
             'vpc_id',
@@ -59,7 +59,7 @@ class AclPolicyController extends BaseController
      */
     public function update(UpdateRequest $request, string $aclPolicyId)
     {
-        $aclPolicy = AclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
+        $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
         $aclPolicy->update($request->all());
         if (!$aclPolicy->save()) {
             return $aclPolicy->getSyncError();
@@ -75,7 +75,7 @@ class AclPolicyController extends BaseController
      */
     public function destroy(Request $request, string $aclPolicyId)
     {
-        $aclPolicy = AclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
+        $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
         if (!$aclPolicy->delete()) {
             return $aclPolicy->getSyncError();
         }

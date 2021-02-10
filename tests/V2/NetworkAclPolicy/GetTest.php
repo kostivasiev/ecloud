@@ -1,7 +1,7 @@
 <?php
-namespace Tests\V2\AclPolicy;
+namespace Tests\V2\NetworkAclPolicy;
 
-use App\Models\V2\AclPolicy;
+use App\Models\V2\NetworkAclPolicy;
 use App\Models\V2\Network;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -10,7 +10,7 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected AclPolicy $aclPolicy;
+    protected NetworkAclPolicy $aclPolicy;
     protected Network $network;
 
     public function setUp(): void
@@ -20,7 +20,7 @@ class GetTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(AclPolicy::class)->create([
+        $this->aclPolicy = factory(NetworkAclPolicy::class)->create([
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);

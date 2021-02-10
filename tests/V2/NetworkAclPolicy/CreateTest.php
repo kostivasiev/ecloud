@@ -1,7 +1,7 @@
 <?php
-namespace Tests\V2\AclPolicy;
+namespace Tests\V2\NetworkAclPolicy;
 
-use App\Models\V2\AclPolicy;
+use App\Models\V2\NetworkAclPolicy;
 use App\Models\V2\Network;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -40,7 +40,7 @@ class CreateTest extends TestCase
         )->assertResponseStatus(201);
 
         $aclPolicyId = (json_decode($this->response->getContent()))->data->id;
-        $aclPolicy = AclPolicy::findOrFail($aclPolicyId);
+        $aclPolicy = NetworkAclPolicy::findOrFail($aclPolicyId);
         $this->assertEquals($data['name'], $aclPolicy->name);
         $this->assertEquals($data['network_id'], $aclPolicy->network_id);
         $this->assertEquals($data['vpc_id'], $aclPolicy->vpc_id);
@@ -53,7 +53,7 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ];
-        factory(AclPolicy::class)->create($data);
+        factory(NetworkAclPolicy::class)->create($data);
         $this->post(
             '/v2/network-acls',
             $data,

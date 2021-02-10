@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Listeners\V2\AclPolicy;
+namespace App\Listeners\V2\NetworkAclPolicy;
 
-use App\Events\V2\AclPolicy\Updated;
+use App\Events\V2\NetworkAclPolicy\Updated;
 use Illuminate\Support\Facades\Log;
 
 class UpdateAclPolicy

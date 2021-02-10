@@ -62,7 +62,7 @@ class Network extends Model implements Filterable, Sortable
 
     public function aclPolicy()
     {
-        return $this->hasOne(AclPolicy::class);
+        return $this->hasOne(NetworkAclPolicy::class);
     }
 
     /**

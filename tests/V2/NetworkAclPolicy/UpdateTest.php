@@ -1,7 +1,7 @@
 <?php
-namespace Tests\V2\AclPolicy;
+namespace Tests\V2\NetworkAclPolicy;
 
-use App\Models\V2\AclPolicy;
+use App\Models\V2\NetworkAclPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -11,7 +11,7 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected AclPolicy $aclPolicy;
+    protected NetworkAclPolicy $aclPolicy;
     protected Network $network;
 
     protected function setUp(): void
@@ -21,7 +21,7 @@ class UpdateTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(AclPolicy::class)->create([
+        $this->aclPolicy = factory(NetworkAclPolicy::class)->create([
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -60,7 +60,7 @@ class UpdateTest extends TestCase
             'id' => 'vpc-new',
             'region_id' => $this->region()->id
         ]);
-        factory(AclPolicy::class)->create([
+        factory(NetworkAclPolicy::class)->create([
             'network_id' => $newNetwork->id,
             'vpc_id' => $newVpc->id,
         ]);

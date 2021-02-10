@@ -1,7 +1,7 @@
 <?php
 namespace Tests\unit\Rules;
 
-use App\Models\V2\AclPolicy;
+use App\Models\V2\NetworkAclPolicy;
 use App\Models\V2\Network;
 use App\Rules\V2\NetworkHasNoAcl;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -31,7 +31,7 @@ class NetworkHasNoAclTest extends TestCase
 
     public function testRuleFails()
     {
-        factory(AclPolicy::class)->create([
+        factory(NetworkAclPolicy::class)->create([
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
