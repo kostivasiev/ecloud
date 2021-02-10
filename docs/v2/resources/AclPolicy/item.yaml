@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/AclPolicy'
+                $ref: '../../public-openapi.yaml#/components/schemas/AclPolicyId'
               meta:
                 type: object
   tags:
