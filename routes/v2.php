@@ -81,6 +81,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
     });
 
+    /** Network Acls */
+    $router->group([], function () use ($router) {
+        $router->get('network-acls', 'AclPolicyController@index');
+        $router->get('network-acls/{aclPolicyId}', 'AclPolicyController@show');
+        $router->post('network-acls', 'AclPolicyController@store');
+        $router->patch('network-acls/{aclPolicyId}', 'AclPolicyController@update');
+        $router->delete('network-acls/{aclPolicyId}', 'AclPolicyController@destroy');
+    });
+
     /** Vpns */
     $router->group([], function () use ($router) {
         $router->get('vpns', 'VpnController@index');
