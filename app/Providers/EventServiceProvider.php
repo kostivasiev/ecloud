@@ -50,6 +50,10 @@ class EventServiceProvider extends ServiceProvider
         // V2
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
+        // AclPolicy
+        \App\Events\V2\AclPolicy\Updated::class => [
+        ],
+
         // AvailabilityZone
         \App\Events\V2\AvailabilityZone\Creating::class => [
         ],
