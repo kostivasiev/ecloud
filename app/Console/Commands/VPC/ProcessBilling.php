@@ -143,6 +143,7 @@ class ProcessBilling extends Command
                     } catch (\Exception $exception) {
                         $this->error($exception->getMessage());
                         Log::error(get_class($this) . ' : ' . $exception->getMessage());
+                        return;
                     }
 
                     $supportMinimumPrice = $supportMinimumProduct->getPrice($resellerId);
