@@ -35,7 +35,7 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../resources/AclPolicy/responses/idResponse.yaml'
+      $ref: '../../resources/NetworkAclPolicy/responses/idResponse.yaml'
   tags:
     - ACL Policy
 
