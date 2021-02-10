@@ -14,7 +14,7 @@ get:
               meta:
                 type: object
   tags:
-    - ACL Policy
+    - Network ACL Policy
 
 patch:
   parameters:
@@ -46,4 +46,4 @@ delete:
     204:
       description: Success
   tags:
-    - ACL Policy
+    - Network ACL Policy

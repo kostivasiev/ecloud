@@ -33,7 +33,7 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/network-acls?page=2'
   tags:
-    - ACL Policy
+    - Network ACL Policy
 
 post:
   requestBody:
@@ -46,4 +46,4 @@ post:
     201:
       $ref: '../../resources/NetworkAclPolicy/responses/idResponse.yaml'
   tags:
-    - ACL Policy
+    - Network ACL Policy
