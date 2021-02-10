@@ -37,7 +37,7 @@ patch:
     200:
       $ref: '../../resources/NetworkAclPolicy/responses/idResponse.yaml'
   tags:
-    - ACL Policy
+    - Network ACL Policy
 
 delete:
   parameters:
