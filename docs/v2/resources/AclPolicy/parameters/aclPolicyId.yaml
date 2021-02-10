@@ -1,0 +1,6 @@
+in: path
+name: AclPolicyId
+required: true
+schema:
+  type: string
+example: na-abc123xyz

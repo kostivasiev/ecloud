@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/AclPolicy'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/AclPolicy'
+              meta:
+                type: object
+  tags:
+    - ACL Policy
+
+patch:
+  parameters:
+    - $ref: '../../resources/AclPolicy/parameters/aclPolicyId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/aclPolicy.yaml'
+            - type: object
+              properties:
+                name:
+                  required: false
+                router_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../resources/AclPolicy/responses/idResponse.yaml'
+  tags:
+    - ACL Policy
+
+delete:
+  parameters:
+    - $ref: '../../resources/AclPolicy/parameters/aclPolicyId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - ACL Policy
