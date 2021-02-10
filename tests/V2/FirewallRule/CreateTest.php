@@ -145,4 +145,51 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(422);
     }
+
+    public function testPortsValidSucceeds()
+    {
+        $this->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewallPolicy()->id,
+            'source' => '212.22.18.10/24',
+            'destination' => 'ANY',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'ports' => [
+                [
+                    'source' => '80',
+                    'destination' => '443',
+                    'protocol' => 'TCP'
+                ]
+            ],
+            'enabled' => true
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(201);
+    }
+
+    public function testPortsInvalidFails()
+    {
+        $this->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewallPolicy()->id,
+            'source' => '212.22.18.10/24',
+            'destination' => 'ANY',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'ports' => [
+                [
+                    'destination' => 'ANY',
+                    'protocol' => 'TCP'
+                ]
+            ],
+            'enabled' => true
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(422);
+    }
 }
