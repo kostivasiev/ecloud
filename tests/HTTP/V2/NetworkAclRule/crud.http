@@ -1,0 +1,131 @@
+###
+# Setup - Create Network Acl
+POST https://{{host}}/{{version}}/network-acls
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "network_id": "{{dev_network_id}}",
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Test ACL"
+}
+
+> {%
+client.test('Create a Network ACL', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('acl_id', response.body.data.id);
+    client.log('Network Acl ID: ' + response.body.data.id);
+});
+%}
+
+###
+# Create Network Rule
+POST https://{{host}}/{{version}}/network-acl-rules
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "network_acl_policy_id": "{{acl_id}}",
+    "sequence": 1,
+    "source": "10.0.1.0/32",
+    "destination": "10.0.2.0/32",
+    "action": "ALLOW",
+    "enabled": true
+}
+
+> {%
+client.test('Create a Network ACL Rule', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('acl_rule_id', response.body.data.id);
+    client.log('Network Acl Rule ID: ' + response.body.data.id);
+});
+%}
+
+###
+# Get ACL Rule Collection
+GET https://{{host}}/{{version}}/network-acl-rules
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Network Acl Rules Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data[0].id, client.global.get('acl_rule_id'));
+});
+%}
+
+###
+# Patch Acl Rule Policy
+PATCH https://{{host}}/{{version}}/network-acl-rules/{{acl_rule_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "New ACL Rule Name",
+    "enabled": false
+}
+
+> {%
+client.test('Update Network ACL Rule', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id, client.global.get('acl_rule_id'));
+});
+%}
+
+###
+# Get Acl Rule
+GET https://{{host}}/{{version}}/network-acl-rules/{{acl_rule_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Network ACL Rule', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id, client.global.get('acl_rule_id'));
+});
+%}
+
+###
+# Delete Acl Rule
+DELETE https://{{host}}/{{version}}/network-acl-rules/{{acl_rule_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete Network ACL Rule', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+###
+# Delete Acl Policy
+DELETE https://{{host}}/{{version}}/network-acls/{{acl_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete Network ACL Policy', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
