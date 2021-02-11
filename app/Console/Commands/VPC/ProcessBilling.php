@@ -129,15 +129,8 @@ class ProcessBilling extends Command
                     $this->line($key . ': £' . number_format($val, 2));
                 }
 
-                $this->line(PHP_EOL . 'Usage Total: £' . number_format($vpc['total'], 2));
-
-                $total += $vpc['total'];
-
+                $supportCost = 0;
                 if ($vpc['support']['enabled'] === true) {
-                    if ($this->option('debug')) {
-                        $this->info('VPC ' . $vpcId .' has support enabled');
-                    }
-
                     try {
                         $supportMinimumProduct = $this->getSupportMinimumProduct($vpcId);
                     } catch (\Exception $exception) {
@@ -148,24 +141,36 @@ class ProcessBilling extends Command
 
                     $supportMinimumPrice = $supportMinimumProduct->getPrice($resellerId);
 
-exit(print_r($supportMinimumPrice));
+                    // Support is calculated as the greater of 25% of the cost of the VPC, or the support minimum price.
+                    $vpcBasedSupportCost = $vpc['total'] * 0.25;
 
+                    $supportCost = ($vpcBasedSupportCost > $supportMinimumPrice) ? $vpcBasedSupportCost : $supportMinimumPrice;
 
                     if ($vpc['support']['pro-rata']) {
-                        if ($this->option('debug')) {
-                            $this->info('Support started during this billing cycle - applying pro-rata billing' . PHP_EOL);
+                        // A pro-rata payment will have been taken upfront already for the billing period, we just need to charge the difference
+                        if ($vpcBasedSupportCost > $supportMinimumPrice) {
+                            $supportCost = $vpcBasedSupportCost - $supportMinimumPrice;
                         }
                     }
-
-                    $this->line('Support: £00.00');
-
                 }
 
+                $this->line(PHP_EOL . 'Usage Total: £' . number_format($vpc['total'], 2));
 
+                $this->line('Support: £' . number_format($supportCost, 2));
+
+                if ($this->option('debug') && $vpc['support']['pro-rata']) {
+                    $this->info('Support started during this billing cycle - applying pro-rata support billing');
+                }
+
+                $vpcTotal = $vpc['total'] + $supportCost;
+
+                $this->line(PHP_EOL . 'VPC Total: £' . number_format($vpcTotal, 2));
+
+                $total += $vpcTotal;
             }
 
             $this->line('-----------------------------------');
-            $this->line('Reseller ' . $resellerId . ' VPC\'s Usage Total: £' . number_format($total, 2) . PHP_EOL);
+            $this->line('Reseller ' . $resellerId . ' VPC\'s Total: £' . number_format($total, 2) . PHP_EOL);
 
             // Apply any discount plans
             $discountPlans = DiscountPlan::where('reseller_id', $resellerId)
