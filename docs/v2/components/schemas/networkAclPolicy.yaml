@@ -7,7 +7,6 @@ properties:
     type: string
     example: 'Default Network ACL'
   network_id :
-    required : false
     writeOnly : true
     type : string
     example : 'net-912345'
@@ -28,4 +27,4 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
-description: 'Availability Zones'
+description: 'Network ACL Policy'
