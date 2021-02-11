@@ -381,7 +381,7 @@ class ProcessBilling extends Command
             ->first();
 
         if (empty($supportProduct)) {
-            throw new \Exception('Failed to load \'support minimum\' product for availability zone ' . $availabilityZone->id);;
+            throw new \Exception('Failed to load \'support minimum\' product for availability zone ' . $availabilityZone->id);
         }
 
         return $supportProduct;
