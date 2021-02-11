@@ -1,0 +1,6 @@
+in: path
+name: NetworkAclRuleId
+required: true
+schema:
+  type: string
+example: nar-abc123xyz

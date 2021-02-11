@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkAclRuleId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/NetworkAclRule'
+              meta:
+                type: object
+  tags:
+    - Network ACL Rule
+
+patch:
+  parameters:
+    - $ref: '../../resources/NetworkAclRule/parameters/networkAclRuleId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/networkAclRule.yaml'
+            - type: object
+              properties:
+                name:
+                  required: false
+                router_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../resources/NetworkAclRule/responses/idResponse.yaml'
+  tags:
+    - Network ACL Rule
+
+delete:
+  parameters:
+    - $ref: '../../resources/NetworkAclRule/parameters/networkAclRuleId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Network ACL Rule
