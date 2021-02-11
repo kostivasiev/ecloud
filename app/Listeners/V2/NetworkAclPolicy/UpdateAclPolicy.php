@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\NetworkAclPolicy;
 
-use App\Events\V2\NetworkAclPolicy\Updated;
+use App\Events\V2\NetworkAcl\Updated;
 use Illuminate\Support\Facades\Log;
 
 class UpdateAclPolicy

@@ -20,8 +20,8 @@ components:
       in: header
       name: Authorization
   schemas:
-    NetworkAclPolicy:
-      $ref: 'components/schemas/networkAclPolicy.yaml'
+    NetworkAcl:
+      $ref: 'components/schemas/networkAcl.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
@@ -65,8 +65,8 @@ components:
     # Path Parameters
     VpcId:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
-    NetworkAclPolicyId:
-      $ref: 'resources/NetworkAclPolicy/parameters/networkAclPolicyId.yaml'
+    NetworkAclId:
+      $ref: 'resources/NetworkAclPolicy/parameters/networkAclId.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
@@ -88,8 +88,8 @@ components:
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
   responses:
-    NetworkAclPolicyIdResponse:
-      $ref: 'resources/NetworkAclPolicy/responses/idResponse.yaml'
+    NetworkAclIdResponse:
+      $ref: 'resources/NetworkAcl/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
@@ -236,7 +236,7 @@ paths:
     $ref: 'resources/RouterThroughput/collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
-  '/ecloud/v2/network-acl-policies':
-    $ref: 'resources/NetworkAclPolicy/collection.yaml'
-  '/ecloud/v2/network-acl-policies/{networkAclPolicyId}':
-    $ref: 'resources/NetworkAclPolicy/item.yaml'
+  '/ecloud/v2/network-acls':
+    $ref: 'resources/NetworkAcl/collection.yaml'
+  '/ecloud/v2/network-acls/{networkAclId}':
+    $ref: 'resources/NetworkAcl/item.yaml'

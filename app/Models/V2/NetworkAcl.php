@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NetworkAclPolicy\Updated;
+use App\Events\V2\NetworkAcl\Updated;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -15,12 +15,12 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class AclPolicy
+ * Class NetworkAcl
  * @package App\Models\V2
- * @method static NetworkAclPolicy findOrFail(string $aclPolicyId)
- * @method static NetworkAclPolicy forUser($user)
+ * @method static NetworkAcl findOrFail(string $aclPolicyId)
+ * @method static NetworkAcl forUser($user)
  */
-class NetworkAclPolicy extends Model implements Filterable, Sortable
+class NetworkAcl extends Model implements Filterable, Sortable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable;
 

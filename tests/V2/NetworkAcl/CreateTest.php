@@ -1,7 +1,7 @@
 <?php
-namespace Tests\V2\NetworkAclPolicy;
+namespace Tests\V2\NetworkAcl;
 
-use App\Models\V2\NetworkAclPolicy;
+use App\Models\V2\NetworkAcl;
 use App\Models\V2\Network;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -31,15 +31,19 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc()->id,
         ];
         $this->post(
-            '/v2/network-acl-policies',
+            '/v2/network-acls',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->seeInDatabase(
-            'network_acl_policies',
-            $data,
+            'network_acls',
+            [
+                'name' => 'Test ACL',
+                'network_id' => $this->network->id,
+                'vpc_id' => $this->vpc()->id,
+            ],
             'ecloud'
         )->assertResponseStatus(201);
     }
@@ -51,9 +55,9 @@ class CreateTest extends TestCase
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ];
-        factory(NetworkAclPolicy::class)->create($data);
+        factory(NetworkAcl::class)->create($data);
         $this->post(
-            '/v2/network-acl-policies',
+            '/v2/network-acls',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

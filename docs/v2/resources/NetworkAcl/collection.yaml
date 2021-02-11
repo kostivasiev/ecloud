@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/NetworkAclPolicy'
+                  $ref: '../../public-openapi.yaml#/components/schemas/NetworkAcl'
               meta:
                 allOf:
                   - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
@@ -33,7 +33,7 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/network-acls?page=2'
   tags:
-    - Network ACL Policy
+    - Network ACL
 
 post:
   requestBody:
@@ -41,9 +41,9 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/networkAclPolicy.yaml'
+          $ref: '../../components/schemas/networkAcl.yaml'
   responses:
     201:
-      $ref: '../../resources/NetworkAclPolicy/responses/idResponse.yaml'
+      $ref: '../../resources/NetworkAcl/responses/idResponse.yaml'
   tags:
-    - Network ACL Policy
+    - Network ACL

@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Jobs\Sync\NetworkAclPolicy;
+namespace App\Jobs\Sync\NetworkAcl;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\NetworkAclPolicy\Undeploy;
-use App\Jobs\Nsx\NetworkAclPolicy\UndeployCheck;
-use App\Models\V2\NetworkAclPolicy;
+use App\Jobs\Nsx\NetworkAcl\Undeploy;
+use App\Jobs\Nsx\NetworkAcl\UndeployCheck;
+use App\Models\V2\NetworkAcl;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
     private $model;
 
-    public function __construct(NetworkAclPolicy $model)
+    public function __construct(NetworkAcl $model)
     {
         $this->model = $model;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\V2\NetworkAclPolicy;
+namespace App\Events\V2\NetworkAcl;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;

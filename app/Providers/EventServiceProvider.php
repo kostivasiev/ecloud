@@ -153,7 +153,7 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // NetworkAclPolicy
-        \App\Events\V2\NetworkAclPolicy\Updated::class => [
+        \App\Events\V2\NetworkAcl\Updated::class => [
         ],
 
         // Nat
