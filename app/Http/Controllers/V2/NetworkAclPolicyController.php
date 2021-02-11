@@ -28,12 +28,12 @@ class NetworkAclPolicyController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $aclPolicyId
+     * @param string $networkAclPolicyId
      * @return NetworkAclPolicyResource
      */
-    public function show(Request $request, string $aclPolicyId)
+    public function show(Request $request, string $networkAclPolicyId)
     {
-        return new NetworkAclPolicyResource(NetworkAclPolicy::forUser($request->user)->findOrFail($aclPolicyId));
+        return new NetworkAclPolicyResource(NetworkAclPolicy::forUser($request->user)->findOrFail($networkAclPolicyId));
     }
 
     /**
@@ -53,13 +53,13 @@ class NetworkAclPolicyController extends BaseController
 
     /**
      * @param UpdateRequest $request
-     * @param string $aclPolicyId
+     * @param string $networkAclPolicyId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function update(UpdateRequest $request, string $aclPolicyId)
+    public function update(UpdateRequest $request, string $networkAclPolicyId)
     {
-        $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
+        $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($networkAclPolicyId);
         $aclPolicy->update($request->all());
         $aclPolicy->save();
         return $this->responseIdMeta($request, $aclPolicy->getKey(), 200);
@@ -67,13 +67,13 @@ class NetworkAclPolicyController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $aclPolicyId
+     * @param string $networkAclPolicyId
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
-    public function destroy(Request $request, string $aclPolicyId)
+    public function destroy(Request $request, string $networkAclPolicyId)
     {
-        $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
+        $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($networkAclPolicyId);
         $aclPolicy->delete();
         return response('', 204);
     }

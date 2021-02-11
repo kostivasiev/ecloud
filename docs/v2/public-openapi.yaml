@@ -238,5 +238,5 @@ paths:
     $ref: 'resources/RouterThroughput/item.yaml'
   '/ecloud/v2/network-acls':
     $ref: 'resources/NetworkAclPolicy/collection.yaml'
-  '/ecloud/v2/network-acls/{aclPolicyId}':
+  '/ecloud/v2/network-acls/{networkAclPolicyId}':
     $ref: 'resources/NetworkAclPolicy/item.yaml'
