@@ -50,16 +50,6 @@ class NetworkAclController extends BaseController
             'network_id',
             'vpc_id'
         ]));
-//        $aclPolicy->network()
-//            ->associate(
-//                Network::forUser(app('request')->user)
-//                    ->findOrFail($request->get('network_id'))
-//            );
-//        $aclPolicy->vpc()
-//            ->associate(
-//                Vpc::forUser(app('request')->user)
-//                    ->findOrFail($request->get('vpc_id'))
-//            );
         $aclPolicy->save();
         return $this->responseIdMeta($request, $aclPolicy->getKey(), 201);
     }
