@@ -26,10 +26,6 @@ class NetworkAcl extends Model implements Filterable, Sortable
 
     public string $keyPrefix = 'na';
 
-    protected $dispatchesEvents = [
-        'updated' => Updated::class,
-    ];
-
     public function __construct(array $attributes = [])
     {
         $this->timestamps = true;
