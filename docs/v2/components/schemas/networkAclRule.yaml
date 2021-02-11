@@ -6,11 +6,12 @@ properties:
   name:
     type: string
     example: 'Network ACL Rule'
-  network_acl_policy_id :
-    required : false
+    readOnly : false
+  network_acl_id :
     writeOnly : true
     type : string
     example : 'na-abc123xyz'
+    readOnly : false
   sequence:
     type: integer
     required: true

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\V2\NetworkAclRule;
 
-use App\Models\V2\NetworkAclPolicy;
+use App\Models\V2\NetworkAcl;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
@@ -32,8 +32,8 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                'exists:ecloud.network_acl_policies,id,deleted_at,NULL',
-                new ExistsForUser(NetworkAclPolicy::class),
+                'exists:ecloud.network_acls,id,deleted_at,NULL',
+                new ExistsForUser(NetworkAcl::class),
             ],
             'sequence' => 'sometimes|required|integer',
             'source' => [
@@ -60,9 +60,6 @@ class UpdateRequest extends FormRequest
      */
     public function messages()
     {
-        return [
-            'router_id.required' => 'The :attribute field is required',
-            'subnet.unique' => 'The :attribute is already assigned to another network',
-        ];
+        return [];
     }
 }

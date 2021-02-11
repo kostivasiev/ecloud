@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Factory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
@@ -23,43 +22,38 @@ use UKFast\DB\Ditto\Sortable;
  * @method static NetworkAclRule findOrFail(string $id)
  * @method static NetworkAclRule forUser(mixed $user)
  * @method static NetworkAclRule get()
- * @property string id
- * @property string network_acl_policy_id
- * @property string name
- * @property integer sequence
- * @property string source
- * @property string destination
- * @property string action
- * @property boolean enabled
- * @property string created_at
- * @property string updated_at
  */
 class NetworkAclRule extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
 
-    public $keyPrefix = 'nar';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    protected $fillable = [
-        'id',
-        'network_acl_policy_id',
-        'name',
-        'sequence',
-        'source',
-        'destination',
-        'action',
-        'enabled',
-    ];
-    protected $casts = [
-        'sequence' => 'integer',
-        'enabled' => 'boolean',
-    ];
+    public string $keyPrefix = 'nar';
 
-    public function networkAclPolicy(): BelongsTo
+    public function __construct(array $attributes = [])
     {
-        return $this->belongsTo(NetworkAclPolicy::class);
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+        $this->fillable = [
+            'id',
+            'network_acl_id',
+            'name',
+            'sequence',
+            'source',
+            'destination',
+            'action',
+            'enabled',
+        ];
+        $this->casts = [
+            'sequence' => 'integer',
+            'enabled' => 'boolean',
+        ];
+        parent::__construct($attributes);
+    }
+
+    public function networkAcl(): BelongsTo
+    {
+        return $this->belongsTo(NetworkAcl::class);
     }
 
     /**
@@ -70,7 +64,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
-            $query->whereHas('networkAclPolicy.vpc', function ($query) use ($user) {
+            $query->whereHas('networkAcl.vpc', function ($query) use ($user) {
                 $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
                 if (!empty($resellerId)) {
                     $query->where('reseller_id', '=', $resellerId);
@@ -84,7 +78,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('network_acl_policy_id', Filter::$stringDefaults),
+            $factory->create('network_acl_id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('sequence', Filter::$numericDefaults),
             $factory->create('source', Filter::$stringDefaults),
@@ -100,7 +94,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('network_acl_policy_id'),
+            $factory->create('network_acl_id'),
             $factory->create('name'),
             $factory->create('sequence'),
             $factory->create('source'),
@@ -123,7 +117,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
-            'network_acl_policy_id' => 'network_acl_policy_id',
+            'network_acl_id' => 'network_acl_id',
             'name' => 'name',
             'sequence' => 'sequence',
             'source' => 'source',

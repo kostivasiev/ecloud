@@ -48,8 +48,9 @@ class NetworkAclRuleController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $aclRule = new NetworkAclRule($request->only([
-            'network_acl_policy_id',
+        $aclRule = app()->make(NetworkAclRule::class);
+        $aclRule->fill($request->only([
+            'network_acl_id',
             'name',
             'sequence',
             'source',
@@ -70,10 +71,16 @@ class NetworkAclRuleController extends BaseController
     public function update(UpdateRequest $request, string $networkAclRuleId)
     {
         $aclRule = NetworkAclRule::forUser(app('request')->user)->findOrFail($networkAclRuleId);
-        $aclRule->update($request->all());
-        if (!$aclRule->save()) {
-            return $aclRule->getSyncError();
-        }
+        $aclRule->fill($request->only([
+            'network_acl_id',
+            'name',
+            'sequence',
+            'source',
+            'destination',
+            'action',
+            'enabled',
+        ]));
+        $aclRule->save();
         return $this->responseIdMeta($request, $aclRule->getKey(), 200);
     }
 
@@ -86,9 +93,7 @@ class NetworkAclRuleController extends BaseController
     public function destroy(Request $request, string $networkAclRuleId)
     {
         $aclRule = NetworkAclRule::forUser(app('request')->user)->findOrFail($networkAclRuleId);
-        if (!$aclRule->delete()) {
-            return $aclRule->getSyncError();
-        }
+        $aclRule->delete();
         return response('', 204);
     }
 }

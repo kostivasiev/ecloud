@@ -84,10 +84,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     /** Network Acl Rules */
     $router->group([], function () use ($router) {
         $router->get('network-acl-rules', 'NetworkAclRuleController@index');
-        $router->get('network-acl-rules/{aclPolicyId}', 'NetworkAclRuleController@show');
+        $router->get('network-acl-rules/{networkAclRuleId}', 'NetworkAclRuleController@show');
         $router->post('network-acl-rules', 'NetworkAclRuleController@store');
-        $router->patch('network-acl-rules/{aclPolicyId}', 'NetworkAclRuleController@update');
-        $router->delete('network-acl-rules/{aclPolicyId}', 'NetworkAclRuleController@destroy');
+        $router->patch('network-acl-rules/{networkAclRuleId}', 'NetworkAclRuleController@update');
+        $router->delete('network-acl-rules/{networkAclRuleId}', 'NetworkAclRuleController@destroy');
     });
 
     /** Vpns */

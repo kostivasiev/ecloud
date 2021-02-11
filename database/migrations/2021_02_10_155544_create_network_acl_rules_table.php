@@ -15,7 +15,7 @@ class CreateNetworkAclRulesTable extends Migration
     {
         Schema::connection('ecloud')->create('network_acl_rules', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('network_acl_policy_id');
+            $table->string('network_acl_id');
             $table->string('name');
             $table->integer('sequence');
             $table->string('source');

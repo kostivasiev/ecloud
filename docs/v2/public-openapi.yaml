@@ -21,9 +21,16 @@ components:
       name: Authorization
   schemas:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
     NetworkAclPolicy:
       $ref: 'components/schemas/networkAclPolicy.yaml'
+    NetworkAclRule:
+      $ref : 'components/schemas/networkAclRule.yaml'
+>>>>>>> Stashed changes
+=======
+    NetworkAcl:
+      $ref: 'components/schemas/networkAcl.yaml'
     NetworkAclRule:
       $ref : 'components/schemas/networkAclRule.yaml'
 >>>>>>> Stashed changes
@@ -71,9 +78,16 @@ components:
     VpcId:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
     NetworkAclPolicyId:
       $ref: 'resources/NetworkAclPolicy/parameters/networkAclPolicyId.yaml'
+    NetworkAclRuleId:
+      $ref: 'resources/NetworkAclRule/parameters/networkAclRuleId.yaml'
+>>>>>>> Stashed changes
+=======
+    NetworkAclId:
+      $ref: 'resources/NetworkAcl/parameters/networkAclId.yaml'
     NetworkAclRuleId:
       $ref: 'resources/NetworkAclRule/parameters/networkAclRuleId.yaml'
 >>>>>>> Stashed changes
@@ -99,9 +113,16 @@ components:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
   responses:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
     NetworkAclPolicyIdResponse:
       $ref: 'resources/NetworkAclPolicy/responses/idResponse.yaml'
+    NetworkAclRuleIdResponse:
+      $ref: 'resources/NetworkAclRule/responses/idResponse.yaml'
+>>>>>>> Stashed changes
+=======
+    NetworkAclIdResponse:
+      $ref: 'resources/NetworkAcl/responses/idResponse.yaml'
     NetworkAclRuleIdResponse:
       $ref: 'resources/NetworkAclRule/responses/idResponse.yaml'
 >>>>>>> Stashed changes
@@ -251,6 +272,10 @@ paths:
     $ref: 'resources/RouterThroughput/collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
+  '/ecloud/v2/network-acls':
+    $ref: 'resources/NetworkAcl/collection.yaml'
+  '/ecloud/v2/network-acls/{networkAclId}':
+    $ref: 'resources/NetworkAcl/item.yaml'
   '/ecloud/v2/network-acl-rules':
     $ref: 'resources/NetworkAclRule/collection.yaml'
   '/ecloud/v2/network-acl-rules/{aclRulesId}':
