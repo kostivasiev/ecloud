@@ -6,16 +6,6 @@ use DateTimeZone;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
-/**
- * Class NetworkAclPolicyResource
- * @package App\Resources\V2
- * @property string id
- * @property string network_id
- * @property string vpc_id
- * @property string name
- * @property string created_at
- * @property string updated_at
- */
 class NetworkAclPolicyResource extends UKFastResource
 {
     public function toArray($request)
