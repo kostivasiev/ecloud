@@ -37,13 +37,11 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
+        )->seeInDatabase(
+            'network_acl_policies',
+            $data,
+            'ecloud'
         )->assertResponseStatus(201);
-
-        $aclPolicyId = (json_decode($this->response->getContent()))->data->id;
-        $aclPolicy = NetworkAclPolicy::findOrFail($aclPolicyId);
-        $this->assertEquals($data['name'], $aclPolicy->name);
-        $this->assertEquals($data['network_id'], $aclPolicy->network_id);
-        $this->assertEquals($data['vpc_id'], $aclPolicy->vpc_id);
     }
 
     public function testCreateResourceNetworkAlreadyAssigned()
