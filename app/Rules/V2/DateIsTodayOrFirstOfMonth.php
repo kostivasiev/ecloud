@@ -15,12 +15,7 @@ class DateIsTodayOrFirstOfMonth implements Rule
     {
         $now = Carbon::now();
         $theDate = Carbon::createFromTimeString($value);
-        return ($this->firstOfThisMonth($theDate, $now) || $theDate >= Carbon::now());
-    }
-
-    public function firstOfThisMonth($theDate, $now): bool
-    {
-        return ($theDate->firstOfMonth() && $theDate->month == $now->month && $theDate->year == $now->year);
+        return ($theDate->isSameDay($now->firstOfMonth()) || $theDate >= Carbon::now());
     }
 
     /**

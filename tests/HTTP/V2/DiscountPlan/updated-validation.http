@@ -247,6 +247,30 @@ client.test('I am a standard user - I create a plan with a start date in the pas
 %}
 
 ###
+# I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is rejected
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "2021-02-02 00:00:00",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is created', function () {
+    client.assert(response.status === 422, '422 Response not received');
+});
+%}
+
+###
 # CLEANUP
 DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id_1}}
 Cache-Control: no-cache
