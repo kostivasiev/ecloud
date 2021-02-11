@@ -60,7 +60,7 @@ class Network extends Model implements Filterable, Sortable
         return $this->hasMany(Nic::class);
     }
 
-    public function aclPolicy()
+    public function networkAclPolicy()
     {
         return $this->hasOne(NetworkAclPolicy::class);
     }
