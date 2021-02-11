@@ -7,7 +7,6 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -25,16 +24,7 @@ class NetworkAclPolicy extends Model implements Filterable, Sortable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable;
 
-    public $keyPrefix = 'na';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    protected $fillable = [
-        'id',
-        'network_id',
-        'vpc_id',
-        'name',
-    ];
+    public string $keyPrefix = 'na';
 
     protected $dispatchesEvents = [
         'updated' => Updated::class,
@@ -42,17 +32,25 @@ class NetworkAclPolicy extends Model implements Filterable, Sortable
 
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
-
         $this->timestamps = true;
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+        $this->fillable = [
+            'id',
+            'network_id',
+            'vpc_id',
+            'name',
+        ];
+        parent::__construct($attributes);
     }
 
-    public function vpc(): BelongsTo
+    public function vpc()
     {
         return $this->belongsTo(Vpc::class);
     }
 
-    public function network(): BelongsTo
+    public function network()
     {
         return $this->belongsTo(Network::class);
     }
