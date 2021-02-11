@@ -10,7 +10,7 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkAcl $aclPolicy;
+    protected NetworkAcl $networkAcl;
     protected Network $network;
 
     public function setUp(): void
@@ -18,9 +18,11 @@ class GetTest extends TestCase
         parent::setUp();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
+            'id' => 'net-test',
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(NetworkAcl::class)->create([
+        $this->networkAcl = factory(NetworkAcl::class)->create([
+            'id' => 'na-test',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -35,26 +37,26 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'id' => $this->aclPolicy->id,
-            'network_id' => $this->aclPolicy->network_id,
-            'vpc_id' => $this->aclPolicy->vpc_id,
-            'name' => $this->aclPolicy->name,
+            'id' => 'na-test',
+            'network_id' => 'net-test',
+            'vpc_id' => 'vpc-test',
+            'name' => 'na-test',
         ])->assertResponseStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get(
-            '/v2/network-acls/'.$this->aclPolicy->id,
+            '/v2/network-acls/'.$this->networkAcl->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'id' => $this->aclPolicy->id,
-            'network_id' => $this->aclPolicy->network_id,
-            'vpc_id' => $this->aclPolicy->vpc_id,
-            'name' => $this->aclPolicy->name,
+            'id' => 'na-test',
+            'network_id' => 'net-test',
+            'vpc_id' => 'vpc-test',
+            'name' => 'na-test',
         ])->assertResponseStatus(200);
     }
 }
