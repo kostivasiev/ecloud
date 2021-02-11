@@ -61,9 +61,7 @@ class NetworkAclPolicyController extends BaseController
     {
         $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
         $aclPolicy->update($request->all());
-        if (!$aclPolicy->save()) {
-            return $aclPolicy->getSyncError();
-        }
+        $aclPolicy->save();
         return $this->responseIdMeta($request, $aclPolicy->getKey(), 200);
     }
 
@@ -76,9 +74,7 @@ class NetworkAclPolicyController extends BaseController
     public function destroy(Request $request, string $aclPolicyId)
     {
         $aclPolicy = NetworkAclPolicy::forUser(app('request')->user)->findOrFail($aclPolicyId);
-        if (!$aclPolicy->delete()) {
-            return $aclPolicy->getSyncError();
-        }
+        $aclPolicy->delete();
         return response('', 204);
     }
 }
