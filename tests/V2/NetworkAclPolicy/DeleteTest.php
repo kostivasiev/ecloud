@@ -29,7 +29,7 @@ class DeleteTest extends TestCase
     public function testDeleteResource()
     {
         $this->delete(
-            '/v2/network-acls/'.$this->aclPolicy->id,
+            '/v2/network-acl-policies/'.$this->aclPolicy->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',

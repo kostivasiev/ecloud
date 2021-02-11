@@ -38,7 +38,7 @@ class UpdateTest extends TestCase
             'region_id' => $this->region()->id
         ]);
         $this->patch(
-            '/v2/network-acls/'.$this->aclPolicy->id,
+            '/v2/network-acl-policies/'.$this->aclPolicy->id,
             [
                 'network_id' => $newNetwork->id,
                 'vpc_id' => $newVpc->id,
@@ -65,7 +65,7 @@ class UpdateTest extends TestCase
             'vpc_id' => $newVpc->id,
         ]);
         $this->patch(
-            '/v2/network-acls/'.$this->aclPolicy->id,
+            '/v2/network-acl-policies/'.$this->aclPolicy->id,
             [
                 'network_id' => $newNetwork->id,
                 'vpc_id' => $newVpc->id,

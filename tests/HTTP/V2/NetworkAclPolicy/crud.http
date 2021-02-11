@@ -1,6 +1,6 @@
 ###
 # Create an ACL Policy
-POST https://{{host}}/{{version}}/network-acls
+POST https://{{host}}/{{version}}/network-acl-policies
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -23,7 +23,7 @@ client.test('Create a Network ACL', function () {
 
 ###
 # Get ACL Policy Collection
-GET https://{{host}}/{{version}}/network-acls
+GET https://{{host}}/{{version}}/network-acl-policies
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -39,7 +39,7 @@ client.test('Get Network Acl Collection', function () {
 
 ###
 # Patch Acl Policy
-PATCH https://{{host}}/{{version}}/network-acls/{{acl_id}}
+PATCH https://{{host}}/{{version}}/network-acl-policies/{{acl_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -59,7 +59,7 @@ client.test('Update Network ACL', function () {
 
 ###
 # Get Acl Policy
-GET https://{{host}}/{{version}}/network-acls/{{acl_id}}
+GET https://{{host}}/{{version}}/network-acl-policies/{{acl_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -75,7 +75,7 @@ client.test('Get Network ACL', function () {
 
 ###
 # Delete Acl Policy
-DELETE https://{{host}}/{{version}}/network-acls/{{acl_id}}
+DELETE https://{{host}}/{{version}}/network-acl-policies/{{acl_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

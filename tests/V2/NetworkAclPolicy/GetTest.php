@@ -29,7 +29,7 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/network-acls',
+            '/v2/network-acl-policies',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -45,7 +45,7 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/network-acls/'.$this->aclPolicy->id,
+            '/v2/network-acl-policies/'.$this->aclPolicy->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

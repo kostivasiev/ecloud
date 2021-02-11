@@ -31,7 +31,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc()->id,
         ];
         $this->post(
-            '/v2/network-acls',
+            '/v2/network-acl-policies',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -55,7 +55,7 @@ class CreateTest extends TestCase
         ];
         factory(NetworkAclPolicy::class)->create($data);
         $this->post(
-            '/v2/network-acls',
+            '/v2/network-acl-policies',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
