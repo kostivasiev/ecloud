@@ -1,11 +1,11 @@
 properties:
   id:
     type: string
-    example: na-abc123xyz
+    example: np-abc123xyz
     readOnly: true
   name:
     type: string
-    example: 'Default Network ACL'
+    example: 'Default Network Policy'
   network_id :
     writeOnly : true
     type : string
