@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNetworkAclsTable extends Migration
+class CreateNetworkPoliciesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateNetworkAclsTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('network_acls', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('network_policies', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('network_id');
             $table->uuid('vpc_id');
@@ -30,6 +30,6 @@ class CreateNetworkAclsTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('network_acls');
+        Schema::connection('ecloud')->dropIfExists('network_policies');
     }
 }

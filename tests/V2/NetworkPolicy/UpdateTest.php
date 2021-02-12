@@ -1,7 +1,7 @@
 <?php
-namespace Tests\V2\NetworkAcl;
+namespace Tests\V2\NetworkPolicy;
 
-use App\Models\V2\NetworkAcl;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -11,7 +11,7 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkAcl $networkAcl;
+    protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
     protected function setUp(): void
@@ -21,7 +21,8 @@ class UpdateTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->networkAcl = factory(NetworkAcl::class)->create([
+        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+            'id' => 'na-test',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -38,19 +39,24 @@ class UpdateTest extends TestCase
             'region_id' => $this->region()->id
         ]);
         $this->patch(
-            '/v2/network-acls/'.$this->networkAcl->id,
+            '/v2/network-policies/na-test',
             [
-                'network_id' => $newNetwork->id,
-                'vpc_id' => $newVpc->id,
+                'network_id' => 'net-new',
+                'vpc_id' => 'vpc-new',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
+        )->seeInDatabase(
+            'network_policies',
+            [
+                'id' => 'na-test',
+                'network_id' => 'net-new',
+                'vpc_id' => 'vpc-new',
+            ],
+            'ecloud'
         )->assertResponseStatus(200);
-        $this->networkAcl->refresh();
-        $this->assertEquals($this->networkAcl->network_id, $newNetwork->id);
-        $this->assertEquals($this->networkAcl->vpc_id, $newVpc->id);
     }
 
     public function testUpdateResourceNetworkHasAcl()
@@ -62,15 +68,15 @@ class UpdateTest extends TestCase
             'id' => 'vpc-new',
             'region_id' => $this->region()->id
         ]);
-        factory(NetworkAcl::class)->create([
+        factory(NetworkPolicy::class)->create([
             'network_id' => $newNetwork->id,
             'vpc_id' => $newVpc->id,
         ]);
         $this->patch(
-            '/v2/network-acls/'.$this->networkAcl->id,
+            '/v2/network-policies/na-test',
             [
-                'network_id' => $newNetwork->id,
-                'vpc_id' => $newVpc->id,
+                'network_id' => 'net-111aaa222',
+                'vpc_id' => 'vpc-new',
             ],
             [
                 'X-consumer-custom-id' => '0-0',

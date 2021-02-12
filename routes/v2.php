@@ -83,11 +83,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Network Acls */
     $router->group([], function () use ($router) {
-        $router->get('network-acls', 'NetworkAclController@index');
-        $router->get('network-acls/{networkAclId}', 'NetworkAclController@show');
-        $router->post('network-acls', 'NetworkAclController@store');
-        $router->patch('network-acls/{networkAclId}', 'NetworkAclController@update');
-        $router->delete('network-acls/{networkAclId}', 'NetworkAclController@destroy');
+        $router->get('network-policies', 'NetworkPolicyController@index');
+        $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->post('network-policies', 'NetworkPolicyController@store');
+        $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
+        $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
     });
 
     /** Vpns */

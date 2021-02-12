@@ -11,7 +11,7 @@ class NetworkHasNoAcl implements Rule
     public function passes($attribute, $value)
     {
         $network = Network::forUser(app('request')->user)->findOrFail($value);
-        return (is_null($network->networkAcl));
+        return (is_null($network->networkPolicy));
     }
 
     public function message()

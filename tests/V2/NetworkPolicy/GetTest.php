@@ -1,7 +1,7 @@
 <?php
-namespace Tests\V2\NetworkAcl;
+namespace Tests\V2\NetworkPolicy;
 
-use App\Models\V2\NetworkAcl;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -10,7 +10,7 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkAcl $networkAcl;
+    protected NetworkPolicy $networkAcl;
     protected Network $network;
 
     public function setUp(): void
@@ -21,7 +21,7 @@ class GetTest extends TestCase
             'id' => 'net-test',
             'router_id' => $this->router()->id,
         ]);
-        $this->networkAcl = factory(NetworkAcl::class)->create([
+        $this->networkAcl = factory(NetworkPolicy::class)->create([
             'id' => 'na-test',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
@@ -31,7 +31,7 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/network-acls',
+            '/v2/network-policies',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -47,7 +47,7 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/network-acls/'.$this->networkAcl->id,
+            '/v2/network-policies/na-test',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

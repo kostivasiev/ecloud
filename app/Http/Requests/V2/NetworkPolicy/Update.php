@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Requests\V2\NetworkAcl;
+namespace App\Http\Requests\V2\NetworkPolicy;
 
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
@@ -7,7 +7,7 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\NetworkHasNoAcl;
 use UKFast\FormRequests\FormRequest;
 
-class CreateRequest extends FormRequest
+class Update extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,8 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
             'network_id' => [
+                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.networks,id,deleted_at,NULL',
@@ -36,11 +36,13 @@ class CreateRequest extends FormRequest
                 new NetworkHasNoAcl(),
             ],
             'vpc_id' => [
+                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class)
             ],
+            'name' => 'nullable|string',
         ];
     }
 

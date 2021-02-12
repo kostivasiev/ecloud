@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Jobs\Nsx\NetworkAcl;
+namespace App\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Job;
-use App\Models\V2\NetworkAcl;
+use App\Models\V2\NetworkPolicy;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
@@ -14,7 +14,7 @@ class Undeploy extends Job
 
     private $model;
 
-    public function __construct(NetworkAcl $model)
+    public function __construct(NetworkPolicy $model)
     {
         $this->model = $model;
     }

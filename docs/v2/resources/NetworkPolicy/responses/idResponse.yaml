@@ -15,4 +15,4 @@ content:
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/network-acls/na-abc123xyz'
+              example: 'https://api.ukfast.io/ecloud/v2/network-policies/na-abc123xyz'

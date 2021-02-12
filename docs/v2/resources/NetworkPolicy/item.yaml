@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkAclId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkPolicyId'
   responses:
     200:
       description: success
@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/NetworkAcl'
+                $ref: '../../public-openapi.yaml#/components/schemas/NetworkPolicy'
               meta:
                 type: object
   tags:
@@ -18,7 +18,7 @@ get:
 
 patch:
   parameters:
-    - $ref: '../../resources/NetworkAcl/parameters/networkAclId.yaml'
+    - $ref: '../../resources/NetworkPolicy/parameters/networkPolicyId.yaml'
   requestBody:
     required: true
     content:
@@ -26,7 +26,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/networkAcl.yaml'
+            - $ref: '../../components/schemas/networkPolicy.yaml'
             - type: object
               properties:
                 name:
@@ -35,15 +35,15 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../resources/NetworkAcl/responses/idResponse.yaml'
+      $ref: '../../resources/NetworkPolicy/responses/idResponse.yaml'
   tags:
-    - Network ACL
+    - Network Policies
 
 delete:
   parameters:
-    - $ref: '../../resources/NetworkAcl/parameters/networkAclId.yaml'
+    - $ref: '../../resources/NetworkPolicy/parameters/networkPolicyId.yaml'
   responses:
     204:
       description: Success
   tags:
-    - Network ACL
+    - Network Policies

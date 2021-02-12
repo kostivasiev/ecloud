@@ -1,5 +1,5 @@
 in: path
-name: NetworkAclId
+name: NetworkPolicyId
 required: true
 schema:
   type: string

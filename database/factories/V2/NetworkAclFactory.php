@@ -2,8 +2,8 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\NetworkAcl;
+use App\Models\V2\NetworkPolicy;
 
-$factory->define(NetworkAcl::class, function () {
+$factory->define(NetworkPolicy::class, function () {
     return [];
 });

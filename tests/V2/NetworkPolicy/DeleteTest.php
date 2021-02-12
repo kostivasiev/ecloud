@@ -1,7 +1,7 @@
 <?php
-namespace Tests\V2\NetworkAcl;
+namespace Tests\V2\NetworkPolicy;
 
-use App\Models\V2\NetworkAcl;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -10,7 +10,7 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkAcl $aclPolicy;
+    protected NetworkPolicy $aclPolicy;
     protected Network $network;
 
     public function setUp(): void
@@ -20,7 +20,7 @@ class DeleteTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(NetworkAcl::class)->create([
+        $this->aclPolicy = factory(NetworkPolicy::class)->create([
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -29,14 +29,14 @@ class DeleteTest extends TestCase
     public function testDeleteResource()
     {
         $this->delete(
-            '/v2/network-acls/'.$this->aclPolicy->id,
+            '/v2/network-policies/'.$this->aclPolicy->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(204);
-        $aclPolicy = NetworkAcl::withTrashed()->findOrFail($this->aclPolicy->id);
+        $aclPolicy = NetworkPolicy::withTrashed()->findOrFail($this->aclPolicy->id);
         $this->assertNotNull($aclPolicy->deleted_at);
     }
 }

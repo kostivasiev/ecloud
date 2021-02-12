@@ -1,16 +1,14 @@
 <?php
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\NetworkAcl\CreateRequest;
-use App\Http\Requests\V2\NetworkAcl\UpdateRequest;
-use App\Models\V2\Network;
-use App\Models\V2\NetworkAcl;
-use App\Models\V2\Vpc;
-use App\Resources\V2\NetworkAclResource;
+use App\Http\Requests\V2\NetworkPolicy\Create;
+use App\Http\Requests\V2\NetworkPolicy\Update;
+use App\Models\V2\NetworkPolicy;
+use App\Resources\V2\NetworkPolicyResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
-class NetworkAclController extends BaseController
+class NetworkPolicyController extends BaseController
 {
     /**
      * @param Request $request
@@ -19,11 +17,11 @@ class NetworkAclController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = NetworkAcl::forUser($request->user);
-        $queryTransformer->config(NetworkAcl::class)
+        $collection = NetworkPolicy::forUser($request->user);
+        $queryTransformer->config(NetworkPolicy::class)
             ->transform($collection);
 
-        return NetworkAclResource::collection($collection->paginate(
+        return NetworkPolicyResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -31,20 +29,20 @@ class NetworkAclController extends BaseController
     /**
      * @param Request $request
      * @param string $networkAclId
-     * @return NetworkAclResource
+     * @return NetworkPolicyResource
      */
     public function show(Request $request, string $networkAclId)
     {
-        return new NetworkAclResource(NetworkAcl::forUser($request->user)->findOrFail($networkAclId));
+        return new NetworkPolicyResource(NetworkPolicy::forUser($request->user)->findOrFail($networkAclId));
     }
 
     /**
-     * @param CreateRequest $request
+     * @param Create $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateRequest $request)
+    public function store(Create $request)
     {
-        $aclPolicy = app()->make(NetworkAcl::class);
+        $aclPolicy = app()->make(NetworkPolicy::class);
         $aclPolicy->fill($request->only([
             'name',
             'network_id',
@@ -55,14 +53,14 @@ class NetworkAclController extends BaseController
     }
 
     /**
-     * @param UpdateRequest $request
+     * @param Update $request
      * @param string $networkAclId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function update(UpdateRequest $request, string $networkAclId)
+    public function update(Update $request, string $networkAclId)
     {
-        $aclPolicy = NetworkAcl::forUser(app('request')->user)->findOrFail($networkAclId);
+        $aclPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
         $aclPolicy->fill($request->only([
             'name',
             'network_id',
@@ -80,7 +78,7 @@ class NetworkAclController extends BaseController
      */
     public function destroy(Request $request, string $networkAclId)
     {
-        $aclPolicy = NetworkAcl::forUser(app('request')->user)->findOrFail($networkAclId);
+        $aclPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
         $aclPolicy->delete();
         return response('', 204);
     }

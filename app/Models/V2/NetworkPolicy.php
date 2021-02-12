@@ -17,10 +17,10 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * Class NetworkAcl
  * @package App\Models\V2
- * @method static NetworkAcl findOrFail(string $aclPolicyId)
- * @method static NetworkAcl forUser($user)
+ * @method static NetworkPolicy findOrFail(string $aclPolicyId)
+ * @method static NetworkPolicy forUser($user)
  */
-class NetworkAcl extends Model implements Filterable, Sortable
+class NetworkPolicy extends Model implements Filterable, Sortable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable;
 
