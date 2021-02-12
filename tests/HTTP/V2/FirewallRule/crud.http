@@ -5,22 +5,14 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "fwr-aaaaaaaa",
+    "name": "What's in a name?",
     "sequence": 10,
     "firewall_policy_id": "{{dev_firewall_policy_id}}",
+    "source": "192.168.100.1/24",
+    "destination": "212.22.18.10/24",
     "action": "ALLOW",
     "direction": "IN",
-    "enabled": true,
-    "ports": [
-        {
-           "protocol": "UDP"
-        },
-        {
-           "protocol": "TCP",
-           "source": "443",
-           "destination": "555"
-        }
-    ]
+    "enabled": true
 }
 
 > {%
