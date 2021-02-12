@@ -81,7 +81,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
     });
 
-    /** Network Acls */
+    /** Network Policy */
     $router->group([], function () use ($router) {
         $router->get('network-policies', 'NetworkPolicyController@index');
         $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
