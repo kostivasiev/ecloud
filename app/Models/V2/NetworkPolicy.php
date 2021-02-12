@@ -24,7 +24,7 @@ class NetworkPolicy extends Model implements Filterable, Sortable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable;
 
-    public string $keyPrefix = 'na';
+    public string $keyPrefix = 'np';
 
     public function __construct(array $attributes = [])
     {
