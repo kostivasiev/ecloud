@@ -65,7 +65,7 @@ class CreateTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'This network id already has an assigned ACL'
+            'detail' => 'This network id already has an assigned Policy'
         ])->assertResponseStatus(422);
     }
 }
