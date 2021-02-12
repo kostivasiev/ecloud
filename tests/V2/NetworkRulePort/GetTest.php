@@ -1,10 +1,10 @@
 <?php
-namespace Tests\V2\NetworkAclRulePort;
+namespace Tests\V2\NetworkRulePort;
 
 use App\Models\V2\Network;
-use App\Models\V2\NetworkAcl;
-use App\Models\V2\NetworkAclRule;
-use App\Models\V2\NetworkAclRulePort;
+use App\Models\V2\NetworkPolicy;
+use App\Models\V2\NetworkRule;
+use App\Models\V2\NetworkRulePort;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -13,42 +13,45 @@ class GetTest extends TestCase
     use DatabaseMigrations;
 
     protected Network $network;
-    protected NetworkAcl $networkAcl;
-    protected NetworkAclRule $networkAclRule;
-    protected NetworkAclRulePort $networkAclRulePort;
+    protected NetworkPolicy $networkPolicy;
+    protected NetworkRule $networkRule;
+    protected NetworkRulePort $networkRulePort;
 
     public function setUp(): void
     {
         parent::setUp();
+        $this->vpc();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
+            'id' => 'net-test',
             'router_id' => $this->router()->id,
         ]);
-        $this->networkAcl = factory(NetworkAcl::class)->create([
-            'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
+        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+            'id' => 'np-test',
+            'network_id' => 'net-test',
+            'vpc_id' => 'vpc-test',
         ]);
-        $this->networkAclRule = factory(NetworkAclRule::class)->create([
-            'id' => 'nar-abc123xyz',
-            'network_acl_id' => $this->networkAcl->id,
+        $this->networkRule = factory(NetworkRule::class)->create([
+            'id' => 'nr-test',
+            'network_policy_id' => 'np-test',
         ]);
-        $this->networkAclRulePort = factory(NetworkAclRulePort::class)->create([
-            'id' => 'narp-abc123xyz',
-            'network_acl_rule_id' => $this->networkAclRule->id,
+        $this->networkRulePort = factory(NetworkRulePort::class)->create([
+            'id' => 'nrp-test',
+            'network_rule_id' => 'nr-test',
         ]);
     }
 
     public function testGetCollection()
     {
         $this->get(
-            '/v2/network-acl-rule-ports',
+            '/v2/network-rule-ports',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'id' => 'narp-abc123xyz',
-            'network_acl_rule_id' => 'nar-abc123xyz',
+            'id' => 'nrp-test',
+            'network_rule_id' => 'nr-test',
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555',
@@ -58,14 +61,14 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/network-acl-rule-ports/narp-abc123xyz',
+            '/v2/network-acl-rule-ports/nrp-test',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'id' => 'narp-abc123xyz',
-            'network_acl_rule_id' => 'nar-abc123xyz',
+            'id' => 'nrp-test',
+            'network_rule_id' => 'nr-test',
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555',

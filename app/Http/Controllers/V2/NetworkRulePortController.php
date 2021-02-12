@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\NetworkAclRulePort\CreateRequest;
-use App\Http\Requests\V2\NetworkAclRulePort\UpdateRequest;
-use App\Models\V2\NetworkAclRulePort;
-use App\Resources\V2\NetworkAclRulePortResource;
+use App\Http\Requests\V2\NetworkRulePort\Create;
+use App\Http\Requests\V2\NetworkRulePort\Update;
+use App\Models\V2\NetworkRulePort;
+use App\Resources\V2\NetworkRulePortResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
-class NetworkAclRulePortController extends BaseController
+class NetworkRulePortController extends BaseController
 {
     /**
      * @param Request $request
@@ -18,13 +18,13 @@ class NetworkAclRulePortController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = NetworkAclRulePort::forUser($request->user);
+        $collection = NetworkRulePort::forUser($request->user);
 
         (new QueryTransformer($request))
-            ->config(NetworkAclRulePort::class)
+            ->config(NetworkRulePort::class)
             ->transform($collection);
 
-        return NetworkAclRulePortResource::collection($collection->paginate(
+        return NetworkRulePortResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -32,23 +32,23 @@ class NetworkAclRulePortController extends BaseController
     /**
      * @param Request $request
      * @param string $networkAclRuleId
-     * @return NetworkAclRulePortResource
+     * @return NetworkRulePortResource
      */
     public function show(Request $request, string $networkAclRuleId)
     {
-        return new NetworkAclRulePortResource(
-            NetworkAclRulePort::forUser($request->user)->findOrFail($networkAclRuleId)
+        return new NetworkRulePortResource(
+            NetworkRulePort::forUser($request->user)->findOrFail($networkAclRuleId)
         );
     }
 
     /**
-     * @param CreateRequest $request
+     * @param Create $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function store(CreateRequest $request)
+    public function store(Create $request)
     {
-        $aclRulePort = app()->make(NetworkAclRulePort::class);
+        $aclRulePort = app()->make(NetworkRulePort::class);
         $aclRulePort->fill($request->only([
             'network_acl_rule_id',
             'name',
@@ -61,14 +61,14 @@ class NetworkAclRulePortController extends BaseController
     }
 
     /**
-     * @param UpdateRequest $request
+     * @param Update $request
      * @param string $networkAclRuleId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function update(UpdateRequest $request, string $networkAclRuleId)
+    public function update(Update $request, string $networkAclRuleId)
     {
-        $aclRulePort = NetworkAclRulePort::forUser(app('request')->user)->findOrFail($networkAclRuleId);
+        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkAclRuleId);
         $aclRulePort->fill($request->only([
             'network_acl_rule_id',
             'name',
@@ -88,7 +88,7 @@ class NetworkAclRulePortController extends BaseController
      */
     public function destroy(Request $request, string $networkAclRuleId)
     {
-        $aclRulePort = NetworkAclRulePort::forUser(app('request')->user)->findOrFail($networkAclRuleId);
+        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkAclRuleId);
         $aclRulePort->delete();
         return response('', 204);
     }

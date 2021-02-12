@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Jobs\Nsx\NetworkAclRulePort;
+namespace App\Jobs\Nsx\NetworkRulePort;
 
 use App\Jobs\Job;
-use App\Models\V2\NetworkAclRulePort;
+use App\Models\V2\NetworkRulePort;
 use Illuminate\Support\Facades\Log;
 
-class UndeployCheck extends Job
+class Undeploy extends Job
 {
     const RETRY_DELAY = 5;
 
@@ -14,7 +14,7 @@ class UndeployCheck extends Job
 
     private $model;
 
-    public function __construct(NetworkAclRulePort $model)
+    public function __construct(NetworkRulePort $model)
     {
         $this->model = $model;
     }
@@ -23,10 +23,7 @@ class UndeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // @todo NSX Undeploy check to be added here
-
-        $this->model->setSyncCompleted();
-        $this->model->syncDelete();
+        // @todo NSX undeploy to be added here
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

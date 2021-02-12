@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\NetworkAclRulePort;
+use App\Models\V2\NetworkRulePort;
 
-$factory->define(NetworkAclRulePort::class, function () {
+$factory->define(NetworkRulePort::class, function () {
     return [
         'protocol' => 'TCP',
         'source' => '443',

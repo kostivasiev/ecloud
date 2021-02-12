@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Jobs\Sync\NetworkAclRulePort;
+namespace App\Jobs\Sync\NetworkRulePort;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\NetworkAclRulePort\Undeploy;
-use App\Jobs\Nsx\NetworkAclRulePort\UndeployCheck;
-use App\Models\V2\NetworkAclRulePort;
+use App\Jobs\Nsx\NetworkRulePort\Undeploy;
+use App\Jobs\Nsx\NetworkRulePort\UndeployCheck;
+use App\Models\V2\NetworkRulePort;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
     private $model;
 
-    public function __construct(NetworkAclRulePort $model)
+    public function __construct(NetworkRulePort $model)
     {
         $this->model = $model;
     }
