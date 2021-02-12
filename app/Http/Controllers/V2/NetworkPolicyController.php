@@ -42,14 +42,14 @@ class NetworkPolicyController extends BaseController
      */
     public function store(Create $request)
     {
-        $aclPolicy = app()->make(NetworkPolicy::class);
-        $aclPolicy->fill($request->only([
+        $networkPolicy = app()->make(NetworkPolicy::class);
+        $networkPolicy->fill($request->only([
             'name',
             'network_id',
             'vpc_id'
         ]));
-        $aclPolicy->save();
-        return $this->responseIdMeta($request, $aclPolicy->getKey(), 201);
+        $networkPolicy->save();
+        return $this->responseIdMeta($request, $networkPolicy->getKey(), 201);
     }
 
     /**
@@ -60,14 +60,14 @@ class NetworkPolicyController extends BaseController
      */
     public function update(Update $request, string $networkAclId)
     {
-        $aclPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
-        $aclPolicy->fill($request->only([
+        $networkPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
+        $networkPolicy->fill($request->only([
             'name',
             'network_id',
             'vpc_id',
         ]));
-        $aclPolicy->save();
-        return $this->responseIdMeta($request, $aclPolicy->getKey(), 200);
+        $networkPolicy->save();
+        return $this->responseIdMeta($request, $networkPolicy->getKey(), 200);
     }
 
     /**
@@ -78,8 +78,8 @@ class NetworkPolicyController extends BaseController
      */
     public function destroy(Request $request, string $networkAclId)
     {
-        $aclPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
-        $aclPolicy->delete();
+        $networkPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
+        $networkPolicy->delete();
         return response('', 204);
     }
 }
