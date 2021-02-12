@@ -29,7 +29,8 @@ class ProductPopulation extends Command
                     return;
                 }
 
-                $product = factory(Product::class)->create([
+                $product = app()->make(Product::class);
+                $product->fill([
                     'product_sales_product_id' => 0,
                     'product_name' => $productName,
                     'product_category' => 'eCloud',
@@ -41,11 +42,16 @@ class ProductPopulation extends Command
                     'product_cost_currency' => '',
                     'product_cost_price' => 0.0,
                 ]);
-                factory(ProductPrice::class)->create([
+                $product->save();
+
+                $product_price = app()->make(ProductPrice::class);
+                $product_price->fill([
                     'product_price_product_id' => $product->product_id,
                     'product_price_type' => 'Standard',
                     'product_price_sale_price' => 0.01,
                 ]);
+                $product_price->save();
+
                 $this->info('Created product "' . $productName . '" (' . $product->product_id . ')');
             });
         });

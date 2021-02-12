@@ -43,7 +43,8 @@ class UpdateBilling
             $currentActiveMetric->save();
         }
 
-        $billingMetric = factory(BillingMetric::class)->create([
+        $billingMetric = app()->make(BillingMetric::class);
+        $billingMetric->fill([
             'resource_id' => $model->id,
             'vpc_id' => $model->vpc->id,
             'reseller_id' => $model->vpc->reseller_id,
