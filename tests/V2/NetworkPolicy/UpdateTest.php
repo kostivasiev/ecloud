@@ -22,7 +22,7 @@ class UpdateTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
-            'id' => 'na-test',
+            'id' => 'np-test',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -39,7 +39,7 @@ class UpdateTest extends TestCase
             'region_id' => $this->region()->id
         ]);
         $this->patch(
-            '/v2/network-policies/na-test',
+            '/v2/network-policies/np-test',
             [
                 'network_id' => 'net-new',
                 'vpc_id' => 'vpc-new',
@@ -51,7 +51,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'network_policies',
             [
-                'id' => 'na-test',
+                'id' => 'np-test',
                 'network_id' => 'net-new',
                 'vpc_id' => 'vpc-new',
             ],
@@ -73,7 +73,7 @@ class UpdateTest extends TestCase
             'vpc_id' => $newVpc->id,
         ]);
         $this->patch(
-            '/v2/network-policies/na-test',
+            '/v2/network-policies/np-test',
             [
                 'network_id' => 'net-111aaa222',
                 'vpc_id' => 'vpc-new',
@@ -84,7 +84,7 @@ class UpdateTest extends TestCase
             ]
         )->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'This network id already has an assigned ACL'
+            'detail' => 'This network id already has an assigned Policy'
         ])->assertResponseStatus(422);
     }
 }
