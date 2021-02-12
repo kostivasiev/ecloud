@@ -40,7 +40,7 @@ class CreateTest extends TestCase
         )->seeInDatabase(
             'network_policies',
             [
-                'name' => 'Test ACL',
+                'name' => 'Test Policy',
                 'network_id' => 'net-test',
                 'vpc_id' => 'vpc-test',
             ],
