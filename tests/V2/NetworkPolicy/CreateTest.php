@@ -26,7 +26,7 @@ class CreateTest extends TestCase
     public function testCreateResource()
     {
         $data = [
-            'name' => 'Test ACL',
+            'name' => 'Test Policy',
             'network_id' => 'net-test',
             'vpc_id' => $this->vpc()->id,
         ];
