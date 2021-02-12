@@ -81,24 +81,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
     });
 
-    /** Network Acls */
-    $router->group([], function () use ($router) {
-        $router->get('network-acls', 'NetworkAclController@index');
-        $router->get('network-acls/{networkAclId}', 'NetworkAclController@show');
-        $router->post('network-acls', 'NetworkAclController@store');
-        $router->patch('network-acls/{networkAclId}', 'NetworkAclController@update');
-        $router->delete('network-acls/{networkAclId}', 'NetworkAclController@destroy');
-    });
-
-    /** Network Acl Rules */
-    $router->group([], function () use ($router) {
-        $router->get('network-acl-rules', 'NetworkAclRuleController@index');
-        $router->get('network-acl-rules/{networkAclRuleId}', 'NetworkAclRuleController@show');
-        $router->post('network-acl-rules', 'NetworkAclRuleController@store');
-        $router->patch('network-acl-rules/{networkAclRuleId}', 'NetworkAclRuleController@update');
-        $router->delete('network-acl-rules/{networkAclRuleId}', 'NetworkAclRuleController@destroy');
-    });
-
     /** Network Acl Rule Ports */
     $router->group([], function () use ($router) {
         $router->get('network-acl-rule-ports', 'NetworkAclRulePortController@index');
