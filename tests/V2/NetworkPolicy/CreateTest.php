@@ -51,7 +51,7 @@ class CreateTest extends TestCase
     public function testCreateResourceNetworkAlreadyAssigned()
     {
         $data = [
-            'name' => 'Test ACL',
+            'name' => 'Test Policy',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ];
