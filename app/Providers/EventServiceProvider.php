@@ -151,11 +151,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
-
-        // NetworkAclPolicy
-        \App\Events\V2\NetworkAcl\Updated::class => [
-        ],
-
         // Nat
         \App\Events\V2\Nat\Created::class => [
             \App\Listeners\V2\ResourceSync::class,
