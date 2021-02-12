@@ -16,6 +16,6 @@ class NetworkHasNoPolicy implements Rule
 
     public function message()
     {
-        return 'This :attribute already has an assigned ACL';
+        return 'This :attribute already has an assigned Policy';
     }
 }
