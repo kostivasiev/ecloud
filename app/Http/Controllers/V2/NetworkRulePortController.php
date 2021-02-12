@@ -31,13 +31,13 @@ class NetworkRulePortController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $networkAclRuleId
+     * @param string $networkRuleId
      * @return NetworkRulePortResource
      */
-    public function show(Request $request, string $networkAclRuleId)
+    public function show(Request $request, string $networkRuleId)
     {
         return new NetworkRulePortResource(
-            NetworkRulePort::forUser($request->user)->findOrFail($networkAclRuleId)
+            NetworkRulePort::forUser($request->user)->findOrFail($networkRuleId)
         );
     }
 
@@ -62,13 +62,13 @@ class NetworkRulePortController extends BaseController
 
     /**
      * @param Update $request
-     * @param string $networkAclRuleId
+     * @param string $networkRuleId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function update(Update $request, string $networkAclRuleId)
+    public function update(Update $request, string $networkRuleId)
     {
-        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkAclRuleId);
+        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
         $aclRulePort->fill($request->only([
             'network_acl_rule_id',
             'name',
@@ -82,13 +82,13 @@ class NetworkRulePortController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $networkAclRuleId
+     * @param string $networkRuleId
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
-    public function destroy(Request $request, string $networkAclRuleId)
+    public function destroy(Request $request, string $networkRuleId)
     {
-        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkAclRuleId);
+        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
         $aclRulePort->delete();
         return response('', 204);
     }

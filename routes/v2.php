@@ -83,11 +83,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Network Acl Rule Ports */
     $router->group([], function () use ($router) {
-        $router->get('network-acl-rule-ports', 'NetworkAclRulePortController@index');
-        $router->get('network-acl-rule-ports/{networkAclRulePortId}', 'NetworkAclRulePortController@show');
-        $router->post('network-acl-rule-ports', 'NetworkAclRulePortController@store');
-        $router->patch('network-acl-rule-ports/{networkAclRulePortId}', 'NetworkAclRulePortController@update');
-        $router->delete('network-acl-rule-ports/{networkAclRulePortId}', 'NetworkAclRulePortController@destroy');
+        $router->get('network-rule-ports', 'NetworkRulePortController@index');
+        $router->get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
+        $router->post('network-rule-ports', 'NetworkRulePortController@store');
+        $router->patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
+        $router->delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
     });
 
     /** Vpns */
