@@ -84,7 +84,7 @@ class Vpc extends Model implements Filterable, Sortable
         return $this->hasMany(VpcSupport::class);
     }
 
-    public function networkAcls()
+    public function networkPolicies()
     {
         return $this->hasMany(NetworkPolicy::class);
     }
