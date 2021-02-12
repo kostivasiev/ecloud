@@ -5,7 +5,7 @@ namespace App\Rules\V2;
 use App\Models\V2\Network;
 use Illuminate\Contracts\Validation\Rule;
 
-class NetworkHasNoAcl implements Rule
+class NetworkHasNoPolicy implements Rule
 {
 
     public function passes($attribute, $value)

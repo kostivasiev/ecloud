@@ -3,7 +3,7 @@ namespace Tests\unit\Rules;
 
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
-use App\Rules\V2\NetworkHasNoAcl;
+use App\Rules\V2\NetworkHasNoPolicy;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -11,13 +11,13 @@ class NetworkHasNoAclTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkHasNoAcl $rule;
+    protected NetworkHasNoPolicy $rule;
     protected Network $network;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->rule = new NetworkHasNoAcl();
+        $this->rule = new NetworkHasNoPolicy();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
