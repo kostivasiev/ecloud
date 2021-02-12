@@ -14,7 +14,7 @@ get:
               meta:
                 type: object
   tags:
-    - Network ACL
+    - Network Policies
 
 patch:
   parameters:
