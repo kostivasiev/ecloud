@@ -22,7 +22,7 @@ class GetTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
         $this->networkAcl = factory(NetworkPolicy::class)->create([
-            'id' => 'na-test',
+            'id' => 'np-test',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -37,26 +37,26 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'id' => 'na-test',
+            'id' => 'np-test',
             'network_id' => 'net-test',
             'vpc_id' => 'vpc-test',
-            'name' => 'na-test',
+            'name' => 'np-test',
         ])->assertResponseStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get(
-            '/v2/network-policies/na-test',
+            '/v2/network-policies/np-test',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
-            'id' => 'na-test',
+            'id' => 'np-test',
             'network_id' => 'net-test',
             'vpc_id' => 'vpc-test',
-            'name' => 'na-test',
+            'name' => 'np-test',
         ])->assertResponseStatus(200);
     }
 }
