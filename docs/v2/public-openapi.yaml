@@ -237,6 +237,6 @@ paths:
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
   '/ecloud/v2/network-policies':
-    $ref: 'resources/NetworkAcl/collection.yaml'
+    $ref: 'resources/NetworkPolicy/collection.yaml'
   '/ecloud/v2/network-policies/{networkPolicyId}':
-    $ref: 'resources/NetworkAcl/item.yaml'
+    $ref: 'resources/NetworkPolicy/item.yaml'
