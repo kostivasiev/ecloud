@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\NetworkAclRule\CreateRequest;
-use App\Http\Requests\V2\NetworkAclRule\UpdateRequest;
-use App\Models\V2\NetworkAclRule;
-use App\Resources\V2\NetworkAclRuleResource;
+use App\Http\Requests\V2\NetworkRule\Create;
+use App\Http\Requests\V2\NetworkRule\Update;
+use App\Models\V2\NetworkRule;
+use App\Resources\V2\NetworkRuleResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
-class NetworkAclRuleController extends BaseController
+class NetworkRuleController extends BaseController
 {
     /**
      * @param Request $request
@@ -18,39 +18,39 @@ class NetworkAclRuleController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = NetworkAclRule::forUser($request->user);
+        $collection = NetworkRule::forUser($request->user);
 
         (new QueryTransformer($request))
-            ->config(NetworkAclRule::class)
+            ->config(NetworkRule::class)
             ->transform($collection);
 
-        return NetworkAclRuleResource::collection($collection->paginate(
+        return NetworkRuleResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     /**
      * @param Request $request
-     * @param string $networkAclRuleId
-     * @return NetworkAclRuleResource
+     * @param string $networkRuleId
+     * @return NetworkRuleResource
      */
-    public function show(Request $request, string $networkAclRuleId)
+    public function show(Request $request, string $networkRuleId)
     {
-        return new NetworkAclRuleResource(
-            NetworkAclRule::forUser($request->user)->findOrFail($networkAclRuleId)
+        return new NetworkRuleResource(
+            NetworkRule::forUser($request->user)->findOrFail($networkRuleId)
         );
     }
 
     /**
-     * @param CreateRequest $request
+     * @param Create $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function store(CreateRequest $request)
+    public function store(Create $request)
     {
-        $aclRule = app()->make(NetworkAclRule::class);
+        $aclRule = app()->make(NetworkRule::class);
         $aclRule->fill($request->only([
-            'network_acl_id',
+            'network_policy_id',
             'name',
             'sequence',
             'source',
@@ -63,16 +63,16 @@ class NetworkAclRuleController extends BaseController
     }
 
     /**
-     * @param UpdateRequest $request
-     * @param string $networkAclRuleId
+     * @param Update $request
+     * @param string $networkRuleId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function update(UpdateRequest $request, string $networkAclRuleId)
+    public function update(Update $request, string $networkRuleId)
     {
-        $aclRule = NetworkAclRule::forUser(app('request')->user)->findOrFail($networkAclRuleId);
+        $aclRule = NetworkRule::forUser(app('request')->user)->findOrFail($networkRuleId);
         $aclRule->fill($request->only([
-            'network_acl_id',
+            'network_policy_id',
             'name',
             'sequence',
             'source',
@@ -86,13 +86,13 @@ class NetworkAclRuleController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $networkAclRuleId
+     * @param string $networkRuleId
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
-    public function destroy(Request $request, string $networkAclRuleId)
+    public function destroy(Request $request, string $networkRuleId)
     {
-        $aclRule = NetworkAclRule::forUser(app('request')->user)->findOrFail($networkAclRuleId);
+        $aclRule = NetworkRule::forUser(app('request')->user)->findOrFail($networkRuleId);
         $aclRule->delete();
         return response('', 204);
     }

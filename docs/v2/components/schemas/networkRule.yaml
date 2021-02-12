@@ -1,16 +1,16 @@
 properties:
   id:
     type: string
-    example: nar-abc123xyz
+    example: nr-abc123xyz
     readOnly: true
   name:
     type: string
-    example: 'Network ACL Rule'
+    example: 'Network Rule'
     readOnly : false
   network_acl_id :
     writeOnly : true
     type : string
-    example : 'na-abc123xyz'
+    example : 'nr-abc123xyz'
     readOnly : false
   sequence:
     type: integer
@@ -42,4 +42,4 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
-description: 'Network Acl Rule'
+description: 'Network Rule'

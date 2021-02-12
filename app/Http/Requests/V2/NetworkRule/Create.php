@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\V2\NetworkAclRule;
+namespace App\Http\Requests\V2\NetworkRule;
 
 use App\Models\V2\NetworkAcl;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
 
-class CreateRequest extends FormRequest
+class Create extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,11 +28,11 @@ class CreateRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string|max:50',
-            'network_acl_id' => [
+            'network_policy_id' => [
                 'required',
                 'string',
-                'exists:ecloud.network_acls,id,deleted_at,NULL',
-                new ExistsForUser(NetworkAcl::class),
+                'exists:ecloud.network_policies,id,deleted_at,NULL',
+                new ExistsForUser(NetworkPolicy::class),
             ],
             'sequence' => 'required|integer',
             'source' => [

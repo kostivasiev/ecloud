@@ -1,9 +1,9 @@
 <?php
-namespace Tests\V2\NetworkAclRule;
+namespace Tests\V2\NetworkRule;
 
-use App\Models\V2\NetworkAclPolicy;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
-use App\Models\V2\NetworkAclRule;
+use App\Models\V2\NetworkRule;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -11,8 +11,8 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkAclRule $aclRule;
-    protected NetworkAclPolicy $aclPolicy;
+    protected NetworkRule $networkRule;
+    protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
     public function setUp(): void
@@ -21,29 +21,31 @@ class DeleteTest extends TestCase
         $this->vpc();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
+            'id' => 'net-abc123xyz',
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(NetworkAclPolicy::class)->create([
+        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+            'id' => 'np-abc123xyz',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
-        $this->aclRule = factory(NetworkAclRule::class)->create([
-            'id' => 'nar-abc123xyz',
-            'network_acl_policy_id' => $this->aclPolicy->id,
+        $this->networkRule = factory(NetworkRule::class)->create([
+            'id' => 'nr-abc123xyz',
+            'network_policy_id' => $this->networkPolicy->id,
         ]);
     }
 
     public function testDeleteResource()
     {
         $this->delete(
-            '/v2/network-acl-rules/'.$this->aclRule->id,
+            '/v2/network-rules/nr-abc123xyz',
             [],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(204);
-        $aclRule = NetworkAclRule::withTrashed()->findOrFail($this->aclRule->id);
-        $this->assertNotNull($aclRule->deleted_at);
+        $networkRule = NetworkRule::withTrashed()->findOrFail($this->networkRule->id);
+        $this->assertNotNull($networkRule->deleted_at);
     }
 }

@@ -1,9 +1,9 @@
 <?php
-namespace Tests\V2\NetworkAclRule;
+namespace Tests\V2\NetworkRule;
 
-use App\Models\V2\NetworkAclPolicy;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
-use App\Models\V2\NetworkAclRule;
+use App\Models\V2\NetworkRule;
 use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -12,9 +12,9 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkAclRule $aclRule;
-    protected NetworkAclPolicy $aclPolicy;
     protected Network $network;
+    protected NetworkPolicy $networkPolicy;
+    protected NetworkRule $networkRule;
 
     protected function setUp(): void
     {
@@ -22,37 +22,45 @@ class UpdateTest extends TestCase
         $this->vpc();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
+            'id' => 'net-test',
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(NetworkAclPolicy::class)->create([
+        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+            'id' => 'np-test',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
-        $this->aclRule = factory(NetworkAclRule::class)->create([
-            'id' => 'nar-abc123xyz',
-            'network_acl_policy_id' => $this->aclPolicy->id,
+        $this->networkRule = factory(NetworkRule::class)->create([
+            'id' => 'nr-test',
+            'network_policy_id' => $this->networkPolicy->id,
         ]);
     }
 
     public function testUpdateResource()
     {
-        $newAclPolicy = factory(NetworkAclPolicy::class)->create([
+        factory(NetworkPolicy::class)->create([
+            'id' => 'np-alttest',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
         $this->patch(
-            '/v2/network-acl-rules/'.$this->aclRule->id,
+            '/v2/network-acl-rules/nr-test',
             [
-                'network_acl_policy_id' => $newAclPolicy->id,
+                'network_policy_id' => 'np-alttest',
                 'action' => 'REJECT',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
+        )->seeInDatabase(
+            'network_rules',
+            [
+                'id' => 'nr-test',
+                'network_policy_id' => 'np-alttest',
+                'action' => 'REJECT',
+            ],
+            'ecloud'
         )->assertResponseStatus(200);
-        $this->aclRule->refresh();
-        $this->assertEquals($newAclPolicy->id, $this->aclRule->network_acl_policy_id);
-        $this->assertEquals('REJECT', $this->aclRule->action);
     }
 }

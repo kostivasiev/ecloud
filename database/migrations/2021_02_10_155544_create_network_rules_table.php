@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNetworkAclRulesTable extends Migration
+class CreateNetworkRulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateNetworkAclRulesTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('network_acl_rules', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('network_rules', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('network_acl_id');
+            $table->string('network_policy_id');
             $table->string('name');
             $table->integer('sequence');
             $table->string('source');
@@ -34,6 +34,6 @@ class CreateNetworkAclRulesTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('network_acl_rules');
+        Schema::connection('ecloud')->dropIfExists('network_rules');
     }
 }

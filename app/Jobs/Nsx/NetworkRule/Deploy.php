@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Jobs\Nsx\NetworkAclRule;
+namespace App\Jobs\Nsx\NetworkRule;
 
 use App\Jobs\Job;
-use App\Models\V2\NetworkAclRule;
+use App\Models\V2\NetworkRule;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
     private $model;
 
-    public function __construct(NetworkAclRule $model)
+    public function __construct(NetworkRule $model)
     {
         $this->model = $model;
     }

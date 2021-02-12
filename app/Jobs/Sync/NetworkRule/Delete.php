@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Jobs\Sync\NetworkAclRule;
+namespace App\Jobs\Sync\NetworkRule;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\NetworkAclRule\Deploy;
-use App\Jobs\Nsx\NetworkAclRule\DeployCheck;
-use App\Models\V2\NetworkAclRule;
+use App\Jobs\Nsx\NetworkRule\Undeploy;
+use App\Jobs\Nsx\NetworkRule\UndeployCheck;
+use App\Models\V2\NetworkRule;
 use Illuminate\Support\Facades\Log;
 
-class Save extends Job
+class Delete extends Job
 {
     private $model;
 
-    public function __construct(NetworkAclRule $model)
+    public function __construct(NetworkRule $model)
     {
         $this->model = $model;
     }
@@ -22,10 +22,9 @@ class Save extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $jobs = [
-            new Deploy($this->model),
-            new DeployCheck($this->model),
+            new Undeploy($this->model),
+            new UndeployCheck($this->model)
         ];
-
         dispatch(array_shift($jobs)->chain($jobs));
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);

@@ -16,18 +16,18 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class NetworkAclRule
+ * Class NetworkRule
  * @package App\Models\V2
- * @method static NetworkAclRule find(string $id)
- * @method static NetworkAclRule findOrFail(string $id)
- * @method static NetworkAclRule forUser(mixed $user)
- * @method static NetworkAclRule get()
+ * @method static NetworkRule find(string $id)
+ * @method static NetworkRule findOrFail(string $id)
+ * @method static NetworkRule forUser(mixed $user)
+ * @method static NetworkRule get()
  */
-class NetworkAclRule extends Model implements Filterable, Sortable
+class NetworkRule extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
 
-    public string $keyPrefix = 'nar';
+    public string $keyPrefix = 'nr';
 
     public function __construct(array $attributes = [])
     {
@@ -36,7 +36,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
         $this->connection = 'ecloud';
         $this->fillable = [
             'id',
-            'network_acl_id',
+            'network_policy_id',
             'name',
             'sequence',
             'source',
@@ -51,9 +51,9 @@ class NetworkAclRule extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
-    public function networkAcl(): BelongsTo
+    public function networkPolicy(): BelongsTo
     {
-        return $this->belongsTo(NetworkAcl::class);
+        return $this->belongsTo(NetworkPolicy::class);
     }
 
     /**
@@ -64,7 +64,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
-            $query->whereHas('networkAcl.vpc', function ($query) use ($user) {
+            $query->whereHas('networkPolicy.vpc', function ($query) use ($user) {
                 $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
                 if (!empty($resellerId)) {
                     $query->where('reseller_id', '=', $resellerId);
@@ -78,7 +78,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('network_acl_id', Filter::$stringDefaults),
+            $factory->create('network_policy_id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('sequence', Filter::$numericDefaults),
             $factory->create('source', Filter::$stringDefaults),
@@ -94,7 +94,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('network_acl_id'),
+            $factory->create('network_policy_id'),
             $factory->create('name'),
             $factory->create('sequence'),
             $factory->create('source'),
@@ -117,7 +117,7 @@ class NetworkAclRule extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
-            'network_acl_id' => 'network_acl_id',
+            'network_policy_id' => 'network_policy_id',
             'name' => 'name',
             'sequence' => 'sequence',
             'source' => 'source',

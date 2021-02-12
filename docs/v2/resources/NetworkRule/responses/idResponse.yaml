@@ -9,10 +9,10 @@ content:
           properties:
             id:
               type: string
-              example: nar-abc123xyz
+              example: nr-abc123xyz
         meta:
           type: object
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/network-acl-rules/nar-abc123xyz'
+              example: 'https://api.ukfast.io/ecloud/v2/network-rules/nr-abc123xyz'

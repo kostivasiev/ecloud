@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Jobs\Nsx\NetworkAclRule;
+namespace App\Jobs\Nsx\NetworkRule;
 
 use App\Jobs\Job;
-use App\Models\V2\NetworkAclRule;
+use App\Models\V2\NetworkRule;
 use Illuminate\Support\Facades\Log;
 
-class UndeployCheck extends Job
+class DeployCheck extends Job
 {
     const RETRY_DELAY = 5;
 
@@ -14,7 +14,7 @@ class UndeployCheck extends Job
 
     private $model;
 
-    public function __construct(NetworkAclRule $model)
+    public function __construct(NetworkRule $model)
     {
         $this->model = $model;
     }
@@ -23,10 +23,9 @@ class UndeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // @todo NSX Undeploy check to be added here
+        // @todo DeployCheck implementation goes here
 
         $this->model->setSyncCompleted();
-        $this->model->syncDelete();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

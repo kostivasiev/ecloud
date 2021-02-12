@@ -1,9 +1,9 @@
 <?php
-namespace Tests\V2\NetworkAclRule;
+namespace Tests\V2\NetworkRule;
 
 use App\Models\V2\Network;
-use App\Models\V2\NetworkAclPolicy;
-use App\Models\V2\NetworkAclRule;
+use App\Models\V2\NetworkPolicy;
+use App\Models\V2\NetworkRule;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -11,7 +11,7 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkAclPolicy $aclPolicy;
+    protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
     protected function setUp(): void
@@ -22,7 +22,8 @@ class CreateTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(NetworkAclPolicy::class)->create([
+        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+            'id' => 'np-abc123xyz',
             'network_id' => $this->network->id,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -31,7 +32,7 @@ class CreateTest extends TestCase
     public function testCreateResource()
     {
         $data = [
-            'network_acl_policy_id' => $this->aclPolicy->id,
+            'network_policy_id' => 'np-abc123xyz',
             'sequence' => 1,
             'source' => '10.0.1.0/32',
             'destination' => '10.0.2.0/32',
@@ -39,18 +40,23 @@ class CreateTest extends TestCase
             'enabled' => true,
         ];
         $this->post(
-            '/v2/network-acl-rules',
+            '/v2/network-rules',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
+        )->seeInDatabase(
+            'network_rules',
+            [
+                'network_policy_id' => 'np-abc123xyz',
+                'sequence' => 1,
+                'source' => '10.0.1.0/32',
+                'destination' => '10.0.2.0/32',
+                'action' => 'ALLOW',
+                'enabled' => true,
+            ],
+            'ecloud'
         )->assertResponseStatus(201);
-
-        $aclRuleId = (json_decode($this->response->getContent()))->data->id;
-        $aclRule = NetworkAclRule::findOrFail($aclRuleId);
-        $this->assertEquals($data['network_acl_policy_id'], $aclRule->network_acl_policy_id);
-        $this->assertEquals($data['sequence'], $aclRule->sequence);
-        $this->assertEquals($data['source'], $aclRule->source);
     }
 }

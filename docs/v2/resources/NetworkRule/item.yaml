@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkAclRuleId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkRuleId'
   responses:
     200:
       description: success
@@ -10,15 +10,15 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/NetworkAclRule'
+                $ref: '../../public-openapi.yaml#/components/schemas/NetworkRule'
               meta:
                 type: object
   tags:
-    - Network ACL Rule
+    - Network Rule
 
 patch:
   parameters:
-    - $ref: '../../resources/NetworkAclRule/parameters/networkAclRuleId.yaml'
+    - $ref: '../../resources/NetworkRule/parameters/networkRuleId.yaml'
   requestBody:
     required: true
     content:
@@ -26,7 +26,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/networkAclRule.yaml'
+            - $ref: '../../components/schemas/networkRule.yaml'
             - type: object
               properties:
                 name:
@@ -35,15 +35,15 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../resources/NetworkAclRule/responses/idResponse.yaml'
+      $ref: '../../resources/NetworkRule/responses/idResponse.yaml'
   tags:
-    - Network ACL Rule
+    - Network Rule
 
 delete:
   parameters:
-    - $ref: '../../resources/NetworkAclRule/parameters/networkAclRuleId.yaml'
+    - $ref: '../../resources/NetworkRule/parameters/networkRuleId.yaml'
   responses:
     204:
       description: Success
   tags:
-    - Network ACL Rule
+    - Network Rule

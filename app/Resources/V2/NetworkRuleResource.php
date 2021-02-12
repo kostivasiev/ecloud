@@ -6,13 +6,13 @@ use DateTimeZone;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
-class NetworkAclRuleResource extends UKFastResource
+class NetworkRuleResource extends UKFastResource
 {
     public function toArray($request)
     {
         return [
             'id' => $this->id,
-            'network_acl_id' => $this->network_acl_id,
+            'network_policy_id' => $this->network_policy_id,
             'name' => $this->name,
             'sequence' => $this->sequence,
             'source' => $this->source,

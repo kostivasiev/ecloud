@@ -1,6 +1,6 @@
 in: path
-name: NetworkAclRuleId
+name: NetworkRuleId
 required: true
 schema:
   type: string
-example: nar-abc123xyz
+example: nr-abc123xyz

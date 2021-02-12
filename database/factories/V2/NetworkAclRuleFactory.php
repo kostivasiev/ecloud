@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\NetworkAclRule;
+use App\Models\V2\NetworkRule;
 
-$factory->define(NetworkAclRule::class, function () {
+$factory->define(NetworkRule::class, function () {
     return [
         'sequence' => 1,
         'source' => '10.0.1.0/32',

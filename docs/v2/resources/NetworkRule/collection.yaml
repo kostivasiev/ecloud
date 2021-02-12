@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/NetworkAclRule'
+                  $ref: '../../public-openapi.yaml#/components/schemas/NetworkRule'
               meta:
                 allOf:
                   - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
@@ -25,15 +25,15 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-acl-rules?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-acl-rules?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-acl-rules?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-acl-rules?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=2'
   tags:
-    - Network ACL Rule
+    - Network Rule
 
 post:
   requestBody:
@@ -41,9 +41,9 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/networkAclRule.yaml'
+          $ref: '../../components/schemas/networkRule.yaml'
   responses:
     201:
-      $ref: '../../resources/NetworkAclRule/responses/idResponse.yaml'
+      $ref: '../../resources/NetworkRule/responses/idResponse.yaml'
   tags:
-    - Network ACL Rule
+    - Network Rule
