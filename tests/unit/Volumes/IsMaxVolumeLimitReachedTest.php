@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Volume;
+namespace Tests\unit\Volumes;
 
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;

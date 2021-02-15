@@ -81,6 +81,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
     });
 
+    /** Network Policy */
+    $router->group([], function () use ($router) {
+        $router->get('network-policies', 'NetworkPolicyController@index');
+        $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->post('network-policies', 'NetworkPolicyController@store');
+        $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
+        $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
+    });
+
     /** Network Acl Rule Ports */
     $router->group([], function () use ($router) {
         $router->get('network-rule-ports', 'NetworkRulePortController@index');

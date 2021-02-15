@@ -151,7 +151,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
-
         // Nat
         \App\Events\V2\Nat\Created::class => [
             \App\Listeners\V2\ResourceSync::class,
@@ -241,6 +240,7 @@ class EventServiceProvider extends ServiceProvider
         // Sync
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
+            \App\Listeners\V2\Router\UpdateBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
