@@ -6,6 +6,7 @@ use App\Events\V2\Router\Creating;
 use App\Listeners\V2\Router\DefaultRouterThroughput;
 use App\Models\V2\Router;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class SetDefaultBilling extends Command
 {
@@ -17,10 +18,18 @@ class SetDefaultBilling extends Command
     {
         $listener = new DefaultRouterThroughput();
         Router::all()->each(function ($router) use ($listener) {
-            $this->info('Running default billing listener against ' . $router->id);
-            $event = new Creating($router);
-            $listener->handle($event);
-            $event->model->save();
+            try {
+                $this->info('Running default billing listener against ' . $router->id);
+                $event = new Creating($router);
+                $listener->handle($event);
+                $event->model->setSyncCompleted();
+                $event->model->save();
+            } catch (\Throwable $exception) {
+                Log::error('Failed to set default router throughput', [
+                    'router_id' => $router->id,
+                    'exception' => $exception,
+                ]);
+            }
         });
     }
 }
