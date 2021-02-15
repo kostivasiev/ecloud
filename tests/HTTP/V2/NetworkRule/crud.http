@@ -10,7 +10,7 @@ Content-Type: application/json
 {
     "network_id": "{{dev_network_id}}",
     "vpc_id": "{{dev_vpc_id}}",
-    "name": "Test ACL"
+    "name": "Test Policy"
 }
 
 > {%
@@ -48,7 +48,7 @@ client.test('Create a Network Rule', function () {
 %}
 
 ###
-# Get ACL Rule Collection
+# Get Network Rule Collection
 GET https://{{host}}/{{version}}/network-rules
 Accept: */*
 Cache-Control: no-cache
@@ -73,7 +73,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "New ACL Rule Name",
+    "name": "New Network Rule Name",
     "enabled": false
 }
 
@@ -97,6 +97,7 @@ Content-Type: application/json
 client.test('Get Network Rule', function () {
     client.assert(response.status === 200, '200 response not received');
     client.assert(response.body.data.id, client.global.get('network_rule_id'));
+    client.assert(response.body.data.name === 'New Network Rule Name');
 });
 %}
 
