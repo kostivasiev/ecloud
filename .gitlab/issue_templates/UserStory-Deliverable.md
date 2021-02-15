@@ -18,16 +18,16 @@
 
 | As an <type of user> | I want to <perform some task> | so that I can <achieve some goal> |
 |---|---|---|
-| End User | View my VPC's | View an overview of my VPC's |
-| API User | Retrieve my VPC's | Perform actions on my vpc data |
+| (gui example) End User | View my VPC's | View an overview of my VPC's |
+| (api example) API User | Retrieve my VPC's | Perform actions on my vpc data |
 
 
 ### Acceptance Criteria
 
 | GIVEN | WHEN | THEN |
 |---|---|---|
-| I am on the VPC Summary page | The page loads | I can see all VPCs I have created showing VPC ID, Name, status |
-| I request the vpc collection/item | the request completes | I can see the vpc id, name, status, etc |
+| (gui example) I am on the VPC Summary page | The page loads | I can see all VPCs I have created showing VPC ID, Name, status |
+| (api example) I request the vpc collection/item | the request completes | I can see the vpc id, name, status, etc |
 
 
 ### Process Flows
@@ -56,5 +56,5 @@
 
 <!--- set initial issue status, priority, weight & estimate - see handbook if unsure  -->
 /label ~"To Do" ~P2
-/weight 2
-/estimate 4h
+/weight 
+/estimate 

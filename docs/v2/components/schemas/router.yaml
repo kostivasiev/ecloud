@@ -16,10 +16,10 @@ properties:
     type: string
     required: true
     example: 'rtp-2b66bb79'
-#  availability_zone_id:
-#    type: string
-#    required: false
-#    example: 'az-2b66bb79'
+  availability_zone_id:
+    type: string
+    required: false
+    example: 'az-2b66bb79'
   sync:
     type: string
     readOnly: true

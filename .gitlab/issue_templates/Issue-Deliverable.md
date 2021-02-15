@@ -24,4 +24,3 @@ checklist of the tasks required to determine this issue as done
 
 <!--- set initial issue status and weight  -->
 /label ~"To Do" 
-/weight 5
