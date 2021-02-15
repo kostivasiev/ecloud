@@ -105,9 +105,9 @@ class VolumeController extends BaseController
             }
         }
 
-        $volume = new Volume($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity', 'iops']));
+        $volume = app()->make(Volume::class);
+        $volume->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity', 'iops']));
         $volume->save();
-        $volume->refresh();
         return $this->responseIdMeta($request, $volume->getKey(), 201);
     }
 
