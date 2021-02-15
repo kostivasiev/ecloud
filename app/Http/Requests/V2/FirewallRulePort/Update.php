@@ -44,13 +44,11 @@ class Update extends FormRequest
                 'in:TCP,UDP,ICMPv4'
             ],
             'source' => [
-                'sometimes',
                 'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidFirewallRulePortSourceDestination()
             ],
             'destination' => [
-                'sometimes',
                 'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidFirewallRulePortSourceDestination(),
