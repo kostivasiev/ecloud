@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -40,14 +41,12 @@ class BackupBillingTest extends TestCase
             'region_id' => $this->region->getKey()
         ]);
 
-        Model::withoutEvents(function () {
-            $this->volume = factory(Volume::class)->create([
-                'id' => 'vol-aaaaaaaa',
-                'vpc_id' => $this->vpc->getKey(),
-                'capacity' => 10,
-                'availability_zone_id' => $this->availabilityZone->getKey()
-            ]);
-        });
+        $this->volume = factory(Volume::class)->create([
+            'id' => 'vol-aaaaaaaa',
+            'vpc_id' => $this->vpc->getKey(),
+            'capacity' => 10,
+            'availability_zone_id' => $this->availabilityZone->getKey()
+        ]);
 
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
@@ -70,24 +69,11 @@ class BackupBillingTest extends TestCase
 
     public function testResizingVolumeUpdatesBackupBillingMetric()
     {
+
         $this->volume->capacity = 15;
         $this->volume->save();
 
-        Event::assertDispatched(\App\Events\V2\Volume\Saving::class, function ($event) {
-            return $event->model->id === $this->volume->id;
-        });
-
-        Event::assertDispatched(\App\Events\V2\Volume\Saved::class, function ($event) {
-            return $event->model->id === $this->volume->id;
-        });
-
-        $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
-        $resourceSyncListener->handle(new \App\Events\V2\Volume\Saving($this->volume));
-
         $sync = Sync::where('resource_id', $this->volume->id)->first();
-
-        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
-        $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
 
         // sync set to complete by the CapacityIncrease listener
         Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {
