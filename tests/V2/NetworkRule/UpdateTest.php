@@ -44,7 +44,7 @@ class UpdateTest extends TestCase
             'vpc_id' => $this->vpc()->id,
         ]);
         $this->patch(
-            '/v2/network-acl-rules/nr-test',
+            '/v2/network-rules/nr-test',
             [
                 'network_policy_id' => 'np-alttest',
                 'action' => 'REJECT',
