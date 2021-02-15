@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Listeners\V2\Volume\ModifyVolume;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
