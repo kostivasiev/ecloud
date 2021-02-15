@@ -57,7 +57,7 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/network-acl-rules/nr-test',
+            '/v2/network-rules/nr-test',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
