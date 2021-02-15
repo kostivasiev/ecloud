@@ -26,6 +26,13 @@ class Deploy extends Job
         $this->originalCapacity = $volume->getOriginal('capacity');
         $this->originalIops = $volume->getOriginal('iops');
 
+        // We need to do nothing if there is nothing to do
+        if (!is_null($volume->vmware_uuid) &&
+            $this->originalCapacity === $volume->capacity &&
+            $this->originalIops === $volume->iops) {
+            return;
+        }
+
         // If vmware_uuid is null, then this is a create job
         if (is_null($volume->vmware_uuid)) {
             $response = $this->create();
