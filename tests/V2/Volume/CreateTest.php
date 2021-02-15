@@ -6,6 +6,8 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Str;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -18,7 +20,6 @@ class CreateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $this->availabilityZone();
         $this->volume = factory(Volume::class)->create([
             'vpc_id' => $this->vpc()->getKey()
@@ -80,6 +81,12 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        $this->kingpinServiceMock()
+            ->expects('post')
+            ->withSomeOfArgs('/api/v1/vpc/' . $this->vpc()->getKey() . '/volume')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => '3c011de3-f5c8-4195-8ba2-651436ad6486']));
+            });
         $this->post(
             '/v2/volumes',
             [
@@ -101,6 +108,13 @@ class CreateTest extends TestCase
 
     public function testAzIsOptionalParameter()
     {
+        $this->kingpinServiceMock()
+            ->expects('post')
+            ->withSomeOfArgs('/api/v1/vpc/' . $this->vpc()->getKey() . '/volume')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => '3c011de3-f5c8-4195-8ba2-651436ad6486']));
+            });
+
         $this->post(
             '/v2/volumes',
             [
@@ -112,8 +126,7 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(201);
+        )->assertResponseStatus(201);
 
         $volumeId = (json_decode($this->response->getContent()))->data->id;
         $volume = Volume::find($volumeId);
