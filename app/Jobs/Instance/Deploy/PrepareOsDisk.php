@@ -41,7 +41,7 @@ class PrepareOsDisk extends Job
             $volume->vpc()->associate($instance->vpc);
             $volume->availability_zone_id = $instance->availability_zone_id;
             $volume->capacity = $this->data['volume_capacity'];
-            $volume->iops = $this->data['iops'];
+            $volume->iops = $this->data['volume_iops'];
             $volume->vmware_uuid = $volumeData->uuid;
             $volume->save();
             $volume->instances()->attach($instance);
