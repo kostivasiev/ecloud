@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\V2\NetworkRule;
 
-use App\Models\V2\NetworkAcl;
+use App\Models\V2\NetworkPolicy;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
