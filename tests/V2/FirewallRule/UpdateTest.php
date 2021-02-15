@@ -87,4 +87,23 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(422);
     }
+
+    public function testInvalidPortFails()
+    {
+        $this->patch(
+            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            [
+                'name' => 'Changed',
+                'ports' => [
+                    [
+                        'source' => "ANY",
+                    ]
+                ]
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(422);
+    }
 }

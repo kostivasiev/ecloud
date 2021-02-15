@@ -20,6 +20,8 @@ components:
       in: header
       name: Authorization
   schemas:
+    NetworkPolicy:
+      $ref: 'components/schemas/networkPolicy.yaml'
     NetworkRule:
       $ref : 'components/schemas/networkRule.yaml'
     AvailabilityZone:
@@ -65,6 +67,8 @@ components:
     # Path Parameters
     VpcId:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
+    NetworkPolicyId:
+      $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
     NetworkRuleId:
       $ref: 'resources/NetworkRule/parameters/networkRuleId.yaml'
     AvailabilityZoneId:
@@ -88,6 +92,8 @@ components:
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
   responses:
+    NetworkPolicyIdResponse:
+      $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
     NetworkRuleIdResponse:
       $ref: 'resources/NetworkRule/responses/idResponse.yaml'
     DhcpIdResponse:
@@ -236,6 +242,10 @@ paths:
     $ref: 'resources/RouterThroughput/collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
+  '/ecloud/v2/network-policies':
+    $ref: 'resources/NetworkPolicy/collection.yaml'
+  '/ecloud/v2/network-policies/{networkPolicyId}':
+    $ref: 'resources/NetworkPolicy/item.yaml'
   '/ecloud/v2/network-rules':
     $ref: 'resources/NetworkRule/collection.yaml'
   '/ecloud/v2/network-rules/{networkRuleId}':

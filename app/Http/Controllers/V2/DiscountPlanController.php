@@ -9,6 +9,7 @@ use App\Resources\V2\DiscountPlanResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -47,10 +48,14 @@ class DiscountPlanController extends BaseController
 
     /**
      * @param Create $request
-     * @return JsonResponse
+     * @return JsonResponse|Response
+     * @throws BadRequestException
      */
     public function store(Create $request)
     {
+        if ($this->isAdmin && empty($this->resellerId)) {
+            throw new BadRequestException('Missing Reseller scope');
+        }
         $discountPlan = new DiscountPlan($request->only($this->getAllowedFields()));
         if (!$request->has('term_end_date')) {
             $discountPlan->term_end_date = $this->calculateNewEndDate(
@@ -154,6 +159,7 @@ class DiscountPlanController extends BaseController
             $allowedFields[] = 'contact_id';
             $allowedFields[] = 'employee_id';
             $allowedFields[] = 'reseller_id';
+            $allowedFields[] = 'status';
         }
         return $allowedFields;
     }

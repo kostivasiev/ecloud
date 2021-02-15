@@ -81,6 +81,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
     });
 
+    /** Network Policy */
+    $router->group([], function () use ($router) {
+        $router->get('network-policies', 'NetworkPolicyController@index');
+        $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->post('network-policies', 'NetworkPolicyController@store');
+        $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
+        $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
+    });
+
     /** Network Acl Rules */
     $router->group([], function () use ($router) {
         $router->get('network-rules', 'NetworkRuleController@index');
@@ -244,6 +253,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('discount-plans', 'DiscountPlanController@index');
         $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
+        $router->post('discount-plans', 'DiscountPlanController@store');
 
         $router->group(['middleware' => 'is-pending'], function () use ($router) {
             $router->post('discount-plans/{discountPlanId}/approve', 'DiscountPlanController@approve');
@@ -251,7 +261,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
 
         $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->post('discount-plans', 'DiscountPlanController@store');
             $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
             $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
         });

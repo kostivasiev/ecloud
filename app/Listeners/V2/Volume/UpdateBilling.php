@@ -80,5 +80,7 @@ class UpdateBilling
         }
 
         $billingMetric->save();
+
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }
