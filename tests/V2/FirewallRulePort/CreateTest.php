@@ -64,7 +64,7 @@ class CreateTest extends TestCase
     {
         $this->post('/v2/firewall-rule-ports', [
             'firewall_rule_id' => $this->firewallRule->id,
-            'protocol' => 'ICMPv4'
+            'protocol' => 'ICMPv4',
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
@@ -76,5 +76,75 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(201);
+    }
+
+    public function testSourceANYSucceeds()
+    {
+        $this->post('/v2/firewall-rule-ports', [
+            'firewall_rule_id' => $this->firewallRule->id,
+            'protocol' => 'TCP',
+            'source' => 'ANY',
+            'destination' => '555'
+        ], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write'
+        ])->seeInDatabase(
+            'firewall_rule_ports',
+            [
+                'firewall_rule_id' => $this->firewallRule->id,
+                'protocol' => 'TCP',
+                'source' => 'ANY',
+                'destination' => '555'
+            ],
+            'ecloud'
+        )->assertResponseStatus(201);
+    }
+
+    public function testDestinationANYSucceeds()
+    {
+        $this->post('/v2/firewall-rule-ports', [
+            'firewall_rule_id' => $this->firewallRule->id,
+            'protocol' => 'TCP',
+            'source' => '444',
+            'destination' => 'ANY'
+        ], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write'
+        ])->seeInDatabase(
+            'firewall_rule_ports',
+            [
+                'firewall_rule_id' => $this->firewallRule->id,
+                'protocol' => 'TCP',
+                'source' => '444',
+                'destination' => 'ANY'
+            ],
+            'ecloud'
+        )->assertResponseStatus(201);
+    }
+
+    public function testMissingSourceFails()
+    {
+        $this->post('/v2/firewall-rule-ports', [
+            'firewall_rule_id' => $this->firewallRule->id,
+            'protocol' => 'TCP',
+            'source' => '',
+            'destination' => 'ANY'
+        ], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write'
+        ])->assertResponseStatus(422);
+    }
+
+    public function testMissingDestinationFails()
+    {
+        $this->post('/v2/firewall-rule-ports', [
+            'firewall_rule_id' => $this->firewallRule->id,
+            'protocol' => 'TCP',
+            'source' => 'ANY',
+            'destination' => ''
+        ], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write'
+        ])->assertResponseStatus(422);
     }
 }

@@ -30,11 +30,9 @@
 
 Service Affecting - this bug is affecting the uptime of the customers solution 
 /label ~"Service Affecting" 
-/weight 9
 
 Process Affecting - the problem is preventing me or the customer from doing a task 
 /label ~"Process Affecting" 
-/weight 7
 
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~dotNET ~DevOps

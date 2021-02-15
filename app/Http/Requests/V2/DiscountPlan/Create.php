@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\DiscountPlan;
 
+use App\Rules\V2\DateIsTodayOrFirstOfMonth;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -17,7 +18,7 @@ class Create extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
 //            'contact_id' => 'sometimes|required_without:employee_id|exists:reseller.reseller_contact,reseller_contact_id',
 //            'employee_id' => 'sometimes|required_without:contact_id|exists:holiday.employee,employee_id',
             'contact_id' => 'sometimes|required_without:employee_id|integer',
@@ -28,7 +29,11 @@ class Create extends FormRequest
             'commitment_before_discount' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
             'discount_rate' => 'required|numeric|min:0|max:100',
             'term_length' => 'required|integer|min:1',
-            'term_start_date' => 'required|date|after_or_equal:today',
+            'term_start_date' => [
+                'required',
+                'date',
+                new DateIsTodayOrFirstOfMonth()
+            ],
             'term_end_date' => [
                 'sometimes',
                 'required',
@@ -41,6 +46,13 @@ class Create extends FormRequest
                 }
             ],
         ];
+
+        if (app('request')->user->isAdministrator) {
+            $rules['term_start_date'] = 'required|date';
+            $rules['status'] = 'sometimes|required|string|in:approved,rejected';
+        }
+
+        return $rules;
     }
 
     public function messages()

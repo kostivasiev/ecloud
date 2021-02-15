@@ -115,7 +115,7 @@ class ConfigureNics extends Job
                 } catch (\Exception $exception) {
                     if ($exception->getCode() == 23000) {
                         // Ip already assigned
-                        Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': IP is already used.');
+                        //Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': IP is already used.');
                         continue;
                     }
 

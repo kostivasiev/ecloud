@@ -19,7 +19,7 @@ class Update extends FormRequest
     public function rules()
     {
         $discountPlanId = app('request')->route('discountPlanId');
-        return [
+        $rules = [
             'name' => 'sometimes|required|string|max:255',
             'commitment_amount' => [
                 'sometimes',
@@ -63,6 +63,13 @@ class Update extends FormRequest
                 }
             ],
         ];
+
+        if (app('request')->user->isAdministrator) {
+            $rules['term_start_date'] = 'sometimes|required|date';
+            $rules['status'] = 'sometimes|required|string|in:approved,rejected';
+        }
+
+        return $rules;
     }
 
     public function messages()
