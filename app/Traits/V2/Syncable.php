@@ -6,6 +6,7 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Sync;
+use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -40,9 +41,10 @@ trait Syncable
 
     public function save(array $options = [])
     {
-        // Only do this for Firewall's at the moment
+        // Only do this for Firewall's & Volumes at the moment
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
+            Volume::class,
         ])) {
             return parent::save($options);
         }
