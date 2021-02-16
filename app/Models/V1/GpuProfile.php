@@ -27,6 +27,7 @@ class GpuProfile extends Model implements Filterable, Sortable
 
     protected $table = 'gpu_profile';
 
+    protected $keyType = 'string';
     // Use UUID as primary key
     protected $primaryKey = 'uuid';
     // Don't increment the primary key for UUID's

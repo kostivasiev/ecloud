@@ -34,6 +34,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
 
     protected $table = 'appliance_version';
 
+    protected $keyType = 'string';
     // Use UUID as primary key
     protected $primaryKey = 'appliance_version_uuid';
     // Don't increment the primary key for UUID's
