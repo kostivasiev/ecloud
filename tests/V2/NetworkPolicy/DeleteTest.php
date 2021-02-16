@@ -22,7 +22,6 @@ class DeleteTest extends TestCase
         ]);
         $this->aclPolicy = factory(NetworkPolicy::class)->create([
             'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
         ]);
     }
 

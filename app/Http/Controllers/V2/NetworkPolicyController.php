@@ -46,7 +46,6 @@ class NetworkPolicyController extends BaseController
         $networkPolicy->fill($request->only([
             'name',
             'network_id',
-            'vpc_id'
         ]));
         $networkPolicy->save();
         return $this->responseIdMeta($request, $networkPolicy->getKey(), 201);
@@ -64,7 +63,6 @@ class NetworkPolicyController extends BaseController
         $networkPolicy->fill($request->only([
             'name',
             'network_id',
-            'vpc_id',
         ]));
         $networkPolicy->save();
         return $this->responseIdMeta($request, $networkPolicy->getKey(), 200);

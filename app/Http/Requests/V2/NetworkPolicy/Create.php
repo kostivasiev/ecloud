@@ -35,12 +35,6 @@ class Create extends FormRequest
                 new ExistsForUser(Network::class),
                 new NetworkHasNoPolicy(),
             ],
-            'vpc_id' => [
-                'required',
-                'string',
-                'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class)
-            ],
         ];
     }
 

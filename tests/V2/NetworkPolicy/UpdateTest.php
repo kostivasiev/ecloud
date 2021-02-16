@@ -24,7 +24,6 @@ class UpdateTest extends TestCase
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
         ]);
     }
 
@@ -42,7 +41,6 @@ class UpdateTest extends TestCase
             '/v2/network-policies/np-test',
             [
                 'network_id' => 'net-new',
-                'vpc_id' => 'vpc-new',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -53,7 +51,6 @@ class UpdateTest extends TestCase
             [
                 'id' => 'np-test',
                 'network_id' => 'net-new',
-                'vpc_id' => 'vpc-new',
             ],
             'ecloud'
         )->assertResponseStatus(200);
@@ -70,13 +67,11 @@ class UpdateTest extends TestCase
         ]);
         factory(NetworkPolicy::class)->create([
             'network_id' => $newNetwork->id,
-            'vpc_id' => $newVpc->id,
         ]);
         $this->patch(
             '/v2/network-policies/np-test',
             [
                 'network_id' => 'net-111aaa222',
-                'vpc_id' => 'vpc-new',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
