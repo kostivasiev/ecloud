@@ -180,7 +180,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
             \App\Events\V2\Nic\Created::class,
-            \App\Events\V2\Volume\Created::class,
 
             // Deleting
             \App\Events\V2\Nat\Deleting::class,
@@ -194,7 +193,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Nic\Deleted::class,
             \App\Events\V2\FirewallRulePort\Deleted::class,
             \App\Events\V2\FloatingIp\Deleted::class,
-            \App\Events\V2\Volume\Deleted::class,
             \App\Events\V2\Network\Deleted::class,
             \App\Events\V2\Router\Deleted::class,
 
@@ -203,7 +201,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Network\Saved::class,
             \App\Events\V2\Nat\Saved::class,
             \App\Events\V2\AvailabilityZoneCapacity\Saved::class,
-            \App\Events\V2\Volume\Saved::class,
 
             // Updated
             \App\Events\V2\Sync\Updated::class,
@@ -216,7 +213,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Nat\Saving::class,
 
             // Deleting
-            \App\Events\V2\Volume\Saving::class,
             \App\Events\V2\Instance\Saving::class,
 
             // Deploy
