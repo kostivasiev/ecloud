@@ -20,6 +20,7 @@ class Deploy extends Job
 
     public function handle()
     {
+        $response = false;
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $volume = $this->model;
@@ -37,7 +38,7 @@ class Deploy extends Job
         if (is_null($volume->vmware_uuid)) {
             $response = $this->create();
             if ($response->getStatusCode() === 200) {
-                $this->iopsChange();
+                $response = $this->iopsChange();
             }
         }
 
@@ -49,23 +50,15 @@ class Deploy extends Job
             $response = $this->iopsChange();
         }
 
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->model->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Failed to create "' . $this->model->id . '"'));
-            return false;
-        }
-
         // If the vmware_uuid has been populated, then save the model.
-        if (($response->getStatusCode() === 200) &&
+        if ($response && ($response->getStatusCode() === 200) &&
             ($this->model->getOriginal('vmware_uuid') !== $this->model->vmware_uuid)) {
             $this->model->save();
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+
+        return $response;
     }
 
     public function create()
@@ -82,7 +75,17 @@ class Deploy extends Job
                 ]
             );
         } catch (ServerException $exception) {
-            return $exception->getResponse();
+            $response = $exception->getResponse();
+        }
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::error(get_class($this) . ' : Failed', [
+                'id' => $this->model->id,
+                'status_code' => $response->getStatusCode(),
+                'content' => $response->getBody()->getContents()
+            ]);
+            $this->fail(new \Exception('Failed to create "' . $this->model->id . '"'));
+            return false;
         }
 
         $responseContents = json_decode($response->getBody()->getContents());
@@ -108,6 +111,18 @@ class Deploy extends Job
             ]
         );
 
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::error(get_class($this) . ' : Failed', [
+                'id' => $this->model->id,
+                'status_code' => $response->getStatusCode(),
+                'content' => $response->getBody()->getContents()
+            ]);
+            $this->fail(new \Exception('Volume ' . $this->model->getKey() .
+                ' failed to increase capacity from ' . $this->originalCapacity .
+                ' to ' . $this->model->capacity));
+            return false;
+        }
+
         Log::info('Volume ' . $this->model->getKey() . ' capacity increased from ' . $this->originalCapacity . ' to ' . $this->model->capacity);
 
         return $response;
@@ -127,6 +142,18 @@ class Deploy extends Job
                     ]
                 ]
             );
+
+            if (!$response || $response->getStatusCode() !== 200) {
+                Log::error(get_class($this) . ' : Failed', [
+                    'id' => $this->model->id,
+                    'status_code' => $response->getStatusCode(),
+                    'content' => $response->getBody()->getContents()
+                ]);
+                $this->fail(new \Exception('Volume ' . $this->model->getKey() .
+                    ' failed to change iops from ' . $this->originalIops .
+                    ' to ' . $this->model->iops));
+                return false;
+            }
 
             Log::info('Volume ' . $this->model->getKey() . ' iops changed from ' . $this->originalIops . ' to ' . $this->model->iops);
 
