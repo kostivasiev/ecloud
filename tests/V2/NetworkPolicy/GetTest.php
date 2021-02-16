@@ -10,7 +10,7 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkPolicy $networkAcl;
+    protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
     public function setUp(): void
@@ -21,10 +21,9 @@ class GetTest extends TestCase
             'id' => 'net-test',
             'router_id' => $this->router()->id,
         ]);
-        $this->networkAcl = factory(NetworkPolicy::class)->create([
+        $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
         ]);
     }
 
@@ -39,7 +38,6 @@ class GetTest extends TestCase
         )->seeJson([
             'id' => 'np-test',
             'network_id' => 'net-test',
-            'vpc_id' => 'vpc-test',
             'name' => 'np-test',
         ])->assertResponseStatus(200);
     }
@@ -55,7 +53,6 @@ class GetTest extends TestCase
         )->seeJson([
             'id' => 'np-test',
             'network_id' => 'net-test',
-            'vpc_id' => 'vpc-test',
             'name' => 'np-test',
         ])->assertResponseStatus(200);
     }
