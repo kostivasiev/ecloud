@@ -33,7 +33,6 @@ class NetworkHasNoAclTest extends TestCase
     {
         factory(NetworkPolicy::class)->create([
             'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
         ]);
         $this->assertFalse($this->rule->passes('', $this->network->id));
     }
