@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Nsx\Volume;
+namespace App\Jobs\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;

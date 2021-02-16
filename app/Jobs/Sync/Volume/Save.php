@@ -3,8 +3,8 @@
 namespace App\Jobs\Sync\Volume;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\Volume\Deploy;
-use App\Jobs\Nsx\Volume\DeployCheck;
+use App\Jobs\Volume\Deploy;
+use App\Jobs\Volume\DeployCheck;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
