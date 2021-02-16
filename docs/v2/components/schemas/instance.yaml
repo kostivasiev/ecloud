@@ -53,7 +53,7 @@ properties:
     required: false
     type: integer
     example: 50
-  iops:
+  volume_iops:
     required: false
     type: integer
     example: 300
