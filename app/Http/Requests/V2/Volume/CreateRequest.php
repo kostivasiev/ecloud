@@ -64,8 +64,6 @@ class CreateRequest extends FormRequest
     public function messages()
     {
         return [
-            'required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'The specified :attribute was not found',
             'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
             'iops.in' => 'The specified :attribute field is not a valid IOPS value (300, 600, 1200, 2500)',
