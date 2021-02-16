@@ -25,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class NetworkRulePort extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
     public string $keyPrefix = 'nrp';
 
