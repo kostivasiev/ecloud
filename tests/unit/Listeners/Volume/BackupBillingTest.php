@@ -72,15 +72,9 @@ class BackupBillingTest extends TestCase
 
         $this->volume->capacity = 15;
         $this->volume->save();
+        $this->volume->setSyncCompleted();
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();
-
-        // sync set to complete by the CapacityIncrease listener
-        Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {
-            return $event->model->id === $sync->id;
-        });
-
-        $sync->refresh();
 
         // Check that the backup billing metric is added
         $updateBackupBillingListener = \Mockery::mock(\App\Listeners\V2\Instance\UpdateBackupBilling::class)->makePartial();

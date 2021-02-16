@@ -57,6 +57,7 @@ class DeleteTest extends TestCase
             'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availability_zone->id,
         ]);
+        $this->volume->setSyncCompleted();
 
         $kingpinService = app()->makeWith(KingpinService::class, [$this->availability_zone]);
         $mockKingpinService = \Mockery::mock($kingpinService)->makePartial();

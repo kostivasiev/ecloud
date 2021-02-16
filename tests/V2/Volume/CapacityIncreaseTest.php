@@ -38,6 +38,7 @@ class CapacityIncreaseTest extends TestCase
         $this->volume = factory(Volume::class)->create([
             'vpc_id' => $this->vpc->getKey()
         ]);
+        $this->volume->setSyncCompleted();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'GetTest Default',

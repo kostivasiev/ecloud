@@ -61,15 +61,9 @@ class BillingMetricTest extends TestCase
     {
         $this->volume->capacity = 15;
         $this->volume->save();
+        $this->volume->setSyncCompleted();
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();
-
-        // sync set to complete by the CapacityIncrease listener
-        Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {
-            return $event->model->id === $sync->id;
-        });
-
-        $sync->refresh();
 
         // Check that the volume billing metric is added
         $dispatchResourceSyncedEventListener = \Mockery::mock(\App\Listeners\V2\Volume\UpdateBilling::class)->makePartial();
@@ -99,6 +93,7 @@ class BillingMetricTest extends TestCase
         $this->volume->capacity = 15;
         $this->volume->iops = 600;
         $this->volume->save();
+        $this->volume->setSyncCompleted();
 
         $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
         $resourceSyncListener->handle(new \App\Events\V2\Volume\Saving($this->volume));
