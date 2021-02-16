@@ -23,7 +23,6 @@ class Save extends Job
 
         $jobs = [
             new Deploy($this->model),
-            new DeployCheck($this->model),
         ];
 
         dispatch(array_shift($jobs)->chain($jobs));

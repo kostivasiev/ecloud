@@ -90,6 +90,7 @@ class Deploy extends Job
 
         $responseContents = json_decode($response->getBody()->getContents());
         $this->model->vmware_uuid = $responseContents->uuid;
+        $this->model->setSyncCompleted();
         return $response;
     }
 
