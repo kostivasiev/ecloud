@@ -56,6 +56,8 @@ class Deploy extends Job
             $this->model->save();
         }
 
+        $this->model->setSyncCompleted();
+
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
 
         return $response;
@@ -90,7 +92,7 @@ class Deploy extends Job
 
         $responseContents = json_decode($response->getBody()->getContents());
         $this->model->vmware_uuid = $responseContents->uuid;
-        $this->model->setSyncCompleted();
+        $this->model->save();
         return $response;
     }
 
