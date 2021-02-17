@@ -18,16 +18,8 @@ use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
-/**
- * Class VpcController
- * @package App\Http\Controllers\V2
- */
 class VpcController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $collection = Vpc::forUser($request->user);
@@ -40,11 +32,6 @@ class VpcController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $vpcId
-     * @return VpcResource
-     */
     public function show(Request $request, string $vpcId)
     {
         return new VpcResource(
@@ -52,10 +39,6 @@ class VpcController extends BaseController
         );
     }
 
-    /**
-     * @param CreateRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function create(CreateRequest $request)
     {
         $vpc = new Vpc($request->only(['name', 'region_id']));
@@ -64,11 +47,6 @@ class VpcController extends BaseController
         return $this->responseIdMeta($request, $vpc->getKey(), 201);
     }
 
-    /**
-     * @param UpdateRequest $request
-     * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(UpdateRequest $request, string $vpcId)
     {
         $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
@@ -82,11 +60,6 @@ class VpcController extends BaseController
         return $this->responseIdMeta($request, $vpc->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $vpcId)
     {
         $model = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
@@ -97,12 +70,6 @@ class VpcController extends BaseController
         return response()->json([], 204);
     }
 
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $vpcId
-     * @return \Illuminate\Http\Response
-     */
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
         $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->volumes();
@@ -114,12 +81,6 @@ class VpcController extends BaseController
         ));
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $vpcId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function instances(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
         $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->instances();
@@ -131,11 +92,6 @@ class VpcController extends BaseController
         ));
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $vpcId
-     */
     public function lbcs(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
         $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->loadBalancerClusters();
@@ -147,12 +103,6 @@ class VpcController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $vpcId
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Exception
-     */
     public function deployDefaults(Request $request, string $vpcId)
     {
         $vpc = Vpc::forUser($request->user)->findOrFail($vpcId);

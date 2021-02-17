@@ -227,11 +227,6 @@ class AvailabilityZoneController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $zoneId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $zoneId)
     {
         $model = AvailabilityZone::findOrFail($zoneId);

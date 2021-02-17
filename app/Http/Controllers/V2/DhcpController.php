@@ -70,18 +70,13 @@ class DhcpController extends BaseController
         return $this->responseIdMeta($request, $dhcp->getKey(), 200);
     }
 
-    /**
-     * @param string $dhcpId
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function destroy(string $dhcpId)
     {
         $model = Dhcp::findOrFail($dhcpId);
-
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 }

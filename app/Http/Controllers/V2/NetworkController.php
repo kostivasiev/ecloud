@@ -162,24 +162,15 @@ class NetworkController extends BaseController
         return $this->responseIdMeta($request, $network->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkId
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function destroy(Request $request, string $networkId)
     {
         $model = Network::forUser($request->user)->findOrFail($networkId);
-
         if (!$model->canDelete()) {
             return $model->getDeletionError();
         }
-
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 
