@@ -25,7 +25,6 @@ class CreateTest extends TestCase
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-abc123xyz',
             'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
         ]);
     }
 
@@ -48,14 +47,7 @@ class CreateTest extends TestCase
             ]
         )->seeInDatabase(
             'network_rules',
-            [
-                'network_policy_id' => 'np-abc123xyz',
-                'sequence' => 1,
-                'source' => '10.0.1.0/32',
-                'destination' => '10.0.2.0/32',
-                'action' => 'ALLOW',
-                'enabled' => true,
-            ],
+            $data,
             'ecloud'
         )->assertResponseStatus(201);
     }
