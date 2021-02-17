@@ -51,7 +51,7 @@ class NetworkRule extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
-    public function networkPolicy(): BelongsTo
+    public function networkPolicy()
     {
         return $this->belongsTo(NetworkPolicy::class);
     }
