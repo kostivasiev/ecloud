@@ -16,6 +16,19 @@ client.log('VPC Id : ' + response.body.data.id);
 
 ###
 GET https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+###
+
+###
+GET https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  2-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+###
+
+GET https://{{host}}/{{version}}/vpcs/vpc-d94538dc
 X-consumer-custom-id:  2-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

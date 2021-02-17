@@ -71,15 +71,12 @@ class Nic extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, $user)
     {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('network.router.vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
-        return $query;
+        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
     }
 
     /**

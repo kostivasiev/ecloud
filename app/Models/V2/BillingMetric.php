@@ -44,11 +44,10 @@ class BillingMetric extends Model implements Filterable, Sortable
 
     public function scopeForUser($query, $user)
     {
-        if (empty($user->resellerId)) {
+        if (!$user->isScoped()) {
             return $query;
         }
-        $query->where('reseller_id', '=', $user->resellerId);
-        return $query;
+        return $query->where('reseller_id', '=', $user->resellerId());
     }
 
     /**

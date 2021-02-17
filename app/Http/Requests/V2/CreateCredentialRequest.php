@@ -31,7 +31,7 @@ class CreateCredentialRequest extends FormRequest
             'password' => ['required', 'string'],
             'port' => ['nullable', 'integer'],
         ];
-        if (app('request')->user->isAdministrator) {
+        if (app('request')->user()->isAdmin()) {
             $rules['is_hidden'] = ['sometimes', 'boolean'];
         }
         return $rules;

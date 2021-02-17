@@ -64,7 +64,7 @@ class Update extends FormRequest
             ],
         ];
 
-        if (app('request')->user->isAdministrator) {
+        if (app('request')->user()->isAdmin()) {
             $rules['term_start_date'] = 'sometimes|required|date';
             $rules['status'] = 'sometimes|required|string|in:approved,rejected';
         }

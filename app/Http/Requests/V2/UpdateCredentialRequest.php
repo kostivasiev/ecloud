@@ -31,7 +31,7 @@ class UpdateCredentialRequest extends FormRequest
             'password' => ['sometimes', 'required', 'string'],
             'port' => ['sometimes', 'nullable', 'integer'],
         ];
-        if (app('request')->user->isAdministrator) {
+        if (app('request')->user()->isAdmin()) {
             $rules['is_hidden'] = ['sometimes', 'boolean'];
         }
         return $rules;

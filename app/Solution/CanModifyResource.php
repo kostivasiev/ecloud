@@ -30,7 +30,7 @@ class CanModifyResource
 
     public function validate()
     {
-        if ($this->request->user->isAdministrator) {
+        if ($this->request->user()->isAdmin()) {
             return true;
         }
 

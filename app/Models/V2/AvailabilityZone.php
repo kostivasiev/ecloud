@@ -135,11 +135,10 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, $user)
     {
-        if (!$user->isAdministrator) {
-            $query->where('is_public', '=', 1);
+        if ($user->isAdmin()) {
+            return $query;
         }
-
-        return $query;
+        return $query->where('is_public', '=', 1);
     }
 
     /**

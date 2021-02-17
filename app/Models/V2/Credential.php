@@ -101,7 +101,7 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
-        if (app('request')->user->isAdministrator) {
+        if (app('request')->user()->isAdmin()) {
             $filters[] = $factory->create('is_hidden', Filter::$numericDefaults);
         }
         return $filters;
