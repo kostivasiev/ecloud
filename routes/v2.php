@@ -99,6 +99,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
     });
 
+    /** Network Acl Rules */
+    $router->group([], function () use ($router) {
+        $router->get('network-rules', 'NetworkRuleController@index');
+        $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
+        $router->post('network-rules', 'NetworkRuleController@store');
+        $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+    });
+
     /** Vpns */
     $router->group([], function () use ($router) {
         $router->get('vpns', 'VpnController@index');
