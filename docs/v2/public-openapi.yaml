@@ -22,6 +22,8 @@ components:
   schemas:
     NetworkPolicy:
       $ref: 'components/schemas/networkPolicy.yaml'
+    NetworkRule:
+      $ref : 'components/schemas/networkRule.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
@@ -67,6 +69,8 @@ components:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
     NetworkPolicyId:
       $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
+    NetworkRuleId:
+      $ref: 'resources/NetworkRule/parameters/networkRuleId.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
@@ -90,6 +94,8 @@ components:
   responses:
     NetworkPolicyIdResponse:
       $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
+    NetworkRuleIdResponse:
+      $ref: 'resources/NetworkRule/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
@@ -240,3 +246,7 @@ paths:
     $ref: 'resources/NetworkPolicy/collection.yaml'
   '/ecloud/v2/network-policies/{networkPolicyId}':
     $ref: 'resources/NetworkPolicy/item.yaml'
+  '/ecloud/v2/network-rules':
+    $ref: 'resources/NetworkRule/collection.yaml'
+  '/ecloud/v2/network-rules/{networkRuleId}':
+    $ref: 'resources/NetworkRule/item.yaml'
