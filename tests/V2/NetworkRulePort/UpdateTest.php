@@ -29,7 +29,6 @@ class UpdateTest extends TestCase
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => 'net-test',
-            'vpc_id' => 'vpc-test',
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-test',
@@ -62,7 +61,7 @@ class UpdateTest extends TestCase
             'network_rule_ports',
             [
                 'id' => 'nrp-test',
-                'network_acl_rule_id' => 'nr-alttest',
+                'network_rule_id' => 'nr-alttest',
                 'source' => '3306',
                 'destination' => '444',
 

@@ -48,16 +48,16 @@ class NetworkRulePortController extends BaseController
      */
     public function store(Create $request)
     {
-        $aclRulePort = app()->make(NetworkRulePort::class);
-        $aclRulePort->fill($request->only([
-            'network_acl_rule_id',
+        $networkRulePort = app()->make(NetworkRulePort::class);
+        $networkRulePort->fill($request->only([
+            'network_rule_id',
             'name',
             'protocol',
             'source',
             'destination',
         ]));
-        $aclRulePort->save();
-        return $this->responseIdMeta($request, $aclRulePort->getKey(), 201);
+        $networkRulePort->save();
+        return $this->responseIdMeta($request, $networkRulePort->getKey(), 201);
     }
 
     /**
@@ -68,16 +68,16 @@ class NetworkRulePortController extends BaseController
      */
     public function update(Update $request, string $networkRuleId)
     {
-        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
-        $aclRulePort->fill($request->only([
-            'network_acl_rule_id',
+        $networkRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
+        $networkRulePort->fill($request->only([
+            'network_rule_id',
             'name',
             'protocol',
             'source',
             'destination',
         ]));
-        $aclRulePort->save();
-        return $this->responseIdMeta($request, $aclRulePort->getKey(), 200);
+        $networkRulePort->save();
+        return $this->responseIdMeta($request, $networkRulePort->getKey(), 200);
     }
 
     /**
@@ -88,8 +88,8 @@ class NetworkRulePortController extends BaseController
      */
     public function destroy(Request $request, string $networkRuleId)
     {
-        $aclRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
-        $aclRulePort->delete();
+        $networkRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
+        $networkRulePort->delete();
         return response('', 204);
     }
 }

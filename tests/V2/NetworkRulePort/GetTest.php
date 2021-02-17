@@ -29,7 +29,6 @@ class GetTest extends TestCase
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => 'net-test',
-            'vpc_id' => 'vpc-test',
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-test',
@@ -61,7 +60,7 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/network-acl-rule-ports/nrp-test',
+            '/v2/network-rule-ports/nrp-test',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

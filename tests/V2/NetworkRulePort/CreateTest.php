@@ -29,7 +29,6 @@ class CreateTest extends TestCase
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => 'net-test',
-            'vpc_id' => 'vpc-test',
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-test',
