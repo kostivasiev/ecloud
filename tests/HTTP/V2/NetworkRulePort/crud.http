@@ -166,5 +166,8 @@ Content-Type: application/json
 > {%
 client.test('Delete Network Policy', function () {
     client.assert(response.status === 204, '204 response not received');
+    client.log('Run the following SQL on the Database:-');
+    client.log('UPDATE syncs SET completed=1 WHERE resource_id=\'' + client.global.get('network_policy_id') + '\';');
+    client.log('UPDATE network_policies SET deleted_at=NOW() WHERE id=\'' + client.global.get('network_policy_id') + '\';');
 });
 %}
