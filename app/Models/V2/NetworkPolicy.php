@@ -16,7 +16,7 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * Class NetworkPolicy
  * @package App\Models\V2
- * @method static NetworkPolicy findOrFail(string $aclPolicyId)
+ * @method static NetworkPolicy findOrFail(string $networkPolicyId)
  * @method static NetworkPolicy forUser($user)
  */
 class NetworkPolicy extends Model implements Filterable, Sortable
