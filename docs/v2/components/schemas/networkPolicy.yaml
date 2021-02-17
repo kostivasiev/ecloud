@@ -7,14 +7,14 @@ properties:
     type: string
     example: 'Default Network Policy'
   network_id :
-    writeOnly : true
+    required : true
     type : string
     example : 'net-912345'
   vpc_id :
     type : string
     required : true
     example : vpc-2b66bb79
-    readOnly : false
+    readOnly : true
   sync :
     type : string
     example : 'completed'

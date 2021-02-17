@@ -13,7 +13,7 @@ class NetworkPolicyResource extends UKFastResource
         return [
             'id' => $this->id,
             'network_id' => $this->network_id,
-            'vpc_id' => $this->vpc_id,
+            'vpc_id' => $this->network->router->vpc_id,
             'name' => $this->name,
             'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(

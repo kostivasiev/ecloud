@@ -137,12 +137,15 @@ trait Syncable
 
     public function setSyncFailureReason($value)
     {
+        Log::info(get_class($this) . ' : Setting Sync to failed - Started', ['resource_id' => $this->id]);
         if (!$this->syncs()->count()) {
             return;
         }
         $sync = $this->syncs()->latest()->first();
         $sync->failure_reason = $value;
         $sync->save();
+        Log::debug(get_class($this), ['reason' => $value]);
+        Log::info(get_class($this) . ' : Setting Sync to failed - Finished', ['resource_id' => $this->id]);
     }
 
     public function getSyncFailureReason()

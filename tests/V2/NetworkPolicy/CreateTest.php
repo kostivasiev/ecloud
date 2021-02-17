@@ -28,7 +28,6 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test Policy',
             'network_id' => 'net-test',
-            'vpc_id' => $this->vpc()->id,
         ];
         $this->post(
             '/v2/network-policies',
@@ -42,7 +41,6 @@ class CreateTest extends TestCase
             [
                 'name' => 'Test Policy',
                 'network_id' => 'net-test',
-                'vpc_id' => 'vpc-test',
             ],
             'ecloud'
         )->assertResponseStatus(201);
@@ -53,7 +51,6 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test Policy',
             'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
         ];
         factory(NetworkPolicy::class)->create($data);
         $this->post(
