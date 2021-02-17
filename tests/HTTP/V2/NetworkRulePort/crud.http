@@ -136,7 +136,6 @@ Content-Type: application/json
 > {%
 client.test('Delete Network Rule Ports', function () {
     client.assert(response.status === 204, '204 response not received');
-    client.assert(response.body.data.id, client.global.get('network_rule_port_id'));
 });
 %}
 
