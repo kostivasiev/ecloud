@@ -27,7 +27,6 @@ class DeleteTest extends TestCase
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-abc123xyz',
             'network_id' => $this->network->id,
-            'vpc_id' => $this->vpc()->id,
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-abc123xyz',
