@@ -7,7 +7,7 @@ properties:
     type: string
     example: 'Network Rule'
     readOnly : false
-  network_acl_id :
+  network_policy_id :
     writeOnly : true
     type : string
     example : 'nr-abc123xyz'
