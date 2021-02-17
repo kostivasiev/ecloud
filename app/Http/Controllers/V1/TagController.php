@@ -25,7 +25,7 @@ class TagController extends BaseController
     {
         SolutionController::getSolutionById($request, $solutionId);
 
-        $collection = Tag::withReseller($request->user->resellerId)
+        $collection = Tag::withReseller($request->user()->resellerId())
             ->withSolution($solutionId);
 
         (new QueryTransformer($request))
@@ -42,7 +42,7 @@ class TagController extends BaseController
     {
         SolutionController::getSolutionById($request, $solutionId);
 
-        $tag = Tag::withReseller($request->user->resellerId)
+        $tag = Tag::withReseller($request->user()->resellerId())
             ->withSolution($solutionId)
             ->withKey($tagKey)
             ->first();
@@ -79,7 +79,7 @@ class TagController extends BaseController
             'value' => ['required'],
         ]);
 
-        $existingTags = Tag::withReseller($request->user->resellerId)
+        $existingTags = Tag::withReseller($request->user()->resellerId())
             ->withSolution($solutionId)
             ->withKey($request->input('key'));
 
@@ -129,7 +129,7 @@ class TagController extends BaseController
         $solution = SolutionController::getSolutionById($request, $solutionId);
         (new CanModifyResource($solution))->validate();
 
-        $tag = Tag::withReseller($request->user->resellerId)
+        $tag = Tag::withReseller($request->user()->resellerId())
             ->withSolution($solutionId)
             ->withKey($tagKey)
             ->first();
@@ -167,7 +167,7 @@ class TagController extends BaseController
         $solution = SolutionController::getSolutionById($request, $solutionId);
         (new CanModifyResource($solution))->validate();
 
-        $tag = Tag::withReseller($request->user->resellerId)
+        $tag = Tag::withReseller($request->user()->resellerId())
             ->withSolution($solutionId)
             ->withKey($tagKey)
             ->first();
@@ -187,7 +187,7 @@ class TagController extends BaseController
     {
         VirtualMachineController::getVirtualMachineById($request, $vmId);
 
-        $collection = Tag::withReseller($request->user->resellerId)
+        $collection = Tag::withReseller($request->user()->resellerId())
             ->withServer($vmId);
 
         (new QueryTransformer($request))
@@ -204,7 +204,7 @@ class TagController extends BaseController
     {
         VirtualMachineController::getVirtualMachineById($request, $vmId);
 
-        $tag = Tag::withReseller($request->user->resellerId)
+        $tag = Tag::withReseller($request->user()->resellerId())
             ->withServer($vmId)
             ->withKey($tagKey)
             ->first();
@@ -232,7 +232,7 @@ class TagController extends BaseController
             'value' => ['required'],
         ]);
 
-        $existingTags = Tag::withReseller($request->user->resellerId)
+        $existingTags = Tag::withReseller($request->user()->resellerId())
             ->withServer($vmId)
             ->withKey($request->input('key'));
 
@@ -272,7 +272,7 @@ class TagController extends BaseController
             (new CanModifyResource($virtualMachine->solution))->validate();
         }
 
-        $tag = Tag::withReseller($request->user->resellerId)
+        $tag = Tag::withReseller($request->user()->resellerId())
             ->withServer($vmId)
             ->withKey($tagKey)
             ->first();
@@ -303,7 +303,7 @@ class TagController extends BaseController
             (new CanModifyResource($virtualMachine->solution))->validate();
         }
 
-        $tag = Tag::withReseller($request->user->resellerId)
+        $tag = Tag::withReseller($request->user()->resellerId())
             ->withServer($vmId)
             ->withKey($tagKey)
             ->first();

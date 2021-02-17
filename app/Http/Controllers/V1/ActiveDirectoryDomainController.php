@@ -23,7 +23,7 @@ class ActiveDirectoryDomainController extends BaseController
     {
         $collectionQuery = ActiveDirectoryDomain::query();
         if (!empty($this->resellerId) || !$this->isAdmin) {
-            $collectionQuery->where('ad_domain_reseller_id', $request->user->resellerId);
+            $collectionQuery->where('ad_domain_reseller_id', $request->user()->resellerId());
         }
 
         (new QueryTransformer($request))
@@ -46,7 +46,7 @@ class ActiveDirectoryDomainController extends BaseController
      */
     public function show(Request $request, $domainId)
     {
-        $domain = ActiveDirectoryDomain::withReseller($request->user->resellerId)->find($domainId);
+        $domain = ActiveDirectoryDomain::withReseller($request->user()->resellerId())->find($domainId);
         if (is_null($domain)) {
             throw new NotFoundException(
                 "An Active Directory domain matching the requested ID was not found"

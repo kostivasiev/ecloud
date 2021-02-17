@@ -389,7 +389,7 @@ class TemplateController extends BaseController
      */
     protected function filterAdminProperties(Request $request, $templates)
     {
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             return $templates;
         }
 

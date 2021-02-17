@@ -387,7 +387,8 @@ class VolumeSetController extends BaseController
     public function volumes(Request $request, $volumeSetId)
     {
         $volumeSet = VolumeSet::find($volumeSetId);
-        if (!$volumeSet || ($request->user->resellerId !== 0 && $volumeSet->solution->reseller_id !== $request->user->resellerId)) {
+
+        if (!$volumeSet || ($request->user()->isScoped() && $volumeSet->solution->reseller_id !== $request->user()->resellerId())) {
             return Response::create([
                 'errors' => [
                     'title' => 'Not found',
@@ -432,14 +433,14 @@ class VolumeSetController extends BaseController
     public static function getQuery(Request $request)
     {
         $query = self::$model::query();
-        if ($request->user->resellerId != 0) {
+        if ($request->user()->isScoped()) {
             $query->join(
                 'ucs_reseller',
                 (new self::$model)->getTable() . '.ucs_reseller_id',
                 '=',
                 'ucs_reseller.ucs_reseller_id'
             )
-                ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
+                ->where('ucs_reseller_reseller_id', '=', $request->user()->resellerId());
         }
 
         return $query;

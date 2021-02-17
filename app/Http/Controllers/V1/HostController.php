@@ -166,7 +166,7 @@ class HostController extends BaseController
         }
 
         $headers = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $headers = [
                 'X-AutomationRequestId' => $automationRequestId
             ];
@@ -284,13 +284,13 @@ class HostController extends BaseController
      */
     public static function getHostQuery(Request $request)
     {
-        $query = Host::withReseller($request->user->resellerId)
+        $query = Host::withReseller($request->user()->resellerId())
             ->where('ucs_node_status', '!=', 'Cancelled')
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'ucs_node_ucs_reseller_id')
             ->join('ucs_specification', 'ucs_specification_id', '=', 'ucs_node_specification_id')
             ->where('ucs_specification_active', '=', 'Yes');
 
-        if (!$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             $query->where('ucs_reseller_active', 'Yes');
         }
 

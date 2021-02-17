@@ -24,7 +24,7 @@ class VpcSupportController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = VpcSupport::forUser($request->user);
+        $collection = VpcSupport::forUser($request->user());
 
         $queryTransformer->config(VpcSupport::class)
             ->transform($collection);
@@ -42,7 +42,7 @@ class VpcSupportController extends BaseController
     public function show(Request $request, string $vpcSupportId)
     {
         return new VpcSupportResource(
-            VpcSupport::forUser($request->user)->findOrFail($vpcSupportId)
+            VpcSupport::forUser($request->user())->findOrFail($vpcSupportId)
         );
     }
 
@@ -68,7 +68,7 @@ class VpcSupportController extends BaseController
      */
     public function update(UpdateRequest $request, string $vpcSupportId)
     {
-        $vpcSupport = VpcSupport::forUser(app('request')->user)->findOrFail($vpcSupportId);
+        $vpcSupport = VpcSupport::forUser(app('request')->user())->findOrFail($vpcSupportId);
 
         $vpcSupport->fill($request->only([
             'vpc_id',
@@ -86,7 +86,7 @@ class VpcSupportController extends BaseController
      */
     public function destroy(Request $request, string $vpcId)
     {
-        VpcSupport::forUser($request->user)->findOrFail($vpcId)->delete();
+        VpcSupport::forUser($request->user())->findOrFail($vpcId)->delete();
         return response(null, 204);
     }
 }

@@ -16,7 +16,7 @@ class CommitmentIsGreater implements Rule
 
     public function passes($attribute, $value)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user)
+        $discountPlan = DiscountPlan::forUser(app('request')->user())
             ->findOrFail($this->discountPlanId);
         return $value > $discountPlan->$attribute;
     }

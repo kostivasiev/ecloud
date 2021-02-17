@@ -32,7 +32,7 @@ class AvailabilityZoneResource extends UKFastResource
             'region_id' => $this->region_id
         ];
 
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data['is_public'] = $this->is_public;
             $data['nsx_manager_endpoint'] = $this->nsx_manager_endpoint;
             $data['nsx_edge_cluster_id'] = $this->nsx_edge_cluster_id;

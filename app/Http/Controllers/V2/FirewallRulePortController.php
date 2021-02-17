@@ -20,7 +20,7 @@ class FirewallRulePortController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallRulePort::forUser($request->user);
+        $collection = FirewallRulePort::forUser($request->user());
         $queryTransformer->config(FirewallRulePort::class)
             ->transform($collection);
 
@@ -37,7 +37,7 @@ class FirewallRulePortController extends BaseController
     public function show(Request $request, string $nicId)
     {
         return new FirewallRulePortResource(
-            FirewallRulePort::forUser($request->user)->findOrFail($nicId)
+            FirewallRulePort::forUser($request->user())->findOrFail($nicId)
         );
     }
 
@@ -65,7 +65,7 @@ class FirewallRulePortController extends BaseController
      */
     public function update(Update $request, string $firewallRulePortId)
     {
-        $resource = FirewallRulePort::forUser(app('request')->user)->findOrFail($firewallRulePortId);
+        $resource = FirewallRulePort::forUser(app('request')->user())->findOrFail($firewallRulePortId);
         $resource->fill($request->only([
             'name',
             'firewall_rule_id',
@@ -88,7 +88,7 @@ class FirewallRulePortController extends BaseController
      */
     public function destroy(Request $request, string $firewallRulePortId)
     {
-        $resource = FirewallRulePort::forUser($request->user)->findOrFail($firewallRulePortId);
+        $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
         $resource->delete();
         return response(null, 204);
     }

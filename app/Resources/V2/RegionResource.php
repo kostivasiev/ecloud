@@ -27,7 +27,7 @@ class RegionResource extends UKFastResource
             'name' => $this->name
         ];
 
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data['is_public'] = $this->is_public;
             $tz = new \DateTimeZone(config('app.timezone'));
             $data['created_at'] = $this->created_at === null ? null : Carbon::parse($this->created_at, $tz)->toIso8601String();

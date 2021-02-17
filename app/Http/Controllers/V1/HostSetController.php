@@ -232,14 +232,14 @@ class HostSetController extends BaseController
     public static function getQuery(Request $request)
     {
         $query = self::$model::query();
-        if ($request->user->resellerId != 0) {
+        if ($request->user()->isScoped()) {
             $query->join(
                 'ucs_reseller',
                 (new self::$model)->getTable() . '.ucs_reseller_id',
                 '=',
                 'ucs_reseller.ucs_reseller_id'
             )
-                ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
+                ->where('ucs_reseller_reseller_id', '=', $request->user()->resellerId());
         }
 
         return $query;

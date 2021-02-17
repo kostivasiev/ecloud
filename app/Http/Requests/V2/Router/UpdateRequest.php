@@ -33,7 +33,7 @@ class UpdateRequest extends FormRequest
             $availabilityZoneId = $this->request->get('availability_zone_id');
         }
         if (empty($availabilityZoneId)) {
-            $router = Router::forUser(app('request')->user)->find(Request::route('routerId'));
+            $router = Router::forUser(app('request')->user())->find(Request::route('routerId'));
             if (!empty($router)) {
                 $availabilityZoneId = $router->availability_zone_id;
             }

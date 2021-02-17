@@ -33,7 +33,7 @@ class CreateRequest extends FormRequest
         }
         // Default AZ
         if (empty($availabilityZoneId) && $this->request->has('vpc_id')) {
-            $vpc = Vpc::forUser(app('request')->user)->find($this->request->get('vpc_id'));
+            $vpc = Vpc::forUser(app('request')->user())->find($this->request->get('vpc_id'));
             if (!empty($vpc)) {
                 $availabilityZoneId = $vpc->region
                     ->availabilityZones

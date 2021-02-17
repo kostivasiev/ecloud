@@ -239,7 +239,7 @@ class ApplianceParametersController extends BaseController
                 'appliance_version_appliance_id'
             );
 
-        if ($request->user->resellerId != 0) {
+        if ($request->user()->isScoped()) {
             $applianceParametersQuery->where('appliance_version_active', 'Yes');
             $applianceParametersQuery->where('appliance_active', 'Yes');
         }

@@ -16,7 +16,7 @@ class VolumeNotAttached implements Rule
 
     public function passes($attribute, $value)
     {
-        $instance = Instance::forUser(app('request')->user)->findOrFail($value);
+        $instance = Instance::forUser(app('request')->user())->findOrFail($value);
         if ($instance->volumes()->count() == 0) {
             return true;
         }

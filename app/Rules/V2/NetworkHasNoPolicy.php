@@ -10,7 +10,7 @@ class NetworkHasNoPolicy implements Rule
 
     public function passes($attribute, $value)
     {
-        $network = Network::forUser(app('request')->user)->findOrFail($value);
+        $network = Network::forUser(app('request')->user())->findOrFail($value);
         return (is_null($network->networkPolicy));
     }
 

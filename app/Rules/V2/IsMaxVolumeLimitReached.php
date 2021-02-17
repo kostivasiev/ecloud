@@ -16,7 +16,7 @@ class IsMaxVolumeLimitReached implements Rule
 
     public function passes($attribute, $value)
     {
-        $instance = Instance::forUser(app('request')->user)->findOrFail($value);
+        $instance = Instance::forUser(app('request')->user())->findOrFail($value);
         return ($instance->volumes()->get()->count() < $this->volumeMountLimit);
     }
 

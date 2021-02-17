@@ -13,7 +13,7 @@ class BillingMetricController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = BillingMetric::forUser($request->user);
+        $collection = BillingMetric::forUser($request->user());
         $queryTransformer->config(BillingMetric::class)
             ->transform($collection);
         return BillingMetricResource::collection($collection->paginate(
@@ -23,7 +23,7 @@ class BillingMetricController extends BaseController
 
     public function show(Request $request, string $modelId)
     {
-        return new BillingMetricResource(BillingMetric::forUser($request->user)->findOrFail($modelId));
+        return new BillingMetricResource(BillingMetric::forUser($request->user())->findOrFail($modelId));
     }
 
     public function create(CreateRequest $request)
@@ -45,7 +45,7 @@ class BillingMetricController extends BaseController
 
     public function update(UpdateRequest $request, string $modelId)
     {
-        $model = BillingMetric::forUser(app('request')->user)->findOrFail($modelId);
+        $model = BillingMetric::forUser(app('request')->user())->findOrFail($modelId);
         $model->fill($request->only([
             'resource_id',
             'vpc_id',
@@ -63,7 +63,7 @@ class BillingMetricController extends BaseController
 
     public function destroy(Request $request, string $modelId)
     {
-        $model = BillingMetric::forUser($request->user)->findOrFail($modelId);
+        $model = BillingMetric::forUser($request->user())->findOrFail($modelId);
         $model->delete();
         return response()->json([], 204);
     }

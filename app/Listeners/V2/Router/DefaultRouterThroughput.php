@@ -16,7 +16,7 @@ class DefaultRouterThroughput
 
         if (empty($router->router_throughput_id)) {
             if (empty($router->availability_zone_id)) {
-                $availabilityZone = Vpc::forUser(app('request')->user)
+                $availabilityZone = Vpc::forUser(app('request')->user())
                     ->findOrFail($router->vpc_id)
                     ->region
                     ->availabilityZones

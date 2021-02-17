@@ -30,7 +30,7 @@ trait DefaultAvailabilityZone
             return;
         }
 
-        $availabilityZone = Vpc::forUser(app('request')->user)
+        $availabilityZone = Vpc::forUser(app('request')->user())
             ->findOrFail($model->vpc_id)
             ->region
             ->availabilityZones

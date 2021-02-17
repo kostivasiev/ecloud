@@ -13,7 +13,7 @@ class IsVolumeAttached implements Rule
     public function __construct()
     {
         $volumeId = app('request')->route('volumeId');
-        $this->volume = Volume::forUser(app('request')->user)
+        $this->volume = Volume::forUser(app('request')->user())
             ->findOrFail($volumeId);
     }
 

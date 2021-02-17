@@ -21,7 +21,7 @@ class IsAdministrator
      */
     public function handle($request, Closure $next)
     {
-        if (!$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             throw new UnauthorisedException();
         }
 

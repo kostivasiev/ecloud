@@ -78,7 +78,7 @@ class Credential extends Model implements Filterable, Sortable
      */
     public function scopeFilterHidden(Builder $query, Request $request)
     {
-        if (!empty($request->user->isAdministrator) && !$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             $query->where('is_hidden', '=', 0);
         }
         return $query;

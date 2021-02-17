@@ -24,7 +24,7 @@ class FirewallPolicyController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallPolicy::forUser($request->user);
+        $collection = FirewallPolicy::forUser($request->user());
 
         $queryTransformer->config(FirewallPolicy::class)
             ->transform($collection);
@@ -42,7 +42,7 @@ class FirewallPolicyController extends BaseController
     public function show(Request $request, string $firewallPolicyId)
     {
         return new FirewallPolicyResource(
-            FirewallPolicy::forUser($request->user)->findOrFail($firewallPolicyId)
+            FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)
         );
     }
 
@@ -54,7 +54,7 @@ class FirewallPolicyController extends BaseController
      */
     public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        $collection = FirewallPolicy::forUser($request->user)->findOrFail($routerId)->firewallRules();
+        $collection = FirewallPolicy::forUser($request->user())->findOrFail($routerId)->firewallRules();
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
 
@@ -83,7 +83,7 @@ class FirewallPolicyController extends BaseController
      */
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
+        $policy = FirewallPolicy::forUser(app('request')->user())->findOrFail($firewallPolicyId);
         $policy->fill($request->only(['name', 'sequence', 'router_id']));
         $policy->save();
         return $this->responseIdMeta($request, $policy->getKey(), 200);
@@ -96,7 +96,7 @@ class FirewallPolicyController extends BaseController
      */
     public function destroy(Request $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
+        $policy = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
         $policy->delete();
         return response()->json([], 204);
     }

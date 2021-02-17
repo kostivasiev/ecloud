@@ -24,7 +24,7 @@ class FirewallRuleController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallRule::forUser($request->user);
+        $collection = FirewallRule::forUser($request->user());
 
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
@@ -42,13 +42,13 @@ class FirewallRuleController extends BaseController
     public function show(Request $request, string $firewallRuleId)
     {
         return new FirewallRuleResource(
-            FirewallRule::forUser($request->user)->findOrFail($firewallRuleId)
+            FirewallRule::forUser($request->user())->findOrFail($firewallRuleId)
         );
     }
 
     public function ports(Request $request, QueryTransformer $queryTransformer, string $firewallRuleId)
     {
-        $collection = FirewallRule::forUser($request->user)->findOrFail($firewallRuleId)->firewallRulePorts();
+        $collection = FirewallRule::forUser($request->user())->findOrFail($firewallRuleId)->firewallRulePorts();
         $queryTransformer->config(FirewallRulePort::class)
             ->transform($collection);
 
@@ -96,7 +96,7 @@ class FirewallRuleController extends BaseController
      */
     public function update(Update $request, string $firewallRuleId)
     {
-        $firewallRule = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
+        $firewallRule = FirewallRule::foruser(app('request')->user())->findOrFail($firewallRuleId);
         $firewallRule->fill($request->only([
             'name',
             'sequence',
@@ -129,7 +129,7 @@ class FirewallRuleController extends BaseController
      */
     public function destroy(Request $request, string $firewallRuleId)
     {
-        $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
+        $item = FirewallRule::foruser(app('request')->user())->findOrFail($firewallRuleId);
         if (!$item->delete()) {
             return $item->getSyncError();
         }

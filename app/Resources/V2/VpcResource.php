@@ -40,7 +40,7 @@ class VpcResource extends UKFastResource
             )->toIso8601String(),
         ];
 
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data['reseller_id'] = $this->reseller_id;
         }
 

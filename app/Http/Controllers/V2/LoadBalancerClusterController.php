@@ -21,7 +21,7 @@ class LoadBalancerClusterController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = LoadBalancerCluster::forUser($request->user);
+        $collection = LoadBalancerCluster::forUser($request->user());
         (new QueryTransformer($request))
             ->config(LoadBalancerCluster::class)
             ->transform($collection);
@@ -39,7 +39,7 @@ class LoadBalancerClusterController extends BaseController
     public function show(Request $request, string $lbcId)
     {
         return new LoadBalancerClusterResource(
-            LoadBalancerCluster::forUser($request->user)->findOrFail($lbcId)
+            LoadBalancerCluster::forUser($request->user())->findOrFail($lbcId)
         );
     }
 
@@ -63,7 +63,7 @@ class LoadBalancerClusterController extends BaseController
      */
     public function update(UpdateLoadBalancerClusterRequest $request, string $lbcId)
     {
-        $loadBalancerCluster = LoadBalancerCluster::forUser(app('request')->user)->findOrFail($lbcId);
+        $loadBalancerCluster = LoadBalancerCluster::forUser(app('request')->user())->findOrFail($lbcId);
         $loadBalancerCluster->fill($request->only(['name', 'availability_zone_id', 'vpc_id', 'nodes']));
         $loadBalancerCluster->save();
         return $this->responseIdMeta($request, $loadBalancerCluster->getKey(), 200);
@@ -76,7 +76,7 @@ class LoadBalancerClusterController extends BaseController
      */
     public function destroy(Request $request, string $lbcId)
     {
-        LoadBalancerCluster::forUser($request->user)->findOrFail($lbcId)->delete();
+        LoadBalancerCluster::forUser($request->user())->findOrFail($lbcId)->delete();
         return response()->json([], 204);
     }
 }

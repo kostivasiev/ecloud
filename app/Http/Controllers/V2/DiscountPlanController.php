@@ -24,7 +24,7 @@ class DiscountPlanController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = DiscountPlan::forUser($request->user);
+        $collection = DiscountPlan::forUser($request->user());
         (new QueryTransformer($request))
             ->config(DiscountPlan::class)
             ->transform($collection);
@@ -42,7 +42,7 @@ class DiscountPlanController extends BaseController
     public function show(Request $request, string $discountPlanId)
     {
         return new DiscountPlanResource(
-            DiscountPlan::forUser($request->user)->findOrFail($discountPlanId)
+            DiscountPlan::forUser($request->user())->findOrFail($discountPlanId)
         );
     }
 
@@ -77,7 +77,7 @@ class DiscountPlanController extends BaseController
      */
     public function update(Update $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser(app('request')->user())->findOrFail($discountPlanId);
         $discountPlan->update($request->only($this->getAllowedFields()));
 
         if ($this->isAdmin) {
@@ -106,13 +106,14 @@ class DiscountPlanController extends BaseController
     }
 
     /**
+     * @param Request $request
      * @param string $discountPlanId
      * @return Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
-    public function destroy(string $discountPlanId)
+    public function destroy(Request $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->delete();
         return response(null, 204);
     }
@@ -124,7 +125,7 @@ class DiscountPlanController extends BaseController
      */
     public function approve(Request $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->approve();
         return response(null, 200);
     }
@@ -136,7 +137,7 @@ class DiscountPlanController extends BaseController
      */
     public function reject(Request $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->reject();
         return response(null, 200);
     }
@@ -155,7 +156,7 @@ class DiscountPlanController extends BaseController
             'term_start_date',
             'term_end_date',
         ];
-        if (app('request')->user->isAdministrator) {
+        if (app('request')->user()->isAdmin()) {
             $allowedFields[] = 'contact_id';
             $allowedFields[] = 'employee_id';
             $allowedFields[] = 'reseller_id';

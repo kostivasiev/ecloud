@@ -59,9 +59,9 @@ class VirtualMachineController extends BaseController
      */
     public static function getVirtualMachineById(Request $request, $vmId)
     {
-        $collection = VirtualMachine::withResellerId($request->user->resellerId);
+        $collection = VirtualMachine::withResellerId($request->user()->resellerId());
 
-        if ($request->user->resellerId != 0) {
+        if ($request->user()->isScoped()) {
             $collection->where('servers_active', '=', 'y');
         }
 
@@ -236,7 +236,7 @@ class VirtualMachineController extends BaseController
         ];
 
 
-        if (!$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             $rules['hdd'] = [
                 'required_without:hdd_disks',
                 'integer',
@@ -307,21 +307,21 @@ class VirtualMachineController extends BaseController
         $maxHdd = VirtualMachine::MAX_HDD;
 
         if ($request->input('environment') == 'Public') {
-            if (empty($request->user->resellerId)) {
+            if (!$request->user()->isScoped()) {
                 // if admin reseller scope is empty, we won't know the owner for the new VM
                 throw new Exceptions\UnauthorisedException('Unable to determine account id');
             }
 
             // check for demo accounts
-            if ($accountsService->isDemoCustomer($request->user->resellerId)) {
+            if ($accountsService->isDemoCustomer($request->user()->resellerId())) {
                 throw new Exceptions\ForbiddenException(
                     'eCloud Public is not available to demo account users, please upgrade via MyUKfast'
                 );
             }
 
             // check the customer has a valid payment method on their account
-            if ($accountsService->getPaymentMethod($request->user->resellerId) == 'Credit Card') {
-                $billingService->scopeResellerId($request->user->resellerId)->verifyDefaultPaymentCard();
+            if ($accountsService->getPaymentMethod($request->user()->resellerId()) == 'Credit Card') {
+                $billingService->scopeResellerId($request->user()->resellerId())->verifyDefaultPaymentCard();
             }
 
             if ($request->has('encrypt')) {
@@ -376,7 +376,7 @@ class VirtualMachineController extends BaseController
                     ));
                 }
 
-                if (!$request->user->isAdministrator) {
+                if (!$request->user()->isAdmin()) {
                     $maxHdd = min(static::HDD_MAX_SIZE_GB, $maxHdd);
                 }
 
@@ -651,7 +651,7 @@ class VirtualMachineController extends BaseController
         $this->validate($request, $rules);
 
         $post_data = array(
-            'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user->resellerId,
+            'reseller_id' => !empty($solution) ? $solution->ucs_reseller_reseller_id : $request->user()->resellerId(),
             'ecloud_type' => $request->input('environment'),
             'ucs_reseller_id' => $request->input('solution_id'),
             'server_active' => true,
@@ -768,7 +768,7 @@ class VirtualMachineController extends BaseController
 
         // set active directory domain
         if ($request->has('ad_domain_id')) {
-            $domain = ActiveDirectoryDomain::withReseller($request->user->resellerId)
+            $domain = ActiveDirectoryDomain::withReseller($request->user()->resellerId())
                 ->find($request->input('ad_domain_id'));
 
             if (is_null($domain)) {
@@ -913,7 +913,7 @@ class VirtualMachineController extends BaseController
         $virtualMachine->servers_status = $intapiData->data->server_status;
 
         $headers = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $headers = [
                 'X-AutomationRequestId' => $intapiData->data->automation_request_id
             ];
@@ -993,7 +993,7 @@ class VirtualMachineController extends BaseController
         }
 
         //server is in contract
-        if (!$request->user->isAdministrator && $virtualMachine->inContract()) {
+        if (!$request->user()->isAdmin() && $virtualMachine->inContract()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, in contract until ' .
                 date('d/m/Y', strtotime($virtualMachine->servers_contract_end_date))
@@ -1001,14 +1001,14 @@ class VirtualMachineController extends BaseController
         }
 
         //server is a managed device
-        if (!$request->user->isAdministrator && $virtualMachine->isManaged()) {
+        if (!$request->user()->isAdmin() && $virtualMachine->isManaged()) {
             throw new Exceptions\ForbiddenException(
                 'VM cannot be deleted, device is managed by UKFast'
             );
         }
 
         $post_data = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $rules = [
                 'reason' => ['sometimes', 'string'],
                 'cancel_billing' => ['sometimes', 'boolean']
@@ -1073,7 +1073,7 @@ class VirtualMachineController extends BaseController
         }
 
         $headers = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $headers = [
                 'X-AutomationRequestId' => $automationRequestId
             ];
@@ -1238,7 +1238,7 @@ class VirtualMachineController extends BaseController
 
         // Respond with the new machine id
         $headers = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $headers = ['X-AutomationRequestId' => $automationRequestId];
         }
 
@@ -1458,7 +1458,7 @@ class VirtualMachineController extends BaseController
             foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object)$hdd;
 
-                if (!$request->user->isAdministrator) {
+                if (!$request->user()->isAdmin()) {
                     if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
                         throw new Exceptions\BadRequestException(
                             'HDD with UUID ' . $hdd->uuid . ' cannot exceed ' . static::HDD_MAX_SIZE_GB . 'GB'
@@ -1957,7 +1957,7 @@ class VirtualMachineController extends BaseController
             throw new ServiceResponseException($error_msg);
         }
         $headers = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $headers = [
                 'X-AutomationRequestId' => $intapiData->automation_request->id
             ];
@@ -2065,7 +2065,7 @@ class VirtualMachineController extends BaseController
             throw new ServiceResponseException($error_msg);
         }
         $headers = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $headers = [
                 'X-AutomationRequestId' => $intapiData->automation_request->id
             ];
@@ -2390,7 +2390,7 @@ class VirtualMachineController extends BaseController
     {
         SolutionController::getSolutionById($request, $solutionId);
 
-        $collection = VirtualMachine::withResellerId($request->user->resellerId)->withSolutionId($solutionId);
+        $collection = VirtualMachine::withResellerId($request->user()->resellerId())->withSolutionId($solutionId);
 
         if (!$this->isAdmin) {
             $collection->where('servers_active', '=', 'y');

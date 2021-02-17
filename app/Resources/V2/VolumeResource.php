@@ -45,7 +45,7 @@ class VolumeResource extends UKFastResource
             )->toIso8601String(),
         ];
 
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data['vmware_uuid'] = $this->vmware_uuid;
         }
 

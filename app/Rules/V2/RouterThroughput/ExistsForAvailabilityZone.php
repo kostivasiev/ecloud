@@ -11,7 +11,7 @@ class ExistsForAvailabilityZone implements Rule
 
     public function __construct($availabilityZoneId)
     {
-        $availabilityZone = AvailabilityZone::forUser(app('request')->user)->find($availabilityZoneId);
+        $availabilityZone = AvailabilityZone::forUser(app('request')->user())->find($availabilityZoneId);
 
         if (!empty($availabilityZone)) {
             $this->routerThroughputs = $availabilityZone->routerThroughputs->pluck('id')->toArray();

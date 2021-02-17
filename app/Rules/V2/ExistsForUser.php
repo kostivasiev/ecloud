@@ -20,7 +20,7 @@ class ExistsForUser implements Rule
 
         foreach ($this->model as $model) {
             try {
-                $model::forUser(app('request')->user)->findOrFail($value);
+                $model::forUser(app('request')->user())->findOrFail($value);
                 return true;
             } catch (ModelNotFoundException $exception) {
                 continue;

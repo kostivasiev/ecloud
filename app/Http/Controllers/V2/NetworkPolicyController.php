@@ -17,7 +17,7 @@ class NetworkPolicyController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = NetworkPolicy::forUser($request->user);
+        $collection = NetworkPolicy::forUser($request->user());
         $queryTransformer->config(NetworkPolicy::class)
             ->transform($collection);
 
@@ -33,7 +33,7 @@ class NetworkPolicyController extends BaseController
      */
     public function show(Request $request, string $networkAclId)
     {
-        return new NetworkPolicyResource(NetworkPolicy::forUser($request->user)->findOrFail($networkAclId));
+        return new NetworkPolicyResource(NetworkPolicy::forUser($request->user())->findOrFail($networkAclId));
     }
 
     /**
@@ -60,7 +60,7 @@ class NetworkPolicyController extends BaseController
      */
     public function update(Update $request, string $networkAclId)
     {
-        $networkPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
+        $networkPolicy = NetworkPolicy::forUser(app('request')->user())->findOrFail($networkAclId);
         $networkPolicy->fill($request->only([
             'name',
             'network_id',
@@ -78,7 +78,7 @@ class NetworkPolicyController extends BaseController
      */
     public function destroy(Request $request, string $networkAclId)
     {
-        $networkPolicy = NetworkPolicy::forUser(app('request')->user)->findOrFail($networkAclId);
+        $networkPolicy = NetworkPolicy::forUser($request->user())->findOrFail($networkAclId);
         $networkPolicy->delete();
         return response('', 204);
     }

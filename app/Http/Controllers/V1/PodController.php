@@ -77,11 +77,11 @@ class PodController extends BaseController
     public static function getPodQuery(Request $request)
     {
         $podQuery = Pod::query();
-        if (!empty($request->user->resellerId) || !$request->user->isAdministrator) {
+        if ($request->user()->isScoped()) {
             $podQuery->where('ucs_datacentre_active', 'Yes');
             $podQuery->where('ucs_datacentre_api_enabled', 'Yes');
 
-            $podQuery->whereIn('ucs_datacentre_reseller_id', [0, $request->user->resellerId]);
+            $podQuery->whereIn('ucs_datacentre_reseller_id', [0, $request->user()->resellerId()]);
         }
         return $podQuery;
     }

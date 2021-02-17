@@ -43,7 +43,7 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $instance = Instance::forUser(app('request')->user)
+        $instance = Instance::forUser(app('request')->user())
             ->findOrFail($this->instanceId);
 
         $this->config = $instance->applianceVersion->applianceVersionData->pluck('key', 'value')->flip();

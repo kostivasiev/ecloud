@@ -39,7 +39,7 @@ class NetworkController extends BaseController
                     $request->query->remove('vpc_id:eq');
                 }
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || $network->router->vpc_id != $vpcId;
                     })
@@ -50,7 +50,7 @@ class NetworkController extends BaseController
                 $vpcId = $request->get('vpc_id:neq');
                 $request->query->remove('vpc_id:neq');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || $network->router->vpc_id == $vpcId;
                     })
@@ -61,7 +61,7 @@ class NetworkController extends BaseController
                 $vpcId = $request->get('vpc_id:lk');
                 $request->query->remove('vpc_id:lk');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || strpos($network->router->vpc_id, $vpcId) === false;
                     })
@@ -72,7 +72,7 @@ class NetworkController extends BaseController
                 $vpcId = $request->get('vpc_id:nlk');
                 $request->query->remove('vpc_id:nlk');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || strpos($network->router->vpc_id, $vpcId) !== false;
                     })
@@ -83,7 +83,7 @@ class NetworkController extends BaseController
                 $ids = explode(',', $request->get('vpc_id:in'));
                 $request->query->remove('vpc_id:in');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($ids) {
                         return !$network->router || !in_array($network->router->vpc_id, $ids);
                     })
@@ -94,7 +94,7 @@ class NetworkController extends BaseController
                 $ids = explode(',', $request->get('vpc_id:nin'));
                 $request->query->remove('vpc_id:nin');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($ids) {
                         return !$network->router || in_array($network->router->vpc_id, $ids);
                     })
@@ -104,7 +104,7 @@ class NetworkController extends BaseController
             }
             $collection = Network::whereIn('id', $networkIds);
         } else {
-            $collection = Network::forUser($request->user);
+            $collection = Network::forUser($request->user());
         }
 
         $queryTransformer->config(Network::class)
@@ -123,7 +123,7 @@ class NetworkController extends BaseController
     public function show(Request $request, string $networkId)
     {
         return new NetworkResource(
-            Network::forUser($request->user)->findOrFail($networkId)
+            Network::forUser($request->user())->findOrFail($networkId)
         );
     }
 
@@ -150,7 +150,7 @@ class NetworkController extends BaseController
      */
     public function update(UpdateRequest $request, string $networkId)
     {
-        $network = Network::forUser(app('request')->user)->findOrFail($networkId);
+        $network = Network::forUser(app('request')->user())->findOrFail($networkId);
         $network->fill($request->only([
             'router_id',
             'name',
@@ -170,7 +170,7 @@ class NetworkController extends BaseController
      */
     public function destroy(Request $request, string $networkId)
     {
-        $model = Network::forUser($request->user)->findOrFail($networkId);
+        $model = Network::forUser($request->user())->findOrFail($networkId);
 
         if (!$model->canDelete()) {
             return $model->getDeletionError();
@@ -191,7 +191,7 @@ class NetworkController extends BaseController
      */
     public function nics(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = Network::forUser($request->user)->findOrFail($zoneId)->nics();
+        $collection = Network::forUser($request->user())->findOrFail($zoneId)->nics();
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 
