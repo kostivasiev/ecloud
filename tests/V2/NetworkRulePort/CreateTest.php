@@ -45,7 +45,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/network-rule-ports',
             [
-                'network_rule_id' => 'nr-alttest',
+                'network_rule_id' => 'nr-test',
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555',
