@@ -89,15 +89,12 @@ class FirewallPolicyController extends BaseController
         return $this->responseIdMeta($request, $policy->getKey(), 200);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $firewallPolicyId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
-        $policy->delete();
+        $model = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
+        if (!$model->delete()) {
+            return $model->getSyncError();
+        }
         return response()->json([], 204);
     }
 }

@@ -105,15 +105,10 @@ class DiscountPlanController extends BaseController
         return $this->responseIdMeta($request, $discountPlan->getKey(), 200);
     }
 
-    /**
-     * @param string $discountPlanId
-     * @return Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Exception
-     */
     public function destroy(string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
-        $discountPlan->delete();
+        DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId)
+            ->delete();
         return response(null, 204);
     }
 

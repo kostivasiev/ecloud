@@ -160,11 +160,9 @@ class InstanceController extends BaseController
     public function destroy(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user)->findOrFail($instanceId);
-
         if (!$instance->delete()) {
             return $instance->getSyncError();
         }
-
         return response('', 204);
     }
 
