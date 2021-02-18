@@ -7,6 +7,7 @@ use App\Http\Requests\V2\UpdateVpnRequest;
 use App\Models\V2\Vpn;
 use App\Resources\V2\VpnResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -63,7 +64,7 @@ class VpnController extends BaseController
      */
     public function update(UpdateVpnRequest $request, string $vpnId)
     {
-        $vpns = Vpn::forUser(app('request')->user())->findOrFail($vpnId);
+        $vpns = Vpn::forUser(Auth::user())->findOrFail($vpnId);
         $vpns->fill($request->only(['router_id']));
         $vpns->save();
         return $this->responseIdMeta($request, $vpns->getKey(), 200);

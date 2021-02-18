@@ -32,8 +32,8 @@ class UpdateTest extends TestCase
             'name' => 'Manchester DC',
             'region_id' => $this->region->getKey(),
         ])->seeJson([
-            'title' => 'Unauthorised',
-            'detail' => 'Unauthorised',
+            'title' => 'Unauthorized',
+            'detail' => 'Unauthorized',
             'status' => 401,
         ])->assertResponseStatus(401);
     }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -101,7 +102,7 @@ class Credential extends Model implements Filterable, Sortable
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
-        if (app('request')->user()->isAdmin()) {
+        if (Auth::user()->isAdmin()) {
             $filters[] = $factory->create('is_hidden', Filter::$numericDefaults);
         }
         return $filters;

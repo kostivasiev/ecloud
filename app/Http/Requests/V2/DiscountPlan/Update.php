@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V2\DiscountPlan;
 
 use App\Rules\V2\CommitmentIsGreater;
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -64,7 +65,7 @@ class Update extends FormRequest
             ],
         ];
 
-        if (app('request')->user()->isAdmin()) {
+        if (Auth::user()->isAdmin()) {
             $rules['term_start_date'] = 'sometimes|required|date';
             $rules['status'] = 'sometimes|required|string|in:approved,rejected';
         }

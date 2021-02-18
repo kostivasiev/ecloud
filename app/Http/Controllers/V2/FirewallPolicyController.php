@@ -9,6 +9,7 @@ use App\Models\V2\FirewallRule;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -83,7 +84,7 @@ class FirewallPolicyController extends BaseController
      */
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::forUser(app('request')->user())->findOrFail($firewallPolicyId);
+        $policy = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $policy->fill($request->only(['name', 'sequence', 'router_id']));
         $policy->save();
         return $this->responseIdMeta($request, $policy->getKey(), 200);

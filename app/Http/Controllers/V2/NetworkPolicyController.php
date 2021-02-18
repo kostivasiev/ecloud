@@ -6,6 +6,7 @@ use App\Http\Requests\V2\NetworkPolicy\Update;
 use App\Models\V2\NetworkPolicy;
 use App\Resources\V2\NetworkPolicyResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class NetworkPolicyController extends BaseController
@@ -60,7 +61,7 @@ class NetworkPolicyController extends BaseController
      */
     public function update(Update $request, string $networkAclId)
     {
-        $networkPolicy = NetworkPolicy::forUser(app('request')->user())->findOrFail($networkAclId);
+        $networkPolicy = NetworkPolicy::forUser(Auth::user())->findOrFail($networkAclId);
         $networkPolicy->fill($request->only([
             'name',
             'network_id',

@@ -10,6 +10,7 @@ use App\Rules\V2\IpAvailable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -67,7 +68,7 @@ class NicController extends BaseController
      */
     public function update(UpdateNicRequest $request, string $nicId)
     {
-        $nic = Nic::forUser(app('request')->user())->findOrFail($nicId);
+        $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
         $nic->fill($request->only([
             'mac_address',
             'instance_id',

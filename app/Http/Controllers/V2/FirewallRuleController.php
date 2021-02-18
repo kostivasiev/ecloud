@@ -9,6 +9,7 @@ use App\Models\V2\FirewallRulePort;
 use App\Resources\V2\FirewallRulePortResource;
 use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -96,7 +97,7 @@ class FirewallRuleController extends BaseController
      */
     public function update(Update $request, string $firewallRuleId)
     {
-        $firewallRule = FirewallRule::foruser(app('request')->user())->findOrFail($firewallRuleId);
+        $firewallRule = FirewallRule::foruser(Auth::user())->findOrFail($firewallRuleId);
         $firewallRule->fill($request->only([
             'name',
             'sequence',
@@ -129,7 +130,7 @@ class FirewallRuleController extends BaseController
      */
     public function destroy(Request $request, string $firewallRuleId)
     {
-        $item = FirewallRule::foruser(app('request')->user())->findOrFail($firewallRuleId);
+        $item = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
         if (!$item->delete()) {
             return $item->getSyncError();
         }

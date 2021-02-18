@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Instance;
 use App\Rules\V2\IsValidRamMultiple;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
@@ -43,7 +44,7 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $instance = Instance::forUser(app('request')->user())
+        $instance = Instance::forUser(Auth::user())
             ->findOrFail($this->instanceId);
 
         $this->config = $instance->applianceVersion->applianceVersionData->pluck('key', 'value')->flip();

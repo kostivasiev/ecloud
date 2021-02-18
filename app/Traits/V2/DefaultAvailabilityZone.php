@@ -4,6 +4,7 @@ namespace App\Traits\V2;
 
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 trait DefaultAvailabilityZone
 {
@@ -30,7 +31,7 @@ trait DefaultAvailabilityZone
             return;
         }
 
-        $availabilityZone = Vpc::forUser(app('request')->user())
+        $availabilityZone = Vpc::forUser(Auth::user())
             ->findOrFail($model->vpc_id)
             ->region
             ->availabilityZones

@@ -15,6 +15,7 @@ use App\Resources\V2\RouterResource;
 use App\Resources\V2\VpnResource;
 use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -71,7 +72,7 @@ class RouterController extends BaseController
      */
     public function update(UpdateRequest $request, string $routerId)
     {
-        $router = Router::forUser(app('request')->user())->findOrFail($routerId);
+        $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
         if (!$router->save()) {
             return $router->getSyncError();

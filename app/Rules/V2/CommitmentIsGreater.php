@@ -4,6 +4,7 @@ namespace App\Rules\V2;
 
 use App\Models\V2\DiscountPlan;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class CommitmentIsGreater implements Rule
 {
@@ -16,7 +17,7 @@ class CommitmentIsGreater implements Rule
 
     public function passes($attribute, $value)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user())
+        $discountPlan = DiscountPlan::forUser(Auth::user())
             ->findOrFail($this->discountPlanId);
         return $value > $discountPlan->$attribute;
     }

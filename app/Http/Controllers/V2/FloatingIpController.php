@@ -11,6 +11,7 @@ use App\Models\V2\FloatingIp;
 use App\Resources\V2\FloatingIpResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -86,7 +87,7 @@ class FloatingIpController extends BaseController
 
     public function update(UpdateRequest $request, string $fipId)
     {
-        $resource = FloatingIp::forUser(app('request')->user())->findOrFail($fipId);
+        $resource = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
         $resource->fill($request->only(['name']));
         $resource->save();
         return $this->responseIdMeta($request, $resource->getKey(), 200);
@@ -94,7 +95,7 @@ class FloatingIpController extends BaseController
 
     public function destroy(Request $request, string $fipId)
     {
-        $model = FloatingIp::forUser(app('request')->user())->findOrFail($fipId);
+        $model = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         if (!$model->delete()) {
             return $model->getSyncError();

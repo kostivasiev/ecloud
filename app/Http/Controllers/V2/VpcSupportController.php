@@ -9,6 +9,7 @@ use App\Resources\V2\VpcSupportResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -68,7 +69,7 @@ class VpcSupportController extends BaseController
      */
     public function update(UpdateRequest $request, string $vpcSupportId)
     {
-        $vpcSupport = VpcSupport::forUser(app('request')->user())->findOrFail($vpcSupportId);
+        $vpcSupport = VpcSupport::forUser(Auth::user())->findOrFail($vpcSupportId);
 
         $vpcSupport->fill($request->only([
             'vpc_id',

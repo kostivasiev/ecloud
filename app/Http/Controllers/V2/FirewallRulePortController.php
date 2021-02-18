@@ -9,6 +9,7 @@ use App\Resources\V2\FirewallRulePortResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallRulePortController extends BaseController
@@ -65,7 +66,7 @@ class FirewallRulePortController extends BaseController
      */
     public function update(Update $request, string $firewallRulePortId)
     {
-        $resource = FirewallRulePort::forUser(app('request')->user())->findOrFail($firewallRulePortId);
+        $resource = FirewallRulePort::forUser(Auth::user())->findOrFail($firewallRulePortId);
         $resource->fill($request->only([
             'name',
             'firewall_rule_id',

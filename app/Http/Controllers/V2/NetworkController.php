@@ -10,6 +10,7 @@ use App\Models\V2\Nic;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -150,7 +151,7 @@ class NetworkController extends BaseController
      */
     public function update(UpdateRequest $request, string $networkId)
     {
-        $network = Network::forUser(app('request')->user())->findOrFail($networkId);
+        $network = Network::forUser(Auth::user())->findOrFail($networkId);
         $network->fill($request->only([
             'router_id',
             'name',

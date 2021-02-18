@@ -7,6 +7,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -50,7 +51,7 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         return $this->belongsTo(Network::class);
     }
 
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
             return $query;

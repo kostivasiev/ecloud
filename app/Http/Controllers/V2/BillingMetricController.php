@@ -7,6 +7,7 @@ use App\Http\Requests\V2\BillingMetric\UpdateRequest;
 use App\Models\V2\BillingMetric;
 use App\Resources\V2\BillingMetricResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class BillingMetricController extends BaseController
@@ -45,7 +46,7 @@ class BillingMetricController extends BaseController
 
     public function update(UpdateRequest $request, string $modelId)
     {
-        $model = BillingMetric::forUser(app('request')->user())->findOrFail($modelId);
+        $model = BillingMetric::forUser(Auth::user())->findOrFail($modelId);
         $model->fill($request->only([
             'resource_id',
             'vpc_id',

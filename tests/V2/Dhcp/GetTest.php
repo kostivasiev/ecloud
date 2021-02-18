@@ -42,8 +42,8 @@ class GetTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->get('/v2/dhcps')->seeJson([
-            'title' => 'Unauthorised',
-            'detail' => 'Unauthorised',
+            'title' => 'Unauthorized',
+            'detail' => 'Unauthorized',
             'status' => 401,
         ])->assertResponseStatus(401);
     }

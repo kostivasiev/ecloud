@@ -5,6 +5,7 @@ namespace App\Listeners\V2\Router;
 use App\Events\V2\Router\Creating;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class DefaultRouterThroughput
@@ -16,7 +17,7 @@ class DefaultRouterThroughput
 
         if (empty($router->router_throughput_id)) {
             if (empty($router->availability_zone_id)) {
-                $availabilityZone = Vpc::forUser(app('request')->user())
+                $availabilityZone = Vpc::forUser(Auth::user())
                     ->findOrFail($router->vpc_id)
                     ->region
                     ->availabilityZones

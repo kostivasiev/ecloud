@@ -16,6 +16,7 @@ use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 
@@ -72,7 +73,7 @@ class VpcController extends BaseController
      */
     public function update(UpdateRequest $request, string $vpcId)
     {
-        $vpc = Vpc::forUser(app('request')->user())->findOrFail($vpcId);
+        $vpc = Vpc::forUser(Auth::user())->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
         $vpc->region_id = $request->input('region_id', $vpc->region_id);
 

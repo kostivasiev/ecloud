@@ -4,6 +4,7 @@ namespace App\Rules\V2;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 
 class ExistsForUser implements Rule
 {
@@ -20,7 +21,7 @@ class ExistsForUser implements Rule
 
         foreach ($this->model as $model) {
             try {
-                $model::forUser(app('request')->user())->findOrFail($value);
+                $model::forUser(Auth::user())->findOrFail($value);
                 return true;
             } catch (ModelNotFoundException $exception) {
                 continue;

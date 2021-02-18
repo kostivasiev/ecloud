@@ -76,7 +76,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->router) {
             $this->router = factory(Router::class)->create([
                 'id' => 'rtr-test',
-                'vpc_id' => $this->vpc()->id
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id
             ]);
         }
         return $this->router;

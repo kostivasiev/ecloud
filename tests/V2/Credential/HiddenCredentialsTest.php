@@ -19,7 +19,7 @@ class HiddenCredentialsTest extends TestCase
 
     protected Appliance $appliance;
     protected ApplianceVersion $appliance_version;
-    protected AvailabilityZone $availability_zone;
+    protected AvailabilityZone $availabilityZone;
     protected Credential $credentials;
     protected Instance $instance;
     protected Region $region;
@@ -31,7 +31,7 @@ class HiddenCredentialsTest extends TestCase
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
         $this->vpc = factory(Vpc::class)->create([
@@ -50,6 +50,7 @@ class HiddenCredentialsTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'platform' => 'Linux',
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
 
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)

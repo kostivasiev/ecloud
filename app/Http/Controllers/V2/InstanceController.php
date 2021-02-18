@@ -24,6 +24,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -74,7 +75,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $vpc = Vpc::forUser(app('request')->user())->findOrFail($request->input('vpc_id'));
+        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->input('vpc_id'));
 
         // Use the default network if there is only one and no network_id was passed in
         $defaultNetworkId = null;
@@ -135,7 +136,7 @@ class InstanceController extends BaseController
      */
     public function update(UpdateRequest $request, string $instanceId)
     {
-        $instance = Instance::forUser(app('request')->user())->findOrFail($instanceId);
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
         $instance->fill($request->only([
             'name',

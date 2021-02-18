@@ -4,6 +4,7 @@ namespace App\Rules\V2;
 
 use App\Models\V2\Instance;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class IsMaxVolumeLimitReached implements Rule
 {
@@ -16,7 +17,7 @@ class IsMaxVolumeLimitReached implements Rule
 
     public function passes($attribute, $value)
     {
-        $instance = Instance::forUser(app('request')->user())->findOrFail($value);
+        $instance = Instance::forUser(Auth::user())->findOrFail($value);
         return ($instance->volumes()->get()->count() < $this->volumeMountLimit);
     }
 

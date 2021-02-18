@@ -9,6 +9,7 @@ use App\Resources\V2\DiscountPlanResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -77,7 +78,7 @@ class DiscountPlanController extends BaseController
      */
     public function update(Update $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user())->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser(Auth::user())->findOrFail($discountPlanId);
         $discountPlan->update($request->only($this->getAllowedFields()));
 
         if ($this->isAdmin) {
@@ -156,7 +157,7 @@ class DiscountPlanController extends BaseController
             'term_start_date',
             'term_end_date',
         ];
-        if (app('request')->user()->isAdmin()) {
+        if (Auth::user()->isAdmin()) {
             $allowedFields[] = 'contact_id';
             $allowedFields[] = 'employee_id';
             $allowedFields[] = 'reseller_id';
