@@ -11,11 +11,6 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class NetworkRuleController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = NetworkRule::forUser($request->user);
@@ -29,23 +24,11 @@ class NetworkRuleController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkRuleId
-     * @return NetworkRuleResource
-     */
     public function show(Request $request, string $networkRuleId)
     {
-        return new NetworkRuleResource(
-            NetworkRule::forUser($request->user)->findOrFail($networkRuleId)
-        );
+        return new NetworkRuleResource(NetworkRule::forUser($request->user)->findOrFail($networkRuleId));
     }
 
-    /**
-     * @param Create $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function store(Create $request)
     {
         $aclRule = app()->make(NetworkRule::class);
@@ -62,12 +45,6 @@ class NetworkRuleController extends BaseController
         return $this->responseIdMeta($request, $aclRule->getKey(), 201);
     }
 
-    /**
-     * @param Update $request
-     * @param string $networkRuleId
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function update(Update $request, string $networkRuleId)
     {
         $aclRule = NetworkRule::forUser(app('request')->user)->findOrFail($networkRuleId);
@@ -84,16 +61,10 @@ class NetworkRuleController extends BaseController
         return $this->responseIdMeta($request, $aclRule->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkRuleId
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Exception
-     */
     public function destroy(Request $request, string $networkRuleId)
     {
-        $aclRule = NetworkRule::forUser(app('request')->user)->findOrFail($networkRuleId);
-        $aclRule->delete();
+        NetworkRule::forUser(app('request')->user)->findOrFail($networkRuleId)
+            ->delete();
         return response('', 204);
     }
 }

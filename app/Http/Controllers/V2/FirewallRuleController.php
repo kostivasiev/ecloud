@@ -122,17 +122,10 @@ class FirewallRuleController extends BaseController
         return $this->responseIdMeta($request, $firewallRule->id, 200);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $firewallRuleId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $firewallRuleId)
     {
-        $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
-        if (!$item->delete()) {
-            return $item->getSyncError();
-        }
+        FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId)
+            ->delete();
         return response()->json([], 204);
     }
 }

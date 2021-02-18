@@ -95,11 +95,9 @@ class FloatingIpController extends BaseController
     public function destroy(Request $request, string $fipId)
     {
         $model = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
-
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 
