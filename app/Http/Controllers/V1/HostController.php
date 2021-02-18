@@ -158,8 +158,8 @@ class HostController extends BaseController
                 $host->getKey(),
                 ['host_set_id' => $hostSet->getKey()],
                 'ecloud_ucs_' . $host->pod->getKey(),
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Failed to delete host: unable to schedule deletion');

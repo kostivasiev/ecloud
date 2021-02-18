@@ -31,10 +31,6 @@ class VpcController extends BaseController
      */
     public function index(Request $request)
     {
-        exit(print_r(
-            $request->user()->userId()
-        ));
-
         $collection = Vpc::forUser($request->user());
         (new QueryTransformer($request))
             ->config(Vpc::class)

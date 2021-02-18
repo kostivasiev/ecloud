@@ -329,8 +329,8 @@ class DatastoreController extends BaseController
                     $datastore->getKey(),
                     $automationData,
                     'ecloud_ucs_' . $pod->getKey(),
-                    $request->user->id,
-                    $request->user->type
+                    $request->user()->userId(),
+                    $request->user()->type()
                 );
             } catch (IntapiServiceException $exception) {
                 throw new ServiceUnavailableException('Failed to expand datastore', null, 502);
@@ -449,8 +449,8 @@ class DatastoreController extends BaseController
                 $datastore->getKey(),
                 null,
                 'ecloud_ucs_' . $datastore->pod->getKey(),
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Failed to scheduele datastore for deletion', null, 502);
@@ -505,8 +505,8 @@ class DatastoreController extends BaseController
                     'new_capacity_gb' => $newSizeGB
                 ],
                 'ecloud_ucs_' . $datastore->storage->pod->getKey(),
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Failed to expand datastore.');
