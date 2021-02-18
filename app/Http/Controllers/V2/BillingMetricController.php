@@ -63,8 +63,8 @@ class BillingMetricController extends BaseController
 
     public function destroy(Request $request, string $modelId)
     {
-        $model = BillingMetric::forUser($request->user)->findOrFail($modelId);
-        $model->delete();
+        BillingMetric::forUser($request->user)->findOrFail($modelId)
+            ->delete();
         return response()->json([], 204);
     }
 }

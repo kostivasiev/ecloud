@@ -90,6 +90,24 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
     });
 
+    /** Network Rules */
+    $router->group([], function () use ($router) {
+        $router->get('network-rules', 'NetworkRuleController@index');
+        $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
+        $router->post('network-rules', 'NetworkRuleController@store');
+        $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+    });
+
+    /** Network Rule Ports */
+    $router->group([], function () use ($router) {
+        $router->get('network-rule-ports', 'NetworkRulePortController@index');
+        $router->get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
+        $router->post('network-rule-ports', 'NetworkRulePortController@store');
+        $router->patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
+        $router->delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
+    });
+
     /** Vpns */
     $router->group([], function () use ($router) {
         $router->get('vpns', 'VpnController@index');

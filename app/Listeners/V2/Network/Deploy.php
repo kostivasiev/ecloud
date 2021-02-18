@@ -2,7 +2,8 @@
 
 namespace App\Listeners\V2\Network;
 
-use App\Events\V2\Network\Created;
+use App\Events\V2\Network\Saved;
+use App\Models\V2\Network;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,14 +21,15 @@ class Deploy implements ShouldQueue
     public $tries = 20;
 
     /**
-     * @param Created $event
+     * @param Saved $event
      * @return void
      * @throws Exception
      */
-    public function handle(Created $event)
+    public function handle(Saved $event)
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
+        /** @var Network $network */
         $network = $event->model;
 
         $router = $network->router;
@@ -58,7 +60,7 @@ class Deploy implements ShouldQueue
         Log::info($message . 'DHCP ID: ' . $router->vpc->dhcp->id);
 
         try {
-            $response = $router->availabilityZone->nsxService()->put(
+            $router->availabilityZone->nsxService()->patch(
                 'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id,
                 [
                     'json' => [
@@ -100,20 +102,66 @@ class Deploy implements ShouldQueue
                     $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
                     return;
                 }
-
-                $message = 'Unhandled error response for ' . $network->id;
-                Log::error($message, (array) $error);
-                $network->setSyncFailureReason($message . PHP_EOL . $exception->getResponse()->getBody());
-                $this->fail($exception);
-                return;
             }
-
-            $message = 'Unhandled error for ' . $network->id;
-            Log::error($message, [$exception]);
-            $network->setSyncFailureReason($message . ' : ' . $exception->getMessage());
-            $this->fail($exception);
-            return;
+            throw($exception);
         }
+
+        // Security profile
+        Log::info('Updating security profile');
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-security-profile-binding-maps',
+        );
+        $response = json_decode($response->getBody()->getContents(), true);
+        if (!isset($response['results'][0])) {
+            $response['results'][0] = [
+                'id' => $network->id . '-segment-security-profile-binding-maps',
+            ];
+        }
+        $response['results'][0]['segment_security_profile_path'] = '/infra/segment-security-profiles/ecloud-segment-security-profile';
+        $response['results'][0]['spoofguard_profile_path'] = '/infra/spoofguard-profiles/ecloud-spoofguard-profile';
+        $router->availabilityZone->nsxService()->patch(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-security-profile-binding-maps/' . $response['results'][0]['id'],
+            ['json' => $response['results'][0]]
+        );
+        Log::info('Updated security profile ' . $response['results'][0]['id']);
+
+        // Discovery profile
+        Log::info('Updating discovery profile');
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-discovery-profile-binding-maps',
+        );
+        $response = json_decode($response->getBody()->getContents(), true);
+        if (!isset($response['results'][0])) {
+            $response['results'][0] = [
+                'id' => $network->id . '-segment-discovery-profile-binding-maps',
+            ];
+        }
+        $response['results'][0]['ip_discovery_profile_path'] = '/infra/ip-discovery-profiles/ecloud-ip-discovery-profile';
+        $response['results'][0]['mac_discovery_profile_path'] = '/infra/mac-discovery-profiles/ecloud-mac-discovery-profile';
+        $router->availabilityZone->nsxService()->patch(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-discovery-profile-binding-maps/' . $response['results'][0]['id'],
+            ['json' => $response['results'][0]]
+        );
+        Log::info('Updated discovery profile ' . $response['results'][0]['id']);
+
+        // QOS profile
+        Log::info('Updating QOS profile');
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-qos-profile-binding-maps',
+        );
+        $response = json_decode($response->getBody()->getContents(), true);
+        if (!isset($response['results'][0])) {
+            $response['results'][0] = [
+                'id' => $network->id . '-segment-qos-profile-binding-maps',
+            ];
+        }
+        $response['results'][0]['qos_profile_path'] = '';
+        $router->availabilityZone->nsxService()->patch(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/segment-qos-profile-binding-maps/' . $response['results'][0]['id'],
+            ['json' => $response['results'][0]]
+        );
+        Log::info('Updated QOS profile ' . $response['results'][0]['id']);
+
         $network->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

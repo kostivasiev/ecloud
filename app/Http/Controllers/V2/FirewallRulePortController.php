@@ -81,15 +81,10 @@ class FirewallRulePortController extends BaseController
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $firewallRulePortId
-     * @return JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     */
     public function destroy(Request $request, string $firewallRulePortId)
     {
-        $resource = FirewallRulePort::forUser($request->user)->findOrFail($firewallRulePortId);
-        $resource->delete();
+        FirewallRulePort::forUser($request->user)->findOrFail($firewallRulePortId)
+            ->delete();
         return response(null, 204);
     }
 }

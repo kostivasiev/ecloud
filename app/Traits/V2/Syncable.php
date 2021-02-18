@@ -5,6 +5,7 @@ namespace App\Traits\V2;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
@@ -45,6 +46,7 @@ trait Syncable
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
             Volume::class,
+            NetworkPolicy::class,
         ])) {
             return parent::save($options);
         }
@@ -139,12 +141,15 @@ trait Syncable
 
     public function setSyncFailureReason($value)
     {
+        Log::info(get_class($this) . ' : Setting Sync to failed - Started', ['resource_id' => $this->id]);
         if (!$this->syncs()->count()) {
             return;
         }
         $sync = $this->syncs()->latest()->first();
         $sync->failure_reason = $value;
         $sync->save();
+        Log::debug(get_class($this), ['reason' => $value]);
+        Log::info(get_class($this) . ' : Setting Sync to failed - Finished', ['resource_id' => $this->id]);
     }
 
     public function getSyncFailureReason()
