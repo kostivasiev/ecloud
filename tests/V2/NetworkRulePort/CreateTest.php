@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\V2\NetworkRulePort;
 
 use App\Models\V2\Network;
@@ -17,10 +18,9 @@ class CreateTest extends TestCase
     protected NetworkRule $networkRule;
     protected NetworkRulePort $networkRulePort;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->vpc();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
             'id' => 'net-test',
@@ -40,21 +40,17 @@ class CreateTest extends TestCase
         ]);
     }
 
-    public function testCreateResource()
+    public function testCreate()
     {
-        $this->post(
-            '/v2/network-rule-ports',
-            [
-                'network_rule_id' => 'nr-test',
-                'protocol' => 'TCP',
-                'source' => '443',
-                'destination' => '555',
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->seeInDatabase(
+        $this->post('/v2/network-rule-ports', [
+            'network_rule_id' => 'nr-test',
+            'protocol' => 'TCP',
+            'source' => '443',
+            'destination' => '555',
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase(
             'network_rule_ports',
             [
                 'network_rule_id' => 'nr-test',

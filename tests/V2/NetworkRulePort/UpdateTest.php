@@ -1,8 +1,9 @@
 <?php
+
 namespace Tests\V2\NetworkRulePort;
 
-use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,10 +18,9 @@ class UpdateTest extends TestCase
     protected NetworkRule $networkRule;
     protected NetworkRulePort $networkRulePort;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->vpc();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
             'id' => 'net-test',
@@ -40,31 +40,26 @@ class UpdateTest extends TestCase
         ]);
     }
 
-    public function testUpdateResource()
+    public function testUpdate()
     {
         factory(NetworkRule::class)->create([
             'id' => 'nr-alttest',
             'network_policy_id' => 'np-test',
         ]);
-        $this->patch(
-            '/v2/network-rule-ports/nrp-test',
-            [
-                'network_rule_id' => 'nr-alttest',
-                'source' => '3306',
-                'destination' => '444',
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->seeInDatabase(
+        $this->patch('v2/network-rule-ports/nrp-test', [
+            'network_rule_id' => 'nr-alttest',
+            'source' => '3306',
+            'destination' => '444',
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase(
             'network_rule_ports',
             [
                 'id' => 'nrp-test',
                 'network_rule_id' => 'nr-alttest',
                 'source' => '3306',
                 'destination' => '444',
-
             ],
             'ecloud'
         )->assertResponseStatus(200);

@@ -1,8 +1,9 @@
 <?php
+
 namespace Tests\V2\NetworkRulePort;
 
-use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -20,7 +21,6 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->vpc();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
             'id' => 'net-test',
@@ -40,17 +40,12 @@ class DeleteTest extends TestCase
         ]);
     }
 
-    public function testDeleteResource()
+    public function testDelete()
     {
-        $this->delete(
-            '/v2/network-rule-ports/nrp-test',
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertResponseStatus(204);
-        $networkRulePort = NetworkRulePort::withTrashed()->findOrFail('nrp-test');
-        $this->assertNotNull($networkRulePort->deleted_at);
+        $this->delete('/v2/network-rule-ports/nrp-test', [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(204);
+        $this->assertNotFalse(NetworkRulePort::find('nrp-test'));
     }
 }

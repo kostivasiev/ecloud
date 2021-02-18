@@ -15,14 +15,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class NetworkRule
- * @package App\Models\V2
- * @method static NetworkRule find(string $id)
- * @method static NetworkRule findOrFail(string $id)
- * @method static NetworkRule forUser(mixed $user)
- * @method static NetworkRule get()
- */
 class NetworkRule extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules;

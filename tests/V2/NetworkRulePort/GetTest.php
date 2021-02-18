@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\V2\NetworkRulePort;
 
 use App\Models\V2\Network;
@@ -20,7 +21,6 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->vpc();
         $this->availabilityZone();
         $this->network = factory(Network::class)->create([
             'id' => 'net-test',
@@ -42,13 +42,10 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $this->get(
-            '/v2/network-rule-ports',
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )->seeJson([
+        $this->get('v2/network-rule-ports', [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ])->seeJson([
             'id' => 'nrp-test',
             'network_rule_id' => 'nr-test',
             'protocol' => 'TCP',
@@ -57,15 +54,12 @@ class GetTest extends TestCase
         ])->assertResponseStatus(200);
     }
 
-    public function testGetResource()
+    public function testGet()
     {
-        $this->get(
-            '/v2/network-rule-ports/nrp-test',
-            [
+        $this->get('v2/network-rule-ports/nrp-test', [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
-            ]
-        )->seeJson([
+            ])->seeJson([
             'id' => 'nrp-test',
             'network_rule_id' => 'nr-test',
             'protocol' => 'TCP',

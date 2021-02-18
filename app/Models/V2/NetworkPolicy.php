@@ -13,12 +13,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class NetworkPolicy
- * @package App\Models\V2
- * @method static NetworkPolicy findOrFail(string $networkPolicyId)
- * @method static NetworkPolicy forUser($user)
- */
 class NetworkPolicy extends Model implements Filterable, Sortable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable;

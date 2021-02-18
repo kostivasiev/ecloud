@@ -15,14 +15,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class NetworkRulePort
- * @package App\Models\V2
- * @method static NetworkRulePort find(string $id)
- * @method static NetworkRulePort findOrFail(string $id)
- * @method static NetworkRulePort forUser(mixed $user)
- * @method static NetworkRulePort get()
- */
 class NetworkRulePort extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules;
