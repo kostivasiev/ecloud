@@ -14,54 +14,50 @@ class NetworkRulePortController extends BaseController
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = NetworkRulePort::forUser($request->user);
-
         (new QueryTransformer($request))
             ->config(NetworkRulePort::class)
             ->transform($collection);
-
         return NetworkRulePortResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
-    public function show(Request $request, string $networkRuleId)
+    public function show(Request $request, string $id)
     {
-        return new NetworkRulePortResource(
-            NetworkRulePort::forUser($request->user)->findOrFail($networkRuleId)
-        );
+        return new NetworkRulePortResource(NetworkRulePort::forUser($request->user)->findOrFail($id));
     }
 
     public function store(Create $request)
     {
-        $networkRulePort = app()->make(NetworkRulePort::class);
-        $networkRulePort->fill($request->only([
+        $model = app()->make(NetworkRulePort::class);
+        $model->fill($request->only([
             'network_rule_id',
             'name',
             'protocol',
             'source',
             'destination',
         ]));
-        $networkRulePort->save();
-        return $this->responseIdMeta($request, $networkRulePort->getKey(), 201);
+        $model->save();
+        return $this->responseIdMeta($request, $model->getKey(), 201);
     }
 
-    public function update(Update $request, string $networkRuleId)
+    public function update(Update $request, string $id)
     {
-        $networkRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
-        $networkRulePort->fill($request->only([
+        $model = NetworkRulePort::forUser(app('request')->user)->findOrFail($id);
+        $model->fill($request->only([
             'network_rule_id',
             'name',
             'protocol',
             'source',
             'destination',
         ]));
-        $networkRulePort->save();
-        return $this->responseIdMeta($request, $networkRulePort->getKey(), 200);
+        $model->save();
+        return $this->responseIdMeta($request, $model->getKey(), 200);
     }
 
-    public function destroy(Request $request, string $networkRuleId)
+    public function destroy(Request $request, string $id)
     {
-        NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId)
+        NetworkRulePort::forUser(app('request')->user)->findOrFail($id)
             ->delete();
         return response('', 204);
     }

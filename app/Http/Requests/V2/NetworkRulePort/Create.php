@@ -40,12 +40,12 @@ class Create extends FormRequest
                 'in:TCP,UDP,ICMPv4'
             ],
             'source' => [
-                'required',
+                'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidPortReference()
             ],
             'destination' => [
-                'required',
+                'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidPortReference()
             ],

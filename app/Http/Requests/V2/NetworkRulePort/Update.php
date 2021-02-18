@@ -42,14 +42,12 @@ class Update extends FormRequest
                 'in:TCP,UDP,ICMPv4'
             ],
             'source' => [
-                'sometimes',
-                'required',
+                'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidPortReference()
             ],
             'destination' => [
-                'sometimes',
-                'required',
+                'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidPortReference()
             ],

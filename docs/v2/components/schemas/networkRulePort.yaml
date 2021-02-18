@@ -5,12 +5,14 @@ properties:
     readOnly: true
   name:
     type: string
-    required: true
-    example: 'Port Name'
+    required: false
+    example: '443 to 555'
+    readOnly: false
   network_rule_id:
     type: string
     required: true
     example: nr-4c63cf58
+    readOnly: false
   protocol:
     required: true
     description: The protocol to use for the port map. TCP or UDP.
