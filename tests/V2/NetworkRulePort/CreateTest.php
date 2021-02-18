@@ -57,7 +57,7 @@ class CreateTest extends TestCase
         )->seeInDatabase(
             'network_rule_ports',
             [
-                'network_rule_id' => 'nr-alttest',
+                'network_rule_id' => 'nr-test',
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555',
