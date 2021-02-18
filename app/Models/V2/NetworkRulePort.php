@@ -4,8 +4,10 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -13,35 +15,42 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class NetworkPolicy extends Model implements Filterable, Sortable
+class NetworkRulePort extends Model implements Filterable, Sortable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
-    public string $keyPrefix = 'np';
+    public string $keyPrefix = 'nrp';
 
     public function __construct(array $attributes = [])
     {
-        $this->timestamps = true;
         $this->incrementing = false;
         $this->keyType = 'string';
         $this->connection = 'ecloud';
         $this->fillable = [
             'id',
-            'network_id',
+            'network_rule_id',
             'name',
+            'protocol',
+            'source',
+            'destination',
         ];
         parent::__construct($attributes);
     }
 
-    public function network()
+    public function networkRule(): BelongsTo
     {
-        return $this->belongsTo(Network::class);
+        return $this->belongsTo(NetworkRule::class);
     }
 
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
     public function scopeForUser($query, $user)
     {
         if (!empty($user->resellerId)) {
-            $query->whereHas('network.router.vpc', function ($query) use ($user) {
+            $query->whereHas('networkRule.networkPolicy.network.router.vpc', function ($query) use ($user) {
                 $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
                 if (!empty($resellerId)) {
                     $query->where('reseller_id', '=', $resellerId);
@@ -51,46 +60,38 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         return $query;
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array
-     */
     public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('network_rule_id', Filter::$stringDefaults),
+            $factory->create('protocol', Filter::$stringDefaults),
+            $factory->create('source', Filter::$stringDefaults),
+            $factory->create('destination', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
     }
 
-    /**
-     * @param SortFactory $factory
-     * @return array
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
     public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('id'),
-            $factory->create('network_id'),
             $factory->create('name'),
+            $factory->create('network_rule_id'),
+            $factory->create('protocol'),
+            $factory->create('source'),
+            $factory->create('destination'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
     }
 
-    /**
-     * @param SortFactory $factory
-     * @return array
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('id', 'asc'),
+            $factory->create('name', 'asc'),
         ];
     }
 
@@ -98,8 +99,11 @@ class NetworkPolicy extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
-            'network_id' => 'network_id',
             'name' => 'name',
+            'network_rule_id' => 'network_rule_id',
+            'protocol' => 'protocol',
+            'source' => 'source',
+            'destination' => 'destination',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

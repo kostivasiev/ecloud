@@ -5,6 +5,7 @@ namespace App\Traits\V2;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,9 +41,9 @@ trait Syncable
 
     public function save(array $options = [])
     {
-        // Only do this for Firewall's at the moment
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
+            NetworkPolicy::class,
         ])) {
             return parent::save($options);
         }

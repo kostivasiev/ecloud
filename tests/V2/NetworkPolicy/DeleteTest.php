@@ -10,7 +10,7 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkPolicy $aclPolicy;
+    protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
     public function setUp(): void
@@ -20,7 +20,7 @@ class DeleteTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->aclPolicy = factory(NetworkPolicy::class)->create([
+        $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'network_id' => $this->network->id,
         ]);
     }
@@ -28,14 +28,14 @@ class DeleteTest extends TestCase
     public function testDeleteResource()
     {
         $this->delete(
-            '/v2/network-policies/'.$this->aclPolicy->id,
+            '/v2/network-policies/'.$this->networkPolicy->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(204);
-        $aclPolicy = NetworkPolicy::withTrashed()->findOrFail($this->aclPolicy->id);
+        $aclPolicy = NetworkPolicy::withTrashed()->findOrFail($this->networkPolicy->id);
         $this->assertNotNull($aclPolicy->deleted_at);
     }
 }
