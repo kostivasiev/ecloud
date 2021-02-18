@@ -31,7 +31,7 @@ class Deploy extends Job
             [
                 'json' => [
                     'id' => $this->model->id,
-                    'display_name' => $this->model->name,
+                    'display_name' => $this->model->id,
                     'description' => $this->model->name,
                     'sequence_number' => $this->model->sequence,
                     'rules' => $this->model->firewallRules->map(function ($rule) use ($router) {
@@ -39,7 +39,7 @@ class Deploy extends Job
                             'action' => $rule->action,
                             'resource_type' => 'Rule',
                             'id' => $rule->id,
-                            'display_name' => $rule->name,
+                            'display_name' => $rule->id,
                             'sequence_number' => $rule->sequence,
                             'sources_excluded' => false,
                             'destinations_excluded' => false,

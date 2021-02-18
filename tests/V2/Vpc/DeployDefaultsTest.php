@@ -57,7 +57,7 @@ class DeployDefaultsTest extends TestCase
                 [
                     'json' => [
                         'id' => 'fwp-test-1',
-                        'display_name' => 'Infrastructure',
+                        'display_name' => 'fwp-test-1',
                         'description' => 'Infrastructure',
                         'sequence_number' => 0,
                         'rules' => [
@@ -65,7 +65,7 @@ class DeployDefaultsTest extends TestCase
                                 'action' => 'ALLOW',
                                 'resource_type' => 'Rule',
                                 'id' => 'fwr-test-1',
-                                'display_name' => 'Ping',
+                                'display_name' => 'fwr-test-1',
                                 'sequence_number' => '0',
                                 'sources_excluded' => false,
                                 'destinations_excluded' => false,
@@ -93,7 +93,7 @@ class DeployDefaultsTest extends TestCase
                                 'action' => 'ALLOW',
                                 'resource_type' => 'Rule',
                                 'id' => 'fwr-test-2',
-                                'display_name' => 'DNS',
+                                'display_name' => 'fwr-test-2',
                                 'sequence_number' => '0',
                                 'sources_excluded' => false,
                                 'destinations_excluded' => false,
@@ -129,7 +129,7 @@ class DeployDefaultsTest extends TestCase
                                 'action' => 'ALLOW',
                                 'resource_type' => 'Rule',
                                 'id' => 'fwr-test-3',
-                                'display_name' => 'NTP',
+                                'display_name' => 'fwr-test-3',
                                 'sequence_number' => '0',
                                 'sources_excluded' => false,
                                 'destinations_excluded' => false,
@@ -165,7 +165,7 @@ class DeployDefaultsTest extends TestCase
                                 'action' => 'ALLOW',
                                 'resource_type' => 'Rule',
                                 'id' => 'fwr-test-4',
-                                'display_name' => 'HTTP/S',
+                                'display_name' => 'fwr-test-4',
                                 'sequence_number' => '0',
                                 'sources_excluded' => false,
                                 'destinations_excluded' => false,
@@ -219,7 +219,7 @@ class DeployDefaultsTest extends TestCase
                 [
                     'json' => [
                         'id' => 'fwp-test-2',
-                        'display_name' => 'Remote Access',
+                        'display_name' => 'fwp-test-2',
                         'description' => 'Remote Access',
                         'sequence_number' => 0,
                         'rules' => [
@@ -227,7 +227,7 @@ class DeployDefaultsTest extends TestCase
                                 'action' => 'ALLOW',
                                 'resource_type' => 'Rule',
                                 'id' => 'fwr-test-5',
-                                'display_name' => 'RDP',
+                                'display_name' => 'fwr-test-5',
                                 'sequence_number' => '0',
                                 'sources_excluded' => false,
                                 'destinations_excluded' => false,
@@ -256,7 +256,7 @@ class DeployDefaultsTest extends TestCase
                                 'action' => 'ALLOW',
                                 'resource_type' => 'Rule',
                                 'id' => 'fwr-test-6',
-                                'display_name' => 'SSH',
+                                'display_name' => 'fwr-test-6',
                                 'sequence_number' => '0',
                                 'sources_excluded' => false,
                                 'destinations_excluded' => false,
@@ -310,7 +310,7 @@ class DeployDefaultsTest extends TestCase
                 [
                     'json' => [
                         'id' => 'fwp-test-3',
-                        'display_name' => 'Web Services',
+                        'display_name' => 'fwp-test-3',
                         'description' => 'Web Services',
                         'sequence_number' => 0,
                         'rules' => [
@@ -318,7 +318,7 @@ class DeployDefaultsTest extends TestCase
                                 'action' => 'ALLOW',
                                 'resource_type' => 'Rule',
                                 'id' => 'fwr-test-7',
-                                'display_name' => 'HTTP/S',
+                                'display_name' => 'fwr-test-7',
                                 'sequence_number' => '0',
                                 'sources_excluded' => false,
                                 'destinations_excluded' => false,
