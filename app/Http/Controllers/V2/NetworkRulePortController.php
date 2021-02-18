@@ -11,11 +11,6 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class NetworkRulePortController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = NetworkRulePort::forUser($request->user);
@@ -29,11 +24,6 @@ class NetworkRulePortController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkRuleId
-     * @return NetworkRulePortResource
-     */
     public function show(Request $request, string $networkRuleId)
     {
         return new NetworkRulePortResource(
@@ -41,11 +31,6 @@ class NetworkRulePortController extends BaseController
         );
     }
 
-    /**
-     * @param Create $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function store(Create $request)
     {
         $networkRulePort = app()->make(NetworkRulePort::class);
@@ -60,12 +45,6 @@ class NetworkRulePortController extends BaseController
         return $this->responseIdMeta($request, $networkRulePort->getKey(), 201);
     }
 
-    /**
-     * @param Update $request
-     * @param string $networkRuleId
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function update(Update $request, string $networkRuleId)
     {
         $networkRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
@@ -80,16 +59,10 @@ class NetworkRulePortController extends BaseController
         return $this->responseIdMeta($request, $networkRulePort->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkRuleId
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Exception
-     */
     public function destroy(Request $request, string $networkRuleId)
     {
-        $networkRulePort = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId);
-        $networkRulePort->delete();
+        NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRuleId)
+            ->delete();
         return response('', 204);
     }
 }
