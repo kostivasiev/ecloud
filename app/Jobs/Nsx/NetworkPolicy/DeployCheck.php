@@ -23,7 +23,24 @@ class DeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // @todo DeployCheck implementation goes here
+        // NSX doesn't try to "realise" a NetworkPolicy until it has rules
+        if (!count($this->model->networkRules)) {
+            Log::info('No rules on the policy. Ignoring deploy check and marking policy as in sync');
+            $this->model->setSyncCompleted();
+            return;
+        }
+
+        $response = $this->model->router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/' . $this->model->id
+        );
+        $response = json_decode($response->getBody()->getContents());
+        if ($response->publish_status !== 'REALIZED') {
+            $this->release(static::RETRY_DELAY);
+            Log::info(
+                'Waiting for ' . $this->model->id . ' being deployed, retrying in ' . static::RETRY_DELAY . ' seconds'
+            );
+            return;
+        }
 
         $this->model->setSyncCompleted();
 
