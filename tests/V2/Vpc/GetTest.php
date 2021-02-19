@@ -47,7 +47,7 @@ class GetTest extends TestCase
         ])->assertResponseStatus(200);
     }
 
-    public function testGetCollectionResellerScope()
+    public function testGetCollectionResellerScopeCanSeeVpc()
     {
         $this->get('/v2/vpcs', [
             'X-consumer-custom-id' => '1-0',
@@ -55,10 +55,10 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->vpc->getKey(),
         ])->assertResponseStatus(200);
+    }
 
-
-
-
+    public function testGetCollectionResellerScopeCanNotSeeVpc()
+    {
         $this->get('/v2/vpcs', [
             'X-consumer-custom-id' => '2-0',
             'X-consumer-groups' => 'ecloud.read',
@@ -66,6 +66,7 @@ class GetTest extends TestCase
             'id' => $this->vpc->getKey(),
         ])->assertResponseStatus(200);
     }
+
 
     public function testGetCollectionAdminResellerScope()
     {

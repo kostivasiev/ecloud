@@ -60,7 +60,7 @@ class GetTest extends TestCase
     {
         $this->get('/v2/billing-metrics', [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
+            'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeJson([
                 'id' => $this->billingMetric->id,
