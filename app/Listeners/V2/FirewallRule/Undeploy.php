@@ -23,7 +23,7 @@ class Undeploy implements ShouldQueue
      */
     public function handle(Deleted $event)
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         $firewallRule = $event->model;
 
@@ -31,6 +31,6 @@ class Undeploy implements ShouldQueue
             '/policy/api/v1/infra/domains/default/gateway-policies/' . $firewallRule->firewallPolicy->getKey() . '/rules/' . $firewallRule->getKey()
         );
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }

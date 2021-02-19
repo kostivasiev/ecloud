@@ -260,11 +260,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Deleted
             \App\Events\V2\AvailabilityZone\Deleted::class,
             \App\Events\V2\Nat\Deleted::class,
-            \App\Events\V2\FirewallRule\Deleted::class,
             \App\Events\V2\Vpc\Deleted::class,
             \App\Events\V2\Dhcp\Deleted::class,
             \App\Events\V2\Nic\Deleted::class,
-            \App\Events\V2\FirewallRulePort\Deleted::class,
             \App\Events\V2\FloatingIp\Deleted::class,
             \App\Events\V2\Volume\Deleted::class,
             \App\Events\V2\Network\Deleted::class,

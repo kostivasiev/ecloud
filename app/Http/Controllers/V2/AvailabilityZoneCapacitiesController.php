@@ -77,15 +77,10 @@ class AvailabilityZoneCapacitiesController extends BaseController
         return $this->responseIdMeta($request, $availabilityZoneCapacity->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $capacityId
-     * @return JsonResponse
-     */
     public function destroy(Request $request, string $capacityId)
     {
-        $availabilityZoneCapacity = AvailabilityZoneCapacity::findOrFail($capacityId);
-        $availabilityZoneCapacity->delete();
+        AvailabilityZoneCapacity::findOrFail($capacityId)
+            ->delete();
         return response(null, 204);
     }
 }

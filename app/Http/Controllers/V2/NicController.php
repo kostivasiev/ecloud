@@ -16,11 +16,6 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class NicController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return AnonymousResourceCollection
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = Nic::forUser($request->user());
@@ -32,11 +27,6 @@ class NicController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $nicId
-     * @return NicResource
-     */
     public function show(Request $request, string $nicId)
     {
         return new NicResource(
@@ -44,10 +34,6 @@ class NicController extends BaseController
         );
     }
 
-    /**
-     * @param CreateNicRequest $request
-     * @return JsonResponse
-     */
     public function create(CreateNicRequest $request)
     {
         $nic = new Nic($request->only([
@@ -60,12 +46,6 @@ class NicController extends BaseController
         return $this->responseIdMeta($request, $nic->getKey(), 201);
     }
 
-    /**
-     * @param UpdateNicRequest $request
-     * @param string $nicId
-     * @return JsonResponse
-     * @throws ValidationException
-     */
     public function update(UpdateNicRequest $request, string $nicId)
     {
         $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
@@ -82,11 +62,6 @@ class NicController extends BaseController
         return $this->responseIdMeta($request, $nic->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $nicId
-     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     */
     public function destroy(Request $request, string $nicId)
     {
         $nic = Nic::forUser($request->user())->findOrFail($nicId);

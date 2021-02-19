@@ -14,12 +14,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class NetworkPolicy
- * @package App\Models\V2
- * @method static NetworkPolicy findOrFail(string $aclPolicyId)
- * @method static NetworkPolicy forUser($user)
- */
 class NetworkPolicy extends Model implements Filterable, Sortable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable;
@@ -35,15 +29,9 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         $this->fillable = [
             'id',
             'network_id',
-            'vpc_id',
             'name',
         ];
         parent::__construct($attributes);
-    }
-
-    public function vpc()
-    {
-        return $this->belongsTo(Vpc::class);
     }
 
     public function network()
@@ -56,7 +44,7 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('vpc', function ($query) use ($user) {
+        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
@@ -70,7 +58,6 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('network_id', Filter::$stringDefaults),
-            $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -87,7 +74,6 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('network_id'),
-            $factory->create('vpc_id'),
             $factory->create('name'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -111,7 +97,6 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'network_id' => 'network_id',
-            'vpc_id' => 'vpc_id',
             'name' => 'name',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

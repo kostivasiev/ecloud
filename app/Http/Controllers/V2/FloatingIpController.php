@@ -100,7 +100,6 @@ class FloatingIpController extends BaseController
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 

@@ -13,22 +13,12 @@ use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\VpnResource;
-use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
-/**
- * Class RouterController
- * @package App\Http\Controllers\V2
- */
 class RouterController extends BaseController
 {
-    /**
-     * Get routers collection
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $collection = Router::forUser($request->user());
@@ -42,11 +32,6 @@ class RouterController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $routerId
-     * @return RouterResource
-     */
     public function show(Request $request, string $routerId)
     {
         return new RouterResource(
@@ -54,10 +39,6 @@ class RouterController extends BaseController
         );
     }
 
-    /**
-     * @param CreateRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function create(CreateRequest $request)
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
@@ -65,11 +46,6 @@ class RouterController extends BaseController
         return $this->responseIdMeta($request, $router->getKey(), 201);
     }
 
-    /**
-     * @param UpdateRequest $request
-     * @param string $routerId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(UpdateRequest $request, string $routerId)
     {
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
@@ -80,11 +56,6 @@ class RouterController extends BaseController
         return $this->responseIdMeta($request, $router->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $routerId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $routerId)
     {
         $model = Router::forUser($request->user())->findOrFail($routerId);
@@ -92,20 +63,12 @@ class RouterController extends BaseController
         if (!$model->canDelete()) {
             return $model->getDeletionError();
         }
-
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $routerId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->vpns();
@@ -117,12 +80,6 @@ class RouterController extends BaseController
         ));
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $routerId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function networks(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->networks();
@@ -134,12 +91,6 @@ class RouterController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $routerId
-     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Exception
-     */
     public function configureDefaultPolicies(Request $request, string $routerId)
     {
         $router = Router::forUser($request->user())->findOrFail($routerId);
@@ -151,12 +102,6 @@ class RouterController extends BaseController
         return response(null, 202);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $routerId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function firewallPolicies(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->firewallPolicies();

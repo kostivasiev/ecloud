@@ -112,7 +112,9 @@ class FirewallRuleController extends BaseController
         $firewallRule->save();
 
         if ($request->has('ports')) {
-            $firewallRule->firewallRulePorts->delete();
+            $firewallRule->firewallRulePorts->each(function ($rule) {
+                $rule->delete();
+            });
             foreach ($request->input('ports') as $port) {
                 $port['firewall_rule_id'] = $firewallRule->id;
                 $firewallRulePort = new FirewallRulePort($port);
@@ -123,17 +125,10 @@ class FirewallRuleController extends BaseController
         return $this->responseIdMeta($request, $firewallRule->id, 200);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $firewallRuleId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $firewallRuleId)
     {
-        $item = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
-        if (!$item->delete()) {
-            return $item->getSyncError();
-        }
+        FirewallRule::foruser($request->user())->findOrFail($firewallRuleId)
+            ->delete();
         return response()->json([], 204);
     }
 }

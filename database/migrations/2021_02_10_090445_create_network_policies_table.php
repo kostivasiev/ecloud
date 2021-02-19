@@ -16,7 +16,6 @@ class CreateNetworkPoliciesTable extends Migration
         Schema::connection('ecloud')->create('network_policies', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('network_id');
-            $table->uuid('vpc_id');
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();

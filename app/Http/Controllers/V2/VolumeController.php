@@ -12,27 +12,19 @@ use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
-/**
- * Class VolumeController
- * @package App\Http\Controllers\V2
- */
 class VolumeController extends BaseController
 {
-    /**
-     * Get volumes collection
-     * @param Request $request
-     * @return Response
-     */
     public function index(Request $request)
     {
         if ($request->hasAny([
-            'mounted', 'mounted:eq', 'mounted:neq',
+            'mounted',
+            'mounted:eq',
+            'mounted:neq',
         ])) {
             if ($request->has('mounted') || $request->has('mounted:eq')) {
                 if ($request->has('mounted')) {
@@ -65,11 +57,6 @@ class VolumeController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $volumeId
-     * @return VolumeResource
-     */
     public function show(Request $request, string $volumeId)
     {
         return new VolumeResource(
@@ -77,10 +64,6 @@ class VolumeController extends BaseController
         );
     }
 
-    /**
-     * @param CreateRequest $request
-     * @return JsonResponse|Response
-     */
     public function store(CreateRequest $request)
     {
         if ($request->has('availability_zone_id')) {
@@ -110,11 +93,6 @@ class VolumeController extends BaseController
         return $this->responseIdMeta($request, $volume->getKey(), 201);
     }
 
-    /**
-     * @param UpdateRequest $request
-     * @param string $volumeId
-     * @return JsonResponse|Response
-     */
     public function update(UpdateRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
@@ -151,12 +129,6 @@ class VolumeController extends BaseController
         return $this->responseIdMeta($request, $volume->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $volumeId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
     {
         $collection = Volume::forUser($request->user())->findOrFail($volumeId)->instances();
@@ -168,26 +140,15 @@ class VolumeController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $volumeId
-     * @return Response|\Laravel\Lumen\Http\ResponseFactory
-     */
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
         if (!$volume->delete()) {
             return $volume->getSyncError();
         }
-
         return response(null, 204);
     }
 
-    /**
-     * @param AttachRequest $request
-     * @param string $volumeId
-     * @return Response|\Laravel\Lumen\Http\ResponseFactory
-     */
     public function attachToInstance(AttachRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);

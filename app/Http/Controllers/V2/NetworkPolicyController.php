@@ -11,11 +11,6 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class NetworkPolicyController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = NetworkPolicy::forUser($request->user());
@@ -32,17 +27,12 @@ class NetworkPolicyController extends BaseController
         return new NetworkPolicyResource(NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId));
     }
 
-    /**
-     * @param Create $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Create $request)
     {
         $networkPolicy = app()->make(NetworkPolicy::class);
         $networkPolicy->fill($request->only([
             'name',
             'network_id',
-            'vpc_id'
         ]));
         $networkPolicy->save();
         return $this->responseIdMeta($request, $networkPolicy->getKey(), 201);
@@ -54,7 +44,6 @@ class NetworkPolicyController extends BaseController
         $networkPolicy->fill($request->only([
             'name',
             'network_id',
-            'vpc_id',
         ]));
         $networkPolicy->save();
         return $this->responseIdMeta($request, $networkPolicy->getKey(), 200);
@@ -63,7 +52,9 @@ class NetworkPolicyController extends BaseController
     public function destroy(Request $request, string $networkPolicyId)
     {
         $networkPolicy = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
-        $networkPolicy->delete();
+        if (!$networkPolicy->delete()) {
+            return $networkPolicy->getSyncError();
+        }
         return response('', 204);
     }
 }

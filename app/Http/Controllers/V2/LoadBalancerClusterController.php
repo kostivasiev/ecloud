@@ -70,11 +70,6 @@ class LoadBalancerClusterController extends BaseController
         return $this->responseIdMeta($request, $loadBalancerCluster->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $lbcId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $lbcId)
     {
         LoadBalancerCluster::forUser($request->user())->findOrFail($lbcId)->delete();

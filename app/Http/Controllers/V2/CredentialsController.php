@@ -76,14 +76,10 @@ class CredentialsController extends BaseController
         return $this->responseIdMeta($request, $credential->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $credentialsId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $credentialsId)
     {
-        Credential::findOrFail($credentialsId)->delete();
+        Credential::findOrFail($credentialsId)
+            ->delete();
         return response()->json([], 204);
     }
 }

@@ -165,7 +165,6 @@ class InstanceController extends BaseController
         if (!$instance->delete()) {
             return $instance->getSyncError();
         }
-
         return response('', 204);
     }
 
