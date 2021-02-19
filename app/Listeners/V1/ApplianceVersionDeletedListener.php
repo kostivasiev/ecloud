@@ -44,7 +44,7 @@ class ApplianceVersionDeletedListener
             [
                 'id' => $event->applianceVersion->id,
                 'appliance_id' => $event->applianceVersion->appliance->id,
-                'reseller_id' => $this->request->user->resellerId
+                'reseller_id' => $this->request->user()->resellerId()
             ]
         );
 

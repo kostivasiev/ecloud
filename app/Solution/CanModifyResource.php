@@ -4,13 +4,11 @@ namespace App\Solution;
 
 use App\Models\V1\Solution;
 use App\Solution\Exceptions\InvalidSolutionStateException;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CanModifyResource
 {
     private $solution;
-
-    private $request;
 
     /**
      * List of allowed statuses for a Solution
@@ -22,15 +20,14 @@ class CanModifyResource
     ];
 
 
-    public function __construct(Solution $solution, Request $request = null)
+    public function __construct(Solution $solution)
     {
         $this->solution = $solution;
-        $this->request = empty($request) ? app('request') : $request;
     }
 
     public function validate()
     {
-        if ($this->request->user()->isAdmin()) {
+        if (Auth::user()->isAdmin()) {
             return true;
         }
 

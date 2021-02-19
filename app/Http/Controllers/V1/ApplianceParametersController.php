@@ -124,14 +124,14 @@ class ApplianceParametersController extends BaseController
     /**
      * Update an appliance script parameter
      * @param Request $request
-     * @param $applianceParameterId
+     * @param $parameterId
      * @return \Illuminate\Http\Response
      * @throws BadRequestException
      * @throws DatabaseException
      * @throws ParameterNotFoundException
      * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
      */
-    public function update(Request $request, $applianceParameterId)
+    public function update(Request $request, $parameterId)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException();
@@ -139,14 +139,14 @@ class ApplianceParametersController extends BaseController
 
         $rules = ApplianceParameter::getUpdateRules();
 
-        $request['id'] = $applianceParameterId;
+        $request['id'] = $parameterId;
         $this->validate($request, $rules);
 
         //Do we want to change the Appliance Version the parameter is associated with?
         if ($request->has('version_id')) {
             $applianceParameter = ApplianceParametersController::getApplianceParameterById(
                 $request,
-                $applianceParameterId
+                $parameterId
             );
             //Validate the appliance version exists
             $newApplianceVersion = ApplianceVersionController::getApplianceVersionById(
@@ -176,20 +176,20 @@ class ApplianceParametersController extends BaseController
     /**
      * Delete an appliance script parameter
      * @param Request $request
-     * @param $applianceParameterId
+     * @param $parameterId
      * @return \Illuminate\Http\Response
      * @throws DatabaseException
      * @throws ParameterNotFoundException
      */
-    public function delete(Request $request, $applianceParameterId)
+    public function delete(Request $request, $parameterId)
     {
         if (!$this->isAdmin) {
             throw new ForbiddenException();
         }
-        $request['id'] = $applianceParameterId;
+        $request['id'] = $parameterId;
         $this->validate($request, ['id' => [new IsValidUuid()]]);
 
-        $parameter = static::getApplianceParameterById($request, $applianceParameterId);
+        $parameter = static::getApplianceParameterById($request, $parameterId);
 
         try {
             $parameter->delete();
@@ -203,16 +203,16 @@ class ApplianceParametersController extends BaseController
     /**
      * Load an appliance parameter (by UUID)
      * @param Request $request
-     * @param $applianceParameterId
+     * @param $parameterId
      * @return mixed
      * @throws ParameterNotFoundException
      */
-    public static function getApplianceParameterById(Request $request, $applianceParameterId)
+    public static function getApplianceParameterById(Request $request, $parameterId)
     {
-        $applianceVersion = static::getApplianceParametersQuery($request)->find($applianceParameterId);
+        $applianceVersion = static::getApplianceParametersQuery($request)->find($parameterId);
 
         if (is_null($applianceVersion)) {
-            throw new ParameterNotFoundException("Parameter with ID '$applianceParameterId' was not found", 'id');
+            throw new ParameterNotFoundException("Parameter with ID '$parameterId' was not found", 'id');
         }
 
         return $applianceVersion;

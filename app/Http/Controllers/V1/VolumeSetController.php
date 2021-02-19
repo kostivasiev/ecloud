@@ -52,12 +52,12 @@ class VolumeSetController extends BaseController
      * Show item
      *
      * @param Request $request
-     * @param $id
+     * @param $volumeSetId
      * @return Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $volumeSetId)
     {
-        return $this->respondItem($request, static::getById($request, $id));
+        return $this->respondItem($request, static::getById($request, $volumeSetId));
     }
 
 

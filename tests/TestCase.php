@@ -27,7 +27,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     ];
     public $validWriteHeaders = [
         'X-consumer-custom-id' => '0-0',
-        'X-consumer-groups' => 'ecloud.write',
+        'X-consumer-groups' => 'ecloud.read, ecloud.write',
     ];
 
     /** @var Region */

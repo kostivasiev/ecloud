@@ -22,7 +22,7 @@ class ActiveDirectoryDomainController extends BaseController
     public function index(Request $request)
     {
         $collectionQuery = ActiveDirectoryDomain::query();
-        if (!empty($this->resellerId) || !$this->isAdmin) {
+        if ($request->user()->isScoped()) {
             $collectionQuery->where('ad_domain_reseller_id', $request->user()->resellerId());
         }
 

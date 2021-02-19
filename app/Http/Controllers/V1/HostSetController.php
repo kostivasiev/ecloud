@@ -42,13 +42,13 @@ class HostSetController extends BaseController
      * Show host set item
      *
      * @param Request $request
-     * @param $id
+     * @param $hostSetId
      * @return \Illuminate\http\Response
      * @throws NotFoundException
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $hostSetId)
     {
-        return $this->respondItem($request, static::getById($request, $id));
+        return $this->respondItem($request, static::getById($request, $hostSetId));
     }
 
 
