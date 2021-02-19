@@ -19,6 +19,7 @@ class NetworkRulePort extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
+    const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
     public string $keyPrefix = 'nrp';
 
     public function __construct(array $attributes = [])
