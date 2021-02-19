@@ -84,10 +84,10 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallRule\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
-            \App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
+            \App\Listeners\V2\FirewallRule\UpdateNetworkPolicy::class,
         ],
         \App\Events\V2\FirewallRule\Saved::class => [
-            \App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
+            \App\Listeners\V2\FirewallRule\UpdateNetworkPolicy::class,
         ],
 
         // FirewallRulePort
@@ -150,6 +150,31 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
+
+        // NetworkPolicy
+        \App\Events\V2\NetworkPolicy\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
+        // NetworkRule
+        \App\Events\V2\NetworkRule\Deleted::class => [
+            \App\Listeners\V2\NetworkRule\Undeploy::class,
+            \App\Listeners\V2\BillingMetric\End::class,
+            \App\Listeners\V2\NetworkRule\UpdateNetworkPolicy::class,
+        ],
+        \App\Events\V2\NetworkRule\Saved::class => [
+            \App\Listeners\V2\NetworkRule\UpdateNetworkPolicy::class,
+        ],
+
+        // NetworkRulePort
+        \App\Events\V2\NetworkRulePort\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+            \App\Listeners\V2\NetworkRulePort\UpdateNetworkPolicy::class,
+        ],
+        \App\Events\V2\NetworkRulePort\Saved::class => [
+            \App\Listeners\V2\NetworkRulePort\UpdateNetworkPolicy::class,
+        ],
+
         // Nat
         \App\Events\V2\Nat\Created::class => [
             \App\Listeners\V2\ResourceSync::class,
