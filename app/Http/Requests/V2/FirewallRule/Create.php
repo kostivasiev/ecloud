@@ -48,6 +48,7 @@ class Create extends FormRequest
             'direction' => 'required|string|in:IN,OUT,IN_OUT',
             'enabled' => 'required|boolean',
             'ports' => [
+                'sometimes',
                 'present',
                 'array'
             ],

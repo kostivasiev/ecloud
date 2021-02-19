@@ -41,6 +41,7 @@ class Update extends FormRequest
             'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',
             'enabled' => 'sometimes|required|boolean',
             'ports' => [
+                'sometimes',
                 'present',
                 'array'
             ],
