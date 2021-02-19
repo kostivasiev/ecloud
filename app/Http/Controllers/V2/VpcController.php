@@ -19,7 +19,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
-
 /**
  * Class VpcController
  * @package App\Http\Controllers\V2
