@@ -22,9 +22,9 @@ class NetworkRulePortController extends BaseController
         ));
     }
 
-    public function show(Request $request, string $id)
+    public function show(Request $request, string $networkRulePortId)
     {
-        return new NetworkRulePortResource(NetworkRulePort::forUser($request->user)->findOrFail($id));
+        return new NetworkRulePortResource(NetworkRulePort::forUser($request->user)->findOrFail($networkRulePortId));
     }
 
     public function store(Create $request)
@@ -41,9 +41,9 @@ class NetworkRulePortController extends BaseController
         return $this->responseIdMeta($request, $model->getKey(), 201);
     }
 
-    public function update(Update $request, string $id)
+    public function update(Update $request, string $networkRulePortId)
     {
-        $model = NetworkRulePort::forUser(app('request')->user)->findOrFail($id);
+        $model = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRulePortId);
         $model->fill($request->only([
             'network_rule_id',
             'name',
@@ -55,9 +55,9 @@ class NetworkRulePortController extends BaseController
         return $this->responseIdMeta($request, $model->getKey(), 200);
     }
 
-    public function destroy(Request $request, string $id)
+    public function destroy(Request $request, string $networkRulePortId)
     {
-        NetworkRulePort::forUser(app('request')->user)->findOrFail($id)
+        NetworkRulePort::forUser($request->user())->findOrFail($networkRulePortId)
             ->delete();
         return response('', 204);
     }
