@@ -4,6 +4,7 @@ namespace Tests\V2\NetworkPolicy;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -21,6 +22,16 @@ class UpdateTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
+
+        $mockIds = ['np-test', 'np-zzzxxxyyy'];
+        foreach ($mockIds as $mockId) {
+            $this->nsxServiceMock()->shouldReceive('patch')
+                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/'.$mockId)
+                ->andReturnUsing(function () {
+                    return new Response(200, [], '');
+                });
+        }
+
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => $this->network->id,
@@ -60,12 +71,14 @@ class UpdateTest extends TestCase
     {
         $newNetwork = factory(Network::class)->create([
             'id' => 'net-111aaa222',
+            'router_id' => $this->router()->id,
         ]);
         $newVpc = factory(Vpc::class)->create([
             'id' => 'vpc-new',
             'region_id' => $this->region()->id
         ]);
         factory(NetworkPolicy::class)->create([
+            'id' => 'np-zzzxxxyyy',
             'network_id' => $newNetwork->id,
         ]);
         $this->patch(

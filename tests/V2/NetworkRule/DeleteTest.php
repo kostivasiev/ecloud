@@ -4,6 +4,7 @@ namespace Tests\V2\NetworkRule;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkRule;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -24,6 +25,12 @@ class DeleteTest extends TestCase
             'id' => 'net-abc123xyz',
             'router_id' => $this->router()->id,
         ]);
+
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-abc123xyz')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-abc123xyz',
             'network_id' => $this->network->id,

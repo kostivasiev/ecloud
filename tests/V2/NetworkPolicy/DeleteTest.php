@@ -1,8 +1,9 @@
 <?php
 namespace Tests\V2\NetworkPolicy;
 
-use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -20,7 +21,31 @@ class DeleteTest extends TestCase
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router()->id,
         ]);
+
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->withSomeOfArgs('policy/api/v1/infra/domains/default/security-policies/?include_mark_for_delete_objects=true')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                    ],
+                    'result_count' => 0,
+                    'sort_by' => 'precedence',
+                    'sort_ascending' => true
+                ]));
+            });
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->withSomeOfArgs('policy/api/v1/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
+            'id' => 'np-test',
             'network_id' => $this->network->id,
         ]);
     }
