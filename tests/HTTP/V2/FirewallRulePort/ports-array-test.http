@@ -20,7 +20,7 @@ client.test('Create firewall policy', function () {
 %}
 
 ###
-# Create Rule with empty port array
+# Create Rule with port array
 POST https://{{host}}/v2/firewall-rules
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -34,7 +34,7 @@ Content-Type:  application/json
     "action": "ALLOW",
     "direction": "IN_OUT",
     "enabled": true,
-    "ports": []
+    "ports": [{"protocol": "TCP", "source": "443", "destination": "443"}]
 }
 
 > {%
@@ -42,6 +42,20 @@ client.test('Create firewall rule', function () {
     client.assert(response.status === 201, '201 response not received');
     client.global.set('firewall_rule_id', response.body.data.id);
     client.log('Rule ID: ' + response.body.data.id);
+});
+%}
+
+###
+# Check Rule has ports
+GET https://{{host}}/v2/firewall-rules/{{firewall_rule_id}}/ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Check rule has ports', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.meta.pagination.total === 1, 'Did not receive expected port count. expected = 1, received = ' + response.body.meta.pagination.total);
 });
 %}
 
@@ -70,6 +84,20 @@ client.test('Update firewall rule', function () {
 %}
 
 ###
+# Check Rule still has ports
+GET https://{{host}}/v2/firewall-rules/{{firewall_rule_id}}/ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Check rule has ports', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.meta.pagination.total === 1, 'Did not receive expected port count. expected = 1, received = ' + response.body.meta.pagination.total);
+});
+%}
+
+###
 # PATCH Rule with non-empty port array
 PATCH https://{{host}}/v2/firewall-rules/{{firewall_rule_id}}
 X-consumer-custom-id:  0-0
@@ -90,6 +118,20 @@ Content-Type:  application/json
 > {%
 client.test('Update firewall rule', function () {
     client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+###
+# Check Rule still has ports
+GET https://{{host}}/v2/firewall-rules/{{firewall_rule_id}}/ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Check rule has ports', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.meta.pagination.total === 1, 'Did not receive expected port count. expected = 1, received = ' + response.body.meta.pagination.total);
 });
 %}
 
