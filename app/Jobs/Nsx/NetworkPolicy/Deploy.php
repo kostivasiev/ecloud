@@ -3,7 +3,6 @@
 namespace App\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Job;
-use App\Models\V2\FirewallRulePort;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Support\Facades\Log;
@@ -59,7 +58,7 @@ class Deploy extends Job
                                     return [
                                         'id' => $port->getKey(),
                                         'name' => $port->name,
-                                        'icmp_type' => FirewallRulePort::ICMP_MESSAGE_TYPE_ECHO_REQUEST,
+                                        'icmp_type' => NetworkRulePort::ICMP_MESSAGE_TYPE_ECHO_REQUEST,
                                         'resource_type' => 'ICMPTypeServiceEntry',
                                         'protocol' => 'ICMPv4',
                                     ];
