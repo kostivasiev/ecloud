@@ -50,12 +50,12 @@ class FirewallPolicyController extends BaseController
     /**
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @param string $routerId
+     * @param string $firewallPolicyId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
     {
-        $collection = FirewallPolicy::forUser($request->user())->findOrFail($routerId)->firewallRules();
+        $collection = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)->firewallRules();
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
 

@@ -27,14 +27,9 @@ class NetworkPolicyController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkAclId
-     * @return NetworkPolicyResource
-     */
-    public function show(Request $request, string $networkAclId)
+    public function show(Request $request, string $networkPolicyId)
     {
-        return new NetworkPolicyResource(NetworkPolicy::forUser($request->user())->findOrFail($networkAclId));
+        return new NetworkPolicyResource(NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId));
     }
 
     /**
@@ -53,15 +48,9 @@ class NetworkPolicyController extends BaseController
         return $this->responseIdMeta($request, $networkPolicy->getKey(), 201);
     }
 
-    /**
-     * @param Update $request
-     * @param string $networkAclId
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
-    public function update(Update $request, string $networkAclId)
+    public function update(Update $request, string $networkPolicyId)
     {
-        $networkPolicy = NetworkPolicy::forUser(Auth::user())->findOrFail($networkAclId);
+        $networkPolicy = NetworkPolicy::forUser(Auth::user())->findOrFail($networkPolicyId);
         $networkPolicy->fill($request->only([
             'name',
             'network_id',
@@ -71,15 +60,9 @@ class NetworkPolicyController extends BaseController
         return $this->responseIdMeta($request, $networkPolicy->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkAclId
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     * @throws \Exception
-     */
-    public function destroy(Request $request, string $networkAclId)
+    public function destroy(Request $request, string $networkPolicyId)
     {
-        $networkPolicy = NetworkPolicy::forUser($request->user())->findOrFail($networkAclId);
+        $networkPolicy = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
         $networkPolicy->delete();
         return response('', 204);
     }

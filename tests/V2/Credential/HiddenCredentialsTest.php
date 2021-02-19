@@ -106,7 +106,7 @@ class HiddenCredentialsTest extends TestCase
             '/v2/credentials/' . $this->credentials->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
             'is_hidden' => true,
@@ -119,7 +119,7 @@ class HiddenCredentialsTest extends TestCase
             '/v2/instances/' . $this->instance->getKey() . '/credentials',
             [
                 'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )->dontSeeJson([
             'is_hidden' => true,

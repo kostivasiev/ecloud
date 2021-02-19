@@ -82,12 +82,12 @@ class VpcSupportController extends BaseController
 
     /**
      * @param Request $request
-     * @param string $vpcId
+     * @param string $vpcSupportId
      * @return Response|\Laravel\Lumen\Http\ResponseFactory
      */
-    public function destroy(Request $request, string $vpcId)
+    public function destroy(Request $request, string $vpcSupportId)
     {
-        VpcSupport::forUser($request->user())->findOrFail($vpcId)->delete();
+        VpcSupport::forUser($request->user())->findOrFail($vpcSupportId)->delete();
         return response(null, 204);
     }
 }
