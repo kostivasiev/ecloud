@@ -101,7 +101,6 @@ class Vpc extends Model implements Filterable, Sortable
         if (!$user->isScoped()) {
             return $query;
         }
-        exit(var_dump($user->resellerId()));
         return $query->where('reseller_id', '=', $user->resellerId());
     }
 

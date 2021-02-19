@@ -59,18 +59,12 @@ class GetTest extends TestCase
 
 
 
-        $res = $this->get('/v2/vpcs', [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write'
-        ]);
-
-        exit(print_r(
-            $res->response
-        ));
-
-//        ->dontSeeJson([
-//            'id' => $this->vpc->getKey(),
-//        ])->assertResponseStatus(200);
+        $this->get('/v2/vpcs', [
+            'X-consumer-custom-id' => '2-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ])->dontSeeJson([
+            'id' => $this->vpc->getKey(),
+        ])->assertResponseStatus(200);
     }
 
     public function testGetCollectionAdminResellerScope()

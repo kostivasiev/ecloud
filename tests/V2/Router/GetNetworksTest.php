@@ -23,6 +23,7 @@ class GetNetworksTest extends TestCase
     protected Router $router;
     protected Vpc $vpc;
     protected Vpn $vpn;
+    protected AvailabilityZone $availabilityZone;
 
     public function setUp(): void
     {
@@ -37,7 +38,8 @@ class GetNetworksTest extends TestCase
             'region_id' => $this->region->getKey()
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->vpn = factory(Vpn::class)->create([
             'router_id' => $this->router->id,
