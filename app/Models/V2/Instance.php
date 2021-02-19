@@ -104,7 +104,7 @@ class Instance extends Model implements Filterable, Sortable
 
     public function volumes()
     {
-        return $this->belongsToMany(Volume::class);
+        return $this->belongsToMany(Volume::class)->using(InstanceVolume::class);
     }
 
     public function scopeForUser($query, $user)

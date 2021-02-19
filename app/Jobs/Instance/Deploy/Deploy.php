@@ -35,22 +35,26 @@ class Deploy extends Job
         }
 
         /** @var Response $deployResponse */
-        $deployResponse = $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/fromtemplate',
-            [
-                'json' => [
-                    'templateName' => $instance->applianceVersion->appliance_version_vm_template,
-                    'instanceId' => $instance->getKey(),
-                    'numCPU' => $instance->vcpu_cores,
-                    'ramMib' => $instance->ram_capacity,
-                    'resourceTierTags' => config('instance.resource_tier_tags')
+        try {
+            $deployResponse = $instance->availabilityZone->kingpinService()->post(
+                '/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/fromtemplate',
+                [
+                    'json' => [
+                        'templateName' => $instance->applianceVersion->appliance_version_vm_template,
+                        'instanceId' => $instance->getKey(),
+                        'numCPU' => $instance->vcpu_cores,
+                        'ramMib' => $instance->ram_capacity,
+                        'resourceTierTags' => config('instance.resource_tier_tags')
+                    ]
                 ]
-            ]
-        );
+            );
 
-        $deployResponse = json_decode($deployResponse->getBody()->getContents());
-        if (!$deployResponse) {
-            throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+            $deployResponse = json_decode($deployResponse->getBody()->getContents());
+            if (!$deployResponse) {
+                throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+            }
+        } catch (\Exception $exception) {
+            exit(print_r($exception->getResponse()->getBody()->getContents()));
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

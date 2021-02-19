@@ -65,7 +65,7 @@ class Volume extends Model implements Filterable, Sortable
 
     public function instances()
     {
-        return $this->belongsToMany(Instance::class);
+        return $this->belongsToMany(Instance::class)->using(InstanceVolume::class);
     }
 
     /**
