@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Jobs\Sync\Instance;
+namespace App\Jobs\Kingpin\Instance;
 
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Instance\Undeploy;
-use App\Jobs\Kingpin\Instance\UndeployCheck;
 use App\Models\V2\Instance;
 use Illuminate\Support\Facades\Log;
 
-class Delete extends Job
+class UndeployCheck extends Job
 {
+    const RETRY_DELAY = 5;
+
+    public $tries = 500;
+
     /** @var Instance */
     private $model;
 
@@ -22,12 +24,10 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        $jobs = [
-            new Undeploy($this->model),
-            new UndeployCheck($this->model),
-        ];
+        // TODO :- Undeploy
 
-        dispatch(array_shift($jobs)->chain($jobs));
+        $this->model->setSyncCompleted();
+        $this->model->syncDelete();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

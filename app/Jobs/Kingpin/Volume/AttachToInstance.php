@@ -1,5 +1,5 @@
 <?php
-namespace App\Jobs\Volume;
+namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;

@@ -77,12 +77,6 @@ class AttachVolumeTest extends TestCase
             });
     }
 
-    protected function tearDown(): void
-    {
-        \Mockery::close();
-        parent::tearDown();
-    }
-
     public function testAttachingVolumeAndSettingIops()
     {
         $this->assertEquals(

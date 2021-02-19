@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Jobs\VmWare\Instance;
+namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
+use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
 class UndeployCheck extends Job
@@ -12,10 +12,10 @@ class UndeployCheck extends Job
 
     public $tries = 500;
 
-    /** @var Instance */
+    /** @var Volume */
     private $model;
 
-    public function __construct(Instance $model)
+    public function __construct(Volume $model)
     {
         $this->model = $model;
     }
@@ -24,7 +24,7 @@ class UndeployCheck extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // TODO :- Undeploy
+        // TODO :- Undeploy Volume
 
         $this->model->setSyncCompleted();
         $this->model->syncDelete();

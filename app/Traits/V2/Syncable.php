@@ -51,6 +51,7 @@ trait Syncable
             return parent::save($options);
         }
 
+        $originalValues = $this->getOriginal();
         $response = parent::save($options);
         if (!$response) {
             Log::error(get_class($this) . ' : Failed to save', ['resource_id' => $this->id]);
@@ -67,7 +68,7 @@ trait Syncable
             return false;
         }
 
-        dispatch(new $class($this));
+        dispatch(new $class($this, $originalValues));
 
         return $response;
     }

@@ -32,11 +32,6 @@ class DeployDefaultsTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
-    {
-        \Mockery::close();
-    }
-
     public function testInvalidVpcId()
     {
         $this->post('/v2/vpcs/x/deploy-defaults', [], [
