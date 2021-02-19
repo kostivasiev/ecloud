@@ -48,6 +48,11 @@ class NetworkRule extends Model implements Filterable, Sortable
         return $this->belongsTo(NetworkPolicy::class);
     }
 
+    public function networkRulePorts()
+    {
+        return $this->hasMany(NetworkRulePort::class);
+    }
+
     /**
      * @param $query
      * @param $user
