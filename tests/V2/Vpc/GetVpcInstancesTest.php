@@ -16,14 +16,10 @@ class GetVpcInstancesTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $instance = $this->instance();
-    }
-
     public function testInstancesCollection()
     {
+        $instance = $this->instance();
+
         $this->get(
             '/v2/vpcs/'.$this->vpc()->getKey().'/instances',
             [
@@ -32,10 +28,10 @@ class GetVpcInstancesTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'       => $this->instances[0]->id,
-                'name'     => $this->instances[0]->name,
-                'vpc_id'   => $this->instances[0]->vpc_id,
-                'platform' => $this->instances[0]->platform,
+                'id'       => $instance->id,
+                'name'     => $instance->name,
+                'vpc_id'   => $instance->vpc_id,
+                'platform' => $instance->platform,
             ])
             ->assertResponseStatus(200);
     }

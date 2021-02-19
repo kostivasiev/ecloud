@@ -22,9 +22,9 @@ class BillingMetricController extends BaseController
         ));
     }
 
-    public function show(Request $request, string $modelId)
+    public function show(Request $request, string $billingMetricId)
     {
-        return new BillingMetricResource(BillingMetric::forUser($request->user())->findOrFail($modelId));
+        return new BillingMetricResource(BillingMetric::forUser($request->user())->findOrFail($billingMetricId));
     }
 
     public function create(CreateRequest $request)
@@ -44,9 +44,9 @@ class BillingMetricController extends BaseController
         return $this->responseIdMeta($request, $model->getKey(), 201);
     }
 
-    public function update(UpdateRequest $request, string $modelId)
+    public function update(UpdateRequest $request, string $billingMetricId)
     {
-        $model = BillingMetric::forUser(Auth::user())->findOrFail($modelId);
+        $model = BillingMetric::forUser(Auth::user())->findOrFail($billingMetricId);
         $model->fill($request->only([
             'resource_id',
             'vpc_id',
@@ -62,9 +62,9 @@ class BillingMetricController extends BaseController
         return $this->responseIdMeta($request, $model->getKey(), 200);
     }
 
-    public function destroy(Request $request, string $modelId)
+    public function destroy(Request $request, string $billingMetricId)
     {
-        $model = BillingMetric::forUser($request->user())->findOrFail($modelId);
+        $model = BillingMetric::forUser($request->user())->findOrFail($billingMetricId);
         $model->delete();
         return response()->json([], 204);
     }

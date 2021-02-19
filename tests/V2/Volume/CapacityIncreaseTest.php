@@ -2,14 +2,8 @@
 
 namespace Tests\V2\Volume;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Region;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
 use App\Rules\V2\VolumeCapacityIsGreater;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -18,40 +12,22 @@ class CapacityIncreaseTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $availabilityZone;
-    protected $instance;
-    protected $region;
     protected $volume;
-    protected $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc()->getKey()
         ]);
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'name' => 'GetTest Default',
-        ]);
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('put')
-            ->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey().'/volume/'.
+
+        $this->kingpinServiceMock()->shouldReceive('put')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->getKey() . '/instance/' . $this->instance()->getKey() . '/volume/'.
                         $this->volume->vmware_uuid.'/size'])
             ->andReturn(
                 new Response(200)
             );
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
     }
 
     public function testIncreaseSize()

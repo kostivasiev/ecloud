@@ -95,7 +95,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Hosts - Admin
     $router->group([
         'middleware' => [
-            'is-administrator',
+            'is-admin',
         ],
     ], function () use ($router) {
         $router->get(
@@ -149,7 +149,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Pod resource - Admin
     $router->group([
         'middleware' => [
-            'is-administrator',
+            'is-admin',
         ],
     ], function () use ($router) {
         $router->get('pods/{pod_id}/resources', 'PodController@resource');
@@ -183,7 +183,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     // Appliance Versions Data - Admin
     $router->group([
         'middleware' => [
-            'is-administrator',
+            'is-admin',
             \App\Http\Middleware\Appliance\Version::class,
         ],
     ], function () use ($router) {
@@ -239,7 +239,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         /**
          * Base middleware + reseller ID scope + is-administrator
          */
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
 
         });
     });
@@ -249,7 +249,7 @@ $router->group($baseRouteParameters, function () use ($router) {
      * Base middleware + is-administrator
      */
 
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         // Datastores
         $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand');
         $router->post('datastores', 'DatastoreController@create');
@@ -293,7 +293,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
 // Public Support
 $router->group($baseRouteParameters, function () use ($router) {
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('support', 'PublicSupportController@index');
         $router->post('support', 'PublicSupportController@store');
         $router->get('support/{id}', [

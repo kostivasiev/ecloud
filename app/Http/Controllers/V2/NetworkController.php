@@ -187,12 +187,12 @@ class NetworkController extends BaseController
     /**
      * @param \Illuminate\Http\Request $request
      * @param QueryTransformer $queryTransformer
-     * @param string $zoneId
+     * @param string $networkId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function nics(Request $request, QueryTransformer $queryTransformer, string $networkId)
     {
-        $collection = Network::forUser($request->user())->findOrFail($zoneId)->nics();
+        $collection = Network::forUser($request->user())->findOrFail($networkId)->nics();
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 

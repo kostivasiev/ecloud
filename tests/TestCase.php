@@ -8,6 +8,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -67,6 +68,11 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
      * @var Appliance
      */
     private $appliance;
+
+    /**
+     * @var Network
+     */
+    private $network;
 
     /**
      * Creates the application.
@@ -169,16 +175,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->credential;
     }
 
-    public function appliance()
-    {
-        if (!$this->appliance) {
-            $this->appliance = factory(Appliance::class)->create([
-                'appliance_name' => 'Test Appliance',
-            ]);
-        }
-        return $this->appliance;
-    }
-
     public function applianceVersion()
     {
         if (!$this->applianceVersion) {
@@ -189,10 +185,20 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->applianceVersion;
     }
 
+    public function appliance()
+    {
+        if (!$this->appliance) {
+            $this->appliance = factory(Appliance::class)->create([
+                'appliance_name' => 'Test Appliance',
+            ])->refresh();
+        }
+        return $this->appliance;
+    }
+
     public function instance()
     {
         if (!$this->instance) {
-            $this->instances = factory(Instance::class, 4)->create([
+            $this->instance = factory(Instance::class)->create([
                 'vpc_id' => $this->vpc()->getKey(),
                 'name' => 'Test Instance ' . uniqid(),
                 'appliance_version_id' => $this->applianceVersion()->uuid,
@@ -203,6 +209,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->instance;
+    }
+
+    public function network()
+    {
+        if (!$this->network) {
+            $this->network = factory(Network::class)->create([
+                'name' => 'Manchester Network',
+                'router_id' => $this->router()->id
+            ]);
+        }
+        return $this->network;
     }
 
     protected function setUp(): void

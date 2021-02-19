@@ -6,19 +6,12 @@ use App\Http\Requests\V2\FirewallRulePort\Create;
 use App\Http\Requests\V2\FirewallRulePort\Update;
 use App\Models\V2\FirewallRulePort;
 use App\Resources\V2\FirewallRulePortResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallRulePortController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return AnonymousResourceCollection
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = FirewallRulePort::forUser($request->user());
@@ -30,22 +23,13 @@ class FirewallRulePortController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $nicId
-     * @return FirewallRulePortResource
-     */
-    public function show(Request $request, string $nicId)
+    public function show(Request $request, string $firewallRulePortId)
     {
         return new FirewallRulePortResource(
-            FirewallRulePort::forUser($request->user())->findOrFail($nicId)
+            FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId)
         );
     }
 
-    /**
-     * @param Create $request
-     * @return JsonResponse
-     */
     public function store(Create $request)
     {
         $resource = new FirewallRulePort($request->only([
@@ -59,11 +43,6 @@ class FirewallRulePortController extends BaseController
         return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
 
-    /**
-     * @param Update $request
-     * @param string $firewallRulePortId
-     * @return JsonResponse
-     */
     public function update(Update $request, string $firewallRulePortId)
     {
         $resource = FirewallRulePort::forUser(Auth::user())->findOrFail($firewallRulePortId);
@@ -82,11 +61,6 @@ class FirewallRulePortController extends BaseController
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $firewallRulePortId
-     * @return JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     */
     public function destroy(Request $request, string $firewallRulePortId)
     {
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);

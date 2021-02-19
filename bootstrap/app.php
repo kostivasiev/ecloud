@@ -83,7 +83,6 @@ $app->routeMiddleware([
     'is-admin' => \UKFast\Api\Auth\Middleware\IsAdmin::class,
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
-    'is-administrator' => \App\Http\Middleware\IsAdministrator::class,
     'is-locked' => \App\Http\Middleware\IsLocked::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
     'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class

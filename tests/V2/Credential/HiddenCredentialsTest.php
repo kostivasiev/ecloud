@@ -116,7 +116,7 @@ class HiddenCredentialsTest extends TestCase
     public function testUserCannotSeeHiddenFlag()
     {
         $this->get(
-            '/v2/instances/'.$this->instance->getKey().'/credentials',
+            '/v2/instances/' . $this->instance->getKey() . '/credentials',
             [
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
