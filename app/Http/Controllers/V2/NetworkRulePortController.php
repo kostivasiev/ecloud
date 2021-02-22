@@ -7,6 +7,7 @@ use App\Http\Requests\V2\NetworkRulePort\Update;
 use App\Models\V2\NetworkRulePort;
 use App\Resources\V2\NetworkRulePortResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class NetworkRulePortController extends BaseController
@@ -43,7 +44,7 @@ class NetworkRulePortController extends BaseController
 
     public function update(Update $request, string $networkRulePortId)
     {
-        $model = NetworkRulePort::forUser(app('request')->user)->findOrFail($networkRulePortId);
+        $model = NetworkRulePort::forUser(Auth::user())->findOrFail($networkRulePortId);
         $model->fill($request->only([
             'network_rule_id',
             'name',
