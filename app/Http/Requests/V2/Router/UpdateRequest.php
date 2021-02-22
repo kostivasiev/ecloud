@@ -28,15 +28,10 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $availabilityZoneId = null;
-        if ($this->request->has('availability_zone_id')) {
-            $availabilityZoneId = $this->request->get('availability_zone_id');
-        }
-        if (empty($availabilityZoneId)) {
-            $router = Router::forUser(app('request')->user)->find(Request::route('routerId'));
-            if (!empty($router)) {
-                $availabilityZoneId = $router->availability_zone_id;
-            }
+        $availabilityZoneId = '';
+        $router = Router::forUser(app('request')->user)->find(Request::route('routerId'));
+        if (!empty($router)) {
+            $availabilityZoneId = $router->availability_zone_id;
         }
 
         return [
@@ -46,14 +41,6 @@ class UpdateRequest extends FormRequest
                 'required',
                 new ExistsForAvailabilityZone($availabilityZoneId)
             ],
-            'vpc_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class)
-            ],
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
 
