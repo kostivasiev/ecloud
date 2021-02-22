@@ -33,7 +33,7 @@
     "ukfast/api-resources": "^4.2",
     "ukfast/api-validation": "~1.0",
     "ukfast/ditto": "^4.8",
-    "ukfast/form-requests": "^0.1.1",
+    "ukfast/form-requests": "^1.1",
     "ukfast/health-check": "~1.0",
     "ukfast/log-provider": "~2.0",
     "ukfast/responses": "~1.0",

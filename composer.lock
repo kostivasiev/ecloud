@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bbf7d6352e48d36a062226b369f496c3",
+    "content-hash": "6178a240731cbadcb7534f153223966b",
     "packages": [
         {
             "name": "cebe/php-openapi",
@@ -5766,11 +5766,11 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v1.15.5",
+            "version": "v1.15.7",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "86c2444db6e1b0eb7341fe7d54336917fcacc13e"
+                "reference": "85a6b9466f0490714e772668b0b8cfa0f13430fa"
             },
             "require": {
                 "ext-json": "*",
@@ -5801,7 +5801,7 @@
             "support": {
                 "email": "developers@ukfast.co.uk"
             },
-            "time": "2021-02-01T14:46:19+00:00"
+            "time": "2021-02-19T10:27:50+00:00"
         },
         {
             "name": "ukfast/api-auth",
@@ -6183,15 +6183,15 @@
         },
         {
             "name": "ukfast/form-requests",
-            "version": "v0.1.1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/form-requests.git",
-                "reference": "fcd4105fa594ce119f868ac04fd4fb9b9a2fafe4"
+                "reference": "b40edd40fb4ca78e99eb340b2449817ad088ddca"
             },
             "require": {
-                "illuminate/http": "^5.6|^6.0|^7.0",
-                "illuminate/support": "^5.6|^6.0|^7.0"
+                "illuminate/http": "^5.6|^6.0|^7.0|^8.0",
+                "illuminate/support": "^5.6|^6.0|^7.0|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -6205,15 +6205,12 @@
             "authors": [
                 {
                     "name": "George Kelly",
-                    "email": "george.kelly@ukfast.co.uk"
-                },
-                {
-                    "name": "Moien Ilyas",
-                    "email": "moien.ilyas@ukfast.co.uk"
+                    "email": "george.kelly@ukfast.co.uk",
+                    "role": "Author"
                 }
             ],
             "description": "Patches form requests into lumen along with some extra ukfast functionality",
-            "time": "2020-04-09T07:47:46+00:00"
+            "time": "2020-10-19T12:53:38+00:00"
         },
         {
             "name": "ukfast/health-check",
