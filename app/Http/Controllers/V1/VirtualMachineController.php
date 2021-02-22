@@ -661,7 +661,7 @@ class VirtualMachineController extends BaseController
             'netbios' => $request->input('computername'),
 
             'submitted_by_type' => 'API Client',
-            'submitted_by_id' => $request->user->applicationId,
+            'submitted_by_id' => $request->user()->applicationId(),
             'launched_by' => '-5',
         );
 

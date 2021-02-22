@@ -14,7 +14,7 @@ class NetworkRulePortController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = NetworkRulePort::forUser($request->user);
+        $collection = NetworkRulePort::forUser($request->user());
         (new QueryTransformer($request))
             ->config(NetworkRulePort::class)
             ->transform($collection);
@@ -25,7 +25,7 @@ class NetworkRulePortController extends BaseController
 
     public function show(Request $request, string $networkRulePortId)
     {
-        return new NetworkRulePortResource(NetworkRulePort::forUser($request->user)->findOrFail($networkRulePortId));
+        return new NetworkRulePortResource(NetworkRulePort::forUser($request->user())->findOrFail($networkRulePortId));
     }
 
     public function store(Create $request)

@@ -248,7 +248,7 @@ class TagController extends BaseController
         $tag->metadata_resource_id = $virtualMachine->getKey();
         $tag->metadata_created = date('Y-m-d H:i:s');
         $tag->metadata_createdby = 'API Client';
-        $tag->metadata_createdby_id = $request->user->applicationId;
+        $tag->metadata_createdby_id = $request->user()->applicationId();
 
         if (!$tag->save()) {
             // todo log and error
