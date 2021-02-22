@@ -73,8 +73,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('solutions/{solutionId}/networks', 'SolutionNetworkController@getSolutionNetworks');
     $router->get('solutions/{solutionId}/firewalls', 'FirewallController@getSolutionFirewalls');
     $router->get('solutions/{solutionId}/templates', 'TemplateController@indexSolutionTemplate');
-    $router->get('solutions/{solutionId}/templates/{template_name}', 'TemplateController@showSolutionTemplate');
-    $router->post('solutions/{solutionId}/templates/{template_name}/move',
+    $router->get('solutions/{solutionId}/templates/{templateName}', 'TemplateController@showSolutionTemplate');
+    $router->post('solutions/{solutionId}/templates/{templateName}/move',
         'TemplateController@renameSolutionTemplate');
     $router->delete('solutions/{solutionId}/templates/{templateName}', 'TemplateController@deleteSolutionTemplate');
 
