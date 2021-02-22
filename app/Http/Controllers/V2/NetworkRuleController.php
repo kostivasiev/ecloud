@@ -13,7 +13,7 @@ class NetworkRuleController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = NetworkRule::forUser($request->user);
+        $collection = NetworkRule::forUser($request->user());
 
         (new QueryTransformer($request))
             ->config(NetworkRule::class)
@@ -26,7 +26,7 @@ class NetworkRuleController extends BaseController
 
     public function show(Request $request, string $networkRuleId)
     {
-        return new NetworkRuleResource(NetworkRule::forUser($request->user)->findOrFail($networkRuleId));
+        return new NetworkRuleResource(NetworkRule::forUser($request->user())->findOrFail($networkRuleId));
     }
 
     public function store(Create $request)
