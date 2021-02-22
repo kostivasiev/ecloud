@@ -115,7 +115,7 @@ class Vpc extends Model implements Filterable, Sortable
             return false;
         }
 
-        foreach ($this->vpcSupports() as $support) {
+        foreach ($this->vpcSupports as $support) {
             if ($support->active) {
                 return true;
             }
