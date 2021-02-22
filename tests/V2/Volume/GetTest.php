@@ -15,17 +15,9 @@ class GetTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
-
     protected $vpc;
-
-    /**
-     * @var AvailabilityZone
-     */
-    private $availabilityZone;
-
-    /**
-     * @var Volume
-     */
+    protected $region;
+    protected $availabilityZone;
     protected $volume;
 
     public function setUp(): void
