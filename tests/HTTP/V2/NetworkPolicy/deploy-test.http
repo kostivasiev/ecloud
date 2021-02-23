@@ -66,6 +66,85 @@ client.test('Create a Network Policy', function () {
 });
 %}
 
+###
+# Create a Rule
+POST https://{{host}}/{{version}}/network-rules
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "network_policy_id": "{{network_policy_id}}",
+    "sequence": 1,
+    "source": "10.0.1.0/32",
+    "destination": "10.0.2.0/32",
+    "action": "ALLOW",
+    "enabled": true
+}
+
+> {%
+client.test('Create a Network Rule', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('network_rule_id', response.body.data.id);
+    client.log('Rule ID: ' + response.body.data.id);
+});
+%}
+
+###
+# Create a Rule Port
+POST https://{{host}}/{{version}}/network-rule-ports
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "network_rule_id": "{{network_rule_id}}",
+    "protocol": "TCP",
+    "source": "443",
+    "destination": "555"
+}
+
+> {%
+client.test('Create a Network Rule Port', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('network_port_id', response.body.data.id);
+    client.log('Port ID: ' + response.body.data.id);
+});
+%}
+
+###
+# CLEANUP - DELETE Rule Port
+DELETE https://{{host}}/{{version}}/network-rule-ports/{{network_port_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('CLEANUP - Delete Rule Port', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+###
+# CLEANUP - DELETE Network Rule
+DELETE https://{{host}}/{{version}}/network-rules/{{network_rule_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('CLEANUP - Delete Network Rule', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
 
 ###
 # CLEANUP - DELETE Network Policy
