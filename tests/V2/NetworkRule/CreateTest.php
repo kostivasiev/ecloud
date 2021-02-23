@@ -15,7 +15,7 @@ class CreateTest extends TestCase
     protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         $this->vpc();
@@ -24,6 +24,15 @@ class CreateTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
 
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-abc123xyz')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(
+                    [
+                        'publish_status' => 'REALIZED'
+                    ]
+                ));
+            });
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-abc123xyz')
             ->andReturnUsing(function () {
