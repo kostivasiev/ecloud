@@ -44,14 +44,14 @@ class GpuProfileController extends BaseController
      * Show item
      *
      * @param Request $request
-     * @param $id
+     * @param $profileId
      * @return \Illuminate\http\Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $profileId)
     {
         return $this->respondItem(
             $request,
-            static::getById($request, $id),
+            static::getById($request, $profileId),
             200,
             null,
             [],

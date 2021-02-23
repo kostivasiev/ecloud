@@ -28,7 +28,7 @@ class DatastoreResource extends CustomResource
         // return additional admin properties if required
         // Auth::user()->isAdmin()
         // $request->user()
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $visible = array_merge(
                 $visible,
                 Datastore::$adminProperties
@@ -55,7 +55,7 @@ class DatastoreResource extends CustomResource
                 ]);
             }
 
-            if ($request->user->isAdministrator) {
+            if ($request->user()->isAdmin()) {
                 $iops = null;
                 try {
                     $volumeSet = $this->resource->volumeSet();

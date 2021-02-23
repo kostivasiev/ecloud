@@ -4,6 +4,7 @@ namespace App\Rules\V2;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class VolumeNotAttached implements Rule
 {
@@ -16,7 +17,7 @@ class VolumeNotAttached implements Rule
 
     public function passes($attribute, $value)
     {
-        $instance = Instance::forUser(app('request')->user)->findOrFail($value);
+        $instance = Instance::forUser(Auth::user())->findOrFail($value);
         if ($instance->volumes()->count() == 0) {
             return true;
         }

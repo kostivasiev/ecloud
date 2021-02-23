@@ -18,6 +18,7 @@ class Appliance extends Model
     protected $connection = 'ecloud';
     protected $table = 'appliance';
     protected $primaryKey = 'appliance_uuid';
+    protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = true;
 

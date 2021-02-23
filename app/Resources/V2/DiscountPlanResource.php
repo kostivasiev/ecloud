@@ -35,7 +35,7 @@ class DiscountPlanResource extends UKFastResource
             )->toIso8601String(),
         ];
 
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data = $data + [
                 'contact_id' => $this->contact_id,
                 'employee_id' => $this->employee_id,

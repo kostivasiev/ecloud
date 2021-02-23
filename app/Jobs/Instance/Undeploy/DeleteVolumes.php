@@ -19,7 +19,7 @@ class DeleteVolumes extends Job
     {
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
-        $instance->volumes()->whereNotNull('vmware_uuid')->each(function ($volume) use ($instance) {
+        $instance->volumes()->each(function ($volume) use ($instance) {
             $instance->volumes()->detach($volume);
             if ($volume->instances()->count() == 0) {
                 $volume->delete();

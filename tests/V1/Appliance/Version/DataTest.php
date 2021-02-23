@@ -25,7 +25,7 @@ class DataTest extends TestCase
 
     const HEADERS_ADMIN = [
         'X-consumer-custom-id' => '0-0',
-        'X-consumer-groups' => 'ecloud.write',
+        'X-consumer-groups' => 'ecloud.read, ecloud.write',
     ];
 
     /**
@@ -330,7 +330,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
             [],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_NOT_FOUND);
+        )->seeStatusCode(404);
     }
 
     public function testGetAll()

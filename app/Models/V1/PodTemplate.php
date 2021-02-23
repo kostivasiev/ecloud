@@ -3,6 +3,7 @@
 namespace App\Models\V1;
 
 use App\Exceptions\V1\TemplateNotFoundException;
+use Illuminate\Support\Facades\Auth;
 
 class PodTemplate
 {
@@ -37,7 +38,7 @@ class PodTemplate
         // Show non-managed pod templates?
         $showNonManagedPodTemplates = false;
         if ($pod->ucs_datacentre_reseller_id != 0
-            && $pod->ucs_datacentre_reseller_id == app()->request->user->resellerId) {
+            && $pod->ucs_datacentre_reseller_id == Auth::user()->resellerId()) {
             $showNonManagedPodTemplates = true;
         }
 

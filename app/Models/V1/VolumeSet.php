@@ -28,6 +28,8 @@ class VolumeSet extends Model implements Filterable, Sortable
 
     // Use UUID as primary key
     protected $primaryKey = 'uuid';
+
+    protected $keyType = 'string';
     // Don't increment the primary key for UUID's
     public $incrementing = false;
 

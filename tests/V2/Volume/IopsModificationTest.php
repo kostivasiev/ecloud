@@ -1,13 +1,7 @@
 <?php
 namespace Tests\V2\Volume;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Region;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -15,44 +9,17 @@ class IopsModificationTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Appliance $appliance;
-    protected ApplianceVersion $appliance_version;
-    protected AvailabilityZone $availabilityZone;
-    protected Instance $instance;
-    protected Region $region;
     protected Volume $volume;
-    protected Vpc $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->id,
-        ])->refresh();
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc()->getKey()
         ]);
-        $this->volume->setSyncCompleted();
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'name' => 'GetTest Default',
-            'appliance_version_id' => $this->appliance_version->uuid,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'platform' => 'Linux',
-        ]);
-        $this->instance->volumes()->save($this->volume);
+
+        $this->instance()->volumes()->save($this->volume);
     }
 
     public function testSetValidIopsValue()
@@ -98,7 +65,7 @@ class IopsModificationTest extends TestCase
 
     public function testSetIopsOnUnmountedVolume()
     {
-        $this->instance->volumes()->detach($this->volume);
+        $this->instance()->volumes()->detach($this->volume);
         $data = [
             'iops' => 200,
         ];

@@ -7,13 +7,14 @@ use App\Http\Requests\V2\NetworkRule\Update;
 use App\Models\V2\NetworkRule;
 use App\Resources\V2\NetworkRuleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class NetworkRuleController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = NetworkRule::forUser($request->user);
+        $collection = NetworkRule::forUser($request->user());
 
         (new QueryTransformer($request))
             ->config(NetworkRule::class)
@@ -26,7 +27,7 @@ class NetworkRuleController extends BaseController
 
     public function show(Request $request, string $networkRuleId)
     {
-        return new NetworkRuleResource(NetworkRule::forUser($request->user)->findOrFail($networkRuleId));
+        return new NetworkRuleResource(NetworkRule::forUser($request->user())->findOrFail($networkRuleId));
     }
 
     public function store(Create $request)
@@ -47,7 +48,7 @@ class NetworkRuleController extends BaseController
 
     public function update(Update $request, string $networkRuleId)
     {
-        $aclRule = NetworkRule::forUser(app('request')->user)->findOrFail($networkRuleId);
+        $aclRule = NetworkRule::forUser(Auth::user())->findOrFail($networkRuleId);
         $aclRule->fill($request->only([
             'network_policy_id',
             'name',
@@ -63,7 +64,7 @@ class NetworkRuleController extends BaseController
 
     public function destroy(Request $request, string $networkRuleId)
     {
-        NetworkRule::forUser(app('request')->user)->findOrFail($networkRuleId)
+        NetworkRule::forUser($request->user())->findOrFail($networkRuleId)
             ->delete();
         return response('', 204);
     }

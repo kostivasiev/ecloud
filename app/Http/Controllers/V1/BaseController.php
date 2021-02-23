@@ -34,9 +34,9 @@ class BaseController extends Controller
         $this->perPage = $request->input('per_page', env('PAGINATION_LIMIT'));
 
         // is the client an admin
-        $this->isAdmin = $request->user->isAdministrator;
+        $this->isAdmin = $request->user()->isAdmin();
 
-        $this->resellerId = $request->user->resellerId;
+        $this->resellerId = $request->user()->resellerId();
     }
 
     /**

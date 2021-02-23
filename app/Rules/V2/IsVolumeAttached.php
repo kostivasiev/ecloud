@@ -4,6 +4,7 @@ namespace App\Rules\V2;
 
 use App\Models\V2\Volume;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class IsVolumeAttached implements Rule
 {
@@ -13,7 +14,7 @@ class IsVolumeAttached implements Rule
     public function __construct()
     {
         $volumeId = app('request')->route('volumeId');
-        $this->volume = Volume::forUser(app('request')->user)
+        $this->volume = Volume::forUser(Auth::user())
             ->findOrFail($volumeId);
     }
 

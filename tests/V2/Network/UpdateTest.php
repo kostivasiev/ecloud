@@ -18,12 +18,13 @@ class UpdateTest extends TestCase
     protected $vpc;
     protected $router;
     protected $network;
+    protected $availabilityZone;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
-        factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
@@ -31,6 +32,7 @@ class UpdateTest extends TestCase
         ]);
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router->getKey(),

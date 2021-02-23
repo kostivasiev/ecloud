@@ -62,7 +62,7 @@ class InstanceResource extends UKFastResource
                 new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $response['appliance_version_id'] = $this->appliance_version_id;
             $response['task_running'] = $this->task_running;
         }

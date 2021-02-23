@@ -2,9 +2,13 @@
 
 namespace Tests;
 
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -23,7 +27,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     ];
     public $validWriteHeaders = [
         'X-consumer-custom-id' => '0-0',
-        'X-consumer-groups' => 'ecloud.write',
+        'X-consumer-groups' => 'ecloud.read, ecloud.write',
     ];
 
     /** @var Region */
@@ -51,6 +55,26 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     private $credential;
 
     /**
+     * @var Instance
+     */
+    private $instance;
+
+    /**
+     * @var ApplianceVersion
+     */
+    private $applianceVersion;
+
+    /**
+     * @var Appliance
+     */
+    private $appliance;
+
+    /**
+     * @var Network
+     */
+    private $network;
+
+    /**
      * Creates the application.
      *
      * @return Application
@@ -76,7 +100,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->router) {
             $this->router = factory(Router::class)->create([
                 'id' => 'rtr-test',
-                'vpc_id' => $this->vpc()->id
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id
             ]);
         }
         return $this->router;
@@ -148,6 +173,53 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->credential;
+    }
+
+    public function applianceVersion()
+    {
+        if (!$this->applianceVersion) {
+            $this->applianceVersion = factory(ApplianceVersion::class)->create([
+                'appliance_version_appliance_id' => $this->appliance()->id,
+            ]);
+        }
+        return $this->applianceVersion;
+    }
+
+    public function appliance()
+    {
+        if (!$this->appliance) {
+            $this->appliance = factory(Appliance::class)->create([
+                'appliance_name' => 'Test Appliance',
+            ])->refresh();
+        }
+        return $this->appliance;
+    }
+
+    public function instance()
+    {
+        if (!$this->instance) {
+            $this->instance = factory(Instance::class)->create([
+                'vpc_id' => $this->vpc()->getKey(),
+                'name' => 'Test Instance ' . uniqid(),
+                'appliance_version_id' => $this->applianceVersion()->uuid,
+                'vcpu_cores' => 1,
+                'ram_capacity' => 1024,
+                'platform' => 'Linux',
+                'availability_zone_id' => $this->availabilityZone()->id
+            ]);
+        }
+        return $this->instance;
+    }
+
+    public function network()
+    {
+        if (!$this->network) {
+            $this->network = factory(Network::class)->create([
+                'name' => 'Manchester Network',
+                'router_id' => $this->router()->id
+            ]);
+        }
+        return $this->network;
     }
 
     protected function setUp(): void

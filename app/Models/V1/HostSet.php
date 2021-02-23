@@ -24,6 +24,7 @@ class HostSet extends Model implements Filterable, Sortable
 
     protected $table = 'ucs_storage_host_set';
 
+    protected $keyType = 'string';
     // Use UUID as primary key
     protected $primaryKey = 'uuid';
     // Don't increment the primary key for UUID's

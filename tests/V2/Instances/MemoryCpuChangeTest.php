@@ -26,6 +26,7 @@ class MemoryCpuChangeTest extends TestCase
     protected Region $region;
     protected $appliance;
     protected $appliance_version;
+    protected $vpc;
 
     public function setUp(): void
     {

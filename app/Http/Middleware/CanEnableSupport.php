@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
  * Class CanEnableSupport
  * @package App\Http\Middleware
  *
- * Determine of the user can the user enable support on the VPC
+ * Determine if the user can the user enable support on the VPC
  */
 class CanEnableSupport
 {
@@ -20,9 +20,9 @@ class CanEnableSupport
      */
     public function handle($request, Closure $next)
     {
-        if (!$request->user->isAdministrator || ($request->user->isAdministrator && !empty($request->user->resellerId))) {
+        if ($request->user()->isScoped()) {
             $accountAdminClient = app()->make(\UKFast\Admin\Account\AdminClient::class);
-            $paymentMethod = $accountAdminClient->customers()->getById($request->user->resellerId)->paymentMethod;
+            $paymentMethod = $accountAdminClient->customers()->getById($request->user()->resellerId())->paymentMethod;
 
             if ($paymentMethod == 'Credit Card') {
                 return JsonResponse::create([

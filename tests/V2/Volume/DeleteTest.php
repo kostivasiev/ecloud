@@ -24,7 +24,7 @@ class DeleteTest extends TestCase
     protected $region;
     protected $vpc;
     protected $volume;
-    protected $availability_zone;
+    protected $availabilityZone;
     protected $instance;
 
     public function setUp(): void
@@ -40,26 +40,27 @@ class DeleteTest extends TestCase
         });
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
         factory(Credential::class)->create([
             'username' => 'kingpinapi',
-            'resource_id' => $this->availability_zone->id,
+            'resource_id' => $this->availabilityZone->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->id,
         ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->volume = factory(Volume::class)->create([
             'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availability_zone->id,
+            'availability_zone_id' => $this->availabilityZone->id,
         ]);
         $this->volume->setSyncCompleted();
 
-        $kingpinService = app()->makeWith(KingpinService::class, [$this->availability_zone]);
+        $kingpinService = app()->makeWith(KingpinService::class, [$this->availabilityZone]);
         $mockKingpinService = \Mockery::mock($kingpinService)->makePartial();
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             $mockKingpinService->shouldReceive('delete')
