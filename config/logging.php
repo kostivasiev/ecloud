@@ -104,6 +104,12 @@ return [
             'ignore_exceptions' => true,
         ],
 
+        'staging' => [
+            'driver' => 'stack',
+            'channels' => ['elasticsearch', 'single', 'ukfastjson'],
+            'ignore_exceptions' => true,
+        ],
+
         'elasticsearch' => [
             'driver' => 'monolog',
             'level' => 'debug',
