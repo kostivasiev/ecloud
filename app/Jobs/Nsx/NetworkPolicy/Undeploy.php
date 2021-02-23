@@ -22,7 +22,7 @@ class Undeploy extends Job
         // TODO :- Move this to the \App\Jobs\Sync\NetworkPolicy\Delete as chained jobs BEFORE deleting the policy!
         // See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/590#note_712450
         $this->model->networkRules->each(function ($networkRule) {
-            $networkRule->firewallRulePorts->each(function ($networkRulePort) {
+            $networkRule->networkRulePorts->each(function ($networkRulePort) {
                 $networkRulePort->delete();
             });
             $networkRule->delete();

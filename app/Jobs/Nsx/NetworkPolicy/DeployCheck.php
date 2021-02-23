@@ -30,7 +30,7 @@ class DeployCheck extends Job
             return;
         }
 
-        $response = $this->model->router->availabilityZone->nsxService()->get(
+        $response = $this->model->network->router->availabilityZone->nsxService()->get(
             'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/' . $this->model->id
         );
         $response = json_decode($response->getBody()->getContents());

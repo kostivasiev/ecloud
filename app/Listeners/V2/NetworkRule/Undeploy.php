@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\NetworkRule;
 
-use App\Events\V2\FirewallRule\Deleted;
+use App\Events\V2\NetworkRule\Deleted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;

@@ -66,20 +66,20 @@ class Deploy extends Job
                 'json' => [
                     'resource_type' => 'SecurityPolicy',
                     'id' => $this->model->id,
-                    'display_name' => $this->model->name,
+                    'display_name' => $this->model->id,
                     'sequence_number' => $this->model->sequence,
                     'category' => 'Application',
                     'stateful' => true,
                     'tcp_strict' => true,
                     'scope' => [
-                        '/infra/domains/default/groups/'.$this->model->id,
+                        '/infra/domains/default/groups/' . $this->model->id,
                     ],
                     'rules' => $this->model->networkRules->map(function ($rule) use ($router) {
                         return [
                             'action' => $rule->action,
                             'resource_type' => 'Rule',
                             'id' => $rule->id,
-                            'display_name' => $rule->name,
+                            'display_name' => $rule->id,
                             'sequence_number' => $rule->sequence,
                             'source_groups' => explode(',', $rule->source),
                             'destination_groups' => explode(',', $rule->destination),
@@ -90,7 +90,7 @@ class Deploy extends Job
                                 if ($port->protocol == 'ICMPv4') {
                                     return [
                                         'id' => $port->getKey(),
-                                        'name' => $port->name,
+                                        'display_name' => $port->id,
                                         'icmp_type' => NetworkRulePort::ICMP_MESSAGE_TYPE_ECHO_REQUEST,
                                         'resource_type' => 'ICMPTypeServiceEntry',
                                         'protocol' => 'ICMPv4',
@@ -98,7 +98,7 @@ class Deploy extends Job
                                 }
                                 return [
                                     'id' => $port->getKey(),
-                                    'name' => $port->name,
+                                    'display_name' => $port->id,
                                     'l4_protocol' => $port->protocol,
                                     'resource_type' => 'L4PortSetServiceEntry',
                                     'source_ports' => $port->source == 'ANY' ?
