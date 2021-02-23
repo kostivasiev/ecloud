@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6178a240731cbadcb7534f153223966b",
+    "content-hash": "f74495314a489bda7fc7e3766f2c0d39",
     "packages": [
         {
             "name": "cebe/php-openapi",
@@ -6263,15 +6263,14 @@
         },
         {
             "name": "ukfast/log-provider",
-            "version": "v2.1.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/log-provider.git",
-                "reference": "19d7166d6e0cfb8b274f2a9ac143f3878d0c402b"
+                "reference": "d419a7450a394c5287114bf97786562a869feead"
             },
             "require": {
-                "illuminate/support": "~5.0|^6.0|^7.0|^8.0",
-                "monolog/monolog": "~1.12|^2.0"
+                "monolog/monolog": "^2.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9.4"
@@ -6297,7 +6296,7 @@
                 }
             ],
             "description": "Package for enabling custom placement of log files",
-            "time": "2020-12-01T11:32:44+00:00"
+            "time": "2020-12-15T09:14:52+00:00"
         },
         {
             "name": "ukfast/responses",
