@@ -3,14 +3,13 @@
 namespace App\Listeners\V2\InstanceVolume;
 
 use App\Events\V2\InstanceVolume\Created;
-use App\Jobs\Kingpin\Volume\Attach as AttachJob;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Jobs\Sync\Completed;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
-class Attach
+class UpdateIops
 {
     public function handle(Created $event)
     {
@@ -32,7 +31,6 @@ class Attach
         }
 
         $jobs = [
-            new AttachJob($volume, $instance),
             new IopsChange($volume),
             new Completed($volume),
             new Completed($instance),

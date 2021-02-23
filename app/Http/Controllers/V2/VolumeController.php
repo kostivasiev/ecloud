@@ -154,7 +154,6 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
         $instance->volumes()->attach($volume);
-        $this->dispatch(new AttachToInstance($volume, $instance));
         return response('', 202);
     }
 }

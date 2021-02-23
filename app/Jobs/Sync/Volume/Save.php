@@ -6,7 +6,7 @@ use App\Jobs\Job;
 use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
-use App\Jobs\Kingpin\Volume\MarkSyncCompleted;
+use App\Jobs\Sync\Completed;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
@@ -31,18 +31,17 @@ class Save extends Job
             new Deploy($this->model),
         ];
 
-        dump($this->originalValues);
-        dump($volume->attributesToArray());
-
+        // DO NOT DO THIS! Original values will be removed in the future!
         if (!isset($this->originalValues['iops']) || $this->originalValues['iops'] !== $volume->iops) {
             $jobs[] = new IopsChange($this->model);
         }
 
+        // DO NOT DO THIS! Original values will be removed in the future!
         if (!isset($this->originalValues['capacity']) || $this->originalValues['capacity'] !== $volume->capacity) {
             $jobs[] = new CapacityChange($this->model);
         }
 
-        $jobs[] = new MarkSyncCompleted($this->model);
+        $jobs[] = new Completed($this->model);
 
         dispatch(array_shift($jobs)->chain($jobs));
 

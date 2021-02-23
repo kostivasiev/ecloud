@@ -3,45 +3,44 @@
 namespace App\Listeners\V2\InstanceVolume;
 
 use App\Events\V2\InstanceVolume\Created;
-use App\Jobs\Kingpin\Volume\IopsChange;
-use App\Jobs\Kingpin\Volume\MarkSyncCompleted;
+use App\Jobs\Kingpin\Volume\Detach as DetachJob;
+use App\Jobs\Sync\Completed;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
 class Detach
 {
-    const RETRY_DELAY = 5;
-
     public function handle(Created $event)
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        Log::info(get_class($this) . ' : Started', [
+            'instance_id' => $event->model->instance_id,
+            'volume_id' => $event->model->volume_id,
+        ]);
 
         $instance = Instance::find($event->model->instance_id);
         if (!$instance) {
-            return;
+            Log::error(get_class($this) . ' : Failed to find instance');
+            return false;
         }
 
         $volume = Volume::find($event->model->volume_id);
         if (!$volume) {
-            return;
-        }
-
-        if (!$volume->createSync()) {
-            $this->release(static::RETRY_DELAY);
-            Log::info(
-                'Waiting for ' . $this->model->id . ' syncing, retrying in ' . static::RETRY_DELAY . ' seconds'
-            );
-            return;
+            Log::error(get_class($this) . ' : Failed to find volume');
+            return false;
         }
 
         $jobs = [
-            new IopsChange($volume),
-            new MarkSyncCompleted($volume),
+            new Detach($volume, $instance),
+            new Completed($volume),
+            new Completed($instance),
         ];
 
         dispatch(array_shift($jobs)->chain($jobs));
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished', [
+            'instance_id' => $event->model->instance_id,
+            'volume_id' => $event->model->volume_id,
+        ]);
     }
 }

@@ -4,8 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Nic;
-use App\Models\V2\Volume;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
@@ -53,8 +52,8 @@ class Deploy extends Job
             if (!$deployResponse) {
                 throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
             }
-        } catch (\Exception $exception) {
-            exit(print_r($exception->getResponse()->getBody()->getContents()));
+        } catch (RequestException $exception) {
+            throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

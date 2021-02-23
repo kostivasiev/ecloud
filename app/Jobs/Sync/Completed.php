@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Jobs\Kingpin\Volume;
+namespace App\Jobs\Sync;
 
 use App\Jobs\Job;
-use App\Models\V2\Volume;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
-class MarkSyncCompleted extends Job
+class Completed extends Job
 {
     private $model;
 
-    public function __construct(Volume $model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }

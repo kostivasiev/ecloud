@@ -14,11 +14,14 @@ class NsxServiceProvider extends ServiceProvider
         $this->app->bind(NsxService::class, function ($app, $data) {
             $availabilityZone = array_shift($data);
             if (!$availabilityZone instanceof AvailabilityZone) {
-                throw new \Exception('Failed to create NSX connection: Invalid AvailabilityZone');
+                throw new \Exception(get_class($this) . ' : Failed to create connection: Invalid AvailabilityZone');
             }
             $credentials = $availabilityZone->credentials()
                 ->where('name', '=', 'NSX')
-                ->firstOrFail();
+                ->first();
+            if (!$credentials) {
+                throw new \Exception(get_class($this) . ' : Failed to find credentials for user ' . config('kingpin.user'));
+            }
             $auth = base64_encode($credentials->username . ':' . $credentials->password);
             return new NsxService(
                 new Client([
