@@ -30,6 +30,11 @@ class UpdateTest extends TestCase
                 ->andReturnUsing(function () {
                     return new Response(200, [], '');
                 });
+            $this->nsxServiceMock()->shouldReceive('patch')
+                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/'.$mockId)
+                ->andReturnUsing(function () {
+                    return new Response(200, [], '');
+                });
         }
 
         $this->networkPolicy = factory(NetworkPolicy::class)->create([

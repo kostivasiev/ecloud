@@ -38,6 +38,11 @@ class DeleteTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
         $this->nsxServiceMock()->shouldReceive('delete')
             ->withSomeOfArgs('policy/api/v1/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {

@@ -29,6 +29,13 @@ class CreateTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
+
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-abc123xyz')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-abc123xyz',
             'network_id' => $this->network->id,
