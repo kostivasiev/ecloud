@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class PowerOffTest extends TestCase
 {
@@ -26,6 +27,9 @@ class PowerOffTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
@@ -35,6 +39,7 @@ class PowerOffTest extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey()
         ]);
+
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
             'name' => 'GetTest Default',

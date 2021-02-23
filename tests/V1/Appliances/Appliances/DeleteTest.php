@@ -58,6 +58,6 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(401);
     }
 }

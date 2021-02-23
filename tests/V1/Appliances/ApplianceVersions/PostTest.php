@@ -145,6 +145,6 @@ class PostTest extends ApplianceTestCase
             'vm_template' => $applianceVersion->vm_template,
             'active' => true
         ], $this->validReadHeaders)
-            ->assertResponseStatus(403);
+            ->assertResponseStatus(401);
     }
 }

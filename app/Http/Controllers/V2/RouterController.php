@@ -14,13 +14,14 @@ use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\VpnResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class RouterController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = Router::forUser($request->user);
+        $collection = Router::forUser($request->user());
 
         (new QueryTransformer($request))
             ->config(Router::class)
@@ -34,7 +35,7 @@ class RouterController extends BaseController
     public function show(Request $request, string $routerId)
     {
         return new RouterResource(
-            Router::forUser($request->user)->findOrFail($routerId)
+            Router::forUser($request->user())->findOrFail($routerId)
         );
     }
 
@@ -47,7 +48,7 @@ class RouterController extends BaseController
 
     public function update(UpdateRequest $request, string $routerId)
     {
-        $router = Router::forUser(app('request')->user)->findOrFail($routerId);
+        $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
         if (!$router->save()) {
             return $router->getSyncError();
@@ -57,7 +58,8 @@ class RouterController extends BaseController
 
     public function destroy(Request $request, string $routerId)
     {
-        $model = Router::forUser($request->user)->findOrFail($routerId);
+        $model = Router::forUser($request->user())->findOrFail($routerId);
+
         if (!$model->canDelete()) {
             return $model->getDeletionError();
         }
@@ -69,7 +71,7 @@ class RouterController extends BaseController
 
     public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        $collection = Router::forUser($request->user)->findOrFail($routerId)->vpns();
+        $collection = Router::forUser($request->user())->findOrFail($routerId)->vpns();
         $queryTransformer->config(Vpn::class)
             ->transform($collection);
 
@@ -80,7 +82,7 @@ class RouterController extends BaseController
 
     public function networks(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        $collection = Router::forUser($request->user)->findOrFail($routerId)->networks();
+        $collection = Router::forUser($request->user())->findOrFail($routerId)->networks();
         $queryTransformer->config(Network::class)
             ->transform($collection);
 
@@ -91,7 +93,7 @@ class RouterController extends BaseController
 
     public function configureDefaultPolicies(Request $request, string $routerId)
     {
-        $router = Router::forUser($request->user)->findOrFail($routerId);
+        $router = Router::forUser($request->user())->findOrFail($routerId);
 
         $this->dispatch(new ConfigureDefaults([
             'router_id' => $router->id
@@ -102,7 +104,7 @@ class RouterController extends BaseController
 
     public function firewallPolicies(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
-        $collection = Router::forUser($request->user)->findOrFail($routerId)->firewallPolicies();
+        $collection = Router::forUser($request->user())->findOrFail($routerId)->firewallPolicies();
         $queryTransformer->config(FirewallPolicy::class)
             ->transform($collection);
 

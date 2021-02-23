@@ -82,6 +82,6 @@ class PatchTest extends ApplianceTestCase
             'name' => $newParameter->name
         ], $this->validReadHeaders);
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(401);
     }
 }

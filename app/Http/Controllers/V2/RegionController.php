@@ -27,7 +27,7 @@ class RegionController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = Region::forUser($request->user);
+        $collection = Region::forUser($request->user());
         (new QueryTransformer($request))
             ->config(Region::class)
             ->transform($collection);
@@ -45,7 +45,7 @@ class RegionController extends BaseController
     public function show(Request $request, string $regionId)
     {
         return new RegionResource(
-            Region::forUser($request->user)->findOrFail($regionId)
+            Region::forUser($request->user())->findOrFail($regionId)
         );
     }
 
@@ -96,7 +96,7 @@ class RegionController extends BaseController
      */
     public function availabilityZones(Request $request, QueryTransformer $queryTransformer, string $regionId)
     {
-        $collection = Region::forUser(app('request')->user)->findOrFail($regionId)->availabilityZones();
+        $collection = Region::forUser($request->user())->findOrFail($regionId)->availabilityZones();
         $queryTransformer->config(AvailabilityZone::class)
             ->transform($collection);
 
@@ -113,7 +113,7 @@ class RegionController extends BaseController
      */
     public function vpcs(Request $request, QueryTransformer $queryTransformer, string $regionId)
     {
-        $collection = Region::forUser(app('request')->user)->findOrFail($regionId)->vpcs();
+        $collection = Region::forUser($request->user())->findOrFail($regionId)->vpcs();
         $queryTransformer->config(Vpc::class)
             ->transform($collection);
 
@@ -130,7 +130,7 @@ class RegionController extends BaseController
      */
     public function prices(Request $request, string $regionId)
     {
-        $region = Region::forUser($request->user)->findOrFail($regionId);
+        $region = Region::forUser($request->user())->findOrFail($regionId);
         $products = Product::forRegion($region);
 
         // Hacky Resource specific filtering

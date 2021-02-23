@@ -20,7 +20,7 @@ class HostResource extends CustomResource
             ]);
         }
 
-        if (!$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             unset($attributes['internal_name']);
         }
 

@@ -41,7 +41,8 @@ class GetTest extends TestCase
             'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->getKey(),
         ]);
         $this->billingMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->router->id,
@@ -59,7 +60,7 @@ class GetTest extends TestCase
     {
         $this->get('/v2/billing-metrics', [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
+            'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeJson([
                 'id' => $this->billingMetric->id,
@@ -79,7 +80,7 @@ class GetTest extends TestCase
     {
         $this->get('/v2/billing-metrics/' . $this->billingMetric->id, [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
+            'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeJson([
                 'id' => $this->billingMetric->id,

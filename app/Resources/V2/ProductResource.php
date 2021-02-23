@@ -2,6 +2,7 @@
 
 namespace App\Resources\V2;
 
+use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 
 class ProductResource extends UKFastResource
@@ -16,7 +17,7 @@ class ProductResource extends UKFastResource
             'availability_zone_id' => $this->availabilityZoneId,
             'name' => $this->name,
             'category' => strtolower($this->category),
-            'price' => $this->getPrice(app('request')->user->resellerId),
+            'price' => $this->getPrice(Auth::user()->resellerId()),
             'rate' => strtolower($this->rate),
         ];
     }

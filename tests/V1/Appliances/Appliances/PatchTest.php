@@ -81,6 +81,6 @@ class PatchTest extends ApplianceTestCase
             'X-consumer-groups' => 'ecloud.read',
         ]);
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(401);
     }
 }

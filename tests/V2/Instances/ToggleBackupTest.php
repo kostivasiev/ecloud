@@ -2,10 +2,7 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Instance;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Event;
@@ -16,10 +13,7 @@ class ToggleBackupTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $instance;
     protected $volume;
-    private $appliance;
-    private $applianceVersion;
 
     public function setUp(): void
     {
@@ -32,33 +26,16 @@ class ToggleBackupTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id
         ]);
 
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-
-        $this->applianceVersion = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->id,
-        ])->refresh();
-
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'appliance_version_id' => $this->applianceVersion->uuid,
-            'backup_enabled' => false,
-            'appliance_version_id' => $this->applianceVersion->uuid,
-        ]);
-
         $this->volume->vpc()->associate($this->vpc());
-        $this->volume->instances()->attach($this->instance);
+        $this->volume->instances()->attach($this->instance());
     }
 
     public function testEnableBackupUpdatesBillingMetrics()
     {
-        $this->assertNull(BillingMetric::getActiveByKey($this->instance, 'backup.quota'));
+        $this->assertNull(BillingMetric::getActiveByKey($this->instance(), 'backup.quota'));
 
         $this->patch(
-            '/v2/instances/' . $this->instance->id,
+            '/v2/instances/' . $this->instance()->id,
             [
                 'backup_enabled' => true,
             ],
@@ -69,7 +46,7 @@ class ToggleBackupTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance->id,
+                'id' => $this->instance()->id,
                 'backup_enabled' => true
             ],
             'ecloud'
@@ -77,16 +54,16 @@ class ToggleBackupTest extends TestCase
             ->assertResponseStatus(200);
 
         Event::assertDispatched(\App\Events\V2\Instance\Saving::class, function ($event) {
-            return $event->model->id === $this->instance->id;
+            return $event->model->id === $this->instance()->id;
         });
 
         $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
-        $resourceSyncListener->handle(new \App\Events\V2\Instance\Saving($this->instance));
+        $resourceSyncListener->handle(new \App\Events\V2\Instance\Saving($this->instance()));
 
-        $sync = Sync::where('resource_id', $this->instance->id)->first();
+        $sync = Sync::where('resource_id', $this->instance()->id)->first();
 
         $computeChangeListener = \Mockery::mock(\App\Listeners\V2\Instance\ComputeChange::class)->makePartial();
-        $computeChangeListener->handle(new \App\Events\V2\Instance\Updated($this->instance));
+        $computeChangeListener->handle(new \App\Events\V2\Instance\Updated($this->instance()));
 
         // sync set to complete by the ComputeChange listener
         Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {
@@ -99,7 +76,7 @@ class ToggleBackupTest extends TestCase
         $updateBackupBillingListener = \Mockery::mock(\App\Listeners\V2\Instance\UpdateBackupBilling::class)->makePartial();
         $updateBackupBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
 
-        $backupMetric = BillingMetric::getActiveByKey($this->instance, 'backup.quota');
+        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
 
         $this->assertNotNull($backupMetric);
 
@@ -108,20 +85,20 @@ class ToggleBackupTest extends TestCase
 
     public function testDisableBackupUpdatesBillingMetrics()
     {
-        $this->instance->backup_enabled = true;
-        $this->instance->save();
+        $this->instance()->backup_enabled = true;
+        $this->instance()->save();
 
         $billingMetric = factory(BillingMetric::class)->create([
-            'resource_id' => $this->instance->id,
+            'resource_id' => $this->instance()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'backup.quota',
             'value' => $this->volume->capacity
         ]);
 
-        $this->assertNotNull(BillingMetric::getActiveByKey($this->instance, 'backup.quota'));
+        $this->assertNotNull(BillingMetric::getActiveByKey($this->instance(), 'backup.quota'));
 
         $this->patch(
-            '/v2/instances/' . $this->instance->id,
+            '/v2/instances/' . $this->instance()->id,
             [
                 'backup_enabled' => false,
             ],
@@ -132,7 +109,7 @@ class ToggleBackupTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance->id,
+                'id' => $this->instance()->id,
                 'backup_enabled' => false
             ],
             'ecloud'
@@ -140,16 +117,16 @@ class ToggleBackupTest extends TestCase
             ->assertResponseStatus(200);
 
         Event::assertDispatched(\App\Events\V2\Instance\Saving::class, function ($event) {
-            return $event->model->id === $this->instance->id;
+            return $event->model->id === $this->instance()->id;
         });
 
         $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
-        $resourceSyncListener->handle(new \App\Events\V2\Instance\Saving($this->instance));
+        $resourceSyncListener->handle(new \App\Events\V2\Instance\Saving($this->instance()));
 
-        $sync = Sync::where('resource_id', $this->instance->id)->first();
+        $sync = Sync::where('resource_id', $this->instance()->id)->first();
 
         $computeChangeListener = \Mockery::mock(\App\Listeners\V2\Instance\ComputeChange::class)->makePartial();
-        $computeChangeListener->handle(new \App\Events\V2\Instance\Updated($this->instance));
+        $computeChangeListener->handle(new \App\Events\V2\Instance\Updated($this->instance()));
 
         // sync set to complete by the ComputeChange listener
         Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {
@@ -165,7 +142,7 @@ class ToggleBackupTest extends TestCase
         $billingMetric->refresh();
         $this->assertNotNull($billingMetric->end);
 
-        $backupMetric = BillingMetric::getActiveByKey($this->instance, 'backup.quota');
+        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
         $this->assertNull($backupMetric);
     }
 }

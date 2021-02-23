@@ -7,6 +7,7 @@ use App\Rules\V2\NetworkHasNoPolicy;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class NetworkHasNoAclTest extends TestCase
 {
@@ -38,11 +39,13 @@ class NetworkHasNoAclTest extends TestCase
 
     public function testRulePasses()
     {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->assertTrue($this->rule->passes('', $this->network->id));
     }
 
     public function testRuleFails()
     {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => $this->network->id,
