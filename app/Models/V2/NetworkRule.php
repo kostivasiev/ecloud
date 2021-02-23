@@ -2,6 +2,8 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkRule\Deleted;
+use App\Events\V2\NetworkRule\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -39,6 +41,10 @@ class NetworkRule extends Model implements Filterable, Sortable
         $this->casts = [
             'sequence' => 'integer',
             'enabled' => 'boolean',
+        ];
+        $this->dispatchesEvents = [
+            'saved' => Saved::class,
+            'deleted' => Deleted::class,
         ];
         parent::__construct($attributes);
     }
