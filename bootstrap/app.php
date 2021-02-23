@@ -37,6 +37,7 @@ $app->configure('job-status');
 $app->configure('firewall');
 $app->configure('alerts');
 $app->configure('router');
+$app->configure('auth');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -78,10 +79,10 @@ $app->singleton(
 */
 
 $app->routeMiddleware([
-    'auth' => \UKFast\Api\Auth\Middleware\Authenticate::class,
+    'auth' => UKFast\Api\Auth\Authenticate::class,
+    'is-admin' => \UKFast\Api\Auth\Middleware\IsAdmin::class,
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
-    'is-administrator' => \App\Http\Middleware\IsAdministrator::class,
     'is-locked' => \App\Http\Middleware\IsLocked::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
     'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class
@@ -108,7 +109,7 @@ $app->register(App\Providers\IntapiServiceProvider::class);
 $app->register(UKFast\Responses\ResponseServiceProvider::class);
 $app->register(UKFast\Api\Paginator\PaginationServiceProvider::class);
 $app->register(UKFast\HealthCheck\HealthCheckServiceProvider::class);
-$app->register(UKFast\Api\Auth\Providers\AuthServiceProvider::class);
+$app->register(\UKFast\Api\Auth\AuthServiceProvider::class);
 $app->register(UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class);
 $app->register(UKFast\Api\Resource\ResourceServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider::class);

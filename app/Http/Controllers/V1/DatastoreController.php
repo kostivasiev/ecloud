@@ -329,13 +329,13 @@ class DatastoreController extends BaseController
                     $datastore->getKey(),
                     $automationData,
                     'ecloud_ucs_' . $pod->getKey(),
-                    $request->user->id,
-                    $request->user->type
+                    $request->user()->userId(),
+                    $request->user()->type()
                 );
             } catch (IntapiServiceException $exception) {
                 throw new ServiceUnavailableException('Failed to expand datastore', null, 502);
             }
-            if ($request->user->isAdministrator) {
+            if ($request->user()->isAdmin()) {
                 $headers = [
                     'X-AutomationRequestId' => $automationRequestId
                 ];
@@ -449,8 +449,8 @@ class DatastoreController extends BaseController
                 $datastore->getKey(),
                 null,
                 'ecloud_ucs_' . $datastore->pod->getKey(),
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Failed to scheduele datastore for deletion', null, 502);
@@ -505,8 +505,8 @@ class DatastoreController extends BaseController
                     'new_capacity_gb' => $newSizeGB
                 ],
                 'ecloud_ucs_' . $datastore->storage->pod->getKey(),
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
         } catch (IntapiServiceException $exception) {
             throw new ServiceUnavailableException('Failed to expand datastore.');
@@ -515,7 +515,7 @@ class DatastoreController extends BaseController
         $datastore->save();
 
         $headers = [];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $headers = [
                 'X-AutomationRequestId' => $automationRequestId
             ];
@@ -532,11 +532,11 @@ class DatastoreController extends BaseController
      */
     public static function getDatastoreQuery(Request $request)
     {
-        $query = Datastore::withReseller($request->user->resellerId)
+        $query = Datastore::withReseller($request->user()->resellerId())
             ->where('reseller_lun_status', '!=', 'Deleted')
             ->join('ucs_reseller', 'ucs_reseller_id', '=', 'reseller_lun_ucs_reseller_id');
 
-        if (!$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             $query->where('ucs_reseller_active', 'Yes');
         }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V2\DiscountPlan;
 
 use App\Rules\V2\DateIsTodayOrFirstOfMonth;
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -47,7 +48,7 @@ class Create extends FormRequest
             ],
         ];
 
-        if (app('request')->user->isAdministrator) {
+        if (Auth::user()->isAdmin()) {
             $rules['term_start_date'] = 'required|date';
             $rules['status'] = 'sometimes|required|string|in:approved,rejected';
         }

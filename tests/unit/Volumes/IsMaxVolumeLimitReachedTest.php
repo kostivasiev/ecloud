@@ -10,39 +10,22 @@ use App\Rules\V2\IsMaxVolumeLimitReached;
 use Illuminate\Support\Facades\Config;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class IsMaxVolumeLimitReachedTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Appliance $appliance;
-    protected ApplianceVersion $appliance_version;
     protected IsMaxVolumeLimitReached $rule;
-    protected Instance $instance;
     protected $volume;
     protected int $volumeCount;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         // Set volume limit to 1
         Config::set('volume.instance.limit', 1);
         $this->rule = new IsMaxVolumeLimitReached();
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->id,
-        ])->refresh();
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc()->getKey(),
-            'name' => 'GetTest Default',
-            'appliance_version_id' => $this->appliance_version->uuid,
-            'availability_zone_id' => $this->availabilityZone()->getKey(),
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'platform' => 'Linux',
-        ]);
         $this->volumeCount = 1;
         $this->volume = factory(Volume::class, 2)->create([
             'name' => 'Volume 1',
@@ -57,12 +40,14 @@ class IsMaxVolumeLimitReachedTest extends TestCase
 
     public function testLimits()
     {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
         // Test with one volume limit, and then attach that volume
-        $this->assertTrue($this->rule->passes('', $this->instance->getKey()));
-        $this->instance->volumes()->attach($this->volume[0]);
-        $this->instance->save();
+        $this->assertTrue($this->rule->passes('', $this->instance()->getKey()));
+        $this->instance()->volumes()->attach($this->volume[0]);
+        $this->instance()->save();
 
         // Now assert that we're at the limit
-        $this->assertFalse($this->rule->passes('', $this->instance->getKey()));
+        $this->assertFalse($this->rule->passes('', $this->instance()->getKey()));
     }
 }

@@ -15,7 +15,7 @@ class UpdateTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
-    protected $availability_zone;
+    protected $availabilityZone;
     protected $region;
     protected $vpc;
     protected $dhcp;
@@ -27,7 +27,7 @@ class UpdateTest extends TestCase
         $this->region = factory(Region::class)->create([
             'name' => $this->faker->country(),
         ]);
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
@@ -35,6 +35,7 @@ class UpdateTest extends TestCase
         ]);
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
@@ -48,8 +49,8 @@ class UpdateTest extends TestCase
             []
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);

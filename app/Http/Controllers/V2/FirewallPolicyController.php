@@ -9,6 +9,7 @@ use App\Models\V2\FirewallRule;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -24,7 +25,7 @@ class FirewallPolicyController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallPolicy::forUser($request->user);
+        $collection = FirewallPolicy::forUser($request->user());
 
         $queryTransformer->config(FirewallPolicy::class)
             ->transform($collection);
@@ -42,19 +43,19 @@ class FirewallPolicyController extends BaseController
     public function show(Request $request, string $firewallPolicyId)
     {
         return new FirewallPolicyResource(
-            FirewallPolicy::forUser($request->user)->findOrFail($firewallPolicyId)
+            FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)
         );
     }
 
     /**
      * @param Request $request
      * @param QueryTransformer $queryTransformer
-     * @param string $routerId
+     * @param string $firewallPolicyId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
     {
-        $collection = FirewallPolicy::forUser($request->user)->findOrFail($routerId)->firewallRules();
+        $collection = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)->firewallRules();
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
 
@@ -83,7 +84,7 @@ class FirewallPolicyController extends BaseController
      */
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
+        $policy = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $policy->fill($request->only(['name', 'sequence', 'router_id']));
         $policy->save();
         return $this->responseIdMeta($request, $policy->getKey(), 200);
@@ -91,7 +92,7 @@ class FirewallPolicyController extends BaseController
 
     public function destroy(Request $request, string $firewallPolicyId)
     {
-        $model = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
+        $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
         if (!$model->delete()) {
             return $model->getSyncError();
         }

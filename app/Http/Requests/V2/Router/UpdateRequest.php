@@ -6,6 +6,7 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
@@ -29,7 +30,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         $availabilityZoneId = '';
-        $router = Router::forUser(app('request')->user)->find(Request::route('routerId'));
+        $router = Router::forUser(Auth::user())->find(Request::route('routerId'));
         if (!empty($router)) {
             $availabilityZoneId = $router->availability_zone_id;
         }

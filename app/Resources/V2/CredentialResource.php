@@ -36,7 +36,7 @@ class CredentialResource extends UKFastResource
             'password' => $this->password,
             'port' => $this->port
         ];
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data['is_hidden'] = $this->is_hidden;
         }
         $tz = new \DateTimeZone(config('app.timezone'));

@@ -37,7 +37,7 @@ class ApplianceParameterDeletedListener
                 'id' => $event->applianceParameter->id,
                 'appliance_version_id' => $event->applianceParameter->appliance_version_id,
                 'appliance_id' => $event->applianceParameter->applianceVersion->appliance->id,
-                'reseller_id' => $this->request->user->resellerId
+                'reseller_id' => $this->request->user()->resellerId()
             ]
         );
     }
