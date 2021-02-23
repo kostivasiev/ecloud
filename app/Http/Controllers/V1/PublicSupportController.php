@@ -56,12 +56,12 @@ class PublicSupportController extends BaseController
      */
     public function store(Request $request)
     {
-        if (empty($request->user->resellerId)) {
+        if (!$request->user()->isScoped()) {
             throw new Exceptions\UnauthorisedException('Unable to determine account id');
         }
 
         $item = app()->make(PublicSupport::class);
-        $item->reseller_id = $request->user->resellerId;
+        $item->reseller_id = $request->user()->resellerId();
         $item->save();
 
         return response()->self(

@@ -26,7 +26,7 @@ $router->get('{apiVersion}/docs.yaml', function ($apiVersion) {
 });
 
 
-$router->group(['middleware' => ['auth', 'is-administrator']], function () use ($router) {
+$router->group(['middleware' => ['auth', 'is-admin']], function () use ($router) {
     $router->get('{apiVersion}/admin-docs.yaml', function ($apiVersion) {
         if (!preg_match('/v[0-9]+/si', $apiVersion)) {
             return 'Invalid version';

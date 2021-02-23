@@ -61,6 +61,6 @@ class PostTest extends ApplianceTestCase
             'description' => 'This is a test parameter',
             'required' => false
 
-        ], $this->validReadHeaders)->seeStatusCode(403);
+        ], $this->validReadHeaders)->seeStatusCode(401);
     }
 }

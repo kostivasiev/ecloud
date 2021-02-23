@@ -63,127 +63,125 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     // Solution's
     $router->get('solutions', 'SolutionController@index');
-    $router->get('solutions/{solution_id}', 'SolutionController@show');
-    $router->patch('solutions/{solution_id}', 'SolutionController@update');
-    $router->get('solutions/{solution_id}/vms', 'VirtualMachineController@getSolutionVMs');
-    $router->get('solutions/{solution_id}/hosts', 'HostController@indexSolution');
-    $router->get('solutions/{solution_id}/datastores', 'DatastoreController@indexSolution');
-    $router->get('solutions/{solution_id}/datastores/default', 'DatastoreController@getSolutionDefault');
-    $router->get('solutions/{solution_id}/sites', 'SolutionSiteController@getSolutionSites');
-    $router->get('solutions/{solution_id}/networks', 'SolutionNetworkController@getSolutionNetworks');
-    $router->get('solutions/{solution_id}/firewalls', 'FirewallController@getSolutionFirewalls');
-    $router->get('solutions/{solution_id}/templates', 'TemplateController@indexSolutionTemplate');
-    $router->get('solutions/{solution_id}/templates/{template_name}', 'TemplateController@showSolutionTemplate');
-    $router->post('solutions/{solution_id}/templates/{template_name}/move',
+    $router->get('solutions/{solutionId}', 'SolutionController@show');
+    $router->patch('solutions/{solutionId}', 'SolutionController@update');
+    $router->get('solutions/{solutionId}/vms', 'VirtualMachineController@getSolutionVMs');
+    $router->get('solutions/{solutionId}/hosts', 'HostController@indexSolution');
+    $router->get('solutions/{solutionId}/datastores', 'DatastoreController@indexSolution');
+    $router->get('solutions/{solutionId}/datastores/default', 'DatastoreController@getSolutionDefault');
+    $router->get('solutions/{solutionId}/sites', 'SolutionSiteController@getSolutionSites');
+    $router->get('solutions/{solutionId}/networks', 'SolutionNetworkController@getSolutionNetworks');
+    $router->get('solutions/{solutionId}/firewalls', 'FirewallController@getSolutionFirewalls');
+    $router->get('solutions/{solutionId}/templates', 'TemplateController@indexSolutionTemplate');
+    $router->get('solutions/{solutionId}/templates/{templateName}', 'TemplateController@showSolutionTemplate');
+    $router->post('solutions/{solutionId}/templates/{templateName}/move',
         'TemplateController@renameSolutionTemplate');
-    $router->delete('solutions/{solution_id}/templates/{template_name}', 'TemplateController@deleteSolutionTemplate');
-    $router->get('solutions/{solution_id}/tags', 'TagController@indexSolutionTags');
-    $router->post('solutions/{solution_id}/tags', 'TagController@createSolutionTag');
-    $router->get('solutions/{solution_id}/tags/{name}', 'TagController@showSolutionTag');
-    $router->patch('solutions/{solution_id}/tags/{name}', 'TagController@updateSolutionTag');
-    $router->delete('solutions/{solution_id}/tags/{name}', 'TagController@destroySolutionTag');
+    $router->delete('solutions/{solutionId}/templates/{templateName}', 'TemplateController@deleteSolutionTemplate');
+
+    $router->get('solutions/{solutionId}/tags', 'TagController@indexSolutionTags');
+    $router->post('solutions/{solutionId}/tags', 'TagController@createSolutionTag');
+    $router->get('solutions/{solutionId}/tags/{tagKey}', 'TagController@showSolutionTag');
+    $router->patch('solutions/{solutionId}/tags/{tagKey}', 'TagController@updateSolutionTag');
+    $router->delete('solutions/{solutionId}/tags/{tagKey}', 'TagController@destroySolutionTag');
 
     // Solution Sites
     $router->get('sites', 'SolutionSiteController@index');
-    $router->get('sites/{site_id}', 'SolutionSiteController@show');
-
+    $router->get('sites/{siteId}', 'SolutionSiteController@show');
 
     // Hosts
     $router->get('hosts', 'HostController@index');
-    $router->get('hosts/{host_id}', 'HostController@show');
+    $router->get('hosts/{hostId}', 'HostController@show');
 
     // Hosts - Admin
     $router->group([
         'middleware' => [
-            'is-administrator',
+            'is-admin',
         ],
     ], function () use ($router) {
         $router->get(
-            'hosts/{host_id}/hardware',
+            'hosts/{hostId}/hardware',
             'HostController@hardware'
         );
         $router->post(
-            'hosts/{host_id}/create',
+            'hosts/{hostId}/create',
             'HostController@createHost'
         );
         $router->delete(
-            'hosts/{host_id}',
+            'hosts/{hostId}',
             'HostController@delete'
         );
         $router->post(
-            'hosts/{host_id}/delete',
+            'hosts/{hostId}/delete',
             'HostController@deleteHost'
         );
         $router->post(
-            'hosts/{host_id}/rescan',
+            'hosts/{hostId}/rescan',
             'HostController@clusterRescan'
         );
     });
 
     // Datastores
     $router->get('datastores', 'DatastoreController@index');
-    $router->get('datastores/{datastore_id}', 'DatastoreController@show');
+    $router->get('datastores/{datastoreId}', 'DatastoreController@show');
 
     // Firewalls
     $router->get('firewalls', 'FirewallController@index');
-    $router->get('firewalls/{firewall_id}', 'FirewallController@show');
-    $router->get('firewalls/{firewall_id}/config', 'FirewallController@getFirewallConfig');
-
+    $router->get('firewalls/{firewallId}', 'FirewallController@show');
+    $router->get('firewalls/{firewallId}/config', 'FirewallController@getFirewallConfig');
 
     // Pods
     $router->get('pods', 'PodController@index');
-    $router->get('pods/{pod_id}', 'PodController@show');
-    $router->get('pods/{pod_id}/templates', 'TemplateController@indexPodTemplate');
-    $router->get('pods/{pod_id}/templates/{template_name}', 'TemplateController@showPodTemplate');
-    $router->post('pods/{pod_id}/templates/{template_name}/move', 'TemplateController@renamePodTemplate');
-    $router->get('pods/{pod_id}/gpu-profiles', 'PodController@gpuProfiles');
-    $router->get('pods/{pod_id}/storage', 'PodController@indexStorage');
-    // todo datastores
+    $router->get('pods/{podId}', 'PodController@show');
+    $router->get('pods/{podId}/templates', 'TemplateController@indexPodTemplate');
+    $router->get('pods/{podId}/templates/{templateName}', 'TemplateController@showPodTemplate');
+    $router->post('pods/{podId}/templates/{templateName}/move', 'TemplateController@renamePodTemplate');
+    $router->get('pods/{podId}/gpu-profiles', 'PodController@gpuProfiles');
+    $router->get('pods/{podId}/storage', 'PodController@indexStorage');
 
-    $router->get('pods/{pod_id}/appliances', 'ApplianceController@podAvailability');
-    $router->post('pods/{pod_id}/appliances', 'ApplianceController@addToPod');
-    $router->delete('pods/{pod_id}/appliances/{appliance_id}', 'ApplianceController@removeFromPod');
-    $router->delete('pods/{pod_id}/templates/{template_name}', 'TemplateController@deletePodTemplate');
-    $router->get('pods/{pod_id}/console-available', 'PodController@consoleAvailable');
+    $router->get('pods/{podId}/appliances', 'ApplianceController@podAvailability');
+    $router->post('pods/{podId}/appliances', 'ApplianceController@addToPod');
+    $router->delete('pods/{podId}/appliances/{applianceId}', 'ApplianceController@removeFromPod');
+    $router->delete('pods/{podId}/templates/{templateName}', 'TemplateController@deletePodTemplate');
+    $router->get('pods/{podId}/console-available', 'PodController@consoleAvailable');
 
     // Pod resource - Admin
     $router->group([
         'middleware' => [
-            'is-administrator',
+            'is-admin',
         ],
     ], function () use ($router) {
-        $router->get('pods/{pod_id}/resources', 'PodController@resource');
-        $router->get('pods/{pod_id}/resources/types', 'PodController@resourceTypes');
-        $router->post('pods/{pod_id}/resources', 'PodController@resourceAdd');
-        $router->delete('pods/{pod_id}/resources/{resource_id}', 'PodController@resourceRemove');
-        $router->put('pods/{pod_id}/resources/{resource_id}', 'PodController@resourceUpdate');
+        $router->get('pods/{podId}/resources', 'PodController@resource');
+        $router->get('pods/{podId}/resources/types', 'PodController@resourceTypes');
+        $router->post('pods/{podId}/resources', 'PodController@resourceAdd');
+        $router->delete('pods/{podId}/resources/{resourceId}', 'PodController@resourceRemove');
+        $router->put('pods/{podId}/resources/{resourceId}', 'PodController@resourceUpdate');
     });
 
     // Appliances
     $router->get('appliances', 'ApplianceController@index');
-    $router->get('appliances/{appliance_id}', 'ApplianceController@show');
-    $router->get('appliances/{appliance_id}/versions', 'ApplianceController@versions');
-    $router->get('appliances/{appliance_id}/version', 'ApplianceController@latestVersion');
-    $router->get('appliances/{appliance_id}/parameters', 'ApplianceController@latestVersionParameters');
-    $router->get('appliances/{appliance_id}/data', 'ApplianceController@latestVersionData');
-    $router->get('appliances/{appliance_id}/pods', 'ApplianceController@pods');
+    $router->get('appliances/{applianceId}', 'ApplianceController@show');
+    $router->get('appliances/{applianceId}/versions', 'ApplianceController@versions');
+    $router->get('appliances/{applianceId}/version', 'ApplianceController@latestVersion');
+    $router->get('appliances/{applianceId}/parameters', 'ApplianceController@latestVersionParameters');
+    $router->get('appliances/{applianceId}/data', 'ApplianceController@latestVersionData');
+    $router->get('appliances/{applianceId}/pods', 'ApplianceController@pods');
     $router->post('appliances', 'ApplianceController@create');
-    $router->patch('appliances/{appliance_id}', 'ApplianceController@update');
-    $router->delete('appliances/{appliance_id}', 'ApplianceController@delete');
+    $router->patch('appliances/{applianceId}', 'ApplianceController@update');
+    $router->delete('appliances/{applianceId}', 'ApplianceController@delete');
 
     //Appliance Versions
     $router->get('appliance-versions', 'ApplianceVersionController@index');
-    $router->get('appliance-versions/{appliance_version_id}', 'ApplianceVersionController@show');
+    $router->get('appliance-versions/{applianceVersionId}', 'ApplianceVersionController@show');
     $router->post('appliance-versions', 'ApplianceVersionController@create');
-    $router->patch('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@update');
-    $router->get('appliance-versions/{appliance_version_uuid}/parameters',
+    $router->patch('appliance-versions/{applianceVersionId}', 'ApplianceVersionController@update');
+    $router->get('appliance-versions/{applianceVersionId}/parameters',
         'ApplianceVersionController@versionParameters');
-    $router->delete('appliance-versions/{appliance_version_uuid}', 'ApplianceVersionController@delete');
+    $router->delete('appliance-versions/{applianceVersionId}', 'ApplianceVersionController@delete');
 
     // Appliance Versions Data - Admin
     $router->group([
         'middleware' => [
-            'is-administrator',
+            'is-admin',
             \App\Http\Middleware\Appliance\Version::class,
         ],
     ], function () use ($router) {
@@ -211,22 +209,22 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     //Appliance Parameters
     $router->get('appliance-parameters', 'ApplianceParametersController@index');
-    $router->get('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@show');
+    $router->get('appliance-parameters/{parameterId}', 'ApplianceParametersController@show');
     $router->post('appliance-parameters', 'ApplianceParametersController@create');
-    $router->patch('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@update');
-    $router->delete('appliance-parameters/{parameter_uuid}', 'ApplianceParametersController@delete');
+    $router->patch('appliance-parameters/{parameterId}', 'ApplianceParametersController@update');
+    $router->delete('appliance-parameters/{parameterId}', 'ApplianceParametersController@delete');
 
     //GPU Profiles
     $router->get('gpu-profiles', 'GpuProfileController@index');
-    $router->get('gpu-profiles/{profile_id}', 'GpuProfileController@show');
+    $router->get('gpu-profiles/{profileId}', 'GpuProfileController@show');
 
     // Active Directory Domains
     $router->get('active-directory/domains', 'ActiveDirectoryDomainController@index');
-    $router->get('active-directory/domains/{domain_id}', 'ActiveDirectoryDomainController@show');
+    $router->get('active-directory/domains/{domainId}', 'ActiveDirectoryDomainController@show');
 
     // IOPS
     $router->get('iops', 'IOPSController@index');
-    $router->get('iops/{uuid}', 'IOPSController@show');
+    $router->get('iops/{id}', 'IOPSController@show');
 
     /**
      * Base middleware + reseller ID scope
@@ -239,7 +237,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         /**
          * Base middleware + reseller ID scope + is-administrator
          */
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
 
         });
     });
@@ -249,51 +247,50 @@ $router->group($baseRouteParameters, function () use ($router) {
      * Base middleware + is-administrator
      */
 
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         // Datastores
         $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand');
         $router->post('datastores', 'DatastoreController@create');
 
-        $router->patch('datastores/{datastore_id}', 'DatastoreController@update');
-        $router->delete('datastores/{datastore_id}', 'DatastoreController@delete');
-        $router->post('datastores/{datastore_id}/expandvolume', 'DatastoreController@expandVolume');
-        $router->post('datastores/{datastore_id}/rescan', 'DatastoreController@clusterRescan');
-        $router->post('datastores/{datastore_id}/expanddatastore', 'DatastoreController@expandDatastore');
-        $router->post('datastores/{datastore_id}/iops', 'DatastoreController@updateIops');
+        $router->patch('datastores/{datastoreId}', 'DatastoreController@update');
+        $router->delete('datastores/{datastoreId}', 'DatastoreController@delete');
+        $router->post('datastores/{datastoreId}/expandvolume', 'DatastoreController@expandVolume');
+        $router->post('datastores/{datastoreId}/rescan', 'DatastoreController@clusterRescan');
+        $router->post('datastores/{datastoreId}/expanddatastore', 'DatastoreController@expandDatastore');
+        $router->post('datastores/{datastoreId}/iops', 'DatastoreController@updateIops');
 
-
-        $router->post('datastores/{datastore_id}/createvolume', 'DatastoreController@createvolume');
-        $router->post('datastores/{datastore_id}/create', 'DatastoreController@createDatastore');
+        $router->post('datastores/{datastoreId}/createvolume', 'DatastoreController@createvolume');
+        $router->post('datastores/{datastoreId}/create', 'DatastoreController@createDatastore');
 
         // Storage volume sets
         $router->get('volumesets', 'VolumeSetController@index');
-        $router->get('volumesets/{volue_set_id}', 'VolumeSetController@show');
+        $router->get('volumesets/{volumeSetId}', 'VolumeSetController@show');
         $router->post('volumesets', 'VolumeSetController@create');
-        $router->post('volumesets/{volume_set_id}/iops', 'VolumeSetController@setIOPS');
-        $router->post('volumesets/{volume_set_id}/export', 'VolumeSetController@export');
-        $router->post('volumesets/{volume_set_id}/datastores', 'VolumeSetController@addDatastore');
-        $router->delete('volumesets/{volume_set_id}/datastores/{datastore_id}', 'VolumeSetController@removeDatastore');
+        $router->post('volumesets/{volumeSetId}/iops', 'VolumeSetController@setIOPS');
+        $router->post('volumesets/{volumeSetId}/export', 'VolumeSetController@export');
+        $router->post('volumesets/{volumeSetId}/datastores', 'VolumeSetController@addDatastore');
+        $router->delete('volumesets/{volumeSetId}/datastores/{datastore_id}', 'VolumeSetController@removeDatastore');
 
-        $router->delete('volumesets/{volume_set_id}', 'VolumeSetController@delete');
-        $router->post('volumesets/{volume_set_id}/delete', 'VolumeSetController@deleteVolumeSet');
-        $router->get('volumesets/{volume_set_id}/volumes', 'VolumeSetController@volumes');
+        $router->delete('volumesets/{volumeSetId}', 'VolumeSetController@delete');
+        $router->post('volumesets/{volumeSetId}/delete', 'VolumeSetController@deleteVolumeSet');
+        $router->get('volumesets/{volumeSetId}/volumes', 'VolumeSetController@volumes');
 
 
         // Storage host sets
         $router->get('hostsets', 'HostSetController@index');
-        $router->get('hostsets/{host_set_id}', 'HostSetController@show');
+        $router->get('hostsets/{hostSetId}', 'HostSetController@show');
         $router->post('hostsets', 'HostSetController@create');
-        $router->post('hostsets/{host_set_id}/hosts', 'HostSetController@addHost');
-        $router->delete('hostsets/{host_set_id}/hosts/{host_id}', 'HostSetController@removeHost');
+        $router->post('hostsets/{hostSetId}/hosts', 'HostSetController@addHost');
+        $router->delete('hostsets/{hostSetId}/hosts/{hostId}', 'HostSetController@removeHost');
 
         //DRS
-        $router->get('solutions/{solution_id}/constraints', 'SolutionController@getDrsRules');
+        $router->get('solutions/{solutionId}/constraints', 'SolutionController@getDrsRules');
     });
 });
 
 // Public Support
 $router->group($baseRouteParameters, function () use ($router) {
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('support', 'PublicSupportController@index');
         $router->post('support', 'PublicSupportController@store');
         $router->get('support/{id}', [

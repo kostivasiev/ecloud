@@ -21,7 +21,7 @@ class HasResellerId
      */
     public function handle($request, Closure $next)
     {
-        if (empty($request->user->resellerId)) {
+        if (empty($request->user()->resellerId())) {
             throw new BadRequestException('Missing Reseller scope');
         }
 

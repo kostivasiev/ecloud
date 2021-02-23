@@ -16,13 +16,14 @@ use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VpcController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = Vpc::forUser($request->user);
+        $collection = Vpc::forUser($request->user());
         (new QueryTransformer($request))
             ->config(Vpc::class)
             ->transform($collection);
@@ -35,7 +36,7 @@ class VpcController extends BaseController
     public function show(Request $request, string $vpcId)
     {
         return new VpcResource(
-            Vpc::forUser($request->user)->findOrFail($vpcId)
+            Vpc::forUser($request->user())->findOrFail($vpcId)
         );
     }
 
@@ -49,7 +50,7 @@ class VpcController extends BaseController
 
     public function update(UpdateRequest $request, string $vpcId)
     {
-        $vpc = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        $vpc = Vpc::forUser(Auth::user())->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
         $vpc->region_id = $request->input('region_id', $vpc->region_id);
 
@@ -62,7 +63,7 @@ class VpcController extends BaseController
 
     public function destroy(Request $request, string $vpcId)
     {
-        $model = Vpc::forUser(app('request')->user)->findOrFail($vpcId);
+        $model = Vpc::forUser($request->user())->findOrFail($vpcId);
         if (!$model->canDelete()) {
             return $model->getDeletionError();
         }
@@ -72,7 +73,7 @@ class VpcController extends BaseController
 
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->volumes();
+        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->volumes();
         $queryTransformer->config(Volume::class)
             ->transform($collection);
 
@@ -83,7 +84,7 @@ class VpcController extends BaseController
 
     public function instances(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->instances();
+        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->instances();
         $queryTransformer->config(Instance::class)
             ->transform($collection);
 
@@ -94,7 +95,7 @@ class VpcController extends BaseController
 
     public function lbcs(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        $collection = Vpc::forUser($request->user)->findOrFail($vpcId)->loadBalancerClusters();
+        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->loadBalancerClusters();
         $queryTransformer->config(LoadBalancerCluster::class)
             ->transform($collection);
 
@@ -105,7 +106,7 @@ class VpcController extends BaseController
 
     public function deployDefaults(Request $request, string $vpcId)
     {
-        $vpc = Vpc::forUser($request->user)->findOrFail($vpcId);
+        $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
 
         $availabilityZone = $vpc->region()->first()->availabilityZones()->first();
 

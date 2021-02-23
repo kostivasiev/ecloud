@@ -18,6 +18,7 @@ class ApplianceVersion extends Model
     protected $connection = 'ecloud';
     protected $table = 'appliance_version';
     protected $primaryKey = 'appliance_version_uuid';
+    protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = true;
 

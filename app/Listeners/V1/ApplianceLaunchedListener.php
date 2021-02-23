@@ -38,7 +38,7 @@ class ApplianceLaunchedListener
                 'id' => $event->appliance->id,
                 'name' => $event->appliance->name,
                 'version' => $event->appliance->version,
-                'reseller_id' => $this->request->user->resellerId
+                'reseller_id' => $this->request->user()->resellerId()
             ]
         );
     }

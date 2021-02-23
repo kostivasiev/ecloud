@@ -35,6 +35,7 @@ class ApplianceParameter extends Model implements Filterable, Sortable
 
     protected $table = 'appliance_script_parameters';
 
+    protected $keyType = 'string';
     // Use UUID as primary key
     protected $primaryKey = 'appliance_script_parameters_uuid';
     // Don't increment the primary key for UUID's

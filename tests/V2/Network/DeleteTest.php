@@ -21,7 +21,7 @@ class DeleteTest extends TestCase
     protected $faker;
 
     protected $region;
-    protected $availability_zone;
+    protected $availabilityZone;
     protected $vpc;
     protected $router;
     protected $network;
@@ -39,24 +39,25 @@ class DeleteTest extends TestCase
         });
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
         factory(Credential::class)->create([
             'name' => 'NSX',
-            'resource_id' => $this->availability_zone->id,
+            'resource_id' => $this->availabilityZone->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->id,
         ]);
         $this->router = factory(Router::class)->create([
             'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',
             'router_id' => $this->router->id,
         ]);
-        $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
+        $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
             $mockNsxService->shouldReceive('delete')
@@ -79,8 +80,8 @@ class DeleteTest extends TestCase
             []
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);

@@ -6,6 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -33,7 +34,7 @@ class CreateRequest extends FormRequest
         }
         // Default AZ
         if (empty($availabilityZoneId) && $this->request->has('vpc_id')) {
-            $vpc = Vpc::forUser(app('request')->user)->find($this->request->get('vpc_id'));
+            $vpc = Vpc::forUser(Auth::user())->find($this->request->get('vpc_id'));
             if (!empty($vpc)) {
                 $availabilityZoneId = $vpc->region
                     ->availabilityZones

@@ -21,11 +21,9 @@ class IsLocked
      */
     public function handle($request, Closure $next)
     {
-        $instance = Instance::forUser($request->user)->findOrFail($request->route('instanceId'));
+        $instance = Instance::forUser($request->user())->findOrFail($request->route('instanceId'));
 
-        if ((!$request->user->isAdministrator ||
-                ($request->user->isAdministrator && !empty(filter_var($request->user->resellerId, FILTER_SANITIZE_NUMBER_INT))))
-            && $instance->locked) {
+        if ($request->user()->isScoped() && $instance->locked) {
             return JsonResponse::create([
                 'errors' => [
                     [
