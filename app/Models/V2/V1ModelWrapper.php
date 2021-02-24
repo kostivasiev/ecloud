@@ -13,7 +13,7 @@ class V1ModelWrapper extends Model
         foreach (debug_backtrace() as $row) {
             $message .= $row['file'] . ':' . $row['line'] . PHP_EOL;
         }
-        Log::debug(get_class($this) . '->id was read from on a V1 resource in...' . $message);
+        Log::debug(get_class($this) . '->id was read from on a V1 resource in...' . rtrim($message));
 
         return $this->attributes[$this->getKeyName()];
     }
@@ -24,7 +24,7 @@ class V1ModelWrapper extends Model
         foreach (debug_backtrace() as $row) {
             $message .= $row['file'] . ':' . $row['line'] . PHP_EOL;
         }
-        Log::debug(get_class($this) . '->id was wrote to on a V1 resource in...' . $message);
+        Log::debug(get_class($this) . '->id was wrote to on a V1 resource in...' . rtrim($message));
 
         $this->attributes[$this->getKeyName()] = $value;
     }
