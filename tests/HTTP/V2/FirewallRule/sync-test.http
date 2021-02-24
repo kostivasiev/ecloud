@@ -63,7 +63,7 @@ client.test('Create Firewall Port', function () {
     client.log('Port ID: ' + response.body.data.id);
 });
 client.log('Run the following SQL query to force an in-progress sync status:-');
-client.log('UPDATE `syncs` SET completed=0 WHERE resource_id=\'' + client.global.get('policy_id') + '\';');
+client.log('UPDATE `syncs` SET completed=0 WHERE resource_id=\'' + client.global.get('policy_id') + '\' order by created_at DESC limit 1;');
 %}
 
 ### Update Firewall Policy with sync in progress
@@ -288,7 +288,7 @@ client.test('Delete Firewall Rule', function () {
 %}
 
 ### Delete Firewall Policy
-PATCH https://{{host}}/{{version}}/firewall-policies/{{policy_id}}
+DELETE https://{{host}}/{{version}}/firewall-policies/{{policy_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
