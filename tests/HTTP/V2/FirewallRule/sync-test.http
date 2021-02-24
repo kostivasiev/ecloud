@@ -228,9 +228,10 @@ Content-Type:  application/json
 > {%
 client.test('Get new firewall port id', function () {
     client.assert(response.status === 200, '200 status not received');
-    client.assert(response.body.data[0].source === 111, 'Source is not 111');
-    client.assert(response.body.data[0].destination === 222, 'Source is not 222');
+    client.assert(response.body.data[0].source === "111", 'Source is not 111');
+    client.assert(response.body.data[0].destination === "222", 'Source is not 222');
     client.global.set('port_id', response.body.data[0].id);
+    client.log('Port ID Updated to: ' + response.body.data[0].id);
 });
 %}
 
@@ -241,7 +242,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "destination": 333
+    "destination": "333"
 }
 
 > {%
@@ -259,7 +260,7 @@ Content-Type:  application/json
 > {%
 client.test('Verify Firewall Port Change', function () {
     client.assert(response.status === 200, '200 status not received');
-    client.assert(response.body.data[0].destination === 333, 'Source is not 333');
+    client.assert(response.body.data[0].destination === "333", 'Source is not 333');
 });
 %}
 
