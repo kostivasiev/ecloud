@@ -92,14 +92,14 @@ class DatastoreController extends BaseController
     public function getSolutionDefault(Request $request, $solutionId)
     {
         $solution = SolutionController::getSolutionById($request, $solutionId);
-        $datastore = Datastore::getDefault($solution->id, $solution->ucs_reseller_type);
+        $datastore = Datastore::getDefault($solution->getKey(), $solution->ucs_reseller_type);
 
         return new Response([
             'data' => [
-                'id' => $datastore->id,
+                'id' => $datastore->getKey(),
             ],
             'meta' => [
-                'location' => config('app.url') . '/v1/datastores/' . $datastore->id
+                'location' => config('app.url') . '/v1/datastores/' . $datastore->getKey()
             ],
         ], 200);
     }
@@ -131,7 +131,7 @@ class DatastoreController extends BaseController
             Log::error(
                 'Failed to load datastore\'s volume set details from database',
                 [
-                    'datastore_id' => $this->id
+                    'datastore_id' => $this->getKey()
                 ]
             );
             throw new ServiceUnavailableException('IOPS can not be configured for this datastore');
@@ -144,7 +144,7 @@ class DatastoreController extends BaseController
             Log::error(
                 'Failed to get volume set details from the SAN',
                 [
-                    'datastore_id' => $this->id,
+                    'datastore_id' => $this->getKey(),
                     'volume_set' => $volumeSet->name,
                     'SAN error message' => $artisan->getLastError()
                 ]
@@ -157,7 +157,7 @@ class DatastoreController extends BaseController
             Log::error(
                 'Unable to configure IOPS on datastore. The volume set contains more than one volume.',
                 [
-                    'datastore_id' => $this->id,
+                    'datastore_id' => $this->getKey(),
                     'volume_set' => $volumeSet->name
                 ]
             );
@@ -176,7 +176,7 @@ class DatastoreController extends BaseController
             Log::error(
                 'Unable to configure IOPS on datastore',
                 [
-                    'datastore_id' => $this->id,
+                    'datastore_id' => $this->getKey(),
                     'volume_set' => $volumeSet->name,
                     'error' => $error
                 ]
@@ -227,11 +227,11 @@ class DatastoreController extends BaseController
         $whitelist = ['solution_id', 'capacity'];
 
         if ($request->filled('name')) {
-            $datastoresQuery = Datastore::where('reseller_lun_ucs_reseller_id', '=', $solution->id)
+            $datastoresQuery = Datastore::where('reseller_lun_ucs_reseller_id', '=', $solution->getKey())
                 ->where('reseller_lun_status', '!=', Status::DELETED);
 
             if (isset($solutionSite)) {
-                $datastoresQuery->where('reseller_lun_ucs_site_id', '=', $solutionSite->id);
+                $datastoresQuery->where('reseller_lun_ucs_site_id', '=', $solutionSite->getKey());
             }
 
             $datastores = $datastoresQuery->get();
@@ -273,7 +273,7 @@ class DatastoreController extends BaseController
                     $errorMessage,
                     [
                         'san_id' => $request->input('san_id'),
-                        'pod_id' => $pod->id
+                        'pod_id' => $pod->getKey()
                     ]
                 );
                 throw new SanNotFoundException($errorMessage);
@@ -311,7 +311,7 @@ class DatastoreController extends BaseController
         }
 
         $datastore = $datastoreResource->resource;
-        $datastore->reseller_lun_ucs_storage_id = $storage->id;
+        $datastore->reseller_lun_ucs_storage_id = $storage->getKey();
         $datastore->reseller_lun_type = $request->input('type', $solution->ucs_reseller_type);
         $datastore->reseller_lun_reseller_id = $solution->resellerId();
         $datastore->reseller_lun_lun_type = $request->input('lun_type', 'DATA');
@@ -326,9 +326,9 @@ class DatastoreController extends BaseController
                 $automationRequestId = $intapiService->automationRequest(
                     'add_lun',
                     'reseller_lun',
-                    $datastore->id,
+                    $datastore->getKey(),
                     $automationData,
-                    'ecloud_ucs_' . $pod->id,
+                    'ecloud_ucs_' . $pod->getKey(),
                     $request->user()->userId(),
                     $request->user()->type()
                 );
@@ -446,9 +446,9 @@ class DatastoreController extends BaseController
             $automationRequestId = $intapiService->automationRequest(
                 'delete_lun',
                 'reseller_lun',
-                $datastore->id,
+                $datastore->getKey(),
                 null,
-                'ecloud_ucs_' . $datastore->pod->id,
+                'ecloud_ucs_' . $datastore->pod->getKey(),
                 $request->user()->userId(),
                 $request->user()->type()
             );
@@ -500,11 +500,11 @@ class DatastoreController extends BaseController
             $automationRequestId = $intapiService->automationRequest(
                 'expand_lun',
                 'reseller_lun',
-                $datastore->id,
+                $datastore->getKey(),
                 [
                     'new_capacity_gb' => $newSizeGB
                 ],
-                'ecloud_ucs_' . $datastore->storage->pod->id,
+                'ecloud_ucs_' . $datastore->storage->pod->getKey(),
                 $request->user()->userId(),
                 $request->user()->type()
             );

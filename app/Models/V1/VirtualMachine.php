@@ -683,7 +683,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         }
 
         $isOnline = $kingpin->checkVMOnline(
-            $this->id,
+            $this->getKey(),
             $this->solutionId()
         );
 
@@ -717,7 +717,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         }
 
         $response = $kingpin->vmwareToolsStatus(
-            $this->id,
+            $this->getKey(),
             $this->solutionId()
         );
 
@@ -742,7 +742,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         }
 
         $response = $kingpin->getActiveHDDs(
-            $this->id,
+            $this->getKey(),
             $this->solutionId()
         );
 
@@ -766,7 +766,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         }
 
         $response = $kingpin->getVMDatastore(
-            $this->id,
+            $this->getKey(),
             $this->solutionId()
         );
 

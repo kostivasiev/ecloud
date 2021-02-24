@@ -28,7 +28,7 @@ class SolutionTemplate extends AbstractTemplate
         $tmp_template = parent::convertToPublicTemplate();
 
         //Add the solution_id for Solution templates
-        $tmp_template->solution_id = $this->solution->id;
+        $tmp_template->solution_id = $this->solution->getKey();
 
         return $tmp_template;
     }

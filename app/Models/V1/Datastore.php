@@ -469,9 +469,9 @@ class Datastore extends Model implements Filterable, Sortable
             23 => 'X',
         ];
 
-        $podId = $pod->id;
+        $podId = $pod->getKey();
         if (array_key_exists($podId, $podMapping)) {
-            $podId = $podMapping[$pod->id];
+            $podId = $podMapping[$pod->getKey()];
         }
 
         $clusterName = 'MCS_P' . $podId . '_VV_VMPUBLICSTORE_SSD_' . ($backupRequired ? 'BACKUP' : 'NONBACKUP');
@@ -660,7 +660,7 @@ class Datastore extends Model implements Filterable, Sortable
     {
         $query = VolumeSetController::getQuery(app('request'));
 
-        $query->where('ucs_reseller_id', '=', $this->solution->id);
+        $query->where('ucs_reseller_id', '=', $this->solution->getKey());
 
         if ($query->count() > 0) {
             $artisan = app()->makeWith(ArtisanService::class, [['datastore' => $this]]);
@@ -676,7 +676,7 @@ class Datastore extends Model implements Filterable, Sortable
                     Log::error(
                         'Failed to get volume set details from the SAN',
                         [
-                            'datastore_id' => $this->id,
+                            'datastore_id' => $this->getKey(),
                             'volume_set' => $volumeSet->name,
                             'SAN error message' => $error
                         ]

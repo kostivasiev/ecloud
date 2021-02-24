@@ -35,7 +35,7 @@ class DatastoreExpandListener
         Log::info(
             'Datastore expand was scheduled',
             [
-                'id' => $event->datastore->id,
+                'id' => $event->datastore->getKey(),
                 'reseller_id' => $this->request->user()->resellerId(),
                 'new_size_gb' => $event->newSizeGb
             ]

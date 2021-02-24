@@ -181,7 +181,7 @@ class TemplateController extends BaseController
                     'template_name' => $solutionTemplate->name,
                     'new_template_name' => $newTemplateName
                 ],
-                'ecloud_ucs_' . $solution->pod->id,
+                'ecloud_ucs_' . $solution->pod->getKey(),
                 $request->user()->userId(),
                 $request->user()->type()
             );
@@ -272,12 +272,12 @@ class TemplateController extends BaseController
             $intapiService->automationRequest(
                 'delete_template',
                 'ucs_reseller',
-                $solutionTemplate->solution->id,
+                $solutionTemplate->solution->getKey(),
                 [
                     'template_type' => 'solution',
                     'template_name' => $templateName,
                 ],
-                'ecloud_ucs_' . $solution->pod->id,
+                'ecloud_ucs_' . $solution->pod->getKey(),
                 $request->user()->userId(),
                 $request->user()->type()
             );

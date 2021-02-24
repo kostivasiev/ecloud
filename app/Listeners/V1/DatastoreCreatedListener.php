@@ -35,7 +35,7 @@ class DatastoreCreatedListener
         Log::info(
             'New Datastore Creation was scheduled',
             [
-                'id' => $event->datastore->id,
+                'id' => $event->datastore->getKey(),
                 'reseller_id' => $this->request->user()->resellerId(),
                 'sizeGB' => $event->datastore->reseller_lun_size_gb
             ]

@@ -35,7 +35,7 @@ class VolumeSetIopsUpdatedListener
         Log::info(
             'IOPS limit updated for Volume Set',
             [
-                'volume_set_id' => $event->volumeSet->id,
+                'volume_set_id' => $event->volumeSet->getKey(),
                 'reseller_id' => $this->request->user()->resellerId(),
                 'new_iops_limit' => $event->volumeSet->max_iops
             ]

@@ -368,7 +368,7 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         }
 
         throw new ApplianceServerLicenseNotFoundException(
-            "No Server license found for Appliance version '" . $this->id . "'"
+            "No Server license found for Appliance version '" . $this->getKey() . "'"
         );
     }
 

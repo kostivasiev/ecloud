@@ -62,7 +62,7 @@ abstract class AbstractTemplate
             $templateName = substr($this->name, 0, strpos($this->name, '-gpu-'));
         }
 
-        $ecloudLicenses = ServerLicense::availableToInstall('ecloud vm', true, 'OS', $this->pod->id);
+        $ecloudLicenses = ServerLicense::availableToInstall('ecloud vm', true, 'OS', $this->pod->getKey());
 
         // exact name match (aka base templates)
         $baseTemplate = $ecloudLicenses->filter(function ($license) use ($templateName) {

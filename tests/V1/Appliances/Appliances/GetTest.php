@@ -147,7 +147,7 @@ class GetTest extends ApplianceTestCase
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/pods', [], $this->validWriteHeaders)
             ->seeStatusCode(200)
             ->seeJson([
-                'id' => $pod[0]->id
+                'id' => $pod[0]->getKey()
             ]);
     }
 

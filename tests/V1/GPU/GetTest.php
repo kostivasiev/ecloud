@@ -24,7 +24,7 @@ class GetTest extends TestCase
         $this->json('GET', '/v1/gpu-profiles', [], $this->validWriteHeaders)
             ->seeStatusCode(200)
             ->seeJson([
-                'id' => $this->gpu_profile->id,
+                'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'profile_name' => $this->gpu_profile->profile_name,
                 'card_type' => $this->gpu_profile->card_type,
@@ -39,7 +39,7 @@ class GetTest extends TestCase
                 'profile_name' => $this->gpu_profile->profile_name,
             ])
             ->seeJson([
-                'id' => $this->gpu_profile->id,
+                'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'card_type' => $this->gpu_profile->card_type,
             ]);
@@ -47,10 +47,10 @@ class GetTest extends TestCase
 
     public function testValidItem()
     {
-        $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->id, [], $this->validWriteHeaders)
+        $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->getKey(), [], $this->validWriteHeaders)
             ->seeStatusCode(200)
             ->seeJson([
-                'id' => $this->gpu_profile->id,
+                'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'profile_name' => $this->gpu_profile->profile_name,
                 'card_type' => $this->gpu_profile->card_type,
@@ -59,13 +59,13 @@ class GetTest extends TestCase
 
     public function testValidItemReadOnly()
     {
-        $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->id, [], $this->validReadHeaders)
+        $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->getKey(), [], $this->validReadHeaders)
             ->seeStatusCode(200)
             ->dontSeeJson([
                 'profile_name' => $this->gpu_profile->profile_name,
             ])
             ->seeJson([
-                'id' => $this->gpu_profile->id,
+                'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'card_type' => $this->gpu_profile->card_type,
             ]);
@@ -77,7 +77,7 @@ class GetTest extends TestCase
         $this->assertEquals(5, GpuProfile::gpuResourcePoolAvailability());
 
         $vms = factory(VirtualMachine::class, 1)->create()->first();
-        $vms->servers_ecloud_gpu_profile_uuid = $this->gpu_profile->id;
+        $vms->servers_ecloud_gpu_profile_uuid = $this->gpu_profile->getKey();
         $vms->save();
 
         $this->assertEquals(4, GpuProfile::gpuResourcePoolAvailability());

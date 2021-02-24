@@ -208,7 +208,7 @@ class VolumeSet extends Model implements Filterable, Sortable
 
         $index = 0;
         $solution->volumeSets()->withTrashed()->get()->map(function ($item) use (&$index, $solution) {
-            if (preg_match('/\w+(' . $solution->id . ')_?(\d+)*$/', $item->name, $matches) == true) {
+            if (preg_match('/\w+(' . $solution->getKey() . ')_?(\d+)*$/', $item->name, $matches) == true) {
                 $numeric = $matches[2] ?? 1;
                 $index = ($numeric > $index) ? (int)$numeric : $index;
             }

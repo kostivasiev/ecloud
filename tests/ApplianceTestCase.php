@@ -46,7 +46,7 @@ class ApplianceTestCase extends TestCase
             $version = 3;
 
             if ($this->verbose) {
-                echo 'Creating appliance \'' . $appliance->id . PHP_EOL;
+                echo 'Creating appliance \'' . $appliance->getKey() . PHP_EOL;
             }
 
             for ($i = 0; $i < $version; $i++) {
@@ -58,7 +58,7 @@ class ApplianceTestCase extends TestCase
                 $applianceVersion = factory(ApplianceVersion::class)->make($applianceFactoryConfig);
 
                 if ($this->verbose) {
-                    echo 'Creating appliance version \'' . ($i + 1) . '\' for appliance \'' . $appliance->id . '\'';
+                    echo 'Creating appliance version \'' . ($i + 1) . '\' for appliance \'' . $appliance->getKey() . '\'';
                 }
                 $applianceVersion->save();
 

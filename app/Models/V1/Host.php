@@ -285,7 +285,7 @@ class Host extends Model implements Filterable, Sortable
                 $this->solution->ucs_reseller_type
             ]);
 
-            if (!$kingpin->clusterRescan($this->solution->id)) {
+            if (!$kingpin->clusterRescan($this->solution->getKey())) {
                 throw new \Exception('Failed to perform cluster rescan: ' . $kingpin->getLastError());
             }
         } catch (\Exception $exception) {

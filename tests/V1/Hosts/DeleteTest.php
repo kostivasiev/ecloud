@@ -21,15 +21,15 @@ class DeleteTest extends TestCase
         $pod = factory(Pod::class, 1)->create()->first();
 
         $solution = factory(Solution::class, 1)->create([
-            'ucs_reseller_datacentre_id' => $pod->id
+            'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
         $host = factory(Host::class, 1)->create([
-            'ucs_node_ucs_reseller_id' => $solution->id,
+            'ucs_node_ucs_reseller_id' => $solution->getKey(),
             'ucs_node_internal_name' => 'Test Host 1'
         ])->first();
 
-        $this->json('POST', '/v1/hosts/' . $host->id . '/delete', [], [
+        $this->json('POST', '/v1/hosts/' . $host->getKey() . '/delete', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeStatusCode(404)->seeJson([
