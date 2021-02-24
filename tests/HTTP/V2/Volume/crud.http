@@ -61,7 +61,7 @@ Content-Type: application/json
 
 {
     "name": "Test - updated",
-    "capacity": 50
+    "capacity": 60
 }
 
 > {%
@@ -81,7 +81,7 @@ Content-Type: application/json
 
 {
     "name": "Test - updated",
-    "iops": 600
+    "iops": 300
 }
 
 > {%
