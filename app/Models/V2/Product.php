@@ -3,7 +3,6 @@
 namespace App\Models\V2;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -15,7 +14,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class Product
  * @package App\Models\V1
  */
-class Product extends Model implements Filterable, Sortable
+class Product extends V1ModelWrapper implements Filterable, Sortable
 {
     protected $connection = 'reseller';
     protected $table = 'product';
