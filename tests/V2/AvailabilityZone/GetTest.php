@@ -13,7 +13,7 @@ class GetTest extends TestCase
 
     public function testGetCollectionAsAdmin()
     {
-        // Region only visible to admins
+        // Availability Zone only visible to admins
         factory(AvailabilityZone::class)->create();
 
         $this->availabilityZone()->is_public = true;
@@ -32,7 +32,7 @@ class GetTest extends TestCase
 
     public function testGetCollectionAsNonAdmin()
     {
-        // Region only visible to admins
+        // Availability Zone only visible to admins
         factory(AvailabilityZone::class)->create();
 
         $this->availabilityZone()->is_public = true;
