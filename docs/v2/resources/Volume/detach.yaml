@@ -1,0 +1,14 @@
+post:
+  parameters :
+    - $ref : '../../resources/Volume/parameters/volumeId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref : '../../components/schemas/volumes/detach.yaml'
+  responses:
+    202:
+      description: Success
+  tags:
+    - Volumes
