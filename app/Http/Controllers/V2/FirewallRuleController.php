@@ -77,7 +77,9 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
-        $firewallRule->save();
+        if (!$firewallRule->save()) {
+            return $firewallRule->getSyncError();
+        }
 
         if ($request->has('ports')) {
             foreach ($request->input('ports') as $port) {
@@ -109,17 +111,25 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
-        $firewallRule->save();
 
-        if ($request->has('ports')) {
-            $firewallRule->firewallRulePorts->each(function ($rule) {
-                $rule->delete();
-            });
-            foreach ($request->input('ports') as $port) {
-                $port['firewall_rule_id'] = $firewallRule->id;
-                $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->save();
-            }
+        if ($request->has('ports') && $firewallRule->firewallPolicy->getStatus() !== 'in-progress') {
+            FirewallRule::withoutEvents(
+                function () use ($request, $firewallRule) {
+                    $firewallRule->firewallRulePorts->each(function ($rule) {
+                        $rule->delete();
+                    });
+                    foreach ($request->input('ports') as $port) {
+                        $port['firewall_rule_id'] = $firewallRule->id;
+                        $firewallRulePort = new FirewallRulePort($port);
+                        FirewallRulePort::addCustomKey($firewallRulePort);
+                        $firewallRulePort->save();
+                    }
+                }
+            );
+        }
+
+        if (!$firewallRule->save()) {
+            return $firewallRule->getSyncError();
         }
 
         return $this->responseIdMeta($request, $firewallRule->id, 200);
@@ -127,8 +137,10 @@ class FirewallRuleController extends BaseController
 
     public function destroy(Request $request, string $firewallRuleId)
     {
-        FirewallRule::foruser($request->user())->findOrFail($firewallRuleId)
-            ->delete();
+        $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
+        if (!$firewallRule->delete()) {
+            return $firewallRule->getSyncError();
+        }
         return response()->json([], 204);
     }
 }
