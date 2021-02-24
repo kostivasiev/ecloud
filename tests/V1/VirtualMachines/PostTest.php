@@ -7,7 +7,7 @@ use App\Models\V1\VirtualMachine;
 use App\Rules\V1\IsValidSSHPublicKey;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class PostTest extends TestCase
 {

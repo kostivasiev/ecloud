@@ -3,7 +3,7 @@
 namespace Tests\V1\PublicSupport;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class PostTest extends TestCase
 {
