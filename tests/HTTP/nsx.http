@@ -179,3 +179,34 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+
+###
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/groups
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+###
+
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+###
+
+GET https://185.197.63.88/policy/api/v1/aaa/effective-permissions?feature_name=policy_grouping&object_path=/infra/domains/default/groups/ptest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+###
+
+# %20AND%20
+GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:Group
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+###
+
+
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-2ac62996
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+

@@ -21,6 +21,8 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
+        // TODO: Undeploy Policy -> Undeploy Policy Check -> Delete Group -> Delete group check -> mark sync completed
+
         $jobs = [
             new Undeploy($this->model),
             new UndeployCheck($this->model)

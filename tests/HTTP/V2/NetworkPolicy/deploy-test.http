@@ -55,7 +55,7 @@ Content-Type: application/json
 
 {
     "network_id": "{{network_id}}",
-    "name": "Test Policy"
+    "name": "Test Policy - PM"
 }
 
 > {%

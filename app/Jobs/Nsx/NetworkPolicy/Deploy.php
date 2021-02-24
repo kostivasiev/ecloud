@@ -5,7 +5,6 @@ namespace App\Jobs\Nsx\NetworkPolicy;
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRulePort;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
@@ -26,41 +25,9 @@ class Deploy extends Job
         $availabilityZone = $router->availabilityZone;
 
         /**
-         * First create a security group for the policy if there isn't one already there
-         */
-        $response = $availabilityZone->nsxService()->patch(
-            '/policy/api/v1/infra/domains/default/groups/' . $this->model->id,
-            [
-                'json' => [
-                    'id' => $this->model->id,
-                    'display_name' => $this->model->id,
-                    'resource_type' => 'Group',
-                    'expression' => [
-                        [
-                            'resource_type' => 'PathExpression',
-                            'paths' => [
-                                '/infra/tier-1s/' . $router->id . '/segments/' . $network->id
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        );
-
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->model->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Failed to create security group for "' . $this->model->id . '"'));
-            return false;
-        }
-
-        /**
          * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/d9f0d8ce-b56e-45fa-9d32-ad9b95baa071/bd4b6353-6bbf-45ca-b7ef-3fa6c4905e94/api_includes/method_UpdateSecurityPolicyForDomain.html
          */
-        $response = $availabilityZone->nsxService()->patch(
+        $availabilityZone->nsxService()->patch(
             '/policy/api/v1/infra/domains/default/security-policies/' . $this->model->id,
             [
                 'json' => [
@@ -122,16 +89,6 @@ class Deploy extends Job
                 ]
             ]
         );
-
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->model->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Failed to create "' . $this->model->id . '"'));
-            return false;
-        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

@@ -16,8 +16,7 @@ class NetworkRuleController extends BaseController
     {
         $collection = NetworkRule::forUser($request->user());
 
-        (new QueryTransformer($request))
-            ->config(NetworkRule::class)
+        $queryTransformer->config(NetworkRule::class)
             ->transform($collection);
 
         return NetworkRuleResource::collection($collection->paginate(
@@ -32,8 +31,8 @@ class NetworkRuleController extends BaseController
 
     public function store(Create $request)
     {
-        $aclRule = app()->make(NetworkRule::class);
-        $aclRule->fill($request->only([
+        $networkRule = app()->make(NetworkRule::class);
+        $networkRule->fill($request->only([
             'network_policy_id',
             'name',
             'sequence',
@@ -42,14 +41,14 @@ class NetworkRuleController extends BaseController
             'action',
             'enabled',
         ]));
-        $aclRule->save();
-        return $this->responseIdMeta($request, $aclRule->getKey(), 201);
+        $networkRule->save();
+        return $this->responseIdMeta($request, $networkRule->getKey(), 201);
     }
 
     public function update(Update $request, string $networkRuleId)
     {
-        $aclRule = NetworkRule::forUser(Auth::user())->findOrFail($networkRuleId);
-        $aclRule->fill($request->only([
+        $networkRule = NetworkRule::forUser(Auth::user())->findOrFail($networkRuleId);
+        $networkRule->fill($request->only([
             'network_policy_id',
             'name',
             'sequence',
@@ -58,8 +57,8 @@ class NetworkRuleController extends BaseController
             'action',
             'enabled',
         ]));
-        $aclRule->save();
-        return $this->responseIdMeta($request, $aclRule->getKey(), 200);
+        $networkRule->save();
+        return $this->responseIdMeta($request, $networkRule->getKey(), 200);
     }
 
     public function destroy(Request $request, string $networkRuleId)
