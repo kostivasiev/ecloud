@@ -4,8 +4,10 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -50,6 +52,24 @@ class RouterThroughput extends Model implements Filterable, Sortable
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    /**
+     * @param Builder $query
+     * @param Consumer $user
+     * @return Builder
+     */
+    public function scopeForUser(Builder $query, Consumer $user)
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+        return $query->whereHas(
+            'availabilityZone',
+            function ($query) {
+                $query->where('is_public', '=', 1);
+            }
+        );
     }
 
     /**
