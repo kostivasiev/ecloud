@@ -30,6 +30,8 @@ class AssignTest extends TestCase
     protected $vpc;
     protected $dhcp;
     protected $availability_zone;
+    protected $instance;
+    protected $network;
 
     public function setUp(): void
     {
