@@ -15,7 +15,7 @@ class UpdateTest extends TestCase
     protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         $this->availabilityZone();
@@ -26,14 +26,24 @@ class UpdateTest extends TestCase
         $mockIds = ['np-test', 'np-zzzxxxyyy'];
         foreach ($mockIds as $mockId) {
             $this->nsxServiceMock()->shouldReceive('patch')
-                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/'.$mockId)
+                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/' . $mockId)
                 ->andReturnUsing(function () {
                     return new Response(200, [], '');
                 });
+            $this->nsxServiceMock()->shouldReceive('get')
+                ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/' . $mockId])
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+                });
             $this->nsxServiceMock()->shouldReceive('patch')
-                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/'.$mockId)
+                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/' . $mockId)
                 ->andReturnUsing(function () {
                     return new Response(200, [], '');
+                });
+            $this->nsxServiceMock()->shouldReceive('get')
+                ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/' . $mockId])
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
                 });
         }
 

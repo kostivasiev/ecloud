@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Nsx\NetworkPolicy;
+namespace App\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
@@ -24,7 +24,7 @@ class UndeployCheck extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $response = $this->model->network->router->availabilityZone->nsxService()->get(
-            'policy/api/v1/infra/domains/default/security-policies/?include_mark_for_delete_objects=true'
+            'policy/api/v1/infra/domains/default/groups/?include_mark_for_delete_objects=true'
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {

@@ -53,7 +53,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'Test Policy',
-            'network_id' => 'net-test',
+            'network_id' => $this->network()->id,
         ];
         $this->post(
             '/v2/network-policies',
@@ -66,7 +66,7 @@ class CreateTest extends TestCase
             'network_policies',
             [
                 'name' => 'Test Policy',
-                'network_id' => 'net-test',
+                'network_id' => $this->network()->id,
             ],
             'ecloud'
         )->assertResponseStatus(201);

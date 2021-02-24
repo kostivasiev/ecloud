@@ -14,7 +14,6 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Network $network;
     protected NetworkPolicy $networkPolicy;
     protected NetworkRule $networkRule;
     protected NetworkRulePort $networkRulePort;
@@ -22,12 +21,13 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->availabilityZone();
-        $this->network = factory(Network::class)->create([
-            'id' => 'net-test',
-            'router_id' => $this->router()->id,
-        ]);
+        $this->network();
 
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
         $this->nsxServiceMock()->shouldReceive('get')
             ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
@@ -38,26 +38,27 @@ class GetTest extends TestCase
                 ));
             });
         $this->nsxServiceMock()->shouldReceive('patch')
-            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-        $this->nsxServiceMock()->shouldReceive('patch')
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
-            'network_id' => 'net-test',
+            'network_id' => $this->network()->id,
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-test',
-            'network_policy_id' => 'np-test',
+            'network_policy_id' => $this->networkPolicy->id,
         ]);
         $this->networkRulePort = factory(NetworkRulePort::class)->create([
             'id' => 'nrp-test',
-            'network_rule_id' => 'nr-test',
+            'network_rule_id' => $this->networkRule->id,
         ]);
     }
 

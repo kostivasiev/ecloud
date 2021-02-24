@@ -1,46 +1,55 @@
 <?php
-namespace Tests\unit\Rules;
+namespace Tests\unit\Network;
 
 use App\Models\V2\NetworkPolicy;
-use App\Models\V2\Network;
 use App\Rules\V2\NetworkHasNoPolicy;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
-class NetworkHasNoAclTest extends TestCase
+class NetworkHasNoPolicyTest extends TestCase
 {
     use DatabaseMigrations;
 
     protected NetworkHasNoPolicy $rule;
-    protected Network $network;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         $this->rule = new NetworkHasNoPolicy();
-        $this->availabilityZone();
-        $this->network = factory(Network::class)->create([
-            'router_id' => $this->router()->id,
-        ]);
+        $this->network();
 
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(
+                    [
+                        'publish_status' => 'REALIZED'
+                    ]
+                ));
+            });
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
+            });
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
     }
 
     public function testRulePasses()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->assertTrue($this->rule->passes('', $this->network->id));
+        $this->assertTrue($this->rule->passes('', $this->network()->id));
     }
 
     public function testRuleFails()
@@ -48,8 +57,8 @@ class NetworkHasNoAclTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
-            'network_id' => $this->network->id,
+            'network_id' => $this->network()->id,
         ]);
-        $this->assertFalse($this->rule->passes('', $this->network->id));
+        $this->assertFalse($this->rule->passes('', $this->network()->id));
     }
 }

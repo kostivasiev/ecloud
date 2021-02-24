@@ -189,7 +189,7 @@ Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 ###
 
-GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/np-5470ba95
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 ###
@@ -206,7 +206,19 @@ Content-Type:  application/json
 ###
 
 
-GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-2ac62996
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-5470ba95
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
+
+
+###
+
+DELETE https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/np-acb5a46d
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/?include_mark_for_delete_objects=truee
+GET https://185.197.63.88/policy/api/v1/search/query?query=path:/infra/domains/default/security-policies/np-5470ba95
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
