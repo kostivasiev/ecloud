@@ -34,19 +34,6 @@ class CreateTest extends TestCase
                 return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
             });
 
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
-                [
-                    'json' => [
-                        'sizeGiB' => '100',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
         $this->volume = factory(Volume::class)->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
@@ -100,19 +87,6 @@ class CreateTest extends TestCase
                 return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
             });
 
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
-                [
-                    'json' => [
-                        'sizeGiB' => '1',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
         $this->post('/v2/volumes', [
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -133,19 +107,6 @@ class CreateTest extends TestCase
             ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
-
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
-                [
-                    'json' => [
-                        'sizeGiB' => '1',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
             });
 
         $this->post('/v2/volumes', [

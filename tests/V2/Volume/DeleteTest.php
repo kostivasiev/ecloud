@@ -34,19 +34,6 @@ class DeleteTest extends TestCase
                 ]));
             });
 
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
-                [
-                    'json' => [
-                        'sizeGiB' => '100',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
         $this->volume = factory(Volume::class)->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
