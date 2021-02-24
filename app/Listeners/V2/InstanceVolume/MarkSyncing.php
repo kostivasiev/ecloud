@@ -2,6 +2,7 @@
 
 namespace App\Listeners\V2\InstanceVolume;
 
+use App\Exceptions\SyncException;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
@@ -18,24 +19,24 @@ class MarkSyncing
         $instance = Instance::find($event->model->instance_id);
         if (!$instance) {
             Log::error(get_class($this) . ' : Failed to find instance');
-            return false;
+            throw new \Exception('Failed to find instance');
         }
 
         $volume = Volume::find($event->model->volume_id);
         if (!$volume) {
             Log::error(get_class($this) . ' : Failed to find volume');
-            return false;
+            throw new \Exception('Failed to find instance');
         }
 
         if (!$instance->createSync()) {
             Log::error(get_class($this) . ' : Failed to create sync for instance');
-            return false;
+            throw new SyncException('Failed to create sync for instance');
         }
 
         if (!$volume->createSync()) {
             Log::error(get_class($this) . ' : Failed to create sync for volume');
             $instance->markSyncCompleted();
-            return false;
+            throw new SyncException('Failed to create sync for volume');
         }
 
         Log::info(get_class($this) . ' : Finished', [

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Volume\Data;
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Volume\AttachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
-use App\Jobs\Volume\AttachToInstance;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -87,10 +86,18 @@ class VolumeController extends BaseController
             }
         }
 
-        $volume = app()->make(Volume::class);
-        $volume->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity', 'iops']));
-        $volume->save();
-        return $this->responseIdMeta($request, $volume->getKey(), 201);
+        $model = app()->make(Volume::class);
+        $model->fill($request->only([
+            'name',
+            'vpc_id',
+            'availability_zone_id',
+            'capacity',
+            'iops',
+        ]));
+        if (!$model->save()) {
+            return $model->getSyncError();
+        }
+        return $this->responseIdMeta($request, $model->id, 201);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
@@ -117,7 +124,13 @@ class VolumeController extends BaseController
             }
         }
 
-        $only = ['name', 'vpc_id', 'capacity', 'availability_zone_id', 'iops'];
+        $only = [
+            'name',
+            'vpc_id',
+            'capacity',
+            'availability_zone_id',
+            'iops',
+        ];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }
@@ -126,7 +139,7 @@ class VolumeController extends BaseController
             return $volume->getSyncError();
         }
 
-        return $this->responseIdMeta($request, $volume->getKey(), 200);
+        return $this->responseIdMeta($request, $volume->id, 200);
     }
 
     public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
@@ -151,9 +164,13 @@ class VolumeController extends BaseController
 
     public function attachToInstance(AttachRequest $request, string $volumeId)
     {
-        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
-        $instance->volumes()->attach($volume);
+        try {
+            $instance->volumes()->attach($model);
+        } catch (SyncException $exception) {
+            return $model->getSyncError();
+        }
         return response('', 202);
     }
 }

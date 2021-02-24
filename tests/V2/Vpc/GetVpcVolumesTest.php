@@ -2,10 +2,8 @@
 
 namespace Tests\V2\Vpc;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -13,47 +11,59 @@ class GetVpcVolumesTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public AvailabilityZone $availabilityZone;
-    public Region $region;
     public $volumes;
-    public Vpc $vpc;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
 
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-test',
+                        'sizeGiB' => '100',
+                        'shared' => false,
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+            });
 
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '100',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
 
-        $this->volumes = factory(Volume::class, 4)->create([
-            'name' => 'Volume ' . uniqid(),
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
+        $this->volume = factory(Volume::class)->create([
+            'id' => 'vol-test',
+            'name' => 'Volume',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
         ]);
     }
 
     public function testVolumesCollection()
     {
-        $this->get(
-            '/v2/vpcs/'.$this->vpc->getKey().'/volumes',
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups'    => 'ecloud.read',
-            ]
-        )
-            ->seeJson([
-                'id' => $this->volumes[0]->id,
-                'name' => $this->volumes[0]->name,
-                'vpc_id' => $this->volumes[0]->vpc_id,
-                'availability_zone_id' => $this->volumes[0]->availability_zone_id,
-                'capacity' => $this->volumes[0]->capacity,
-            ])
-            ->assertResponseStatus(200);
+        $this->get('/v2/vpcs/' . $this->vpc()->id . '/volumes', [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.read',
+        ])->seeJson([
+            'id' => 'vol-test',
+            'name' => 'Volume',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'capacity' => '100',
+        ])->assertResponseStatus(200);
     }
 }

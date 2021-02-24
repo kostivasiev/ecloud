@@ -8,7 +8,7 @@ use App\Models\V2\Volume;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Log;
 
-class Attach extends Job
+class Detach extends Job
 {
     private Volume $volume;
     private Instance $instance;
@@ -23,18 +23,10 @@ class Attach extends Job
     {
         Log::info(get_class($this) . ' : Started');
 
-        if ($this->instance->volumes()->get()->count() >= config('volume.instance.limit', 15)) {
-            $message = 'Volume ' . $this->volume->id . ' failed to attach to instance ' . $this->instance->id . ', volume limit exceeded';
-            $this->instance->setSyncFailureReason($message);
-            $this->volume->setSyncFailureReason($message);
-            $this->fail(new \Exception($message));
-            return;
-        }
-
         try {
             $this->instance->availabilityZone->kingpinService()
                 ->post(
-                    '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
+                    '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/detach',
                     [
                         'json' => [
                             'volumeUUID' => $this->volume->vmware_uuid
@@ -45,7 +37,7 @@ class Attach extends Job
             Log::error($exception->getResponse()->getBody()->getContents());
             throw $exception;
         }
-        Log::debug('Volume ' . $this->volume->id . ' has been attached to instance ' . $this->instance->id);
+        Log::debug('Volume ' . $this->volume->id . ' has been detached from instance ' . $this->instance->id);
 
         Log::info(get_class($this) . ' : Finished');
     }

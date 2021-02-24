@@ -18,9 +18,13 @@ use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
+    // This is required for the Kingping/NSX mocks, see below
+    use DatabaseMigrations;
+
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',
@@ -54,29 +58,20 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var Credential */
     private $credential;
 
-    /**
-     * @var Instance
-     */
+    /** @var Instance */
     private $instance;
 
-    /**
-     * @var ApplianceVersion
-     */
+    /** @var ApplianceVersion */
     private $applianceVersion;
 
-    /**
-     * @var Appliance
-     */
+    /** @var Appliance */
     private $appliance;
 
-    /**
-     * @var Network
-     */
+    /** @var Network */
     private $network;
 
     /**
      * Creates the application.
-     *
      * @return Application
      */
     public function createApplication()
@@ -135,21 +130,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'id' => 'az-test',
                 'region_id' => $this->region()->id,
             ]);
-            //$this->credential();
         }
         return $this->availabilityZone;
-    }
-
-    public function credential()
-    {
-        if (!$this->credential) {
-            $this->credential = factory(Credential::class)->create([
-                'id' => 'cred-test',
-                'name' => 'NSX',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-        }
-        return $this->credential;
     }
 
     public function instance()
@@ -213,6 +195,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             return $mockEncryptionServiceProvider;
         });
 
+        // Using these mocks means we have to use DatabaseMigration by default, but the ability to catch 3rd party
+        // API calls being performed in tests is more than worth the extra overhead.
         $this->kingpinServiceMock();
         $this->nsxServiceMock();
 

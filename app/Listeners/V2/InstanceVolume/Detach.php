@@ -21,17 +21,17 @@ class Detach
         $instance = Instance::find($event->model->instance_id);
         if (!$instance) {
             Log::error(get_class($this) . ' : Failed to find instance');
-            return false;
+            throw new \Exception('Failed to find instance');
         }
 
         $volume = Volume::find($event->model->volume_id);
         if (!$volume) {
             Log::error(get_class($this) . ' : Failed to find volume');
-            return false;
+            throw new \Exception('Failed to find volume');
         }
 
         $jobs = [
-            new Detach($volume, $instance),
+            new DetachJob($volume, $instance),
             new Completed($volume),
             new Completed($instance),
         ];
@@ -42,5 +42,7 @@ class Detach
             'instance_id' => $event->model->instance_id,
             'volume_id' => $event->model->volume_id,
         ]);
+
+        return true;
     }
 }

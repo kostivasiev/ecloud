@@ -32,12 +32,12 @@ class Save extends Job
         ];
 
         // DO NOT DO THIS! Original values will be removed in the future!
-        if (!isset($this->originalValues['iops']) || $this->originalValues['iops'] !== $volume->iops) {
+        if (!isset($this->originalValues['iops']) || $this->originalValues['iops'] != $volume->iops) {
             $jobs[] = new IopsChange($this->model);
         }
 
         // DO NOT DO THIS! Original values will be removed in the future!
-        if (!isset($this->originalValues['capacity']) || $this->originalValues['capacity'] !== $volume->capacity) {
+        if (!isset($this->originalValues['capacity']) || $this->originalValues['capacity'] != $volume->capacity) {
             $jobs[] = new CapacityChange($this->model);
         }
 

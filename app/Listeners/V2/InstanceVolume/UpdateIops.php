@@ -42,5 +42,7 @@ class UpdateIops
             'instance_id' => $event->model->instance_id,
             'volume_id' => $event->model->volume_id,
         ]);
+
+        return true;
     }
 }

@@ -12,8 +12,6 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
-use App\Services\V2\NsxService;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -34,14 +32,6 @@ class AssignTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
-        });
 
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
@@ -74,19 +64,15 @@ class AssignTest extends TestCase
         $this->floatingIp = factory(FloatingIp::class)->create([
             'vpc_id' => $this->vpc->id
         ]);
-        $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
-        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
-        app()->bind(NsxService::class, function () use ($mockNsxService) {
-            $mockNsxService->shouldReceive('delete')
-                ->andReturnUsing(function () {
-                    return new Response(204, [], '');
-                });
-            $mockNsxService->shouldReceive('get')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
-                });
-            return $mockNsxService;
-        });
+
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->andReturnUsing(function () {
+                return new Response(204, [], '');
+            });
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
+            });
     }
 
     public function testAssignIsSuccessful()
