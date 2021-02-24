@@ -6,7 +6,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/volumes/attach.yaml'
+          $ref: '../../components/schemas/volume/attach.yaml'
   responses:
     202:
       description: Success

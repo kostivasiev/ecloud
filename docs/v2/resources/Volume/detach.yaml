@@ -6,7 +6,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/volumes/detach.yaml'
+          $ref: '../../components/schemas/volume/detach.yaml'
   responses:
     202:
       description: Success
