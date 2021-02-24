@@ -14,9 +14,9 @@ class GetTest extends TestCase
     public function testGetCollectionAsAdmin()
     {
         // Availability Zone only visible to admins
-        factory(AvailabilityZone::class, [
+        factory(AvailabilityZone::class)->create([
             'is_public' => false,
-        ])->create();
+        ]);
 
         $this->availabilityZone()->is_public = true;
         $this->availabilityZone()->save();
@@ -35,9 +35,9 @@ class GetTest extends TestCase
     public function testGetCollectionAsNonAdmin()
     {
         // Availability Zone only visible to admins
-        factory(AvailabilityZone::class, [
+        factory(AvailabilityZone::class)->create([
             'is_public' => false,
-        ])->create();
+        ]);
 
         $this->availabilityZone()->is_public = true;
         $this->availabilityZone()->save();
