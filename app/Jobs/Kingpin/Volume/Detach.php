@@ -41,4 +41,10 @@ class Detach extends Job
 
         Log::info(get_class($this) . ' : Finished');
     }
+
+    public function failed($exception)
+    {
+        $this->instance->setSyncFailureReason($exception->getMessage());
+        $this->volume->setSyncFailureReason($exception->getMessage());
+    }
 }

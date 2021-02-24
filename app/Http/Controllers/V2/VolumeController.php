@@ -142,17 +142,6 @@ class VolumeController extends BaseController
         return $this->responseIdMeta($request, $volume->id, 200);
     }
 
-    public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
-    {
-        $collection = Volume::forUser($request->user())->findOrFail($volumeId)->instances();
-        $queryTransformer->config(Instance::class)
-            ->transform($collection);
-
-        return InstanceResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
-    }
-
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
@@ -162,7 +151,7 @@ class VolumeController extends BaseController
         return response(null, 204);
     }
 
-    public function attachToInstance(AttachRequest $request, string $volumeId)
+    public function attach(AttachRequest $request, string $volumeId)
     {
         $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
@@ -172,5 +161,28 @@ class VolumeController extends BaseController
             return $model->getSyncError();
         }
         return response('', 202);
+    }
+
+    public function detach(AttachRequest $request, string $volumeId)
+    {
+        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
+        try {
+            $instance->volumes()->detach($model);
+        } catch (SyncException $exception) {
+            return $model->getSyncError();
+        }
+        return response('', 202);
+    }
+
+    public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
+    {
+        $collection = Volume::forUser($request->user())->findOrFail($volumeId)->instances();
+        $queryTransformer->config(Instance::class)
+            ->transform($collection);
+
+        return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
