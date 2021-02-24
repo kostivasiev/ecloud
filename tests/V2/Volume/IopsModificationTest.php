@@ -62,25 +62,4 @@ class IopsModificationTest extends TestCase
             'source' => 'iops',
         ])->assertResponseStatus(422);
     }
-
-    public function testSetIopsOnUnmountedVolume()
-    {
-        $this->instance()->volumes()->detach($this->volume);
-        $data = [
-            'iops' => 200,
-        ];
-        $this->patch(
-            '/v2/volumes/'.$this->volume->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'The Iops value can only be set on mounted volumes',
-            'source' => 'iops',
-        ])->assertResponseStatus(422);
-    }
-
 }
