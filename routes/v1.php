@@ -249,7 +249,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         // Datastores
-        $router->post('datastores/{datastore_id}/expand', 'DatastoreController@expand');
+        $router->post('datastores/{datastoreId}/expand', 'DatastoreController@expand');
         $router->post('datastores', 'DatastoreController@create');
 
         $router->patch('datastores/{datastoreId}', 'DatastoreController@update');
