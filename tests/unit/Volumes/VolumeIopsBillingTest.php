@@ -4,9 +4,13 @@ namespace Tests\unit\Volumes;
 
 use App\Events\V2\Sync\Updated;
 use App\Listeners\V2\Volume\UpdateBilling;
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\BillingMetric;
+use App\Models\V2\Instance;
 use App\Models\V2\Product;
 use App\Models\V2\Volume;
+use Carbon\Carbon;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,6 +18,8 @@ class VolumeIopsBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
+    public Appliance $appliance;
+    public ApplianceVersion $applianceVersion;
     public UpdateBilling $updateBilling;
     public BillingMetric $billingMetric;
 
@@ -32,6 +38,14 @@ class VolumeIopsBillingTest extends TestCase
                 'product_duration_type' => 'Hour'
             ]);
         }
+
+        // Setup Appliance
+        $this->appliance = factory(Appliance::class)->create([
+            'appliance_name' => 'Test Appliance',
+        ])->refresh();  // Hack needed since this is a V1 resource
+        $this->applianceVersion = factory(ApplianceVersion::class)->create([
+            'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ]);
 
         $this->billingMetric = app()->make(BillingMetric::class);
         app()->bind(BillingMetric::class, function () {
@@ -76,6 +90,105 @@ class VolumeIopsBillingTest extends TestCase
         $this->billingMetric->refresh();
         $this->assertEquals(300, $volume->iops);
         $this->assertEquals('disk.capacity.300', $this->billingMetric->key);
+        $this->assertNull($this->billingMetric->end);
+    }
+
+    public function testMountedVolumeWithDefaultIops()
+    {
+        $volume = factory(Volume::class)->create([
+            'id' => 'vol-abc123xyz',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id
+        ]);
+
+        $instance = factory(Instance::class)->create([
+            'vpc_id' => $this->vpc()->id,
+            'appliance_version_id' => $this->applianceVersion->uuid,
+            'availability_zone_id' => $this->availabilityZone()->id,
+        ]);
+        $instance->volumes()->attach($volume);
+
+        // Setup event and fire listener
+        $event = new Updated($volume);
+        $this->updateBilling->handle($event);
+
+        // Update the billingMetric instance now it's been saved
+        $this->billingMetric->refresh();
+        $this->assertEquals(300, $volume->iops);
+        $this->assertEquals('disk.capacity.300', $this->billingMetric->key);
+        $this->assertNull($this->billingMetric->end);
+    }
+
+    public function testMountedVolumeWithNonDefaultIops()
+    {
+        $volume = factory(Volume::class)->create([
+            'id' => 'vol-abc123xyz',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'iops' => 600
+        ]);
+
+        $instance = factory(Instance::class)->create([
+            'vpc_id' => $this->vpc()->id,
+            'appliance_version_id' => $this->applianceVersion->uuid,
+            'availability_zone_id' => $this->availabilityZone()->id,
+        ]);
+        $instance->volumes()->attach($volume);
+
+        // Setup event and fire listener
+        $event = new Updated($volume);
+        $this->updateBilling->handle($event);
+
+        // Update the billingMetric instance now it's been saved
+        $this->billingMetric->refresh();
+        $this->assertEquals(600, $volume->iops);
+        $this->assertEquals('disk.capacity.600', $this->billingMetric->key);
+        $this->assertNull($this->billingMetric->end);
+    }
+
+    public function testMountedVolumeNewIopsExistingMetric()
+    {
+        $originalBilling = factory(BillingMetric::class)->create([
+            'id' => 'bm-test',
+            'resource_id' => 'vol-abc123xyz',
+            'vpc_id' => 'vpc-test',
+            'reseller_id' => '1',
+            'key' => 'disk.capacity.300',
+            'value' => '100',
+            'start' => (string) Carbon::now(),
+            'end' => null,
+            'category' => 'Storage',
+            'price' => null,
+        ]);
+        $volume = factory(Volume::class)->create([
+            'id' => 'vol-abc123xyz',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'iops' => 600
+        ]);
+
+        $instance = factory(Instance::class)->create([
+            'vpc_id' => $this->vpc()->id,
+            'appliance_version_id' => $this->applianceVersion->uuid,
+            'availability_zone_id' => $this->availabilityZone()->id,
+        ]);
+        $instance->volumes()->attach($volume);
+
+        // Setup event and fire listener
+        $event = new Updated($volume);
+        $this->updateBilling->handle($event);
+
+        // Update the origin billingMetric now it's been ended
+        $originalBilling->refresh();
+        // Update the billingMetric instance now it's been saved
+        $this->billingMetric->refresh();
+
+        $this->assertEquals('disk.capacity.300', $originalBilling->key);
+        $this->assertNotNull($originalBilling->end);
+
+        $this->assertEquals($originalBilling->resource_id, $this->billingMetric->resource_id);
+
+        $this->assertEquals('disk.capacity.600', $this->billingMetric->key);
         $this->assertNull($this->billingMetric->end);
     }
 
