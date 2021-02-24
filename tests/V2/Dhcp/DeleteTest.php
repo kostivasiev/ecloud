@@ -8,13 +8,10 @@ use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
-use App\Services\V2\NsxService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
-use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
@@ -32,13 +29,6 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
-        });
 
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
@@ -55,29 +45,25 @@ class DeleteTest extends TestCase
             'vpc_id' => $this->vpc->getKey(),
             'availability_zone_id' => $this->availabilityZone->id
         ]);
-        $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
-        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
-        app()->bind(NsxService::class, function () use ($mockNsxService) {
-            $mockNsxService->shouldReceive('delete')
-                ->andReturnUsing(function () {
-                    return new Response(204, [], '');
-                });
-            $mockNsxService->shouldReceive('get')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
-                });
-            return $mockNsxService;
-        });
+
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->andReturnUsing(function () {
+                return new Response(204, [], '');
+            });
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
+            });
     }
 
     public function testNoPermsIsDenied()
     {
         $this->delete('/v2/dhcps/' . $this->dhcp->getKey())
             ->seeJson([
-            'title' => 'Unauthorized',
-            'detail' => 'Unauthorized',
-            'status' => 401,
-        ])->assertResponseStatus(401);
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
+                'status' => 401,
+            ])->assertResponseStatus(401);
     }
 
     public function testFailInvalidId()

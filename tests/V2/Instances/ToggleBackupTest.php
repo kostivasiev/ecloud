@@ -5,6 +5,7 @@ namespace Tests\V2\Instances;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -19,14 +20,57 @@ class ToggleBackupTest extends TestCase
     {
         parent::setUp();
 
+        $this->instance()->backup_enabled = true;
+        $this->instance()->save();
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-test',
+                        'sizeGiB' => '10',
+                        'shared' => false,
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+            });
+
         $this->volume = factory(Volume::class)->create([
-            'id' => 'vol-aaaaaaaa',
+            'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'capacity' => 10,
             'availability_zone_id' => $this->availabilityZone()->id
         ]);
 
-        $this->volume->vpc()->associate($this->vpc());
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
+                [
+                    'json' => [
+                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
+                [
+                    'json' => [
+                        'limit' => '300',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $this->volume->instances()->attach($this->instance());
     }
 
@@ -34,24 +78,19 @@ class ToggleBackupTest extends TestCase
     {
         $this->assertNull(BillingMetric::getActiveByKey($this->instance(), 'backup.quota'));
 
-        $this->patch(
-            '/v2/instances/' . $this->instance()->id,
-            [
-                'backup_enabled' => true,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->seeInDatabase(
+        $this->patch('/v2/instances/' . $this->instance()->id, [
+            'backup_enabled' => true,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase(
             'instances',
             [
                 'id' => $this->instance()->id,
                 'backup_enabled' => true
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(200);
+        )->assertResponseStatus(200);
 
         Event::assertDispatched(\App\Events\V2\Instance\Saving::class, function ($event) {
             return $event->model->id === $this->instance()->id;
@@ -85,9 +124,6 @@ class ToggleBackupTest extends TestCase
 
     public function testDisableBackupUpdatesBillingMetrics()
     {
-        $this->instance()->backup_enabled = true;
-        $this->instance()->save();
-
         $billingMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->instance()->id,
             'vpc_id' => $this->vpc()->id,
@@ -97,24 +133,19 @@ class ToggleBackupTest extends TestCase
 
         $this->assertNotNull(BillingMetric::getActiveByKey($this->instance(), 'backup.quota'));
 
-        $this->patch(
-            '/v2/instances/' . $this->instance()->id,
-            [
-                'backup_enabled' => false,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->seeInDatabase(
+        $this->patch('/v2/instances/' . $this->instance()->id, [
+            'backup_enabled' => false,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase(
             'instances',
             [
                 'id' => $this->instance()->id,
                 'backup_enabled' => false
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(200);
+        )->assertResponseStatus(200);
 
         Event::assertDispatched(\App\Events\V2\Instance\Saving::class, function ($event) {
             return $event->model->id === $this->instance()->id;

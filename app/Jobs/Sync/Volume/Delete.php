@@ -3,8 +3,8 @@
 namespace App\Jobs\Sync\Volume;
 
 use App\Jobs\Job;
-use App\Jobs\VmWare\Volume\Undeploy;
-use App\Jobs\VmWare\Volume\UndeployCheck;
+use App\Jobs\Kingpin\Volume\Undeploy;
+use App\Jobs\Kingpin\Volume\UndeployCheck;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 

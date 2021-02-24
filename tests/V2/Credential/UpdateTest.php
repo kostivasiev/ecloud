@@ -11,54 +11,35 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @var Credential */
-    private $credential;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            return $mockEncryptionServiceProvider;
-        });
-        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('newPass');
-
-        $this->credential = factory(Credential::class)->create();
-
-    }
-
     public function testValidDataSucceeds()
     {
-        $this->patch(
-            '/v2/credentials/' . $this->credential->getKey(),
+        $credential = factory(Credential::class)->create();
+
+        $this->patch('/v2/credentials/' . $credential->id, [
+            'resource_id' => 'abc-abc123',
+            'host' => 'https://0.0.0.0',
+            'username' => 'username',
+            'password' => 'doesnt even matter', // See below
+            'port' => 8080
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeInDatabase(
+            'credentials',
             [
+                'id' => $credential->id,
                 'resource_id' => 'abc-abc123',
                 'host' => 'https://0.0.0.0',
                 'username' => 'username',
-                'password' => 'newPass',
                 'port' => 8080
             ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeInDatabase(
-                'credentials',
-                [
-                    'id' => $this->credential->getKey(),
-                    'resource_id' => 'abc-abc123',
-                    'host' => 'https://0.0.0.0',
-                    'username' => 'username',
-                    'port' => 8080
-                ],
-                'ecloud'
-            )->assertResponseStatus(200);
+            'ecloud'
+        )->assertResponseStatus(200);
 
-        $resource = Credential::find($this->credential->getKey());
-        $this->assertEquals($resource->password, 'newPass');
+        $resource = Credential::find($credential->id);
+
+        // TODO - Improve this test
+        // This is a bit pointless since we mock the response in setup() but it does prove it's been saved..
+        $this->assertEquals($resource->password, 'somepassword');
     }
 }

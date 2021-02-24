@@ -2,17 +2,7 @@
 
 namespace Tests\V2\Volume;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Credential;
-use App\Models\V2\Instance;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
-use App\Services\V2\KingpinService;
-use App\Services\V2\NsxService;
-use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -21,58 +11,65 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $region;
-    protected $vpc;
-    protected $volume;
-    protected $availabilityZone;
-    protected $instance;
+    private $volume;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
-        });
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-test',
+                        'sizeGiB' => '100',
+                        'shared' => false,
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'uuid' => 'uuid-test-uuid-test-uuid-test',
+                ]));
+            });
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        factory(Credential::class)->create([
-            'username' => 'kingpinapi',
-            'resource_id' => $this->availabilityZone->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id,
+            'id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
         ]);
-
-        $kingpinService = app()->makeWith(KingpinService::class, [$this->availabilityZone]);
-        $mockKingpinService = \Mockery::mock($kingpinService)->makePartial();
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            $mockKingpinService->shouldReceive('delete')
-                ->andReturnUsing(function () {
-                    return new Response(204, [], '');
-                });
-            return $mockKingpinService;
-        });
     }
 
     public function testFailedDeleteDueToAssignedInstance()
     {
-        $this->instance->volumes()->attach($this->volume);
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
+                [
+                    'json' => [
+                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
+                [
+                    'json' => [
+                        'limit' => '300',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $this->instance()->volumes()->attach($this->volume);
         $this->delete('/v2/volumes/' . $this->volume->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -82,7 +79,12 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->assertNull($this->volume->deleted_at);
+        $this->kingpinServiceMock()->expects('delete')
+            ->withArgs(['/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test'])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $this->delete('/v2/volumes/' . $this->volume->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',

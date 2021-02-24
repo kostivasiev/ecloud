@@ -6,7 +6,6 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -30,15 +29,6 @@ class GetCredentialsTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
-
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            return $mockEncryptionServiceProvider;
-        });
-        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-
         $this->credential = factory(Credential::class)->create([
             'resource_id' => $this->availabilityZone->getKey(),
         ]);

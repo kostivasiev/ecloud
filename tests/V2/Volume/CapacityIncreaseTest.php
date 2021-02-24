@@ -12,36 +12,91 @@ class CapacityIncreaseTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $volume;
+    private $volume;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc()->getKey()
-        ]);
+        // Initial create
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-test',
+                        'sizeGiB' => '100',
+                        'shared' => false,
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'uuid' => 'uuid-test-uuid-test-uuid-test',
+                ]));
+            });
 
-        $this->kingpinServiceMock()->shouldReceive('put')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->getKey() . '/instance/' . $this->instance()->getKey() . '/volume/'.
-                        $this->volume->vmware_uuid.'/size'])
-            ->andReturn(
-                new Response(200)
-            );
+        $this->volume = factory(Volume::class)->create([
+            'id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'iops' => '300',
+            'capacity' => '100',
+        ]);
     }
 
     public function testIncreaseSize()
     {
-        $this->patch(
-            '/v2/volumes/'.$this->volume->getKey(),
-            [
-                'capacity' => 200,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )->assertResponseStatus(200);
+        // Capacity change to 200 fired from the test
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '200',
+                    ],
+                ],
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // Attach
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
+                [
+                    'json' => [
+                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        // Post Attach IOPS update
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
+                [
+                    'json' => [
+                        'limit' => '300',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $this->volume->instances()->attach($this->instance());
+
+        $this->patch('v2/volumes/vol-test', [
+            'capacity' => 200,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(200);
     }
 
     public function testValidationRule()
