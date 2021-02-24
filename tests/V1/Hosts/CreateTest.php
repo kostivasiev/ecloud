@@ -23,7 +23,7 @@ class CreateTest extends TestCase
         $pod = factory(Pod::class, 1)->create()->first();
 
         $solution = factory(Solution::class, 1)->create([
-            'ucs_reseller_datacentre_id' => $pod->getKey()
+            'ucs_reseller_datacentre_id' => $pod->id
         ])->first();
 
         $this->assertEquals(0, $solution->pod->sans->count());
@@ -45,14 +45,14 @@ class CreateTest extends TestCase
         $pod = factory(Pod::class, 1)->create()->first();
 
         $solution = factory(Solution::class, 1)->create([
-            'ucs_reseller_datacentre_id' => $pod->getKey()
+            'ucs_reseller_datacentre_id' => $pod->id
         ])->first();
 
         $host = factory(Host::class, 1)->create([
-            'ucs_node_ucs_reseller_id' => $solution->getKey()
+            'ucs_node_ucs_reseller_id' => $solution->id
         ])->first();
 
-        $this->json('POST', '/v1/hosts/' . $host->getKey() . '/create', [], [
+        $this->json('POST', '/v1/hosts/' . $host->id . '/create', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeStatusCode(404)->seeJson([
@@ -70,22 +70,22 @@ class CreateTest extends TestCase
         $pod = factory(Pod::class, 1)->create()->first();
 
         $solution = factory(Solution::class, 1)->create([
-            'ucs_reseller_datacentre_id' => $pod->getKey()
+            'ucs_reseller_datacentre_id' => $pod->id
         ])->first();
 
         $host = factory(Host::class, 1)->create([
-            'ucs_node_ucs_reseller_id' => $solution->getKey()
+            'ucs_node_ucs_reseller_id' => $solution->id
         ])->first();
 
         $san = factory(San::class, 1)->create([])->first();
 
         factory(Storage::class, 1)->create([
-            'ucs_datacentre_id' => $pod->getKey(),
-            'server_id' => $san->getKey()
+            'ucs_datacentre_id' => $pod->id,
+            'server_id' => $san->id
         ]);
 
         // This won't complete, but we can check that it's not getting caught at 'san not found'
-        $response = $this->json('POST', '/v1/hosts/' . $host->getKey() . '/create', [], [
+        $response = $this->json('POST', '/v1/hosts/' . $host->id . '/create', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ]);

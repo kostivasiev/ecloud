@@ -66,7 +66,7 @@ class PublicSupportController extends BaseController
 
         return response()->self(
             'support.item',
-            $item->getKey()
+            $item->id
         )->setStatusCode(201);
     }
 }

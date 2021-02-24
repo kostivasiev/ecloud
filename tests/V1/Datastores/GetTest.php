@@ -85,7 +85,7 @@ class GetTest extends TestCase
         ])->first();
 
         // Backup
-        $clusterName = 'MCS_P' . $pod->getKey() . '_VV_VMPUBLICSTORE_SSD_BACKUP';
+        $clusterName = 'MCS_P' . $pod->id . '_VV_VMPUBLICSTORE_SSD_BACKUP';
         factory(Datastore::class, 1)->create([
             'reseller_lun_name' => $clusterName,
         ]);
@@ -96,7 +96,7 @@ class GetTest extends TestCase
         );
 
         // Non-Backup
-        $clusterName = 'MCS_P' . $pod->getKey() . '_VV_VMPUBLICSTORE_SSD_NONBACKUP';
+        $clusterName = 'MCS_P' . $pod->id . '_VV_VMPUBLICSTORE_SSD_NONBACKUP';
         factory(Datastore::class, 1)->create([
             'reseller_lun_name' => $clusterName,
         ]);

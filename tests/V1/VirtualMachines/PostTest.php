@@ -141,7 +141,7 @@ class PostTest extends TestCase
             'cpu' => 2,
             'ram' => 2,
             'hdd' => 20,
-            'solution_id' => $solution->getKey(),
+            'solution_id' => $solution->id,
             "template" => 'CentOS 7 64-bit',
             'ssh_keys' => [
                 'THIS IS AN INVALID SSH PUBLIC KEY'

@@ -131,7 +131,7 @@ class VolumeSetController extends BaseController
 
         $volumeSet = new VolumeSet;
         $volumeSet->name = $artisanResponse->name;
-        $volumeSet->ucs_reseller_id = $solution->getKey();
+        $volumeSet->ucs_reseller_id = $solution->id;
 
         // return id & link to resource in meta
         $volumeSet->save();
@@ -289,7 +289,7 @@ class VolumeSetController extends BaseController
         $hostSet = $volumeSet->solution->hostSets->first();
 
         if (!$hostSet) {
-            throw new NotFoundException('No host set was found for solution ' . $volumeSet->solution->getKey());
+            throw new NotFoundException('No host set was found for solution ' . $volumeSet->solution->id);
         }
 
         $artisan = app()->makeWith(

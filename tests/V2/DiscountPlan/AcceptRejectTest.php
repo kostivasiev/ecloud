@@ -28,7 +28,7 @@ class AcceptRejectTest extends TestCase
     {
         $discountPlan = $this->discountPlan->first();
         $this->post(
-            '/v2/discount-plans/' . $discountPlan->first()->getKey() . '/approve',
+            '/v2/discount-plans/' . $discountPlan->first()->id . '/approve',
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -47,7 +47,7 @@ class AcceptRejectTest extends TestCase
     {
         $discountPlan = $this->discountPlan[1];
         $this->post(
-            '/v2/discount-plans/' . $discountPlan->getKey() . '/reject',
+            '/v2/discount-plans/' . $discountPlan->id . '/reject',
             [],
             [
                 'X-consumer-custom-id' => '0-0',

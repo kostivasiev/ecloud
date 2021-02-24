@@ -68,7 +68,7 @@ class DiscountPlanController extends BaseController
             $discountPlan->reseller_id = $this->resellerId;
         }
         $discountPlan->save();
-        return $this->responseIdMeta($request, $discountPlan->getKey(), 201);
+        return $this->responseIdMeta($request, $discountPlan->id, 201);
     }
 
     /**
@@ -103,7 +103,7 @@ class DiscountPlanController extends BaseController
         }
 
         $discountPlan->save();
-        return $this->responseIdMeta($request, $discountPlan->getKey(), 200);
+        return $this->responseIdMeta($request, $discountPlan->id, 200);
     }
 
     /**

@@ -60,7 +60,7 @@ class Storage extends Model
      */
     public function scopeWithPod($query, Pod $pod)
     {
-        $query->where('ucs_datacentre_id', '=', $pod->getKey());
+        $query->where('ucs_datacentre_id', '=', $pod->id);
         return $query;
     }
 }

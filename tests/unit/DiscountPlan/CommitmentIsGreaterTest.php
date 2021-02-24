@@ -27,7 +27,7 @@ class CommitmentIsGreaterTest extends TestCase
             'term_end_date' => date('Y-m-d 00:00:00', strtotime('2 days')),
         ]);
 
-        $validationRule = new CommitmentIsGreater($discountPlan->getKey());
+        $validationRule = new CommitmentIsGreater($discountPlan->id);
 
         // commitment_amount
         $this->assertFalse($validationRule->passes('commitment_amount', 1000));

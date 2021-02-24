@@ -414,7 +414,7 @@ class KingpinService
      */
     public function getSolutionTemplates(Solution $solution)
     {
-        $url = $this->generateV1URL($solution->getKey());
+        $url = $this->generateV1URL($solution->id);
         $url .= 'template';
 
         $templates = [];
@@ -442,7 +442,7 @@ class KingpinService
      */
     public function getSolutionTemplate(Solution $solution, $templateName)
     {
-        $url = $this->generateV1URL($solution->getKey());
+        $url = $this->generateV1URL($solution->id);
         $url .= 'template/' . $templateName;
 
         try {
@@ -452,7 +452,7 @@ class KingpinService
                 Log::info(
                     'Failed to load solution template from Kingpin by name: no response data from Kingpin',
                     [
-                        'solution_id' => $solution->getKey(),
+                        'solution_id' => $solution->id,
                         'requested_template_name' => $templateName,
                         'url' => $url,
                     ]
@@ -467,7 +467,7 @@ class KingpinService
             Log::info(
                 'Failed to load solution template from Kingpin by name',
                 [
-                    'solution_id' => $solution->getKey(),
+                    'solution_id' => $solution->id,
                     'requested_template_name' => $templateName,
                     'url' => $url,
                 ]
@@ -749,7 +749,7 @@ class KingpinService
         try {
             $this->makeRequest(
                 'GET',
-                $this->generateV1URL($solution->getKey()) . 'cluster/drs/rule'
+                $this->generateV1URL($solution->id) . 'cluster/drs/rule'
             );
         } catch (TransferException $exception) {
             throw new KingpinException($exception->getMessage());

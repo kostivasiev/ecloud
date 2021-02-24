@@ -123,13 +123,13 @@ class Product extends Model implements Filterable, Sortable
 
     public function scopeForAvailabilityZone($query, AvailabilityZone $availabilityZone)
     {
-        return $query->where('product_name', 'like', $availabilityZone->getKey() . '%');
+        return $query->where('product_name', 'like', $availabilityZone->id . '%');
     }
 
     public function scopeForRegion($query, Region $region)
     {
         foreach ($region->availabilityZones as $availabilityZone) {
-            $query->orWhere('product_name', 'like', $availabilityZone->getKey() . '%');
+            $query->orWhere('product_name', 'like', $availabilityZone->id . '%');
         }
 
         return $query;

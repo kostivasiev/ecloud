@@ -35,7 +35,7 @@ class GetTest extends TestCase
     {
         $item = factory(PublicSupport::class)->create();
 
-        $this->get('/v1/support/' . $item->getKey(), [
+        $this->get('/v1/support/' . $item->id, [
             'X-consumer-custom-id' => '0-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
@@ -61,7 +61,7 @@ class GetTest extends TestCase
     {
         $item = factory(PublicSupport::class)->create();
 
-        $this->get('/v1/support/' . $item->getKey(), [
+        $this->get('/v1/support/' . $item->id, [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);

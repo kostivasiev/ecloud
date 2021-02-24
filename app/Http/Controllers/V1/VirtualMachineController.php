@@ -357,7 +357,7 @@ class VirtualMachineController extends BaseController
             if ($request->has('datastore_id')) {
                 $datastore = Datastore::find($request->input('datastore_id'));
             } else {
-                $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
+                $datastore = Datastore::getDefault($solution->id, $request->input('environment'));
             }
 
             if (!in_array($request->input('environment'), ['Burst', 'GPU'])) {
@@ -391,8 +391,8 @@ class VirtualMachineController extends BaseController
                 if (!$solution->hasMultipleNetworks()) {
                     unset($rules['network_id']);
 
-                    $defaultNetwork = SolutionNetwork::withSolution($solution->getKey())->first();
-                    $request->request->add(['network_id' => $defaultNetwork->getKey()]);
+                    $defaultNetwork = SolutionNetwork::withSolution($solution->id)->first();
+                    $request->request->add(['network_id' => $defaultNetwork->id]);
                 }
             }
             // If encryption is enabled but no flag passed in, set to the solution default
@@ -579,11 +579,11 @@ class VirtualMachineController extends BaseController
                 }
 
                 Log::critical(
-                    "Unable to launch VM using Appliance '" . $appliance->getKey() . "'': Appliance version '"
-                    . $applianceVersion->getKey() . "' has no server license."
+                    "Unable to launch VM using Appliance '" . $appliance->id . "'': Appliance version '"
+                    . $applianceVersion->id . "' has no server license."
                 );
                 throw new ServiceUnavailableException(
-                    "Unable to launch Appliance '" . $appliance->getKey() . "' at this time."
+                    "Unable to launch Appliance '" . $appliance->id . "' at this time."
                 );
             }
 
@@ -670,7 +670,7 @@ class VirtualMachineController extends BaseController
         }
 
         if (isset($gpuProfile)) {
-            $post_data['gpu_profile_uuid'] = $gpuProfile->getKey();
+            $post_data['gpu_profile_uuid'] = $gpuProfile->id;
         }
 
         if ($request->has('ssh_keys')) {
@@ -711,7 +711,7 @@ class VirtualMachineController extends BaseController
         $post_data['ram_gb'] = $request->input('ram');
 
         // set storage
-        $post_data['reseller_lun_id'] = $datastore->getKey();
+        $post_data['reseller_lun_id'] = $datastore->id;
 
         if ($request->has('hdd')) {
             $post_data['hdd_gb'] = $request->input('hdd');
@@ -816,7 +816,7 @@ class VirtualMachineController extends BaseController
                 );
             }
 
-            $post_data['ucs_site_id'] = $site->getKey();
+            $post_data['ucs_site_id'] = $site->id;
         }
 
 
@@ -928,13 +928,13 @@ class VirtualMachineController extends BaseController
             if ($solution->encryptionBillingType() == EncryptionBillingType::PAYG) {
                 $result = $accountsService
                     ->scopeResellerId($solution->resellerId())
-                    ->assignVmEncryptionCredit($virtualMachine->getKey());
+                    ->assignVmEncryptionCredit($virtualMachine->id);
 
                 if (!$result) {
                     Log::critical(
                         'Failed to assign credit when launching encrypted Virtual Machine.',
                         [
-                            'id' => $virtualMachine->getKey(),
+                            'id' => $virtualMachine->id,
                             'reseller_id' => $virtualMachine->servers_reseller_id
                         ]
                     );
@@ -1030,9 +1030,9 @@ class VirtualMachineController extends BaseController
             $automationRequestId = $intapiService->automationRequest(
                 'delete_vm',
                 'server',
-                $virtualMachine->getKey(),
+                $virtualMachine->id,
                 $post_data,
-                'ecloud_ucs_' . $virtualMachine->pod->getKey(),
+                'ecloud_ucs_' . $virtualMachine->pod->id,
                 $request->user()->userId(),
                 $request->user()->type()
             );
@@ -1048,7 +1048,7 @@ class VirtualMachineController extends BaseController
         Log::info(
             'VirtualMachine Deleted',
             [
-                'id' => $virtualMachine->getKey(),
+                'id' => $virtualMachine->id,
                 'type' => $virtualMachine->type(),
 
                 'kong_request_id' => $request->header('Request-ID'),
@@ -1059,13 +1059,13 @@ class VirtualMachineController extends BaseController
         if ($refundCredit) {
             $result = $accountsService
                 ->scopeResellerId($virtualMachine->servers_reseller_id)
-                ->refundVmEncryptionCredit($virtualMachine->getKey());
+                ->refundVmEncryptionCredit($virtualMachine->id);
 
             if (!$result) {
                 Log::critical(
                     'Failed to refund encryption credit when destroying Virtual Machine',
                     [
-                        'id' => $virtualMachine->getKey(),
+                        'id' => $virtualMachine->id,
                         'reseller_id' => $virtualMachine->servers_reseller_id
                     ]
                 );
@@ -1190,10 +1190,10 @@ class VirtualMachineController extends BaseController
         //OK, start the clone process ==
         //create new server record
         $postData['reseller_id'] = $virtualMachine->servers_reseller_id;
-        $postData['reseller_lun_id'] = $datastore->getKey();
+        $postData['reseller_lun_id'] = $datastore->id;
         $postData['ucs_reseller_id'] = $virtualMachine->servers_ecloud_ucs_reseller_id;
         $postData['launched_by'] = '-5';
-        $postData['server_id'] = $virtualMachine->getKey();
+        $postData['server_id'] = $virtualMachine->id;
         $postData['datastore'] = $datastore->reseller_lun_name;
         $postData['name'] = $request->input('name');
         $postData['server_active'] = true;
@@ -1219,14 +1219,14 @@ class VirtualMachineController extends BaseController
         if ($assignEncryptionCredit) {
             $result = $accountsService
                 ->scopeResellerId($clonedVirtualMacine->solution->resellerId())
-                ->assignVmEncryptionCredit($clonedVirtualMacine->getKey());
+                ->assignVmEncryptionCredit($clonedVirtualMacine->id);
 
             if (!$result) {
                 Log::critical(
                     'Failed to assign credit when cloning encrypted Virtual Machine.',
                     [
-                        'original_vm_id' => $virtualMachine->getKey(),
-                        'new_vm_id' => $clonedVirtualMacine->getKey(),
+                        'original_vm_id' => $virtualMachine->id,
+                        'new_vm_id' => $clonedVirtualMacine->id,
                         'reseller_id' => $clonedVirtualMacine->servers_reseller_id
                     ]
                 );
@@ -1619,9 +1619,9 @@ class VirtualMachineController extends BaseController
                 $intapiService->automationRequest(
                     'resize_vm',
                     'server',
-                    $virtualMachine->getKey(),
+                    $virtualMachine->id,
                     $automationData,
-                    !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                    !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->id : null,
                     $request->user()->userId(),
                     $request->user()->type()
                 );
@@ -1635,7 +1635,7 @@ class VirtualMachineController extends BaseController
             Log::info(
                 'VirtualMachine Resized',
                 [
-                    'id' => $virtualMachine->getKey(),
+                    'id' => $virtualMachine->id,
                     'type' => $virtualMachine->type(),
 
                     'kong_request_id' => $request->header('Request-ID'),
@@ -1846,9 +1846,9 @@ class VirtualMachineController extends BaseController
             $intapiService->automationRequest(
                 'create_template_from_vm',
                 'server',
-                $virtualMachine->getKey(),
+                $virtualMachine->id,
                 $automationData,
-                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->id : null,
                 $request->user()->userId(),
                 $request->user()->type()
             );
@@ -1935,9 +1935,9 @@ class VirtualMachineController extends BaseController
             $intapiService->automationRequest(
                 'encrypt_vm', //todo: automation needs creating
                 'server',
-                $virtualMachine->getKey(),
+                $virtualMachine->id,
                 [],
-                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->id : null,
                 $request->user()->userId(),
                 $request->user()->type()
             );
@@ -1967,13 +1967,13 @@ class VirtualMachineController extends BaseController
         if ($allocateEncryptionCredit) {
             $result = $accountsService
                 ->scopeResellerId($virtualMachine->servers_reseller_id)
-                ->assignVmEncryptionCredit($virtualMachine->getKey());
+                ->assignVmEncryptionCredit($virtualMachine->id);
 
             if (!$result) {
                 Log::critical(
                     'Failed to assign credit when encrypting Virtual Machine.',
                     [
-                        'id' => $virtualMachine->getKey(),
+                        'id' => $virtualMachine->id,
                         'reseller_id' => $virtualMachine->servers_reseller_id,
                         'credits_available' => $credits->remaining
                     ]
@@ -2043,9 +2043,9 @@ class VirtualMachineController extends BaseController
             $intapiService->automationRequest(
                 'decrypt_vm', //todo: automation needs creating
                 'server',
-                $virtualMachine->getKey(),
+                $virtualMachine->id,
                 [],
-                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->getKey() : null,
+                !empty($virtualMachine->solution) ? 'ecloud_ucs_' . $virtualMachine->solution->pod->id : null,
                 $request->user()->userId(),
                 $request->user()->type()
             );
@@ -2075,13 +2075,13 @@ class VirtualMachineController extends BaseController
         if ($deallocateEncryptionCredit) {
             $result = $accountsService
                 ->scopeResellerId($virtualMachine->servers_reseller_id)
-                ->refundVmEncryptionCredit($virtualMachine->getKey());
+                ->refundVmEncryptionCredit($virtualMachine->id);
 
             if (!$result) {
                 Log::critical(
                     'Failed to refund encryption credit when decrypting virtual machine',
                     [
-                        'id' => $virtualMachine->getKey(),
+                        'id' => $virtualMachine->id,
                         'reseller_id' => $virtualMachine->servers_reseller_id
                     ]
                 );
@@ -2128,7 +2128,7 @@ class VirtualMachineController extends BaseController
         $kingpin = $this->loadKingpinService($virtualMachine);
 
         $powerOnResult = $kingpin->powerOnVirtualMachine(
-            $virtualMachine->getKey(),
+            $virtualMachine->id,
             $virtualMachine->solutionId()
         );
 
@@ -2195,7 +2195,7 @@ class VirtualMachineController extends BaseController
         $kingpin = $this->loadKingpinService($virtualMachine);
 
         $powerOffResult = $kingpin->powerOffVirtualMachine(
-            $virtualMachine->getKey(),
+            $virtualMachine->id,
             $virtualMachine->solutionId()
         );
 
@@ -2243,7 +2243,7 @@ class VirtualMachineController extends BaseController
         $kingpin = $this->loadKingpinService($virtualMachine);
 
         $shutDownResult = $kingpin->shutDownVirtualMachine(
-            $virtualMachine->getKey(),
+            $virtualMachine->id,
             $virtualMachine->solutionId()
         );
 
@@ -2255,7 +2255,7 @@ class VirtualMachineController extends BaseController
 
         do {
             sleep(10);
-            $isOnline = $kingpin->checkVMOnline($virtualMachine->getKey(), $virtualMachine->solutionId());
+            $isOnline = $kingpin->checkVMOnline($virtualMachine->id, $virtualMachine->solutionId());
             if ($isOnline === false) {
                 return true;
             }
@@ -2367,7 +2367,7 @@ class VirtualMachineController extends BaseController
         $kingpin = $this->loadKingpinService($virtualMachine);
 
         $powerOnResult = $kingpin->powerSuspend(
-            $virtualMachine->getKey(),
+            $virtualMachine->id,
             $virtualMachine->solutionId()
         );
 
@@ -2419,7 +2419,7 @@ class VirtualMachineController extends BaseController
         // hit management resource retrieving the host and ticket values
         $managementResource = $this->loadKingpinService($virtualMachine);
         $response = $managementResource->consoleSession(
-            $virtualMachine->getKey(),
+            $virtualMachine->id,
             $virtualMachine->solutionId()
         );
         $host = $response['host'] ?? null;
@@ -2454,7 +2454,7 @@ class VirtualMachineController extends BaseController
         // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
         return response()->json([
             'data' => [
-                'url' => $consoleResource->console_url . '/?title=id' . $virtualMachine->getKey() . '&session=' . $uuid,
+                'url' => $consoleResource->console_url . '/?title=id' . $virtualMachine->id . '&session=' . $uuid,
             ],
             'meta' => (object)[]
         ]);

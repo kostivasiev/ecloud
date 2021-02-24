@@ -86,7 +86,7 @@ class ArtisanServiceProvider extends ServiceProvider
                         Log::error(
                             $log_message,
                             [
-                                'solution_id' => $solution->getKey()
+                                'solution_id' => $solution->id
                             ]
                         );
                         throw new ServiceUnavailableException('Unable to load ArtisanService: Invalid SAN');
@@ -96,14 +96,14 @@ class ArtisanServiceProvider extends ServiceProvider
                         Log::error(
                             'Unable to determine storage for SAN',
                             [
-                                'solution_id' => $solution->getKey()
+                                'solution_id' => $solution->id
                             ]
                         );
                         throw new ServiceUnavailableException('Unable to load ArtisanService: Invalid storage configuration');
                     }
 
                     $config = $this->loadConfig($san->storage()->withPod($solution->pod)->firstOrFail());
-                    $config['solution_id'] = $solution->getKey();
+                    $config['solution_id'] = $solution->id;
 
                     return $this->launchArtisanService($config);
                 }
@@ -151,7 +151,7 @@ class ArtisanServiceProvider extends ServiceProvider
             Log::error(
                 'Failed to load storage API URL for Pod.',
                 [
-                    'pod_id' => $pod->getKey()
+                    'pod_id' => $pod->id
                 ]
             );
             throw new ServiceUnavailableException('Failed to load storage for datastore.');
@@ -162,7 +162,7 @@ class ArtisanServiceProvider extends ServiceProvider
             Log::error(
                 'Failed to load storage API password for Pod.',
                 [
-                    'pod_id' => $pod->getKey(),
+                    'pod_id' => $pod->id,
                     'vce_server_id' => $pod->ucs_datacentre_vce_server_id
                 ]
             );
@@ -177,7 +177,7 @@ class ArtisanServiceProvider extends ServiceProvider
             Log::error(
                 'Failed to load SAN name from server record.',
                 [
-                    'server_id' => $san->getKey()
+                    'server_id' => $san->id
                 ]
             );
             throw new ServiceUnavailableException('Failed to load storage for datastore');
@@ -189,7 +189,7 @@ class ArtisanServiceProvider extends ServiceProvider
             Log::error(
                 'Failed to load SAN password.',
                 [
-                    'server_id' => $san->getKey()
+                    'server_id' => $san->id
                 ]
             );
             throw new ServiceUnavailableException('Failed to load storage for datastore');

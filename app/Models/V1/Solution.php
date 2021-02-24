@@ -387,7 +387,7 @@ class Solution extends Model implements Filterable, Sortable
         }
 
         try {
-            $vmwareHosts = $kingpin->getHostsForSolution($this->getKey(), true);
+            $vmwareHosts = $kingpin->getHostsForSolution($this->id, true);
         } catch (KingpinException $exception) {
             return $ramAllocated;
         }
@@ -506,14 +506,14 @@ class Solution extends Model implements Filterable, Sortable
 
     public function isMultiNetwork()
     {
-        return SolutionNetwork::withSolution($this->getKey())
+        return SolutionNetwork::withSolution($this->id)
                 ->limit(1)
                 ->count() > 0;
     }
 
     public function hasMultipleNetworks()
     {
-        return SolutionNetwork::withSolution($this->getKey())
+        return SolutionNetwork::withSolution($this->id)
                 ->limit(2)
                 ->count() > 1;
     }
@@ -537,7 +537,7 @@ class Solution extends Model implements Filterable, Sortable
             );
 
             //Load the solution datastores from VMWare
-            $datastores = $kingpin->getDatastores($this->getKey());
+            $datastores = $kingpin->getDatastores($this->id);
         } catch (KingpinException $exception) {
             throw new \Exception('Failed to load solution datastores.');
         }

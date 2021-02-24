@@ -204,7 +204,7 @@ class HostSetController extends BaseController
         }
 
         $solution->hostSets->each(function ($item) use (&$index, $solution) {
-            if (preg_match('/\w+SET_' . $solution->getKey() . '_?(\d+)?/', $item->name, $matches) == true) {
+            if (preg_match('/\w+SET_' . $solution->id . '_?(\d+)?/', $item->name, $matches) == true) {
                 $numeric = $matches[1] ?? 1;
                 $index = ($numeric > $index) ? (int)$numeric : $index;
             }

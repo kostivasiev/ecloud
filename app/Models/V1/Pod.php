@@ -295,7 +295,7 @@ class Pod extends Model implements Filterable, Sortable
     public function vceServerDetails($username)
     {
         if (empty($this->ucs_datacentre_vce_server_id)) {
-            Log::error('Invalid or missing VCE server ID for Pod ' . $this->getKey());
+            Log::error('Invalid or missing VCE server ID for Pod ' . $this->id);
             return false;
         }
 

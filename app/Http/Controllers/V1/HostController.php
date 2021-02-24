@@ -109,7 +109,7 @@ class HostController extends BaseController
             $artisan = app()->makeWith(ArtisanService::class, [['solution' => $solution, 'san' => $san]]);
 
             // Create host on san
-            $artisanResponse = $artisan->createHost($host->getKey(), $fcwwns);
+            $artisanResponse = $artisan->createHost($host->id, $fcwwns);
 
             if (!$artisanResponse) {
                 throw new ArtisanException('Failed to create Host: ' . $artisan->getLastError());
@@ -142,7 +142,7 @@ class HostController extends BaseController
                 'Unable to determine host set for host',
                 [
                     'host_id' => $hostId,
-                    'solution_id' => $host->solution->getKey()
+                    'solution_id' => $host->solution->id
                 ]
             );
             throw new ServiceUnavailableException('Unable to delete host: missing host set');
@@ -155,9 +155,9 @@ class HostController extends BaseController
             $automationRequestId = $intapiService->automationRequest(
                 'remove_host',
                 'ucs_node',
-                $host->getKey(),
-                ['host_set_id' => $hostSet->getKey()],
-                'ecloud_ucs_' . $host->pod->getKey(),
+                $host->id,
+                ['host_set_id' => $hostSet->id],
+                'ecloud_ucs_' . $host->pod->id,
                 $request->user()->userId(),
                 $request->user()->type()
             );

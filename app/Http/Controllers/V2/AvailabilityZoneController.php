@@ -77,7 +77,7 @@ class AvailabilityZoneController extends BaseController
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 201);
+        return $this->responseIdMeta($request, $availabilityZone->id, 201);
     }
 
     /**
@@ -98,7 +98,7 @@ class AvailabilityZoneController extends BaseController
             'nsx_edge_cluster_id',
         ]));
         $availabilityZone->save();
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
+        return $this->responseIdMeta($request, $availabilityZone->id, 200);
     }
 
     /**

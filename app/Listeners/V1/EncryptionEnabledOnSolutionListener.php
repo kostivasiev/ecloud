@@ -39,9 +39,9 @@ class EncryptionEnabledOnSolutionListener
             $this->intapiService->automationRequest(
                 'solution_encryption_enable',
                 'ucs_reseller',
-                $event->solution->getKey(),
+                $event->solution->id,
                 [],
-                'ecloud_ucs_' . $event->solution->pod->getKey(),
+                'ecloud_ucs_' . $event->solution->pod->id,
                 $this->request->user()->userId(),
                 $this->request->user()->type()
             );
@@ -66,7 +66,7 @@ class EncryptionEnabledOnSolutionListener
         Log::info(
             'Virtual machine encryption was enabled on Solution',
             [
-                'id' => $event->solution->getKey(),
+                'id' => $event->solution->id,
                 'reseller_id' => $this->request->user()->resellerId()
             ]
         );
