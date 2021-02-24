@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\V2;
+namespace Tests\V1;
 
 use Tests\TestCase;
 
@@ -8,7 +8,7 @@ class DocsTest extends TestCase
 {
     public function testDocsPublic()
     {
-        $this->get('/v2/docs.yaml', [
+        $this->get('/v1/docs.yaml', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->assertResponseStatus(200);
@@ -16,7 +16,7 @@ class DocsTest extends TestCase
 
     public function testDocsAdmin()
     {
-        $this->get('/v2/admin-docs.yaml', [
+        $this->get('/v1/admin-docs.yaml', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->assertResponseStatus(200);
