@@ -23,7 +23,7 @@ class Attach extends Job
     {
         Log::info(get_class($this) . ' : Started');
 
-        if ($this->instance->volumes()->get()->count() >= config('volume.instance.limit', 15)) {
+        if ($this->instance->volumes()->get()->count() > config('volume.instance.limit', 15)) {
             $this->fail(new \Exception(
                 'Volume ' . $this->volume->id . ' failed to attach to instance ' .
                 $this->instance->id . ', volume limit exceeded'

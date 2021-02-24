@@ -21,31 +21,18 @@ class IsMaxVolumeLimitReachedTest extends TestCase
                 '/api/v1/vpc/vpc-test/volume',
                 [
                     'json' => [
-                        'volumeId' => 'vol-test-1',
+                        'volumeId' => 'vol-test',
                         'sizeGiB' => '100',
                         'shared' => false,
                     ]
                 ]
             ])
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test-1']));
-            });
-
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test-1/size',
-                [
-                    'json' => [
-                        'sizeGiB' => '100',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
             });
 
         $volume = factory(Volume::class)->create([
-            'id' => 'vol-test-1',
+            'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id
         ]);
@@ -56,6 +43,33 @@ class IsMaxVolumeLimitReachedTest extends TestCase
 
         // Test with one volume limit, and then attach that volume
         $this->assertTrue($rule->passes('', $this->instance()->id));
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
+                [
+                    'json' => [
+                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
+                [
+                    'json' => [
+                        'limit' => '300',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $this->instance()->volumes()->attach($volume);
 
         // Now assert that we're at the limit
