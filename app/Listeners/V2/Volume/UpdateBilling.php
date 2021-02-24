@@ -42,7 +42,7 @@ class UpdateBilling
         }
 
         // If iops is empty, or if the volume is unmounted, then set the iops to the default for billing purposes
-        if (empty($volume->iops) || ($volume->instances()->count() > 0)) {
+        if (empty($volume->iops) || ($volume->instances()->count() === 0)) {
             $volume->iops = config('volume.iops.default', 300);
         }
 
