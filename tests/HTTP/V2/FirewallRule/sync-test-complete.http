@@ -1,0 +1,135 @@
+### Update Policy
+PATCH https://{{host}}/{{version}}/firewall-policies/{{policy_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Updated Policy Name"
+}
+
+> {%
+client.test("Test Update Policy", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### Update Firewall Rule
+PATCH https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Update Firewall Rule"
+}
+
+> {%
+client.test('Update Firewall Rule', function () {
+    client.assert(response.status === 200, '200 status not received');
+});
+%}
+
+### Update Firewall Rule including ports
+PATCH https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "ports": [
+        {
+            "protocol": "TCP",
+            "source": "111",
+            "destination": "222"
+        }
+    ]
+}
+
+> {%
+client.test('Update Firewall Rule including ports', function () {
+    client.assert(response.status === 200, '200 status not received');
+});
+%}
+
+### Get new firewall port id
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}/ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Get new firewall port id', function () {
+    client.assert(response.status === 200, '200 status not received');
+    client.assert(response.body.data[0].source === 111, 'Source is not 111');
+    client.assert(response.body.data[0].destination === 222, 'Source is not 222');
+    client.global.set('port_id', response.body.data[0].id);
+});
+%}
+
+### Update Firewall Port
+PATCH https://{{host}}/{{version}}/firewall-rule-ports/{{port_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "destination": 333
+}
+
+> {%
+client.test('Update Firewall Port', function () {
+    client.assert(response.status === 200, '200 status not received');
+});
+%}
+
+### Verify Firewall Port Change
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}/ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Verify Firewall Port Change', function () {
+    client.assert(response.status === 200, '200 status not received');
+    client.assert(response.body.data[0].destination === 333, 'Source is not 333');
+});
+%}
+
+### Delete Firewall Port
+DELETE https://{{host}}/{{version}}/firewall-rule-ports/{{port_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Delete Firewall Port', function () {
+    client.assert(response.status === 204, '204 status not received');
+});
+%}
+
+### Delete Firewall Rule
+DELETE https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Delete Firewall Rule', function () {
+    client.assert(response.status === 204, '204 status not received');
+});
+%}
+
+### Delete Firewall Policy
+PATCH https://{{host}}/{{version}}/firewall-policies/{{policy_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete Firewall Policy', function () {
+    client.assert(response.status === 204, '204 status not received');
+});
+%}
