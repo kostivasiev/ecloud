@@ -161,7 +161,7 @@ client.test('Update Firewall Rule with sync in progress', function () {
     client.assert(response.status === 409, '409 status not received');
 });
 client.log('Run the following SQL query to return to a completed sync status:-');
-client.log('UPDATE `syncs` SET completed=1 WHERE resource_id=\'' + client.global.get('policy_id') + '\';');
+client.log('UPDATE `syncs` SET completed=1 WHERE resource_id=\'' + client.global.get('policy_id') + '\' order by created_at DESC limit 1;');
 %}
 
 ### Update Policy
