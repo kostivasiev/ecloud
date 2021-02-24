@@ -10,7 +10,7 @@ class UpdateFirewallPolicy
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        if (!is_empty($event->model->firewallPolicy)) {
+        if (!empty($event->model->firewallPolicy)) {
             $event->model->firewallPolicy->save();
         }
 
