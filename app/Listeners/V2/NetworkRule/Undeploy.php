@@ -12,11 +12,9 @@ class Undeploy implements ShouldQueue
     use InteractsWithQueue;
 
     /**
-     * @see https://185.197.63.88/policy/api_includes/method_DeleteGatewayRule.html
      *
-     * TODO: For some reason patching the gateway policy does not remove the rule from NSX as expected,
-     * so we're going to have to do it explicitly. A ticket has been opened with VMWare regarding this, see
-     * https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/533#
+     * Patching the network policy does not remove the rule from NSX as expected,
+     * so we're going to have to do it explicitly.
      *
      * @param Deleted $event
      * @return void

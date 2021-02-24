@@ -160,6 +160,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\NetworkRule\Deleted::class => [
             \App\Listeners\V2\NetworkRule\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
+            // TODO: not convinced we need to re-deploy the policy here. Undeploy will delete the rule, this just pointlessly redeploys the policy.
             \App\Listeners\V2\NetworkRule\UpdateNetworkPolicy::class,
         ],
         \App\Events\V2\NetworkRule\Saved::class => [
