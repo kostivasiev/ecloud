@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\InstanceVolume;
 
-use App\Events\V2\InstanceVolume\Created;
+use App\Events\V2\InstanceVolume\Deleted;
 use App\Jobs\Kingpin\Volume\Detach as DetachJob;
 use App\Jobs\Sync\Completed;
 use App\Models\V2\Instance;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class Detach
 {
-    public function handle(Created $event)
+    public function handle(Deleted $event)
     {
         Log::info(get_class($this) . ' : Started', [
             'instance_id' => $event->model->instance_id,

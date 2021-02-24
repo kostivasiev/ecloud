@@ -49,7 +49,7 @@ class CapacityChange extends Job
             Log::error(get_class($this) . ' : Failed', [
                 'id' => $volume->id,
                 'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
+                'content' => $response->getBody()->getContents(),
             ]);
             $this->fail(new \Exception('Volume ' . $volume->id . ' failed to increase capacity to ' . $volume->capacity));
             return false;

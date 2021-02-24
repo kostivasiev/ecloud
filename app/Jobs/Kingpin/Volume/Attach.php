@@ -28,11 +28,11 @@ class Attach extends Job
                 'Volume ' . $this->volume->id . ' failed to attach to instance ' .
                 $this->instance->id . ', volume limit exceeded'
             ));
-            return;
+            return false;
         }
 
         try {
-            $this->instance->availabilityZone->kingpinService()
+            $response = $this->instance->availabilityZone->kingpinService()
                 ->post(
                     '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
                     [
@@ -42,9 +42,19 @@ class Attach extends Job
                     ]
                 );
         } catch (ServerException $exception) {
-            Log::error($exception->getResponse()->getBody()->getContents());
-            throw $exception;
+            $response = $exception->getResponse();
         }
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::error(get_class($this) . ' : Failed', [
+                'id' => $this->volume->id,
+                'status_code' => $response->getStatusCode(),
+                'content' => $response->getBody()->getContents()
+            ]);
+            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed attachment'));
+            return false;
+        }
+
         Log::debug('Volume ' . $this->volume->id . ' has been attached to instance ' . $this->instance->id);
 
         Log::info(get_class($this) . ' : Finished');
@@ -54,5 +64,8 @@ class Attach extends Job
     {
         $this->instance->setSyncFailureReason($exception->getMessage());
         $this->volume->setSyncFailureReason($exception->getMessage());
+
+        // Detach
+        $this->instance->volumes()->detach($this->volume);
     }
 }

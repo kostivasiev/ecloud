@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Volume\AttachRequest;
+use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
 use App\Models\V2\Instance;
@@ -163,7 +164,7 @@ class VolumeController extends BaseController
         return response('', 202);
     }
 
-    public function detach(AttachRequest $request, string $volumeId)
+    public function detach(DetachRequest $request, string $volumeId)
     {
         $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));

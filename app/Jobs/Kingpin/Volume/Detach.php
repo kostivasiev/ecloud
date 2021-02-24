@@ -24,19 +24,22 @@ class Detach extends Job
         Log::info(get_class($this) . ' : Started');
 
         try {
-            $this->instance->availabilityZone->kingpinService()
-                ->post(
-                    '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/detach',
-                    [
-                        'json' => [
-                            'volumeUUID' => $this->volume->vmware_uuid
-                        ]
-                    ]
-                );
+            $response = $this->instance->availabilityZone->kingpinService()
+                ->post('/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/' . $this->volume->vmware_uuid . '/detach');
         } catch (ServerException $exception) {
-            Log::error($exception->getResponse()->getBody()->getContents());
-            throw $exception;
+            $response = $exception->getResponse();
         }
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::error(get_class($this) . ' : Failed', [
+                'id' => $this->volume->id,
+                'status_code' => $response->getStatusCode(),
+                'content' => $response->getBody()->getContents()
+            ]);
+            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed detachment'));
+            return false;
+        }
+
         Log::debug('Volume ' . $this->volume->id . ' has been detached from instance ' . $this->instance->id);
 
         Log::info(get_class($this) . ' : Finished');

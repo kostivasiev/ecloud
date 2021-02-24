@@ -51,7 +51,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### update
+### update - capacity
 PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -60,8 +60,28 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "name": "Test - updated",
-  "capacity": 50
+    "name": "Test - updated",
+    "capacity": 50
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
+});
+%}
+
+### update - IOPS
+PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test - updated",
+    "iops": 600
 }
 
 > {%

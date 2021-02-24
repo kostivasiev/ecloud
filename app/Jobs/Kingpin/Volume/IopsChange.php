@@ -51,6 +51,8 @@ class IopsChange extends Job
             }
 
             Log::debug('Volume ' . $volume->id . ' iops changed to ' . $volume->iops . ' on instance ' . $instance->id);
+
+            return true;
         });
 
         if ($updateSuccessful === false) {
@@ -59,6 +61,8 @@ class IopsChange extends Job
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+
+        return true;
     }
 
     public function failed($exception)
