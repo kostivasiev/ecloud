@@ -31,12 +31,6 @@ class Update extends FormRequest
                 'nullable',
                 'string'
             ],
-            'firewall_rule_id' => [
-                'sometimes',
-                'string',
-                'exists:ecloud.firewall_rules,id,deleted_at,NULL',
-                new ExistsForUser(FirewallRule::class)
-            ],
             'protocol' => [
                 'sometimes',
                 'required',
