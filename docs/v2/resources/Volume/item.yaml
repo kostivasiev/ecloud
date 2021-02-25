@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/Volume"
+            - $ref: '../../components/schemas/volume-patch.yaml'
             - type: object
               properties:
                 vpc_id:

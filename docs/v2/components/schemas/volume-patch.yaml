@@ -1,0 +1,48 @@
+properties:
+  id:
+    type: string
+    example: 'vol-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'vol-2b66bb79'
+  vpc_id:
+    type: string
+    required: true
+    example: 'vpc-2b66bb79'
+    readOnly : true
+  availability_zone_id:
+    type: string
+    required: false
+    example: az-2b66bb79
+    readOnly : true
+  capacity:
+    type: integer
+    required: true
+    description: Volume capacity in GB
+    example: 250
+  iops:
+    type: integer
+    required: false
+    description: IOPS value 300, 600, 1200 or 2500 only
+    example: 300
+  mounted:
+    type: boolean
+    readOnly: true
+    description: Is the volume mounted to a resource
+    example: true
+  sync:
+    type: string
+    readOnly: true
+    description: The current sync state of the resource
+    example: complete
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Routers'

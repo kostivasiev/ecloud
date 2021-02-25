@@ -30,82 +30,15 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc()->getKey()
         ]);
-    }
-
-    public function testInvalidVpcIdIsFailed()
-    {
-        $data = [
-            'name' => 'Volume 1',
-            'vpc_id' => 'x',
-            'availability_zone_id' => $this->availabilityZone->getKey()
-        ];
-
-        $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
-
-    public function testInvalidAzIsFailed()
-    {
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
-        ]);
-
-        $data = [
-            'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.max') - 1),
-        ];
-
-        $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Not Found',
-                'detail' => 'The specified availability zone is not available to that VPC',
-                'status' => 404,
-                'source' => 'availability_zone_id'
-            ])
-            ->assertResponseStatus(404);
     }
 
     public function testNotOwnedVolumeIsFailed()
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
         ];
 
         $this->patch(
@@ -128,8 +61,6 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.min') - 1),
         ];
 
@@ -154,8 +85,6 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.max') + 1),
         ];
 
@@ -180,8 +109,6 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.max') - 1),
         ];
 

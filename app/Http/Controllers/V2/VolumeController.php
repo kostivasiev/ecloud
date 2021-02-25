@@ -117,7 +117,7 @@ class VolumeController extends BaseController
             }
         }
 
-        $only = ['name', 'vpc_id', 'capacity', 'availability_zone_id', 'iops'];
+        $only = ['name', 'capacity', 'iops'];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }
