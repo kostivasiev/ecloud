@@ -56,21 +56,6 @@ class DhcpController extends BaseController
         return $this->responseIdMeta($request, $dhcps->getKey(), 201);
     }
 
-    /**
-     * @param UpdateDhcpRequest $request
-     * @param string $dhcpId
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(UpdateDhcpRequest $request, string $dhcpId)
-    {
-        $dhcp = Dhcp::findOrFail($dhcpId);
-        $dhcp->fill($request->only(['vpc_id', 'availability_zone_id']));
-        $dhcp->save();
-        $dhcp->setSyncCompleted();
-        return $this->responseIdMeta($request, $dhcp->getKey(), 200);
-    }
-
-
     public function destroy(string $dhcpId)
     {
         $model = Dhcp::findOrFail($dhcpId);

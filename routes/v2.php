@@ -67,7 +67,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('dhcps', 'DhcpController@index');
         $router->get('dhcps/{dhcpId}', 'DhcpController@show');
         $router->post('dhcps', 'DhcpController@create');
-        $router->patch('dhcps/{dhcpId}', 'DhcpController@update');
         $router->delete('dhcps/{dhcpId}', 'DhcpController@destroy');
     });
 
