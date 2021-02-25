@@ -40,7 +40,7 @@ class VpcSupportController extends BaseController
             'end_date',
         ]));
         $vpcSupport->save();
-        return $this->responseIdMeta($request, $vpcSupport->getKey(), 201);
+        return $this->responseIdMeta($request, $vpcSupport->id, 201);
     }
 
     public function update(UpdateRequest $request, string $vpcSupportId)
@@ -53,7 +53,7 @@ class VpcSupportController extends BaseController
             'end_date',
         ]))->save();
 
-        return $this->responseIdMeta($request, $vpcSupport->getKey(), 200);
+        return $this->responseIdMeta($request, $vpcSupport->id, 200);
     }
 
     /**

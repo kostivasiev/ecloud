@@ -21,7 +21,7 @@ class GetVpcInstancesTest extends TestCase
         $instance = $this->instance();
 
         $this->get(
-            '/v2/vpcs/'.$this->vpc()->getKey().'/instances',
+            '/v2/vpcs/'.$this->vpc()->id.'/instances',
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups'    => 'ecloud.read',

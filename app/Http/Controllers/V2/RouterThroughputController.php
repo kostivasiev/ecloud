@@ -38,7 +38,7 @@ class RouterThroughputController extends BaseController
             'burst_size'
         ]));
         $routerThroughput->save();
-        return $this->responseIdMeta($request, $routerThroughput->getKey(), 201);
+        return $this->responseIdMeta($request, $routerThroughput->id, 201);
     }
 
     public function update(UpdateRequest $request, string $routerThroughputId)
@@ -51,7 +51,7 @@ class RouterThroughputController extends BaseController
             'burst_size'
         ]));
         $routerThroughput->save();
-        return $this->responseIdMeta($request, $routerThroughput->getKey(), 200);
+        return $this->responseIdMeta($request, $routerThroughput->id, 200);
     }
 
     public function destroy(Request $request, string $routerThroughputId)

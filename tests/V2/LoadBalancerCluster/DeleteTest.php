@@ -29,16 +29,16 @@ class DeleteTest extends TestCase
 
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->lbc = factory(LoadBalancerCluster::class)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'vpc_id' => $this->vpc->getKey()
+            'availability_zone_id' => $this->availabilityZone->id,
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
@@ -63,7 +63,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/lbcs/' . $this->lbc->getKey(),
+            '/v2/lbcs/' . $this->lbc->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -71,7 +71,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $resource = LoadBalancerCluster::withTrashed()->findOrFail($this->lbc->getKey());
+        $resource = LoadBalancerCluster::withTrashed()->findOrFail($this->lbc->id);
         $this->assertNotNull($resource->deleted_at);
     }
 }

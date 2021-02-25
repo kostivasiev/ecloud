@@ -24,10 +24,10 @@ class VpcHasResourcesValidationTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
 
         $this->validator = new VpcHasResources();
@@ -35,16 +35,16 @@ class VpcHasResourcesValidationTest extends TestCase
 
     public function testNoResourcesPasses()
     {
-        $this->assertTrue($this->validator->passes('', $this->vpc->getKey()));
+        $this->assertTrue($this->validator->passes('', $this->vpc->id));
     }
 
     public function testAssignedresourcesFails()
     {
         factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availability_zone->getKey()
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availability_zone->id
         ]);
 
-        $this->assertFalse($this->validator->passes('', $this->vpc->getKey()));
+        $this->assertFalse($this->validator->passes('', $this->vpc->id));
     }
 }

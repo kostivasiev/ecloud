@@ -22,7 +22,7 @@ class Undeploy extends Job
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
         $instance->availabilityZone
             ->kingpinService()
-            ->delete('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey());
+            ->delete('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id);
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

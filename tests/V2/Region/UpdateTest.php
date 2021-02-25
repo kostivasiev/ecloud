@@ -29,7 +29,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/regions/' . $this->region->getKey(),
+            '/v2/regions/' . $this->region->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -50,7 +50,7 @@ class UpdateTest extends TestCase
             'name' => '',
         ];
         $this->patch(
-            '/v2/regions/' . $this->region->getKey(),
+            '/v2/regions/' . $this->region->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -72,7 +72,7 @@ class UpdateTest extends TestCase
             'name' => $this->faker->word(),
         ];
         $this->patch(
-            '/v2/regions/' . $this->region->getKey(),
+            '/v2/regions/' . $this->region->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -86,7 +86,7 @@ class UpdateTest extends TestCase
             )
             ->assertResponseStatus(200);
 
-        $region = Region::findOrFail($this->region->getKey());
+        $region = Region::findOrFail($this->region->id);
         $this->assertEquals($data['name'], $region->name);
     }
 }

@@ -28,25 +28,25 @@ class VolumeTest extends TestCase
 
         $region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey(),
+            'region_id' => $region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
-            'region_id' => $region->getKey(),
+            'region_id' => $region->id,
         ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $availabilityZone->id,
         ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
         ]);
     }
 
     public function testGetVolumes()
     {
         $this->instance->volumes()->attach($this->volume);
-        $this->get('/v2/instances/' . $this->instance->getKey() . '/volumes', [
+        $this->get('/v2/instances/' . $this->instance->id . '/volumes', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([

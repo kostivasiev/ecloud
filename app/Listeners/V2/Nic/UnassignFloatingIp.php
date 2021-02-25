@@ -20,13 +20,13 @@ class UnassignFloatingIp implements ShouldQueue
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
         $nic = $event->model;
-        $logMessage = 'UnassignFloatingIp for NIC ' . $nic->getKey() . ': ';
+        $logMessage = 'UnassignFloatingIp for NIC ' . $nic->id . ': ';
         Log::info($logMessage . 'Started');
         Nat::whereHasMorph('translated', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
-            $query->where('translated_id', $nic->getKey())->withTrashed();
+            $query->where('translated_id', $nic->id)->withTrashed();
         })
             ->orWhereHasMorph('source', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
-                $query->where('source_id', $nic->getKey())->withTrashed();
+                $query->where('source_id', $nic->id)->withTrashed();
             })
             ->each(function ($nat) use ($logMessage) {
                 Log::info($logMessage . 'Floating IP ' . $nat->destination_id . ' unassigned');

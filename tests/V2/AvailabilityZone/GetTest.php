@@ -24,12 +24,12 @@ class GetTest extends TestCase
 
         $region = factory(Region::class)->create();
         $this->availabilityZones = factory(AvailabilityZone::class, 2)->create([
-            'region_id' => $region->getKey(),
+            'region_id' => $region->id,
             'name' => $this->faker->city(),
             'is_public' => false,
         ]);
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
-            'availability_zone_id' => $this->availabilityZones->first()->getKey()
+            'availability_zone_id' => $this->availabilityZones->first()->id
         ]);
     }
 
@@ -47,7 +47,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->availabilityZones->first()->getKey(),
+                'id' => $this->availabilityZones->first()->id,
                 'name' => $this->availabilityZones->first()->name,
             ])
             ->assertResponseStatus(200);
@@ -69,7 +69,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->availabilityZones->first()->getKey(),
+                'id' => $this->availabilityZones->first()->id,
                 'name' => $this->availabilityZones->first()->name,
             ])
             ->assertResponseStatus(200);
@@ -84,14 +84,14 @@ class GetTest extends TestCase
         $availabilityZone->save();
 
         $this->get(
-            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            '/v2/availability-zones/' . $availabilityZone->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $availabilityZone->getKey(),
+                'id' => $availabilityZone->id,
                 'name' => $availabilityZone->name,
             ])
             ->assertResponseStatus(200);
@@ -104,14 +104,14 @@ class GetTest extends TestCase
         $availabilityZone->save();
 
         $this->get(
-            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            '/v2/availability-zones/' . $availabilityZone->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $availabilityZone->getKey(),
+                'id' => $availabilityZone->id,
                 'name' => $availabilityZone->name,
             ])
             ->assertResponseStatus(200);
@@ -124,14 +124,14 @@ class GetTest extends TestCase
         $availabilityZone->save();
 
         $this->get(
-            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            '/v2/availability-zones/' . $availabilityZone->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $availabilityZone->getKey(),
+                'id' => $availabilityZone->id,
                 'name' => $availabilityZone->name,
             ])
             ->assertResponseStatus(200);
@@ -144,7 +144,7 @@ class GetTest extends TestCase
         $availabilityZone->save();
 
         $this->get(
-            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            '/v2/availability-zones/' . $availabilityZone->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -186,7 +186,7 @@ class GetTest extends TestCase
         $availabilityZone->save();
 
         $this->get(
-            '/v2/availability-zones/' . $availabilityZone->getKey(),
+            '/v2/availability-zones/' . $availabilityZone->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -207,12 +207,12 @@ class GetTest extends TestCase
 
     public function testGetCapacities()
     {
-        $this->get('/v2/availability-zones/' . $this->availabilityZones->first()->getKey() . '/capacities', [
+        $this->get('/v2/availability-zones/' . $this->availabilityZones->first()->id . '/capacities', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
-            'id' => $this->availabilityZoneCapacity->getKey(),
-            'availability_zone_id' => $this->availabilityZones->first()->getKey(),
+            'id' => $this->availabilityZoneCapacity->id,
+            'availability_zone_id' => $this->availabilityZones->first()->id,
             'type' => $this->availabilityZoneCapacity->type,
             'alert_warning' => $this->availabilityZoneCapacity->alert_warning,
             'alert_critical' => $this->availabilityZoneCapacity->alert_critical,

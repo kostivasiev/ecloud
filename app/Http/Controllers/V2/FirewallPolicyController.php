@@ -52,7 +52,7 @@ class FirewallPolicyController extends BaseController
             return $model->getSyncError();
         }
         $model->refresh();
-        return $this->responseIdMeta($request, $model->getKey(), 201);
+        return $this->responseIdMeta($request, $model->id, 201);
     }
 
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
@@ -62,7 +62,7 @@ class FirewallPolicyController extends BaseController
         if (!$model->save()) {
             return $model->getSyncError();
         }
-        return $this->responseIdMeta($request, $model->getKey(), 200);
+        return $this->responseIdMeta($request, $model->id, 200);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)

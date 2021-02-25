@@ -28,7 +28,7 @@ class Undeploy implements ShouldQueue
         $firewallRule = $event->model;
 
         $firewallRule->firewallPolicy->router->availabilityZone->nsxService()->delete(
-            '/policy/api/v1/infra/domains/default/gateway-policies/' . $firewallRule->firewallPolicy->getKey() . '/rules/' . $firewallRule->getKey()
+            '/policy/api/v1/infra/domains/default/gateway-policies/' . $firewallRule->firewallPolicy->id . '/rules/' . $firewallRule->id
         );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);

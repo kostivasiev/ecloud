@@ -29,8 +29,8 @@ class IsMaxVolumeLimitReachedTest extends TestCase
         $this->volumeCount = 1;
         $this->volume = factory(Volume::class, 2)->create([
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc()->getKey(),
-            'availability_zone_id' => $this->availabilityZone()->getKey()
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id
         ])->each(function ($volume) {
             $volume->name = 'Volume ' . $this->volumeCount;
             $volume->save();
@@ -43,11 +43,11 @@ class IsMaxVolumeLimitReachedTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         // Test with one volume limit, and then attach that volume
-        $this->assertTrue($this->rule->passes('', $this->instance()->getKey()));
+        $this->assertTrue($this->rule->passes('', $this->instance()->id));
         $this->instance()->volumes()->attach($this->volume[0]);
         $this->instance()->save();
 
         // Now assert that we're at the limit
-        $this->assertFalse($this->rule->passes('', $this->instance()->getKey()));
+        $this->assertFalse($this->rule->passes('', $this->instance()->id));
     }
 }
