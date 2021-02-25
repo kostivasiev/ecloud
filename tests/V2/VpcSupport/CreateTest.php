@@ -27,10 +27,10 @@ class CreateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
     }
 
@@ -39,7 +39,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/support',
             [
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -49,7 +49,7 @@ class CreateTest extends TestCase
             ->seeInDatabase(
                 'vpc_support',
                 [
-                    'vpc_id' => $this->vpc->getKey()
+                    'vpc_id' => $this->vpc->id
                 ],
                 'ecloud'
             )
@@ -80,7 +80,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/support',
             [
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc->id,
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -119,7 +119,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/support',
             [
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',

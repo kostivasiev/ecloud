@@ -31,13 +31,13 @@ class NewIDTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
@@ -48,7 +48,7 @@ class NewIDTest extends TestCase
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',
             'datacentre_site_id' => 1,
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -61,8 +61,8 @@ class NewIDTest extends TestCase
     {
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -75,7 +75,7 @@ class NewIDTest extends TestCase
     {
         $this->post('/v2/vpcs', [
             'name' => 'Manchester DC',
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',

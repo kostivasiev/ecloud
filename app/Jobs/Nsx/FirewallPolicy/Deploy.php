@@ -51,14 +51,14 @@ class Deploy extends Job
                             'service_entries' => $rule->firewallRulePorts->map(function ($port) {
                                 if ($port->protocol == 'ICMPv4') {
                                     return [
-                                        'id' => $port->getKey(),
+                                        'id' => $port->id,
                                         'icmp_type' => FirewallRulePort::ICMP_MESSAGE_TYPE_ECHO_REQUEST,
                                         'resource_type' => 'ICMPTypeServiceEntry',
                                         'protocol' => 'ICMPv4',
                                     ];
                                 }
                                 return [
-                                    'id' => $port->getKey(),
+                                    'id' => $port->id,
                                     'l4_protocol' => $port->protocol,
                                     'resource_type' => 'L4PortSetServiceEntry',
                                     'source_ports' => $port->source == 'ANY' ?

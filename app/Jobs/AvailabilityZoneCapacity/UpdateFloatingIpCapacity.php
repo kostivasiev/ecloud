@@ -25,11 +25,11 @@ class UpdateFloatingIpCapacity extends Job
 
         $availabilityZone = AvailabilityZone::findOrFail($this->data['availability_zone_id']);
 
-        $availabilityZoneCapacity = AvailabilityZoneCapacity::where('availability_zone_id', $availabilityZone->getKey())
+        $availabilityZoneCapacity = AvailabilityZoneCapacity::where('availability_zone_id', $availabilityZone->id)
             ->where('type', 'floating_ip')->first();
 
         if (empty($availabilityZoneCapacity)) {
-            Log::info('No \'floating_ip\' capacity record found for availability zone ' . $availabilityZone->getKey() . ', Skipping.');
+            Log::info('No \'floating_ip\' capacity record found for availability zone ' . $availabilityZone->id . ', Skipping.');
             return;
         }
 
@@ -48,7 +48,7 @@ class UpdateFloatingIpCapacity extends Job
         } while ($currentPage < $page->totalPages());
 
         // As the ip ranges are loaded from all az's for the region we need to load all fips associated with the region
-        $floatingIps = FloatingIp::withRegion($availabilityZone->region->getKey())->whereNotNull('ip_address');
+        $floatingIps = FloatingIp::withRegion($availabilityZone->region->id)->whereNotNull('ip_address');
 
         $runningTotal = [
             'total' => 0,

@@ -19,11 +19,11 @@ class CapacityIncreaseTest extends TestCase
         parent::setUp();
 
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc()->getKey()
+            'vpc_id' => $this->vpc()->id
         ]);
 
         $this->kingpinServiceMock()->shouldReceive('put')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->getKey() . '/instance/' . $this->instance()->getKey() . '/volume/'.
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/volume/'.
                         $this->volume->vmware_uuid.'/size'])
             ->andReturn(
                 new Response(200)
@@ -33,7 +33,7 @@ class CapacityIncreaseTest extends TestCase
     public function testIncreaseSize()
     {
         $this->patch(
-            '/v2/volumes/'.$this->volume->getKey(),
+            '/v2/volumes/'.$this->volume->id,
             [
                 'capacity' => 200,
             ],
