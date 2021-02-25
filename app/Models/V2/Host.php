@@ -58,7 +58,6 @@ class Host extends Model implements Filterable, Sortable
         });
     }
 
-
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
