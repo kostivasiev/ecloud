@@ -30,7 +30,6 @@ class MarkSyncing
 
         if (!$volume->createSync()) {
             Log::error(get_class($this) . ' : Failed to create sync for volume');
-            $instance->markSyncCompleted();
             throw new SyncException('Failed to create sync for volume');
         }
 
