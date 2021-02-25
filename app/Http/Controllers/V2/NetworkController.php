@@ -153,7 +153,6 @@ class NetworkController extends BaseController
     {
         $network = Network::forUser(Auth::user())->findOrFail($networkId);
         $network->fill($request->only([
-            'router_id',
             'name',
             'subnet',
         ]));
