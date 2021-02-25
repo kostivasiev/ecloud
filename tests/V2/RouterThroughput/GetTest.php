@@ -2,8 +2,6 @@
 
 namespace Tests\V2\RouterThroughput;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
 use App\Models\V2\RouterThroughput;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -17,14 +15,8 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
-        ]);
-
         $this->routerThroughput = factory(RouterThroughput::class)->create([
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'availability_zone_id' => $this->availabilityZone()->getKey(),
         ]);
     }
 
@@ -32,7 +24,7 @@ class GetTest extends TestCase
     {
         $this->get('/v2/router-throughputs', [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
+            'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeJson([
                 'id' => $this->routerThroughput->getKey(),
@@ -48,7 +40,7 @@ class GetTest extends TestCase
     {
         $this->get('/v2/router-throughputs/' . $this->routerThroughput->getKey(), [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
+            'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeJson([
                 'id' => $this->routerThroughput->getKey(),

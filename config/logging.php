@@ -102,7 +102,12 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/lumen.log'),
             'formatter' => \UKFast\Logging\JsonFormatter::class,
-            'level' => 'debug',
+        ],
+
+        'staging' => [
+            'driver' => 'stack',
+            'channels' => ['single', 'ukfastjson'],
+            'ignore_exceptions' => true,
         ],
     ],
 ];

@@ -146,8 +146,8 @@ class SolutionController extends BaseController
      */
     public static function getSolutionQuery(Request $request)
     {
-        $solutionQuery = Solution::withReseller($request->user->resellerId);
-        if (!$request->user->isAdministrator) {
+        $solutionQuery = Solution::withReseller($request->user()->resellerId());
+        if (!$request->user()->isAdmin()) {
             $solutionQuery->where('ucs_reseller_active', 'Yes');
             $solutionQuery->where('ucs_reseller_status', '!=', 'Cancelled');
             $solutionQuery->where('ucs_reseller_start_date', '<=', date('Y-m-d H:i:s'));

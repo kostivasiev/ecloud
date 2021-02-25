@@ -18,7 +18,7 @@ class DeleteTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected $availability_zone;
+    protected $availabilityZone;
     protected $instance;
     protected $macAddress;
     protected $network;
@@ -32,7 +32,7 @@ class DeleteTest extends TestCase
         $this->faker = Faker::create();
         $this->macAddress = $this->faker->macAddress;
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
 
@@ -41,6 +41,7 @@ class DeleteTest extends TestCase
         ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',

@@ -32,6 +32,6 @@ class CreateLbcsTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('regions');
+        Schema::connection('ecloud')->dropIfExists('lbcs');
     }
 }

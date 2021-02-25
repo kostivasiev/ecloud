@@ -4,6 +4,7 @@ namespace App\Rules\V2\RouterThroughput;
 
 use App\Models\V2\AvailabilityZone;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class ExistsForAvailabilityZone implements Rule
 {
@@ -11,7 +12,7 @@ class ExistsForAvailabilityZone implements Rule
 
     public function __construct($availabilityZoneId)
     {
-        $availabilityZone = AvailabilityZone::forUser(app('request')->user)->find($availabilityZoneId);
+        $availabilityZone = AvailabilityZone::forUser(Auth::user())->find($availabilityZoneId);
 
         if (!empty($availabilityZone)) {
             $this->routerThroughputs = $availabilityZone->routerThroughputs->pluck('id')->toArray();

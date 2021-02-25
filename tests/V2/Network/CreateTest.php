@@ -18,21 +18,22 @@ class CreateTest extends TestCase
     protected $region;
     protected $vpc;
     protected $router;
-    protected $availability_zone;
+    protected $availabilityZone;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->getKey(),
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 

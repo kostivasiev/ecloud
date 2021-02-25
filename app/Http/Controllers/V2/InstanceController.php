@@ -24,6 +24,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -41,7 +42,7 @@ class InstanceController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Instance::forUser($request->user);
+        $collection = Instance::forUser($request->user());
 
         $queryTransformer->config(Instance::class)
             ->transform($collection);
@@ -58,7 +59,7 @@ class InstanceController extends BaseController
      */
     public function show(Request $request, string $instanceId)
     {
-        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
         if ($this->isAdmin) {
             $instance->makeVisible('appliance_version_id');
         }
@@ -74,7 +75,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $vpc = Vpc::forUser(app('request')->user)->findOrFail($request->input('vpc_id'));
+        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->input('vpc_id'));
 
         // Use the default network if there is only one and no network_id was passed in
         $defaultNetworkId = null;
@@ -135,7 +136,7 @@ class InstanceController extends BaseController
      */
     public function update(UpdateRequest $request, string $instanceId)
     {
-        $instance = Instance::forUser(app('request')->user)->findOrFail($instanceId);
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
         $instance->fill($request->only([
             'name',
@@ -159,7 +160,8 @@ class InstanceController extends BaseController
      */
     public function destroy(Request $request, string $instanceId)
     {
-        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+
         if (!$instance->delete()) {
             return $instance->getSyncError();
         }
@@ -175,8 +177,8 @@ class InstanceController extends BaseController
      */
     public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        $collection = Instance::forUser($request->user)->findOrFail($instanceId)->credentials();
-        if (!$request->user->isAdministrator) {
+        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->credentials();
+        if (!$request->user()->isAdmin()) {
             $collection->where('credentials.is_hidden', 0);
         }
         $queryTransformer->config(Credential::class)
@@ -195,7 +197,7 @@ class InstanceController extends BaseController
      */
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        $collection = Instance::forUser($request->user)->findOrFail($instanceId)->volumes();
+        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->volumes();
         $queryTransformer->config(Volume::class)
             ->transform($collection);
 
@@ -212,7 +214,7 @@ class InstanceController extends BaseController
      */
     public function nics(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        $collection = Instance::forUser($request->user)->findOrFail($instanceId)->nics();
+        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 
@@ -223,7 +225,7 @@ class InstanceController extends BaseController
 
     public function powerOn(Request $request, $instanceId)
     {
-        $instance = Instance::forUser($request->user)
+        $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
         $this->dispatch(new PowerOn([
@@ -236,7 +238,7 @@ class InstanceController extends BaseController
 
     public function powerOff(Request $request, $instanceId)
     {
-        $instance = Instance::forUser($request->user)
+        $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
         $this->dispatch(new PowerOff([
@@ -250,7 +252,7 @@ class InstanceController extends BaseController
 
     public function guestRestart(Request $request, $instanceId)
     {
-        $instance = Instance::forUser($request->user)
+        $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
         $this->dispatch(new GuestRestart([
@@ -263,7 +265,7 @@ class InstanceController extends BaseController
 
     public function guestShutdown(Request $request, $instanceId)
     {
-        $instance = Instance::forUser($request->user)
+        $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
         $this->dispatch(new GuestShutdown([
@@ -276,7 +278,7 @@ class InstanceController extends BaseController
 
     public function powerReset(Request $request, $instanceId)
     {
-        $instance = Instance::forUser($request->user)
+        $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
         $this->dispatch(new PowerReset([
@@ -289,7 +291,7 @@ class InstanceController extends BaseController
 
     public function lock(Request $request, $instanceId)
     {
-        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
         $instance->locked = true;
         $instance->save();
 
@@ -298,7 +300,7 @@ class InstanceController extends BaseController
 
     public function unlock(Request $request, $instanceId)
     {
-        $instance = Instance::forUser($request->user)->findOrFail($instanceId);
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
         $instance->locked = false;
         $instance->save();
 

@@ -14,6 +14,7 @@ use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VolumeController extends BaseController
@@ -39,12 +40,12 @@ class VolumeController extends BaseController
             }
 
             if ($mounted) {
-                $collection = Volume::forUser($request->user)->has('instances', '>', 0);
+                $collection = Volume::forUser($request->user())->has('instances', '>', 0);
             } else {
-                $collection = Volume::forUser($request->user)->has('instances', '=', 0);
+                $collection = Volume::forUser($request->user())->has('instances', '=', 0);
             }
         } else {
-            $collection = Volume::forUser($request->user);
+            $collection = Volume::forUser($request->user());
         }
 
         (new QueryTransformer($request))
@@ -59,14 +60,14 @@ class VolumeController extends BaseController
     public function show(Request $request, string $volumeId)
     {
         return new VolumeResource(
-            Volume::forUser($request->user)->findOrFail($volumeId)
+            Volume::forUser($request->user())->findOrFail($volumeId)
         );
     }
 
     public function store(CreateRequest $request)
     {
         if ($request->has('availability_zone_id')) {
-            $availabilityZone = Vpc::forUser(app('request')->user)
+            $availabilityZone = Vpc::forUser(Auth::user())
                 ->findOrFail($request->vpc_id)
                 ->region
                 ->availabilityZones
@@ -94,9 +95,9 @@ class VolumeController extends BaseController
 
     public function update(UpdateRequest $request, string $volumeId)
     {
-        $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         if ($request->has('availability_zone_id')) {
-            $availabilityZone = Vpc::forUser(app('request')->user)
+            $availabilityZone = Vpc::forUser(Auth::user())
                 ->findOrFail($request->input('vpc_id', $volume->vpc_id))
                 ->region
                 ->availabilityZones
@@ -130,7 +131,7 @@ class VolumeController extends BaseController
 
     public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
     {
-        $collection = Volume::forUser($request->user)->findOrFail($volumeId)->instances();
+        $collection = Volume::forUser($request->user())->findOrFail($volumeId)->instances();
         $queryTransformer->config(Instance::class)
             ->transform($collection);
 
@@ -141,7 +142,7 @@ class VolumeController extends BaseController
 
     public function destroy(Request $request, string $volumeId)
     {
-        $volume = Volume::forUser($request->user)->findOrFail($volumeId);
+        $volume = Volume::forUser($request->user())->findOrFail($volumeId);
         if (!$volume->delete()) {
             return $volume->getSyncError();
         }
@@ -150,8 +151,8 @@ class VolumeController extends BaseController
 
     public function attachToInstance(AttachRequest $request, string $volumeId)
     {
-        $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
-        $instance = Instance::forUser(app('request')->user)->findOrFail($request->get('instance_id'));
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
         $instance->volumes()->attach($volume);
         $this->dispatch(new AttachToInstance($volume, $instance));
         return response('', 202);

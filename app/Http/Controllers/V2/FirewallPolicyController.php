@@ -9,22 +9,14 @@ use App\Models\V2\FirewallRule;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
-/**
- * Class FirewallPolicyController
- * @package App\Http\Controllers\V2
- */
 class FirewallPolicyController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallPolicy::forUser($request->user);
+        $collection = FirewallPolicy::forUser($request->user());
 
         $queryTransformer->config(FirewallPolicy::class)
             ->transform($collection);
@@ -34,27 +26,16 @@ class FirewallPolicyController extends BaseController
         ));
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $firewallPolicyId
-     * @return FirewallPolicyResource
-     */
     public function show(Request $request, string $firewallPolicyId)
     {
         return new FirewallPolicyResource(
-            FirewallPolicy::forUser($request->user)->findOrFail($firewallPolicyId)
+            FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)
         );
     }
 
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $routerId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
-    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
     {
-        $collection = FirewallPolicy::forUser($request->user)->findOrFail($routerId)->firewallRules();
+        $collection = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)->firewallRules();
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
 
@@ -63,35 +44,30 @@ class FirewallPolicyController extends BaseController
         ));
     }
 
-    /**
-     * @param CreateFirewallPolicyRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(CreateFirewallPolicyRequest $request)
     {
-        $policy = new FirewallPolicy();
-        $policy->fill($request->only(['name', 'sequence', 'router_id']));
-        $policy->save();
-        $policy->refresh();
-        return $this->responseIdMeta($request, $policy->getKey(), 201);
+        $model = new FirewallPolicy();
+        $model->fill($request->only(['name', 'sequence', 'router_id']));
+        if (!$model->save()) {
+            return $model->getSyncError();
+        }
+        $model->refresh();
+        return $this->responseIdMeta($request, $model->getKey(), 201);
     }
 
-    /**
-     * @param UpdateFirewallPolicyRequest $request
-     * @param string $firewallPolicyId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
-        $policy = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
-        $policy->fill($request->only(['name', 'sequence', 'router_id']));
-        $policy->save();
-        return $this->responseIdMeta($request, $policy->getKey(), 200);
+        $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
+        $model->fill($request->only(['name', 'sequence', 'router_id']));
+        if (!$model->save()) {
+            return $model->getSyncError();
+        }
+        return $this->responseIdMeta($request, $model->getKey(), 200);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)
     {
-        $model = FirewallPolicy::forUser(app('request')->user)->findOrFail($firewallPolicyId);
+        $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
         if (!$model->delete()) {
             return $model->getSyncError();
         }

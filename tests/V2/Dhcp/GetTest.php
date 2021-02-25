@@ -13,37 +13,23 @@ class GetTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @var Region */
-    private $region;
-
-    /** @var Vpc */
-    private $vpc;
-
     /** @var Dhcp */
     private $dhcp;
-
-    protected $availability_zone;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
         $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc()->getKey(),
+            'availability_zone_id' => $this->availabilityZone()->getKey(),
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
         $this->get('/v2/dhcps')->seeJson([
-            'title' => 'Unauthorised',
-            'detail' => 'Unauthorised',
+            'title' => 'Unauthorized',
+            'detail' => 'Unauthorized',
             'status' => 401,
         ])->assertResponseStatus(401);
     }

@@ -37,7 +37,8 @@ class CreateTest extends TestCase
             'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 

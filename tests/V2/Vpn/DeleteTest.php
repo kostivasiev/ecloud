@@ -15,31 +15,13 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected $availability_zone;
-    protected $region;
-    protected $router;
-    protected $vpc;
     protected $vpn;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create([
-            'name' => $this->faker->country(),
-        ]);
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-        ]);
         $this->vpn = factory(Vpn::class)->create([
-            'router_id' => $this->router->id,
+            'router_id' => $this->router()->id,
         ]);
     }
 

@@ -14,13 +14,14 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
     /** @var AvailabilityZone */
-    protected $availability_zone;
+    protected $availabilityZone;
     /** @var Region */
     private $region;
     /** @var Vpc */
@@ -31,7 +32,6 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
             ->shouldAllowMockingProtectedMethods();
         app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
@@ -41,20 +41,21 @@ class DeleteTest extends TestCase
         });
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
         factory(Credential::class)->create([
             'name' => 'NSX',
-            'resource_id' => $this->availability_zone->id,
+            'resource_id' => $this->availabilityZone->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'region_id' => $this->region->id,
         ]);
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
-        $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
+        $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
         $mockNsxService = \Mockery::mock($nsxService)->makePartial();
         app()->bind(NsxService::class, function () use ($mockNsxService) {
             $mockNsxService->shouldReceive('delete')
@@ -71,9 +72,10 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $this->delete('/v2/dhcps/' . $this->dhcp->getKey())->seeJson([
-            'title' => 'Unauthorised',
-            'detail' => 'Unauthorised',
+        $this->delete('/v2/dhcps/' . $this->dhcp->getKey())
+            ->seeJson([
+            'title' => 'Unauthorized',
+            'detail' => 'Unauthorized',
             'status' => 401,
         ])->assertResponseStatus(401);
     }

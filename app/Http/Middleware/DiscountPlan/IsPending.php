@@ -19,7 +19,7 @@ class IsPending
      */
     public function handle($request, Closure $next)
     {
-        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($request->route('discountPlanId'));
+        $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($request->route('discountPlanId'));
 
         if ($discountPlan->status != 'pending') {
             return JsonResponse::create([

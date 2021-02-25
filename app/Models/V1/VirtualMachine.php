@@ -324,7 +324,7 @@ class VirtualMachine extends Model implements Filterable, Sortable
         ];
 
         $request = app('request');
-        if (!$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             return $properties;
         }
 

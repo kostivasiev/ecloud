@@ -37,7 +37,7 @@ class GetTest extends TestCase
             '/v2/credentials',
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.read, ecloud.write',
             ]
         )
             ->seeJson([
@@ -56,7 +56,7 @@ class GetTest extends TestCase
             '/v2/credentials/' . $this->credential->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.read, ecloud.write',
             ]
         )
             ->seeJson([

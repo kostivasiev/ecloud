@@ -425,7 +425,7 @@ class ApplianceVersionController extends BaseController
     {
         $applianceVersionQuery = ApplianceVersion::query();
 
-        if ($request->user->resellerId != 0) {
+        if ($request->user()->isScoped()) {
             $applianceVersionQuery->where('appliance_version_active', '=', 'Yes');
         }
 

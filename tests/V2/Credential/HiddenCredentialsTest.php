@@ -19,7 +19,7 @@ class HiddenCredentialsTest extends TestCase
 
     protected Appliance $appliance;
     protected ApplianceVersion $appliance_version;
-    protected AvailabilityZone $availability_zone;
+    protected AvailabilityZone $availabilityZone;
     protected Credential $credentials;
     protected Instance $instance;
     protected Region $region;
@@ -31,7 +31,7 @@ class HiddenCredentialsTest extends TestCase
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->getKey()
         ]);
         $this->vpc = factory(Vpc::class)->create([
@@ -50,6 +50,7 @@ class HiddenCredentialsTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'platform' => 'Linux',
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
 
         $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
@@ -105,7 +106,7 @@ class HiddenCredentialsTest extends TestCase
             '/v2/credentials/' . $this->credentials->getKey(),
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )->seeJson([
             'is_hidden' => true,
@@ -115,10 +116,10 @@ class HiddenCredentialsTest extends TestCase
     public function testUserCannotSeeHiddenFlag()
     {
         $this->get(
-            '/v2/instances/'.$this->instance->getKey().'/credentials',
+            '/v2/instances/' . $this->instance->getKey() . '/credentials',
             [
                 'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
+                'X-consumer-groups' => 'ecloud.read',
             ]
         )->dontSeeJson([
             'is_hidden' => true,

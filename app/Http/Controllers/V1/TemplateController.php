@@ -182,8 +182,8 @@ class TemplateController extends BaseController
                     'new_template_name' => $newTemplateName
                 ],
                 'ecloud_ucs_' . $solution->pod->getKey(),
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
 
             return $this->respondEmpty(202);
@@ -235,8 +235,8 @@ class TemplateController extends BaseController
                     'datacentre_id' => $podId
                 ],
                 'ecloud_ucs_' . $podId,
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
 
             return $this->respondEmpty(202);
@@ -278,8 +278,8 @@ class TemplateController extends BaseController
                     'template_name' => $templateName,
                 ],
                 'ecloud_ucs_' . $solution->pod->getKey(),
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
 
             return $this->respondEmpty(202);
@@ -325,8 +325,8 @@ class TemplateController extends BaseController
                     'datacentre_id' => $podId
                 ],
                 'ecloud_ucs_' . $podId,
-                $request->user->id,
-                $request->user->type
+                $request->user()->userId(),
+                $request->user()->type()
             );
 
             return $this->respondEmpty(202);
@@ -389,7 +389,7 @@ class TemplateController extends BaseController
      */
     protected function filterAdminProperties(Request $request, $templates)
     {
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             return $templates;
         }
 
