@@ -43,7 +43,7 @@ class NicController extends BaseController
             'ip_address',
         ]));
         $nic->save();
-        return $this->responseIdMeta($request, $nic->getKey(), 201);
+        return $this->responseIdMeta($request, $nic->id, 201);
     }
 
     public function update(UpdateNicRequest $request, string $nicId)
@@ -59,7 +59,7 @@ class NicController extends BaseController
         if (!$nic->save()) {
             return $nic->getSyncError();
         }
-        return $this->responseIdMeta($request, $nic->getKey(), 200);
+        return $this->responseIdMeta($request, $nic->id, 200);
     }
 
     public function destroy(Request $request, string $nicId)

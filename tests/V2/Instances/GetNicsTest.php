@@ -46,14 +46,14 @@ class GetNicsTest extends TestCase
         ]);
 
         $this->get(
-            '/v2/instances/' . $this->instance()->getKey() . '/nics',
+            '/v2/instances/' . $this->instance()->id . '/nics',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'          => $nic->getKey(),
+                'id'          => $nic->id,
                 'mac_address' => $nic->mac_address,
                 'instance_id' => $nic->instance_id,
                 'network_id'  => $nic->network_id,

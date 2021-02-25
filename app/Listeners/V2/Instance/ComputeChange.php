@@ -45,7 +45,7 @@ class ComputeChange implements ShouldQueue
         }
 
         $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->getKey() . '/resize',
+            '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/resize',
             [
                 'json' => [
                     'ramMiB' => $instance->ram_capacity,

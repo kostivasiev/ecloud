@@ -30,23 +30,23 @@ class OverlappingSubnetTest extends TestCase
             'name' => 'testregion',
         ]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id,
         ]);
         $this->network = factory(Network::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
             'subnet' => '10.0.0.1/30',
         ]);
         app()->bind('request', function () {
             $request = new Request();
             $request->merge([
-                'router_id' => $this->router->getKey(),
+                'router_id' => $this->router->id,
             ]);
             return $request;
         });

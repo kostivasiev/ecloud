@@ -54,7 +54,7 @@ class LoadBalancerClusterController extends BaseController
             $request->only(['name', 'availability_zone_id', 'vpc_id', 'nodes'])
         );
         $loadBalancerCluster->save();
-        return $this->responseIdMeta($request, $loadBalancerCluster->getKey(), 201);
+        return $this->responseIdMeta($request, $loadBalancerCluster->id, 201);
     }
 
     /**
@@ -67,7 +67,7 @@ class LoadBalancerClusterController extends BaseController
         $loadBalancerCluster = LoadBalancerCluster::forUser(Auth::user())->findOrFail($lbcId);
         $loadBalancerCluster->fill($request->only(['name', 'availability_zone_id', 'vpc_id', 'nodes']));
         $loadBalancerCluster->save();
-        return $this->responseIdMeta($request, $loadBalancerCluster->getKey(), 200);
+        return $this->responseIdMeta($request, $loadBalancerCluster->id, 200);
     }
 
     public function destroy(Request $request, string $lbcId)

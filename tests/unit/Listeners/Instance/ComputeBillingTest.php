@@ -36,14 +36,14 @@ class ComputeBillingTest extends TestCase
         // compute metrics created on deploy
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->instance()->id,
-            'vpc_id' => $this->vpc()->getKey(),
+            'vpc_id' => $this->vpc()->id,
             'key' => 'vcpu.count',
             'value' => 1,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
         $originalRamMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->instance()->id,
-            'vpc_id' => $this->vpc()->getKey(),
+            'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => 1024,
             'start' => '2020-07-07T10:30:00+01:00',

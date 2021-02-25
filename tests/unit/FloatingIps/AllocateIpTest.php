@@ -36,14 +36,14 @@ class AllocateIpTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->floating_ip = factory(FloatingIp::class)->create([
             'ip_address' => null,
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
 
         $this->event = new Created($this->floating_ip);
@@ -107,9 +107,9 @@ class AllocateIpTest extends TestCase
             'ip_address' => null,
         ])->each(function ($fip) {
             $vpc = factory(Vpc::class)->create([
-                'region_id' => $this->region->getKey()
+                'region_id' => $this->region->id
             ]);
-            $fip->vpc_id = $vpc->getKey();
+            $fip->vpc_id = $vpc->id;
             $fip->save();
         })->first();
 
@@ -136,9 +136,9 @@ class AllocateIpTest extends TestCase
             'ip_address' => null,
         ])->each(function ($fip) {
             $vpc = factory(Vpc::class)->create([
-                'region_id' => $this->region->getKey()
+                'region_id' => $this->region->id
             ]);
-            $fip->vpc_id = $vpc->getKey();
+            $fip->vpc_id = $vpc->id;
             $fip->save();
         })->first();
 

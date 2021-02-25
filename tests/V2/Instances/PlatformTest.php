@@ -33,11 +33,11 @@ class PlatformTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
@@ -59,7 +59,7 @@ class PlatformTest extends TestCase
     public function testSettingPlatform()
     {
         $data = [
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'appliance_id' => $this->appliance->uuid,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,

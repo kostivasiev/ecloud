@@ -3,7 +3,7 @@
 namespace Tests\V1\Appliances\Pods;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class GetTest extends ApplianceTestCase
 {
