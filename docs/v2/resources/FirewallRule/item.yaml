@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/firewallRule.yaml'
+            - $ref: '../../components/schemas/firewallRule-patch.yaml'
   responses:
     200:
       $ref: '../../resources/FirewallRule/responses/idResponse.yaml'
