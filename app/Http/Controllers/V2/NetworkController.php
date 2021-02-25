@@ -155,7 +155,6 @@ class NetworkController extends BaseController
         $network->fill($request->only([
             'router_id',
             'name',
-            'subnet',
         ]));
         if (!$network->save()) {
             return $network->getSyncError();
