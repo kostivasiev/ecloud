@@ -66,8 +66,7 @@ class UpdateTest extends TestCase
             '/v2/networks/' . $this->network->getKey(),
             [
                 'name' => 'expected',
-                'router_id' => $this->router->getKey(),
-                'subnet' => '192.168.0.0/24'
+                'router_id' => $this->router->getKey()
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -76,6 +75,5 @@ class UpdateTest extends TestCase
 
         $network = Network::findOrFail($this->network->getKey());
         $this->assertEquals('expected', $network->name);
-        $this->assertEquals('192.168.0.0/24', $network->subnet);
     }
 }
