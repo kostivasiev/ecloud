@@ -7,7 +7,7 @@ use App\Models\V1\Solution;
 use App\Models\V1\Tag;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class PatchTest extends TestCase
 {
