@@ -35,7 +35,6 @@ class Attach
             new AttachJob($volume, $instance),
             new IopsChange($volume),
             new Completed($volume),
-            new Completed($instance),
         ];
 
         dispatch(array_shift($jobs)->chain($jobs));

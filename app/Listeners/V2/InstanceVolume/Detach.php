@@ -33,7 +33,6 @@ class Detach
         $jobs = [
             new DetachJob($volume, $instance),
             new Completed($volume),
-            new Completed($instance),
         ];
 
         dispatch(array_shift($jobs)->chain($jobs));

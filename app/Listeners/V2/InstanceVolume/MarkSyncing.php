@@ -28,11 +28,6 @@ class MarkSyncing
             throw new \Exception('Failed to find instance');
         }
 
-        if (!$instance->createSync()) {
-            Log::error(get_class($this) . ' : Failed to create sync for instance');
-            throw new SyncException('Failed to create sync for instance');
-        }
-
         if (!$volume->createSync()) {
             Log::error(get_class($this) . ' : Failed to create sync for volume');
             $instance->markSyncCompleted();
