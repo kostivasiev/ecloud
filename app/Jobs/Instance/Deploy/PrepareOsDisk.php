@@ -45,16 +45,6 @@ class PrepareOsDisk extends Job
             $volume->vmware_uuid = $volumeData->uuid;
             $volume->save();
 
-            // This is an ugly hack since attach will fail as the save marks the volume as out of sync and
-            // the background job hasn't had chance to run yet meaning attach will fail.
-            while ($volume->getStatus() === 'in-progress') {
-                Log::debug('Waiting for Volume ' . $volume->id . ' to finish syncing...');
-                sleep(5);
-            }
-
-            // Now the save has completed, attach it to the instance
-            $volume->instances()->attach($instance);
-
             Log::info(get_class($this) . ' : Created volume resource ' . $volume->id . ' for volume ' . $volume->vmware_uuid);
 
             // Send created Volume ID's to Kinpin
