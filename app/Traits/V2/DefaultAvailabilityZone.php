@@ -37,7 +37,7 @@ trait DefaultAvailabilityZone
             ->availabilityZones
             ->first();
         if ($availabilityZone) {
-            $model->availability_zone_id = $availabilityZone->getKey();
+            $model->availability_zone_id = $availabilityZone->id;
         } else {
             Log::error('Failed to find default Availability Zone for instance ' . $model->id);
             throw new \Exception('Failed to find default Availability Zone for instance ' . $model->id);

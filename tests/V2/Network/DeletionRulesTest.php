@@ -30,8 +30,8 @@ class DeletionRulesTest extends TestCase
         $this->faker = Faker::create();
         $this->nics = factory(Nic::class)->create([
             'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance()->getKey(),
-            'network_id' => $this->network()->getKey(),
+            'instance_id' => $this->instance()->id,
+            'network_id' => $this->network()->id,
             'ip_address' => $this->faker->ipv4,
         ]);
     }
@@ -39,7 +39,7 @@ class DeletionRulesTest extends TestCase
     public function testFailedDeletion()
     {
         $this->delete(
-            '/v2/networks/' . $this->network()->getKey(),
+            '/v2/networks/' . $this->network()->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -48,7 +48,7 @@ class DeletionRulesTest extends TestCase
         )->seeJson([
             'detail' => 'The specified resource has dependant relationships and cannot be deleted',
         ])->assertResponseStatus(412);
-        $network = Network::withTrashed()->findOrFail($this->network()->getKey());
+        $network = Network::withTrashed()->findOrFail($this->network()->id);
         $this->assertNull($network->deleted_at);
     }
 }

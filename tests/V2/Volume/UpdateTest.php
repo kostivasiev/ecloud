@@ -33,13 +33,13 @@ class UpdateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
@@ -48,11 +48,11 @@ class UpdateTest extends TestCase
         $data = [
             'name' => 'Volume 1',
             'vpc_id' => 'x',
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'availability_zone_id' => $this->availabilityZone->id
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -73,18 +73,18 @@ class UpdateTest extends TestCase
     {
         $region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ]);
 
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $availabilityZone->id,
             'capacity' => (config('volume.capacity.max') - 1),
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -104,12 +104,12 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -128,13 +128,13 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id,
             'capacity' => (config('volume.capacity.min') - 1),
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -154,13 +154,13 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id,
             'capacity' => (config('volume.capacity.max') + 1),
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -180,13 +180,13 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id,
             'capacity' => (config('volume.capacity.max') - 1),
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

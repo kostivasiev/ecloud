@@ -199,7 +199,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->instance) {
             $this->instance = factory(Instance::class)->create([
-                'vpc_id' => $this->vpc()->getKey(),
+                'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),
                 'appliance_version_id' => $this->applianceVersion()->uuid,
                 'vcpu_cores' => 1,

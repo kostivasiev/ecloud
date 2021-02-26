@@ -28,10 +28,10 @@ class UpdateTest extends TestCase
             'name' => $this->faker->country(),
         ]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->id,
@@ -42,7 +42,7 @@ class UpdateTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
                 'vpc_id' => $this->vpc->id,
             ],
@@ -59,7 +59,7 @@ class UpdateTest extends TestCase
     public function testNullNameIsDenied()
     {
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
                 'vpc_id' => '',
             ],
@@ -81,12 +81,12 @@ class UpdateTest extends TestCase
     {
         $vpc2 = factory(Vpc::class)->create([
             'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
-                'vpc_id' => $vpc2->getKey(),
+                'vpc_id' => $vpc2->id,
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -108,7 +108,7 @@ class UpdateTest extends TestCase
             'vpc_id' => $this->vpc->id,
         ];
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -116,7 +116,7 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(200);
 
-        $dhcp = Dhcp::findOrFail($this->dhcp->getKey());
+        $dhcp = Dhcp::findOrFail($this->dhcp->id);
         $this->assertEquals($data['vpc_id'], $this->dhcp->vpc_id);
     }
 }
