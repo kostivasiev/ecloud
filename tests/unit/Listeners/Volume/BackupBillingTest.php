@@ -13,12 +13,8 @@ class BackupBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $volume;
-
-    public function setUp(): void
+    public function testResizingVolumeUpdatesBackupBillingMetric()
     {
-        parent::setUp();
-
         $this->instance()->backup_enabled = true;
         $this->instance()->save();
 
@@ -37,12 +33,33 @@ class BackupBillingTest extends TestCase
                 return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
             });
 
-        $this->volume = factory(Volume::class)->create([
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
+                [
+                    'json' => [
+                        'limit' => '300',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $volume = factory(Volume::class)->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'capacity' => 10,
             'availability_zone_id' => $this->availabilityZone()->id
         ]);
+
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'volumes' => []
+                ]));
+            });
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
@@ -57,24 +74,8 @@ class BackupBillingTest extends TestCase
                 return new Response(200);
             });
 
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
-                [
-                    'json' => [
-                        'limit' => '300',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        $volume->instances()->attach($this->instance());
 
-        $this->volume->instances()->attach($this->instance());
-    }
-
-    public function testResizingVolumeUpdatesBackupBillingMetric()
-    {
         $this->kingpinServiceMock()->expects('put')
             ->withArgs([
                 '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/size',
@@ -88,10 +89,10 @@ class BackupBillingTest extends TestCase
                 return new Response(200);
             });
 
-        $this->volume->capacity = 15;
-        $this->volume->save();
+        $volume->capacity = 15;
+        $volume->save();
 
-        $sync = Sync::where('resource_id', $this->volume->id)->first();
+        $sync = Sync::where('resource_id', $volume->id)->first();
 
         // Check that the backup billing metric is added
         $updateBackupBillingListener = \Mockery::mock(\App\Listeners\V2\Instance\UpdateBackupBilling::class)->makePartial();
