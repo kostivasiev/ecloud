@@ -22,7 +22,7 @@ class CreateTest extends TestCase
 
         $region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ]);
     }
 
@@ -30,7 +30,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => '10Gb',
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id,
             "committed_bandwidth" => 10240,
             "burst_size" => 1024
         ];

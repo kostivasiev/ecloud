@@ -6,7 +6,7 @@ use App\Models\V1\Solution;
 use App\Models\V1\Tag;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {

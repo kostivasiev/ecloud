@@ -28,18 +28,18 @@ class GetTest extends TestCase
         $this->region = factory(Region::class)->create();
 
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->volume = factory(Volume::class)->create([
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
@@ -53,7 +53,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->volume->getKey(),
+                'id' => $this->volume->id,
                 'name' => $this->volume->name,
                 'vpc_id' => $this->volume->vpc_id,
                 'availability_zone_id' => $this->volume->availability_zone_id,
@@ -65,7 +65,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -88,7 +88,7 @@ class GetTest extends TestCase
     public function testGetItemDetailAdmin()
     {
         $this->get(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             [
                 'X-consumer-custom-id' => 'o-0',
                 'X-consumer-groups' => 'ecloud.read',

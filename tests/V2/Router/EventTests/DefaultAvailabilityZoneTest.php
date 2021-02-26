@@ -29,10 +29,10 @@ class DefaultAvailabilityZoneTest extends TestCase
             'name' => $this->faker->country(),
         ]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
     }
 
@@ -42,8 +42,8 @@ class DefaultAvailabilityZoneTest extends TestCase
             '/v2/routers',
             [
                 'name' => 'Manchester Network',
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availabilityZone->getKey(),
+                'vpc_id' => $this->vpc->id,
+                'availability_zone_id' => $this->availabilityZone->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -54,6 +54,6 @@ class DefaultAvailabilityZoneTest extends TestCase
         $id = json_decode($this->response->getContent())->data->id;
         $router = Router::findOrFail($id);
         // verify that the availability_zone_id equals the one in the data array
-        $this->assertEquals($router->availability_zone_id, $this->availabilityZone->getKey());
+        $this->assertEquals($router->availability_zone_id, $this->availabilityZone->id);
     }
 }

@@ -59,7 +59,7 @@ class BillingMetric extends Model implements Filterable, Sortable
      */
     public static function getActiveByKey($resource, $key, $operator = '='): ?BillingMetric
     {
-        return self::where('resource_id', $resource->getKey())
+        return self::where('resource_id', $resource->id)
             ->whereNull('end')
             ->where('key', $operator, $key)
             ->first();

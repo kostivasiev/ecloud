@@ -18,7 +18,7 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             [
                 'name' => 'Changed',
                 'backup_enabled' => true,
@@ -30,7 +30,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance()->getKey(),
+                'id' => $this->instance()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
@@ -51,7 +51,7 @@ class UpdateTest extends TestCase
             'name' => 'Changed',
         ];
         $this->patch(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -60,7 +60,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance()->getKey(),
+                'id' => $this->instance()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
@@ -73,7 +73,7 @@ class UpdateTest extends TestCase
         $this->instance()->locked = true;
         $this->instance()->save();
         $this->patch(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             [
                 'name' => 'Testing Locked Instance',
             ],
@@ -97,7 +97,7 @@ class UpdateTest extends TestCase
         $this->instance()->locked = true;
         $this->instance()->save();
         $this->patch(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             [
                 'name' => 'Testing Locked Instance',
             ],
@@ -121,7 +121,7 @@ class UpdateTest extends TestCase
             'name' => 'Changed',
         ];
         $this->patch(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-1',
@@ -130,7 +130,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance()->getKey(),
+                'id' => $this->instance()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
@@ -151,7 +151,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -179,7 +179,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

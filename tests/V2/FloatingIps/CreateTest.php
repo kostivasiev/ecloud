@@ -23,14 +23,14 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
     }
 
     public function testValidDataSucceeds()
     {
         $data = [
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ];
         $this->post(
             '/v2/floating-ips',

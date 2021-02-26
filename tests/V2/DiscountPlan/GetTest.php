@@ -49,7 +49,7 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

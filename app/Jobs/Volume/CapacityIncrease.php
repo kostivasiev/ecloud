@@ -37,7 +37,7 @@ class CapacityIncrease extends Job
                 ]
             );
 
-            Log::info('Volume ' . $volume->getKey() . ' capacity increased from ' . $this->event->originalCapacity . ' to ' . $volume->capacity);
+            Log::info('Volume ' . $volume->id . ' capacity increased from ' . $this->event->originalCapacity . ' to ' . $volume->capacity);
         }
 
         Log::info(get_class($this) . ' : Finished', ['event' => $this->event]);

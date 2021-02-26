@@ -5,7 +5,7 @@ namespace Tests\V1\Appliances\Pods;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\Pod;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class DeleteTest extends ApplianceTestCase
 {

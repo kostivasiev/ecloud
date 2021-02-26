@@ -22,7 +22,7 @@ class GetTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
             'reseller_id' => 1
         ]);
     }
@@ -53,7 +53,7 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
-            'id' => $this->vpc->getKey(),
+            'id' => $this->vpc->id,
         ])->assertResponseStatus(200);
     }
 
@@ -63,7 +63,7 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '2-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->dontSeeJson([
-            'id' => $this->vpc->getKey(),
+            'id' => $this->vpc->id,
         ])->assertResponseStatus(200);
     }
 
@@ -72,20 +72,20 @@ class GetTest extends TestCase
     {
         $vpc1 = factory(Vpc::class)->create([
             'reseller_id' => 1,
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $vpc2 = factory(Vpc::class)->create([
             'reseller_id' => 2,
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->get('/v2/vpcs', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
             'X-Reseller-Id' => 1
         ])->dontSeeJson([
-            'id' => $vpc2->getKey(),
+            'id' => $vpc2->id,
         ])->seeJson([
-            'id' => $vpc1->getKey(),
+            'id' => $vpc1->id,
         ])->assertResponseStatus(200);
     }
 
@@ -94,7 +94,7 @@ class GetTest extends TestCase
         $this->vpc->reseller_id = 3;
         $this->vpc->save();
 
-        $this->get('/v2/vpcs/' . $this->vpc->getKey(), [
+        $this->get('/v2/vpcs/' . $this->vpc->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])->seeJson([
@@ -106,7 +106,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/vpcs/' . $this->vpc->getKey(), [
+        $this->get('/v2/vpcs/' . $this->vpc->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([

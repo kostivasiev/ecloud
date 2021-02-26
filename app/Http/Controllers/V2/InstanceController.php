@@ -126,7 +126,7 @@ class InstanceController extends BaseController
 
         event(new Deploy($instanceDeployData));
 
-        return $this->responseIdMeta($request, $instance->getKey(), 201);
+        return $this->responseIdMeta($request, $instance->id, 201);
     }
 
     /**
@@ -150,7 +150,7 @@ class InstanceController extends BaseController
             return $instance->getSyncError();
         }
 
-        return $this->responseIdMeta($request, $instance->getKey(), 200);
+        return $this->responseIdMeta($request, $instance->id, 200);
     }
 
     /**

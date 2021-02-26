@@ -141,7 +141,7 @@ class NetworkController extends BaseController
         ]));
         $network->save();
         $network->refresh();
-        return $this->responseIdMeta($request, $network->getKey(), 201);
+        return $this->responseIdMeta($request, $network->id, 201);
     }
 
     /**
@@ -159,7 +159,7 @@ class NetworkController extends BaseController
         if (!$network->save()) {
             return $network->getSyncError();
         }
-        return $this->responseIdMeta($request, $network->getKey(), 200);
+        return $this->responseIdMeta($request, $network->id, 200);
     }
 
     public function destroy(Request $request, string $networkId)
