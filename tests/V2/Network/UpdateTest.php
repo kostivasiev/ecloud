@@ -13,7 +13,7 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/networks/' . $this->network()->id,
+            '/v2/networks/' . $this->network->id,
             [
                 'name' => 'expected',
                 'subnet' => '192.168.0.0/24'
