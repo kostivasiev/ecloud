@@ -44,6 +44,14 @@ class IsMaxVolumeLimitReachedTest extends TestCase
         // Test with one volume limit, and then attach that volume
         $this->assertTrue($rule->passes('', $this->instance()->id));
 
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'volumes' => []
+                ]));
+            });
+
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
                 '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
