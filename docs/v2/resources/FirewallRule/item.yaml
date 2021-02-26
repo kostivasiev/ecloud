@@ -25,7 +25,11 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/firewallRule-patch.yaml'
+            - $ref: '../../components/schemas/firewallRule.yaml'
+            - type: object
+              properties:
+                firewall_policy_id:
+                  readOnly: true
   responses:
     200:
       $ref: '../../resources/FirewallRule/responses/idResponse.yaml'
