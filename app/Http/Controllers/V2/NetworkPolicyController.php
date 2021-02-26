@@ -35,7 +35,7 @@ class NetworkPolicyController extends BaseController
             'network_id',
         ]));
         $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->getKey(), 201);
+        return $this->responseIdMeta($request, $networkPolicy->id, 201);
     }
 
     public function update(Update $request, string $networkPolicyId)
@@ -46,7 +46,7 @@ class NetworkPolicyController extends BaseController
             'network_id',
         ]));
         $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->getKey(), 200);
+        return $this->responseIdMeta($request, $networkPolicy->id, 200);
     }
 
     public function destroy(Request $request, string $networkPolicyId)

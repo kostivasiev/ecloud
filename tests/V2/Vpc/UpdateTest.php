@@ -22,15 +22,15 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
-        $this->patch('/v2/vpcs/' . $this->vpc->getKey(), [
+        $this->patch('/v2/vpcs/' . $this->vpc->id, [
             'name' => 'Manchester DC',
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ])->seeJson([
             'title' => 'Unauthorized',
             'detail' => 'Unauthorized',
@@ -40,9 +40,9 @@ class UpdateTest extends TestCase
 
     public function testNullNameIsDenied()
     {
-        $this->patch('/v2/vpcs/' . $this->vpc->getKey(), [
+        $this->patch('/v2/vpcs/' . $this->vpc->id, [
             'name' => '',
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -56,7 +56,7 @@ class UpdateTest extends TestCase
 
     public function testNullRegionIsDenied()
     {
-        $this->patch('/v2/vpcs/' . $this->vpc->getKey(), [
+        $this->patch('/v2/vpcs/' . $this->vpc->id, [
             'name' => 'name',
             'region_id' => '',
         ], [
@@ -74,9 +74,9 @@ class UpdateTest extends TestCase
     {
         $this->vpc->reseller_id = 3;
         $this->vpc->save();
-        $this->patch('/v2/vpcs/' . $this->vpc->getKey(), [
+        $this->patch('/v2/vpcs/' . $this->vpc->id, [
             'name' => 'Manchester DC',
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -92,13 +92,13 @@ class UpdateTest extends TestCase
         $data = [
             'name' => 'name',
             'reseller_id' => 2,
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ];
-        $this->patch('/v2/vpcs/' . $this->vpc->getKey(), $data, [
+        $this->patch('/v2/vpcs/' . $this->vpc->id, $data, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeInDatabase('vpcs', $data, 'ecloud')
             ->assertResponseStatus(200);
-        $this->assertEquals($data['name'], Vpc::findOrFail($this->vpc->getKey())->name);
+        $this->assertEquals($data['name'], Vpc::findOrFail($this->vpc->id)->name);
     }
 }

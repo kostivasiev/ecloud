@@ -25,7 +25,7 @@ class DeleteTest extends TestCase
     public function testNotAdminIsDenied()
     {
         $this->delete(
-            '/v2/regions/' . $this->region->getKey(),
+            '/v2/regions/' . $this->region->id,
             [],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -61,7 +61,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/regions/' . $this->region->getKey(),
+            '/v2/regions/' . $this->region->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -69,7 +69,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $region = Region::withTrashed()->findOrFail($this->region->getKey());
+        $region = Region::withTrashed()->findOrFail($this->region->id);
         $this->assertNotNull($region->deleted_at);
     }
 

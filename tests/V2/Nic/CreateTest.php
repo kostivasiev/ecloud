@@ -26,8 +26,8 @@ class CreateTest extends TestCase
             '/v2/nics',
             [
                 'mac_address' => $macAddress,
-                'instance_id' => $this->instance()->getKey(),
-                'network_id' => $this->network()->getKey(),
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
                 'ip_address'  => '10.0.0.5',
             ],
             [
@@ -39,8 +39,8 @@ class CreateTest extends TestCase
                 'nics',
                 [
                     'mac_address' => $macAddress,
-                    'instance_id' => $this->instance()->getKey(),
-                    'network_id'  => $this->network()->getKey(),
+                    'instance_id' => $this->instance()->id,
+                    'network_id'  => $this->network()->id,
                     'ip_address' => '10.0.0.5'
                 ],
                 'ecloud'

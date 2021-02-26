@@ -52,7 +52,7 @@ class DeleteTest extends TestCase
             'region_id' => $this->region->id,
         ]);
         $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
         $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone]);
@@ -72,7 +72,7 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $this->delete('/v2/dhcps/' . $this->dhcp->getKey())
+        $this->delete('/v2/dhcps/' . $this->dhcp->id)
             ->seeJson([
             'title' => 'Unauthorized',
             'detail' => 'Unauthorized',
@@ -94,14 +94,14 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/dhcps/' . $this->dhcp->getKey(), [], [
+        $this->delete('/v2/dhcps/' . $this->dhcp->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(204);
-        $this->assertNotNull(Dhcp::withTrashed()->findOrFail($this->dhcp->getKey())->deleted_at);
+        $this->assertNotNull(Dhcp::withTrashed()->findOrFail($this->dhcp->id)->deleted_at);
 
         Event::assertDispatched(Deleted::class, function ($job) {
-            return $job->model->id === $this->dhcp->getKey();
+            return $job->model->id === $this->dhcp->id;
         });
     }
 }

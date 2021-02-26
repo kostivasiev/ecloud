@@ -31,7 +31,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/credentials/' . $this->credential->getKey(),
+            '/v2/credentials/' . $this->credential->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -39,7 +39,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $resource = Credential::withTrashed()->findOrFail($this->credential->getKey());
+        $resource = Credential::withTrashed()->findOrFail($this->credential->id);
         $this->assertNotNull($resource->deleted_at);
     }
 }

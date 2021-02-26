@@ -21,23 +21,23 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpcSupport = factory(VpcSupport::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
     public function testValidDataIsSuccessful()
     {
         $vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $data = [
-            'vpc_id' => $vpc->getKey(),
+            'vpc_id' => $vpc->id,
         ];
 
-        $this->patch('/v2/support/' . $this->vpcSupport->getKey(), $data, [
+        $this->patch('/v2/support/' . $this->vpcSupport->id, $data, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeInDatabase(

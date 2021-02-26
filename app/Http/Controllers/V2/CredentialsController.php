@@ -57,7 +57,7 @@ class CredentialsController extends BaseController
             $credential->is_hidden = $request->get('is_hidden', false);
         }
         $credential->save();
-        return $this->responseIdMeta($request, $credential->getKey(), 201);
+        return $this->responseIdMeta($request, $credential->id, 201);
     }
 
     /**
@@ -73,7 +73,7 @@ class CredentialsController extends BaseController
             $credential->is_hidden = $request->get('is_hidden', $credential->is_hidden);
         }
         $credential->save();
-        return $this->responseIdMeta($request, $credential->getKey(), 200);
+        return $this->responseIdMeta($request, $credential->id, 200);
     }
 
     public function destroy(Request $request, string $credentialsId)

@@ -31,18 +31,18 @@ class VolumeCapacityAttributeTests extends TestCase
 
         $region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey(),
+            'region_id' => $region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $availabilityZone->id,
         ]);
 
         $this->volumes = factory(Volume::class, 2)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'capacity' => 10,
         ]);
     }
@@ -93,7 +93,7 @@ class VolumeCapacityAttributeTests extends TestCase
     {
         $this->volumes->first()->instances()->attach($this->instance);
         $this->get(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

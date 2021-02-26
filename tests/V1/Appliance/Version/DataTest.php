@@ -7,7 +7,7 @@ use App\Models\V1\ApplianceVersion;
 use Illuminate\Http\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class DataTest extends TestCase
 {

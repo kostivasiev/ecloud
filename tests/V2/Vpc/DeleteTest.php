@@ -80,11 +80,11 @@ class DeleteTest extends TestCase
     public function testDeleteVpcWithResourcesFails()
     {
         factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
 
-        $this->delete('/v2/vpcs/' . $this->vpc->getKey(), [], [
+        $this->delete('/v2/vpcs/' . $this->vpc->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
