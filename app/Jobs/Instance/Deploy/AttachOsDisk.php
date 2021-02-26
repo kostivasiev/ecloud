@@ -11,6 +11,8 @@ class AttachOsDisk extends Job
 {
     const RETRY_DELAY = 1;
 
+    public $tries = 60;
+
     private $data;
 
     public function __construct($data)
