@@ -26,7 +26,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/networkPolicy-patch.yaml'
+            - $ref: '../../components/schemas/networkPolicy.yaml'
             - type: object
               properties:
                 name:
