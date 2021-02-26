@@ -32,6 +32,37 @@ class Attach extends Job
         }
 
         try {
+            $response = $this->instance->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
+            );
+        } catch (ServerException $exception) {
+            $response = $exception->getResponse();
+        }
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::error(get_class($this) . ' : Failed', [
+                'id' => $this->volume->id,
+                'status_code' => $response->getStatusCode(),
+                'content' => $response->getBody()->getContents()
+            ]);
+            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed attachment'));
+            return false;
+        }
+
+        $json = json_decode($response->getBody()->getContents());
+        if (!$json) {
+            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed attachment, invalid JSON'));
+            return false;
+        }
+
+        foreach ($json->volumes as $volume) {
+            if ($this->volume->vmware_uuid = $volume->uuid) {
+                Log::info('Volume is already attached to instance, nothing to do');
+                return true;
+            }
+        }
+
+        try {
             $response = $this->instance->availabilityZone->kingpinService()
                 ->post(
                     '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
@@ -62,7 +93,6 @@ class Attach extends Job
 
     public function failed($exception)
     {
-        $this->instance->setSyncFailureReason($exception->getMessage());
         $this->volume->setSyncFailureReason($exception->getMessage());
 
         // Detach

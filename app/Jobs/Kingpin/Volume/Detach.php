@@ -47,7 +47,6 @@ class Detach extends Job
 
     public function failed($exception)
     {
-        $this->instance->setSyncFailureReason($exception->getMessage());
         $this->volume->setSyncFailureReason($exception->getMessage());
     }
 }
