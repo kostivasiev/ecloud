@@ -28,8 +28,11 @@ patch:
             - $ref: '../../components/schemas/vpc.yaml'
             - type: object
               properties:
-                region_id:
-                  required: false
+                region_id :
+                  type : string
+                  required : true
+                  example : 'reg-a63dd78c'
+                  readOnly : true
   responses:
     200:
       $ref: '../../resources/Vpc/responses/idResponse.yaml'
