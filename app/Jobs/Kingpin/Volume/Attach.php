@@ -56,7 +56,7 @@ class Attach extends Job
         }
 
         foreach ($json->volumes as $volume) {
-            if ($this->volume->vmware_uuid = $volume->uuid) {
+            if ($this->volume->vmware_uuid == $volume->uuid) {
                 Log::info('Volume is already attached to instance, nothing to do');
                 return true;
             }
