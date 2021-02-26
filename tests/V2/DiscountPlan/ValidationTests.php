@@ -110,7 +110,7 @@ class ValidationTests extends TestCase
             'term_start_date' => Carbon::now()->subDays(365)->format('Y-m-d H:i:s')
         ];
         $this->patch(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -120,7 +120,7 @@ class ValidationTests extends TestCase
         )->seeInDatabase(
             'discount_plans',
             [
-                'id' => $this->discountPlan->getKey(),
+                'id' => $this->discountPlan->id,
                 'term_start_date' => $data['term_start_date']
             ],
             'ecloud'
@@ -133,7 +133,7 @@ class ValidationTests extends TestCase
             'term_start_date' => Carbon::now()->addDays(365)->format('Y-m-d H:i:s')
         ];
         $this->patch(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -143,7 +143,7 @@ class ValidationTests extends TestCase
         )->seeInDatabase(
             'discount_plans',
             [
-                'id' => $this->discountPlan->getKey(),
+                'id' => $this->discountPlan->id,
                 'term_start_date' => $data['term_start_date']
             ],
             'ecloud'

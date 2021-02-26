@@ -82,7 +82,7 @@ class FloatingIpController extends BaseController
             $request->only(['vpc_id', 'name'])
         );
         $resource->save();
-        return $this->responseIdMeta($request, $resource->getKey(), 201);
+        return $this->responseIdMeta($request, $resource->id, 201);
     }
 
     public function update(UpdateRequest $request, string $fipId)
@@ -90,7 +90,7 @@ class FloatingIpController extends BaseController
         $resource = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
         $resource->fill($request->only(['name']));
         $resource->save();
-        return $this->responseIdMeta($request, $resource->getKey(), 200);
+        return $this->responseIdMeta($request, $resource->id, 200);
     }
 
     public function destroy(Request $request, string $fipId)

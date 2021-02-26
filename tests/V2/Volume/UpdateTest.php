@@ -42,7 +42,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -65,7 +65,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -89,7 +89,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -113,7 +113,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

@@ -39,7 +39,7 @@ class UpdateTest extends TestCase
             'term_end_date' => date('Y-m-d', strtotime('4 days')),
         ];
         $this->patch(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -55,7 +55,7 @@ class UpdateTest extends TestCase
                 strtotime($data['term_start_date'])
             )
         );
-        $plan = DiscountPlan::findOrFail($this->discountPlan->getKey());
+        $plan = DiscountPlan::findOrFail($this->discountPlan->id);
         $this->assertEquals($data['name'], $plan->name);
         $this->assertEquals($data['commitment_amount'], $plan->commitment_amount);
         $this->assertEquals($data['commitment_before_discount'], $plan->commitment_before_discount);
@@ -77,7 +77,7 @@ class UpdateTest extends TestCase
             'term_end_date' => date('Y-m-d 00:00:00', strtotime('tomorrow')),
         ];
         $this->patch(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

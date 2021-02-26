@@ -13,14 +13,14 @@ class GetNetworksTest extends TestCase
     {
         $this->network();
         $this->get(
-            '/v2/routers/'.$this->router()->getKey().'/networks',
+            '/v2/routers/'.$this->router()->id.'/networks',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'        => $this->network()->getKey(),
+                'id'        => $this->network()->id,
                 'name'      => $this->network()->name,
                 'router_id' => $this->network()->router_id,
             ])

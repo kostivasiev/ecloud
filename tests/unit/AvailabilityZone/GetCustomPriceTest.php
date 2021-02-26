@@ -26,13 +26,13 @@ class GetCustomPriceTest extends TestCase
         $region = factory(Region::class)->create();
 
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ])->each(function ($availabilityZone) {
             factory(Product::class)->create([
-                'product_name' => $availabilityZone->getKey() . ': ' . $this->faker->word,
+                'product_name' => $availabilityZone->id . ': ' . $this->faker->word,
             ])->each(function ($product) {
                 factory(ProductPrice::class)->create([
-                    'product_price_product_id' => $product->getKey(),
+                    'product_price_product_id' => $product->id,
                     'product_price_sale_price' => 0.999
                 ])->each(function ($productPrice) {
                     factory(ProductPriceCustom::class)->create([

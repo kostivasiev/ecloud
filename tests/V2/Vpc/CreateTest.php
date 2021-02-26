@@ -53,7 +53,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => '',
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ];
         $this->post(
             '/v2/vpcs',
@@ -103,7 +103,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => $this->faker->word(),
             'reseller_id' => 1,
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ];
         $this->post(
             '/v2/vpcs',
@@ -125,7 +125,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => $this->faker->word(),
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
             'reseller_id' => 1
         ];
         $this->post(

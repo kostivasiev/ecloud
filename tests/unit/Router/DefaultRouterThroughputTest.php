@@ -24,24 +24,24 @@ class DefaultRouterThroughputTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create([]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
     }
 
     public function testDefaultRouterThroughput()
     {
         $routerThroughput = factory(RouterThroughput::class)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id,
             'committed_bandwidth' => config('router.throughput.default.bandwidth')
         ]);
 
         $defaultThroughputListener = \Mockery::mock(DefaultRouterThroughput::class)->makePartial();
 
         $router = factory(Router::class)->make([
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id,
             'router_throughput_id' => null
         ]);
 

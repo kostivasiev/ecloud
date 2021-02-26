@@ -90,7 +90,7 @@ class VolumeController extends BaseController
         $volume = new Volume($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity']));
         $volume->save();
         $volume->refresh();
-        return $this->responseIdMeta($request, $volume->getKey(), 201);
+        return $this->responseIdMeta($request, $volume->id, 201);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
@@ -105,7 +105,7 @@ class VolumeController extends BaseController
             return $volume->getSyncError();
         }
 
-        return $this->responseIdMeta($request, $volume->getKey(), 200);
+        return $this->responseIdMeta($request, $volume->id, 200);
     }
 
     public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)

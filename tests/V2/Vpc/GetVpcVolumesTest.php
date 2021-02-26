@@ -24,24 +24,24 @@ class GetVpcVolumesTest extends TestCase
         $this->region = factory(Region::class)->create();
 
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
 
         $this->volumes = factory(Volume::class, 4)->create([
             'name' => 'Volume ' . uniqid(),
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
     public function testVolumesCollection()
     {
         $this->get(
-            '/v2/vpcs/'.$this->vpc->getKey().'/volumes',
+            '/v2/vpcs/'.$this->vpc->id.'/volumes',
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups'    => 'ecloud.read',

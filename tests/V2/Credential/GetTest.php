@@ -53,7 +53,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/credentials/' . $this->credential->getKey(),
+            '/v2/credentials/' . $this->credential->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',

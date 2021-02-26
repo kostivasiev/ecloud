@@ -24,10 +24,10 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
@@ -41,9 +41,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->floatingIp->getKey(),
-                'name' => $this->floatingIp->getKey(),
-                'vpc_id' => $this->vpc->getKey(),
+                'id' => $this->floatingIp->id,
+                'name' => $this->floatingIp->id,
+                'vpc_id' => $this->vpc->id,
                 'ip_address' => $this->floatingIp->ip_address
             ])
             ->assertResponseStatus(200);
@@ -52,16 +52,16 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->floatingIp->getKey(),
-                'name' => $this->floatingIp->getKey(),
-                'vpc_id' => $this->vpc->getKey(),
+                'id' => $this->floatingIp->id,
+                'name' => $this->floatingIp->id,
+                'vpc_id' => $this->vpc->id,
                 'ip_address' => $this->floatingIp->ip_address
             ])
             ->assertResponseStatus(200);
