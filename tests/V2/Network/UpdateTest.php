@@ -66,7 +66,7 @@ class UpdateTest extends TestCase
             '/v2/networks/' . $this->network->id,
             [
                 'name' => 'expected',
-                'router_id' => $this->router->getKey()
+                'router_id' => $this->router->id
             ],
             [
                 'X-consumer-custom-id' => '0-0',
