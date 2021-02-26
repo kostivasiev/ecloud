@@ -26,13 +26,15 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/networkPolicy.yaml'
+            - $ref: '../../components/schemas/networkPolicy-patch.yaml'
             - type: object
               properties:
                 name:
                   required: false
                 router_id:
                   required: false
+                network_id:
+                  readOnly: true
   responses:
     200:
       $ref: '../../resources/NetworkPolicy/responses/idResponse.yaml'

@@ -12,22 +12,15 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Network $network;
     protected NetworkPolicy $networkPolicy;
     protected NetworkRule $networkRule;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->vpc();
-        $this->availabilityZone();
-        $this->network = factory(Network::class)->create([
-            'id' => 'net-test',
-            'router_id' => $this->router()->id,
-        ]);
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
-            'network_id' => $this->network->id,
+            'network_id' => $this->network()->id,
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-test',
@@ -37,14 +30,9 @@ class UpdateTest extends TestCase
 
     public function testUpdateResource()
     {
-        factory(NetworkPolicy::class)->create([
-            'id' => 'np-alttest',
-            'network_id' => $this->network->id,
-        ]);
         $this->patch(
             '/v2/network-rules/nr-test',
             [
-                'network_policy_id' => 'np-alttest',
                 'action' => 'REJECT',
             ],
             [
@@ -55,7 +43,6 @@ class UpdateTest extends TestCase
             'network_rules',
             [
                 'id' => 'nr-test',
-                'network_policy_id' => 'np-alttest',
                 'action' => 'REJECT',
             ],
             'ecloud'

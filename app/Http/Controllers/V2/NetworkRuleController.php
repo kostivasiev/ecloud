@@ -50,7 +50,6 @@ class NetworkRuleController extends BaseController
     {
         $aclRule = NetworkRule::forUser(Auth::user())->findOrFail($networkRuleId);
         $aclRule->fill($request->only([
-            'network_policy_id',
             'name',
             'sequence',
             'source',
