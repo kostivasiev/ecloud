@@ -30,7 +30,7 @@ class CreateDhcpRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
+            'name' => 'sometimes|required|string',
             'vpc_id' => [
                 'required',
                 'string',
