@@ -76,13 +76,13 @@ class Network extends Model implements Filterable, Sortable
     {
         try {
             $response = $this->router->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/segments/' . $this->getKey() . '/state'
+                'policy/api/v1/infra/tier-1s/' . $this->router->id . '/segments/' . $this->id . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
             return in_array($response->state, ['in_sync', 'success']);
         } catch (GuzzleException $exception) {
             Log::info('Segment state response', [
-                'id' => $this->getKey(),
+                'id' => $this->id,
                 'response' => json_decode($exception->getResponse()->getBody()->getContents()),
             ]);
             return false;

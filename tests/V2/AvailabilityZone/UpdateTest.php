@@ -24,7 +24,7 @@ class UpdateTest extends TestCase
         $this->faker = Faker::create();
         $region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ]);
         $this->region = factory(Region::class)->create();
     }
@@ -32,12 +32,12 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/availability-zones/' . $this->availabilityZone->getKey(),
+            '/v2/availability-zones/' . $this->availabilityZone->id,
             [
                 'code' => 'MAN2',
                 'name' => 'Manchester Zone 2',
                 'datacentre_site_id' => 2,
-                'region_id' => $this->region->getKey(),
+                'region_id' => $this->region->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -47,11 +47,11 @@ class UpdateTest extends TestCase
             ->seeInDatabase(
                 'availability_zones',
                 [
-                    'id' => $this->availabilityZone->getKey(),
+                    'id' => $this->availabilityZone->id,
                     'code' => 'MAN2',
                     'name' => 'Manchester Zone 2',
                     'datacentre_site_id' => 2,
-                    'region_id' => $this->region->getKey(),
+                    'region_id' => $this->region->id,
                 ],
                 'ecloud'
             )

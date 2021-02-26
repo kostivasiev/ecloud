@@ -29,13 +29,13 @@ class GetVpnsTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->vpn = factory(Vpn::class)->create([
@@ -46,14 +46,14 @@ class GetVpnsTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/routers/'.$this->router->getKey().'/vpns',
+            '/v2/routers/'.$this->router->id.'/vpns',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'                   => $this->vpn->getKey(),
+                'id'                   => $this->vpn->id,
                 'router_id'            => $this->vpn->router_id,
                 'availability_zone_id' => $this->vpn->availability_zone_id,
             ])

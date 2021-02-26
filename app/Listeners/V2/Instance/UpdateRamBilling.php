@@ -44,8 +44,8 @@ class UpdateRamBilling
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $instance->getKey();
-        $billingMetric->vpc_id = $instance->vpc->getKey();
+        $billingMetric->resource_id = $instance->id;
+        $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->key = 'ram.capacity';
         $billingMetric->value = $instance->ram_capacity;
@@ -54,7 +54,7 @@ class UpdateRamBilling
         $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'ram');
         if (empty($product)) {
             Log::error(
-                'Failed to load \'ram\' billing product for availability zone ' . $instance->availabilityZone->getKey()
+                'Failed to load \'ram\' billing product for availability zone ' . $instance->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;

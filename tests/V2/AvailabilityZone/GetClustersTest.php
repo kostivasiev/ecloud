@@ -28,30 +28,30 @@ class GetClustersTest extends TestCase
 
         $region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ]);
 
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ]);
 
         $this->lbc = factory(LoadBalancerCluster::class)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'vpc_id' => $this->vpc->getKey()
+            'availability_zone_id' => $this->availabilityZone->id,
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
     public function testGetCollection()
     {
         $this->get(
-            '/v2/availability-zones/' . $this->availabilityZone->getKey() . '/lbcs',
+            '/v2/availability-zones/' . $this->availabilityZone->id . '/lbcs',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'     => $this->lbc->getKey(),
+                'id'     => $this->lbc->id,
                 'name'   => $this->lbc->name,
                 'vpc_id' => $this->lbc->vpc_id,
                 'nodes'  => $this->lbc->nodes,

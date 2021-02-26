@@ -43,7 +43,7 @@ class RouterController extends BaseController
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
         $router->save();
-        return $this->responseIdMeta($request, $router->getKey(), 201);
+        return $this->responseIdMeta($request, $router->id, 201);
     }
 
     public function update(UpdateRequest $request, string $routerId)
@@ -53,7 +53,7 @@ class RouterController extends BaseController
         if (!$router->save()) {
             return $router->getSyncError();
         }
-        return $this->responseIdMeta($request, $router->getKey(), 200);
+        return $this->responseIdMeta($request, $router->id, 200);
     }
 
     public function destroy(Request $request, string $routerId)
