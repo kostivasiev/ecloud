@@ -16,7 +16,7 @@ class IopsModificationTest extends TestCase
         parent::setUp();
 
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc()->getKey()
+            'vpc_id' => $this->vpc()->id
         ]);
 
         $this->instance()->volumes()->save($this->volume);
@@ -28,7 +28,7 @@ class IopsModificationTest extends TestCase
             'iops' => 300,
         ];
         $this->patch(
-            '/v2/volumes/'.$this->volume->getKey(),
+            '/v2/volumes/'.$this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -37,7 +37,7 @@ class IopsModificationTest extends TestCase
         )->seeInDatabase(
             'volumes',
             [
-                'id' => $this->volume->getKey(),
+                'id' => $this->volume->id,
                 'iops' => $data['iops'],
             ],
             'ecloud'
@@ -50,7 +50,7 @@ class IopsModificationTest extends TestCase
             'iops' => 200,
         ];
         $this->patch(
-            '/v2/volumes/'.$this->volume->getKey(),
+            '/v2/volumes/'.$this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -70,7 +70,7 @@ class IopsModificationTest extends TestCase
             'iops' => 200,
         ];
         $this->patch(
-            '/v2/volumes/'.$this->volume->getKey(),
+            '/v2/volumes/'.$this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

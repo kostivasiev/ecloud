@@ -24,7 +24,7 @@ class GetTest extends TestCase
             'name' => $this->faker->country(),
         ])->each(function ($region) {
             factory(AvailabilityZone::class, 2)->create([
-                'region_id' => $region->getKey(),
+                'region_id' => $region->id,
                 'name' => $this->faker->city(),
                 'is_public' => false,
             ]);
@@ -45,7 +45,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->regions->first()->getKey(),
+                'id' => $this->regions->first()->id,
                 'name' => $this->regions->first()->name,
             ])
             ->assertResponseStatus(200);
@@ -67,7 +67,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->regions->first()->getKey(),
+                'id' => $this->regions->first()->id,
                 'name' => $this->regions->first()->name,
             ])
             ->assertResponseStatus(200);
@@ -82,14 +82,14 @@ class GetTest extends TestCase
         $region->save();
 
         $this->get(
-            '/v2/regions/' . $region->getKey(),
+            '/v2/regions/' . $region->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $region->getKey(),
+                'id' => $region->id,
                 'name' => $region->name,
             ])
             ->assertResponseStatus(200);
@@ -102,14 +102,14 @@ class GetTest extends TestCase
         $region->save();
 
         $this->get(
-            '/v2/regions/' . $region->getKey(),
+            '/v2/regions/' . $region->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $region->getKey(),
+                'id' => $region->id,
                 'name' => $region->name,
             ])
             ->assertResponseStatus(200);
@@ -122,14 +122,14 @@ class GetTest extends TestCase
         $region->save();
 
         $this->get(
-            '/v2/regions/' . $region->getKey(),
+            '/v2/regions/' . $region->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $region->getKey(),
+                'id' => $region->id,
                 'name' => $region->name,
             ])
             ->assertResponseStatus(200);
@@ -142,7 +142,7 @@ class GetTest extends TestCase
         $region->save();
 
         $this->get(
-            '/v2/regions/' . $region->getKey(),
+            '/v2/regions/' . $region->id,
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -160,14 +160,14 @@ class GetTest extends TestCase
         $availabilityZones = $region->availabilityZones()->get();
 
         $this->get(
-            '/v2/regions/' . $region->getKey() . '/availability-zones',
+            '/v2/regions/' . $region->id . '/availability-zones',
             [
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $availabilityZones->first()->getKey(),
+                'id' => $availabilityZones->first()->id,
                 'name' => $availabilityZones->first()->name,
             ])
             ->assertResponseStatus(200);
@@ -182,14 +182,14 @@ class GetTest extends TestCase
         $availabilityZones = $region->availabilityZones()->get();
 
         $this->get(
-            '/v2/regions/' . $region->getKey() . '/availability-zones',
+            '/v2/regions/' . $region->id . '/availability-zones',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $availabilityZones->first()->getKey(),
+                'id' => $availabilityZones->first()->id,
                 'name' => $availabilityZones->first()->name,
             ])
             ->assertResponseStatus(200);

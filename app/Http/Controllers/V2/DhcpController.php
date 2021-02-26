@@ -53,7 +53,7 @@ class DhcpController extends BaseController
         $dhcps = new Dhcp($request->only(['vpc_id', 'availability_zone_id']));
         $dhcps->save();
         $dhcps->refresh();
-        return $this->responseIdMeta($request, $dhcps->getKey(), 201);
+        return $this->responseIdMeta($request, $dhcps->id, 201);
     }
 
     public function destroy(string $dhcpId)

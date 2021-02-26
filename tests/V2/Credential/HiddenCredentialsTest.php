@@ -32,10 +32,10 @@ class HiddenCredentialsTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
@@ -44,7 +44,7 @@ class HiddenCredentialsTest extends TestCase
             'appliance_version_appliance_id' => $this->appliance->id,
         ])->refresh();
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'name' => 'GetTest Default',
             'appliance_version_id' => $this->appliance_version->uuid,
             'vcpu_cores' => 1,
@@ -76,7 +76,7 @@ class HiddenCredentialsTest extends TestCase
         $this->post(
             '/v2/credentials',
             [
-                'resource_id' => $this->instance->getKey(),
+                'resource_id' => $this->instance->id,
                 'host' => 'https://127.0.0.1',
                 'username' => 'someuser',
                 'password' => 'somepassword',
@@ -103,7 +103,7 @@ class HiddenCredentialsTest extends TestCase
     public function testAdminCanSeeHiddenCredentials()
     {
         $this->get(
-            '/v2/credentials/' . $this->credentials->getKey(),
+            '/v2/credentials/' . $this->credentials->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -116,7 +116,7 @@ class HiddenCredentialsTest extends TestCase
     public function testUserCannotSeeHiddenFlag()
     {
         $this->get(
-            '/v2/instances/' . $this->instance->getKey() . '/credentials',
+            '/v2/instances/' . $this->instance->id . '/credentials',
             [
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',

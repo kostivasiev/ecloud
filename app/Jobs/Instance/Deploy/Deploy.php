@@ -40,7 +40,7 @@ class Deploy extends Job
             [
                 'json' => [
                     'templateName' => $instance->applianceVersion->appliance_version_vm_template,
-                    'instanceId' => $instance->getKey(),
+                    'instanceId' => $instance->id,
                     'numCPU' => $instance->vcpu_cores,
                     'ramMib' => $instance->ram_capacity,
                     'resourceTierTags' => config('instance.resource_tier_tags')

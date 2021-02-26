@@ -23,7 +23,7 @@ class DeletionRulesTest extends TestCase
         )->seeJson([
             'detail' => 'The specified resource has dependant relationships and cannot be deleted',
         ])->assertResponseStatus(412);
-        $vpc = Vpc::withTrashed()->findOrFail($this->vpc()->getKey());
+        $vpc = Vpc::withTrashed()->findOrFail($this->vpc()->id);
         $this->assertNull($vpc->deleted_at);
     }
 }

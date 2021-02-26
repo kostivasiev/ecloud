@@ -10,7 +10,7 @@ use App\Models\V1\VolumeSet;
 use App\Services\Artisan\V1\ArtisanService;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Mockery;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class VolumesTest extends TestCase
 {

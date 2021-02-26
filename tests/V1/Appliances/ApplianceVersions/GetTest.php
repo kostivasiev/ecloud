@@ -4,7 +4,7 @@ namespace Tests\V1\Appliances\ApplianceVersions;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Ramsey\Uuid\Uuid;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class GetTest extends ApplianceTestCase
 {

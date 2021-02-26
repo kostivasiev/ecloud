@@ -28,10 +28,10 @@ class DefaultAvailabilityZoneTest extends TestCase
             'name' => $this->faker->country(),
         ]);
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
     }
 
@@ -41,8 +41,8 @@ class DefaultAvailabilityZoneTest extends TestCase
             '/v2/lbcs',
             [
                 'name' => 'My Load Balancer Cluster',
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availability_zone->getKey(),
+                'vpc_id' => $this->vpc->id,
+                'availability_zone_id' => $this->availability_zone->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -53,7 +53,7 @@ class DefaultAvailabilityZoneTest extends TestCase
         $id = json_decode($this->response->getContent())->data->id;
         $lbcs = LoadBalancerCluster::findOrFail($id);
         // verify that the availability_zone_id equals the one in the data array
-        $this->assertEquals($lbcs->availability_zone_id, $this->availability_zone->getKey());
+        $this->assertEquals($lbcs->availability_zone_id, $this->availability_zone->id);
     }
 
     public function testCreateLbcWithNoAvailabilityZone()
@@ -62,7 +62,7 @@ class DefaultAvailabilityZoneTest extends TestCase
             '/v2/lbcs',
             [
                 'name' => 'My Load Balancer Cluster',
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -73,6 +73,6 @@ class DefaultAvailabilityZoneTest extends TestCase
         $id = json_decode($this->response->getContent())->data->id;
         $lbcs = LoadBalancerCluster::findOrFail($id);
         // verify that the availability_zone_id equals the one defined in setUp()
-        $this->assertEquals($lbcs->availability_zone_id, $this->availability_zone->getKey());
+        $this->assertEquals($lbcs->availability_zone_id, $this->availability_zone->id);
     }
 }

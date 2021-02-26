@@ -6,7 +6,7 @@ use App\Models\V1\Host;
 use App\Models\V1\Pod;
 use App\Models\V1\Solution;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class DeleteTest extends TestCase
 {

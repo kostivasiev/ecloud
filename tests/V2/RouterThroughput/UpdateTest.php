@@ -22,23 +22,23 @@ class UpdateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->routerThroughput = factory(RouterThroughput::class)->create([
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'availability_zone_id' => $availabilityZone->id,
         ]);
     }
 
     public function testValidDataSucceeds()
     {
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
-        $this->patch('/v2/router-throughputs/' . $this->routerThroughput->getKey(), [
+        $this->patch('/v2/router-throughputs/' . $this->routerThroughput->id, [
             'name' => 'NEW NAME',
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'availability_zone_id' => $availabilityZone->id,
             "committed_bandwidth" => 999,
             "burst_size" => 888
         ], [
@@ -46,9 +46,9 @@ class UpdateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])
             ->seeInDatabase('router_throughputs', [
-                'id' => $this->routerThroughput->getKey(),
+                'id' => $this->routerThroughput->id,
                 'name' => 'NEW NAME',
-                'availability_zone_id' => $availabilityZone->getKey(),
+                'availability_zone_id' => $availabilityZone->id,
                 "committed_bandwidth" => 999,
                 "burst_size" => 888
             ],

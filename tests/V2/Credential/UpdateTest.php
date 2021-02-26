@@ -33,7 +33,7 @@ class UpdateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $this->patch(
-            '/v2/credentials/' . $this->credential->getKey(),
+            '/v2/credentials/' . $this->credential->id,
             [
                 'resource_id' => 'abc-abc123',
                 'host' => 'https://0.0.0.0',
@@ -49,7 +49,7 @@ class UpdateTest extends TestCase
             ->seeInDatabase(
                 'credentials',
                 [
-                    'id' => $this->credential->getKey(),
+                    'id' => $this->credential->id,
                     'resource_id' => 'abc-abc123',
                     'host' => 'https://0.0.0.0',
                     'username' => 'username',
@@ -58,7 +58,7 @@ class UpdateTest extends TestCase
                 'ecloud'
             )->assertResponseStatus(200);
 
-        $resource = Credential::find($this->credential->getKey());
+        $resource = Credential::find($this->credential->id);
         $this->assertEquals($resource->password, 'newPass');
     }
 }

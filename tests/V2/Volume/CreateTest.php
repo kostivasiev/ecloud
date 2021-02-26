@@ -24,13 +24,13 @@ class CreateTest extends TestCase
 
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
@@ -43,8 +43,8 @@ class CreateTest extends TestCase
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availabilityZone->getKey()
+                'vpc_id' => $this->vpc->id,
+                'availability_zone_id' => $this->availabilityZone->id
             ],
             [
                 'X-consumer-custom-id' => '2-0',
@@ -68,15 +68,15 @@ class CreateTest extends TestCase
 
         $region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ]);
 
         $this->post(
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $availabilityZone->getKey(),
+                'vpc_id' => $this->vpc->id,
+                'availability_zone_id' => $availabilityZone->id,
                 'capacity' => (config('volume.capacity.min') + 1),
             ],
             [
@@ -102,8 +102,8 @@ class CreateTest extends TestCase
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
-                'availability_zone_id' => $this->availabilityZone->getKey(),
+                'vpc_id' => $this->vpc->id,
+                'availability_zone_id' => $this->availabilityZone->id,
                 'capacity' => (config('volume.capacity.min') + 1),
             ],
             [
@@ -127,7 +127,7 @@ class CreateTest extends TestCase
             '/v2/volumes',
             [
                 'name' => 'Volume 1',
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc->id,
                 'capacity' => (config('volume.capacity.min') + 1),
             ],
             [
