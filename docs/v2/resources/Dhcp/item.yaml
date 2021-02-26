@@ -15,6 +15,24 @@ get:
                 type: object
   tags:
     - Dhcps
+patch:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../public-openapi.yaml#/components/schemas/Dhcp"
+            - type: object
+              properties:
+                vpc_id:
+                  required: false
+                  readOnly: true
+#                availability_zone_id:
+#                  required: false
 delete:
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
