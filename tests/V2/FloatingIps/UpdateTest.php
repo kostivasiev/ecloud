@@ -25,7 +25,7 @@ class UpdateTest extends TestCase
         $newName = $this->faker->word;
 
         $this->patch(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->id,
             [
                 'name' => $newName
             ],
@@ -37,7 +37,7 @@ class UpdateTest extends TestCase
             ->seeInDatabase(
                 'floating_ips',
                 [
-                    'id' => $this->floatingIp->getKey(),
+                    'id' => $this->floatingIp->id,
                     'name' => $newName
                 ],
                 'ecloud'

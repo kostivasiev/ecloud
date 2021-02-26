@@ -15,7 +15,7 @@ class GuestShutdownTest extends TestCase
         parent::setUp();
         $this->kingpinServiceMock()
             ->shouldReceive('put')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->getKey() . '/instance/' . $this->instance()->getKey() . '/power/guest/shutdown'])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power/guest/shutdown'])
             ->andReturn(
                 new Response(200)
         );
@@ -24,7 +24,7 @@ class GuestShutdownTest extends TestCase
     public function testShutdown()
     {
         $this->put(
-            '/v2/instances/' . $this->instance()->getKey() . '/power-shutdown',
+            '/v2/instances/' . $this->instance()->id . '/power-shutdown',
             [],
             [
                 'X-consumer-custom-id' => '0-0',

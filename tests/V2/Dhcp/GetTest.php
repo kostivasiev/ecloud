@@ -20,8 +20,8 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc()->getKey(),
-            'availability_zone_id' => $this->availabilityZone()->getKey(),
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
         ]);
     }
 
@@ -47,7 +47,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/dhcps/' . $this->dhcp->getKey(), [
+        $this->get('/v2/dhcps/' . $this->dhcp->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([

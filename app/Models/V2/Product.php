@@ -3,7 +3,6 @@
 namespace App\Models\V2;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -15,7 +14,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class Product
  * @package App\Models\V1
  */
-class Product extends Model implements Filterable, Sortable
+class Product extends V1ModelWrapper implements Filterable, Sortable
 {
     protected $connection = 'reseller';
     protected $table = 'product';
@@ -123,13 +122,13 @@ class Product extends Model implements Filterable, Sortable
 
     public function scopeForAvailabilityZone($query, AvailabilityZone $availabilityZone)
     {
-        return $query->where('product_name', 'like', $availabilityZone->getKey() . '%');
+        return $query->where('product_name', 'like', $availabilityZone->id . '%');
     }
 
     public function scopeForRegion($query, Region $region)
     {
         foreach ($region->availabilityZones as $availabilityZone) {
-            $query->orWhere('product_name', 'like', $availabilityZone->getKey() . '%');
+            $query->orWhere('product_name', 'like', $availabilityZone->id . '%');
         }
 
         return $query;

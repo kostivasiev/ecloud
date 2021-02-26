@@ -28,7 +28,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/vpns/' . $this->vpn->getKey(),
+            '/v2/vpns/' . $this->vpn->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -36,7 +36,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $vpnItem = Vpn::withTrashed()->findOrFail($this->vpn->getKey());
+        $vpnItem = Vpn::withTrashed()->findOrFail($this->vpn->id);
         $this->assertNotNull($vpnItem->deleted_at);
     }
 }

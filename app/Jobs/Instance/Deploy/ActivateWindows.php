@@ -20,7 +20,7 @@ class ActivateWindows extends Job
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
         $instance = Instance::findOrFail($this->data['instance_id']);
-        $logMessage = 'ActivateWindows for ' . $instance->getKey() . ': ';
+        $logMessage = 'ActivateWindows for ' . $instance->id . ': ';
         if ($instance->platform != 'Windows') {
             Log::info($logMessage . 'Platform is not Windows. Skipped.');
             return;
@@ -37,7 +37,7 @@ class ActivateWindows extends Job
         }
 
         $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $instance->vpc->getKey() . '/instance/' . $instance->getKey() . '/guest/windows/activate',
+            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/activate',
             [
                 'json' => [
                     'username' => $guestAdminCredential->username,

@@ -4,7 +4,6 @@ namespace Tests\V1;
 
 use App\Models\V1\Solution;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
 
 class GetDrsRuleTest extends TestCase
 {

@@ -39,7 +39,7 @@ class NetworkRulePortController extends BaseController
             'destination',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->getKey(), 201);
+        return $this->responseIdMeta($request, $model->id, 201);
     }
 
     public function update(Update $request, string $networkRulePortId)
@@ -53,7 +53,7 @@ class NetworkRulePortController extends BaseController
             'destination',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->getKey(), 200);
+        return $this->responseIdMeta($request, $model->id, 200);
     }
 
     public function destroy(Request $request, string $networkRulePortId)

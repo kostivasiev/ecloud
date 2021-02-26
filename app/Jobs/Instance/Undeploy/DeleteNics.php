@@ -20,7 +20,7 @@ class DeleteNics extends Job
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
 
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
-        $logMessage = 'DeleteNics for instance ' . $instance->getKey() . ': ';
+        $logMessage = 'DeleteNics for instance ' . $instance->id . ': ';
 
         $instance->nics()->each(function ($nic) {
             $nic->delete();

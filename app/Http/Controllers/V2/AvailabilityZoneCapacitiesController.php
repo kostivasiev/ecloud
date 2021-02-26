@@ -55,7 +55,7 @@ class AvailabilityZoneCapacitiesController extends BaseController
             'max',
         ]));
         $availabilityZoneCapacity->save();
-        return $this->responseIdMeta($request, $availabilityZoneCapacity->getKey(), 201);
+        return $this->responseIdMeta($request, $availabilityZoneCapacity->id, 201);
     }
 
     /**
@@ -74,7 +74,7 @@ class AvailabilityZoneCapacitiesController extends BaseController
             'max',
         ]));
         $availabilityZoneCapacity->save();
-        return $this->responseIdMeta($request, $availabilityZoneCapacity->getKey(), 200);
+        return $this->responseIdMeta($request, $availabilityZoneCapacity->id, 200);
     }
 
     public function destroy(Request $request, string $capacityId)

@@ -22,7 +22,7 @@ class DeleteDhcpLease implements ShouldQueue
 
         $nic = $event->model;
 
-        $logMessage = 'DeleteDhcpLease for NIC ' . $nic->getKey() . ': ';
+        $logMessage = 'DeleteDhcpLease for NIC ' . $nic->id . ': ';
         Log::info($logMessage . 'Started');
 
         $network = $nic->network;
@@ -31,12 +31,12 @@ class DeleteDhcpLease implements ShouldQueue
 
         //Delete dhcp lease for the ip to the nic's mac address on NSX
         $nsxService->delete(
-            '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
-            . '/dhcp-static-binding-configs/' . $nic->getKey()
+            '/policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id
+            . '/dhcp-static-binding-configs/' . $nic->id
         );
 
         $nic->setSyncCompleted();
-        Log::info('DHCP static binding deleted for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
+        Log::info('DHCP static binding deleted for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }

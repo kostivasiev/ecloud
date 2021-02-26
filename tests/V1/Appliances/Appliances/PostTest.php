@@ -4,7 +4,7 @@ namespace Tests\V1\Appliances\Appliances;
 
 use App\Models\V1\Appliance;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class PostTest extends ApplianceTestCase
 {

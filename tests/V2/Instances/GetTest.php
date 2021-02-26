@@ -45,14 +45,14 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/instances/' . $this->instance()->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->instance()->getKey(),
+                'id' => $this->instance()->id,
                 'name' => $this->instance()->name,
                 'vpc_id' => $this->instance()->vpc_id,
                 'appliance_version_id' => $this->applianceVersion()->uuid,

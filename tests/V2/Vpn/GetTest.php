@@ -31,7 +31,7 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->vpn->getKey(),
+                'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
                 'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
@@ -41,14 +41,14 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/vpns/' . $this->vpn->getKey(),
+            '/v2/vpns/' . $this->vpn->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->vpn->getKey(),
+                'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
                 'availability_zone_id' => $this->vpn->availability_zone_id,
             ])

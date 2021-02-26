@@ -46,14 +46,14 @@ class PrepareOsDisk extends Job
             $volume->save();
             $volume->instances()->attach($instance);
 
-            Log::info(get_class($this) . ' : Created volume resource ' . $volume->getKey() . ' for volume ' . $volume->vmware_uuid);
+            Log::info(get_class($this) . ' : Created volume resource ' . $volume->id . ' for volume ' . $volume->vmware_uuid);
 
             // Send created Volume ID's to Kinpin
             $instance->availabilityZone->kingpinService()->put(
                 '/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid',
                 [
                     'json' => [
-                        'volumeId' => $volume->getKey()
+                        'volumeId' => $volume->id
                     ]
                 ]
             );
@@ -68,7 +68,7 @@ class PrepareOsDisk extends Job
                 ]
             );
 
-            Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
+            Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->id);
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

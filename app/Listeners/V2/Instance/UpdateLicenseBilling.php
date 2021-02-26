@@ -44,8 +44,8 @@ class UpdateLicenseBilling
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $instance->getKey();
-        $billingMetric->vpc_id = $instance->vpc->getKey();
+        $billingMetric->resource_id = $instance->id;
+        $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->key = 'license.windows';
         $billingMetric->value = 1;
@@ -54,7 +54,7 @@ class UpdateLicenseBilling
         $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'windows');
         if (empty($product)) {
             Log::error(
-                'Failed to load \'windows\' billing product for availability zone ' . $instance->availabilityZone->getKey()
+                'Failed to load \'windows\' billing product for availability zone ' . $instance->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;

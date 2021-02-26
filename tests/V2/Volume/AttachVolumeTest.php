@@ -39,11 +39,11 @@ class AttachVolumeTest extends TestCase
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc()->id,
             'appliance_version_id' => $this->applianceVersion->uuid,
-            'availability_zone_id' => $this->availabilityZone()->getKey(),
+            'availability_zone_id' => $this->availabilityZone()->id,
         ]);
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc()->getKey(),
-            'availability_zone_id' => $this->availabilityZone()->getKey(),
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
         ]);
 
         $this->kingpinServiceMock()->expects('post')

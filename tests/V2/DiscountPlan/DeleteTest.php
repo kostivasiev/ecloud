@@ -24,7 +24,7 @@ class DeleteTest extends TestCase
     public function testDeleteRecord()
     {
         $this->delete(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -33,7 +33,7 @@ class DeleteTest extends TestCase
             ]
         )->assertResponseStatus(204);
 
-        $discountPlan = DiscountPlan::withTrashed()->findOrFail($this->discountPlan->getKey());
+        $discountPlan = DiscountPlan::withTrashed()->findOrFail($this->discountPlan->id);
         $this->assertNotNull($discountPlan->deleted_at);
     }
 }

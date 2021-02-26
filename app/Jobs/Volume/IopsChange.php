@@ -34,7 +34,7 @@ class IopsChange extends Job
                     ]
                 );
 
-                Log::info('Volume ' . $volume->getKey() . ' iops changed from ' . $this->event->originalIops . ' to ' . $volume->iops);
+                Log::info('Volume ' . $volume->id . ' iops changed from ' . $this->event->originalIops . ' to ' . $volume->iops);
             }
         }
 
