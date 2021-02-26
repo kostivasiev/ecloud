@@ -7,10 +7,6 @@ use App\Models\V2\Credential;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
-use App\Services\V2\NsxService;
-use Faker\Factory as Faker;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -28,14 +24,6 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
 
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
-        });
-
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
@@ -52,19 +40,14 @@ class DeleteTest extends TestCase
             'availability_zone_id' => $this->availability_zone->id,
         ]);
 
-        $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
-        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
-        app()->bind(NsxService::class, function () use ($mockNsxService) {
-            $mockNsxService->shouldReceive('delete')
-                ->andReturnUsing(function () {
-                    return new Response(204, [], '');
-                });
-            $mockNsxService->shouldReceive('get')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
-                });
-            return $mockNsxService;
-        });
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->andReturnUsing(function () {
+                return new Response(204, [], '');
+            });
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
+            });
     }
 
     public function testSuccessfulDelete()
