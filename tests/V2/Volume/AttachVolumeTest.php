@@ -13,14 +13,6 @@ class AttachVolumeTest extends TestCase
 
     public function testAttachingVolume()
     {
-        $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'volumes' => []
-                ]));
-            });
-
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
                 '/api/v1/vpc/vpc-test/volume',
@@ -49,6 +41,14 @@ class AttachVolumeTest extends TestCase
             ])
             ->andReturnUsing(function () {
                 return new Response(200);
+            });
+
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'volumes' => []
+                ]));
             });
 
         $this->kingpinServiceMock()->expects('post')
@@ -99,18 +99,6 @@ class AttachVolumeTest extends TestCase
 
     public function testAttachingVolumeThatIsAlreadyAttachedFails()
     {
-        $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'volumes' => [
-                        [
-                            'uuid' => 'uuid-test-uuid-test-uuid-test',
-                        ],
-                    ]
-                ]));
-            });
-
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
                 '/api/v1/vpc/vpc-test/volume',
@@ -139,6 +127,18 @@ class AttachVolumeTest extends TestCase
             ])
             ->andReturnUsing(function () {
                 return new Response(200);
+            });
+
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'volumes' => [
+                        [
+                            'uuid' => 'uuid-test-uuid-test-uuid-test',
+                        ],
+                    ]
+                ]));
             });
 
         $this->kingpinServiceMock()->shouldNotReceive('post')
