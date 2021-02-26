@@ -25,13 +25,14 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/router-patch.yaml'
+            - $ref: '../../components/schemas/router.yaml'
             - type: object
               properties:
                 name:
                   required: false
                 vpc_id:
                   required: false
+                  readOnly: true
 #                availability_zone_id:
 #                  required: false
   responses:
