@@ -263,3 +263,7 @@ paths:
     $ref: 'resources/NetworkRule/collection.yaml'
   '/ecloud/v2/network-rules/{networkRuleId}':
     $ref: 'resources/NetworkRule/item.yaml'
+  '/ecloud/v2/host-groups' :
+    $ref : 'resources/HostGroup/collection.yaml'
+  '/ecloud/v2/host-groups/{id}' :
+    $ref : 'resources/HostGroup/item.yaml'

@@ -298,4 +298,13 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->delete('router-throughputs/{routerThroughputId}', 'RouterThroughputController@destroy');
         });
     });
+
+    /** Host Group */
+    $router->group([], function () use ($router) {
+        $router->get('host-groups', 'HostGroupController@index');
+        $router->get('host-groups/{id}', 'HostGroupController@show');
+        $router->post('host-groups', 'HostGroupController@store');
+        $router->patch('host-groups/{id}', 'HostGroupController@update');
+        $router->delete('host-groups/{id}', 'HostGroupController@destroy');
+    });
 });

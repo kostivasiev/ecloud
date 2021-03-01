@@ -1,0 +1,42 @@
+get:
+  parameters:
+    - $ref: '../../resources/HostGroup/parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../resources/HostGroup/schemas/get.yaml'
+              meta:
+                type: object
+  tags:
+    - Host Groups
+patch:
+  parameters:
+    - $ref: '../../resources/HostGroup/parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../resources/HostGroup/schemas/patch.yaml'
+  responses:
+    200:
+      $ref: '../../resources/HostGroup/responses/idResponse.yaml'
+  tags:
+    - Host Groups
+delete:
+  parameters:
+    - $ref: '../../resources/HostGroup/parameters/id.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Host Groups
+
