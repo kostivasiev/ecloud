@@ -43,11 +43,11 @@ class AssignFloatingIp extends Job
             $nic = $instance->nics()->first();
 
             dispatch(new Assign([
-                'floating_ip_id' => $floatingIp->getKey(),
-                'resource_id' => $nic->getKey()
+                'floating_ip_id' => $floatingIp->id,
+                'resource_id' => $nic->id
             ]));
 
-            Log::info('Floating IP (' . $floatingIp->getKey() . ') assigned to NIC (' . $nic->getKey() . ')');
+            Log::info('Floating IP (' . $floatingIp->id . ') assigned to NIC (' . $nic->id . ')');
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

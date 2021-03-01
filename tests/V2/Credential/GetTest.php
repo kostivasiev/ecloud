@@ -3,7 +3,6 @@
 namespace Tests\V2\Credential;
 
 use App\Models\V2\Credential;
-use App\Providers\EncryptionServiceProvider;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -19,14 +18,6 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            return $mockEncryptionServiceProvider;
-        });
-        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
 
         $this->credential = factory(Credential::class)->create();
     }
@@ -53,7 +44,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/credentials/' . $this->credential->getKey(),
+            '/v2/credentials/' . $this->credential->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',

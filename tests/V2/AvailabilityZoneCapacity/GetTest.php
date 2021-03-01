@@ -23,13 +23,13 @@ class GetTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
@@ -39,8 +39,8 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
-            'id' => $this->availabilityZoneCapacity->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'id' => $this->availabilityZoneCapacity->id,
+            'availability_zone_id' => $this->availabilityZone->id,
             'type' => $this->availabilityZoneCapacity->type,
             'alert_warning' => $this->availabilityZoneCapacity->alert_warning,
             'alert_critical' => $this->availabilityZoneCapacity->alert_critical,
@@ -50,12 +50,12 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/availability-zone-capacities/' . $this->availabilityZoneCapacity->getKey(), [
+        $this->get('/v2/availability-zone-capacities/' . $this->availabilityZoneCapacity->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
-            'id' => $this->availabilityZoneCapacity->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'id' => $this->availabilityZoneCapacity->id,
+            'availability_zone_id' => $this->availabilityZone->id,
             'type' => $this->availabilityZoneCapacity->type,
             'alert_warning' => $this->availabilityZoneCapacity->alert_warning,
             'alert_critical' => $this->availabilityZoneCapacity->alert_critical,

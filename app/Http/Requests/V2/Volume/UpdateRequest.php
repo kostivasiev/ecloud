@@ -73,10 +73,6 @@ class UpdateRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
-            'vpc_id.exists' => 'The specified :attribute was not found',
-            'vmware_uuid.required' => 'The :attribute field, when specified, cannot be null',
-            'capacity.required' => 'The :attribute field, when specified, cannot be null',
             'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
             'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
             'iops.in' => 'The specified :attribute field is not a valid IOPS value (300, 600, 1200, 2500)',

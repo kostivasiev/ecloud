@@ -1,21 +1,16 @@
 <?php
 
-namespace App\Jobs\VmWare\Instance;
+namespace App\Jobs\Sync;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
-class UndeployCheck extends Job
+class Completed extends Job
 {
-    const RETRY_DELAY = 5;
-
-    public $tries = 500;
-
-    /** @var Instance */
     private $model;
 
-    public function __construct(Instance $model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
@@ -23,12 +18,7 @@ class UndeployCheck extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        // TODO :- Undeploy
-
         $this->model->setSyncCompleted();
-        $this->model->syncDelete();
-
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

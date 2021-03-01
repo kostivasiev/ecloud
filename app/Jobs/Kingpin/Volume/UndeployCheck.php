@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\VmWare\Volume;
+namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
@@ -30,5 +30,10 @@ class UndeployCheck extends Job
         $this->model->syncDelete();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+    }
+
+    public function failed($exception)
+    {
+        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }

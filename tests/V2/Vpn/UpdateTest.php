@@ -26,7 +26,7 @@ class UpdateTest extends TestCase
         $this->vpc()->reseller_id = 3;
         $this->vpc()->save();
         $this->patch(
-            '/v2/vpns/' . $this->vpn->getKey(),
+            '/v2/vpns/' . $this->vpn->id,
             [
                 'router_id' => $this->router()->id,
             ],
@@ -50,7 +50,7 @@ class UpdateTest extends TestCase
             'router_id' => $this->router()->id,
         ];
         $this->patch(
-            '/v2/vpns/' . $this->vpn->getKey(),
+            '/v2/vpns/' . $this->vpn->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -58,7 +58,7 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(200);
 
-        $vpnItem = Vpn::findOrFail($this->vpn->getKey());
+        $vpnItem = Vpn::findOrFail($this->vpn->id);
         $this->assertEquals($data['router_id'], $vpnItem->router_id);
     }
 }
