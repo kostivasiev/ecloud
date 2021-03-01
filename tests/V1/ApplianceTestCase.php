@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\V1;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceParameter;

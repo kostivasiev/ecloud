@@ -4,7 +4,7 @@ namespace Tests\V1\VolumeSets;
 
 use App\Models\V1\VolumeSet;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {

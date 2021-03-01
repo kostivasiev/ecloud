@@ -59,7 +59,7 @@ class GetTest extends TestCase
             'name' => 'Manchester Network',
         ]);
         $this->get(
-            '/v2/networks/' . $network->getKey(),
+            '/v2/networks/' . $network->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

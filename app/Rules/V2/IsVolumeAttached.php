@@ -11,11 +11,11 @@ class IsVolumeAttached implements Rule
 
     public Volume $volume;
 
-    public function __construct()
+    public function __construct($id = null)
     {
-        $volumeId = app('request')->route('volumeId');
-        $this->volume = Volume::forUser(Auth::user())
-            ->findOrFail($volumeId);
+        $this->volume = Volume::forUser(Auth::user())->findOrFail(
+            ($id !== null) ? $id : app('request')->route('volumeId')
+        );
     }
 
     public function passes($attribute, $value)

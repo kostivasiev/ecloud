@@ -23,17 +23,17 @@ class DeleteTest extends TestCase
 
         $region = factory(Region::class)->create();
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
+            'region_id' => $region->id
         ]);
 
         $this->routerThroughput = factory(RouterThroughput::class)->create([
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'availability_zone_id' => $availabilityZone->id,
         ]);
     }
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/router-throughputs/' . $this->routerThroughput->getKey(), [], [
+        $this->delete('/v2/router-throughputs/' . $this->routerThroughput->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])

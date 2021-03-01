@@ -23,13 +23,13 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
@@ -38,11 +38,11 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Manchester Network',
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
         ];
 
         $this->patch(
-            '/v2/routers/' . $this->router->getKey(),
+            '/v2/routers/' . $this->router->id,
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -61,16 +61,16 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/routers/' . $this->router->getKey(),
+            '/v2/routers/' . $this->router->id,
             [
                 'name' => 'expected',
-                'vpc_id' => $this->vpc->getKey()
+                'vpc_id' => $this->vpc->id
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ])
             ->assertResponseStatus(200);
-        $this->assertEquals('expected', Router::findOrFail($this->router->getKey())->name);
+        $this->assertEquals('expected', Router::findOrFail($this->router->id)->name);
     }
 }

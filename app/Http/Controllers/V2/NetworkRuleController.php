@@ -43,7 +43,7 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
         $aclRule->save();
-        return $this->responseIdMeta($request, $aclRule->getKey(), 201);
+        return $this->responseIdMeta($request, $aclRule->id, 201);
     }
 
     public function update(Update $request, string $networkRuleId)
@@ -59,7 +59,7 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
         $aclRule->save();
-        return $this->responseIdMeta($request, $aclRule->getKey(), 200);
+        return $this->responseIdMeta($request, $aclRule->id, 200);
     }
 
     public function destroy(Request $request, string $networkRuleId)

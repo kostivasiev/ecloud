@@ -6,9 +6,7 @@ use App\Models\V1\Solution;
 use App\Solution\CanModifyResource;
 use App\Solution\Exceptions\InvalidSolutionStateException;
 use App\Solution\Status;
-use Illuminate\Http\Request;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class CanModifyResourceTest extends TestCase

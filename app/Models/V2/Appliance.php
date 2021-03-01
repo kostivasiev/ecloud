@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Exceptions\NotFoundException;
 
-class Appliance extends Model
+class Appliance extends V1ModelWrapper
 {
     use ColumnPrefixHelper, UUIDHelper, SoftDeletes;
 

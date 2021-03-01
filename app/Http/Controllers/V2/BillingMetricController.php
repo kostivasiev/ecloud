@@ -41,7 +41,7 @@ class BillingMetricController extends BaseController
             'price',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->getKey(), 201);
+        return $this->responseIdMeta($request, $model->id, 201);
     }
 
     public function update(UpdateRequest $request, string $billingMetricId)
@@ -59,7 +59,7 @@ class BillingMetricController extends BaseController
             'price',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->getKey(), 200);
+        return $this->responseIdMeta($request, $model->id, 200);
     }
 
     public function destroy(Request $request, string $billingMetricId)

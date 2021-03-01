@@ -57,7 +57,7 @@ class RegionController extends BaseController
     {
         $region = new Region($request->only(['name', 'is_public']));
         $region->save();
-        return $this->responseIdMeta($request, $region->getKey(), 201);
+        return $this->responseIdMeta($request, $region->id, 201);
     }
 
     /**
@@ -69,7 +69,7 @@ class RegionController extends BaseController
     {
         $region = Region::findOrFail($regionId);
         $region->fill($request->only(['name', 'is_public']))->save();
-        return $this->responseIdMeta($request, $region->getKey(), 200);
+        return $this->responseIdMeta($request, $region->id, 200);
     }
 
 
