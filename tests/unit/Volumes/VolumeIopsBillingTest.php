@@ -11,6 +11,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Product;
 use App\Models\V2\Volume;
 use Carbon\Carbon;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -26,6 +27,38 @@ class VolumeIopsBillingTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->kingpinServiceMock()
+            ->shouldReceive('get')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-abc123xyz')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->kingpinServiceMock()
+            ->shouldReceive('post')
+            ->withSomeOfArgs(
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-abc123xyz',
+                        'sizeGiB' => '100',
+                        'shared' => false,
+                    ]
+                ]
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => '81ef6326-4caf-4572-94d1-b06a422659d5']));
+            });
+        $this->kingpinServiceMock()
+            ->shouldReceive('post')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-abc123xyz/volume/81ef6326-4caf-4572-94d1-b06a422659d5/attach')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->kingpinServiceMock()
+            ->shouldReceive('post')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-abc123xyz/volume/81ef6326-4caf-4572-94d1-b06a422659d5/detach')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
 
         // Setup Products
         foreach ([300, 600, 1200, 2500] as $iops) {
@@ -102,6 +135,7 @@ class VolumeIopsBillingTest extends TestCase
         ]);
 
         $instance = factory(Instance::class)->create([
+            'id' => 'i-abc123xyz',
             'vpc_id' => $this->vpc()->id,
             'appliance_version_id' => $this->applianceVersion->uuid,
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -129,11 +163,14 @@ class VolumeIopsBillingTest extends TestCase
         ]);
 
         $instance = factory(Instance::class)->create([
+            'id' => 'i-abc123xyz',
             'vpc_id' => $this->vpc()->id,
             'appliance_version_id' => $this->applianceVersion->uuid,
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
-        $instance->volumes()->attach($volume);
+        Instance::withoutEvents(function () use ($instance, $volume) {
+            $instance->volumes()->attach($volume->id);
+        });
 
         // Setup event and fire listener
         $event = new Updated($volume);
@@ -141,7 +178,7 @@ class VolumeIopsBillingTest extends TestCase
 
         // Update the billingMetric instance now it's been saved
         $this->billingMetric->refresh();
-        $this->assertEquals(600, $volume->iops);
+        $this->assertEquals(600, $volume->iops); // wrong - should be 600
         $this->assertEquals('disk.capacity.600', $this->billingMetric->key);
         $this->assertNull($this->billingMetric->end);
     }
@@ -168,11 +205,14 @@ class VolumeIopsBillingTest extends TestCase
         ]);
 
         $instance = factory(Instance::class)->create([
+            'id' => 'i-abc123xyz',
             'vpc_id' => $this->vpc()->id,
             'appliance_version_id' => $this->applianceVersion->uuid,
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
-        $instance->volumes()->attach($volume);
+        Instance::withoutEvents(function () use ($instance, $volume) {
+            $instance->volumes()->attach($volume);
+        });
 
         // Setup event and fire listener
         $event = new Updated($volume);

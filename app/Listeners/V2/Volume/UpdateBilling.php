@@ -41,9 +41,11 @@ class UpdateBilling
             return;
         }
 
+        $billingIops = $volume->iops;
         // If iops is empty, or if the volume is unmounted, then set the iops to the default for billing purposes
         if (empty($volume->iops) || ($volume->instances()->count() === 0)) {
             $volume->iops = config('volume.iops.default', 300);
+            $billingIops = $volume->iops;
         }
 
         $time = Carbon::now();
@@ -63,13 +65,13 @@ class UpdateBilling
         $billingMetric->resource_id = $volume->id;
         $billingMetric->vpc_id = $volume->vpc->id;
         $billingMetric->reseller_id = $volume->vpc->reseller_id;
-        $billingMetric->key = 'disk.capacity.'.$volume->iops;
+        $billingMetric->key = 'disk.capacity.'.$billingIops;
         $billingMetric->value = $volume->capacity;
         $billingMetric->start = $time;
 
         $product = $volume->availabilityZone
             ->products()
-            ->where('product_name', 'LIKE', '%volume@'.$volume->iops.'%')
+            ->where('product_name', 'LIKE', '%volume@'.$billingIops.'%')
             ->first();
         if (empty($product)) {
             Log::error(
