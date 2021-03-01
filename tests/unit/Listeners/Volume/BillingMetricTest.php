@@ -2,18 +2,10 @@
 
 namespace Tests\unit\Listeners\Volume;
 
-use App\Listeners\V2\Volume\ModifyVolume;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Region;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -21,71 +13,55 @@ class BillingMetricTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected $region;
-    protected $availabilityZone;
-    protected $vpc;
     protected $volume;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-test',
+                        'sizeGiB' => '10',
+                        'shared' => false,
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+            });
+
+        $this->volume = factory(Volume::class)->create([
+            'id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
+            'capacity' => 10,
+            'iops' => 300,
+            'availability_zone_id' => $this->availabilityZone()->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-
-        Model::withoutEvents(function () {
-            $this->volume = factory(Volume::class)->create([
-                'id' => 'vol-aaaaaaaa',
-                'vpc_id' => $this->vpc->id,
-                'capacity' => 10,
-                'iops' => 300,
-                'availability_zone_id' => $this->availabilityZone->id
-            ]);
-        });
-        $this->volume->vpc()->associate($this->vpc);
-
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
-        $mockKingpinService->shouldReceive('put')->andReturn(
-            new Response(200)
-        );
-
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
     }
 
     public function testResizingVolumeAddsBillingMetric()
     {
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '15',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $this->volume->capacity = 15;
         $this->volume->save();
 
-        Event::assertDispatched(\App\Events\V2\Volume\Saving::class, function ($event) {
-            return $event->model->id === $this->volume->id;
-        });
-
-        Event::assertDispatched(\App\Events\V2\Volume\Saved::class, function ($event) {
-            return $event->model->id === $this->volume->id;
-        });
-
-        $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
-        $resourceSyncListener->handle(new \App\Events\V2\Volume\Saving($this->volume));
-
         $sync = Sync::where('resource_id', $this->volume->id)->first();
-
-        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
-        $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
-
-        // sync set to complete by the CapacityIncrease listener
-        Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {
-            return $event->model->id === $sync->id;
-        });
-
-        $sync->refresh();
 
         // Check that the volume billing metric is added
         $dispatchResourceSyncedEventListener = \Mockery::mock(\App\Listeners\V2\Volume\UpdateBilling::class)->makePartial();
@@ -101,9 +77,22 @@ class BillingMetricTest extends TestCase
 
     public function testResizingVolumeEndsExistingBillingMetric()
     {
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '15',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $metric = factory(BillingMetric::class)->create([
-            'resource_id' => 'vol-aaaaaaaa',
-            'vpc_id' => $this->vpc->id,
+            'resource_id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
             'key' => 'disk.capacity.300',
             'value' => 10,
             'start' => '2020-07-07T10:30:00+01:00',
@@ -120,9 +109,6 @@ class BillingMetricTest extends TestCase
         $resourceSyncListener->handle(new \App\Events\V2\Volume\Saving($this->volume));
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();
-
-        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
-        $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
 
         $sync->refresh();
 

@@ -23,6 +23,6 @@ class IsMaxVolumeLimitReached implements Rule
 
     public function message()
     {
-        return 'The instance has reached the maximum mounted volume limit ('.$this->volumeMountLimit.')';
+        return 'The instance has reached the maximum mounted volume limit (' . $this->volumeMountLimit . ')';
     }
 }

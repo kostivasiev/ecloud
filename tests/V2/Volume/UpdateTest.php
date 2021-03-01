@@ -6,8 +6,10 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
@@ -30,13 +32,31 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->kingpinServiceMock()
+            ->shouldReceive('post')
+            ->withSomeOfArgs(
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-abc123xyz',
+                        'sizeGiB' => '100',
+                        'shared' => false
+                    ]
+                ]
+            )
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => '7b9d062f-2048-42e8-82f9-f67d3e9e3dfe']));
+            });
         $this->volume = factory(Volume::class)->create([
+            'id' => 'vol-abc123xyz',
             'vpc_id' => $this->vpc()->getKey()
         ]);
     }
 
     public function testNotOwnedVolumeIsFailed()
     {
+        $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
         $data = [
             'name' => 'Volume 1',
         ];
@@ -107,6 +127,18 @@ class UpdateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        $this->kingpinServiceMock()
+            ->shouldReceive('put')
+            ->withSomeOfArgs(
+                '/api/v1/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '999'
+                    ]
+                ]
+            )->andReturnUsing(function () {
+                return new Response(200);
+            });
         $data = [
             'name' => 'Volume 1',
             'capacity' => (config('volume.capacity.max') - 1),

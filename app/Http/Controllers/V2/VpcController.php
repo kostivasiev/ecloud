@@ -52,7 +52,6 @@ class VpcController extends BaseController
     {
         $vpc = Vpc::forUser(Auth::user())->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
-        $vpc->region_id = $request->input('region_id', $vpc->region_id);
 
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);

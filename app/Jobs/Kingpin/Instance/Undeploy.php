@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\VmWare\Instance;
+namespace App\Jobs\Kingpin\Instance;
 
 use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
