@@ -104,6 +104,7 @@ class RouterThroughput extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'availability_zone_id' => 'availability_zone_id',
+            'name' => 'name',
             'committed_bandwidth' => 'committed_bandwidth',
             'burst_size' => 'burst_size',
             'created_at' => 'created_at',
