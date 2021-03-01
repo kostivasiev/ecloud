@@ -26,6 +26,5 @@ class UpdateTest extends TestCase
 
         $network = Network::findOrFail($this->network->id);
         $this->assertEquals('expected', $network->name);
-        $this->assertEquals('192.168.0.0/24', $network->subnet);
     }
 }

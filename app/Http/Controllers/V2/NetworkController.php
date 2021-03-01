@@ -154,7 +154,6 @@ class NetworkController extends BaseController
         $network = Network::forUser(Auth::user())->findOrFail($networkId);
         $network->fill($request->only([
             'name',
-            'subnet',
         ]));
         if (!$network->save()) {
             return $network->getSyncError();
