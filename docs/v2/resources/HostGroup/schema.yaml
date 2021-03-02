@@ -7,22 +7,22 @@ properties:
     type: string
     required: false
     example: 'Host Group 1'
-    readOnly: true
+    readOnly: false
   host_spec_id:
     type: string
     required: true
     description : The host spec to use with this host group
     example: hs-4c63cf58
-    readOnly: true
+    readOnly: false
   vpc_id :
     type : string
     example : vpc-4c63cf58
-    readOnly : true
+    readOnly : false
   availability_zone_id:
     type: string
     required: false
     example: 'az-2b66bb79'
-    readOnly : true
+    readOnly : false
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
