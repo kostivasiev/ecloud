@@ -38,6 +38,13 @@ class HostSpec extends Model implements Filterable, Sortable
             'ram_capacity',
         ]);
 
+        $this->casts = [
+            'cpu_sockets' => 'integer',
+            'cpu_cores' => 'integer',
+            'cpu_clock_speed' => 'integer',
+            'ram_capacity' => 'integer',
+        ];
+
         parent::__construct($attributes);
     }
 

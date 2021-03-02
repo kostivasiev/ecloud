@@ -24,7 +24,7 @@ class UpdateHostSpecsTable extends Migration
                 'cpu_type',
                 'cpu_cores',
                 'cpu_clock_speed',
-                'ram'
+                'ram_capacity'
             ]);
         });
     }

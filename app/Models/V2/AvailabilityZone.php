@@ -129,6 +129,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return Product::forAvailabilityZone($this);
     }
 
+    public function hostSpecs()
+    {
+        return $this->belongsToMany(HostSpec::class);
+    }
+
     /**
      * @param $query
      * @param $user

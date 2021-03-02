@@ -65,7 +65,7 @@ client.test("Request executed successfully", function() {
 PATCH https://{{host}}/{{version}}/host-specs/{{hostSpecId}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -126,6 +126,20 @@ client.test("Request executed successfully", function() {
 ###
 
 GET https://{{host}}/{{version}}/host-specs/{{hostSpecId}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
+});
+%}
+###
+
+GET https://{{host}}/{{version}}/availability-zones/az-aaaaaaaa/host-specs
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

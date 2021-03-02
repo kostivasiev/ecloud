@@ -22,6 +22,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
     $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
     $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
+    $router->get('availability-zones/{zoneId}/host-specs', 'AvailabilityZoneController@hostSpecs');
 
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
