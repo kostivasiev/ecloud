@@ -8,7 +8,6 @@ class UpdateHostSpecsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('host_specs', function ($table) {
-            $table->unsignedSmallInteger('cpu_quantity')->after('name')->nullable();
             $table->unsignedSmallInteger('cpu_sockets')->nullable();
             $table->string('cpu_type')->nullable();
             $table->unsignedSmallInteger('cpu_cores')->nullable();
@@ -21,7 +20,6 @@ class UpdateHostSpecsTable extends Migration
     {
         Schema::connection('ecloud')->table('host_specs', function ($table) {
             $table->dropColumn([
-                'cpu_quantity',
                 'cpu_sockets',
                 'cpu_type',
                 'cpu_cores',

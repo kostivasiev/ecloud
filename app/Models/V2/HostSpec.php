@@ -31,6 +31,11 @@ class HostSpec extends Model implements Filterable, Sortable
         $this->fillable([
             'id',
             'name',
+            'cpu_sockets',
+            'cpu_type',
+            'cpu_cores',
+            'cpu_clock_speed',
+            'ram_capacity',
         ]);
 
         parent::__construct($attributes);
@@ -39,6 +44,11 @@ class HostSpec extends Model implements Filterable, Sortable
     public function hostGroups()
     {
         return $this->hasMany(HostGroup::class);
+    }
+
+    public function availabilityZones()
+    {
+        return $this->belongsToMany(AvailabilityZone::class);
     }
 
     /**
@@ -50,6 +60,11 @@ class HostSpec extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('cpu_sockets', Filter::$stringDefaults),
+            $factory->create('cpu_type', Filter::$stringDefaults),
+            $factory->create('cpu_cores', Filter::$stringDefaults),
+            $factory->create('cpu_clock_speed', Filter::$stringDefaults),
+            $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -65,6 +80,11 @@ class HostSpec extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('cpu_sockets'),
+            $factory->create('cpu_type'),
+            $factory->create('cpu_cores'),
+            $factory->create('cpu_clock_speed'),
+            $factory->create('ram_capacity'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -87,6 +107,11 @@ class HostSpec extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
+            'cpu_sockets' => 'cpu_sockets',
+            'cpu_type' => 'cpu_type',
+            'cpu_cores' => 'cpu_cores',
+            'cpu_clock_speed' => 'cpu_clock_speed',
+            'ram_capacity' => 'ram_capacity',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

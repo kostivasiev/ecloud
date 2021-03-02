@@ -7,6 +7,9 @@ use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
+use App\Models\V2\HostSpec;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
@@ -73,6 +76,15 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
      * @var Network
      */
     private $network;
+
+    /** @var Host */
+    private $host;
+
+    /** @var HostSpec */
+    private $hostSpec;
+
+    /** @var HostGroup */
+    private $hostGroup;
 
     /**
      * Creates the application.
@@ -221,6 +233,44 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         }
         return $this->network;
     }
+
+    public function host()
+    {
+        if (!$this->host) {
+            $this->host = factory(Host::class)->create([
+                'id' => 'h-test',
+                'name' => 'h-test',
+                'host_group_id' => $this->hostGroup()->id,
+            ]);
+        }
+        return $this->host;
+    }
+
+    public function hostGroup()
+    {
+        if (!$this->hostGroup) {
+            $this->hostGroup = factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+            ]);
+        }
+        return $this->hostGroup;
+    }
+
+    public function hostSpec()
+    {
+        if (!$this->hostSpec) {
+            $this->hostSpec = factory(HostSpec::class)->create([
+                'id' => 'hs-test',
+                'name' => 'test-host-spec',
+            ]);
+        }
+        return $this->hostSpec;
+    }
+
 
     protected function setUp(): void
     {
