@@ -1,7 +1,0 @@
-properties:
-  name:
-    type: string
-    required: false
-    example: 'Host Group 1'
-    readOnly: false
-description: 'Host Groups'

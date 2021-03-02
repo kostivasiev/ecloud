@@ -40,7 +40,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../resources/HostGroup/schemas/post.yaml'
+          $ref: '../../resources/HostGroup/schema.yaml'
   responses:
     201:
       $ref: '../../resources/HostGroup/responses/idResponse.yaml'
