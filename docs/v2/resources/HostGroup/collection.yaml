@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../resources/HostGroup/schemas/get.yaml'
+                  $ref: '../../resources/HostGroup/schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
