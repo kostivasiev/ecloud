@@ -121,8 +121,8 @@ class VolumeIopsBillingTest extends TestCase
 
         // Update the billingMetric instance now it's been saved
         $this->billingMetric->refresh();
-        $this->assertEquals(300, $volume->iops);
-        $this->assertEquals('disk.capacity.300', $this->billingMetric->key);
+        $this->assertEquals(600, $volume->iops);
+        $this->assertEquals('disk.capacity.600', $this->billingMetric->key);
         $this->assertNull($this->billingMetric->end);
     }
 
