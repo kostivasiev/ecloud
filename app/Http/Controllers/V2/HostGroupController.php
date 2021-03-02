@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\HostGroup\CreateRequest;
+use App\Http\Requests\V2\HostGroup\StoreRequest;
 use App\Http\Requests\V2\HostGroup\UpdateRequest;
 use App\Models\V2\HostGroup;
 use App\Resources\V2\HostGroupResource;
@@ -31,7 +31,7 @@ class HostGroupController extends BaseController
         );
     }
 
-    public function store(CreateRequest $request)
+    public function store(StoreRequest $request)
     {
         $model = new HostGroup();
         $model->fill($request->only([
@@ -57,6 +57,15 @@ class HostGroupController extends BaseController
     public function destroy(Request $request, string $id)
     {
         $model = HostGroup::forUser($request->user())->findOrFail($id);
+
+        if ($model->hosts()->count()) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Can not delete Host group with active hosts',
+                'status' => 422,
+            ], 422);
+        }
+
         $model->delete();
         return response()->json([], 204);
     }

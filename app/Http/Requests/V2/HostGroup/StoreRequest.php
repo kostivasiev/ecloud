@@ -7,7 +7,7 @@ use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
-class CreateRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     public function rules()
     {

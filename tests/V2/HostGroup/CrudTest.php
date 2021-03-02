@@ -113,9 +113,9 @@ class CrudTest extends TestCase
     public function testDestroy()
     {
         /**
-        * Switch out the seeInDatabase/notSeeInDatabase with assertSoftDeleted(...) when we switch to Laravel
-        * @see https://laravel.com/docs/5.8/database-testing#available-assertions
-        */
+         * Switch out the seeInDatabase/notSeeInDatabase with assertSoftDeleted(...) when we switch to Laravel
+         * @see https://laravel.com/docs/5.8/database-testing#available-assertions
+         */
         $this->hostGroup();
         $this->delete('/v2/host-groups/hg-test')
             ->seeInDatabase(
@@ -124,8 +124,7 @@ class CrudTest extends TestCase
                     'id' => 'hg-test',
                 ],
                 'ecloud'
-            )
-            ->notSeeInDatabase(
+            )->notSeeInDatabase(
                 'host_groups',
                 [
                     'id' => 'hg-test',
@@ -133,5 +132,17 @@ class CrudTest extends TestCase
                 ],
                 'ecloud'
             )->assertResponseStatus(204);
+    }
+
+    public function testDestroyCantDeleteHostGroupWhenItHasHost()
+    {
+        $this->hostGroup();
+        $this->host()->hostGroup()->associate($this->hostGroup());
+        $this->delete('/v2/host-groups/hg-test')
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'Can not delete Host group with active hosts',
+                'status' => 422,
+            ])->assertResponseStatus(422);
     }
 }
