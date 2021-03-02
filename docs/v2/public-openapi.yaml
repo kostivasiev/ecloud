@@ -58,8 +58,10 @@ components:
       $ref: 'components/schemas/routerThroughput.yaml'
     NetworkRulePort:
       $ref: 'components/schemas/networkRulePort.yaml'
-    Meta:
-      $ref: 'components/schemas/meta.yaml'
+    Meta :
+      $ref : 'components/schemas/meta.yaml'
+    HostGroup :
+      $ref : 'resources/HostGroup/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
