@@ -50,9 +50,9 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.id === client.global.get('host_group_id'), "Incorrect resource ID returned");
   client.assert(response.body.data.name === "test host group");
-  client.assert(response.body.data.vpc_id === "{{dev_vpc_id}}");
-  client.assert(response.body.data.availability_zone_id === "{{dev_availability_zone_id}}");
-  client.assert(response.body.data.host_spec_id === "{{dev_host_spec_id}}");
+  client.assert(response.body.data.vpc_id === "vpc-aaaaaaaa");
+  client.assert(response.body.data.availability_zone_id === "az-aaaaaaaa");
+  client.assert(response.body.data.host_spec_id === "hs-aaaaaaaa");
 });
 %}
 
@@ -73,6 +73,20 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+###
+
+GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.name === "new name");
+});
+%}
 
 ### destroy
 DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
@@ -85,5 +99,20 @@ Content-Type: application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+###
+
+GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
 });
 %}
