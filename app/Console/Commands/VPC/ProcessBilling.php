@@ -76,6 +76,7 @@ class ProcessBilling extends Command
 
             $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
                 if (!in_array($key, $this->billableMetrics)) {
+                    Log::info('Metric `'.$key.'` not found in billableMetrics');
                     return true;
                 }
 
@@ -121,6 +122,10 @@ class ProcessBilling extends Command
                 }
             }
 
+            if (!array_key_exists('metrics', $this->billing[$vpc->reseller_id][$vpc->id])) {
+                return true;
+            }
+
             $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
 
             $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
@@ -132,8 +137,11 @@ class ProcessBilling extends Command
             $this->line('Reseller ID: ' . $resellerId . PHP_EOL);
 
             foreach ($vpcs as $vpcId => $vpc) {
-                $this->line('---------- ' . $vpcId . ' ----------' . PHP_EOL);
+                if (!array_key_exists('metrics', $vpc)) {
+                    continue;
+                }
 
+                $this->line('---------- ' . $vpcId . ' ----------' . PHP_EOL);
                 foreach ($vpc['metrics'] as $key => $val) {
                     $this->line($key . ': £' . number_format($val, 2));
                 }
