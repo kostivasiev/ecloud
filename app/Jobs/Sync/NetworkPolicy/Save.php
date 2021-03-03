@@ -3,6 +3,9 @@
 namespace App\Jobs\Sync\NetworkPolicy;
 
 use App\Jobs\Job;
+use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
+use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
+use App\Jobs\Nsx\DeployCheck;
 use App\Jobs\Sync\Completed;
 use App\Models\V2\NetworkPolicy;
 use Illuminate\Support\Facades\Log;
@@ -21,12 +24,25 @@ class Save extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $jobs = [
-            new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy($this->model),
-            new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\DeployCheck($this->model),
-            new \App\Jobs\Nsx\NetworkPolicy\Deploy($this->model),
-            new \App\Jobs\Nsx\NetworkPolicy\DeployCheck($this->model),
-            new Completed($this->model)
+            new DeploySecurityGroup($this->model),
+            new DeployCheck(
+                $this->model,
+                $this->model->network->router->availabilityZone,
+                '/infra/domains/default/groups/'
+            ),
+            new DeployNetworkPolicy($this->model),
         ];
+
+        if (count($this->model->networkRules) > 0) {
+            // NSX doesn't try to "realise" a NetworkPolicy until it has rules
+            $jobs[] = new DeployCheck(
+                $this->model,
+                $this->model->network->router->availabilityZone,
+                '/infra/domains/default/security-policies/'
+            );
+        }
+
+        $jobs[] = new Completed($this->model);
 
         dispatch(array_shift($jobs)->chain($jobs));
 

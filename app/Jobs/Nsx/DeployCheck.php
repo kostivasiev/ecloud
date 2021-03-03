@@ -6,7 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use Illuminate\Support\Facades\Log;
 
-class NsxDeployCheck extends Job
+class DeployCheck extends Job
 {
     const RETRY_DELAY = 5;
 
@@ -18,9 +18,11 @@ class NsxDeployCheck extends Job
 
     protected string $intentPath;
 
-    public function __construct($model)
+    public function __construct($model, availabilityZone $availabilityZone, $resourcePath)
     {
         $this->model = $model;
+        $this->availabilityZone = $availabilityZone;
+        $this->intentPath = $resourcePath . $this->model->id;
     }
 
     public function handle()
