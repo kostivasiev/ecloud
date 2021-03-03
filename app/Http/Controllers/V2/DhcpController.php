@@ -53,7 +53,7 @@ class DhcpController extends BaseController
         $dhcps = new Dhcp($request->only(['vpc_id', 'availability_zone_id']));
         $dhcps->save();
         $dhcps->refresh();
-        return $this->responseIdMeta($request, $dhcps->getKey(), 201);
+        return $this->responseIdMeta($request, $dhcps->id, 201);
     }
 
     /**
@@ -67,7 +67,7 @@ class DhcpController extends BaseController
         $dhcp->fill($request->only(['vpc_id', 'availability_zone_id']));
         $dhcp->save();
         $dhcp->setSyncCompleted();
-        return $this->responseIdMeta($request, $dhcp->getKey(), 200);
+        return $this->responseIdMeta($request, $dhcp->id, 200);
     }
 
 

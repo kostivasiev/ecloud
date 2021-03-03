@@ -33,18 +33,18 @@ class AutoDeleteTest extends TestCase
         parent::setUp();
 
         $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc()->getKey(),
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
         $this->credential = factory(Credential::class)->create([
-            'resource_id' => $this->availabilityZone()->getKey(),
+            'resource_id' => $this->availabilityZone()->id,
         ]);
     }
 
     public function testDeleteCredentialAndDhcp()
     {
         $this->delete(
-            '/v2/availability-zones/' . $this->availabilityZone()->getKey(),
+            '/v2/availability-zones/' . $this->availabilityZone()->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -53,7 +53,7 @@ class AutoDeleteTest extends TestCase
         )->assertResponseStatus(204);
 
         Event::assertDispatched(Deleted::class, function ($event) {
-            return $event->model->getKey() == $this->availabilityZone()->getKey();
+            return $event->model->id == $this->availabilityZone()->id;
         });
     }
 }

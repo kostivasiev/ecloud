@@ -20,8 +20,9 @@ class DeleteVolumes extends Job
         Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
         $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
         $instance->volumes()->each(function ($volume) use ($instance) {
-            $instance->volumes()->detach($volume);
+            // $instance->volumes()->detach($volume); // No need to detach from deleted instance?!
             if ($volume->instances()->count() == 0) {
+                Log::info('Deleting volume ' . $volume->id);
                 $volume->delete();
             }
         });

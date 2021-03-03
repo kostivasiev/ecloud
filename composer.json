@@ -35,7 +35,7 @@
     "ukfast/ditto": "^4.8",
     "ukfast/form-requests": "^1.1",
     "ukfast/health-check": "~1.0",
-    "ukfast/log-provider": "~2.0",
+    "ukfast/log-provider": "^3.0",
     "ukfast/responses": "~1.0",
     "vlucas/phpdotenv": "^3.3"
   },

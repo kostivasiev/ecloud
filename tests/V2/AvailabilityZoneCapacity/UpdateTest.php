@@ -23,31 +23,31 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
     public function testValidDataIsSuccessful()
     {
         $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $data = [
-            'availability_zone_id' => $availabilityZone->getKey(),
+            'availability_zone_id' => $availabilityZone->id,
             'type' => 'cpu',
             'alert_warning' => 40,
             'alert_critical' => 80,
             'max' => 90
         ];
 
-        $this->patch('/v2/availability-zone-capacities/' . $this->availabilityZoneCapacity->getKey(), $data, [
+        $this->patch('/v2/availability-zone-capacities/' . $this->availabilityZoneCapacity->id, $data, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeInDatabase(

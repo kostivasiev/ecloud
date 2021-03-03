@@ -25,17 +25,17 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->network = factory(Network::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
         ]);
     }
 
@@ -44,10 +44,10 @@ class UpdateTest extends TestCase
         $this->vpc->reseller_id = 3;
         $this->vpc->save();
         $this->patch(
-            '/v2/networks/' . $this->network->getKey(),
+            '/v2/networks/' . $this->network->id,
             [
                 'name' => 'Manchester Network',
-                'router_id' => $this->router->getKey()
+                'router_id' => $this->router->id
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -63,19 +63,17 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/networks/' . $this->network->getKey(),
+            '/v2/networks/' . $this->network->id,
             [
                 'name' => 'expected',
-                'router_id' => $this->router->getKey(),
-                'subnet' => '192.168.0.0/24'
+                'router_id' => $this->router->id
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ])->assertResponseStatus(200);
 
-        $network = Network::findOrFail($this->network->getKey());
+        $network = Network::findOrFail($this->network->id);
         $this->assertEquals('expected', $network->name);
-        $this->assertEquals('192.168.0.0/24', $network->subnet);
     }
 }

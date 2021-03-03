@@ -67,7 +67,16 @@ client.log('Router UUID: ' + response.body.data.id);
 %}
 
 ###
-PUT https://{{host}}/{{version}}/routers/{{router_id}}/availability-zones/{{availability_zone_id}}
+POST https://{{host}}/{{version}}/host-spec
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
+
+{
+  "name": "Host Spec 1"
+}
+
+> {%
+client.global.set('host_spec_id', response.body.data.id);
+client.log('Host Spec UUID: ' + response.body.data.id);
+%}

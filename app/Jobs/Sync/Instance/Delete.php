@@ -3,8 +3,8 @@
 namespace App\Jobs\Sync\Instance;
 
 use App\Jobs\Job;
-use App\Jobs\VmWare\Instance\Undeploy;
-use App\Jobs\VmWare\Instance\UndeployCheck;
+use App\Jobs\Kingpin\Instance\Undeploy;
+use App\Jobs\Kingpin\Instance\UndeployCheck;
 use App\Models\V2\Instance;
 use Illuminate\Support\Facades\Log;
 

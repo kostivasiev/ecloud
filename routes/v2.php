@@ -221,10 +221,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('volumes', 'VolumeController@index');
         $router->get('volumes/{volumeId}', 'VolumeController@show');
         $router->get('volumes/{volumeId}/instances', 'VolumeController@instances');
-        //$router->post('volumes', 'VolumeController@store');
+        $router->post('volumes', 'VolumeController@store');
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
-        $router->post('volumes/{volumeId}/attach', 'VolumeController@attachToInstance');
+        $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
+        $router->post('volumes/{volumeId}/detach', 'VolumeController@detach');
     });
 
     /** Nics */
@@ -296,5 +297,14 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->patch('router-throughputs/{routerThroughputId}', 'RouterThroughputController@update');
             $router->delete('router-throughputs/{routerThroughputId}', 'RouterThroughputController@destroy');
         });
+    });
+
+    /** Host Group */
+    $router->group([], function () use ($router) {
+        $router->get('host-groups', 'HostGroupController@index');
+        $router->get('host-groups/{id}', 'HostGroupController@show');
+        $router->post('host-groups', 'HostGroupController@store');
+        $router->patch('host-groups/{id}', 'HostGroupController@update');
+        $router->delete('host-groups/{id}', 'HostGroupController@destroy');
     });
 });

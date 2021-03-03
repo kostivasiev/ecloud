@@ -13,7 +13,7 @@ class RouterThroughputController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = RouterThroughput::query();
+        $collection = RouterThroughput::forUser($request->user());
         $queryTransformer->config(RouterThroughput::class)
             ->transform($collection);
 
@@ -25,7 +25,7 @@ class RouterThroughputController extends BaseController
     public function show(Request $request, string $routerThroughputId)
     {
         return new RouterThroughputResource(
-            RouterThroughput::findOrFail($routerThroughputId)
+            RouterThroughput::forUser($request->user())->findOrFail($routerThroughputId)
         );
     }
 
@@ -38,7 +38,7 @@ class RouterThroughputController extends BaseController
             'burst_size'
         ]));
         $routerThroughput->save();
-        return $this->responseIdMeta($request, $routerThroughput->getKey(), 201);
+        return $this->responseIdMeta($request, $routerThroughput->id, 201);
     }
 
     public function update(UpdateRequest $request, string $routerThroughputId)
@@ -51,7 +51,7 @@ class RouterThroughputController extends BaseController
             'burst_size'
         ]));
         $routerThroughput->save();
-        return $this->responseIdMeta($request, $routerThroughput->getKey(), 200);
+        return $this->responseIdMeta($request, $routerThroughput->id, 200);
     }
 
     public function destroy(Request $request, string $routerThroughputId)
