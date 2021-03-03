@@ -32,7 +32,7 @@ patch:
                   readOnly : true
                 vpc_id :
                   readOnly : true
-                host_spec :
+                host_spec_id :
                   readOnly : true
   responses:
     200:
