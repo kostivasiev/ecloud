@@ -271,5 +271,4 @@ class AvailabilityZoneController extends BaseController
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
-
 }
