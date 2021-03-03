@@ -25,7 +25,7 @@ class CrudTest extends TestCase
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
                 'cpu_sockets' => 2,
-                'cpu_type' => "E5-2643 v3",
+                'cpu_type' => 'E5-2643 v3',
                 'cpu_cores' => 6,
                 'cpu_clock_speed' => 4000,
                 'ram_capacity' => 64,
@@ -40,7 +40,7 @@ class CrudTest extends TestCase
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
                 'cpu_sockets' => 2,
-                'cpu_type' => "E5-2643 v3",
+                'cpu_type' => 'E5-2643 v3',
                 'cpu_cores' => 6,
                 'cpu_clock_speed' => 4000,
                 'ram_capacity' => 64,
@@ -60,7 +60,7 @@ class CrudTest extends TestCase
         $data = [
             'name' =>  'test-host-spec',
             'cpu_sockets' => 2,
-            'cpu_type' => "E5-2643 v3",
+            'cpu_type' => 'E5-2643 v3',
             'cpu_cores' => 6,
             'cpu_clock_speed' => 4000,
             'ram_capacity' => 64
@@ -77,7 +77,7 @@ class CrudTest extends TestCase
         $data = [
             'name' => 'test-host-spec',
             'cpu_sockets' => 2,
-            'cpu_type' => "E5-2643 v3",
+            'cpu_type' => 'E5-2643 v3',
             'cpu_cores' => 6,
             'cpu_clock_speed' => 4000,
             'ram_capacity' => 64,

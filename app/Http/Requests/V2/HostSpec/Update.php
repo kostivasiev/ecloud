@@ -6,9 +6,6 @@ use UKFast\FormRequests\FormRequest;
 
 class Update extends FormRequest
 {
-    /**
-     * @return array
-     */
     public function rules()
     {
         return [
@@ -43,13 +40,5 @@ class Update extends FormRequest
                 'integer'
             ]
         ];
-    }
-
-    /**
-     * @return array
-     */
-    public function messages()
-    {
-        return [];
     }
 }

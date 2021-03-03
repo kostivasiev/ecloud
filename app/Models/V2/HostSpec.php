@@ -67,11 +67,11 @@ class HostSpec extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('cpu_sockets', Filter::$stringDefaults),
+            $factory->create('cpu_sockets', Filter::$numericDefaults),
             $factory->create('cpu_type', Filter::$stringDefaults),
-            $factory->create('cpu_cores', Filter::$stringDefaults),
-            $factory->create('cpu_clock_speed', Filter::$stringDefaults),
-            $factory->create('ram_capacity', Filter::$stringDefaults),
+            $factory->create('cpu_cores', Filter::$numericDefaults),
+            $factory->create('cpu_clock_speed', Filter::$numericDefaults),
+            $factory->create('ram_capacity', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];

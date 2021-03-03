@@ -6,19 +6,6 @@ use UKFast\FormRequests\FormRequest;
 
 class Create extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
-    /**
-     * @return array
-     */
     public function rules()
     {
         return [
@@ -57,13 +44,5 @@ class Create extends FormRequest
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
             ]
         ];
-    }
-
-    /**
-     * @return array
-     */
-    public function messages()
-    {
-        return [];
     }
 }

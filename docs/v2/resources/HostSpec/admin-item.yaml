@@ -34,7 +34,7 @@ patch:
     - Host Spec
 
 delete:
-  description: Disable support for a VPC
+  description: Delete a host spec
   parameters:
     - $ref: '../../resources/HostSpec/schema.yaml'
   responses:
