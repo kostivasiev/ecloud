@@ -299,6 +299,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
     });
 
+    /** Host */
+    $router->group([], function () use ($router) {
+        $router->get('hosts', 'HostController@index');
+        $router->get('hosts/{id}', 'HostController@show');
+        $router->post('hosts', 'HostController@store');
+        $router->patch('hosts/{id}', 'HostController@update');
+        $router->delete('hosts/{id}', 'HostController@destroy');
+    });
+
     /** Host Group */
     $router->group([], function () use ($router) {
         $router->get('host-groups', 'HostGroupController@index');
