@@ -5,6 +5,7 @@ namespace App\Traits\V2;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\HostGroup;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
@@ -47,6 +48,7 @@ trait Syncable
             FirewallPolicy::class,
             Volume::class,
             NetworkPolicy::class,
+            HostGroup::class,
         ])) {
             return parent::save($options);
         }
