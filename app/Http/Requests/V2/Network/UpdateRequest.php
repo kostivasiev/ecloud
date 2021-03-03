@@ -38,7 +38,6 @@ class UpdateRequest extends FormRequest
             'name' => 'sometimes|required|string',
             'subnet' => [
                 'sometimes',
-                'nullable',
                 'string',
                 new ValidCidrSubnet(),
                 new isPrivateSubnet(),
