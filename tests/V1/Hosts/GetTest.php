@@ -5,7 +5,7 @@ namespace Tests\V1\Hosts;
 use App\Models\V1\Host;
 use App\Models\V1\Solution;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {

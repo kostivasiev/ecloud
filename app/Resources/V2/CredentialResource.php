@@ -15,6 +15,7 @@ use UKFast\Responses\UKFastResource;
  * @property string user
  * @property string password
  * @property string port
+ * @property boolean is_hidden
  * @property string created_at
  * @property string updated_at
  */
@@ -35,7 +36,9 @@ class CredentialResource extends UKFastResource
             'password' => $this->password,
             'port' => $this->port
         ];
-
+        if ($request->user()->isAdmin()) {
+            $data['is_hidden'] = $this->is_hidden;
+        }
         $tz = new \DateTimeZone(config('app.timezone'));
         $data['created_at'] = $this->created_at === null ? null : Carbon::parse($this->created_at, $tz)->toIso8601String();
         $data['updated_at'] = $this->updated_at === null ? null : Carbon::parse($this->updated_at, $tz)->toIso8601String();

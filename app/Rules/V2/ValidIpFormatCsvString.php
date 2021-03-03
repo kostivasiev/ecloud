@@ -18,6 +18,10 @@ class ValidIpFormatCsvString implements Rule
      */
     public function passes($attribute, $value)
     {
+        if (empty($value)) {
+            return false;
+        }
+
         $valueArray = explode(',', $value);
 
         foreach ($valueArray as $valueItem) {

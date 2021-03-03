@@ -12,4 +12,5 @@ class Data
     public $requires_floating_ip;
     public $appliance_data;
     public $user_script;
+    public $iops;
 }

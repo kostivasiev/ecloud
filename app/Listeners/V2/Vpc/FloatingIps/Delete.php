@@ -11,7 +11,7 @@ class Delete
     public function handle(Deleted $event)
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
-        $vpc = Vpc::withTrashed()->findOrFail($event->model->getKey());
+        $vpc = Vpc::withTrashed()->findOrFail($event->model->id);
         $vpc->floatingIps()->each(function ($floatingIp) {
             $floatingIp->delete();
         });

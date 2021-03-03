@@ -15,7 +15,7 @@ class UpdateTest extends TestCase
     use DatabaseMigrations;
 
     protected $faker;
-    protected $availability_zone;
+    protected $availabilityZone;
     protected $region;
     protected $vpc;
     protected $dhcp;
@@ -27,29 +27,30 @@ class UpdateTest extends TestCase
         $this->region = factory(Region::class)->create([
             'name' => $this->faker->country(),
         ]);
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->dhcp = factory(Dhcp::class)->create([
             'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
                 'vpc_id' => $this->vpc->id,
             ],
             []
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);
@@ -58,7 +59,7 @@ class UpdateTest extends TestCase
     public function testNullNameIsDenied()
     {
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
                 'vpc_id' => '',
             ],
@@ -80,12 +81,12 @@ class UpdateTest extends TestCase
     {
         $vpc2 = factory(Vpc::class)->create([
             'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
-                'vpc_id' => $vpc2->getKey(),
+                'vpc_id' => $vpc2->id,
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -107,7 +108,7 @@ class UpdateTest extends TestCase
             'vpc_id' => $this->vpc->id,
         ];
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -115,7 +116,7 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(200);
 
-        $dhcp = Dhcp::findOrFail($this->dhcp->getKey());
+        $dhcp = Dhcp::findOrFail($this->dhcp->id);
         $this->assertEquals($data['vpc_id'], $this->dhcp->vpc_id);
     }
 }

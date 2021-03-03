@@ -11,13 +11,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Exceptions\NotFoundException;
 
-class Appliance extends Model
+class Appliance extends V1ModelWrapper
 {
     use ColumnPrefixHelper, UUIDHelper, SoftDeletes;
 
     protected $connection = 'ecloud';
     protected $table = 'appliance';
     protected $primaryKey = 'appliance_uuid';
+    protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = true;
 

@@ -1,0 +1,42 @@
+get:
+  parameters:
+    - $ref: '../../resources/NetworkRulePort/parameters/networkRulePortId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/networkRulePort.yaml'
+              meta:
+                type: object
+  tags:
+    - Network Rule Ports
+patch:
+  parameters:
+    - $ref: '../../resources/NetworkRulePort/parameters/networkRulePortId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/networkRulePort.yaml'
+  responses:
+    200:
+      $ref: '../../resources/NetworkRulePort/responses/idResponse.yaml'
+  tags:
+    - Network Rule Ports
+delete:
+  parameters:
+    - $ref: '../../resources/NetworkRulePort/parameters/networkRulePortId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Network Rule Ports
+

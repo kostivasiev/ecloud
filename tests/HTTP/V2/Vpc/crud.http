@@ -21,6 +21,23 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 ###
 
+###
+GET https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  2-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+###
+
+GET https://{{host}}/{{version}}/vpcs/vpc-d94538dc
+X-consumer-custom-id:  2-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+###
+
+PATCH https://{{host}}/{{version}}/vpcs/vpc-d94538dc
+Content-Type:  application/json
+###
+
 
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*

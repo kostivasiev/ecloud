@@ -2,14 +2,8 @@
 
 namespace Tests\V2\Volume;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Region;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
 use App\Rules\V2\VolumeCapacityIsGreater;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -18,54 +12,99 @@ class CapacityIncreaseTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $availabilityZone;
-    protected $instance;
-    protected $region;
-    protected $volume;
-    protected $vpc;
+    private $volume;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
+        // Initial create
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-test',
+                        'sizeGiB' => '100',
+                        'shared' => false,
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'uuid' => 'uuid-test-uuid-test-uuid-test',
+                ]));
+            });
+
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'iops' => '300',
+            'capacity' => '100',
         ]);
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'name' => 'GetTest Default',
-        ]);
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('put')
-            ->withArgs(['/api/v2/vpc/'.$this->vpc->getKey().'/instance/'.$this->instance->getKey().'/volume/'.
-                        $this->volume->vmware_uuid.'/size'])
-            ->andReturn(
-                new Response(200)
-            );
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
     }
 
     public function testIncreaseSize()
     {
-        $this->patch(
-            '/v2/volumes/'.$this->volume->getKey(),
-            [
-                'capacity' => 200,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups'    => 'ecloud.write',
-            ]
-        )->assertResponseStatus(200);
+        // Capacity change to 200 fired from the test
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '200',
+                    ],
+                ],
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        // Attach
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'volumes' => []
+                ]));
+            });
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
+                [
+                    'json' => [
+                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        // Post Attach IOPS update
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
+                [
+                    'json' => [
+                        'limit' => '300',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $this->volume->instances()->attach($this->instance());
+
+        $this->patch('v2/volumes/vol-test', [
+            'capacity' => 200,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(200);
     }
 
     public function testValidationRule()

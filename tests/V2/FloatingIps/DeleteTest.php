@@ -23,13 +23,13 @@ class DeleteTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->delete(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->id,
             [],
             []
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);
@@ -56,7 +56,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/floating-ips/' . $this->floatingIp->getKey(),
+            '/v2/floating-ips/' . $this->floatingIp->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -64,7 +64,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $resource = FloatingIp::withTrashed()->findOrFail($this->floatingIp->getKey());
+        $resource = FloatingIp::withTrashed()->findOrFail($this->floatingIp->id);
         $this->assertNotNull($resource->deleted_at);
     }
 }

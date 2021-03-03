@@ -2,9 +2,7 @@
 
 namespace App\Models\V2;
 
-use Illuminate\Database\Eloquent\Model;
-
-class ProductPrice extends Model
+class ProductPrice extends V1ModelWrapper
 {
     protected $connection = 'reseller';
     protected $table = 'product_price';

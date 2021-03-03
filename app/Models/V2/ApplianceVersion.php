@@ -7,17 +7,17 @@ namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Admin\Devices\AdminClient;
 
-class ApplianceVersion extends Model
+class ApplianceVersion extends V1ModelWrapper
 {
     use ColumnPrefixHelper, UUIDHelper, SoftDeletes;
 
     protected $connection = 'ecloud';
     protected $table = 'appliance_version';
     protected $primaryKey = 'appliance_version_uuid';
+    protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = true;
 

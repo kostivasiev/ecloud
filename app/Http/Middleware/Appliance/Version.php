@@ -23,7 +23,7 @@ class Version
         $version = ApplianceVersion::findOrFail($request->appliance_version_uuid);
         if ($version->active != 'Yes' ||
             $version->appliance->active != 'Yes' ||
-            (!$request->user->isAdministrator && $version->appliance->is_public != 'Yes')
+            (!$request->user()->isAdmin() && $version->appliance->is_public != 'Yes')
         ) {
             abort(Response::HTTP_NOT_FOUND, self::ERROR_CANT_FIND_APPLIANCE_VERSION);
         }

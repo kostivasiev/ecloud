@@ -31,7 +31,7 @@ class Deploy extends Job
             [
                 'json' => [
                     'id' => $this->model->id,
-                    'display_name' => $this->model->name,
+                    'display_name' => $this->model->id,
                     'description' => $this->model->name,
                     'sequence_number' => $this->model->sequence,
                     'rules' => $this->model->firewallRules->map(function ($rule) use ($router) {
@@ -39,30 +39,32 @@ class Deploy extends Job
                             'action' => $rule->action,
                             'resource_type' => 'Rule',
                             'id' => $rule->id,
-                            'display_name' => $rule->name,
+                            'display_name' => $rule->id,
                             'sequence_number' => $rule->sequence,
                             'sources_excluded' => false,
                             'destinations_excluded' => false,
-                            'source_groups' => empty($rule->source) ? ['ANY'] : explode(',', $rule->source),
-                            'destination_groups' => empty($rule->source) ? ['ANY'] : explode(',', $rule->destination),
+                            'source_groups' => explode(',', $rule->source),
+                            'destination_groups' => explode(',', $rule->destination),
                             'services' => [
                                 'ANY'
                             ],
                             'service_entries' => $rule->firewallRulePorts->map(function ($port) {
                                 if ($port->protocol == 'ICMPv4') {
                                     return [
-                                        'id' => $port->getKey(),
+                                        'id' => $port->id,
                                         'icmp_type' => FirewallRulePort::ICMP_MESSAGE_TYPE_ECHO_REQUEST,
                                         'resource_type' => 'ICMPTypeServiceEntry',
                                         'protocol' => 'ICMPv4',
                                     ];
                                 }
                                 return [
-                                    'id' => $port->getKey(),
+                                    'id' => $port->id,
                                     'l4_protocol' => $port->protocol,
                                     'resource_type' => 'L4PortSetServiceEntry',
-                                    'source_ports' => empty($port->source) ? [] : explode(',', $port->source),
-                                    'destination_ports' => empty($port->destination) ?
+                                    'source_ports' => $port->source == 'ANY' ?
+                                        [] :
+                                        explode(',', $port->source),
+                                    'destination_ports' => $port->destination == 'ANY' ?
                                         [] :
                                         explode(',', $port->destination),
                                 ];

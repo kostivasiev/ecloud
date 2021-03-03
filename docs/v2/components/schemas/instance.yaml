@@ -53,6 +53,10 @@ properties:
     required: false
     type: integer
     example: 50
+  volume_iops:
+    required: false
+    type: integer
+    example: 300
   sync:
     type: string
     example: 'completed'

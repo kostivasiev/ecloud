@@ -34,10 +34,10 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
@@ -48,7 +48,7 @@ class CreateTest extends TestCase
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->id,
             'appliance_version_id' => $this->applianceVersion->uuid,
-            'availability_zone_id' => $this->availability_zone->getKey(),
+            'availability_zone_id' => $this->availability_zone->id,
         ]);
         $mockAdminDevices = \Mockery::mock(AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
@@ -65,11 +65,12 @@ class CreateTest extends TestCase
     {
         // No name defined - defaults to ID
         $this->post('/v2/instances', [
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'appliance_id' => $this->appliance->uuid,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'volume_iops' => 600,
             'backup_enabled' => true,
         ], [
             'X-consumer-custom-id' => '0-0',
@@ -95,11 +96,12 @@ class CreateTest extends TestCase
             '/v2/instances',
             [
                 'name' => $name,
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc->id,
                 'appliance_id' => $this->appliance->uuid,
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
+                'volume_iops' => 600,
                 'backup_enabled' => true,
             ],
             [
@@ -126,11 +128,12 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/instances',
             [
-                'vpc_id' => $this->vpc->getKey(),
+                'vpc_id' => $this->vpc->id,
                 'appliance_id' => $this->appliance->uuid,
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
+                'volume_iops' => 600,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -148,11 +151,12 @@ class CreateTest extends TestCase
     {
         // No name defined - defaults to ID
         $data = [
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'appliance_id' => $this->appliance->uuid,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'volume_iops' => 600,
         ];
         $this->post(
             '/v2/instances',
@@ -173,12 +177,13 @@ class CreateTest extends TestCase
     public function testApplianceSpecDefaultConfigFallbacks()
     {
         $data = [
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'appliance_id' => $this->appliance->uuid,
             'network_id' => $this->network->id,
             'vcpu_cores' => 11,
             'ram_capacity' => 512,
-            'volume_capacity' => 10
+            'volume_capacity' => 10,
+            'volume_iops' => 600,
         ];
 
         $this->post(
@@ -219,12 +224,13 @@ class CreateTest extends TestCase
         ]);
 
         $data = [
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'appliance_id' => $this->appliance->uuid,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
-            'volume_capacity' => 30
+            'volume_capacity' => 30,
+            'volume_iops' => 600,
         ];
 
         $this->post(
@@ -252,12 +258,13 @@ class CreateTest extends TestCase
         ]);
 
         $data = [
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'appliance_id' => $this->appliance->uuid,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
-            'volume_capacity' => 30
+            'volume_capacity' => 30,
+            'volume_iops' => 600,
         ];
 
         $this->post(
@@ -285,12 +292,13 @@ class CreateTest extends TestCase
         ]);
 
         $data = [
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'appliance_id' => $this->appliance->uuid,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
-            'volume_capacity' => 30
+            'volume_capacity' => 30,
+            'volume_iops' => 600,
         ];
 
         $this->post(

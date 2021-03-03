@@ -4,7 +4,7 @@ namespace Tests\V1\Pods;
 
 use App\Models\V1\Pod;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {
@@ -117,7 +117,7 @@ class GetTest extends TestCase
 
         $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
+            'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeStatusCode(200)
             ->seeJson([
@@ -182,7 +182,7 @@ class GetTest extends TestCase
 
         $this->json('GET', '/v1/pods/123', [], [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
+            'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeStatusCode(200)
             ->seeJson([

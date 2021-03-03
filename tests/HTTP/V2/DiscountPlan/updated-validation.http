@@ -1,0 +1,303 @@
+###
+# Set some default variables
+GET https://{{host}}/{{version}}/discount-plans
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+var theDate = new Date();
+var first_day_of_month = new Date(theDate.getFullYear(), theDate.getMonth(), 1).toISOString().replace(/T/, ' ').replace(/\..+/, '');
+var second_of_last_month = new Date(theDate.getFullYear(), theDate.getMonth() - 1, 2);
+var today = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() - 1);
+var yesterday = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() + 3);
+var day_after_tomorrow = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() + 1);
+var two_days_from_now = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() + 1);
+var three_days_from_now = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() + 27);
+var a_month_from_now = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+client.global.set('today', today);
+client.global.set('day_after_tomorrow', day_after_tomorrow);
+client.global.set('first_day_of_month', first_day_of_month);
+client.global.set('term_start_date', today);
+client.global.set('term_end_date', day_after_tomorrow);
+client.global.set('yesterday', yesterday);
+client.global.set('two_days_from_now', two_days_from_now);
+client.global.set('three_days_from_now', three_days_from_now);
+client.global.set('a_month_from_now', a_month_from_now);
+client.global.set('second_of_last_month', second_of_last_month);
+client.log('today = ' + today);
+client.log('day_after_tomorrow = ' + day_after_tomorrow);
+client.log('term_start_date = ' + today);
+client.log('term_end_date = ' + day_after_tomorrow);
+client.log('yesterday = ' + yesterday);
+client.log('two_days_from_now = ' + two_days_from_now);
+client.log('three_days_from_now = ' + three_days_from_now);
+client.log('a_month_from_now = ' + a_month_from_now);
+client.log('second_of_last_month = ' + second_of_last_month);
+%}
+
+###
+# I am an admin user - I create a plan with any start date - the plan is created
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{three_days_from_now}}",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am an admin user - I create a plan with any start date - the plan is created', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('discount_plan_id_1', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+
+###
+# I am an admin user - I create a plan with the status set to approved - the plan is created
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "name": "test-commitment",
+    "status": "approved",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{three_days_from_now}}",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am an admin user - I create a plan with the status set to approved - the plan is created', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('discount_plan_id_2', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+
+###
+# I am an admin user - I create a plan without reseller scoping the request - the plan is rejected
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "name": "test-commitment",
+    "status": "approved",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{three_days_from_now}}",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am an admin user - I create a plan without reseller scoping the request - the plan is rejected', function () {
+    client.assert(response.status === 422, '422 Response not received');
+});
+%}
+
+###
+# I am an admin user - I update a plan with any start date - the plan is updated
+PATCH https://{{host}}/{{version}}/discount-plans/{{discount_plan_id_1}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "term_start_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am an admin user - I update a plan with any start date - the plan is updated', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+###
+# I am a standard user - I create a plan with a start date of today - the plan is created
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{today}}",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am a standard user - I create a plan with a start date of today - the plan is created', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('discount_plan_id_3', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+
+###
+# I am a standard user - I create a plan with a start date after today - the plan is created
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{day_after_tomorrow}}",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am a standard user - I create a plan with a start date of today - the plan is created', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('discount_plan_id_4', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+
+###
+# I am a standard user - I create a plan with a start date of the first of the current month - the plan is created
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{first_day_of_month}}",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am a standard user - I create a plan with a start date of the first of the current month - the plan is created', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('discount_plan_id_5', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+
+###
+# I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is rejected
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "{{second_of_last_month}}",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is created', function () {
+    client.assert(response.status === 422, '422 Response not received');
+});
+%}
+
+###
+# I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is rejected
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_length": 24,
+    "term_start_date": "2021-02-02 00:00:00",
+    "term_end_date": "{{a_month_from_now}}"
+}
+
+> {%
+client.test('I am a standard user - I create a plan with a start date in the past AND not the first of the current month - the plan is created', function () {
+    client.assert(response.status === 422, '422 Response not received');
+});
+%}
+
+###
+# CLEANUP
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id_1}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+###
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id_2}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+###
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id_3}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+###
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id_4}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+###
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id_5}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

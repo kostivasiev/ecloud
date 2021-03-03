@@ -10,6 +10,7 @@ use App\Models\V2\Nic;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -39,7 +40,7 @@ class NetworkController extends BaseController
                     $request->query->remove('vpc_id:eq');
                 }
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || $network->router->vpc_id != $vpcId;
                     })
@@ -50,7 +51,7 @@ class NetworkController extends BaseController
                 $vpcId = $request->get('vpc_id:neq');
                 $request->query->remove('vpc_id:neq');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || $network->router->vpc_id == $vpcId;
                     })
@@ -61,7 +62,7 @@ class NetworkController extends BaseController
                 $vpcId = $request->get('vpc_id:lk');
                 $request->query->remove('vpc_id:lk');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || strpos($network->router->vpc_id, $vpcId) === false;
                     })
@@ -72,7 +73,7 @@ class NetworkController extends BaseController
                 $vpcId = $request->get('vpc_id:nlk');
                 $request->query->remove('vpc_id:nlk');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
                         return !$network->router || strpos($network->router->vpc_id, $vpcId) !== false;
                     })
@@ -83,7 +84,7 @@ class NetworkController extends BaseController
                 $ids = explode(',', $request->get('vpc_id:in'));
                 $request->query->remove('vpc_id:in');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($ids) {
                         return !$network->router || !in_array($network->router->vpc_id, $ids);
                     })
@@ -94,7 +95,7 @@ class NetworkController extends BaseController
                 $ids = explode(',', $request->get('vpc_id:nin'));
                 $request->query->remove('vpc_id:nin');
 
-                $networkIds = Network::forUser($request->user)->get()
+                $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($ids) {
                         return !$network->router || in_array($network->router->vpc_id, $ids);
                     })
@@ -104,7 +105,7 @@ class NetworkController extends BaseController
             }
             $collection = Network::whereIn('id', $networkIds);
         } else {
-            $collection = Network::forUser($request->user);
+            $collection = Network::forUser($request->user());
         }
 
         $queryTransformer->config(Network::class)
@@ -123,7 +124,7 @@ class NetworkController extends BaseController
     public function show(Request $request, string $networkId)
     {
         return new NetworkResource(
-            Network::forUser($request->user)->findOrFail($networkId)
+            Network::forUser($request->user())->findOrFail($networkId)
         );
     }
 
@@ -140,7 +141,7 @@ class NetworkController extends BaseController
         ]));
         $network->save();
         $network->refresh();
-        return $this->responseIdMeta($request, $network->getKey(), 201);
+        return $this->responseIdMeta($request, $network->id, 201);
     }
 
     /**
@@ -150,48 +151,39 @@ class NetworkController extends BaseController
      */
     public function update(UpdateRequest $request, string $networkId)
     {
-        $network = Network::forUser(app('request')->user)->findOrFail($networkId);
+        $network = Network::forUser(Auth::user())->findOrFail($networkId);
         $network->fill($request->only([
             'router_id',
             'name',
-            'subnet',
         ]));
         if (!$network->save()) {
             return $network->getSyncError();
         }
-        return $this->responseIdMeta($request, $network->getKey(), 200);
+        return $this->responseIdMeta($request, $network->id, 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $networkId
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function destroy(Request $request, string $networkId)
     {
-        $model = Network::forUser($request->user)->findOrFail($networkId);
+        $model = Network::forUser($request->user())->findOrFail($networkId);
 
         if (!$model->canDelete()) {
             return $model->getDeletionError();
         }
-
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 
     /**
      * @param \Illuminate\Http\Request $request
      * @param QueryTransformer $queryTransformer
-     * @param string $zoneId
+     * @param string $networkId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function nics(Request $request, QueryTransformer $queryTransformer, string $networkId)
     {
-        $collection = Network::forUser($request->user)->findOrFail($zoneId)->nics();
+        $collection = Network::forUser($request->user())->findOrFail($networkId)->nics();
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 

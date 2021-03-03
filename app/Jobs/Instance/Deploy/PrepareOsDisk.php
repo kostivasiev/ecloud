@@ -41,23 +41,33 @@ class PrepareOsDisk extends Job
             $volume->vpc()->associate($instance->vpc);
             $volume->availability_zone_id = $instance->availability_zone_id;
             $volume->capacity = $this->data['volume_capacity'];
+            $volume->iops = $this->data['volume_iops'];
             $volume->vmware_uuid = $volumeData->uuid;
             $volume->save();
-            $volume->instances()->attach($instance);
 
-            Log::info(get_class($this) . ' : Created volume resource ' . $volume->getKey() . ' for volume ' . $volume->vmware_uuid);
+            Log::info(get_class($this) . ' : Created volume resource ' . $volume->id . ' for volume ' . $volume->vmware_uuid);
 
             // Send created Volume ID's to Kinpin
             $instance->availabilityZone->kingpinService()->put(
                 '/api/v1/vpc/' . $this->data['vpc_id'] . '/volume/' . $volume->vmware_uuid . '/resourceid',
                 [
                     'json' => [
-                        'volumeId' => $volume->getKey()
+                        'volumeId' => $volume->id
                     ]
                 ]
             );
 
-            Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->getKey());
+            // Update the volume iops
+            $volume->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/iops',
+                [
+                    'json' => [
+                        'limit' => $volume->iops
+                    ]
+                ]
+            );
+
+            Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->id);
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

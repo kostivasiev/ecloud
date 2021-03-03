@@ -4,8 +4,8 @@ namespace App\Http\Requests\V2\FirewallRule;
 
 use App\Models\V2\FirewallPolicy;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ValidIpFormatCsvString;
-use App\Rules\V2\ValidPortReference;
+use App\Rules\V2\ValidFirewallRulePortSourceDestination;
+use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
 
 class Create extends FormRequest
@@ -25,8 +25,6 @@ class Create extends FormRequest
      */
     public function rules()
     {
-        $firewallPortRules = (new \App\Http\Requests\V2\FirewallRulePort\Create)->rules();
-
         return [
             'name' => 'nullable|string|max:50',
             'sequence' => 'required|integer',
@@ -37,14 +35,14 @@ class Create extends FormRequest
                 new ExistsForUser(FirewallPolicy::class)
             ],
             'source' => [
-                'nullable',
+                'required',
                 'string',
-                new ValidIpFormatCsvString()
+                new ValidFirewallRuleSourceDestination()
             ],
             'destination' => [
-                'nullable',
+                'required',
                 'string',
-                new ValidIpFormatCsvString()
+                new ValidFirewallRuleSourceDestination()
             ],
             'action' => 'required|string|in:ALLOW,DROP,REJECT',
             'direction' => 'required|string|in:IN,OUT,IN_OUT',
@@ -54,9 +52,21 @@ class Create extends FormRequest
                 'required',
                 'array'
             ],
-            'ports.*.protocol' => $firewallPortRules['protocol'],
-            'ports.*.source' => $firewallPortRules['source'],
-            'ports.*.destination' => $firewallPortRules['destination']
+            'ports.*.protocol' => [
+                'required',
+                'string',
+                'in:TCP,UDP,ICMPv4'
+            ],
+            'ports.*.source' => [
+                'required_if:ports.*.protocol,TCP,UDP',
+                'string',
+                new ValidFirewallRulePortSourceDestination()
+            ],
+            'ports.*.destination' => [
+                'required_if:ports.*.protocol,TCP,UDP',
+                'string',
+                new ValidFirewallRulePortSourceDestination()
+            ]
         ];
     }
 

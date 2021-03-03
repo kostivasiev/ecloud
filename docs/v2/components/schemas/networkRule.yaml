@@ -1,0 +1,45 @@
+properties:
+  id:
+    type: string
+    example: nr-abc123xyz
+    readOnly: true
+  name:
+    type: string
+    example: 'Network Rule'
+    readOnly : false
+  network_policy_id :
+    writeOnly : true
+    type : string
+    example : 'nr-abc123xyz'
+    readOnly : false
+  sequence:
+    type: integer
+    required: true
+    example: 1
+    readOnly: false
+  source:
+    description: '"ANY" or comma separated list of IPv4, CIDR subnets and/or range boundaries'
+    type: string
+    required: true
+    example: '1.1.1.1'
+    readOnly: false
+  destination:
+    description: '"ANY" or comma separated list of IPv4, CIDR subnets and/or range boundaries'
+    type: string
+    required: true
+    example: '2.2.2.2'
+    readOnly: false
+  enabled:
+    type: boolean
+    required: true
+    readOnly: false
+    example: true
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Network Rule'

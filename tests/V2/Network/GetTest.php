@@ -26,8 +26,8 @@ class GetTest extends TestCase
             []
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);
@@ -59,7 +59,7 @@ class GetTest extends TestCase
             'name' => 'Manchester Network',
         ]);
         $this->get(
-            '/v2/networks/' . $network->getKey(),
+            '/v2/networks/' . $network->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
