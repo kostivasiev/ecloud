@@ -11,6 +11,7 @@ use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
+use App\Models\V2\Appliance;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
@@ -26,6 +27,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -72,6 +74,7 @@ class InstanceController extends BaseController
     /**
      * @param CreateRequest $request
      * @return JsonResponse
+     * @throws ValidationException
      */
     public function store(CreateRequest $request)
     {
