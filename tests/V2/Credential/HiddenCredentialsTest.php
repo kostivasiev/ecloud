@@ -9,7 +9,6 @@ use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -52,14 +51,6 @@ class HiddenCredentialsTest extends TestCase
             'platform' => 'Linux',
             'availability_zone_id' => $this->availabilityZone->id
         ]);
-
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            return $mockEncryptionServiceProvider;
-        });
-        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('password');
 
         $this->credentials = factory(Credential::class)->create([
             'resource_id' => 'abc-abc132',

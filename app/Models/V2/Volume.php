@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Volume\Created;
+use App\Events\V2\Volume\Creating;
 use App\Events\V2\Volume\Deleted;
 use App\Events\V2\Volume\Saved;
 use App\Events\V2\Volume\Saving;
@@ -19,13 +20,6 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-/**
- * Class Volume
- * @package App\Models\V2
- * @method static find(string $routerId)
- * @method static findOrFail(string $routerUuid)
- * @method static forUser(string $user)
- */
 class Volume extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable;
@@ -46,6 +40,7 @@ class Volume extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
+        'creating' => Creating::class,
         'created' => Created::class,
         'deleted' => Deleted::class,
         'saving' => Saving::class,
@@ -64,7 +59,7 @@ class Volume extends Model implements Filterable, Sortable
 
     public function instances()
     {
-        return $this->belongsToMany(Instance::class);
+        return $this->belongsToMany(Instance::class)->using(InstanceVolume::class);
     }
 
     /**
