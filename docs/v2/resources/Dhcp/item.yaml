@@ -29,10 +29,11 @@ patch:
             - type: object
               properties:
                 vpc_id:
-                  required: false
                   readOnly: true
-#                availability_zone_id:
-#                  required: false
+                availability_zone_id:
+                  readOnly : true
+  tags :
+    - Dhcps
 delete:
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
