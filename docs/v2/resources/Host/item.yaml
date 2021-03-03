@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../resources/HostGroup/parameters/id.yaml'
+    - $ref: '../../resources/Host/parameters/id.yaml'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../resources/HostGroup/schema.yaml'
+                $ref: '../../resources/Host/schema.yaml'
               meta:
                 type: object
   tags:
-    - Host Groups
+    - Hosts
 patch:
   parameters:
-    - $ref: '../../resources/HostGroup/parameters/id.yaml'
+    - $ref: '../../resources/Host/parameters/id.yaml'
   requestBody:
     required: true
     content:
@@ -25,26 +25,22 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../resources/HostGroup/schema.yaml'
+            - $ref: '../../resources/Host/schema.yaml'
             - type : object
               properties :
-                availability_zone_id :
-                  readOnly : true
-                vpc_id :
-                  readOnly : true
-                host_spec_id :
+                host_group_id :
                   readOnly : true
   responses:
     200:
-      $ref: '../../resources/HostGroup/responses/idResponse.yaml'
+      $ref: '../../resources/Host/responses/idResponse.yaml'
   tags:
-    - Host Groups
+    - Hosts
 delete:
   parameters:
-    - $ref: '../../resources/HostGroup/parameters/id.yaml'
+    - $ref: '../../resources/Host/parameters/id.yaml'
   responses:
     204:
       description: Success
   tags:
-    - Host Groups
+    - Hosts
 
