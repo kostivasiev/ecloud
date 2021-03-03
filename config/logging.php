@@ -106,8 +106,32 @@ return [
 
         'staging' => [
             'driver' => 'stack',
-            'channels' => ['single', 'ukfastjson'],
+            'channels' => ['elasticsearch', 'single', 'ukfastjson'],
             'ignore_exceptions' => true,
         ],
+
+        'elasticsearch' => [
+            'driver' => 'monolog',
+            'level' => 'debug',
+            'handler' => \Monolog\Handler\ElasticSearchHandler::class,
+            'handler_with' => [
+                'client' => new \Elastica\Client([
+                    'url' => env('ELASTICSEARCH_URL'),
+                    'username' => env('ELASTICSEARCH_USERNAME'),
+                    'password' => env('ELASTICSEARCH_PASSWORD'),
+                    'log' => false,
+                ]),
+                'options' => [
+                    'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon::now()->format('-Y-m-d'),
+                    'type' => env('ELASTICSEARCH_TYPE'),
+                ],
+            ],
+            'formatter' => \Monolog\Formatter\ElasticaFormatter::class,
+            'formatter_with' => [
+                'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon::now()->format('-Y-m-d'),
+                'type' => env('ELASTICSEARCH_TYPE'),
+            ],
+        ],
+    ],
     ],
 ];
