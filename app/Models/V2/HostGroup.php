@@ -34,7 +34,7 @@ class HostGroup extends Model implements Filterable, Sortable
             'name',
             'vpc_id',
             'availability_zone_id',
-            'host_spec_id'
+            'host_spec_id',
         ]);
 
         parent::__construct($attributes);
