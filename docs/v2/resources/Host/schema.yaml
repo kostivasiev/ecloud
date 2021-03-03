@@ -12,7 +12,7 @@ properties:
     type: string
     required: true
     description : The host group to use with this host
-    example: hs-4c63cf58
+    example: hg-4c63cf58
     readOnly: false
   created_at:
     type: string
