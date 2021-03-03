@@ -132,50 +132,6 @@ class InstanceController extends BaseController
         return $this->responseIdMeta($request, $instance->id, 201);
     }
 
-//    /**
-//     * @param $request
-//     * @return bool
-//     * @throws ValidationException
-//     */
-    public function validateApplianceData($request): bool
-    {
-//        $scriptRules = [];
-//        if ($request->has('appliance_id')) {
-//            // So, we need to retrieve the validation rules
-//            $parameters = (Appliance::findOrFail($request->get('appliance_id')))
-//                ->getScriptParameters();
-//            foreach ($parameters as $parameterKey => $parameter) {
-//                $key = 'appliance_data.' . $parameterKey;
-//                $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
-//                //validation rules regex
-//                if (!empty($parameters[$parameterKey]->appliance_script_parameters_validation_rule)) {
-//                    $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->appliance_script_parameters_validation_rule;
-//                }
-//
-//                // For data types String,Numeric,Boolean we can use Laravel validation
-//                switch ($parameters[$parameterKey]->appliance_script_parameters_type) {
-//                    case 'String':
-//                    case 'Numeric':
-//                    case 'Boolean':
-//                        $scriptRules[$key][] = strtolower($parameters[$parameterKey]->appliance_script_parameters_type);
-//                        break;
-//                    case 'Password':
-//                        $scriptRules[$key][] = 'string';
-//                }
-//            }
-//            $messages = [
-//                'required' => 'The :attribute is required',
-//                'string' => 'The :attribute must be a valid string',
-//                'numeric' => 'The :attribute must be a numeric value',
-//                'boolean' => 'The :attribute must be a boolean (true/false) value',
-//                'regex' => 'The :attribute does not validate against the regular expression pattern',
-//            ];
-//
-            $this->validate($request, $scriptRules, $messages);
-//        }
-//        return true;
-    }
-
     /**
      * @param UpdateRequest $request
      * @param string $instanceId
