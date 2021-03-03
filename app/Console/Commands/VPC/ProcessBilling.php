@@ -42,6 +42,15 @@ class ProcessBilling extends Command
         'disk.capacity.600',
         'disk.capacity.1200',
         'disk.capacity.2500',
+        'throughput.20Mb',
+        'throughput.50Mb',
+        'throughput.100Mb',
+        'throughput.250Mb',
+        'throughput.500Mb',
+        'throughput.1Gb',
+        'throughput.2.5Gb',
+        'throughput.5Gb',
+        'throughput.10Gb',
     ];
 
     public function __construct()
