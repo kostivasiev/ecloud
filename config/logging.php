@@ -99,9 +99,9 @@ return [
         ],
 
         'ukfast' => [
-            'driver' => 'stack',
-            'channels' => ['elasticsearch', 'single'],
-            'ignore_exceptions' => true,
+            'driver' => 'single',
+            'path' => storage_path('logs/lumen.log'),
+            'formatter' => \UKFast\Logging\JsonFormatter::class,
         ],
 
         'staging' => [
@@ -133,5 +133,4 @@ return [
             ],
         ],
     ],
-
 ];
