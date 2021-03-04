@@ -17,14 +17,17 @@ use App\Models\V2\Nic;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
+use App\Resources\V2\ErrorResponse;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\VolumeResource;
+use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -305,5 +308,102 @@ class InstanceController extends BaseController
         $instance->save();
 
         return response('', 204);
+    }
+
+    public function consoleSession(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+        if (!$this->isAdmin && $instance->locked) {
+            return ErrorResponse::create(
+                'Forbidden',
+                'Console access to this instance is not available',
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $instance->availabilityZone
+            ->kingpinService()
+            ->post(
+                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/console/session'
+            );
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::info(
+                __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console session',
+                ['instance' => $instance]
+            );
+            return ErrorResponse::create(
+                'Bad Gateway',
+                'Console access to this instance is not available',
+                $response->getStatusCode()
+            );
+        }
+        $json = json_decode($response->getBody()->getContents());
+        $host = $json->host ?? null;
+        $ticket = $json->ticket ?? null;
+
+        // Get Credentials
+        $consoleResource = $instance->availabilityZone->credentials()
+            ->where('username', 'envoyapi')
+            ->first();
+        if (!$consoleResource) {
+            Log::info(
+                __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console credentials',
+                ['instance' => $instance]
+            );
+            return ErrorResponse::create(
+                'Upstream API Failure',
+                'Console access is not available due to an upstream api failure',
+                Response::HTTP_SERVICE_UNAVAILABLE
+            );
+        }
+
+        try {
+            $client = app()->make(Client::class, [
+                'base_uri' => $consoleResource->host,
+                'verify' => app()->environment() === 'production',
+                'headers' => [
+                    'X-API-Authentication' => $consoleResource->password,
+                ],
+            ]);
+            $response = $client->post('/session', [
+                \GuzzleHttp\RequestOptions::JSON => [
+                    'host' => $host,
+                    'ticket' => $ticket,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            $response = response('', Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::info(
+                __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve session from host',
+                [
+                    'data' => [
+                        'instance' => $instance,
+                        'host' => $consoleResource->host,
+                    ]
+                ]
+            );
+            return ErrorResponse::create(
+                'Upstream API Failure',
+                'Console session is not available due to an upstream api failure',
+                Response::HTTP_SERVICE_UNAVAILABLE
+            );
+        }
+
+        $responseJson = json_decode($response->getBody()->getContents());
+        $uuid = $responseJson->uuid ?? '';
+        if (empty($uuid)) {
+            abort(503);
+        }
+
+        // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
+        return response()->json([
+            'data' => [
+                'url' => $consoleResource->host . '/?title=' . $instance->id . '&session=' . $uuid,
+            ],
+            'meta' => (object)[]
+        ]);
     }
 }
