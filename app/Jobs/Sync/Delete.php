@@ -6,7 +6,7 @@ use App\Jobs\Job;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
-class Completed extends Job
+class Delete extends Job
 {
     private $model;
 
@@ -18,7 +18,7 @@ class Completed extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-        $this->model->setSyncCompleted();
+        $this->model->syncDelete();
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

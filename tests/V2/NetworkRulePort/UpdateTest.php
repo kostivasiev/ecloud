@@ -14,7 +14,6 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Network $network;
     protected NetworkPolicy $networkPolicy;
     protected NetworkRule $networkRule;
     protected NetworkRulePort $networkRulePort;
@@ -22,51 +21,47 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->availabilityZone();
-        $this->network = factory(Network::class)->create([
-            'id' => 'net-test',
-            'router_id' => $this->router()->id,
-        ]);
+        $this->network();
 
-        $mockIds = ['np-test', 'np-alttest'];
-        foreach ($mockIds as $mockId) {
-            $this->nsxServiceMock()->shouldReceive('patch')
-                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/'.$mockId)
-                ->andReturnUsing(function () {
-                    return new Response(200, [], '');
-                });
-            $this->nsxServiceMock()->shouldReceive('get')
-                ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/'.$mockId)
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(
-                        [
-                            'publish_status' => 'REALIZED'
-                        ]
-                    ));
-                });
+        $this->nsxServiceMock()->expects('patch')->times(5)
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
 
-            $this->nsxServiceMock()->shouldReceive('patch')
-                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/'.$mockId)
-                ->andReturnUsing(function () {
-                    return new Response(200, [], '');
-                });
-            $this->nsxServiceMock()->shouldReceive('get')
-                ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/' . $mockId])
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-                });
-        }
+        $this->nsxServiceMock()->expects('get')->times(5)
+            ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(
+                    [
+                        'publish_status' => 'REALIZED'
+                    ]
+                ));
+            });
+
+        $this->nsxServiceMock()->shouldReceive('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+
+        $this->nsxServiceMock()->expects('get')->times(5)
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
-            'network_id' => 'net-test',
+            'network_id' => $this->network()->id,
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-test',
-            'network_policy_id' => 'np-test',
+            'network_policy_id' => $this->networkPolicy->id,
         ]);
         $this->networkRulePort = factory(NetworkRulePort::class)->create([
             'id' => 'nrp-test',
-            'network_rule_id' => 'nr-test',
+            'network_rule_id' => $this->networkRule->id,
         ]);
     }
 
@@ -74,7 +69,7 @@ class UpdateTest extends TestCase
     {
         factory(NetworkRule::class)->create([
             'id' => 'nr-alttest',
-            'network_policy_id' => 'np-test',
+            'network_policy_id' => $this->networkPolicy->id,
         ]);
         $this->patch('v2/network-rule-ports/nrp-test', [
             'network_rule_id' => 'nr-alttest',

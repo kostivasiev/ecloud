@@ -5,6 +5,7 @@ namespace App\Jobs\Sync\NetworkPolicy;
 use App\Jobs\Job;
 use App\Jobs\NetworkPolicy\DeleteChildResources;
 use App\Jobs\Sync\Completed;
+use App\Jobs\Sync\Delete as SyncDelete;
 use App\Models\V2\NetworkPolicy;
 use Illuminate\Support\Facades\Log;
 
@@ -27,7 +28,8 @@ class Delete extends Job
             new \App\Jobs\Nsx\NetworkPolicy\UndeployCheck($this->model),
             new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Undeploy($this->model),
             new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\UndeployCheck($this->model),
-            new Completed($this->model, true)
+            new Completed($this->model),
+            new SyncDelete($this->model),
         ];
         dispatch(array_shift($jobs)->chain($jobs));
 

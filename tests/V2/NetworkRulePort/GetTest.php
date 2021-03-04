@@ -23,12 +23,12 @@ class GetTest extends TestCase
         parent::setUp();
         $this->network();
 
-        $this->nsxServiceMock()->shouldReceive('patch')
+        $this->nsxServiceMock()->expects('patch')->times(3)
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
-        $this->nsxServiceMock()->shouldReceive('get')
+        $this->nsxServiceMock()->expects('get')->times(3)
             ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(
@@ -37,12 +37,12 @@ class GetTest extends TestCase
                     ]
                 ));
             });
-        $this->nsxServiceMock()->shouldReceive('patch')
+        $this->nsxServiceMock()->expects('patch')->times(3)
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
-        $this->nsxServiceMock()->shouldReceive('get')
+        $this->nsxServiceMock()->expects('get')->times(3)
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));

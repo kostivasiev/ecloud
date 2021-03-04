@@ -27,4 +27,9 @@ class DeleteChildResources extends Job
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
+
+    public function failed($exception)
+    {
+        $this->model->setSyncFailureReason($exception->getMessage());
+    }
 }

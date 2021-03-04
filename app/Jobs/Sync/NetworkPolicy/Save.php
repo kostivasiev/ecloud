@@ -31,16 +31,12 @@ class Save extends Job
                 '/infra/domains/default/groups/'
             ),
             new DeployNetworkPolicy($this->model),
-        ];
-
-        if (count($this->model->networkRules) > 0) {
-            // NSX doesn't try to "realise" a NetworkPolicy until it has rules
-            $jobs[] = new DeployCheck(
+            new DeployCheck(
                 $this->model,
                 $this->model->network->router->availabilityZone,
                 '/infra/domains/default/security-policies/'
-            );
-        }
+            )
+        ];
 
         $jobs[] = new Completed($this->model);
 

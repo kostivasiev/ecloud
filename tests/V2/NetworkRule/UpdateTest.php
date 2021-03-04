@@ -21,12 +21,12 @@ class UpdateTest extends TestCase
 
         $mockIds = ['np-test', 'np-alttest'];
         foreach ($mockIds as $mockId) {
-            $this->nsxServiceMock()->shouldReceive('patch')
+            $this->nsxServiceMock()->expects('patch')->twice()
                 ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/' . $mockId)
                 ->andReturnUsing(function () {
                     return new Response(200, [], '');
                 });
-            $this->nsxServiceMock()->shouldReceive('get')
+            $this->nsxServiceMock()->expects('get')->twice()
                 ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/' . $mockId)
                 ->andReturnUsing(function () {
                     return new Response(200, [], json_encode(
@@ -35,12 +35,12 @@ class UpdateTest extends TestCase
                         ]
                     ));
                 });
-            $this->nsxServiceMock()->shouldReceive('patch')
+            $this->nsxServiceMock()->expects('patch')->twice()
                 ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/' . $mockId)
                 ->andReturnUsing(function () {
                     return new Response(200, [], '');
                 });
-            $this->nsxServiceMock()->shouldReceive('get')
+            $this->nsxServiceMock()->expects('get')->twice()
                 ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/' . $mockId])
                 ->andReturnUsing(function () {
                     return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));

@@ -18,35 +18,32 @@ class CreateTest extends TestCase
         // bind data so we can use actual NSX mocks
         app()->bind(NetworkPolicy::class, function () {
             return factory(NetworkPolicy::class)->make([
-                'id' => 'np-abc123xyz',
+                'id' => 'np-test',
                 'network_id' => $this->network()->id,
                 'name' => 'Test Policy',
             ]);
         });
 
-        $mockNetworkPolicyIds = ['np-abc123xyz', 'np-zzzxxxyyy'];
-        foreach ($mockNetworkPolicyIds as $mockNetworkPolicyId) {
-            $this->nsxServiceMock()->shouldReceive('patch')
-                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/' . $mockNetworkPolicyId)
-                ->andReturnUsing(function () {
-                    return new Response(200, [], '');
-                });
-            $this->nsxServiceMock()->shouldReceive('get')
-                ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/' . $mockNetworkPolicyId])
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-                });
-            $this->nsxServiceMock()->shouldReceive('patch')
-                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/' . $mockNetworkPolicyId)
-                ->andReturnUsing(function () {
-                    return new Response(200, [], '');
-                });
-            $this->nsxServiceMock()->shouldReceive('get')
-                ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/' . $mockNetworkPolicyId])
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-                });
-        }
+        $this->nsxServiceMock()->expects('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+        $this->nsxServiceMock()->expects('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
     }
 
     public function testCreateResource()
@@ -78,7 +75,7 @@ class CreateTest extends TestCase
             'name' => 'Test Policy',
             'network_id' => $this->network()->id,
         ];
-        factory(NetworkPolicy::class)->create(array_merge(['id' => 'np-zzzxxxyyy'], $data));
+        factory(NetworkPolicy::class)->create(array_merge(['id' => 'np-test'], $data));
         $this->post(
             '/v2/network-policies',
             $data,

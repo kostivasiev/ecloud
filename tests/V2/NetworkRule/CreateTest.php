@@ -3,7 +3,6 @@ namespace Tests\V2\NetworkRule;
 
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
-use App\Models\V2\NetworkRule;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -12,7 +11,6 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected NetworkPolicy $networkPolicy;
     protected Network $network;
 
     public function setUp(): void
@@ -20,23 +18,23 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->network();
 
-        $this->nsxServiceMock()->shouldReceive('patch')
+        $this->nsxServiceMock()->expects('patch')->twice()
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-abc123xyz')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
-        $this->nsxServiceMock()->shouldReceive('get')
+        $this->nsxServiceMock()->expects('get')->twice()
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-abc123xyz'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
 
-        $this->nsxServiceMock()->shouldReceive('patch')
+        $this->nsxServiceMock()->expects('patch')->twice()
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-abc123xyz')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
-        $this->nsxServiceMock()->shouldReceive('get')
+        $this->nsxServiceMock()->expects('get')->twice()
             ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-abc123xyz')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(

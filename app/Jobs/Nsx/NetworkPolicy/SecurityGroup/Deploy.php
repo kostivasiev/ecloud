@@ -47,4 +47,10 @@ class Deploy extends Job
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
+
+    public function failed($exception)
+    {
+        $this->model->setSyncFailureReason(json_decode($exception->getResponse()->getBody()->getContents()));
+    }
+
 }

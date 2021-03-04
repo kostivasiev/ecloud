@@ -25,4 +25,10 @@ class Undeploy extends Job
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
+
+    public function failed($exception)
+    {
+        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
+        $this->model->setSyncFailureReason($message);
+    }
 }
