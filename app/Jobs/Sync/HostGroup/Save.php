@@ -3,8 +3,6 @@
 namespace App\Jobs\Sync\HostGroup;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\HostGroup\Deploy;
-use App\Jobs\Nsx\HostGroup\DeployCheck;
 use App\Models\V2\HostGroup;
 use Illuminate\Support\Facades\Log;
 
@@ -22,12 +20,18 @@ class Save extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $jobs = [
-            new Deploy($this->model),
-            new DeployCheck($this->model),
+            new \App\Jobs\Kingpin\HostGroup\CreateCluster($this->model),
+            new \App\Jobs\Nsx\HostGroup\CreateTransportNode($this->model),
+            new \App\Jobs\Nsx\HostGroup\PrepareCluster($this->model),
+            new \App\Jobs\Sync\Completed($this->model),
         ];
-
         dispatch(array_shift($jobs)->chain($jobs));
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+    }
+
+    public function failed($exception)
+    {
+        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }

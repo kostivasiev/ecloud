@@ -43,7 +43,6 @@ trait Syncable
 
     public function save(array $options = [])
     {
-        // Only do this for Firewall's & Volumes at the moment
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
             Volume::class,
