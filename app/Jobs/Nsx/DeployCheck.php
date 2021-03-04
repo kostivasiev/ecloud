@@ -18,7 +18,7 @@ class DeployCheck extends Job
 
     protected string $intentPath;
 
-    public function __construct($model, availabilityZone $availabilityZone, $resourcePath)
+    public function __construct($model, AvailabilityZone $availabilityZone, $resourcePath)
     {
         $this->model = $model;
         $this->availabilityZone = $availabilityZone;

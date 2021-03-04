@@ -26,7 +26,7 @@ class Undeploy implements ShouldQueue
         $networkRule = $event->model;
 
         $networkRule->networkPolicy->network->router->availabilityZone->nsxService()->delete(
-            '/policy/api/v1/infra/domains/default/security-policies/' . $networkRule->networkPolicy->getKey() . '/rules/' . $networkRule->getKey()
+            '/policy/api/v1/infra/domains/default/security-policies/' . $networkRule->networkPolicy->id . '/rules/' . $networkRule->id
         );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
