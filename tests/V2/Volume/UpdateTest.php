@@ -50,7 +50,7 @@ class UpdateTest extends TestCase
             });
         $this->volume = factory(Volume::class)->create([
             'id' => 'vol-abc123xyz',
-            'vpc_id' => $this->vpc()->getKey()
+            'vpc_id' => $this->vpc()->id
         ]);
     }
 
