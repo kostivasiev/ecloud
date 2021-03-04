@@ -30,19 +30,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string'],
-            'vpc_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class)
-            ],
-            'availability_zone_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.availability_zones,id,deleted_at,NULL',
-            ],
             'capacity' => [
                 'sometimes',
                 'required',
@@ -60,8 +47,7 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'numeric',
-                'in:300,600,1200,2500',
-                new IsVolumeAttached(),
+                'in:300,600,1200,2500'
             ],
         ];
     }

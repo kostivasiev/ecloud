@@ -33,6 +33,7 @@ patch:
                   required: false
                 router_id:
                   required: false
+                  readOnly : true
                 subnet:
                   readOnly: true
   responses:

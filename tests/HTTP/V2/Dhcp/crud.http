@@ -55,7 +55,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "blah"
+    "name": "DHCP Name Update"
 }
 
 > {%
