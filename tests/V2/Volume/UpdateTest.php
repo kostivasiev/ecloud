@@ -5,160 +5,154 @@ namespace Tests\V2\Volume;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
+use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
+    /** @var Region */
+    private $region;
+
+    /**
+     * @var AvailabilityZone
+     */
+    private $availabilityZone;
+
+    /** @var Vpc */
+    private $vpc;
+
+    /** @var Volume */
     private $volume;
 
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->kingpinServiceMock()
+            ->shouldReceive('post')
+            ->withSomeOfArgs(
                 '/api/v1/vpc/vpc-test/volume',
                 [
                     'json' => [
-                        'volumeId' => 'vol-test',
+                        'volumeId' => 'vol-abc123xyz',
                         'sizeGiB' => '100',
-                        'shared' => false,
+                        'shared' => false
                     ]
                 ]
-            ])
+            )
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+                return new Response(200, [], json_encode(['uuid' => '7b9d062f-2048-42e8-82f9-f67d3e9e3dfe']));
             });
-
         $this->volume = factory(Volume::class)->create([
-            'id' => 'vol-test',
-            'name' => 'Volume',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
+            'id' => 'vol-abc123xyz',
+            'vpc_id' => $this->vpc()->id
         ]);
-    }
-
-    public function testInvalidVpcIdIsFailed()
-    {
-        $this->patch('/v2/volumes/' . $this->volume->id, [
-            'name' => 'Volume 1',
-            'vpc_id' => 'x',
-            'availability_zone_id' => $this->availabilityZone()->id
-        ], [
-            'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'The specified vpc id was not found',
-            'status' => 422,
-            'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
-    }
-
-
-    public function testInvalidAzIsFailed()
-    {
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->id
-        ]);
-
-        $this->patch('/v2/volumes/' . $this->volume->id, [
-            'name' => 'Volume 1',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $availabilityZone->id,
-            'capacity' => (config('volume.capacity.max') - 1),
-        ], [
-            'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title' => 'Not Found',
-            'detail' => 'The specified availability zone is not available to that VPC',
-            'status' => 404,
-            'source' => 'availability_zone_id'
-        ])->assertResponseStatus(404);
     }
 
     public function testNotOwnedVolumeIsFailed()
     {
-        $this->patch('/v2/volumes/' . $this->volume->id, [
+        $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
+        $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id
-        ], [
-            'X-consumer-custom-id' => '2-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title' => 'Not found',
-            'detail' => 'No Volume with that ID was found',
-            'status' => 404,
-        ])->assertResponseStatus(404);
+        ];
+
+        $this->patch(
+            '/v2/volumes/' . $this->volume->id,
+            $data,
+            [
+                'X-consumer-custom-id' => '2-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Not found',
+                'detail' => 'No Volume with that ID was found',
+                'status' => 404,
+            ])
+            ->assertResponseStatus(404);
     }
 
     public function testMinCapacityValidation()
     {
-        $this->patch('/v2/volumes/' . $this->volume->id, [
+        $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => (config('volume.capacity.min') - 1),
-        ], [
-            'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'specified capacity is below the minimum of ' . config('volume.capacity.min'),
-            'status' => 422,
-            'source' => 'capacity'
-        ])->assertResponseStatus(422);
+        ];
+
+        $this->patch(
+            '/v2/volumes/' . $this->volume->id,
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'specified capacity is below the minimum of ' . config('volume.capacity.min'),
+                'status' => 422,
+                'source' => 'capacity'
+            ])
+            ->assertResponseStatus(422);
     }
 
     public function testMaxCapacityValidation()
     {
-        $this->patch('/v2/volumes/' . $this->volume->id, [
+        $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => (config('volume.capacity.max') + 1),
-        ], [
-            'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'specified capacity is above the maximum of ' . config('volume.capacity.max'),
-            'status' => 422,
-            'source' => 'capacity'
-        ])->assertResponseStatus(422);
+        ];
+
+        $this->patch(
+            '/v2/volumes/' . $this->volume->id,
+            $data,
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'specified capacity is above the maximum of ' . config('volume.capacity.max'),
+                'status' => 422,
+                'source' => 'capacity'
+            ])
+            ->assertResponseStatus(422);
     }
 
     public function testValidDataSucceeds()
     {
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test/size',
+        $this->kingpinServiceMock()
+            ->shouldReceive('put')
+            ->withSomeOfArgs(
+                '/api/v1/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
                 [
                     'json' => [
-                        'sizeGiB' => '999',
+                        'sizeGiB' => '999'
                     ]
                 ]
-            ])
-            ->andReturnUsing(function () {
+            )->andReturnUsing(function () {
                 return new Response(200);
             });
-
-        $this->patch('/v2/volumes/' . $this->volume->id, [
+        $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => (config('volume.capacity.max') - 1),
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(200);
+        ];
+
+        $this->patch(
+            '/v2/volumes/' . $this->volume->id,
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )
+            ->assertResponseStatus(200);
 
         $volumeId = (json_decode($this->response->getContent()))->data->id;
         $volume = Volume::find($volumeId);
