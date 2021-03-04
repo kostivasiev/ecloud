@@ -47,8 +47,7 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'numeric',
-                'in:300,600,1200,2500',
-                new IsVolumeAttached(),
+                'in:300,600,1200,2500'
             ],
         ];
     }
