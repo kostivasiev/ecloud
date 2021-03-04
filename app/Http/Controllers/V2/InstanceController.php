@@ -110,9 +110,7 @@ class InstanceController extends BaseController
         ]));
 
         $instance->locked = $request->input('locked', false);
-        if ($request->has('appliance_id')) {
-            $instance->setApplianceVersionId($request->get('appliance_id'));
-        }
+        $instance->setApplianceVersionId($request->get('appliance_id'));
         $instance->save();
         $instance->refresh();
 

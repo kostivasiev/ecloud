@@ -307,4 +307,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('host-groups/{id}', 'HostGroupController@update');
         $router->delete('host-groups/{id}', 'HostGroupController@destroy');
     });
+
+    /** Image */
+    $router->group([], function () use ($router) {
+        $router->get('images', 'ImageController@index');
+        $router->get('images/{imageId}', 'ImageController@show');
+        $router->get('images/{imageId}/parameters', 'ImageController@parameters');
+    });
 });
