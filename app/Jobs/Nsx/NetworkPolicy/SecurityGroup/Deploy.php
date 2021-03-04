@@ -52,5 +52,4 @@ class Deploy extends Job
     {
         $this->model->setSyncFailureReason(json_decode($exception->getResponse()->getBody()->getContents()));
     }
-
 }
