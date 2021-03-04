@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
             });
 
         $this->nsxServiceMock()->shouldReceive('get')
-            ->withSomeOfArgs('policy/api/v1/infra/domains/default/groups/?include_mark_for_delete_objects=true')
+            ->with('policy/api/v1/infra/domains/default/groups/?include_mark_for_delete_objects=true')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -53,7 +53,6 @@ class DeleteTest extends TestCase
                 ]));
             });
 
-        //---------
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
@@ -78,13 +77,11 @@ class DeleteTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
-        //---------
 
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
             'network_id' => $this->network()->id,
         ]);
-
     }
 
     public function testDeleteResource()
