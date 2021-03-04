@@ -48,7 +48,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.id === client.global.get('host_id'), "Incorrect resource ID returned");
   client.assert(response.body.data.name === "test host");
-  client.assert(response.body.data.host_group_id === "{{dev_host_group_id}}");
+  client.assert(response.body.data.host_group_id === "hg-aaaaaaaa");
 });
 %}
 
