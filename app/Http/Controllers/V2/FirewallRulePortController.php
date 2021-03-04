@@ -48,7 +48,6 @@ class FirewallRulePortController extends BaseController
         $resource = FirewallRulePort::forUser(Auth::user())->findOrFail($firewallRulePortId);
         $resource->fill($request->only([
             'name',
-            'firewall_rule_id',
             'protocol',
             'source',
             'destination'
