@@ -51,7 +51,7 @@ class ImageController extends BaseController
         $images = new Image($request->only(['appliance_version_id']));
         $images->save();
         $images->refresh();
-        return $this->responseIdMeta($request, $images->id, 201);
+        return $this->responseIdMeta($request, $images->id, 200);
     }
 
     public function destroy(string $imageId)
