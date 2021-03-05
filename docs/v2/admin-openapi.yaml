@@ -80,7 +80,7 @@ components:
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
-      $ref: 'resources/Region/parameters/imageId.yaml'
+      $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
     VolumeId:
@@ -144,7 +144,7 @@ paths:
   '/ecloud/v2/regions/{regionId}/availability-zones':
     $ref: 'resources/Region/availabilityZones.yaml'
   '/ecloud/v2/regions/{regionId}/vpcs':
-    $ref: 'resources/Region/parameter-collection.yaml'
+    $ref: 'resources/Region/vpc-collection.yaml'
   '/ecloud/v2/lbcs':
     $ref: 'resources/LoadBalancerCluster/collection.yaml'
   '/ecloud/v2/lbcs/{lbcId}':

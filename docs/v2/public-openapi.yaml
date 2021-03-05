@@ -38,8 +38,6 @@ components:
       $ref: 'components/schemas/vpn.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
-    Image:
-      $ref: 'components/schemas/image.yaml'
     FloatingIP:
       $ref: 'components/schemas/floatingIp.yaml'
     FirewallRule:
