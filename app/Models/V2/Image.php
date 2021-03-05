@@ -34,11 +34,15 @@ class Image extends Model implements Filterable, Sortable
 
         $this->fillable([
             'id',
-            'name',
             'appliance_version_id',
         ]);
 
         parent::__construct($attributes);
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->applianceVersion->appliance->name;
     }
 
     public function getScriptTemplateAttribute()
@@ -113,7 +117,6 @@ class Image extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -128,7 +131,6 @@ class Image extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('name'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -150,7 +152,6 @@ class Image extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
-            'name' => 'name',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
