@@ -1,6 +1,0 @@
-in: path
-name: imageId
-required: true
-schema:
-  type: string
-example: image-cd226940
