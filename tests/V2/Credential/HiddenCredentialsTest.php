@@ -6,6 +6,7 @@ use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -23,6 +24,7 @@ class HiddenCredentialsTest extends TestCase
     protected Instance $instance;
     protected Region $region;
     protected Vpc $vpc;
+    protected Image $image;
 
 
     public function setUp(): void
@@ -42,10 +44,14 @@ class HiddenCredentialsTest extends TestCase
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->id,
         ])->refresh();
+        $this->image = factory(Image::class)->create([
+            'name' => 'test image',
+            'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
+        ])->refresh();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->id,
             'name' => 'GetTest Default',
-            'appliance_version_id' => $this->appliance_version->uuid,
+            'image_id' => $this->image->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'platform' => 'Linux',

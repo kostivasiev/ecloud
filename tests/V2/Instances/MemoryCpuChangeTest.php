@@ -5,6 +5,7 @@ use App\Listeners\V2\Instance\ComputeChange;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -27,6 +28,7 @@ class MemoryCpuChangeTest extends TestCase
     protected $appliance;
     protected $appliance_version;
     protected $vpc;
+    protected $image;
 
     public function setUp(): void
     {
@@ -46,6 +48,10 @@ class MemoryCpuChangeTest extends TestCase
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();
+        $this->image = factory(Image::class)->create([
+            'name' => 'test image',
+            'appliance_version_id' => $this->appliance_version->appliance_version_id,
+        ])->refresh();
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('put')->andReturn(
@@ -64,7 +70,7 @@ class MemoryCpuChangeTest extends TestCase
             'id' => 'i-abc123',
             'vpc_id' => $this->vpc->id,
             'name' => 'UpdateTest Default',
-            'appliance_version_id' => $this->appliance_version->uuid,
+            'image_id' => $this->image->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'backup_enabled' => false,

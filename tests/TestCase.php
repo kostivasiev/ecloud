@@ -15,6 +15,7 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Models\V2\Image;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
@@ -81,6 +82,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var HostGroup */
     private $hostGroup;
+
+    /** @var Image */
+    private $image;
 
     /**
      * Creates the application.
@@ -153,7 +157,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),
-                'appliance_version_id' => $this->applianceVersion()->uuid,
+                'image_id' => $this->image()->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
                 'platform' => 'Linux',
@@ -161,6 +165,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->instance;
+    }
+
+    public function image()
+    {
+        if (!$this->image) {
+            $this->image = factory(Image::class)->create([
+                'name' => 'test image',
+                'appliance_version_id' => $this->applianceVersion()->id,
+            ]);
+        }
+        return $this->image;
     }
 
     public function applianceVersion()

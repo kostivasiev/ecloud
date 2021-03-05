@@ -50,7 +50,7 @@ Content-Type:  application/json
   "requires_floating_ip": true,
   "network_id": "{{dev_network_id}}",
   "volume_capacity": 30,
-    "appliance_data": {
+  "image_data": {
     "mysql_root_password": "EnCrYpTeD-PaSsWoRd",
     "mysql_wordpress_user_password": "EnCrYpTeD-PaSsWoRd",
     "wordpress_url": "mydomain.com"

@@ -5,13 +5,9 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateImageRequest;
 use App\Http\Requests\V2\UpdateImageRequest;
 use App\Jobs\Nsx\Image\Undeploy;
-use App\Models\V2\ApplianceScriptParameters;
 use App\Models\V2\Image;
-use App\Models\V2\Instance;
-use App\Models\V2\Volume;
 use App\Resources\V2\ImageParameterResource;
 use App\Resources\V2\ImageResource;
-use App\Resources\V2\InstanceResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 

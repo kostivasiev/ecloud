@@ -7,6 +7,7 @@ use App\Listeners\V2\Volume\UpdateBilling;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\BillingMetric;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Product;
 use App\Models\V2\Volume;
@@ -23,6 +24,7 @@ class VolumeIopsBillingTest extends TestCase
     public ApplianceVersion $applianceVersion;
     public UpdateBilling $updateBilling;
     public BillingMetric $billingMetric;
+    public Image $image;
 
     public function setUp(): void
     {
@@ -78,6 +80,10 @@ class VolumeIopsBillingTest extends TestCase
         ])->refresh();  // Hack needed since this is a V1 resource
         $this->applianceVersion = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ]);
+        $this->image = factory(Image::class)->create([
+            'name' => 'test image',
+            'appliance_version_id' => $this->applianceVersion->appliance_version_uuid
         ]);
 
         $this->billingMetric = app()->make(BillingMetric::class);
@@ -137,7 +143,7 @@ class VolumeIopsBillingTest extends TestCase
         $instance = factory(Instance::class)->create([
             'id' => 'i-abc123xyz',
             'vpc_id' => $this->vpc()->id,
-            'appliance_version_id' => $this->applianceVersion->uuid,
+            'image_id' => $this->image->id,
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
         $instance->volumes()->attach($volume);
@@ -165,7 +171,7 @@ class VolumeIopsBillingTest extends TestCase
         $instance = factory(Instance::class)->create([
             'id' => 'i-abc123xyz',
             'vpc_id' => $this->vpc()->id,
-            'appliance_version_id' => $this->applianceVersion->uuid,
+            'image_id' => $this->image->id,
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
         Instance::withoutEvents(function () use ($instance, $volume) {
@@ -207,7 +213,7 @@ class VolumeIopsBillingTest extends TestCase
         $instance = factory(Instance::class)->create([
             'id' => 'i-abc123xyz',
             'vpc_id' => $this->vpc()->id,
-            'appliance_version_id' => $this->applianceVersion->uuid,
+            'image_id' => $this->image->id,
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
         Instance::withoutEvents(function () use ($instance, $volume) {

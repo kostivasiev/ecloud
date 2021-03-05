@@ -12,7 +12,7 @@ use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Devices\AdminClient;
 
-class ApplianceDataValidationTest extends TestCase
+class ImageDataValidationTest extends TestCase
 {
 
     use DatabaseMigrations;
@@ -21,12 +21,12 @@ class ApplianceDataValidationTest extends TestCase
     protected ApplianceVersion $appliance_version;
     protected Image $image;
     protected Request $request;
-    protected array $applianceData;
+    protected array $imageData;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->applianceData = [
+        $this->imageData = [
             'mysql_root_password' => 'EnCrYpTeD-PaSsWoRd',
             'mysql_gogs_user_password' => 'EnCrYpTeD-PaSsWoRd',
             'gogs_url' => 'mydomain.com',
@@ -38,7 +38,11 @@ class ApplianceDataValidationTest extends TestCase
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();  // Hack needed since this is a V1 resource
-        foreach ($this->applianceData as $key => $value) {
+        $this->image = factory(Image::class)->create([
+            'name' => 'test image',
+            'appliance_version_id' => $this->appliance_version->appliance_version_uuid
+        ]);
+        foreach ($this->imageData as $key => $value) {
             $type = ($key == 'mysql_root_password' || $key == 'mysql_gogs_user_password') ? 'Password' : 'String';
             factory(ApplianceScriptParameters::class)->create([
                 'appliance_script_parameters_appliance_version_id' => $this->appliance_version->appliance_version_id,
@@ -48,13 +52,9 @@ class ApplianceDataValidationTest extends TestCase
                 'appliance_script_parameters_validation_rule' => '/.*/'
             ]);
         }
-        $this->image = factory(Image::class)->create([
-            'name' => 'test image',
-            'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
-        ]);
         $this->request = CreateRequest::create('', 'POST', [
-            'image_id' => $this->image->id,
-            'image_data' => $this->applianceData
+            'image_id' => $this->appliance->getKey(),
+            'image_data' => $this->imageData
         ]);
 
         // Admin Client Mock

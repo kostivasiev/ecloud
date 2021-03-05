@@ -35,9 +35,20 @@ class Image extends Model implements Filterable, Sortable
         $this->fillable([
             'id',
             'name',
+            'appliance_version_id',
         ]);
 
         parent::__construct($attributes);
+    }
+
+    public function getScriptTemplateAttribute()
+    {
+        return $this->applianceVersion->script_template;
+    }
+
+    public function getVMTemplateNameAttribute()
+    {
+        return $this->applianceVersion->appliance_version_vm_template;
     }
 
     public function getLogoURIAttribute()
@@ -65,9 +76,19 @@ class Image extends Model implements Filterable, Sortable
         return $this->applianceVersion->appliance->is_public == "Yes";
     }
 
+    public function getPlatformAttribute()
+    {
+        return $this->applianceVersion->serverLicense()->category;
+    }
+
     public function parameters()
     {
         return $this->applianceVersion->applianceScriptParameters();
+    }
+
+    public function metadata()
+    {
+        return $this->applianceVersion->applianceVersionData();
     }
 
     public function applianceVersion()

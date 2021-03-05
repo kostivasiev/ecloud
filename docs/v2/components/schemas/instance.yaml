@@ -18,10 +18,10 @@ properties:
 #    type: string
 #    required: false
 #    example: 'az-2b66bb79'
-  appliance_id:
+  image_id:
     type: string
     required: true
-    example: 'cf7c54c2-ef77-45bc-b700-e00d66044f3c'
+    example: 'image-cf7c54c2'
     readOnly: false
   vcpu_cores:
     type: integer
@@ -86,7 +86,7 @@ properties:
     required: false
     type: boolean
     example: false
-  appliance_data:
+  image_data:
     required: false
     writeOnly: true
     type: json
