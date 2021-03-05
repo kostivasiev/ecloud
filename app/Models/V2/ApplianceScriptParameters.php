@@ -36,6 +36,5 @@ class ApplianceScriptParameters extends Model
 
     public function databaseNames()
     {
-
     }
 }
