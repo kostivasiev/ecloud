@@ -53,6 +53,8 @@ components:
       $ref: 'components/schemas/admin/credential.yaml'
     DiscountPlan:
       $ref: 'components/schemas/admin/discountPlan.yaml'
+    HostSpec :
+      $ref : 'resources/HostSpec/schema.yaml'
 
   parameters:
     # Query Parameters
@@ -179,3 +181,7 @@ paths:
     $ref: 'resources/Image/admin-collection.yaml'
   '/ecloud/v2/images/{imageId}':
     $ref: 'resources/Image/admin-item.yaml'
+  '/ecloud/v2/host-specs':
+    $ref: 'resources/HostSpec/admin-collection.yaml'
+  '/ecloud/v2/host-specs/{hostSpecId}':
+    $ref: 'resources/HostSpec/admin-item.yaml'
