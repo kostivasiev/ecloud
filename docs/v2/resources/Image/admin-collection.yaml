@@ -49,6 +49,6 @@ post:
               required: true
   responses:
     200:
-      $ref: '../../resources/Nic/responses/idResponse.yaml'
+      $ref: '../../resources/Image/responses/idResponse.yaml'
   tags:
     - Images
