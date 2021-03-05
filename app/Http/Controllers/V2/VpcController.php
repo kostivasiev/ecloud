@@ -11,11 +11,13 @@ use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use App\Resources\V2\ErrorResponse;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -43,6 +45,16 @@ class VpcController extends BaseController
     public function create(CreateRequest $request)
     {
         $vpc = new Vpc($request->only(['name', 'region_id']));
+        if ($request->has('console_enabled')) {
+            if (!$this->isAdmin) {
+                return ErrorResponse::create(
+                    'Forbidden',
+                    'Request contains invalid parameters',
+                    Response::HTTP_FORBIDDEN
+                );
+            }
+            $vpc->console_enabled = $request->input('console_enabled', true);
+        }
         $vpc->reseller_id = $this->resellerId;
         $vpc->save();
         return $this->responseIdMeta($request, $vpc->id, 201);
@@ -53,6 +65,16 @@ class VpcController extends BaseController
         $vpc = Vpc::forUser(Auth::user())->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
 
+        if ($request->has('console_enabled')) {
+            if (!$this->isAdmin) {
+                return ErrorResponse::create(
+                    'Forbidden',
+                    'Request contains invalid parameters',
+                    Response::HTTP_FORBIDDEN
+                );
+            }
+            $vpc->console_enabled = $request->input('console_enabled', $vpc->console_enabled);
+        }
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
