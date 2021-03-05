@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateImageRequest;
+use App\Http\Requests\V2\Image\StoreRequest;
 use App\Http\Requests\V2\UpdateImageRequest;
 use App\Jobs\Nsx\Image\Undeploy;
 use App\Models\V2\Image;
@@ -36,8 +37,6 @@ class ImageController extends BaseController
         );
     }
 
-
-
     public function parameters(Request $request, string $imageId)
     {
         $collection = Image::findOrFail($imageId)->parameters();
@@ -46,21 +45,13 @@ class ImageController extends BaseController
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
-/*
-    public function create(CreateImageRequest $request)
+
+    public function store(StoreRequest $request)
     {
-        $images = new Image($request->only(['name', 'vpc_id', 'availability_zone_id']));
+        $images = new Image($request->only(['appliance_version_id']));
         $images->save();
         $images->refresh();
         return $this->responseIdMeta($request, $images->id, 201);
-    }
-
-    public function update(UpdateImageRequest $request, string $imageId)
-    {
-        $image = Image::findOrFail($imageId);
-        $image->fill($request->only(['name']));
-        $image->save();
-        return $this->responseIdMeta($request, $image->id, 200);
     }
 
     public function destroy(string $imageId)
@@ -68,5 +59,5 @@ class ImageController extends BaseController
         $model = Image::findOrFail($imageId);
         $model->delete();
         return response()->json([], 204);
-    }*/
+    }
 }

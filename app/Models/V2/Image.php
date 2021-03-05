@@ -85,6 +85,11 @@ class Image extends Model implements Filterable, Sortable
         return $this->applianceVersion->serverLicense()->category;
     }
 
+    public function getLicenseIDAttribute()
+    {
+        return $this->applianceVersion->serverLicense()->id;
+    }
+
     public function parameters()
     {
         return $this->applianceVersion->applianceScriptParameters();

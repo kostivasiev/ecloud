@@ -15,7 +15,6 @@ class CreateImagesTable extends Migration
     {
         Schema::connection('ecloud')->create('images', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
             $table->uuid('appliance_version_id');
             $table->timestamps();
             $table->softDeletes();
