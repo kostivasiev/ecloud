@@ -41,6 +41,8 @@ fi
 FROM apio
 RUN a2enmod rewrite
 
+ENV LOG_CHANNEL=ukfast
+
 COPY .docker/ca-certificates/ /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 

@@ -47,13 +47,6 @@ class UpdateRequest extends FormRequest
                 'required',
                 new ExistsForAvailabilityZone($availabilityZoneId)
             ],
-            'vpc_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class)
-            ],
             'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
         ];
     }
@@ -67,8 +60,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field, when specified, cannot be null',
-            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
-            'vpc_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
             'router_throughput_id.required' => 'The :attribute field, when specified, cannot be null',
