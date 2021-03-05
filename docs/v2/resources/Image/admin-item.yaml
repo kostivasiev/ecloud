@@ -16,3 +16,11 @@ get:
   tags:
     - Images
 
+delete:
+  parameters:
+    - $ref: '../../resources/Image/parameters/imageId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Images
