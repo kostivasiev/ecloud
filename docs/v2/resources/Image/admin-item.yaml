@@ -18,7 +18,7 @@ get:
 
 delete:
   parameters:
-    - $ref: '../../resources/Image/parameters/imageId.yaml'
+    - $ref: '../../resources/Image/parameters/id.yaml'
   responses:
     204:
       description: Success
