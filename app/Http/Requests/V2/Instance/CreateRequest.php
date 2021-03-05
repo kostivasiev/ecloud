@@ -13,9 +13,10 @@ use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
 {
+    protected $image;
     protected $config;
-
     protected string $platform;
+
     /**
      * Determine if the user is authorized to make this request.
      *
