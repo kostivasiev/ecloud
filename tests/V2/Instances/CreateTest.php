@@ -48,7 +48,6 @@ class CreateTest extends TestCase
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();  // Hack needed since this is a V1 resource
         $this->image = factory(Image::class)->create([
-            'name' => 'test image',
             'appliance_version_id' => $this->applianceVersion->appliance_version_uuid,
         ])->refresh();
         $this->instance = factory(Instance::class)->create([

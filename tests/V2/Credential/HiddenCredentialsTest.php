@@ -45,7 +45,6 @@ class HiddenCredentialsTest extends TestCase
             'appliance_version_appliance_id' => $this->appliance->id,
         ])->refresh();
         $this->image = factory(Image::class)->create([
-            'name' => 'test image',
             'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
         ])->refresh();
         $this->instance = factory(Instance::class)->create([

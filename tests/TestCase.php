@@ -171,7 +171,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->image) {
             $this->image = factory(Image::class)->create([
-                'name' => 'test image',
                 'appliance_version_id' => $this->applianceVersion()->id,
             ]);
         }
