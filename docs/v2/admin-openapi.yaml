@@ -175,3 +175,7 @@ paths:
     $ref: 'resources/RouterThroughput/admin-collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/admin-item.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/admin-collection.yaml'
+  '/ecloud/v2/images/{imageId}':
+    $ref: 'resources/Image/admin-item.yaml'
