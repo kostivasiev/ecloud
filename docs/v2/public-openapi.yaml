@@ -90,7 +90,7 @@ components:
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
-      $ref: 'resources/Region/parameters/imageId.yaml'
+      $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
     LbcId:
