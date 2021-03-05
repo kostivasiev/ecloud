@@ -39,7 +39,7 @@ components:
     Instance:
       $ref: 'components/schemas/instance.yaml'
     Image:
-      $ref: 'resources/Image/schema.yaml'
+      $ref: 'components/schemas/image.yaml'
     FloatingIP:
       $ref: 'components/schemas/floatingIp.yaml'
     FirewallRule:
@@ -157,6 +157,10 @@ paths:
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
     $ref: 'resources/Instance/item.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/collection.yaml'
+  '/ecloud/v2/images/{imageId}':
+    $ref: 'resources/Image/item.yaml'
   '/ecloud/v2/instances/{instanceId}/credentials':
     $ref: 'resources/Instance/credentials.yaml'
   '/ecloud/v2/instances/{instanceId}/volumes':
@@ -177,12 +181,6 @@ paths:
     $ref: 'resources/Instance/lockUnlock.yaml'
   '/ecloud/v2/instances/{instanceId}/unlock':
     $ref: 'resources/Instance/lockUnlock.yaml'
-  '/ecloud/v2/images':
-    $ref: 'resources/Image/collection.yaml'
-  '/ecloud/v2/images/{id}':
-    $ref: 'resources/Image/item.yaml'
-  '/ecloud/v2/images/{id}/parameters':
-    $ref: 'resources/Image/parameter-collection.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
