@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class RenameApplianceColumnOnInstancesTable extends Migration
+class AddImageColumnToInstancesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class RenameApplianceColumnOnInstancesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->renameColumn('appliance_version_id', 'image_id');
+            $table->uuid('image_id')->default('')->after('appliance_version_id');;
         });
     }
 
@@ -26,7 +26,7 @@ class RenameApplianceColumnOnInstancesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->renameColumn('image_id', 'appliance_version_id');
+            $table->dropColumn('image_id');
         });
     }
 }

@@ -38,7 +38,7 @@ class ImageController extends BaseController
 
 
 
-    public function parameters(Request $request,  string $imageId)
+    public function parameters(Request $request, string $imageId)
     {
         $collection = Image::findOrFail($imageId)->parameters();
 
