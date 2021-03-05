@@ -1,5 +1,8 @@
 #/bin/bash
 set -e
+
+tail -F /var/www/html/storage/logs/lumen.log &
+
 ROLE=$1
 if [ "$ROLE" = "app" ]; then
     exec apache2-foreground

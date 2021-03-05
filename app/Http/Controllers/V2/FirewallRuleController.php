@@ -102,7 +102,6 @@ class FirewallRuleController extends BaseController
             'name',
             'sequence',
             'deployed',
-            'firewall_policy_id',
             'source',
             'destination',
             'action',

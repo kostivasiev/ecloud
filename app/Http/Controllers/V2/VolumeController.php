@@ -104,34 +104,7 @@ class VolumeController extends BaseController
     public function update(UpdateRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
-        if ($request->has('availability_zone_id')) {
-            $availabilityZone = Vpc::forUser(Auth::user())
-                ->findOrFail($request->input('vpc_id', $volume->vpc_id))
-                ->region
-                ->availabilityZones
-                ->first(function ($availabilityZone) use ($request) {
-                    return $availabilityZone->id == $request->availability_zone_id;
-                });
-
-            if (!$availabilityZone) {
-                return Response::create([
-                    'errors' => [
-                        'title' => 'Not Found',
-                        'detail' => 'The specified availability zone is not available to that VPC',
-                        'status' => 404,
-                        'source' => 'availability_zone_id'
-                    ]
-                ], 404);
-            }
-        }
-
-        $only = [
-            'name',
-            'vpc_id',
-            'capacity',
-            'availability_zone_id',
-            'iops',
-        ];
+        $only = ['name', 'capacity', 'iops'];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }

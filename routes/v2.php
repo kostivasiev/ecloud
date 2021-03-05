@@ -22,6 +22,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
     $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
     $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
+    $router->get('availability-zones/{zoneId}/host-specs', 'AvailabilityZoneController@hostSpecs');
 
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
@@ -306,6 +307,18 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('hosts', 'HostController@store');
         $router->patch('hosts/{id}', 'HostController@update');
         $router->delete('hosts/{id}', 'HostController@destroy');
+    });
+
+    /** Host Spec */
+    $router->group([], function () use ($router) {
+        $router->get('host-specs', 'HostSpecController@index');
+        $router->get('host-specs/{hostSpecId}', 'HostSpecController@show');
+
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('host-specs', 'HostSpecController@store');
+            $router->patch('host-specs/{hostSpecId}', 'HostSpecController@update');
+            $router->delete('host-specs/{hostSpecId}', 'HostSpecController@destroy');
+        });
     });
 
     /** Host Group */
