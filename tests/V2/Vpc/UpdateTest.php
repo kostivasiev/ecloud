@@ -53,11 +53,31 @@ class UpdateTest extends TestCase
         ])->assertResponseStatus(404);
     }
 
+    public function testNoAdminFailsWhenConsoleIsSet()
+    {
+        $data = [
+            'name' => 'name',
+            'reseller_id' => 2,
+            'console_enabled' => true,
+        ];
+        $this->patch('/v2/vpcs/' . $this->vpc()->id, $data, [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeJson(
+            [
+                'title' => 'Forbidden',
+                'details' => 'Request contains invalid parameters',
+                'status' => 403
+            ]
+        )->assertResponseStatus(403);
+    }
+
     public function testValidDataIsSuccessful()
     {
         $data = [
             'name' => 'name',
             'reseller_id' => 2,
+            'console_enabled' => true,
         ];
         $this->patch('/v2/vpcs/' . $this->vpc()->id, $data, [
             'X-consumer-custom-id' => '0-0',

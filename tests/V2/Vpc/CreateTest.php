@@ -5,9 +5,7 @@ namespace Tests\V2\Vpc;
 use App\Events\V2\DhcpCreated;
 use App\Events\V2\VpcCreated;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -16,20 +14,6 @@ class CreateTest extends TestCase
 {
 
     use DatabaseMigrations;
-
-    protected $faker;
-
-    protected $region;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->faker = Faker::create();
-
-        $this->region = factory(Region::class)->create([
-            'name' => 'Manchester',
-        ]);
-    }
 
     public function testNoPermsIsDenied()
     {
@@ -53,7 +37,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => '',
-            'region_id' => $this->region->id,
+            'region_id' => $this->region()->id,
         ];
         $this->post(
             '/v2/vpcs',
@@ -78,7 +62,7 @@ class CreateTest extends TestCase
     public function testNullRegionIsFailed()
     {
         $data = [
-            'name' => $this->faker->word(),
+            'name' => 'CreateTest Name',
         ];
         $this->post(
             '/v2/vpcs',
@@ -101,9 +85,9 @@ class CreateTest extends TestCase
     public function testNotScopedFails()
     {
         $data = [
-            'name' => $this->faker->word(),
+            'name' => 'CreateTest Name',
             'reseller_id' => 1,
-            'region_id' => $this->region->id
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/vpcs',
@@ -121,12 +105,37 @@ class CreateTest extends TestCase
             ->assertResponseStatus(400);
     }
 
+    public function testNoAdminFailsWhenConsoleIsSet()
+    {
+        $data = [
+            'name' => 'CreateTest Name',
+            'reseller_id' => 1,
+            'region_id' => $this->region()->id,
+            'console_enabled' => true,
+        ];
+        $this->post(
+            '/v2/vpcs',
+            $data,
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Forbidden',
+                'details' => 'Request contains invalid parameters',
+                'status' => 403
+            ]
+        )->assertResponseStatus(403);
+    }
+
     public function testValidDataSucceeds()
     {
         $data = [
-            'name' => $this->faker->word(),
-            'region_id' => $this->region->id,
-            'reseller_id' => 1
+            'name' => 'CreateTest Name',
+            'region_id' => $this->region()->id,
+            'reseller_id' => 1,
+            'console_enabled' => true,
         ];
         $this->post(
             '/v2/vpcs',
