@@ -105,11 +105,11 @@ class CreateRequest extends FormRequest
             ],
         ];
 
-        $rules = array_merge($rules, $this->generateApplianceRules());
+        $rules = array_merge($rules, $this->generateImageDataRules());
         return $rules;
     }
 
-    public function generateApplianceRules()
+    public function generateImageDataRules()
     {
         // Now for the dynamic rules for the appliance data
         $scriptRules = [];
@@ -117,19 +117,19 @@ class CreateRequest extends FormRequest
         // So, we need to retrieve the validation rules
         $parameters = $this->image->parameters;
         foreach ($parameters as $parameterKey => $parameter) {
-            $key = 'image_data.' . $parameterKey;
+            $key = 'image_data.' . $parameter->appliance_script_parameters_key;
             $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
             //validation rules regex
-            if (!empty($parameters[$parameterKey]->appliance_script_parameters_validation_rule)) {
-                $scriptRules[$key][] = 'regex:' . $parameters[$parameterKey]->appliance_script_parameters_validation_rule;
+            if (!empty($parameter->appliance_script_parameters_validation_rule)) {
+                $scriptRules[$key][] = 'regex:' . $parameter->appliance_script_parameters_validation_rule;
             }
 
             // For data types String,Numeric,Boolean we can use Laravel validation
-            switch ($parameters[$parameterKey]->appliance_script_parameters_type) {
+            switch ($parameter->appliance_script_parameters_type) {
                 case 'String':
                 case 'Numeric':
                 case 'Boolean':
-                    $scriptRules[$key][] = strtolower($parameters[$parameterKey]->appliance_script_parameters_type);
+                    $scriptRules[$key][] = strtolower($parameter->appliance_script_parameters_type);
                     break;
                 case 'Password':
                     $scriptRules[$key][] = 'string';
