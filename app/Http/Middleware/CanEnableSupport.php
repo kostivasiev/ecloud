@@ -22,9 +22,21 @@ class CanEnableSupport
     {
         if ($request->user()->isScoped()) {
             $accountAdminClient = app()->make(\UKFast\Admin\Account\AdminClient::class);
-            $paymentMethod = $accountAdminClient->customers()->getById($request->user()->resellerId())->paymentMethod;
+            try {
+                $customer = $accountAdminClient->customers()->getById($request->user()->resellerId());
+            } catch (\Exception $e) {
+                return JsonResponse::create([
+                    'errors' => [
+                        [
+                            'title' => 'Customer Account',
+                            'detail' => 'There was a problem retrieving the customer account',
+                            'status' => 402,
+                        ]
+                    ]
+                ], 402);
+            }
 
-            if ($paymentMethod == 'Credit Card') {
+            if ($customer->paymentMethod == 'Credit Card') {
                 return JsonResponse::create([
                     'errors' => [
                         [
