@@ -31,7 +31,7 @@ class UpdateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The name field, when specified, cannot be null',
+            'detail' => 'The name field is required',
             'status' => 422,
             'source' => 'name'
         ])->assertResponseStatus(422);
