@@ -167,7 +167,7 @@ trait Syncable
      */
     public function getSyncError()
     {
-        return \Illuminate\Http\JsonResponse::create(
+        return response()->json(
             [
                 'errors' => [
                     [

@@ -22,7 +22,7 @@ class IsPending
         $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($request->route('discountPlanId'));
 
         if ($discountPlan->status != 'pending') {
-            return JsonResponse::create([
+            return response()->json([
                 'errors' => [
                     [
                         'title' => 'Forbidden',

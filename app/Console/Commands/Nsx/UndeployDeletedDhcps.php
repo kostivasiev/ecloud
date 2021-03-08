@@ -43,5 +43,7 @@ class UndeployDeletedDhcps extends Command
             $nsxService->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
             $this->info('Dhcp ' . $dhcp->id . ' Undeployed.');
         });
+
+        return Command::SUCCESS;
     }
 }

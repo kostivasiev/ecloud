@@ -87,7 +87,7 @@ class InstanceController extends BaseController
                 $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
             }
             if (!$defaultNetworkId) {
-                return JsonResponse::create([
+                return response()->json([
                     'errors' => [
                         [
                             'title' => 'Not Found',
