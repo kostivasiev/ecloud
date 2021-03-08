@@ -50,6 +50,7 @@ class Deploy extends Job
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason(json_decode($exception->getResponse()->getBody()->getContents()));
+        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
+        $this->model->setSyncFailureReason($message);
     }
 }
