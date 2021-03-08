@@ -28,11 +28,11 @@ class CreateTest extends TestCase
 
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester DC',
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
     }
 
@@ -41,7 +41,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'My Load Balancer Cluster',
             'vpc_id' => $this->faker->uuid(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'availability_zone_id' => $this->availabilityZone->id
         ];
 
         $this->post(
@@ -90,7 +90,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->faker->uuid()
         ];
 
@@ -115,8 +115,8 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ];
         $this->post(
             '/v2/lbcs',

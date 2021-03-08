@@ -7,11 +7,10 @@ namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Admin\Devices\AdminClient;
 
-class ApplianceVersion extends Model
+class ApplianceVersion extends V1ModelWrapper
 {
     use ColumnPrefixHelper, UUIDHelper, SoftDeletes;
 
@@ -63,6 +62,18 @@ class ApplianceVersion extends Model
         );
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function applianceScriptParameters()
+    {
+        return $this->hasMany(
+            ApplianceScriptParameters::class,
+            'appliance_script_parameters_appliance_version_id',
+            'appliance_version_id'
+        );
+    }
+
     public function applianceVersionData()
     {
         return $this->hasMany(
@@ -88,5 +99,16 @@ class ApplianceVersion extends Model
             ->orderBy('appliance_version_version', 'desc')
             ->first()
             ->appliance_version_uuid;
+    }
+
+    public function getScriptParameters(): array
+    {
+        $params = [];
+        $parameters = $this->applianceScriptParameters()->get();
+        foreach ($parameters as $parameter) {
+            $params[$parameter->key] = $parameter;
+        }
+
+        return $params;
     }
 }

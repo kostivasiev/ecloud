@@ -26,6 +26,10 @@ patch:
           type: object
           allOf:
             - $ref: '../../components/schemas/firewallRulePort.yaml'
+            - type: object
+              properties:
+                firewall_rule_id:
+                  readOnly: true
   responses:
     200:
       $ref: '../../resources/FirewallRulePort/responses/idResponse.yaml'

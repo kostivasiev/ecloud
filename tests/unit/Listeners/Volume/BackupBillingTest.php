@@ -2,19 +2,10 @@
 
 namespace Tests\unit\Listeners\Volume;
 
-use App\Listeners\V2\Volume\ModifyVolume;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Instance;
-use App\Models\V2\Region;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -22,85 +13,92 @@ class BackupBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected $region;
-    protected $availabilityZone;
-    protected $vpc;
-    protected $instance;
-    protected $volume;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-
-        Model::withoutEvents(function () {
-            $this->volume = factory(Volume::class)->create([
-                'id' => 'vol-aaaaaaaa',
-                'vpc_id' => $this->vpc->getKey(),
-                'capacity' => 10,
-                'availability_zone_id' => $this->availabilityZone->getKey()
-            ]);
-        });
-
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
-            'backup_enabled' => true,
-        ]);
-
-        $this->volume->vpc()->associate($this->vpc);
-        $this->volume->instances()->attach($this->instance);
-
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
-        $mockKingpinService->shouldReceive('put')->andReturn(
-            new Response(200)
-        );
-
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
-    }
-
     public function testResizingVolumeUpdatesBackupBillingMetric()
     {
-        $this->volume->capacity = 15;
-        $this->volume->save();
+        $this->instance()->backup_enabled = true;
+        $this->instance()->save();
 
-        Event::assertDispatched(\App\Events\V2\Volume\Saving::class, function ($event) {
-            return $event->model->id === $this->volume->id;
-        });
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-test',
+                        'sizeGiB' => '10',
+                        'shared' => false,
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+            });
 
-        Event::assertDispatched(\App\Events\V2\Volume\Saved::class, function ($event) {
-            return $event->model->id === $this->volume->id;
-        });
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
+                [
+                    'json' => [
+                        'limit' => '300',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
 
-        $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
-        $resourceSyncListener->handle(new \App\Events\V2\Volume\Saving($this->volume));
+        $volume = factory(Volume::class)->create([
+            'id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
+            'capacity' => 10,
+            'availability_zone_id' => $this->availabilityZone()->id
+        ]);
 
-        $sync = Sync::where('resource_id', $this->volume->id)->first();
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'volumes' => []
+                ]));
+            });
 
-        $capacityIncreaseListener = \Mockery::mock(ModifyVolume::class)->makePartial();
-        $capacityIncreaseListener->handle(new \App\Events\V2\Volume\Saved($this->volume));
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
+                [
+                    'json' => [
+                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
 
-        // sync set to complete by the CapacityIncrease listener
-        Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {
-            return $event->model->id === $sync->id;
-        });
+        $volume->instances()->attach($this->instance());
 
-        $sync->refresh();
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs([
+                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '15',
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $volume->capacity = 15;
+        $volume->save();
+
+        $sync = Sync::where('resource_id', $volume->id)->first();
 
         // Check that the backup billing metric is added
         $updateBackupBillingListener = \Mockery::mock(\App\Listeners\V2\Instance\UpdateBackupBilling::class)->makePartial();
         $updateBackupBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
 
-        $backupMetric = BillingMetric::getActiveByKey($this->instance, 'backup.quota');
+        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
 
         $this->assertNotNull($backupMetric);
 

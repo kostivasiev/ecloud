@@ -141,7 +141,7 @@ class NetworkController extends BaseController
         ]));
         $network->save();
         $network->refresh();
-        return $this->responseIdMeta($request, $network->getKey(), 201);
+        return $this->responseIdMeta($request, $network->id, 201);
     }
 
     /**
@@ -153,14 +153,12 @@ class NetworkController extends BaseController
     {
         $network = Network::forUser(Auth::user())->findOrFail($networkId);
         $network->fill($request->only([
-            'router_id',
             'name',
-            'subnet',
         ]));
         if (!$network->save()) {
             return $network->getSyncError();
         }
-        return $this->responseIdMeta($request, $network->getKey(), 200);
+        return $this->responseIdMeta($request, $network->id, 200);
     }
 
     public function destroy(Request $request, string $networkId)

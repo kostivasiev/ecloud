@@ -61,8 +61,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field, when specified, cannot be null',
-            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
-            'vpc_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
             'router_throughput_id.required' => 'The :attribute field, when specified, cannot be null',

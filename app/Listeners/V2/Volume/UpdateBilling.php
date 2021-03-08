@@ -41,6 +41,7 @@ class UpdateBilling
             return;
         }
 
+        // If iops is empty, get the default value
         if (empty($volume->iops)) {
             $volume->iops = config('volume.iops.default', 300);
         }
@@ -59,8 +60,8 @@ class UpdateBilling
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $volume->getKey();
-        $billingMetric->vpc_id = $volume->vpc->getKey();
+        $billingMetric->resource_id = $volume->id;
+        $billingMetric->vpc_id = $volume->vpc->id;
         $billingMetric->reseller_id = $volume->vpc->reseller_id;
         $billingMetric->key = 'disk.capacity.'.$volume->iops;
         $billingMetric->value = $volume->capacity;
@@ -72,7 +73,7 @@ class UpdateBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'volume\' billing product for availability zone ' . $volume->availabilityZone->getKey()
+                'Failed to load \'volume\' billing product for availability zone ' . $volume->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;

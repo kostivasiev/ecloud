@@ -16,7 +16,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->routerThroughput = factory(RouterThroughput::class)->create([
-            'availability_zone_id' => $this->availabilityZone()->getKey(),
+            'availability_zone_id' => $this->availabilityZone()->id,
         ]);
     }
 
@@ -27,7 +27,7 @@ class GetTest extends TestCase
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeJson([
-                'id' => $this->routerThroughput->getKey(),
+                'id' => $this->routerThroughput->id,
                 'name' => $this->routerThroughput->name,
                 'availability_zone_id' => $this->routerThroughput->availability_zone_id,
                 "committed_bandwidth" => $this->routerThroughput->committed_bandwidth,
@@ -38,12 +38,12 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/router-throughputs/' . $this->routerThroughput->getKey(), [
+        $this->get('/v2/router-throughputs/' . $this->routerThroughput->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
             ->seeJson([
-                'id' => $this->routerThroughput->getKey(),
+                'id' => $this->routerThroughput->id,
                 'name' => $this->routerThroughput->name,
                 'availability_zone_id' => $this->routerThroughput->availability_zone_id,
                 "committed_bandwidth" => $this->routerThroughput->committed_bandwidth,

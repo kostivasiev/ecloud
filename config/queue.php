@@ -36,7 +36,8 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'table' => env('QUEUE_TABLE', 'jobs'),
+            'connection' => env('QUEUE_DATABASE_CONNECTION', 'ecloud'),
+            'table' => env('QUEUE_DATABASE_TABLE', 'jobs'),
             'queue' => 'default',
             'retry_after' => 90,
         ],
@@ -79,7 +80,7 @@ return [
     */
 
     'failed' => [
-        'database' => env('DB_ECLOUD_CONNECTION', 'mysql'), // Yeah I pulled in this file just for this...
+        'database' => env('QUEUE_FAILED_DATABASE', 'ecloud'),
         'table' => env('QUEUE_FAILED_TABLE', 'failed_jobs'),
     ],
 

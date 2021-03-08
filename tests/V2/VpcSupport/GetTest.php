@@ -21,10 +21,10 @@ class GetTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->vpcSupport = factory(VpcSupport::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id
         ]);
     }
 
@@ -35,18 +35,18 @@ class GetTest extends TestCase
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'id' => $this->vpcSupport->id,
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
         ])->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/support/' . $this->vpcSupport->getKey(), [
+        $this->get('/v2/support/' . $this->vpcSupport->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'id' => $this->vpcSupport->id,
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
         ])->assertResponseStatus(200);
     }
 }

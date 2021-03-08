@@ -7,7 +7,7 @@ use App\Models\V1\Datastore;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\ProvidesConvenienceMethods;
 use Mockery;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 use UKFast\Api\Exceptions\ForbiddenException;
 
 class CreateExpandLimitsTest extends TestCase

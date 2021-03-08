@@ -8,6 +8,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
+use App\Models\V2\HostSpec;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Product;
@@ -17,6 +18,7 @@ use App\Resources\V2\AvailabilityZoneCapacityResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
+use App\Resources\V2\HostSpecResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\ProductResource;
@@ -77,7 +79,7 @@ class AvailabilityZoneController extends BaseController
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 201);
+        return $this->responseIdMeta($request, $availabilityZone->id, 201);
     }
 
     /**
@@ -98,7 +100,7 @@ class AvailabilityZoneController extends BaseController
             'nsx_edge_cluster_id',
         ]));
         $availabilityZone->save();
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
+        return $this->responseIdMeta($request, $availabilityZone->id, 200);
     }
 
     /**
@@ -254,6 +256,18 @@ class AvailabilityZoneController extends BaseController
             ->transform($products);
 
         return ProductResource::collection($products->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function hostSpecs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    {
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
+            ->hostSpecs();
+        $queryTransformer->config(HostSpec::class)
+            ->transform($collection);
+
+        return HostSpecResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

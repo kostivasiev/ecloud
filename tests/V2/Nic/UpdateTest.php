@@ -22,15 +22,15 @@ class UpdateTest extends TestCase
         $this->macAddress = $this->faker->macAddress;
         $this->nic = factory(Nic::class)->create([
             'mac_address' => $this->macAddress,
-            'instance_id' => $this->instance()->getKey(),
-            'network_id' => $this->network()->getKey(),
+            'instance_id' => $this->instance()->id,
+            'network_id' => $this->network()->id,
         ])->refresh();
     }
 
     public function testInvalidMacAddressFails()
     {
         $this->patch(
-            '/v2/nics/' . $this->nic->getKey(),
+            '/v2/nics/' . $this->nic->id,
             [
                 'mac_address' => 'INVALID_MAC_ADDRESS',
             ],
@@ -50,7 +50,7 @@ class UpdateTest extends TestCase
     public function testInvalidInstanceIdFails()
     {
         $this->patch(
-            '/v2/nics/' . $this->nic->getKey(),
+            '/v2/nics/' . $this->nic->id,
             [
                 'instance_id' => 'INVALID_INSTANCE_ID',
             ],
@@ -70,7 +70,7 @@ class UpdateTest extends TestCase
     public function testInvalidNetworkIdFails()
     {
         $this->patch(
-            '/v2/nics/' . $this->nic->getKey(),
+            '/v2/nics/' . $this->nic->id,
             [
                 'network_id' => 'INVALID_NETWORK_ID',
             ],
@@ -90,11 +90,11 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/nics/' . $this->nic->getKey(),
+            '/v2/nics/' . $this->nic->id,
             [
                 'mac_address' => $this->macAddress,
-                'instance_id' => $this->instance()->getKey(),
-                'network_id' => $this->network()->getKey(),
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
                 'ip_address' => '10.0.0.6'
             ],
             [
@@ -105,10 +105,10 @@ class UpdateTest extends TestCase
             ->seeInDatabase(
                 'nics',
                 [
-                    'id' => $this->nic->getKey(),
+                    'id' => $this->nic->id,
                     'mac_address' => $this->macAddress,
-                    'instance_id' => $this->instance()->getKey(),
-                    'network_id'  => $this->network()->getKey(),
+                    'instance_id' => $this->instance()->id,
+                    'network_id'  => $this->network()->id,
                     'ip_address' => '10.0.0.6'
                 ],
                 'ecloud'
