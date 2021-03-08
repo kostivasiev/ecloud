@@ -28,12 +28,12 @@ class CanEnableSupport
                 return JsonResponse::create([
                     'errors' => [
                         [
-                            'title' => 'Customer Account',
-                            'detail' => 'There was a problem retrieving the customer account',
-                            'status' => 402,
+                            'title' => 'Not Found',
+                            'detail' => 'The customer account is not available',
+                            'status' => 404,
                         ]
                     ]
-                ], 402);
+                ], 404);
             }
 
             if ($customer->paymentMethod == 'Credit Card') {

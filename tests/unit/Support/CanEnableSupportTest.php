@@ -45,13 +45,13 @@ class CanEnableSupportTest extends TestCase
             return true;
         };
         $response = $this->canEnableSupport->handle($request, $closure);
-        $this->assertEquals(402, $response->getStatusCode());
+        $this->assertEquals(404, $response->getStatusCode());
         $this->assertJson(
             json_encode([
                 'errors' => [
-                    'title' => 'Customer Account',
-                    'detail' => 'There was a problem retrieving the customer account',
-                    'status' => 402
+                    'title' => 'Not Found',
+                    'detail' => 'The customer account is not available',
+                    'status' => 404
                 ]
             ]),
             $response->getContent()
@@ -65,11 +65,11 @@ class CanEnableSupportTest extends TestCase
             'vpc_id' => $this->vpc()->id
         ])->seeJson(
             [
-                'title' => 'Customer Account',
-                'detail' => 'There was a problem retrieving the customer account',
-                'status' => 402,
+                'title' => 'Not Found',
+                'detail' => 'The customer account is not available',
+                'status' => 404,
             ]
-        )->assertResponseStatus(402);
+        )->assertResponseStatus(404);
     }
 
     public function testWithValidCustomerAndCreditCard()
