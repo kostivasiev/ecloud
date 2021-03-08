@@ -217,6 +217,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                     [
                         'json' => [
                             'hostGroupId' => 'hg-test',
+                            'shared' => false,
                         ]
                     ]
                 )

@@ -62,6 +62,7 @@ class CrudTest extends TestCase
                 [
                     'json' => [
                         'hostGroupId' => 'hg-test',
+                        'shared' => false,
                     ]
                 ]
             )
@@ -113,6 +114,7 @@ class CrudTest extends TestCase
                 [
                     'json' => [
                         'hostGroupId' => 'hg-test',
+                        'shared' => false,
                     ]
                 ]
             )
@@ -143,6 +145,7 @@ class CrudTest extends TestCase
                 [
                     'json' => [
                         'hostGroupId' => 'hg-test',
+                        'shared' => false,
                     ]
                 ]
             )

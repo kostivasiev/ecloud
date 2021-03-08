@@ -28,6 +28,7 @@ class CreateCluster extends Job
                 [
                     'json' => [
                         'hostGroupId' => $hostGroup->id,
+                        'shared' => false,
                     ],
                 ]
             );
