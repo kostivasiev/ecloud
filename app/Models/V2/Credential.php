@@ -59,7 +59,7 @@ class Credential extends Model implements Filterable, Sortable
 
     public function getPasswordAttribute($value)
     {
-        return decrypt($value);
+        return !empty($value) ? decrypt($value) : $value;
     }
 
     public function availabilityZone()
