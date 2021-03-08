@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkPolicy\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -31,12 +32,20 @@ class NetworkPolicy extends Model implements Filterable, Sortable
             'network_id',
             'name',
         ];
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class,
+        ];
         parent::__construct($attributes);
     }
 
     public function network()
     {
         return $this->belongsTo(Network::class);
+    }
+
+    public function networkRules()
+    {
+        return $this->hasMany(NetworkRule::class);
     }
 
     public function scopeForUser($query, Consumer $user)
