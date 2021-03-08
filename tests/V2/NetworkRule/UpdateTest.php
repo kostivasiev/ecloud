@@ -2,9 +2,8 @@
 namespace Tests\V2\NetworkRule;
 
 use App\Models\V2\NetworkPolicy;
-use App\Models\V2\Network;
 use App\Models\V2\NetworkRule;
-use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -12,22 +11,44 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Network $network;
     protected NetworkPolicy $networkPolicy;
     protected NetworkRule $networkRule;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->vpc();
-        $this->availabilityZone();
-        $this->network = factory(Network::class)->create([
-            'id' => 'net-test',
-            'router_id' => $this->router()->id,
-        ]);
+        $this->network();
+
+        $mockIds = ['np-test', 'np-alttest'];
+        foreach ($mockIds as $mockId) {
+            $this->nsxServiceMock()->expects('patch')->twice()
+                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/' . $mockId)
+                ->andReturnUsing(function () {
+                    return new Response(200, [], '');
+                });
+            $this->nsxServiceMock()->expects('get')->twice()
+                ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/' . $mockId)
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(
+                        [
+                            'publish_status' => 'REALIZED'
+                        ]
+                    ));
+                });
+            $this->nsxServiceMock()->expects('patch')->twice()
+                ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/' . $mockId)
+                ->andReturnUsing(function () {
+                    return new Response(200, [], '');
+                });
+            $this->nsxServiceMock()->expects('get')->twice()
+                ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/' . $mockId])
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+                });
+        }
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-test',
-            'network_id' => $this->network->id,
+            'network_id' => $this->network()->id,
         ]);
         $this->networkRule = factory(NetworkRule::class)->create([
             'id' => 'nr-test',
@@ -39,7 +60,7 @@ class UpdateTest extends TestCase
     {
         factory(NetworkPolicy::class)->create([
             'id' => 'np-alttest',
-            'network_id' => $this->network->id,
+            'network_id' => $this->network()->id,
         ]);
         $this->patch(
             '/v2/network-rules/nr-test',

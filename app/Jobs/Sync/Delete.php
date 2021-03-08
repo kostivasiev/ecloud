@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Jobs\Nsx\NetworkPolicy;
+namespace App\Jobs\Sync;
 
 use App\Jobs\Job;
-use App\Models\V2\NetworkPolicy;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
-class DeployCheck extends Job
+class Delete extends Job
 {
-    const RETRY_DELAY = 5;
-
-    public $tries = 500;
-
     private $model;
 
-    public function __construct(NetworkPolicy $model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
@@ -22,11 +18,7 @@ class DeployCheck extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        // @todo DeployCheck implementation goes here
-
-        $this->model->setSyncCompleted();
-
+        $this->model->syncDelete();
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
