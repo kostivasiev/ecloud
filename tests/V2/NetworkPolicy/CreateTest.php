@@ -2,7 +2,7 @@
 namespace Tests\V2\NetworkPolicy;
 
 use App\Models\V2\NetworkPolicy;
-use App\Models\V2\Network;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -10,24 +10,47 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Network $network;
-
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->vpc();
-        $this->availabilityZone();
-        $this->network = factory(Network::class)->create([
-            'id' => 'net-test',
-            'router_id' => $this->router()->id,
-        ]);
+        $this->network();
+
+        // bind data so we can use actual NSX mocks
+        app()->bind(NetworkPolicy::class, function () {
+            return factory(NetworkPolicy::class)->make([
+                'id' => 'np-test',
+                'network_id' => $this->network()->id,
+                'name' => 'Test Policy',
+            ]);
+        });
+
+        $this->nsxServiceMock()->expects('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
+        $this->nsxServiceMock()->expects('patch')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
+            });
     }
 
     public function testCreateResource()
     {
         $data = [
             'name' => 'Test Policy',
-            'network_id' => 'net-test',
+            'network_id' => $this->network()->id,
         ];
         $this->post(
             '/v2/network-policies',
@@ -40,7 +63,7 @@ class CreateTest extends TestCase
             'network_policies',
             [
                 'name' => 'Test Policy',
-                'network_id' => 'net-test',
+                'network_id' => $this->network()->id,
             ],
             'ecloud'
         )->assertResponseStatus(201);
@@ -50,9 +73,9 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'Test Policy',
-            'network_id' => $this->network->id,
+            'network_id' => $this->network()->id,
         ];
-        factory(NetworkPolicy::class)->create($data);
+        factory(NetworkPolicy::class)->create(array_merge(['id' => 'np-test'], $data));
         $this->post(
             '/v2/network-policies',
             $data,
