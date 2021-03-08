@@ -20,15 +20,16 @@ trait DeletionRules
 
     public function getDeletionError()
     {
-        return response()->json([
-            'errors' => [
-                [
-                    'title' => 'Precondition Failed',
-                    'detail' => 'The specified resource has dependant relationships and cannot be deleted',
-                    'status' => Response::HTTP_PRECONDITION_FAILED,
+        return response()->json(
+            [
+                'errors' => [
+                    [
+                        'title' => 'Precondition Failed',
+                        'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+                        'status' => Response::HTTP_PRECONDITION_FAILED,
+                        ],
+                    ],
                 ],
-            ],
-        ],
             Response::HTTP_PRECONDITION_FAILED
         );
     }
