@@ -225,6 +225,16 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                     return new Response(200);
                 });
 
+            // CreateTransportNode Job
+            $this->kingpinServiceMock()->expects('get')
+                ->with('/api/v1/vpc/vpc-test/network/switch')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode([
+                        'name' => 'test-network-switch-name',
+                        'uuid' => 'test-network-switch-uuid',
+                    ]));
+                });
+
             $this->hostGroup = factory(HostGroup::class)->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
