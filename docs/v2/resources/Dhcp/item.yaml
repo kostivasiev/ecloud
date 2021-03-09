@@ -32,6 +32,9 @@ patch:
                   readOnly: true
                 availability_zone_id:
                   readOnly : true
+  responses :
+    200 :
+      $ref : '../../resources/Dhcp/responses/idResponse.yaml'
   tags :
     - Dhcps
 delete:
