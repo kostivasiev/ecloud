@@ -1,7 +1,7 @@
 properties:
   id:
     type: string
-    example: image-2b66bb79
+    example: img-2b66bb79
     readOnly: true
   name:
     type: string

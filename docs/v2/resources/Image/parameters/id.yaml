@@ -3,4 +3,4 @@ name: id
 required: true
 schema:
   type: string
-example: image-2b66bb79
+example: img-2b66bb79

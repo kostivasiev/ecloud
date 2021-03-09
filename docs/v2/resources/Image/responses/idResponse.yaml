@@ -9,10 +9,10 @@ content:
           properties:
             id:
               type: string
-              example: image-2b66bb79
+              example: img-2b66bb79
         meta:
           type: object
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/images/image-2b66bb79'
+              example: 'https://api.ukfast.io/ecloud/v2/images/img-2b66bb79'

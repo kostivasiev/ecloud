@@ -21,7 +21,7 @@ properties:
   image_id:
     type: string
     required: true
-    example: 'image-cf7c54c2'
+    example: 'img-cf7c54c2'
     readOnly: false
   vcpu_cores:
     type: integer

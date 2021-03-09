@@ -24,7 +24,7 @@ class Image extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DeletionRules;
 
-    public string $keyPrefix = 'image';
+    public string $keyPrefix = 'img';
 
     public function __construct(array $attributes = [])
     {
