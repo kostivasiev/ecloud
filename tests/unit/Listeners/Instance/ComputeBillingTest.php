@@ -2,8 +2,6 @@
 namespace Tests\unit\Listeners\Instance;
 
 use App\Listeners\V2\Instance\ComputeChange;
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;

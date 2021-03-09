@@ -9,7 +9,7 @@ Content-Type:  application/json
   "name": "Test",
   "vcpu_cores": 1,
   "ram_capacity": 1024,
-  "appliance_id": "6e12d729-ca82-49f9-89d2-eec2360c482a",
+  "image_id": "img-c879f613",
   "requires_floating_ip": true,
   "network_id": "{{dev_network_id}}",
   "volume_capacity": 30
@@ -46,11 +46,11 @@ Content-Type:  application/json
   "name": "Test",
   "vcpu_cores": 1,
   "ram_capacity": 1024,
-  "appliance_id": "eed603bf-d40e-47d7-bb98-66d2940e0dc2",
+  "image_id": "img-0833c3b6",
   "requires_floating_ip": true,
   "network_id": "{{dev_network_id}}",
   "volume_capacity": 30,
-    "appliance_data": {
+  "image_data": {
     "mysql_root_password": "EnCrYpTeD-PaSsWoRd",
     "mysql_wordpress_user_password": "EnCrYpTeD-PaSsWoRd",
     "wordpress_url": "mydomain.com"
