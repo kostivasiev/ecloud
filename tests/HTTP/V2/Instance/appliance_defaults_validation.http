@@ -1,4 +1,4 @@
-# Test config default min volume capacity for linux appliance of 20GB
+# Test config default min volume capacity for linux image of 20GB
 POST https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
