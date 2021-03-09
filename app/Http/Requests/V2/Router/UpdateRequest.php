@@ -42,13 +42,6 @@ class UpdateRequest extends FormRequest
                 'required',
                 new ExistsForAvailabilityZone($availabilityZoneId)
             ],
-            'vpc_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class)
-            ],
         ];
     }
 
