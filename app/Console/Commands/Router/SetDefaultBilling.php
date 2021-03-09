@@ -31,5 +31,7 @@ class SetDefaultBilling extends Command
                 ]);
             }
         });
+
+        return Command::SUCCESS;
     }
 }
