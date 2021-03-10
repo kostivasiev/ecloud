@@ -103,6 +103,7 @@ $app->routeMiddleware([
 
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
+$app->register(Illuminate\Database\Eloquent\LegacyFactoryServiceProvider::class);
 
 // ukfast
 $app->register(App\Providers\AppServiceProvider::class);
