@@ -20,6 +20,7 @@ use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -223,6 +224,21 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function hostGroup()
     {
         if (!$this->hostGroup) {
+            // CreateCluster Job
+            $this->kingpinServiceMock()->expects('post')
+                ->withSomeOfArgs(
+                    '/api/v1/vpc/vpc-test/hostgroup',
+                    [
+                        'json' => [
+                            'hostGroupId' => 'hg-test',
+                            'shared' => false,
+                        ]
+                    ]
+                )
+                ->andReturnUsing(function () {
+                    return new Response(200);
+                });
+
             $this->hostGroup = factory(HostGroup::class)->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',

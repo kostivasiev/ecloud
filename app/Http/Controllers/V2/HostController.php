@@ -33,7 +33,7 @@ class HostController extends BaseController
 
     public function store(StoreRequest $request)
     {
-        $model = new Host();
+        $model = app()->make(Host::class);
         $model->fill($request->only([
             'name',
             'host_group_id',
