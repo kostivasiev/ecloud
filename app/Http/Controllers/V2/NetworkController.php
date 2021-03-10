@@ -64,7 +64,8 @@ class NetworkController extends BaseController
 
                 $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
-                        return !$network->router || strpos($network->router->vpc_id, $vpcId) === false;
+                        return !$network->router
+                            || preg_match('/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/', $network->router->vpc_id) === 0;
                     })
                     ->map(function ($network) {
                         return $network->id;
@@ -75,7 +76,8 @@ class NetworkController extends BaseController
 
                 $networkIds = Network::forUser($request->user())->get()
                     ->reject(function ($network) use ($vpcId) {
-                        return !$network->router || strpos($network->router->vpc_id, $vpcId) !== false;
+                        return !$network->router
+                            || preg_match('/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/', $network->router->vpc_id) === 1;
                     })
                     ->map(function ($network) {
                         return $network->id;
