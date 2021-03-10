@@ -283,3 +283,7 @@ paths:
     $ref: 'resources/Image/collection.yaml'
   '/ecloud/v2/images/{id}':
     $ref: 'resources/Image/item.yaml'
+  '/ecloud/v2/image/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/image/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'
