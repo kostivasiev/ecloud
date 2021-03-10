@@ -35,6 +35,7 @@ $app->configure('erd-generator');
 $app->configure('instance');
 $app->configure('volume');
 $app->configure('kingpin');
+$app->configure('conjurer');
 $app->configure('job-status');
 $app->configure('firewall');
 $app->configure('alerts');
@@ -129,6 +130,7 @@ $app->register(App\Providers\KingpinServiceProvider::class);
 $app->register(App\Providers\ArtisanServiceProvider::class);
 $app->register(\App\Providers\EncryptionServiceProvider::class);
 $app->register(App\Providers\V2\KingpinServiceProvider::class);
+$app->register(App\Providers\V2\ConjurerServiceProvider::class);
 
 
 // apio service providers

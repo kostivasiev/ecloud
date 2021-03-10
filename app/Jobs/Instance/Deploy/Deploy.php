@@ -26,9 +26,9 @@ class Deploy extends Job
 
         $instance = Instance::findOrFail($this->data['instance_id']);
 
-        if (empty($instance->applianceVersion)) {
+        if (empty($instance->image)) {
             $this->fail(new \Exception(
-                'Deploy failed for ' . $instance->id . ', Failed to load appliance version'
+                'Deploy failed for ' . $instance->id . ', Failed to load image'
             ));
             return;
         }
@@ -39,7 +39,7 @@ class Deploy extends Job
                 '/api/v2/vpc/' . $this->data['vpc_id'] . '/instance/fromtemplate',
                 [
                     'json' => [
-                        'templateName' => $instance->applianceVersion->appliance_version_vm_template,
+                        'templateName' => $instance->image->vm_template_name,
                         'instanceId' => $instance->getKey(),
                         'numCPU' => $instance->vcpu_cores,
                         'ramMib' => $instance->ram_capacity,
