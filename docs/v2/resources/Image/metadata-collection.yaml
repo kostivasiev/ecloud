@@ -33,4 +33,4 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/images/img-2b66bb79/metadata?page=2'
   tags:
-    - Image Metadata
+    - Images
