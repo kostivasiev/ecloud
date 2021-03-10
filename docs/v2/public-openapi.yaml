@@ -69,7 +69,7 @@ components:
     ImageParameter:
       $ref: 'resources/ImageParameter/schema.yaml'
     ImageMetadata:
-      $ref: 'resources/ImageParameter/schema.yaml'
+      $ref: 'resources/ImageMetadata/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
