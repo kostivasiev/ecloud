@@ -3,14 +3,14 @@
 namespace App\Jobs\Artisan\Host;
 
 use App\Jobs\Job;
-use App\Models\V2\HostGroup;
+use App\Models\V2\Host;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
     private $model;
 
-    public function __construct(HostGroup $model)
+    public function __construct(Host $model)
     {
         $this->model = $model;
     }

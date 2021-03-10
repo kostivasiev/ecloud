@@ -8,15 +8,15 @@ use App\Jobs\Conjurer\Host\CreateAutoDeployRule;
 use App\Jobs\Conjurer\Host\CreateProfile;
 use App\Jobs\Conjurer\Host\PowerOn;
 use App\Jobs\Job;
-use App\Jobs\Kingpin\HostGroup\CheckOnline;
-use App\Models\V2\HostGroup;
+use App\Jobs\Kingpin\Host\CheckOnline;
+use App\Models\V2\Host;
 use Illuminate\Support\Facades\Log;
 
 class Save extends Job
 {
     private $model;
 
-    public function __construct(HostGroup $model)
+    public function __construct(Host $model)
     {
         $this->model = $model;
     }
