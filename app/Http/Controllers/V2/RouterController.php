@@ -49,7 +49,7 @@ class RouterController extends BaseController
     public function update(UpdateRequest $request, string $routerId)
     {
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
-        $router->fill($request->only(['name', 'availability_zone_id', 'router_throughput_id']));
+        $router->fill($request->only(['name', 'vpc_id', 'router_throughput_id']));
         if (!$router->save()) {
             return $router->getSyncError();
         }
