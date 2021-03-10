@@ -53,8 +53,11 @@ class NewIDTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(201);
-        $this->assertRegExp($this->generateRegExp(AvailabilityZone::class),
-            (json_decode($this->response->getContent()))->data->id);
+
+        $this->assertMatchesRegularExpression(
+            $this->generateRegExp(AvailabilityZone::class),
+            (json_decode($this->response->getContent()))->data->id
+        );
     }
 
     public function testFormatOfRoutersId()
@@ -67,8 +70,11 @@ class NewIDTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(201);
-        $this->assertRegExp($this->generateRegExp(Router::class),
-            (json_decode($this->response->getContent()))->data->id);
+
+        $this->assertMatchesRegularExpression(
+            $this->generateRegExp(Router::class),
+            (json_decode($this->response->getContent()))->data->id
+        );
     }
 
     public function testFormatOfVpcId()
@@ -81,8 +87,11 @@ class NewIDTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
             'X-Reseller-Id' => 1
         ])->assertResponseStatus(201);
-        $this->assertRegExp($this->generateRegExp(Vpc::class),
-            (json_decode($this->response->getContent()))->data->id);
+
+        $this->assertMatchesRegularExpression(
+            $this->generateRegExp(Vpc::class),
+            (json_decode($this->response->getContent()))->data->id
+        );
     }
 
     /**
