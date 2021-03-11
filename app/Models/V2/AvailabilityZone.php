@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\AvailabilityZone\Created;
 use App\Events\V2\AvailabilityZone\Creating;
 use App\Events\V2\AvailabilityZone\Deleted;
+use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
@@ -40,6 +41,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'region_id',
         'is_public',
         'nsx_edge_cluster_id',
+        'san_name',
     ];
 
     protected $dispatchesEvents = [
@@ -73,6 +75,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      * @var ConjurerService
      */
     protected $conjurerService;
+
+    /**
+     * @var ArtisanService
+     */
+    protected $artisanService;
 
     public function routers()
     {
@@ -138,6 +145,14 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->conjurerService;
     }
 
+    public function artisanService()
+    {
+        if (!$this->artisanService) {
+            $this->artisanService = app()->makeWith(ArtisanService::class, [$this]);
+        }
+        return $this->artisanService;
+    }
+
     public function products()
     {
         return Product::forAvailabilityZone($this);
@@ -175,6 +190,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('is_public', Filter::$numericDefaults),
             $factory->create('nsx_edge_cluster_id', Filter::$stringDefaults),
+            $factory->create('san_name', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -195,6 +211,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('region_id'),
             $factory->create('is_public'),
             $factory->create('nsx_edge_cluster_id'),
+            $factory->create('san_name'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -222,6 +239,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'region_id' => 'region_id',
             'is_public' => 'is_public',
             'nsx_edge_cluster_id' => 'nsx_edge_cluster_id',
+            'san_name' => 'san_name',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

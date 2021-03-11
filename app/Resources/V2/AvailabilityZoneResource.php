@@ -36,6 +36,7 @@ class AvailabilityZoneResource extends UKFastResource
             $data['is_public'] = $this->is_public;
             $data['nsx_manager_endpoint'] = $this->nsx_manager_endpoint;
             $data['nsx_edge_cluster_id'] = $this->nsx_edge_cluster_id;
+            $data['san_name'] = $this->san_name;
 
             $tz = new \DateTimeZone(config('app.timezone'));
             $data['created_at'] = $this->created_at === null ? null : Carbon::parse($this->created_at, $tz)->toIso8601String();
