@@ -10,7 +10,7 @@ class PopulateFailedJobsUuids extends Command
 {
     protected $signature = 'queue:populate-failed-jobs-uuids';
 
-    protected $description = 'Test read from queue';
+    protected $description = 'Populate failed jobs uuuids';
 
     public function handle()
     {
