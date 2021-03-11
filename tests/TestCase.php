@@ -20,6 +20,7 @@ use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -220,9 +221,55 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->host;
     }
 
+    public function hostGroupJobMocks()
+    {
+        // CreateCluster Job
+        $this->kingpinServiceMock()->expects('post')
+            ->withSomeOfArgs(
+                '/api/v1/vpc/vpc-test/hostgroup',
+                [
+                    'json' => [
+                        'hostGroupId' => 'hg-test',
+                        'shared' => false,
+                    ]
+                ]
+            )
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        // CreateTransportNode Job
+        $this->kingpinServiceMock()->expects('get')
+            ->with('/api/v1/vpc/vpc-test/network/switch')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'name' => 'test-network-switch-name',
+                    'uuid' => 'test-network-switch-uuid',
+                ]));
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->with('/api/v1/transport-node-profiles')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => 'TEST-TRANSPORT-NODE-PROFILE-ID',
+                            'display_name' => 'TEST-TRANSPORT-NODE-PROFILE-DISPLAY-NAME',
+                        ]
+                    ],
+                ]));
+            });
+        $this->nsxServiceMock()->expects('post')
+            ->withSomeOfArgs('/api/v1/transport-node-profiles')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+    }
+
     public function hostGroup()
     {
         if (!$this->hostGroup) {
+            $this->hostGroupJobMocks();
             $this->hostGroup = factory(HostGroup::class)->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
@@ -232,6 +279,39 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->hostGroup;
+    }
+
+    public function kingpinServiceMock()
+    {
+        if (!$this->kingpinServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-kingpin',
+                'name' => 'kingpinapi',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+            app()->bind(KingpinService::class, function () {
+                return $this->kingpinServiceMock;
+            });
+        }
+        return $this->kingpinServiceMock;
+    }
+
+    public function nsxServiceMock()
+    {
+        if (!$this->nsxServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-nsx',
+                'name' => 'NSX',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
+            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
+            app()->bind(NsxService::class, function () {
+                return $this->nsxServiceMock;
+            });
+        }
+        return $this->nsxServiceMock;
     }
 
     public function hostSpec()
@@ -316,39 +396,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Deploy
             \App\Events\V2\Instance\Deploy::class,
         ]);
-    }
-
-    public function kingpinServiceMock()
-    {
-        if (!$this->kingpinServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-kingpin',
-                'name' => 'kingpinapi',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-            app()->bind(KingpinService::class, function () {
-                return $this->kingpinServiceMock;
-            });
-        }
-        return $this->kingpinServiceMock;
-    }
-
-    public function nsxServiceMock()
-    {
-        if (!$this->nsxServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-nsx',
-                'name' => 'NSX',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
-            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
-            app()->bind(NsxService::class, function () {
-                return $this->nsxServiceMock;
-            });
-        }
-        return $this->nsxServiceMock;
     }
 
     protected function tearDown(): void

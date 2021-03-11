@@ -2,6 +2,8 @@
 
 namespace Tests\V2\HostGroup;
 
+use App\Models\V2\HostGroup;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -47,6 +49,14 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
+        app()->bind(HostGroup::class, function () {
+            return new HostGroup([
+                'id' => 'hg-test',
+            ]);
+        });
+
+        $this->hostGroupJobMocks();
+
         $data = [
             'name' => 'hg-test',
             'vpc_id' => $this->vpc()->id,
@@ -83,6 +93,10 @@ class CrudTest extends TestCase
     public function testUpdate()
     {
         $this->hostGroup();
+
+        // The request fires the jobs a second time
+        $this->hostGroupJobMocks();
+
         $this->patch('/v2/host-groups/hg-test', [
             'name' => 'new name',
         ])->seeInDatabase(
@@ -98,6 +112,10 @@ class CrudTest extends TestCase
     public function testUpdateCantChangeHostSpecId()
     {
         $this->hostGroup();
+
+        // The request fires the jobs a second time
+        $this->hostGroupJobMocks();
+
         $this->patch('/v2/host-groups/hg-test', [
             'host_spec_id' => 'hs-new',
         ])->seeInDatabase(
