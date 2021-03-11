@@ -22,7 +22,7 @@ class ImageController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Image::forUser(Auth::user())->forUser(Auth::user());
+        $collection = Image::forUser(Auth::user());
 
         $queryTransformer->config(Image::class)
             ->transform($collection);
