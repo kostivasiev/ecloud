@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class PowerOffTest extends TestCase
 {
@@ -26,22 +27,26 @@ class PowerOffTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
+
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc->id,
             'name' => 'GetTest Default',
         ]);
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
-        $mockKingpinService->shouldReceive('delete')->withArgs(['/api/v2/vpc/' . $this->vpc->getKey() . '/instance/' . $this->instance->getKey() . '/power'])->andReturn(
+        $mockKingpinService->shouldReceive('delete')->withArgs(['/api/v2/vpc/' . $this->vpc->id . '/instance/' . $this->instance->id . '/power'])->andReturn(
             new Response(200)
         );
 
@@ -63,7 +68,7 @@ class PowerOffTest extends TestCase
         });
 
         $this->put(
-            '/v2/instances/' . $this->instance->getKey() . '/power-off',
+            '/v2/instances/' . $this->instance->id . '/power-off',
             [],
             [
                 'X-consumer-custom-id' => '0-0',

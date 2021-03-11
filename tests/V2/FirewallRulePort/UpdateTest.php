@@ -52,8 +52,8 @@ class UpdateTest extends TestCase
             [
                 'name' => 'Changed',
                 'protocol' => 'UDP',
-                'source' => '10.0.0.1',
-                'destination' => '192.168.1.2'
+                'source' => 'ANY',
+                'destination' => '80'
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -65,8 +65,8 @@ class UpdateTest extends TestCase
                 'id' => $this->firewallRulePort->id,
                 'name' => 'Changed',
                 'protocol' => 'UDP',
-                'source' => '10.0.0.1',
-                'destination' => '192.168.1.2'
+                'source' => 'ANY',
+                'destination' => '80'
             ],
             'ecloud'
         )->assertResponseStatus(200);
@@ -95,5 +95,39 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(200);
+    }
+
+    public function testEmptySourceFails()
+    {
+        $this->patch(
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
+            [
+                'name' => 'Changed',
+                'protocol' => 'UDP',
+                'source' => '',
+                'destination' => '80'
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(422);
+    }
+
+    public function testEmptyDestinationFails()
+    {
+        $this->patch(
+            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
+            [
+                'name' => 'Changed',
+                'protocol' => 'UDP',
+                'source' => '444',
+                'destination' => ''
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertResponseStatus(422);
     }
 }

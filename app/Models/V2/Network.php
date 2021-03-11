@@ -16,6 +16,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -60,6 +61,11 @@ class Network extends Model implements Filterable, Sortable
         return $this->hasMany(Nic::class);
     }
 
+    public function networkPolicy()
+    {
+        return $this->hasOne(NetworkPolicy::class);
+    }
+
     /**
      * @return bool
      * @throws \Exception
@@ -70,13 +76,13 @@ class Network extends Model implements Filterable, Sortable
     {
         try {
             $response = $this->router->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->router->getKey() . '/segments/' . $this->getKey() . '/state'
+                'policy/api/v1/infra/tier-1s/' . $this->router->id . '/segments/' . $this->id . '/state'
             );
             $response = json_decode($response->getBody()->getContents());
             return in_array($response->state, ['in_sync', 'success']);
         } catch (GuzzleException $exception) {
             Log::info('Segment state response', [
-                'id' => $this->getKey(),
+                'id' => $this->id,
                 'response' => json_decode($exception->getResponse()->getBody()->getContents()),
             ]);
             return false;
@@ -85,21 +91,17 @@ class Network extends Model implements Filterable, Sortable
 
     /**
      * @param $query
-     * @param $user
+     * @param Consumer $user
      * @return mixed
      */
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('router.vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
-
-        return $query;
+        return $query->whereHas('router.vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
     }
 
     /**

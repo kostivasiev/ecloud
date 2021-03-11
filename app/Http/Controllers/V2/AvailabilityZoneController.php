@@ -8,6 +8,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
+use App\Models\V2\HostSpec;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Product;
@@ -17,6 +18,7 @@ use App\Resources\V2\AvailabilityZoneCapacityResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
+use App\Resources\V2\HostSpecResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\ProductResource;
@@ -39,7 +41,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = AvailabilityZone::forUser($request->user);
+        $collection = AvailabilityZone::forUser($request->user());
         $queryTransformer->config(AvailabilityZone::class)
             ->transform($collection);
 
@@ -56,7 +58,7 @@ class AvailabilityZoneController extends BaseController
     public function show(Request $request, string $zoneId)
     {
         return new AvailabilityZoneResource(
-            AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+            AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
         );
     }
 
@@ -77,7 +79,7 @@ class AvailabilityZoneController extends BaseController
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 201);
+        return $this->responseIdMeta($request, $availabilityZone->id, 201);
     }
 
     /**
@@ -98,7 +100,7 @@ class AvailabilityZoneController extends BaseController
             'nsx_edge_cluster_id',
         ]));
         $availabilityZone->save();
-        return $this->responseIdMeta($request, $availabilityZone->getKey(), 200);
+        return $this->responseIdMeta($request, $availabilityZone->id, 200);
     }
 
     /**
@@ -109,7 +111,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function routers(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->routers();
         $queryTransformer->config(Router::class)
             ->transform($collection);
@@ -127,7 +129,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function routerThroughputs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->routerThroughputs();
         $queryTransformer->config(RouterThroughput::class)
             ->transform($collection);
@@ -145,7 +147,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function dhcps(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->dhcps();
         $queryTransformer->config(Dhcp::class)
             ->transform($collection);
@@ -163,7 +165,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function credentials(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->credentials();
         $queryTransformer->config(Credential::class)
             ->transform($collection);
@@ -181,7 +183,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function instances(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->instances();
         $queryTransformer->config(Instance::class)
             ->transform($collection);
@@ -199,7 +201,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function lbcs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->loadBalancerClusters();
         $queryTransformer->config(LoadBalancerCluster::class)
             ->transform($collection);
@@ -217,7 +219,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function capacities(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user)->findOrFail($zoneId)
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->availabilityZoneCapacities();
         $queryTransformer->config(AvailabilityZoneCapacity::class)
             ->transform($collection);
@@ -227,11 +229,6 @@ class AvailabilityZoneController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $zoneId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $zoneId)
     {
         $model = AvailabilityZone::findOrFail($zoneId);
@@ -249,7 +246,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function prices(Request $request, string $zoneId)
     {
-        $availabilityZone = AvailabilityZone::forUser($request->user)->findOrFail($zoneId);
+        $availabilityZone = AvailabilityZone::forUser($request->user())->findOrFail($zoneId);
 
         $products = $availabilityZone->products();
 
@@ -259,6 +256,18 @@ class AvailabilityZoneController extends BaseController
             ->transform($products);
 
         return ProductResource::collection($products->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function hostSpecs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    {
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
+            ->hostSpecs();
+        $queryTransformer->config(HostSpec::class)
+            ->transform($collection);
+
+        return HostSpecResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -2,18 +2,14 @@
 
 namespace Tests\V2\FirewallRulePort;
 
-use App\Events\V2\FirewallRulePort\Deleted;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     use DatabaseMigrations;
 
     protected FirewallRule $firewallRule;
@@ -48,21 +44,10 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete(
-            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
-            [],
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(204);
-        $firewallRulePort = FirewallRulePort::withTrashed()->findOrFail($this->firewallRulePort->id);
-        $this->assertNotNull($firewallRulePort->deleted_at);
-
-        Event::assertDispatched(Deleted::class, function ($job) {
-            return $job->model->id === $this->firewallRulePort->id;
-        });
+        $this->delete('v2/firewall-rule-ports/' . $this->firewallRulePort->id, [], [
+            'X-consumer-custom-id' => '1-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(204);
+        $this->assertNotFalse(FirewallRulePort::find($this->firewallRulePort->id));
     }
-
 }

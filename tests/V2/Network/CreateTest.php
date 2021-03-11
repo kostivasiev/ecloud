@@ -18,21 +18,22 @@ class CreateTest extends TestCase
     protected $region;
     protected $vpc;
     protected $router;
-    protected $availability_zone;
+    protected $availabilityZone;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->id,
         ]);
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
@@ -42,7 +43,7 @@ class CreateTest extends TestCase
             '/v2/networks',
             [
                 'name' => 'Manchester Network',
-                'router_id' => $this->router->getKey(),
+                'router_id' => $this->router->id,
                 'subnet' => '10.0.0.0/24'
             ],
             [
@@ -53,7 +54,7 @@ class CreateTest extends TestCase
             'networks',
             [
                 'name' => 'Manchester Network',
-                'router_id' => $this->router->getKey(),
+                'router_id' => $this->router->id,
                 'subnet' => '10.0.0.0/24'
             ],
             'ecloud'

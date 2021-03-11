@@ -2,26 +2,40 @@
 
 namespace Tests;
 
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
+use App\Models\V2\HostSpec;
+use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Models\V2\Image;
 use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
+    // This is required for the Kingping/NSX mocks, see below
+    use DatabaseMigrations;
+
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',
     ];
     public $validWriteHeaders = [
         'X-consumer-custom-id' => '0-0',
-        'X-consumer-groups' => 'ecloud.write',
+        'X-consumer-groups' => 'ecloud.read, ecloud.write',
     ];
 
     /** @var Region */
@@ -42,12 +56,38 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var NsxService */
     private $nsxServiceMock;
 
+    /** @var KingpinService */
+    private $kingpinServiceMock;
+
     /** @var Credential */
     private $credential;
 
+    /** @var Instance */
+    private $instance;
+
+    /** @var ApplianceVersion */
+    private $applianceVersion;
+
+    /** @var Appliance */
+    private $appliance;
+
+    /** @var Network */
+    private $network;
+
+    /** @var Host */
+    private $host;
+
+    /** @var HostSpec */
+    private $hostSpec;
+
+    /** @var HostGroup */
+    private $hostGroup;
+
+    /** @var Image */
+    private $image;
+
     /**
      * Creates the application.
-     *
      * @return Application
      */
     public function createApplication()
@@ -71,7 +111,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->router) {
             $this->router = factory(Router::class)->create([
                 'id' => 'rtr-test',
-                'vpc_id' => $this->vpc()->id
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id
             ]);
         }
         return $this->router;
@@ -98,18 +139,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->region;
     }
 
-    public function nsxServiceMock()
-    {
-        if (!$this->nsxServiceMock) {
-            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
-            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
-            app()->bind(NsxService::class, function () {
-                return $this->nsxServiceMock;
-            });
-        }
-        return $this->nsxServiceMock;
-    }
-
     public function availabilityZone()
     {
         if (!$this->availabilityZone) {
@@ -117,21 +146,103 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'id' => 'az-test',
                 'region_id' => $this->region()->id,
             ]);
-            $this->credential();
         }
         return $this->availabilityZone;
     }
 
-    public function credential()
+    public function instance()
     {
-        if (!$this->credential) {
-            $this->credential = factory(Credential::class)->create([
-                'id' => 'cred-test',
-                'name' => 'NSX',
-                'resource_id' => $this->availabilityZone->id,
+        if (!$this->instance) {
+            $this->instance = factory(Instance::class)->create([
+                'id' => 'i-test',
+                'vpc_id' => $this->vpc()->id,
+                'name' => 'Test Instance ' . uniqid(),
+                'image_id' => $this->image()->id,
+                'vcpu_cores' => 1,
+                'ram_capacity' => 1024,
+                'platform' => 'Linux',
+                'availability_zone_id' => $this->availabilityZone()->id
             ]);
         }
-        return $this->credential;
+        return $this->instance;
+    }
+
+    public function image()
+    {
+        if (!$this->image) {
+            $this->image = factory(Image::class)->create([
+                'appliance_version_id' => $this->applianceVersion()->id,
+            ]);
+        }
+        return $this->image;
+    }
+
+    public function applianceVersion()
+    {
+        if (!$this->applianceVersion) {
+            $this->applianceVersion = factory(ApplianceVersion::class)->create([
+                'appliance_version_appliance_id' => $this->appliance()->id,
+            ]);
+        }
+        return $this->applianceVersion;
+    }
+
+    public function appliance()
+    {
+        if (!$this->appliance) {
+            $this->appliance = factory(Appliance::class)->create([
+                'appliance_name' => 'Test Appliance',
+            ])->refresh();
+        }
+        return $this->appliance;
+    }
+
+    public function network()
+    {
+        if (!$this->network) {
+            $this->network = factory(Network::class)->create([
+                'name' => 'Manchester Network',
+                'router_id' => $this->router()->id
+            ]);
+        }
+        return $this->network;
+    }
+
+    public function host()
+    {
+        if (!$this->host) {
+            $this->host = factory(Host::class)->create([
+                'id' => 'h-test',
+                'name' => 'h-test',
+                'host_group_id' => $this->hostGroup()->id,
+            ]);
+        }
+        return $this->host;
+    }
+
+    public function hostGroup()
+    {
+        if (!$this->hostGroup) {
+            $this->hostGroup = factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+            ]);
+        }
+        return $this->hostGroup;
+    }
+
+    public function hostSpec()
+    {
+        if (!$this->hostSpec) {
+            $this->hostSpec = factory(HostSpec::class)->create([
+                'id' => 'hs-test',
+                'name' => 'test-host-spec',
+            ]);
+        }
+        return $this->hostSpec;
     }
 
     protected function setUp(): void
@@ -146,6 +257,11 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
             return $mockEncryptionServiceProvider;
         });
+
+        // Using these mocks means we have to use DatabaseMigration by default, but the ability to catch 3rd party
+        // API calls being performed in tests is more than worth the extra overhead.
+        $this->kingpinServiceMock();
+        $this->nsxServiceMock();
 
         Event::fake([
             // V1 hack
@@ -164,7 +280,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
             \App\Events\V2\Nic\Created::class,
-            \App\Events\V2\Volume\Created::class,
 
             // Deleting
             \App\Events\V2\Nat\Deleting::class,
@@ -172,13 +287,10 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Deleted
             \App\Events\V2\AvailabilityZone\Deleted::class,
             \App\Events\V2\Nat\Deleted::class,
-            \App\Events\V2\FirewallRule\Deleted::class,
             \App\Events\V2\Vpc\Deleted::class,
             \App\Events\V2\Dhcp\Deleted::class,
             \App\Events\V2\Nic\Deleted::class,
-            \App\Events\V2\FirewallRulePort\Deleted::class,
             \App\Events\V2\FloatingIp\Deleted::class,
-            \App\Events\V2\Volume\Deleted::class,
             \App\Events\V2\Network\Deleted::class,
             \App\Events\V2\Router\Deleted::class,
 
@@ -187,7 +299,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Network\Saved::class,
             \App\Events\V2\Nat\Saved::class,
             \App\Events\V2\AvailabilityZoneCapacity\Saved::class,
-            \App\Events\V2\Volume\Saved::class,
 
             // Updated
             \App\Events\V2\Sync\Updated::class,
@@ -200,11 +311,49 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Nat\Saving::class,
 
             // Deleting
-            \App\Events\V2\Volume\Saving::class,
             \App\Events\V2\Instance\Saving::class,
 
             // Deploy
             \App\Events\V2\Instance\Deploy::class,
         ]);
+    }
+
+    public function kingpinServiceMock()
+    {
+        if (!$this->kingpinServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-kingpin',
+                'name' => 'kingpinapi',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+            app()->bind(KingpinService::class, function () {
+                return $this->kingpinServiceMock;
+            });
+        }
+        return $this->kingpinServiceMock;
+    }
+
+    public function nsxServiceMock()
+    {
+        if (!$this->nsxServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-nsx',
+                'name' => 'NSX',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
+            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
+            app()->bind(NsxService::class, function () {
+                return $this->nsxServiceMock;
+            });
+        }
+        return $this->nsxServiceMock;
+    }
+
+    protected function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
     }
 }

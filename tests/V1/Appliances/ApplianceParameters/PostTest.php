@@ -3,7 +3,7 @@
 namespace Tests\V1\Appliances\ApplianceParameters;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class PostTest extends ApplianceTestCase
 {
@@ -61,6 +61,6 @@ class PostTest extends ApplianceTestCase
             'description' => 'This is a test parameter',
             'required' => false
 
-        ], $this->validReadHeaders)->seeStatusCode(403);
+        ], $this->validReadHeaders)->seeStatusCode(401);
     }
 }

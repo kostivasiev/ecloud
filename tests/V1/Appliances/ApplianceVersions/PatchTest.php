@@ -3,7 +3,7 @@
 namespace Tests\V1\Appliances\ApplianceVersions;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class PatchTest extends ApplianceTestCase
 {
@@ -85,6 +85,6 @@ class PatchTest extends ApplianceTestCase
             'name' => $testString,
         ], $this->validReadHeaders);
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(401);
     }
 }

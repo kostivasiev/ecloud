@@ -11,6 +11,7 @@ use App\Models\V2\FloatingIp;
 use App\Resources\V2\FloatingIpResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -24,7 +25,7 @@ class FloatingIpController extends BaseController
         // "resource_id" filtering hack - start
         if ($request->has('resource_id:eq')) {
             if ($request->get('resource_id:eq') === 'null') {
-                $floatingIpIds = FloatingIp::forUser($request->user)->get()
+                $floatingIpIds = FloatingIp::forUser($request->user())->get()
                     ->reject(function ($floatingIp) {
                         return $floatingIp->resource_id != null;
                     })
@@ -34,7 +35,7 @@ class FloatingIpController extends BaseController
                 $collection = FloatingIp::whereIn('id', $floatingIpIds);
             } else {
                 $resourceId = $request->get('resource_id:eq');
-                $floatingIpIds = FloatingIp::forUser($request->user)->get()
+                $floatingIpIds = FloatingIp::forUser($request->user())->get()
                     ->reject(function ($floatingIp) use ($resourceId) {
                         return $floatingIp->resource_id != $resourceId;
                     })
@@ -46,7 +47,7 @@ class FloatingIpController extends BaseController
             $request->query->remove('resource_id:eq');  // So Ditto doesn't try to filter by resource_id
         } elseif ($request->has('resource_id:in')) {
             $ids = explode(',', $request->get('resource_id:in'));
-            $floatingIpIds = FloatingIp::forUser($request->user)->get()
+            $floatingIpIds = FloatingIp::forUser($request->user())->get()
                 ->reject(function ($floatingIp) use ($ids) {
                     return !in_array($floatingIp->resource_id, $ids);
                 })
@@ -56,7 +57,7 @@ class FloatingIpController extends BaseController
             $collection = FloatingIp::whereIn('id', $floatingIpIds);
             $request->query->remove('resource_id:in');  // So Ditto doesn't try to filter by resource_id
         } else {
-            $collection = FloatingIp::forUser($request->user);
+            $collection = FloatingIp::forUser($request->user());
         }
         // "resource_id" filtering hack - end
 
@@ -71,7 +72,7 @@ class FloatingIpController extends BaseController
     public function show(Request $request, string $fipId)
     {
         return new FloatingIpResource(
-            FloatingIp::forUser($request->user)->findOrFail($fipId)
+            FloatingIp::forUser($request->user())->findOrFail($fipId)
         );
     }
 
@@ -81,25 +82,24 @@ class FloatingIpController extends BaseController
             $request->only(['vpc_id', 'name'])
         );
         $resource->save();
-        return $this->responseIdMeta($request, $resource->getKey(), 201);
+        return $this->responseIdMeta($request, $resource->id, 201);
     }
 
     public function update(UpdateRequest $request, string $fipId)
     {
-        $resource = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
+        $resource = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
         $resource->fill($request->only(['name']));
         $resource->save();
-        return $this->responseIdMeta($request, $resource->getKey(), 200);
+        return $this->responseIdMeta($request, $resource->id, 200);
     }
 
     public function destroy(Request $request, string $fipId)
     {
-        $model = FloatingIp::forUser(app('request')->user)->findOrFail($fipId);
+        $model = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 
@@ -115,7 +115,7 @@ class FloatingIpController extends BaseController
 
     public function unassign(Request $request, string $fipId)
     {
-        $floatingIp = FloatingIp::forUser($request->user)->findOrFail($fipId);
+        $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         $this->dispatch(new Unassign($floatingIp));
 

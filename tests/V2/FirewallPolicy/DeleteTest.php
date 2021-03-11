@@ -20,7 +20,7 @@ class DeleteTest extends TestCase
                 [
                     'json' => [
                         'id' => 'fwp-test',
-                        'display_name' => 'name',
+                        'display_name' => 'fwp-test',
                         'description' => 'name',
                         'sequence_number' => 10,
                         'rules' => [],

@@ -17,7 +17,7 @@ class GetTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected $availability_zone;
+    protected $availabilityZone;
     protected $instance;
     protected $mac_address;
     protected $ip_address;
@@ -33,7 +33,7 @@ class GetTest extends TestCase
         $this->ip_address = $this->faker->ipv4;
         $this->mac_address = $this->faker->macAddress;
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
         $this->vpc = factory(Vpc::class)->create([
@@ -41,6 +41,7 @@ class GetTest extends TestCase
         ]);
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',

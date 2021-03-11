@@ -22,8 +22,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
     $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
     $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
+    $router->get('availability-zones/{zoneId}/host-specs', 'AvailabilityZoneController@hostSpecs');
 
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
         $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
@@ -36,7 +37,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Availability Zone Capacities */
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@index');
         $router->get('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@show');
         $router->post('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@create');
@@ -57,7 +58,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
         $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->get('vpcs/{vpcId}/lbcs', 'VpcController@lbcs');
         });
     });
@@ -79,6 +80,33 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('networks', 'NetworkController@create');
         $router->patch('networks/{networkId}', 'NetworkController@update');
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
+    });
+
+    /** Network Policy */
+    $router->group([], function () use ($router) {
+        $router->get('network-policies', 'NetworkPolicyController@index');
+        $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->post('network-policies', 'NetworkPolicyController@store');
+        $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
+        $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
+    });
+
+    /** Network Rules */
+    $router->group([], function () use ($router) {
+        $router->get('network-rules', 'NetworkRuleController@index');
+        $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
+        $router->post('network-rules', 'NetworkRuleController@store');
+        $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+    });
+
+    /** Network Rule Ports */
+    $router->group([], function () use ($router) {
+        $router->get('network-rule-ports', 'NetworkRulePortController@index');
+        $router->get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
+        $router->post('network-rule-ports', 'NetworkRulePortController@store');
+        $router->patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
+        $router->delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
     });
 
     /** Vpns */
@@ -173,7 +201,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('regions/{regionId}/vpcs', 'RegionController@vpcs');
         $router->get('regions/{regionId}/prices', 'RegionController@prices');
 
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('regions', 'RegionController@create');
             $router->patch('regions/{regionId}', 'RegionController@update');
             $router->delete('regions/{regionId}', 'RegionController@destroy');
@@ -194,16 +222,18 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('volumes', 'VolumeController@index');
         $router->get('volumes/{volumeId}', 'VolumeController@show');
         $router->get('volumes/{volumeId}/instances', 'VolumeController@instances');
-        //$router->post('volumes', 'VolumeController@store');
+        $router->post('volumes', 'VolumeController@store');
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
+        $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
+        $router->post('volumes/{volumeId}/detach', 'VolumeController@detach');
     });
 
     /** Nics */
     $router->group([], function () use ($router) {
         $router->get('nics', 'NicController@index');
         $router->get('nics/{nicId}', 'NicController@show');
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
             //$router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');
             $router->delete('nics/{nicId}', 'NicController@destroy');
@@ -211,7 +241,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Credentials */
-    $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('credentials', 'CredentialsController@index');
         $router->get('credentials/{credentialsId}', 'CredentialsController@show');
         $router->post('credentials', 'CredentialsController@store');
@@ -234,14 +264,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('discount-plans', 'DiscountPlanController@index');
         $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
+        $router->post('discount-plans', 'DiscountPlanController@store');
 
         $router->group(['middleware' => 'is-pending'], function () use ($router) {
             $router->post('discount-plans/{discountPlanId}/approve', 'DiscountPlanController@approve');
             $router->post('discount-plans/{discountPlanId}/reject', 'DiscountPlanController@reject');
         });
 
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
-            $router->post('discount-plans', 'DiscountPlanController@store');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
             $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
         });
@@ -250,11 +280,11 @@ $router->group($baseRouteParameters, function () use ($router) {
     /** Billing Metrics */
     $router->group([], function () use ($router) {
         $router->get('billing-metrics', 'BillingMetricController@index');
-        $router->get('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@show');
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->get('billing-metrics/{billingMetricId}', 'BillingMetricController@show');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('billing-metrics', 'BillingMetricController@create');
-            $router->patch('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@update');
-            $router->delete('billing-metrics/{billingMetricControllerId}', 'BillingMetricController@destroy');
+            $router->patch('billing-metrics/{billingMetricId}', 'BillingMetricController@update');
+            $router->delete('billing-metrics/{billingMetricId}', 'BillingMetricController@destroy');
         });
     });
 
@@ -263,10 +293,52 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('router-throughputs', 'RouterThroughputController@index');
         $router->get('router-throughputs/{routerThroughputId}', 'RouterThroughputController@show');
 
-        $router->group(['middleware' => 'is-administrator'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('router-throughputs', 'RouterThroughputController@store');
             $router->patch('router-throughputs/{routerThroughputId}', 'RouterThroughputController@update');
             $router->delete('router-throughputs/{routerThroughputId}', 'RouterThroughputController@destroy');
+        });
+    });
+
+    /** Host */
+    $router->group([], function () use ($router) {
+        $router->get('hosts', 'HostController@index');
+        $router->get('hosts/{id}', 'HostController@show');
+        $router->post('hosts', 'HostController@store');
+        $router->patch('hosts/{id}', 'HostController@update');
+        $router->delete('hosts/{id}', 'HostController@destroy');
+    });
+
+    /** Host Spec */
+    $router->group([], function () use ($router) {
+        $router->get('host-specs', 'HostSpecController@index');
+        $router->get('host-specs/{hostSpecId}', 'HostSpecController@show');
+
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('host-specs', 'HostSpecController@store');
+            $router->patch('host-specs/{hostSpecId}', 'HostSpecController@update');
+            $router->delete('host-specs/{hostSpecId}', 'HostSpecController@destroy');
+        });
+    });
+
+    /** Host Group */
+    $router->group([], function () use ($router) {
+        $router->get('host-groups', 'HostGroupController@index');
+        $router->get('host-groups/{id}', 'HostGroupController@show');
+        $router->post('host-groups', 'HostGroupController@store');
+        $router->patch('host-groups/{id}', 'HostGroupController@update');
+        $router->delete('host-groups/{id}', 'HostGroupController@destroy');
+    });
+
+    /** Image */
+    $router->group([], function () use ($router) {
+        $router->get('images', 'ImageController@index');
+        $router->get('images/{imageId}', 'ImageController@show');
+        $router->get('images/{imageId}/parameters', 'ImageController@parameters');
+        $router->get('images/{imageId}/metadata', 'ImageController@metadata');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('images', 'ImageController@store');
+            $router->delete('images/{imageId}', 'ImageController@destroy');
         });
     });
 });

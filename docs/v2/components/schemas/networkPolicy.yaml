@@ -1,0 +1,30 @@
+properties:
+  id:
+    type: string
+    example: np-abc123xyz
+    readOnly: true
+  name:
+    type: string
+    example: 'Default Network Policy'
+  network_id :
+    required : true
+    type : string
+    example : 'net-912345'
+  vpc_id :
+    type : string
+    required : true
+    example : vpc-2b66bb79
+    readOnly : true
+  sync :
+    type : string
+    example : 'completed'
+    readOnly : true
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Network Policies'

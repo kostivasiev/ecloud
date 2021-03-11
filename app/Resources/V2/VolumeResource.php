@@ -13,6 +13,7 @@ use UKFast\Responses\UKFastResource;
  * @property string vpc_id
  * @property string availability_zone_id
  * @property string capacity
+ * @property string iops
  * @property string vmware_uuid
  * @property string created_at
  * @property string updated_at
@@ -31,6 +32,8 @@ class VolumeResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
             'capacity' => $this->capacity,
+            'iops' => $this->iops,
+            'mounted' => $this->mounted,
             'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
@@ -42,7 +45,7 @@ class VolumeResource extends UKFastResource
             )->toIso8601String(),
         ];
 
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data['vmware_uuid'] = $this->vmware_uuid;
         }
 

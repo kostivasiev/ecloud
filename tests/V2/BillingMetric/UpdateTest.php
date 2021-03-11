@@ -41,7 +41,8 @@ class UpdateTest extends TestCase
             'region_id' => $this->region->id
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->billingMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->router->id,

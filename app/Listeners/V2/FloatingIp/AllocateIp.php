@@ -25,14 +25,14 @@ class AllocateIp implements ShouldQueue
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        $floatingIp = FloatingIp::find($event->model->getKey());
+        $floatingIp = FloatingIp::find($event->model->id);
         if (empty($floatingIp)) {
-            $error = 'Failed to allocate floating IP to ' . $event->model->getKey() . '. Resource has been deleted';
+            $error = 'Failed to allocate floating IP to ' . $event->model->id . '. Resource has been deleted';
             Log::error($error);
             $this->fail(new \Exception($error));
             return;
         }
-        $logMessage = 'Allocate external Ip to floating IP ' . $floatingIp->getKey() . ': ';
+        $logMessage = 'Allocate external Ip to floating IP ' . $floatingIp->id . ': ';
 
         $datacentreSiteIds = $floatingIp->vpc->region->availabilityZones->pluck('datacentre_site_id')->unique();
         $networkingAdminClient = app()->make(AdminClient::class);
@@ -93,7 +93,7 @@ class AllocateIp implements ShouldQueue
 
                 $floatingIp->vpc->region->availabilityZones->each(function ($availabilityZone) {
                     dispatch(new UpdateFloatingIpCapacity([
-                        'availability_zone_id' => $availabilityZone->getKey()
+                        'availability_zone_id' => $availabilityZone->id
                     ]));
                 });
 
@@ -101,7 +101,7 @@ class AllocateIp implements ShouldQueue
             }
         }
 
-        $error = 'Insufficient available external IP\'s to assign to floating IP resource ' . $floatingIp->getKey();
+        $error = 'Insufficient available external IP\'s to assign to floating IP resource ' . $floatingIp->id;
         Log::error($error);
         $this->fail(new \Exception($error));
         return;

@@ -29,11 +29,11 @@ class ConfigureNics extends Job
         if (!$network->available) {
             if ($this->attempts() <= static::RETRY_ATTEMPTS) {
                 $this->release(static::RETRY_DELAY);
-                Log::info('Attempted to configure NICs on Network (' . $network->getKey()
+                Log::info('Attempted to configure NICs on Network (' . $network->id
                     . ') but Network was not available, will retry shortly');
                 return;
             } else {
-                $message = 'Timed out waiting for Network (' . $network->getKey() .
+                $message = 'Timed out waiting for Network (' . $network->id .
                     ') to become available for prior to NIC configuration';
                 $this->fail(new \Exception($message));
                 return;
@@ -59,7 +59,7 @@ class ConfigureNics extends Job
             $nic->instance_id = $instance->id;
             $nic->network_id = $network->id;
             $nic->save();
-            Log::info(get_class($this) . ' : Created NIC resource ' . $nic->getKey());
+            Log::info(get_class($this) . ' : Created NIC resource ' . $nic->id);
 
             $router = $network->router;
             $subnet = Subnet::fromString($network->subnet);
@@ -72,7 +72,7 @@ class ConfigureNics extends Job
             $cursor = null;
             $assignedIpsNsx = collect();
             do {
-                $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey() . '/dhcp-static-binding-configs?cursor=' . $cursor);
+                $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/dhcp-static-binding-configs?cursor=' . $cursor);
                 $response = json_decode($response->getBody()->getContents());
                 foreach ($response->results as $dhcpStaticBindingConfig) {
                     $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
@@ -115,17 +115,17 @@ class ConfigureNics extends Job
                 } catch (\Exception $exception) {
                     if ($exception->getCode() == 23000) {
                         // Ip already assigned
-                        Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->getKey() . ': IP is already used.');
+                        //Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->id . ': IP is already used.');
                         continue;
                     }
 
                     $this->fail(new \Exception(
-                        'Configuring NIC ' . $nic->getKey() . ': Failed: ' . $exception->getMessage()
+                        'Configuring NIC ' . $nic->id . ': Failed: ' . $exception->getMessage()
                     ));
                     return;
                 }
 
-                Log::info('Ip Address ' . $nic->ip_address . ' assigned to ' . $nic->getKey());
+                Log::info('Ip Address ' . $nic->ip_address . ' assigned to ' . $nic->id);
                 break;
             }
 
@@ -136,8 +136,8 @@ class ConfigureNics extends Job
              */
             try {
                 $nsxService->put(
-                    '/policy/api/v1/infra/tier-1s/' . $router->getKey() . '/segments/' . $network->getKey()
-                    . '/dhcp-static-binding-configs/' . $nic->getKey(),
+                    '/policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id
+                    . '/dhcp-static-binding-configs/' . $nic->id,
                     [
                         'json' => [
                             'resource_type' => 'DhcpV4StaticBindingConfig',
@@ -154,7 +154,7 @@ class ConfigureNics extends Job
             }
 
             $nic->setSyncCompleted();
-            Log::info('DHCP static binding created for ' . $nic->getKey() . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
+            Log::info('DHCP static binding created for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
         }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);

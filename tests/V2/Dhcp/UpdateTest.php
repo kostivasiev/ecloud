@@ -14,42 +14,29 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $faker;
-    protected $availability_zone;
-    protected $region;
-    protected $vpc;
-    protected $dhcp;
+    protected Dhcp $dhcp;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create([
-            'name' => $this->faker->country(),
-        ]);
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
         $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id
         ]);
     }
 
     public function testNoPermsIsDenied()
     {
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
-                'vpc_id' => $this->vpc->id,
+                'name' => 'Updated Name',
             ],
             []
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);
@@ -58,56 +45,32 @@ class UpdateTest extends TestCase
     public function testNullNameIsDenied()
     {
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             [
-                'vpc_id' => '',
+                'name' => '',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeJson([
+        )->seeJson(
+            [
                 'title' => 'Validation Error',
-                'detail' => 'The vpc id field, when specified, cannot be null',
+                'detail' => 'The name field is required',
                 'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
-    public function testNotOwnedVpcIsFailed()
-    {
-        $vpc2 = factory(Vpc::class)->create([
-            'reseller_id' => 3,
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
-            [
-                'vpc_id' => $vpc2->getKey(),
-            ],
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'source' => 'name'
             ]
         )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
             ->assertResponseStatus(422);
     }
 
     public function testValidDataIsSuccessful()
     {
         $data = [
-            'vpc_id' => $this->vpc->id,
+            'name' => 'Updated Name',
         ];
         $this->patch(
-            '/v2/dhcps/' . $this->dhcp->getKey(),
+            '/v2/dhcps/' . $this->dhcp->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -115,7 +78,7 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(200);
 
-        $dhcp = Dhcp::findOrFail($this->dhcp->getKey());
-        $this->assertEquals($data['vpc_id'], $this->dhcp->vpc_id);
+        $dhcp = Dhcp::findOrFail($this->dhcp->id);
+        $this->assertEquals($data['name'], $dhcp->name);
     }
 }

@@ -50,9 +50,17 @@ components:
     Meta:
       $ref: 'components/schemas/meta.yaml'
     Credentials:
-      $ref: 'components/schemas/credential.yaml'
+      $ref: 'components/schemas/admin/credential.yaml'
     DiscountPlan:
       $ref: 'components/schemas/admin/discountPlan.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
 
   parameters:
     # Query Parameters
@@ -175,3 +183,15 @@ paths:
     $ref: 'resources/RouterThroughput/admin-collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/admin-item.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/admin-collection.yaml'
+  '/ecloud/v2/images/{imageId}':
+    $ref: 'resources/Image/admin-item.yaml'
+  '/ecloud/v2/image/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/image/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'
+  '/ecloud/v2/host-specs':
+    $ref: 'resources/HostSpec/admin-collection.yaml'
+  '/ecloud/v2/host-specs/{hostSpecId}':
+    $ref: 'resources/HostSpec/admin-item.yaml'

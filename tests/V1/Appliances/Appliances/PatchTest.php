@@ -3,7 +3,7 @@
 namespace Tests\V1\Appliances\Appliances;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class PatchTest extends ApplianceTestCase
 {
@@ -81,6 +81,6 @@ class PatchTest extends ApplianceTestCase
             'X-consumer-groups' => 'ecloud.read',
         ]);
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(401);
     }
 }

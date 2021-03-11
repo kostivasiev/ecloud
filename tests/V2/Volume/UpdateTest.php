@@ -6,8 +6,10 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
@@ -30,86 +32,37 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->kingpinServiceMock()
+            ->shouldReceive('post')
+            ->withSomeOfArgs(
+                '/api/v1/vpc/vpc-test/volume',
+                [
+                    'json' => [
+                        'volumeId' => 'vol-abc123xyz',
+                        'sizeGiB' => '100',
+                        'shared' => false
+                    ]
+                ]
+            )
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => '7b9d062f-2048-42e8-82f9-f67d3e9e3dfe']));
+            });
         $this->volume = factory(Volume::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'id' => 'vol-abc123xyz',
+            'vpc_id' => $this->vpc()->id
         ]);
-    }
-
-    public function testInvalidVpcIdIsFailed()
-    {
-        $data = [
-            'name' => 'Volume 1',
-            'vpc_id' => 'x',
-            'availability_zone_id' => $this->availabilityZone->getKey()
-        ];
-
-        $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
-
-    public function testInvalidAzIsFailed()
-    {
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey()
-        ]);
-
-        $data = [
-            'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $availabilityZone->getKey(),
-            'capacity' => (config('volume.capacity.max') - 1),
-        ];
-
-        $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
-            $data,
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Not Found',
-                'detail' => 'The specified availability zone is not available to that VPC',
-                'status' => 404,
-                'source' => 'availability_zone_id'
-            ])
-            ->assertResponseStatus(404);
     }
 
     public function testNotOwnedVolumeIsFailed()
     {
+        $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey()
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -128,13 +81,11 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.min') - 1),
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -154,13 +105,11 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.max') + 1),
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-0',
@@ -178,15 +127,25 @@ class UpdateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        $this->kingpinServiceMock()
+            ->shouldReceive('put')
+            ->withSomeOfArgs(
+                '/api/v1/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
+                [
+                    'json' => [
+                        'sizeGiB' => '999'
+                    ]
+                ]
+            )->andReturnUsing(function () {
+                return new Response(200);
+            });
         $data = [
             'name' => 'Volume 1',
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
             'capacity' => (config('volume.capacity.max') - 1),
         ];
 
         $this->patch(
-            '/v2/volumes/' . $this->volume->getKey(),
+            '/v2/volumes/' . $this->volume->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

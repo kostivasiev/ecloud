@@ -9,6 +9,8 @@ use App\Resources\V2\DiscountPlanResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -23,7 +25,7 @@ class DiscountPlanController extends BaseController
      */
     public function index(Request $request)
     {
-        $collection = DiscountPlan::forUser($request->user);
+        $collection = DiscountPlan::forUser($request->user());
         (new QueryTransformer($request))
             ->config(DiscountPlan::class)
             ->transform($collection);
@@ -41,16 +43,20 @@ class DiscountPlanController extends BaseController
     public function show(Request $request, string $discountPlanId)
     {
         return new DiscountPlanResource(
-            DiscountPlan::forUser($request->user)->findOrFail($discountPlanId)
+            DiscountPlan::forUser($request->user())->findOrFail($discountPlanId)
         );
     }
 
     /**
      * @param Create $request
-     * @return JsonResponse
+     * @return JsonResponse|Response
+     * @throws BadRequestException
      */
     public function store(Create $request)
     {
+        if ($this->isAdmin && empty($this->resellerId)) {
+            throw new BadRequestException('Missing Reseller scope');
+        }
         $discountPlan = new DiscountPlan($request->only($this->getAllowedFields()));
         if (!$request->has('term_end_date')) {
             $discountPlan->term_end_date = $this->calculateNewEndDate(
@@ -62,7 +68,7 @@ class DiscountPlanController extends BaseController
             $discountPlan->reseller_id = $this->resellerId;
         }
         $discountPlan->save();
-        return $this->responseIdMeta($request, $discountPlan->getKey(), 201);
+        return $this->responseIdMeta($request, $discountPlan->id, 201);
     }
 
     /**
@@ -72,7 +78,7 @@ class DiscountPlanController extends BaseController
      */
     public function update(Update $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser(Auth::user())->findOrFail($discountPlanId);
         $discountPlan->update($request->only($this->getAllowedFields()));
 
         if ($this->isAdmin) {
@@ -97,17 +103,18 @@ class DiscountPlanController extends BaseController
         }
 
         $discountPlan->save();
-        return $this->responseIdMeta($request, $discountPlan->getKey(), 200);
+        return $this->responseIdMeta($request, $discountPlan->id, 200);
     }
 
     /**
+     * @param Request $request
      * @param string $discountPlanId
      * @return Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Exception
      */
-    public function destroy(string $discountPlanId)
+    public function destroy(Request $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser(app('request')->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->delete();
         return response(null, 204);
     }
@@ -119,7 +126,7 @@ class DiscountPlanController extends BaseController
      */
     public function approve(Request $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->approve();
         return response(null, 200);
     }
@@ -131,7 +138,7 @@ class DiscountPlanController extends BaseController
      */
     public function reject(Request $request, string $discountPlanId)
     {
-        $discountPlan = DiscountPlan::forUser($request->user)->findOrFail($discountPlanId);
+        $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->reject();
         return response(null, 200);
     }
@@ -150,10 +157,11 @@ class DiscountPlanController extends BaseController
             'term_start_date',
             'term_end_date',
         ];
-        if (app('request')->user->isAdministrator) {
+        if (Auth::user()->isAdmin()) {
             $allowedFields[] = 'contact_id';
             $allowedFields[] = 'employee_id';
             $allowedFields[] = 'reseller_id';
+            $allowedFields[] = 'status';
         }
         return $allowedFields;
     }

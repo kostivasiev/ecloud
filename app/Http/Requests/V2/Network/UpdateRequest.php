@@ -36,16 +36,8 @@ class UpdateRequest extends FormRequest
         $networkId = app()->make('request')->route('networkId');
         return [
             'name' => 'sometimes|required|string',
-            'router_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.routers,id,deleted_at,NULL',
-                new ExistsForUser(Router::class)
-            ],
             'subnet' => [
                 'sometimes',
-                'nullable',
                 'string',
                 new ValidCidrSubnet(),
                 new isPrivateSubnet(),
@@ -64,8 +56,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name.required' => 'The :attribute field, when specified, cannot be null',
-            'router_id.required' => 'The :attribute field, when specified, cannot be null',
-            'router_id.exists' => 'The specified :attribute was not found',
             'subnet.unique' => 'The :attribute is already assigned to another network',
         ];
     }

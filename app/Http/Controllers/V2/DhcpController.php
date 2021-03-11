@@ -50,10 +50,10 @@ class DhcpController extends BaseController
      */
     public function create(CreateDhcpRequest $request)
     {
-        $dhcps = new Dhcp($request->only(['vpc_id', 'availability_zone_id']));
+        $dhcps = new Dhcp($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $dhcps->save();
         $dhcps->refresh();
-        return $this->responseIdMeta($request, $dhcps->getKey(), 201);
+        return $this->responseIdMeta($request, $dhcps->id, 201);
     }
 
     /**
@@ -64,24 +64,18 @@ class DhcpController extends BaseController
     public function update(UpdateDhcpRequest $request, string $dhcpId)
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
-        $dhcp->fill($request->only(['vpc_id', 'availability_zone_id']));
+        $dhcp->fill($request->only(['name']));
         $dhcp->save();
         $dhcp->setSyncCompleted();
-        return $this->responseIdMeta($request, $dhcp->getKey(), 200);
+        return $this->responseIdMeta($request, $dhcp->id, 200);
     }
 
-    /**
-     * @param string $dhcpId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(string $dhcpId)
     {
         $model = Dhcp::findOrFail($dhcpId);
-
         if (!$model->delete()) {
             return $model->getSyncError();
         }
-
         return response()->json([], 204);
     }
 }

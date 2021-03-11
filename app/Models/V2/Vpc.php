@@ -10,6 +10,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -84,21 +85,23 @@ class Vpc extends Model implements Filterable, Sortable
         return $this->hasMany(VpcSupport::class);
     }
 
+    public function networkPolicies()
+    {
+        return $this->hasMany(NetworkPolicy::class);
+    }
+
 
     /**
      * @param $query
      * @param $user
      * @return mixed
      */
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
-        if (!empty($user->resellerId)) {
-            $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-            if (!empty($resellerId)) {
-                $query->where('reseller_id', '=', $resellerId);
-            }
+        if (!$user->isScoped()) {
+            return $query;
         }
-        return $query;
+        return $query->where('reseller_id', '=', $user->resellerId());
     }
 
     /**
@@ -110,7 +113,7 @@ class Vpc extends Model implements Filterable, Sortable
             return false;
         }
 
-        foreach ($this->vpcSupports() as $support) {
+        foreach ($this->vpcSupports as $support) {
             if ($support->active) {
                 return true;
             }

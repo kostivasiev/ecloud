@@ -9,6 +9,7 @@ use App\Models\V2\FirewallRulePort;
 use App\Resources\V2\FirewallRulePortResource;
 use App\Resources\V2\FirewallRuleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -24,7 +25,7 @@ class FirewallRuleController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = FirewallRule::forUser($request->user);
+        $collection = FirewallRule::forUser($request->user());
 
         $queryTransformer->config(FirewallRule::class)
             ->transform($collection);
@@ -42,13 +43,13 @@ class FirewallRuleController extends BaseController
     public function show(Request $request, string $firewallRuleId)
     {
         return new FirewallRuleResource(
-            FirewallRule::forUser($request->user)->findOrFail($firewallRuleId)
+            FirewallRule::forUser($request->user())->findOrFail($firewallRuleId)
         );
     }
 
     public function ports(Request $request, QueryTransformer $queryTransformer, string $firewallRuleId)
     {
-        $collection = FirewallRule::forUser($request->user)->findOrFail($firewallRuleId)->firewallRulePorts();
+        $collection = FirewallRule::forUser($request->user())->findOrFail($firewallRuleId)->firewallRulePorts();
         $queryTransformer->config(FirewallRulePort::class)
             ->transform($collection);
 
@@ -96,12 +97,11 @@ class FirewallRuleController extends BaseController
      */
     public function update(Update $request, string $firewallRuleId)
     {
-        $firewallRule = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
+        $firewallRule = FirewallRule::foruser(Auth::user())->findOrFail($firewallRuleId);
         $firewallRule->fill($request->only([
             'name',
             'sequence',
             'deployed',
-            'firewall_policy_id',
             'source',
             'destination',
             'action',
@@ -111,7 +111,9 @@ class FirewallRuleController extends BaseController
         $firewallRule->save();
 
         if ($request->has('ports')) {
-            $firewallRule->firewallRulePorts->delete();
+            $firewallRule->firewallRulePorts->each(function ($rule) {
+                $rule->delete();
+            });
             foreach ($request->input('ports') as $port) {
                 $port['firewall_rule_id'] = $firewallRule->id;
                 $firewallRulePort = new FirewallRulePort($port);
@@ -122,17 +124,10 @@ class FirewallRuleController extends BaseController
         return $this->responseIdMeta($request, $firewallRule->id, 200);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $firewallRuleId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $firewallRuleId)
     {
-        $item = FirewallRule::foruser(app('request')->user)->findOrFail($firewallRuleId);
-        if (!$item->delete()) {
-            return $item->getSyncError();
-        }
+        FirewallRule::foruser($request->user())->findOrFail($firewallRuleId)
+            ->delete();
         return response()->json([], 204);
     }
 }

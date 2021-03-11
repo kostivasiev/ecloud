@@ -5,6 +5,7 @@ namespace Tests\V2\Instances;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
@@ -26,6 +27,7 @@ class PlatformTest extends TestCase
     protected $vpc;
     protected $appliance;
     protected $appliance_version;
+    protected $image;
 
     public function setUp(): void
     {
@@ -33,17 +35,20 @@ class PlatformTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
 
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->appliance = factory(Appliance::class)->create([
             'appliance_name' => 'Test Appliance',
         ])->refresh();
         $this->appliance_version = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
+        ])->refresh();
+        $this->image = factory(Image::class)->create([
+            'appliance_version_id' => $this->appliance_version->appliance_version_uuid
         ])->refresh();
         $mockAdminDevices = \Mockery::mock(AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
@@ -59,8 +64,8 @@ class PlatformTest extends TestCase
     public function testSettingPlatform()
     {
         $data = [
-            'vpc_id' => $this->vpc->getKey(),
-            'appliance_id' => $this->appliance->uuid,
+            'vpc_id' => $this->vpc->id,
+            'image_id' => $this->image->id,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,

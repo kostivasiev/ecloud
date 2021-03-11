@@ -10,19 +10,15 @@ use App\Rules\V2\IpAvailable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class NicController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @return AnonymousResourceCollection
-     */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Nic::forUser($request->user);
+        $collection = Nic::forUser($request->user());
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 
@@ -31,22 +27,13 @@ class NicController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $nicId
-     * @return NicResource
-     */
     public function show(Request $request, string $nicId)
     {
         return new NicResource(
-            Nic::forUser($request->user)->findOrFail($nicId)
+            Nic::forUser($request->user())->findOrFail($nicId)
         );
     }
 
-    /**
-     * @param CreateNicRequest $request
-     * @return JsonResponse
-     */
     public function create(CreateNicRequest $request)
     {
         $nic = new Nic($request->only([
@@ -56,18 +43,12 @@ class NicController extends BaseController
             'ip_address',
         ]));
         $nic->save();
-        return $this->responseIdMeta($request, $nic->getKey(), 201);
+        return $this->responseIdMeta($request, $nic->id, 201);
     }
 
-    /**
-     * @param UpdateNicRequest $request
-     * @param string $nicId
-     * @return JsonResponse
-     * @throws ValidationException
-     */
     public function update(UpdateNicRequest $request, string $nicId)
     {
-        $nic = Nic::forUser(app('request')->user)->findOrFail($nicId);
+        $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
         $nic->fill($request->only([
             'mac_address',
             'instance_id',
@@ -78,17 +59,12 @@ class NicController extends BaseController
         if (!$nic->save()) {
             return $nic->getSyncError();
         }
-        return $this->responseIdMeta($request, $nic->getKey(), 200);
+        return $this->responseIdMeta($request, $nic->id, 200);
     }
 
-    /**
-     * @param Request $request
-     * @param string $nicId
-     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
-     */
     public function destroy(Request $request, string $nicId)
     {
-        $nic = Nic::forUser($request->user)->findOrFail($nicId);
+        $nic = Nic::forUser($request->user())->findOrFail($nicId);
         if (!$nic->delete()) {
             return $nic->getSyncError();
         }

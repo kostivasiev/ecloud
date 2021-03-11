@@ -5,12 +5,14 @@ namespace App\Models\V2;
 use App\Events\V2\AvailabilityZone\Created;
 use App\Events\V2\AvailabilityZone\Creating;
 use App\Events\V2\AvailabilityZone\Deleted;
+use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -66,6 +68,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      * @var KingpinService
      */
     protected $kingpinService;
+
+    /**
+     * @var ConjurerService
+     */
+    protected $conjurerService;
 
     public function routers()
     {
@@ -123,9 +130,22 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->kingpinService;
     }
 
+    public function conjurerService()
+    {
+        if (!$this->conjurerService) {
+            $this->conjurerService = app()->makeWith(ConjurerService::class, [$this]);
+        }
+        return $this->conjurerService;
+    }
+
     public function products()
     {
         return Product::forAvailabilityZone($this);
+    }
+
+    public function hostSpecs()
+    {
+        return $this->belongsToMany(HostSpec::class);
     }
 
     /**
@@ -133,13 +153,12 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      * @param $user
      * @return mixed
      */
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
-        if (!$user->isAdministrator) {
-            $query->where('is_public', '=', 1);
+        if ($user->isAdmin()) {
+            return $query;
         }
-
-        return $query;
+        return $query->where('is_public', '=', 1);
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace Tests\V2\Region;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
@@ -30,14 +28,14 @@ class DeletionRulesTest extends TestCase
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
     }
 
     public function testFailedDeletion()
     {
         $this->delete(
-            '/v2/regions/' . $this->region->getKey(),
+            '/v2/regions/' . $this->region->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -46,7 +44,7 @@ class DeletionRulesTest extends TestCase
         )->seeJson([
             'detail' => 'The specified resource has dependant relationships and cannot be deleted',
         ])->assertResponseStatus(412);
-        $region = Region::withTrashed()->findOrFail($this->region->getKey());
+        $region = Region::withTrashed()->findOrFail($this->region->id);
         $this->assertNull($region->deleted_at);
     }
 }

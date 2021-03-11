@@ -108,6 +108,7 @@ class PrepareOsUsers extends Job
                     'name' => $username,
                     'resource_id' => $instance->id,
                     'username' => $username,
+                    'is_hidden' => $username === 'ukfastsupport',
                 ]);
                 $credential->password = $password;
                 $credential->save();

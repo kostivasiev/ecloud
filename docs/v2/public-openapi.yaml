@@ -20,6 +20,10 @@ components:
       in: header
       name: Authorization
   schemas:
+    NetworkPolicy:
+      $ref: 'components/schemas/networkPolicy.yaml'
+    NetworkRule:
+      $ref : 'components/schemas/networkRule.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
@@ -52,8 +56,20 @@ components:
       $ref: 'components/schemas/volume.yaml'
     RouterThroughput:
       $ref: 'components/schemas/routerThroughput.yaml'
+    NetworkRulePort:
+      $ref: 'components/schemas/networkRulePort.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
+    HostGroup :
+      $ref: 'resources/HostGroup/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
@@ -63,6 +79,10 @@ components:
     # Path Parameters
     VpcId:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
+    NetworkPolicyId:
+      $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
+    NetworkRuleId:
+      $ref: 'resources/NetworkRule/parameters/networkRuleId.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
@@ -83,7 +103,13 @@ components:
       $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
+    NetworkRulePortId:
+      $ref: 'resources/NetworkRulePort/parameters/networkRulePortId.yaml'
   responses:
+    NetworkPolicyIdResponse:
+      $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
+    NetworkRuleIdResponse:
+      $ref: 'resources/NetworkRule/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
@@ -100,6 +126,8 @@ components:
       $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
     VolumeIdResponse:
       $ref: 'resources/Volume/responses/idResponse.yaml'
+    NetworkRulePortIdResponse:
+      $ref: 'resources/NetworkRulePort/responses/idResponse.yaml'
 paths:
   '/ecloud/v2/vpcs':
     $ref: 'resources/Vpc/collection.yaml'
@@ -107,7 +135,6 @@ paths:
     $ref: 'resources/Vpc/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
     $ref: 'resources/Vpc/deploy-defaults.yaml'
-
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Vpc/volumes-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/instances':
@@ -174,7 +201,7 @@ paths:
     $ref: 'resources/FirewallPolicy/collection.yaml'
   '/ecloud/v2/firewall-policies/{firewallPolicyId}':
     $ref: 'resources/FirewallPolicy/item.yaml'
-  /ecloud/v2/firewall-policies/{firewallPolicyId}/firewall-rules:
+  '/ecloud/v2/firewall-policies/{firewallPolicyId}/firewall-rules':
     $ref: 'resources/FirewallPolicy/firewall-rules-collection.yaml'
   '/ecloud/v2/firewall-rule-ports':
     $ref: 'resources/FirewallRulePort/collection.yaml'
@@ -208,6 +235,10 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
+  '/ecloud/v2/volumes/{volumeId}/attach' :
+    $ref : 'resources/Volume/attach.yaml'
+  '/ecloud/v2/volumes/{volumeId}/detach' :
+    $ref : 'resources/Volume/detach.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
   '/ecloud/v2/support':
@@ -218,15 +249,47 @@ paths:
     $ref: 'resources/BillingMetric/public_collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':
     $ref: 'resources/BillingMetric/public_item.yaml'
-  '/ecloud/v2/discount-plan':
+  '/ecloud/v2/discount-plans':
     $ref: 'resources/DiscountPlan/public_collection.yaml'
-  '/ecloud/v2/discount-plan/{discountPlanId}':
+  '/ecloud/v2/discount-plans/{discountPlanId}':
     $ref: 'resources/DiscountPlan/public_item.yaml'
-  '/ecloud/v2/discount-plan/{discountPlanId}/approve':
+  '/ecloud/v2/discount-plans/{discountPlanId}/approve':
     $ref: 'resources/DiscountPlan/approve-item.yaml'
-  '/ecloud/v2/discount-plan/{discountPlanId}/reject':
+  '/ecloud/v2/discount-plans/{discountPlanId}/reject':
     $ref: 'resources/DiscountPlan/reject-item.yaml'
   '/ecloud/v2/router-throughputs':
     $ref: 'resources/RouterThroughput/collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
+  '/ecloud/v2/network-policies':
+    $ref: 'resources/NetworkPolicy/collection.yaml'
+  '/ecloud/v2/network-policies/{networkPolicyId}':
+    $ref: 'resources/NetworkPolicy/item.yaml'
+  '/ecloud/v2/network-rule-ports':
+    $ref: 'resources/NetworkRulePort/collection.yaml'
+  '/ecloud/v2/network-rule-ports/{networkRulePortId}':
+    $ref: 'resources/NetworkRulePort/item.yaml'
+  '/ecloud/v2/network-rules':
+    $ref: 'resources/NetworkRule/collection.yaml'
+  '/ecloud/v2/network-rules/{networkRuleId}':
+    $ref: 'resources/NetworkRule/item.yaml'
+  '/ecloud/v2/hosts' :
+    $ref : 'resources/Host/collection.yaml'
+  '/ecloud/v2/hosts/{id}' :
+    $ref : 'resources/Host/item.yaml'
+  '/ecloud/v2/host-specs':
+    $ref: 'resources/HostSpec/collection.yaml'
+  '/ecloud/v2/host-specs/{hostSpecId}':
+    $ref: 'resources/HostSpec/item.yaml'
+  '/ecloud/v2/host-groups' :
+    $ref : 'resources/HostGroup/collection.yaml'
+  '/ecloud/v2/host-groups/{id}' :
+    $ref : 'resources/HostGroup/item.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/collection.yaml'
+  '/ecloud/v2/images/{id}':
+    $ref: 'resources/Image/item.yaml'
+  '/ecloud/v2/image/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/image/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'

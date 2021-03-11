@@ -25,11 +25,14 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/Volume"
+            - $ref: '../../components/schemas/volume.yaml'
             - type: object
               properties:
+                availability_zone_id:
+                  readOnly: true
                 vpc_id:
                   required: false
+                  readOnly: true
                 capacity:
                   required: false
   responses:
