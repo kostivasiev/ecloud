@@ -97,13 +97,6 @@ class CrudTest extends TestCase
         // The request fires the jobs a second time
         $this->hostGroupJobMocks();
 
-        // CreateCluster Job
-        $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
         $this->patch('/v2/host-groups/hg-test', [
             'name' => 'new name',
         ])->seeInDatabase(

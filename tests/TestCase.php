@@ -246,7 +246,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         $this->kingpinServiceMock()->expects('post')
             ->withSomeOfArgs(
-                '/api/v1/vpc/vpc-test/hostgroup',
+                '/api/v2/vpc/vpc-test/hostgroup',
                 [
                     'json' => [
                         'hostGroupId' => 'hg-test',
