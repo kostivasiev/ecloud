@@ -33,4 +33,8 @@ class ApplianceScriptParameters extends Model
             'appliance_script_parameters_appliance_version_id'
         );
     }
+
+    public function databaseNames()
+    {
+    }
 }

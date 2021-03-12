@@ -25,7 +25,7 @@ class CanEnableSupport
             $paymentMethod = $accountAdminClient->customers()->getById($request->user()->resellerId())->paymentMethod;
 
             if ($paymentMethod == 'Credit Card') {
-                return JsonResponse::create([
+                return response()->json([
                     'errors' => [
                         [
                             'title' => 'Payment Required',

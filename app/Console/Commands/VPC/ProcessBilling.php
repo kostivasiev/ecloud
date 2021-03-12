@@ -323,6 +323,8 @@ class ProcessBilling extends Command
                 }
             }
         }
+
+        return Command::SUCCESS;
     }
 
     /**

@@ -55,14 +55,11 @@ class GetTest extends TestCase
                 'id' => $this->instance()->id,
                 'name' => $this->instance()->name,
                 'vpc_id' => $this->instance()->vpc_id,
-                'appliance_version_id' => $this->applianceVersion()->uuid,
+                'image_id' => $this->image()->id,
             ])
             ->assertResponseStatus(200);
 
         $result = json_decode($this->response->getContent());
-
-        // Test to ensure appliance_id as a UUID is in the returned result
-        $this->assertEquals($this->appliance()->uuid, $result->data->appliance_id);
 
         // Test to ensure that platform attribute is present
         $this->seeJson([

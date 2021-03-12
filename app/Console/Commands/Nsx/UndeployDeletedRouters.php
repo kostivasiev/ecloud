@@ -45,6 +45,8 @@ class UndeployDeletedRouters extends Command
 
             return true;
         });
+
+        return Command::SUCCESS;
     }
 
     /**

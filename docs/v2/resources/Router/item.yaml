@@ -33,8 +33,8 @@ patch:
                 vpc_id:
                   required: false
                   readOnly: true
-#                availability_zone_id:
-#                  required: false
+                availability_zone_id:
+                  readOnly: true
   responses:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/RouterIdResponse'
