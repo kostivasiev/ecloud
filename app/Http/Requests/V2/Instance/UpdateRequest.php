@@ -47,23 +47,10 @@ class UpdateRequest extends FormRequest
         $instance = Instance::forUser(Auth::user())
             ->findOrFail($this->instanceId);
 
-        $this->config = $instance->applianceVersion->applianceVersionData->pluck('key', 'value')->flip();
+        $this->config = $instance->image->metadata->pluck('key', 'value')->flip();
 
         $rules = [
             'name' => 'nullable|string',
-            /*            'vpc_id' => [
-                            'sometimes',
-                            'required',
-                            'string',
-                            'exists:ecloud.vpcs,id',
-                            new ExistsForUser(Vpc::class)
-                        ],*/
-            /*            'appliance_id' => [
-                            'sometimes',
-                            'required',
-                            'uuid',
-                            'exists:ecloud.appliance,appliance_uuid'
-                        ],*/
             'vcpu_cores' => [
                 'sometimes',
                 'required',
@@ -81,7 +68,6 @@ class UpdateRequest extends FormRequest
             ],
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
-            // 'platform' => 'sometimes|required|in:Windows,Linux',
         ];
 
         return $rules;
@@ -96,8 +82,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
-            'appliance_id.exists' => 'The :attribute is not a valid Appliance',
             'vcpu_cores.min' => 'Specified :attribute is below the minimum of '
                 . ($this->config->get('ukfast.spec.cpu_cores.min') ?? config('instance.cpu_cores.min')),
             'vcpu_cores.max' => 'Specified :attribute is above the maximum of '
