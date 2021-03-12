@@ -22,9 +22,20 @@ class CreateCluster extends Job
 
         $hostGroup = $this->model;
 
+        // Check if it already exists and if do skip creating it
+        $response = $hostGroup->availabilityZone->kingpinService()
+            ->get('/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id);
+        if ($response && $response->getStatusCode() === 200) {
+            Log::info(get_class($this) . ' : Skipped', [
+                'id' => $hostGroup->id,
+                'status_code' => $response->getStatusCode(),
+            ]);
+            return true;
+        }
+
         try {
             $response = $hostGroup->availabilityZone->kingpinService()->post(
-                '/api/v1/vpc/' . $hostGroup->vpc->id . '/hostgroup',
+                '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup',
                 [
                     'json' => [
                         'hostGroupId' => $hostGroup->id,
