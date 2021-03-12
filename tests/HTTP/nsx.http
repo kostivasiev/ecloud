@@ -219,3 +219,18 @@ Content-Type:  application/json
 GET https://185.197.63.88/api/v1/transport-node-profiles
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+###
+GET https://185.197.63.88/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-18bb0f21
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of TransportZones
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of UplinkHostSwitchProfiles
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

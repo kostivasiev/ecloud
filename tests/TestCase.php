@@ -207,6 +207,21 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->host;
     }
 
+    public function hostGroup()
+    {
+        if (!$this->hostGroup) {
+            $this->hostGroupJobMocks();
+            $this->hostGroup = factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+            ]);
+        }
+        return $this->hostGroup;
+    }
+
     public function hostGroupJobMocks()
     {
         // CreateCluster Job
@@ -241,7 +256,33 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                         [
                             'id' => 'TEST-TRANSPORT-NODE-PROFILE-ID',
                             'display_name' => 'TEST-TRANSPORT-NODE-PROFILE-DISPLAY-NAME',
-                        ]
+                        ],
+                    ],
+                ]));
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->with('/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => 'TEST-TRANSPORT-ZONE-ID',
+                            'transport_zone_profile_ids' => [
+                                'profile_id' => 'TEST-TRANSPORT-NODE-PROFILE-ID',
+                                'resource_type' => 'BfdHealthMonitoringProfile',
+                            ],
+                        ],
+                    ],
+                ]));
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->with('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => 'TEST-UPLINK-HOST-SWITCH-ID',
+                        ],
                     ],
                 ]));
             });
@@ -250,21 +291,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ->andReturnUsing(function () {
                 return new Response(200);
             });
-    }
-
-    public function hostGroup()
-    {
-        if (!$this->hostGroup) {
-            $this->hostGroupJobMocks();
-            $this->hostGroup = factory(HostGroup::class)->create([
-                'id' => 'hg-test',
-                'name' => 'hg-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'host_spec_id' => $this->hostSpec()->id,
-            ]);
-        }
-        return $this->hostGroup;
     }
 
     public function kingpinServiceMock()
