@@ -136,16 +136,8 @@ class CrudTest extends TestCase
         $this->hostGroup();
 
         // CreateCluster Job
-        $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs(
-                '/api/v2/vpc/vpc-test/hostgroup',
-                [
-                    'json' => [
-                        'hostGroupId' => 'hg-test',
-                        'shared' => false,
-                    ]
-                ]
-            )
+        $this->kingpinServiceMock()->expects('get')
+            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
             ->andReturnUsing(function () {
                 return new Response(200);
             });
