@@ -82,6 +82,7 @@ return [
     'failed' => [
         'database' => env('QUEUE_FAILED_DATABASE', 'ecloud'),
         'table' => env('QUEUE_FAILED_TABLE', 'failed_jobs'),
+        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
     ],
 
 ];
