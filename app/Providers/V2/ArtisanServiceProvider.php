@@ -18,14 +18,14 @@ class ArtisanServiceProvider extends ServiceProvider
             }
 
             $artisanCredentials = $availabilityZone->credentials()
-                ->where('username', '=', config('conjurer.user'))
+                ->where('username', '=', config('artisan.user'))
                 ->first();
             if (!$artisanCredentials) {
                 throw new \Exception(get_class($this) . ' : Failed to find Artisan credentials for user ' . config('artisan.user'));
             }
 
             $sanCredentials = $availabilityZone->credentials()
-                ->where('username', '=', config('conjurer.ucs_user'))
+                ->where('username', '=', config('artisan.san_user'))
                 ->first();
             if (!$sanCredentials) {
                 throw new \Exception(get_class($this) . ' : Failed to find SAN credentials for user ' . config('artisan.san_user'));
