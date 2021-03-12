@@ -29,7 +29,6 @@ class TestAuth extends Command
             /** @var Response $response */
             $availabilityZone->artisanService()->get('/api/v2/san/' . $availabilityZone->san_name .'/freespace');
         } catch (\Exception $exception) {
-            exit(print_r($exception->getMessage()));
             if ($exception->getCode() == 401) {
                 $this->error('Auth test failed');
                 return Command::FAILURE;
