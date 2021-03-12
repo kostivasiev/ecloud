@@ -335,6 +335,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('images', 'ImageController@index');
         $router->get('images/{imageId}', 'ImageController@show');
         $router->get('images/{imageId}/parameters', 'ImageController@parameters');
+        $router->get('images/{imageId}/metadata', 'ImageController@metadata');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('images', 'ImageController@store');
             $router->delete('images/{imageId}', 'ImageController@destroy');

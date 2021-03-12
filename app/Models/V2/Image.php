@@ -114,6 +114,24 @@ class Image extends Model implements Filterable, Sortable
         return $this->hasMany(Instance::class);
     }
 
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, Consumer $user)
+    {
+        if (!$user->isAdmin()) {
+            return $query->whereHas('applianceVersion.appliance', function ($query) use ($user) {
+                $query->where('appliance_is_public', 'Yes')
+                      ->where('appliance_active', 'Yes');
+            });
+        }
+
+        return $query;
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]

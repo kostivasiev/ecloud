@@ -60,10 +60,16 @@ components:
       $ref: 'components/schemas/networkRulePort.yaml'
     HostSpec:
       $ref: 'resources/HostSpec/schema.yaml'
-    Meta :
-      $ref : 'components/schemas/meta.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
     HostGroup :
-      $ref : 'resources/HostGroup/schema.yaml'
+      $ref: 'resources/HostGroup/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
@@ -283,3 +289,7 @@ paths:
     $ref: 'resources/Image/collection.yaml'
   '/ecloud/v2/images/{id}':
     $ref: 'resources/Image/item.yaml'
+  '/ecloud/v2/image/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/image/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'

@@ -6,14 +6,14 @@ use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
 /**
- * Class ImageParameterResource
+ * Class ImageMetadataResource
  * @package App\Http\Resources\V2
  * @property string id
  * @property string name
  * @property string created_at
  * @property string updated_at
  */
-class ImageParameterResource extends UKFastResource
+class ImageMetadataResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request
@@ -22,12 +22,8 @@ class ImageParameterResource extends UKFastResource
     public function toArray($request)
     {
         return [
-            'name' => $this->name,
             'key' => $this->key,
-            'type' => $this->type,
-            'description' => $this->description,
-            'required' => $this->required == 'Yes',
-            'validation_rule' => $this->validation_rule,
+            'value' => $this->value,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
