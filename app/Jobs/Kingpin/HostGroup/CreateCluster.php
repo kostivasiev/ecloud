@@ -24,7 +24,7 @@ class CreateCluster extends Job
 
         try {
             $response = $hostGroup->availabilityZone->kingpinService()->post(
-                '/api/v1/vpc/' . $hostGroup->vpc->id . '/hostgroup',
+                '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup',
                 [
                     'json' => [
                         'hostGroupId' => $hostGroup->id,
