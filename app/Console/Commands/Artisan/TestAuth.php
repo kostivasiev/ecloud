@@ -22,8 +22,8 @@ class TestAuth extends Command
         /** @var  $availabilityZone
          * Artisan credentials have been stored against this resource
          */
-        $availabilityZone = AvailabilityZone::findOrFail('az-aaaaaaaa');
-        //$availabilityZone = AvailabilityZone::firstOrFail();
+        //$availabilityZone = AvailabilityZone::findOrFail('az-aaaaaaaa');
+        $availabilityZone = AvailabilityZone::firstOrFail();
 
         try {
             /** @var Response $response */
