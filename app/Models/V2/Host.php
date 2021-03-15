@@ -39,7 +39,7 @@ class Host extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
-    public function hostGroup()
+   public function hostGroup()
     {
         return $this->belongsTo(HostGroup::class);
     }

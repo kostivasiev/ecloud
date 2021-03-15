@@ -4,7 +4,10 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CreateLanPolicy extends Job
 {
@@ -15,6 +18,9 @@ class CreateLanPolicy extends Job
         $this->model = $model;
     }
 
+    /**
+     * @return bool
+     */
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
@@ -23,38 +29,47 @@ class CreateLanPolicy extends Job
         $vpc = $host->hostGroup->vpc;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
-        $queryLanPolicyResponse = $availabilityZone->conjurerService()->get('/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id);
-
-        exit(print_r($queryLanPolicyResponse));
-
-        if (!$queryLanPolicyResponse || $queryLanPolicyResponse->getStatusCode() != 200) {
-            throw new \Exception('Failed checking VPC ' . $vpc->id . ' LAN policy exists on UCS');
+        if (empty($availabilityZone->ucs_compute_name)) {
+            $message = 'Failed to load UCS compute name for availability zone ' . $availabilityZone->id;
+            Log::error($message);
+            $this->fail(new \Exception($message));
+            return false;
         }
 
+        $createLanPolicy = false;
 
+        try {
+            // Check whether a LAN connectivity policy exists on the UCS for the VPC
+            $availabilityZone->conjurerService()->get('/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id);
+        } catch (ServerException $exception) {
+            $exceptionMessage = json_decode($exception->getResponse()->getBody()->getContents())->ExceptionMessage;
+            if (!Str::contains($exceptionMessage, 'Cannot find LAN connectivity policy')) {
+                throw $exception;
+            }
+            $createLanPolicy = true;
+        }
 
-        if (1) {
+        if (!$createLanPolicy) {
             Log::debug('VPC LAN Policy already exists. Nothing to do.');
             return true;
         }
 
-
-        $createLanPolicyResponse = $availabilityZone->conjurerService()->get('/api/v2/compute/{computeName}/vpc'); //TODO
-
-
-
-
-
-
-
-        // TODO Check if the VPC has a LAN policy and create one if it does not.
+        $availabilityZone->conjurerService()->post(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc', [
+                'json' => [
+                    'vpcId' => $vpc->id,
+                ],
+            ]
+        );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     public function failed($exception)
     {
-        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
+        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+            json_decode($exception->getResponse()->getBody()->getContents()) :
+            $exception->getMessage();
         $this->model->setSyncFailureReason($message);
     }
 }

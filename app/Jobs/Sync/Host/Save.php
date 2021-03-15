@@ -27,6 +27,9 @@ class Save extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
+        // Todo: check if the host already exists /api/v2/compute/{computeName}/vpc/{vpcId}/host/{hostId}
+
+
         $jobs = [
             new CreateLanPolicy($this->model),
             new CheckAvailableCompute($this->model),
