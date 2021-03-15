@@ -27,6 +27,7 @@ class CreateAvailabilityZoneRequest extends FormRequest
             'code' => 'required|string',
             'name' => 'required|string',
             'datacentre_site_id' => 'required|integer',
+            'ucs_compute_name' => 'sometimes|required|string',
             'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL',
             'is_public' => 'sometimes|required|boolean',
         ];
