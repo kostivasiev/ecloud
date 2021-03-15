@@ -12,7 +12,9 @@ use App\Jobs\Conjurer\Host\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Host\CheckOnline;
 use App\Models\V2\Host;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Save extends Job
 {
@@ -27,21 +29,36 @@ class Save extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // Todo: check if the host already exists /api/v2/compute/{computeName}/vpc/{vpcId}/host/{hostId}
+        $host = $this->model;
+        $vpc = $host->hostGroup->vpc;
+        $availabilityZone = $host->hostGroup->availabilityZone;
 
+        $jobs = [];
 
-        $jobs = [
-            new CreateLanPolicy($this->model),
-            new CheckAvailableCompute($this->model),
-            new CreateProfile($this->model),
+        try {
+            // Only create if the host doesnt already exist
+            $availabilityZone->conjurerService()->get(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id . '/host/' . $host->id
+            );
+        } catch (RequestException $exception) {
+            $exceptionMessage = json_decode($exception->getResponse()->getBody()->getContents())->ExceptionMessage;
+            if (Str::contains($exceptionMessage, 'Cannot find service profile')) {
+                $jobs = [
+                        new CreateLanPolicy($this->model),
+                        new CheckAvailableCompute($this->model),
+                        new CreateProfile($this->model),
 
-            new CreateAutoDeployRule($this->model),
-            new Deploy($this->model),
-            new AddToHostSet($this->model),
-            new PowerOn($this->model),
-            new CheckOnline($this->model),
-            new \App\Jobs\Sync\Completed($this->model),
-        ];
+                        new CreateAutoDeployRule($this->model),
+                        new Deploy($this->model),
+                        new AddToHostSet($this->model),
+                        new PowerOn($this->model),
+                        new CheckOnline($this->model),
+                    ];
+            }
+        }
+
+        $jobs[] = new \App\Jobs\Sync\Completed($this->model);
+
         dispatch(array_shift($jobs)->chain($jobs));
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
@@ -49,6 +66,10 @@ class Save extends Job
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+            $exception->getResponse()->getBody()->getContents() :
+            $exception->getMessage();
+
+        $this->model->setSyncFailureReason($message);
     }
 }

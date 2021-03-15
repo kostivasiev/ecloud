@@ -3,7 +3,6 @@
 namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Host;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
@@ -54,7 +53,8 @@ class CheckAvailableCompute extends Job
     public function failed($exception)
     {
         $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
-            json_decode($exception->getResponse()->getBody()->getContents()) :
+            $exception->getResponse()->getBody()->getContents() :
             $exception->getMessage();
-        $this->model->setSyncFailureReason($message);    }
+        $this->model->setSyncFailureReason($message);
+    }
 }

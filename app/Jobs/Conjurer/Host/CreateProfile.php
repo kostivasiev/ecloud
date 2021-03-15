@@ -38,7 +38,8 @@ class CreateProfile extends Job
     public function failed($exception)
     {
         $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
-            json_decode($exception->getResponse()->getBody()->getContents()) :
+            $exception->getResponse()->getBody()->getContents() :
             $exception->getMessage();
-        $this->model->setSyncFailureReason($message);    }
+        $this->model->setSyncFailureReason($message);
+    }
 }

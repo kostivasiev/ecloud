@@ -50,7 +50,7 @@ class CreateLanPolicy extends Job
         }
 
         if (!$createLanPolicy) {
-            Log::debug('VPC LAN Policy already exists. Nothing to do.');
+            Log::debug('LAN Policy already exists for VPC. Nothing to do.');
             return true;
         }
 
@@ -68,7 +68,7 @@ class CreateLanPolicy extends Job
     public function failed($exception)
     {
         $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
-            json_decode($exception->getResponse()->getBody()->getContents()) :
+            $exception->getResponse()->getBody()->getContents() :
             $exception->getMessage();
         $this->model->setSyncFailureReason($message);
     }
