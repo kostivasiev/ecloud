@@ -17,5 +17,7 @@ class TestRead extends Command
             var_dump(json_decode(Redis::lindex('queues:default', $i), JSON_PRETTY_PRINT));
             //var_dump(unserialize(json_decode(Redis::lindex('queues:default', $i), JSON_PRETTY_PRINT)['data']['command']));
         }
+
+        return Command::SUCCESS;
     }
 }

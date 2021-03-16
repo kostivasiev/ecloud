@@ -37,7 +37,7 @@ class CanEnableSupport
             }
 
             if ($customer->paymentMethod == 'Credit Card') {
-                return JsonResponse::create([
+                return response()->json([
                     'errors' => [
                         [
                             'title' => 'Payment Required',
