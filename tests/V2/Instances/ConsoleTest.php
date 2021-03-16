@@ -156,7 +156,7 @@ class ConsoleTest extends TestCase
         app()->bind(Client::class, function () use ($uuid) {
             $mock = new MockHandler(
                 [
-                    new Response(200, [], json_encode(['uuid' => $uuid])),
+                    new Response(201, [], json_encode(['uuid' => $uuid])),
                 ]
             );
             $stack = HandlerStack::create($mock);
@@ -173,7 +173,7 @@ class ConsoleTest extends TestCase
             ]
         )->seeJson(
             [
-                'url' => 'https://127.0.0.1/?title='.$this->instance()->id.'&session='.$uuid
+                'url' => 'https://127.0.0.1/?title=id'.$this->instance()->id.'&session='.$uuid
             ]
         )->assertResponseStatus(200);
     }
