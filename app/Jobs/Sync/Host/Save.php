@@ -35,26 +35,23 @@ class Save extends Job
 
         $jobs = [];
 
-        try {
-            // Only create if the host doesnt already exist
-            $availabilityZone->conjurerService()->get(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id . '/host/' . $host->id
-            );
-        } catch (RequestException $exception) {
-            $exceptionMessage = json_decode($exception->getResponse()->getBody()->getContents())->ExceptionMessage;
-            if (Str::contains($exceptionMessage, 'Cannot find service profile')) {
-                $jobs = [
-                        new CreateLanPolicy($this->model),
-                        new CheckAvailableCompute($this->model),
-                        new CreateProfile($this->model),
+        // Only create if the host doesnt already exist
+        $response = $availabilityZone->conjurerService()->get(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id . '/host/' . $host->id
+        );
 
-                        new CreateAutoDeployRule($this->model),
-                        new Deploy($this->model),
-                        new AddToHostSet($this->model),
-                        new PowerOn($this->model),
-                        new CheckOnline($this->model),
-                    ];
-            }
+        if ($response->getStatusCode() == 404) {
+            $jobs = [
+                new CreateLanPolicy($this->model),
+                new CheckAvailableCompute($this->model),
+                new CreateProfile($this->model),
+
+                new CreateAutoDeployRule($this->model),
+                new Deploy($this->model),
+                new AddToHostSet($this->model),
+                new PowerOn($this->model),
+                new CheckOnline($this->model),
+            ];
         }
 
         $jobs[] = new \App\Jobs\Sync\Completed($this->model);

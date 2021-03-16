@@ -36,20 +36,9 @@ class CreateLanPolicy extends Job
             return false;
         }
 
-        $createLanPolicy = false;
-
-        try {
-            // Check whether a LAN connectivity policy exists on the UCS for the VPC
-            $availabilityZone->conjurerService()->get('/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id);
-        } catch (ServerException $exception) {
-            $exceptionMessage = json_decode($exception->getResponse()->getBody()->getContents())->ExceptionMessage;
-            if (!Str::contains($exceptionMessage, 'Cannot find LAN connectivity policy')) {
-                throw $exception;
-            }
-            $createLanPolicy = true;
-        }
-
-        if (!$createLanPolicy) {
+        // Check whether a LAN connectivity policy exists on the UCS for the VPC
+        $response = $availabilityZone->conjurerService()->get('/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id);
+        if ($response->getStatusCode() == 200) {
             Log::debug('LAN Policy already exists for VPC. Nothing to do.');
             return true;
         }

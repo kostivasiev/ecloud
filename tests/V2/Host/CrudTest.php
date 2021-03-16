@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Host;
 
+use App\Models\V2\Host;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -14,6 +15,15 @@ class CrudTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        // bind data so we can use Conjurer mocks with expected host ID
+        app()->bind(Host::class, function () {
+            return factory(Host::class)->make([
+                'id' => 'h-test',
+                'name' => 'h-test',
+                'host_group_id' => $this->hostGroup()->id,
+            ]);
+        });
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
@@ -44,21 +54,77 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
-        $this->conjurerServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
+        // Check host doesnt already exist
+        $this->conjurerServiceMock()->expects('get')
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+                return new Response(404);
             });
 
 
+        // Check whether a LAN connectivity policy exists on the UCS for the VPC
+        $this->conjurerServiceMock()->expects('get')
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test'])
+            ->andReturnUsing(function () {
+                return new Response(404);
+            });
 
+        // Create LAN Policy
+        $this->conjurerServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/compute/GC-UCS-FI2-DEV-A/vpc',
+                [
+                    'json' => [
+                        'vpcId' => 'vpc-test'
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
 
+        // Check available stock
+        $this->conjurerServiceMock()->expects('get')
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/specification/test-host-spec/host/available'])
+            ->andReturnUsing(function () {
+                // Empty array means no stock available, array count indicates stock available
+                return new Response(200, [], json_encode([
+                    [
+                        'specification' => 'DUAL-4208--32GB',
+                        'name' => 'DUAL-4208--32GB',
+                        'interfaces' => [
+                            'name' => 'eth0',
+                            'address' => '00:25:B5:C0:A0:1B',
+                            'type' => 'vNIC'
+                        ]
+                    ]
+                ]));
+            });
 
-
-
-
-
-
+        // Create Profile
+        $this->conjurerServiceMock()->expects('post')
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/host',
+                [
+                    'json' => [
+                        'specificationName' => 'test-host-spec',
+                        'hostId' => 'h-test'
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                // Empty array means no stock available, array count indicates stock available
+                return new Response(200, [], json_encode([
+                    [
+                        'specification' => 'DUAL-4208--32GB',
+                        'name' => 'DUAL-4208--32GB',
+                        'interfaces' => [
+                            'name' => 'eth0',
+                            'address' => '00:25:B5:C0:A0:1B',
+                            'type' => 'vNIC'
+                        ]
+                    ]
+                ]));
+            });
 
         $data = [
             'name' => 'h-test',
@@ -66,7 +132,7 @@ class CrudTest extends TestCase
         ];
         $this->post('/v2/hosts', $data)
             ->seeInDatabase('hosts', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
     }
 
     public function testUpdate()
