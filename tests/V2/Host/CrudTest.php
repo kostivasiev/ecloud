@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Host;
 
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -43,6 +44,22 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
+        $this->conjurerServiceMock()->expects('post')
+            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+            });
+
+
+
+
+
+
+
+
+
+
+
         $data = [
             'name' => 'h-test',
             'host_group_id' => $this->hostGroup()->id,

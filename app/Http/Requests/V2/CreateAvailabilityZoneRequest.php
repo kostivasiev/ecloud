@@ -30,6 +30,11 @@ class CreateAvailabilityZoneRequest extends FormRequest
             'ucs_compute_name' => 'sometimes|required|string',
             'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL',
             'is_public' => 'sometimes|required|boolean',
+            'san_name' => [
+                'sometimes',
+                'required',
+                'string'
+            ]
         ];
     }
 

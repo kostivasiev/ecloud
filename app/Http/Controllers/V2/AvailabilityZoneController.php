@@ -76,6 +76,7 @@ class AvailabilityZoneController extends BaseController
             'region_id',
             'nsx_manager_endpoint',
             'nsx_edge_cluster_id',
+            'san_name',
             'ucs_compute_name',
         ]));
         $availabilityZone->save();
@@ -99,6 +100,7 @@ class AvailabilityZoneController extends BaseController
             'region_id',
             'nsx_manager_endpoint',
             'nsx_edge_cluster_id',
+            'san_name',
             'ucs_compute_name',
         ]));
         $availabilityZone->save();
