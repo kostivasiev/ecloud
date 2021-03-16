@@ -58,10 +58,18 @@ components:
       $ref: 'components/schemas/routerThroughput.yaml'
     NetworkRulePort:
       $ref: 'components/schemas/networkRulePort.yaml'
-    Meta :
-      $ref : 'components/schemas/meta.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
     HostGroup :
-      $ref : 'resources/HostGroup/schema.yaml'
+      $ref: 'resources/HostGroup/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
@@ -265,7 +273,23 @@ paths:
     $ref: 'resources/NetworkRule/collection.yaml'
   '/ecloud/v2/network-rules/{networkRuleId}':
     $ref: 'resources/NetworkRule/item.yaml'
+  '/ecloud/v2/hosts' :
+    $ref : 'resources/Host/collection.yaml'
+  '/ecloud/v2/hosts/{id}' :
+    $ref : 'resources/Host/item.yaml'
+  '/ecloud/v2/host-specs':
+    $ref: 'resources/HostSpec/collection.yaml'
+  '/ecloud/v2/host-specs/{hostSpecId}':
+    $ref: 'resources/HostSpec/item.yaml'
   '/ecloud/v2/host-groups' :
     $ref : 'resources/HostGroup/collection.yaml'
   '/ecloud/v2/host-groups/{id}' :
     $ref : 'resources/HostGroup/item.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/collection.yaml'
+  '/ecloud/v2/images/{id}':
+    $ref: 'resources/Image/item.yaml'
+  '/ecloud/v2/image/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/image/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'

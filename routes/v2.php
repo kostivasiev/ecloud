@@ -22,6 +22,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
     $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
     $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
+    $router->get('availability-zones/{zoneId}/host-specs', 'AvailabilityZoneController@hostSpecs');
 
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
@@ -301,6 +302,27 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
     });
 
+    /** Host */
+    $router->group([], function () use ($router) {
+        $router->get('hosts', 'HostController@index');
+        $router->get('hosts/{id}', 'HostController@show');
+        $router->post('hosts', 'HostController@store');
+        $router->patch('hosts/{id}', 'HostController@update');
+        $router->delete('hosts/{id}', 'HostController@destroy');
+    });
+
+    /** Host Spec */
+    $router->group([], function () use ($router) {
+        $router->get('host-specs', 'HostSpecController@index');
+        $router->get('host-specs/{hostSpecId}', 'HostSpecController@show');
+
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('host-specs', 'HostSpecController@store');
+            $router->patch('host-specs/{hostSpecId}', 'HostSpecController@update');
+            $router->delete('host-specs/{hostSpecId}', 'HostSpecController@destroy');
+        });
+    });
+
     /** Host Group */
     $router->group([], function () use ($router) {
         $router->get('host-groups', 'HostGroupController@index');
@@ -308,5 +330,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('host-groups', 'HostGroupController@store');
         $router->patch('host-groups/{id}', 'HostGroupController@update');
         $router->delete('host-groups/{id}', 'HostGroupController@destroy');
+    });
+
+    /** Image */
+    $router->group([], function () use ($router) {
+        $router->get('images', 'ImageController@index');
+        $router->get('images/{imageId}', 'ImageController@show');
+        $router->get('images/{imageId}/parameters', 'ImageController@parameters');
+        $router->get('images/{imageId}/metadata', 'ImageController@metadata');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('images', 'ImageController@store');
+            $router->delete('images/{imageId}', 'ImageController@destroy');
+        });
     });
 });
