@@ -102,7 +102,7 @@ class PrepareCluster extends Job
             return null;
         }
         $firstResult = collect($json['results'])->first();
-        return (isset($firstResult['external_id'])) ? $firstResult['external_id'] : null;
+        return (isset($firstResult['id'])) ? $firstResult['id'] : null;
     }
 
     private function getHostGroupComputeCollectionId(AvailabilityZone $availabilityZone, HostGroup $hostGroup): ?string
