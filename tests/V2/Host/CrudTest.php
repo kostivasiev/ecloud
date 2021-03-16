@@ -26,7 +26,7 @@ class CrudTest extends TestCase
         });
 
         // Check host doesnt already exist
-        $this->conjurerServiceMock()->expects('get')->twice()
+        $this->conjurerServiceMock()->expects('get')
             ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
             ->andReturnUsing(function () {
                 return new Response(404);
@@ -34,14 +34,14 @@ class CrudTest extends TestCase
 
 
         // Check whether a LAN connectivity policy exists on the UCS for the VPC
-        $this->conjurerServiceMock()->expects('get')->twice()
+        $this->conjurerServiceMock()->expects('get')
             ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test'])
             ->andReturnUsing(function () {
                 return new Response(404);
             });
 
         // Create LAN Policy
-        $this->conjurerServiceMock()->expects('post')->twice()
+        $this->conjurerServiceMock()->expects('post')
             ->withArgs([
                 '/api/v2/compute/GC-UCS-FI2-DEV-A/vpc',
                 [
@@ -55,7 +55,7 @@ class CrudTest extends TestCase
             });
 
         // Check available stock
-        $this->conjurerServiceMock()->expects('get')->twice()
+        $this->conjurerServiceMock()->expects('get')
             ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/specification/test-host-spec/host/available'])
             ->andReturnUsing(function () {
                 // Empty array means no stock available, array count indicates stock available
@@ -73,7 +73,7 @@ class CrudTest extends TestCase
             });
 
         // Create Profile
-        $this->conjurerServiceMock()->expects('post')->twice()
+        $this->conjurerServiceMock()->expects('post')
             ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/host',
                 [
                     'json' => [
