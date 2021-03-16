@@ -44,7 +44,8 @@ class CreateLanPolicy extends Job
         }
 
         $availabilityZone->conjurerService()->post(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc', [
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc',
+            [
                 'json' => [
                     'vpcId' => $vpc->id,
                 ],
