@@ -173,7 +173,7 @@ class ConsoleTest extends TestCase
             ]
         )->seeJson(
             [
-                'url' => 'https://127.0.0.1/?title=id'.$this->instance()->id.'&session='.$uuid
+                'url' => 'https://127.0.0.1/console/?title=id'.$this->instance()->id.'&session='.$uuid
             ]
         )->assertResponseStatus(200);
     }
