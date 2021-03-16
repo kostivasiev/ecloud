@@ -32,9 +32,9 @@ class CanEnableSupportTest extends TestCase
             [
                 'title' => 'Not Found',
                 'detail' => 'The customer account is not available',
-                'status' => 404,
+                'status' => 503,
             ]
-        )->assertResponseStatus(404);
+        )->assertResponseStatus(503);
     }
 
     public function testWithValidCustomerAndCreditCard()
