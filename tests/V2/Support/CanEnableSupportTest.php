@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
+use UKFast\Admin\Account\AdminCustomerClient;
+use UKFast\Admin\Account\Entities\Customer;
 use UKFast\Api\Auth\Consumer;
 
 class CanEnableSupportTest extends TestCase
@@ -39,16 +41,15 @@ class CanEnableSupportTest extends TestCase
     {
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
-            $mockClient->shouldReceive('customers')
-                ->andReturnUsing(function () {
-                    return new class {
-                        public string $paymentMethod = 'Credit Card';
-                        public function getById($id)
-                        {
-                            return $this;
-                        }
-                    };
-                });
+            $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
+
+            $mockCustomer->shouldReceive('getById')
+                ->andReturn(
+                    new Customer([
+                        'paymentMethod' => 'Credit Card',
+                    ])
+                );
+            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
             return $mockClient;
         });
 
