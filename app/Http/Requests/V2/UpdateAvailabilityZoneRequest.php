@@ -29,6 +29,11 @@ class UpdateAvailabilityZoneRequest extends FormRequest
             'datacentre_site_id' => 'sometimes|required|integer',
             'is_public' => 'sometimes|required|boolean',
             'region_id' => 'sometimes|required|string|exists:ecloud.regions,id,deleted_at,NULL',
+            'san_name' => [
+                'sometimes',
+                'required',
+                'string'
+            ]
         ];
     }
 
