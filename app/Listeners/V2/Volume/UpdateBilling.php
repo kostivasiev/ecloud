@@ -41,6 +41,7 @@ class UpdateBilling
             return;
         }
 
+        // If iops is empty, get the default value
         if (empty($volume->iops)) {
             $volume->iops = config('volume.iops.default', 300);
         }

@@ -26,6 +26,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -60,9 +61,6 @@ class InstanceController extends BaseController
     public function show(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
-        if ($this->isAdmin) {
-            $instance->makeVisible('appliance_version_id');
-        }
 
         return new InstanceResource(
             $instance
@@ -72,6 +70,7 @@ class InstanceController extends BaseController
     /**
      * @param CreateRequest $request
      * @return JsonResponse
+     * @throws ValidationException
      */
     public function store(CreateRequest $request)
     {
@@ -84,7 +83,7 @@ class InstanceController extends BaseController
                 $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
             }
             if (!$defaultNetworkId) {
-                return JsonResponse::create([
+                return response()->json([
                     'errors' => [
                         [
                             'title' => 'Not Found',
@@ -100,6 +99,7 @@ class InstanceController extends BaseController
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
+            'image_id',
             'vcpu_cores',
             'ram_capacity',
             'locked',
@@ -107,9 +107,6 @@ class InstanceController extends BaseController
         ]));
 
         $instance->locked = $request->input('locked', false);
-        if ($request->has('appliance_id')) {
-            $instance->setApplianceVersionId($request->get('appliance_id'));
-        }
         $instance->save();
         $instance->refresh();
 
@@ -121,7 +118,7 @@ class InstanceController extends BaseController
         $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
         $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
         $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
-        $instanceDeployData->appliance_data = $request->input('appliance_data');
+        $instanceDeployData->image_data = $request->input('image_data');
         $instanceDeployData->user_script = $request->input('user_script');
 
         event(new Deploy($instanceDeployData));

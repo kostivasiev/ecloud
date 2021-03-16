@@ -231,7 +231,7 @@ class HostController extends BaseController
     {
         $host = Host::find($hostId);
         if (!$host) {
-            return Response::create([
+            return response()->json([
                 'errors' => [
                     'title' => 'Not found',
                     'detail' => 'Host not found',
@@ -243,7 +243,7 @@ class HostController extends BaseController
         try {
             $hardware = $host->hardware;
         } catch (\Exception $exception) {
-            return Response::create([
+            return response()->json([
                 'errors' => [
                     'title' => $exception->getMessage(),
                     'status' => 500,
@@ -251,7 +251,7 @@ class HostController extends BaseController
             ], 500);
         }
 
-        return Response::create([
+        return response()->json([
             'data' => $hardware,
             'meta' => (object)[],
         ], 200);

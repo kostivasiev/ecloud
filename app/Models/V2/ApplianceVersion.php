@@ -62,6 +62,18 @@ class ApplianceVersion extends V1ModelWrapper
         );
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function applianceScriptParameters()
+    {
+        return $this->hasMany(
+            ApplianceScriptParameters::class,
+            'appliance_script_parameters_appliance_version_id',
+            'appliance_version_id'
+        );
+    }
+
     public function applianceVersionData()
     {
         return $this->hasMany(
@@ -87,5 +99,16 @@ class ApplianceVersion extends V1ModelWrapper
             ->orderBy('appliance_version_version', 'desc')
             ->first()
             ->appliance_version_uuid;
+    }
+
+    public function getScriptParameters(): array
+    {
+        $params = [];
+        $parameters = $this->applianceScriptParameters()->get();
+        foreach ($parameters as $parameter) {
+            $params[$parameter->key] = $parameter;
+        }
+
+        return $params;
     }
 }

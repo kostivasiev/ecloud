@@ -58,8 +58,18 @@ components:
       $ref: 'components/schemas/routerThroughput.yaml'
     NetworkRulePort:
       $ref: 'components/schemas/networkRulePort.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
+    HostGroup :
+      $ref: 'resources/HostGroup/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
@@ -125,7 +135,6 @@ paths:
     $ref: 'resources/Vpc/item.yaml'
   '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
     $ref: 'resources/Vpc/deploy-defaults.yaml'
-
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Vpc/volumes-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/instances':
@@ -192,7 +201,7 @@ paths:
     $ref: 'resources/FirewallPolicy/collection.yaml'
   '/ecloud/v2/firewall-policies/{firewallPolicyId}':
     $ref: 'resources/FirewallPolicy/item.yaml'
-  /ecloud/v2/firewall-policies/{firewallPolicyId}/firewall-rules:
+  '/ecloud/v2/firewall-policies/{firewallPolicyId}/firewall-rules':
     $ref: 'resources/FirewallPolicy/firewall-rules-collection.yaml'
   '/ecloud/v2/firewall-rule-ports':
     $ref: 'resources/FirewallRulePort/collection.yaml'
@@ -226,6 +235,10 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
+  '/ecloud/v2/volumes/{volumeId}/attach' :
+    $ref : 'resources/Volume/attach.yaml'
+  '/ecloud/v2/volumes/{volumeId}/detach' :
+    $ref : 'resources/Volume/detach.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
   '/ecloud/v2/support':
@@ -260,3 +273,23 @@ paths:
     $ref: 'resources/NetworkRule/collection.yaml'
   '/ecloud/v2/network-rules/{networkRuleId}':
     $ref: 'resources/NetworkRule/item.yaml'
+  '/ecloud/v2/hosts' :
+    $ref : 'resources/Host/collection.yaml'
+  '/ecloud/v2/hosts/{id}' :
+    $ref : 'resources/Host/item.yaml'
+  '/ecloud/v2/host-specs':
+    $ref: 'resources/HostSpec/collection.yaml'
+  '/ecloud/v2/host-specs/{hostSpecId}':
+    $ref: 'resources/HostSpec/item.yaml'
+  '/ecloud/v2/host-groups' :
+    $ref : 'resources/HostGroup/collection.yaml'
+  '/ecloud/v2/host-groups/{id}' :
+    $ref : 'resources/HostGroup/item.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/collection.yaml'
+  '/ecloud/v2/images/{id}':
+    $ref: 'resources/Image/item.yaml'
+  '/ecloud/v2/image/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/image/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'

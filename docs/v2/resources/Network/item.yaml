@@ -33,6 +33,9 @@ patch:
                   required: false
                 router_id:
                   required: false
+                  readOnly : true
+                subnet:
+                  readOnly: true
   responses:
     200:
       $ref: '../../resources/Network/responses/idResponse.yaml'

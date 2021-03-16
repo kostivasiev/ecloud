@@ -9,6 +9,7 @@ use App\Events\V2\Dhcp\Deleting;
 use App\Events\V2\Dhcp\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
+use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultAvailabilityZone, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable;
 
     public $keyPrefix = 'dhcp';
     public $incrementing = false;
@@ -34,6 +35,7 @@ class Dhcp extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $fillable = [
         'id',
+        'name',
         'vpc_id',
         'availability_zone_id',
     ];
@@ -63,6 +65,7 @@ class Dhcp extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -79,6 +82,7 @@ class Dhcp extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('name'),
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
             $factory->create('created_at'),
@@ -104,6 +108,7 @@ class Dhcp extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
+            'name' => 'name',
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
             'created_at' => 'created_at',

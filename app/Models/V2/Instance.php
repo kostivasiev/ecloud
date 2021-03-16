@@ -35,7 +35,7 @@ class Instance extends Model implements Filterable, Sortable
         'id',
         'name',
         'vpc_id',
-        'appliance_version_id',
+        'image_id',
         'vcpu_cores',
         'ram_capacity',
         'availability_zone_id',
@@ -44,12 +44,7 @@ class Instance extends Model implements Filterable, Sortable
         'backup_enabled',
     ];
 
-    protected $hidden = [
-        'appliance_version_id'
-    ];
-
     protected $appends = [
-        'appliance_id',
         'volume_capacity',
     ];
 
@@ -105,7 +100,7 @@ class Instance extends Model implements Filterable, Sortable
 
     public function volumes()
     {
-        return $this->belongsToMany(Volume::class);
+        return $this->belongsToMany(Volume::class)->using(InstanceVolume::class);
     }
 
     public function scopeForUser($query, Consumer $user)
@@ -118,24 +113,9 @@ class Instance extends Model implements Filterable, Sortable
         });
     }
 
-    public function getApplianceIdAttribute()
+    public function image()
     {
-        return !empty($this->applianceVersion) ? $this->applianceVersion->appliance_uuid : null;
-    }
-
-    public function applianceVersion()
-    {
-        return $this->belongsTo(
-            ApplianceVersion::class,
-            'appliance_version_id',
-            'appliance_version_uuid'
-        );
-    }
-
-    public function setApplianceVersionId(string $applianceUuid)
-    {
-        $version = app()->make(ApplianceVersion::class)->getLatest($applianceUuid);
-        $this->attributes['appliance_version_id'] = $version;
+        return $this->belongsTo(Image::class);
     }
 
     /**
@@ -148,7 +128,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('appliance_version_id', Filter::$stringDefaults),
+            $factory->create('image_id', Filter::$stringDefaults),
             $factory->create('vcpu_cores', Filter::$stringDefaults),
             $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
@@ -171,7 +151,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
-            $factory->create('appliance_version_id'),
+            $factory->create('image_id'),
             $factory->create('vcpu_cores'),
             $factory->create('ram_capacity'),
             $factory->create('availability_zone_id'),
@@ -204,7 +184,7 @@ class Instance extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'vpc_id' => 'vpc_id',
-            'appliance_version_id' => 'appliance_version_id',
+            'image_id' => 'image_id',
             'vcpu_cores' => 'vcpu_cores',
             'ram_capacity' => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',

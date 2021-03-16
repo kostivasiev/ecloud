@@ -13,9 +13,7 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Services\V2\NsxService;
 use Faker\Factory as Faker;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -74,13 +72,12 @@ class DeployTest extends TestCase
 
     public function testUpdatingNatWithoutEditingRulesDoesNotDeploy()
     {
-        $listener = \Mockery::mock();
-        $listener->shouldReceive('patch')
+        $this->nsxServiceMock()->shouldReceive('patch')
             ->never();
-        app()->bind(NsxService::class, function () use ($listener) {
-            return $listener;
-        });
         $this->nat->save();
+
+        // Hack so the test doesn't throw "This test did not perform any assertions"
+        $this->addToAssertionCount(1);
     }
 
     public function testUpdatingNatRemovesOldRuleAndAddsNewRule()
@@ -90,13 +87,10 @@ class DeployTest extends TestCase
         ]);
         $this->nat->destination_id = $newFloatingIp->id;
 
-        $mockNsxService = \Mockery::mock();
-        $mockNsxService->shouldReceive('patch')
+        $this->nsxServiceMock()->shouldReceive('patch')
             ->once()
             ->andReturn(new Response(200)); // TODO :- Build on this
-        app()->bind(NsxService::class, function () use ($mockNsxService) {
-            return $mockNsxService;
-        });
+
         $listener = \Mockery::mock(\App\Listeners\V2\Nat\Deploy::class)->makePartial();
         $listener->handle(new \App\Events\V2\Nat\Saved($this->nat));
 

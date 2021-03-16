@@ -26,8 +26,8 @@ class UpdateNetworkAdapter extends Job
         $instance = Instance::findOrFail($this->data['instance_id']);
         $vpc = Vpc::findOrFail($this->data['vpc_id']);
 
-        if (empty($instance->applianceVersion->appliance_version_vm_template)) {
-            Log::info('Skipped UpdateNetworkAdapter for instance ' . $this->data['instance_id']);
+        if (empty($instance->image->vm_template_name)) {
+            Log::info('Skipped UpdateNetworkAdapter for instance ' . $this->data['instance_id'] . ': no vm template found');
             return;
         }
 

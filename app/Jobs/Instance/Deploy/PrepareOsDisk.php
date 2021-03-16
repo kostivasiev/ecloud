@@ -44,7 +44,6 @@ class PrepareOsDisk extends Job
             $volume->iops = $this->data['volume_iops'];
             $volume->vmware_uuid = $volumeData->uuid;
             $volume->save();
-            $volume->instances()->attach($instance);
 
             Log::info(get_class($this) . ' : Created volume resource ' . $volume->id . ' for volume ' . $volume->vmware_uuid);
 

@@ -13,64 +13,19 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $region;
-    protected $router;
-    protected $vpc;
-    protected $availabilityZone;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ]);
-    }
-
-    public function testNotOwnedVpcIdIsFailed()
-    {
-        $data = [
-            'name' => 'Manchester Network',
-            'vpc_id' => $this->vpc->id,
-        ];
-
-        $this->patch(
-            '/v2/routers/' . $this->router->id,
-            $data,
-            [
-                'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
-    }
-
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/routers/' . $this->router->id,
+            '/v2/routers/' . $this->router()->id,
             [
                 'name' => 'expected',
-                'vpc_id' => $this->vpc->id
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
-            ])
+            ]
+        )
             ->assertResponseStatus(200);
-        $this->assertEquals('expected', Router::findOrFail($this->router->id)->name);
+        $this->assertEquals('expected', Router::findOrFail($this->router()->id)->name);
     }
 }

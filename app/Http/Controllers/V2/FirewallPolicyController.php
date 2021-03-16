@@ -58,7 +58,7 @@ class FirewallPolicyController extends BaseController
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
         $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
-        $model->fill($request->only(['name', 'sequence', 'router_id']));
+        $model->fill($request->only(['name', 'sequence']));
         if (!$model->save()) {
             return $model->getSyncError();
         }

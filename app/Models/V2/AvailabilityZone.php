@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\AvailabilityZone\Created;
 use App\Events\V2\AvailabilityZone\Creating;
 use App\Events\V2\AvailabilityZone\Deleted;
+use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
@@ -68,6 +69,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
      */
     protected $kingpinService;
 
+    /**
+     * @var ConjurerService
+     */
+    protected $conjurerService;
+
     public function routers()
     {
         return $this->hasMany(Router::class);
@@ -124,9 +130,22 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->kingpinService;
     }
 
+    public function conjurerService()
+    {
+        if (!$this->conjurerService) {
+            $this->conjurerService = app()->makeWith(ConjurerService::class, [$this]);
+        }
+        return $this->conjurerService;
+    }
+
     public function products()
     {
         return Product::forAvailabilityZone($this);
+    }
+
+    public function hostSpecs()
+    {
+        return $this->belongsToMany(HostSpec::class);
     }
 
     /**

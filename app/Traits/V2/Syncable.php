@@ -5,8 +5,11 @@ namespace App\Traits\V2;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
+use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -43,11 +46,15 @@ trait Syncable
     {
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
+            Volume::class,
             NetworkPolicy::class,
+            HostGroup::class,
+            Host::class
         ])) {
             return parent::save($options);
         }
 
+        $originalValues = $this->getOriginal();
         $response = parent::save($options);
         if (!$response) {
             Log::error(get_class($this) . ' : Failed to save', ['resource_id' => $this->id]);
@@ -64,7 +71,7 @@ trait Syncable
             return false;
         }
 
-        dispatch(new $class($this));
+        dispatch(new $class($this, $originalValues));
 
         return $response;
     }
@@ -163,7 +170,7 @@ trait Syncable
      */
     public function getSyncError()
     {
-        return \Illuminate\Http\JsonResponse::create(
+        return response()->json(
             [
                 'errors' => [
                     [
