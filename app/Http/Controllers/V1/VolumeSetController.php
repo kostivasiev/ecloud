@@ -389,7 +389,7 @@ class VolumeSetController extends BaseController
         $volumeSet = VolumeSet::find($volumeSetId);
 
         if (!$volumeSet || ($request->user()->isScoped() && $volumeSet->solution->reseller_id !== $request->user()->resellerId())) {
-            return Response::create([
+            return response([
                 'errors' => [
                     'title' => 'Not found',
                     'detail' => 'No Volume Set with that ID was found',
@@ -408,7 +408,7 @@ class VolumeSetController extends BaseController
             $data['volumes'] = array_shift($sanVolumes);
         }
 
-        return Response::create([
+        return response([
             'data' => $data,
             'meta' => [],
         ]);

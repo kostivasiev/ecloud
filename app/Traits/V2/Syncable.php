@@ -5,6 +5,8 @@ namespace App\Traits\V2;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
@@ -42,11 +44,12 @@ trait Syncable
 
     public function save(array $options = [])
     {
-        // Only do this for Firewall's & Volumes at the moment
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
             Volume::class,
             NetworkPolicy::class,
+            HostGroup::class,
+            Host::class
         ])) {
             return parent::save($options);
         }
@@ -167,7 +170,7 @@ trait Syncable
      */
     public function getSyncError()
     {
-        return \Illuminate\Http\JsonResponse::create(
+        return response()->json(
             [
                 'errors' => [
                     [

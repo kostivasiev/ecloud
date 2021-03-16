@@ -3,9 +3,7 @@
 namespace App\Console\Commands\Kingpin\Instance;
 
 use App\Models\V2\Instance;
-use App\Models\V2\Volume;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class Delete
@@ -24,9 +22,11 @@ class Delete extends Command
         $instance = Instance::find($this->argument('instanceId'));
         if (!$instance) {
             $this->alert('Failed to find instance');
-            exit;
+            return Command::FAILURE;
         }
 
         $instance->delete();
+
+        return Command::SUCCESS;
     }
 }
