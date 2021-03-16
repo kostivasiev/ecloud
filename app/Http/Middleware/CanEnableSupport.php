@@ -25,15 +25,15 @@ class CanEnableSupport
             try {
                 $customer = $accountAdminClient->customers()->getById($request->user()->resellerId());
             } catch (\Exception $e) {
-                return JsonResponse::create([
+                return response()->json([
                     'errors' => [
                         [
                             'title' => 'Not Found',
                             'detail' => 'The customer account is not available',
-                            'status' => 404,
+                            'status' => 503,
                         ]
                     ]
-                ], 404);
+                ], 503);
             }
 
             if ($customer->paymentMethod == 'Credit Card') {
