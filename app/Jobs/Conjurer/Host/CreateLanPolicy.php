@@ -5,9 +5,7 @@ namespace App\Jobs\Conjurer\Host;
 use App\Jobs\Job;
 use App\Models\V2\Host;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class CreateLanPolicy extends Job
 {
@@ -37,20 +35,23 @@ class CreateLanPolicy extends Job
         }
 
         // Check whether a LAN connectivity policy exists on the UCS for the VPC
-        $response = $availabilityZone->conjurerService()->get('/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id);
-        if ($response->getStatusCode() == 200) {
-            Log::debug('LAN Policy already exists for VPC. Nothing to do.');
-            return true;
-        }
+        try {
+            $availabilityZone->conjurerService()->get('/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id);
+        } catch (RequestException $exception) {
+            if ($exception->getCode() != 404) {
+                throw $exception;
+            }
 
-        $availabilityZone->conjurerService()->post(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc',
-            [
-                'json' => [
-                    'vpcId' => $vpc->id,
-                ],
-            ]
-        );
+            $availabilityZone->conjurerService()->post(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc',
+                [
+                    'json' => [
+                        'vpcId' => $vpc->id,
+                    ],
+                ]
+            );
+            Log::info(get_class($this) . ' : LAN policy created on UCS for VPC', ['id' => $this->model->id]);
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

@@ -5,7 +5,8 @@ namespace App\Services\V2;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
-final class ConjurerService
+final class
+ConjurerService
 {
     /**
      * @var Client

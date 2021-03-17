@@ -14,7 +14,6 @@ use App\Jobs\Kingpin\Host\CheckOnline;
 use App\Models\V2\Host;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class Save extends Job
 {
@@ -36,22 +35,24 @@ class Save extends Job
         $jobs = [];
 
         // Only create if the host doesnt already exist
-        $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id . '/host/' . $host->id
-        );
+        try {
+            $availabilityZone->conjurerService()->get(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id . '/host/' . $host->id
+            );
+        } catch (RequestException $exception) {
+            if ($exception->getCode() == 404) {
+                $jobs = [
+                    new CreateLanPolicy($this->model),
+                    new CheckAvailableCompute($this->model),
+                    new CreateProfile($this->model),
 
-        if ($response->getStatusCode() == 404) {
-            $jobs = [
-                new CreateLanPolicy($this->model),
-                new CheckAvailableCompute($this->model),
-                new CreateProfile($this->model),
-
-                new CreateAutoDeployRule($this->model),
-                new Deploy($this->model),
-                new AddToHostSet($this->model),
-                new PowerOn($this->model),
-                new CheckOnline($this->model),
-            ];
+                    new CreateAutoDeployRule($this->model),
+                    new Deploy($this->model),
+                    new AddToHostSet($this->model),
+                    new PowerOn($this->model),
+                    new CheckOnline($this->model),
+                ];
+            }
         }
 
         $jobs[] = new \App\Jobs\Sync\Completed($this->model);
