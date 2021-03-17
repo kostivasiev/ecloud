@@ -69,16 +69,15 @@ class CanEnableSupportTest extends TestCase
     {
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
-            $mockClient->shouldReceive('customers')
-                ->andReturnUsing(function () {
-                    return new class {
-                        public string $paymentMethod = 'Invoice';
-                        public function getById($id)
-                        {
-                            return $this;
-                        }
-                    };
-                });
+            $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
+
+            $mockCustomer->shouldReceive('getById')
+                ->andReturn(
+                    new Customer([
+                        'paymentMethod' => 'Invoice',
+                    ])
+                );
+            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
             return $mockClient;
         });
 
