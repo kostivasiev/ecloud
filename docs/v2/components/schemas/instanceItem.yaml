@@ -58,6 +58,11 @@ properties:
     required: false
     example: false
     readOnly: false
+  host_group_id :
+    type : string
+    required : false
+    example : hg-abc123
+    readOnly : false
   sync:
     type: string
     example: 'completed'

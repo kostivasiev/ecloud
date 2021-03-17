@@ -68,6 +68,12 @@ class UpdateRequest extends FormRequest
             ],
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
+            'host_group_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.host_groups,id,deleted_at,NULL'
+            ],
         ];
 
         return $rules;

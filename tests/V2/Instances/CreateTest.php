@@ -77,6 +77,7 @@ class CreateTest extends TestCase
             'ram_capacity' => 1024,
             'volume_iops' => 600,
             'backup_enabled' => true,
+            'host_group_id' => $this->hostGroup()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -89,6 +90,7 @@ class CreateTest extends TestCase
             'id' => $id,
             'name' => $id,
             'backup_enabled' => 1,
+            'host_group_id' => $this->hostGroup()->id,
         ], 'ecloud');
     }
 
@@ -108,6 +110,7 @@ class CreateTest extends TestCase
                 'ram_capacity' => 1024,
                 'volume_iops' => 600,
                 'backup_enabled' => true,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -123,6 +126,7 @@ class CreateTest extends TestCase
                 'id' => $id,
                 'name' => $name,
                 'backup_enabled' => 1,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             'ecloud'
         );

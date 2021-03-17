@@ -67,6 +67,11 @@ class CreateRequest extends FormRequest
             ],
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
+            'host_group_id' => [
+                'required',
+                'string',
+                'exists:ecloud.host_groups,id,deleted_at,NULL'
+            ],
             'network_id' => [
                 'sometimes',
                 'string',
