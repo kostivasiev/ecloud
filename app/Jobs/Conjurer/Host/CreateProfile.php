@@ -24,7 +24,7 @@ class CreateProfile extends Job
         $availabilityZone = $host->hostGroup->availabilityZone;
 
         $availabilityZone->conjurerService()->post(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/host',
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host',
             [
                 'json' => [
                     'specificationName' => $host->hostGroup->hostSpec->name,
