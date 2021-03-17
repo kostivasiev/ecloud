@@ -5,17 +5,6 @@ namespace App\Resources\V2;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
-/**
- * Class AvailabilityZonesResource
- * @package App\Http\Resources\V2
- * @property string id
- * @property string code
- * @property string name
- * @property int site_id
- * @property int region_id
- * @property string created_at
- * @property string updated_at
- */
 class AvailabilityZoneResource extends UKFastResource
 {
     /**
@@ -37,6 +26,7 @@ class AvailabilityZoneResource extends UKFastResource
             $data['nsx_manager_endpoint'] = $this->nsx_manager_endpoint;
             $data['nsx_edge_cluster_id'] = $this->nsx_edge_cluster_id;
             $data['san_name'] = $this->san_name;
+            $data['ucs_compute_name'] = $this->ucs_compute_name;
 
             $tz = new \DateTimeZone(config('app.timezone'));
             $data['created_at'] = $this->created_at === null ? null : Carbon::parse($this->created_at, $tz)->toIso8601String();
