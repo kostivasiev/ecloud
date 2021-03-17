@@ -63,6 +63,8 @@ class MemoryCpuChangeTest extends TestCase
 
     public function testMemoryChangeRamCapacity()
     {
+        $this->hostGroup();
+
         Event::fake();
 
         $instance = factory(Instance::class)->create([
