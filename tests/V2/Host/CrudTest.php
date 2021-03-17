@@ -119,7 +119,7 @@ class CrudTest extends TestCase
 
         // Create Profile
         $this->conjurerServiceMock()->expects('post')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/host',
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/' . $this->vpc()->id .'/host',
                 [
                     'json' => [
                         'specificationName' => 'test-host-spec',
