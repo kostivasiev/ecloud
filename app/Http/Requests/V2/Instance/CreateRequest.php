@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\FloatingIp;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
@@ -70,7 +71,8 @@ class CreateRequest extends FormRequest
             'host_group_id' => [
                 'required',
                 'string',
-                'exists:ecloud.host_groups,id,deleted_at,NULL'
+                'exists:ecloud.host_groups,id,deleted_at,NULL',
+                new ExistsForUser(HostGroup::class),
             ],
             'network_id' => [
                 'sometimes',

@@ -54,7 +54,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
 GET https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -68,7 +67,23 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
+PATCH https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
 
+{
+    "host_group_id": "hg-noneexisting"
+}
+
+> {%
+
+client.test("Request failed", function() {
+  client.assert(response.status === 422, "The given data was invalid.");
+});
+%}
+
+###
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
