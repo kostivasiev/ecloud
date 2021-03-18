@@ -64,7 +64,7 @@ class UpdateBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'host\' billing product for availability zone ' . $model->availabilityZone->id
+                'Failed to load \'host\' billing product for availability zone ' . $model->hostGroup->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;
