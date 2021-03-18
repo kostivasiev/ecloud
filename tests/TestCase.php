@@ -17,6 +17,7 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Models\V2\Image;
 use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
@@ -58,6 +59,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var KingpinService */
     private $kingpinServiceMock;
+
+    /** @var ConjurerService */
+    private $conjurerServiceMock;
 
     /** @var Credential */
     private $credential;
@@ -350,6 +354,31 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->nsxServiceMock;
+    }
+
+    public function conjurerServiceMock()
+    {
+        if (!$this->conjurerServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-ucs',
+                'name' => 'UCS API',
+                'username' => config('conjurer.ucs_user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+
+            factory(Credential::class)->create([
+                'id' => 'cred-conjurer',
+                'name' => 'Conjurer API',
+                'username' => config('conjurer.user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+
+            $this->conjurerServiceMock = \Mockery::mock(new ConjurerService(new Client()))->makePartial();
+            app()->bind(ConjurerService::class, function () {
+                return $this->conjurerServiceMock;
+            });
+        }
+        return $this->conjurerServiceMock;
     }
 
     protected function tearDown(): void
