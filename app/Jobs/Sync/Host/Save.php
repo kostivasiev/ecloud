@@ -67,7 +67,6 @@ class Save extends Job
         $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
             $exception->getResponse()->getBody()->getContents() :
             $exception->getMessage();
-
         $this->model->setSyncFailureReason($message);
     }
 }
