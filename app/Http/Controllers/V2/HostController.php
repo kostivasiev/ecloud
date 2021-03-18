@@ -39,7 +39,7 @@ class HostController extends BaseController
             'host_group_id',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateRequest $request, string $id)
