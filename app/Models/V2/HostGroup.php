@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\HostGroup\Deleted;
 use App\Events\V2\HostGroup\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
@@ -27,6 +28,7 @@ class HostGroup extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'saved' => Saved::class,
+        'deleted' => Deleted::class,
     ];
 
     public function __construct(array $attributes = [])

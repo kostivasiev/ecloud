@@ -114,8 +114,11 @@ class EventServiceProvider extends ServiceProvider
 
         // HostGroup
         \App\Events\V2\HostGroup\Saved::class => [
-            \App\Listeners\V2\HostGroup\UpdateUnusedBilling::class,
             \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\HostGroup\UpdateUnusedBilling::class,
+        ],
+        \App\Events\V2\HostGroup\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // Instance

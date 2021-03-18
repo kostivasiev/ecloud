@@ -2,11 +2,9 @@
 namespace App\Listeners\V2\HostGroup;
 
 use App\Jobs\HostGroup\UnusedBilling;
-use App\Models\V2\BillingMetric;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Sync;
 use App\Support\Resource;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateUnusedBilling

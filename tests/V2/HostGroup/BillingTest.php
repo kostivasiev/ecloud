@@ -4,6 +4,7 @@ namespace Tests\V2\HostGroup;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
+use App\Models\V2\Sync;
 use Tests\TestCase;
 
 class BillingTest extends TestCase
@@ -51,6 +52,20 @@ class BillingTest extends TestCase
     {
         // create a host
         $this->host();
+        $billingMetric = BillingMetric::where('resource_id', '=', $this->hostGroup()->id)
+            ->first();
+        $this->assertEquals($this->hostGroup()->id, $billingMetric->resource_id);
+        $this->assertEquals($this->hostSpec()->id, $billingMetric->value);
+        $this->assertEquals($this->productPrice->product_price_sale_price, $billingMetric->price);
+        $this->assertNotNull($billingMetric->end);
+    }
+
+    /**
+     * @test As a service stop billing for an unused HostGroup when it is deleted
+     */
+    public function stopUnusedBillingForAHostGroupWhenDeleted()
+    {
+        $this->hostGroup()->delete();
         $billingMetric = BillingMetric::where('resource_id', '=', $this->hostGroup()->id)
             ->first();
         $this->assertEquals($this->hostGroup()->id, $billingMetric->resource_id);

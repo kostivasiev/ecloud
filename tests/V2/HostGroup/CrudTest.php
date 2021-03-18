@@ -2,6 +2,7 @@
 
 namespace Tests\V2\HostGroup;
 
+use App\Models\V2\HostGroup;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;

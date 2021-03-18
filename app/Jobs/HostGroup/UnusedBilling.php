@@ -30,6 +30,7 @@ class UnusedBilling
                 }
                 $currentActiveMetric->end = $time;
                 $currentActiveMetric->save();
+                $this->model->setSyncCompleted();
             }
             return;
         }
@@ -56,6 +57,7 @@ class UnusedBilling
         }
 
         $billingMetric->save();
+        $this->model->setSyncCompleted();
 
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
     }
