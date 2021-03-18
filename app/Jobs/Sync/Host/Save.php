@@ -45,8 +45,8 @@ class Save extends Job
                     new CreateLanPolicy($this->model),
                     new CheckAvailableCompute($this->model),
                     new CreateProfile($this->model),
-
                     new CreateAutoDeployRule($this->model),
+
                     new Deploy($this->model),
                     new AddToHostSet($this->model),
                     new PowerOn($this->model),

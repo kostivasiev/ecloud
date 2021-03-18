@@ -23,37 +23,32 @@ class CreateAutoDeployRule extends Job
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
-        // retrieved from the Conjurer UCS server profile (conjurer)
+        // Get the host spec from Conjurer
         $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/specification/' . $host->hostGroup->hostSpec->name . '/host/' . $host->id
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id
         );
         $response = json_decode($response->getBody()->getContents());
 
-        // $response->hardwareVersion
-        // $response->hardwareVersion->interfaces , get the MAC address from eth0
+        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
 
+        if (empty($macAddress)) {
+            $message = 'Failed to load eth0 address for host ' . $host->id;
+            Log::error($message);
+            $this->fail(new \Exception($message));
+            return false;
+        }
 
-        // POST
-
-        $availabilityZone->kingpinService()->put(
+        // Add the host to the host group on VMWare
+        $availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $host->hostGroup->vpc_id .'/hostgroup/' . $host->hostGroup->id .'/host',
             [
                 'json' => [
                     'hostId' => $host->id,
                     'hardwareVersion' => $response->hardwareVersion,
-                    'macAddress' => ,
+                    'macAddress' => $macAddress,
                 ],
             ]
         );
-
-
-        /**
-         * {
-        "hostId": "string",
-        "hardwareVersion": "string",
-        "macAddress": "string"
-        }
-         */
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
@@ -64,6 +59,5 @@ class CreateAutoDeployRule extends Job
             $exception->getResponse()->getBody()->getContents() :
             $exception->getMessage();
         $this->model->setSyncFailureReason($message);
-
     }
 }
