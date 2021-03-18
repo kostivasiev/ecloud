@@ -5,6 +5,7 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Sync;
+use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 
 class BillingTest extends TestCase
@@ -50,6 +51,12 @@ class BillingTest extends TestCase
      */
     public function stopUnusedBillingForAHostGroupWhenUsed()
     {
+        $this->conjurerServiceMock()
+            ->shouldReceive('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
         // create a host
         $this->host();
         $billingMetric = BillingMetric::where('resource_id', '=', $this->hostGroup()->id)
