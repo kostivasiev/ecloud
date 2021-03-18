@@ -3,7 +3,6 @@ namespace App\Listeners\V2\Host;
 
 use App\Jobs\HostGroup\UnusedBilling;
 use App\Models\V2\Host;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Sync;
 use App\Support\Resource;
 use Illuminate\Support\Facades\Log;

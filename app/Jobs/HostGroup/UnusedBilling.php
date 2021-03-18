@@ -24,10 +24,6 @@ class UnusedBilling
         if ($hostCount > 0) {
             $currentActiveMetric = BillingMetric::getActiveByKey($this->model, $this->metric . '%', 'LIKE');
             if (!empty($currentActiveMetric)) {
-                if (($currentActiveMetric->value == $this->model->capacity) &&
-                    ($currentActiveMetric->key == $this->metric)) {
-                    return;
-                }
                 $currentActiveMetric->end = $time;
                 $currentActiveMetric->save();
                 $this->model->setSyncCompleted();
@@ -45,7 +41,7 @@ class UnusedBilling
 
         $product = $this->model->availabilityZone
             ->products()
-            ->where('product_name', 'LIKE', '%hostgroup.unallocated')
+            ->where('product_name', 'LIKE', '%'.$this->metric)
             ->first();
         if (empty($product)) {
             Log::error(

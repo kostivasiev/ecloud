@@ -109,6 +109,8 @@ class EventServiceProvider extends ServiceProvider
 
         // Host
         \App\Events\V2\Host\Saved::class => [
+            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\Host\UpdateBilling::class,
             \App\Listeners\V2\Host\UpdateUnusedBilling::class,
         ],
 
