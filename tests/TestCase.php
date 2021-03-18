@@ -269,6 +269,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Creating
             \App\Events\V2\Instance\Creating::class,
+            \App\Events\V2\HostGroup\Creating::class,
 
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,

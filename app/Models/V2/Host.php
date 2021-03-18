@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Host\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -23,6 +24,10 @@ class Host extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public string $keyPrefix = 'h';
+
+    protected $dispatchesEvents = [
+        'saved' => Saved::class,
+    ];
 
     public function __construct(array $attributes = [])
     {

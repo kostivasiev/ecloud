@@ -107,6 +107,17 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
+        // Host
+        \App\Events\V2\Host\Saved::class => [
+            \App\Listeners\V2\Host\UpdateUnusedBilling::class,
+        ],
+
+        // HostGroup
+        \App\Events\V2\HostGroup\Saved::class => [
+            \App\Listeners\V2\HostGroup\UpdateUnusedBilling::class,
+            \App\Listeners\V2\ResourceSync::class,
+        ],
+
         // Instance
         \App\Events\V2\Instance\Creating::class => [
             \App\Listeners\V2\Instance\DefaultPlatform::class,
@@ -274,6 +285,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
+            \App\Listeners\V2\HostGroup\UpdateUnusedBilling::class,
         ]
     ];
 }
