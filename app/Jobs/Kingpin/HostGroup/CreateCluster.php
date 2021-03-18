@@ -4,6 +4,7 @@ namespace App\Jobs\Kingpin\HostGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Log;
 
@@ -23,8 +24,12 @@ class CreateCluster extends Job
         $hostGroup = $this->model;
 
         // Check if it already exists and if do skip creating it
-        $response = $hostGroup->availabilityZone->kingpinService()
-            ->get('/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id);
+        try {
+            $response = $hostGroup->availabilityZone->kingpinService()
+                ->get('/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id);
+        } catch (ClientException $exception) {
+            $response = $exception->getResponse();
+        }
         if ($response && $response->getStatusCode() === 200) {
             Log::info(get_class($this) . ' : Skipped', [
                 'id' => $hostGroup->id,
