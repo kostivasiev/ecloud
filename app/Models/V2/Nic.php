@@ -9,6 +9,7 @@ use App\Events\V2\Nic\Deleting;
 use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -22,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Nic extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, Syncable;
+    use CustomKey, SoftDeletes, Syncable, SyncableOverrides;
 
     public $keyPrefix = 'nic';
     public $incrementing = false;

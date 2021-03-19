@@ -5,10 +5,13 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class WaitOsCustomisation extends Job
 {
+    use Batchable;
+
     const RETRY_ATTEMPTS = 360;
     const RETRY_DELAY = 5; // Retry every 5 seconds for 20 minutes
     public $tries = 500;

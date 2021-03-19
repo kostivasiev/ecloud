@@ -6,10 +6,13 @@ use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AttachOsDisk extends Job
 {
+    use Batchable;
+
     const RETRY_DELAY = 1;
 
     public $tries = 60;

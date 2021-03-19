@@ -7,10 +7,13 @@ use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use Exception;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AssignFloatingIp extends Job
 {
+    use Batchable;
+
     private $data;
 
     public function __construct($data)

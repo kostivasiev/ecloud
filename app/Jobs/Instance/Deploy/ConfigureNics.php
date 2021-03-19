@@ -6,11 +6,14 @@ use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
 class ConfigureNics extends Job
 {
+    use Batchable;
+
     const RETRY_ATTEMPTS = 10;
     const RETRY_DELAY = 10;
     public $tries = 20;

@@ -109,7 +109,9 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        if (!$volume->save()) {
+        try {
+            $volume->save();
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
 

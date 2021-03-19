@@ -7,10 +7,13 @@ use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use App\Services\V2\PasswordService;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class OsCustomisation extends Job
 {
+    use Batchable;
+
     private $data;
 
     public function __construct($data)

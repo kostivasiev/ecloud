@@ -4,10 +4,13 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class ConfigureWinRm extends Job
 {
+    use Batchable;
+
     private $data;
 
     public function __construct($data)

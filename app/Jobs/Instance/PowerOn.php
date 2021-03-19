@@ -5,17 +5,18 @@ namespace App\Jobs\Instance;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PowerOn extends Job
 {
-    private $data;
-    private $setSyncCompleted;
+    use Batchable;
 
-    public function __construct($data, $setSyncCompleted = true)
+    private $data;
+
+    public function __construct($data)
     {
         $this->data = $data;
-        $this->setSyncCompleted = $setSyncCompleted;
     }
 
     /**
@@ -30,10 +31,6 @@ class PowerOn extends Job
         $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
         );
-
-        if ($this->setSyncCompleted) {
-            $instance->setSyncCompleted();
-        }
 
         Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Events\V2\Instance\Deploy;
 use App\Events\V2\Instance\Deploy\Data;
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -107,21 +108,21 @@ class InstanceController extends BaseController
         ]));
 
         $instance->locked = $request->input('locked', false);
-        $instance->save();
+        $instance->deploy_data = [
+            'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min')),
+            'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
+            'network_id' => $request->input('network_id', $defaultNetworkId),
+            'floating_ip_id' => $request->input('floating_ip_id'),
+            'requires_floating_ip' => $request->input('requires_floating_ip', false),
+            'image_data' => $request->input('image_data'),
+            'user_script' => $request->input('user_script'),
+        ];
+        try {
+            $instance->save();
+        } catch (SyncException $exception) {
+            return $instance->getSyncError();
+        }
         $instance->refresh();
-
-        $instanceDeployData = new Data();
-        $instanceDeployData->instance_id = $instance->id;
-        $instanceDeployData->vpc_id = $instance->vpc->id;
-        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min'));
-        $instanceDeployData->volume_iops = $request->input('volume_iops', config('volume.iops.default'));
-        $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
-        $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
-        $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
-        $instanceDeployData->image_data = $request->input('image_data');
-        $instanceDeployData->user_script = $request->input('user_script');
-
-        event(new Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->id, 201);
     }

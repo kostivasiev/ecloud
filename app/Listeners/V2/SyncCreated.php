@@ -4,6 +4,7 @@ namespace App\Listeners\V2;
 
 use App\Jobs\Sync\Completed;
 use App\Jobs\Sync\Update;
+use App\Models\V2\Instance;
 use App\Models\V2\Sync;
 use App\Models\V2\TestSyncable;
 use App\Models\V2\Volume;
@@ -14,12 +15,13 @@ class SyncCreated
 {
     public function handle($event)
     {
-        Log::debug(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         // TODO: Remove following once all syncable resources are using update/delete functionality
         if (!in_array(get_class($event->model->resource), [
             TestSyncable::class,
             Volume::class,
+            Instance::class,
         ])) {
             return true;
         }
@@ -39,6 +41,6 @@ class SyncCreated
             dispatch(new $syncJob($event->model));
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }
