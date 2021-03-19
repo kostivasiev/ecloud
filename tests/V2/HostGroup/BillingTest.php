@@ -135,6 +135,19 @@ class BillingTest extends TestCase
      */
     public function revertToUnusedBillingWhenHostDeleted()
     {
-        $this->markTestSkipped('revertToUnusedBillingWhenHostDeleted - to do');
+        $this->conjurerServiceMock()
+            ->shouldReceive('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->host()->delete();
+
+        // Get Metrics
+        $billingMetric = BillingMetric::where('resource_id', '=', $this->host()->id)->first();
+        $this->assertEquals($this->host()->id, $billingMetric->resource_id);
+        $this->assertEquals($this->hostSpec()->id, $billingMetric->value);
+        $this->assertEquals($this->hostProductPrice->product_price_sale_price, $billingMetric->price);
+        $this->assertNotNull($billingMetric->end);
     }
 }
