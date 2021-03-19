@@ -51,6 +51,8 @@ class ProcessBilling extends Command
         'throughput.2.5Gb',
         'throughput.5Gb',
         'throughput.10Gb',
+        'az-aaaaaaaa: hostgroup.unallocated',
+        'az-aaaaaaaa: host-6-4000-64',
     ];
 
     public function __construct()
