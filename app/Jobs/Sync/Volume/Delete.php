@@ -14,7 +14,7 @@ class Delete extends Job
 {
     use SyncableBatch;
 
-    /** @var Volume */
+    /** @var Sync */
     private $sync;
 
     public function __construct(Sync $sync)
@@ -24,7 +24,7 @@ class Delete extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
         $this->deleteSyncBatch([
             [
@@ -32,6 +32,6 @@ class Delete extends Job
             ]
         ])->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

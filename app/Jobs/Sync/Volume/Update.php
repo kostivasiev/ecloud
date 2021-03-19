@@ -27,7 +27,7 @@ class Update extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
         $volume = $this->sync->resource;
 
@@ -49,6 +49,6 @@ class Update extends Job
             $jobs
         ])->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }
