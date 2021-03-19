@@ -33,7 +33,7 @@ class TestSyncableCommand extends Command
         echo "\n--------------\n";
         //$syncable->testproperty = "something new polymorph1";
         //$syncable->save();
-        sleep(10);
+        sleep(20);
 
         $syncable->delete();
 

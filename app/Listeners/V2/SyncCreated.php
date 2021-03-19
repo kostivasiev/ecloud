@@ -35,7 +35,7 @@ class SyncCreated
         }
 
         if ($syncJob) {
-            Log::debug("Dispatching job", ["job" => $syncJob]);
+            Log::debug(get_class($this) . " : Dispatching job", ["job" => $syncJob]);
             dispatch(new $syncJob($event->model));
         }
 

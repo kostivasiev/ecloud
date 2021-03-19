@@ -46,7 +46,6 @@ trait SyncableBatch
         $sync = $this->sync;
 
         return $this->updateSyncBatch($jobs)->then(function (Batch $batch) use ($sync) {
-            Log::debug("DEBUG :: deleting resource from inside sync batch then block");
             $sync->resource->delete();
         });
     }

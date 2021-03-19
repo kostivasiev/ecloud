@@ -23,10 +23,6 @@ class Deploy extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        Log::debug(get_class($this) . "DEBUG :: RETURNING");
-        return;
-
-
         $volume = $this->model;
 
         if (!empty($volume->vmware_uuid)) {

@@ -23,10 +23,6 @@ class Undeploy extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        Log::debug(get_class($this) . "DEBUG :: RETURNING");
-        return;
-
-
         if (empty($this->model->vmware_uuid)) {
             Log::warning(get_class($this) . ' : No VMware UUID disk set for volume, skipping', ['id' => $this->model->id]);
             return;

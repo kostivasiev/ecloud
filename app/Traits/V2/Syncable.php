@@ -19,12 +19,10 @@ trait Syncable
     // TO BE REMOVED
     public function delete()
     {
-        Log::debug("DEBUG :: in Syncable delete()");
         if (in_array(__CLASS__, [
             TestSyncable::class,
             Volume::class,
         ])) {
-            Log::debug("DEBUG :: returning parent delete()");
             return parent::delete();
         }
 
