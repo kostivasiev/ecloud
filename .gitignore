@@ -7,3 +7,4 @@ Homestead.yaml
 composer.phar
 tests/HTTP/V2/http-client.env.json
 .run/
+.phpunit.result.cache

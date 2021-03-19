@@ -105,7 +105,7 @@ class BillingMetricTest extends TestCase
         $this->volume->iops = 600;
         $this->volume->save();
 
-        $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
+        $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSyncSaving::class)->makePartial();
         $resourceSyncListener->handle(new \App\Events\V2\Volume\Saving($this->volume));
 
         $sync = Sync::where('resource_id', $this->volume->id)->first();

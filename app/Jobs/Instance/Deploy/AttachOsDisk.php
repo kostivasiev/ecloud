@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
@@ -42,7 +43,7 @@ class AttachOsDisk extends Job
         foreach ($instanceData->volumes as $volumeData) {
             $volume = Volume::find($volumeData->volumeId);
 
-            if ($volume->getStatus() === 'in-progress') {
+            if ($volume->getStatus() === Sync::STATUS_INPROGRESS) {
                 Log::debug('Waiting for Volume ' . $volume->id . ' to finish syncing...');
                 $this->release(static::RETRY_DELAY);
                 return;

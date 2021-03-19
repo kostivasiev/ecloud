@@ -30,11 +30,11 @@ class UpdateBilling
                 return;
             }
 
-            if (Resource::classFromId($event->model->resource_id) != Volume::class) {
+            if (get_class($event->model->resource) != Volume::class) {
                 return;
             }
 
-            $volume = Volume::find($event->model->resource_id);
+            $volume = $event->model->resource;
         }
 
         if (empty($volume)) {

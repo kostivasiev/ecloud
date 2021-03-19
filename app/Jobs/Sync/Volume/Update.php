@@ -7,44 +7,48 @@ use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Jobs\Sync\Completed;
+use App\Models\V2\Sync;
 use App\Models\V2\Volume;
+use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
-class Save extends Job
+class Update extends Job
 {
-    private $model;
+    use SyncableBatch;
+
+    private $sync;
     private $originalValues;
 
-    public function __construct(Volume $model, $originalValues)
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
-        $this->originalValues = $originalValues;
+        $this->sync = $sync;
+        $this->originalValues = $sync->resource->getOriginal();
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id]);
 
-        $volume = $this->model;
+        $volume = $this->sync->resource;
 
         $jobs = [
-            new Deploy($this->model),
+            new Deploy($volume),
         ];
 
         // DO NOT DO THIS! Original values will be removed in the future!
         if (isset($this->originalValues['iops']) && $this->originalValues['iops'] != $volume->iops) {
-            $jobs[] = new IopsChange($this->model);
+            $jobs[] = new IopsChange($volume);
         }
 
         // DO NOT DO THIS! Original values will be removed in the future!
         if (isset($this->originalValues['capacity']) && $this->originalValues['capacity'] != $volume->capacity) {
-            $jobs[] = new CapacityChange($this->model);
+            $jobs[] = new CapacityChange($volume);
         }
 
-        $jobs[] = new Completed($this->model);
+        $this->updateSyncBatch([
+            $jobs
+        ])->dispatch();
 
-        dispatch(array_shift($jobs)->chain($jobs));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id]);
     }
 }

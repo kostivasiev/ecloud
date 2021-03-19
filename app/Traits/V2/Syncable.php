@@ -9,21 +9,32 @@ use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
+use App\Models\V2\TestSyncable;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
+    // TO BE REMOVED
     public function delete()
     {
+        Log::debug("DEBUG :: in Syncable delete()");
+        if (in_array(__CLASS__, [
+            TestSyncable::class,
+            Volume::class,
+        ])) {
+            Log::debug("DEBUG :: returning parent delete()");
+            return parent::delete();
+        }
+
         $class = explode('\\', __CLASS__);
         $class = 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
         if (!class_exists($class)) {
             throw new \Exception('Syncable "Delete" job not found for ' . __CLASS__);
         }
 
-        if (!$this->createSync()) {
+        if (!$this->createSync(Sync::TYPE_DELETE)) {
             return false;
         }
 
@@ -32,6 +43,7 @@ trait Syncable
         return true;
     }
 
+    // TO BE REMOVED
     public function syncDelete()
     {
         $response = parent::delete();
@@ -42,11 +54,11 @@ trait Syncable
         Log::info(get_class($this) . ' : Deleted', ['resource_id' => $this->id]);
     }
 
+    // TO BE REMOVED
     public function save(array $options = [])
     {
         if (!in_array(__CLASS__, [
             FirewallPolicy::class,
-            Volume::class,
             NetworkPolicy::class,
             HostGroup::class,
             Host::class
@@ -67,7 +79,7 @@ trait Syncable
             throw new \Exception('Syncable "Save" job not found for ' . __CLASS__);
         }
 
-        if (!$this->createSync()) {
+        if (!$this->createSync(Sync::TYPE_UPDATE)) {
             return false;
         }
 
@@ -76,13 +88,27 @@ trait Syncable
         return $response;
     }
 
-    public function createSync()
+
+    public function getUpdateSyncJob()
     {
-        Log::info(get_class($this) . ' : Creating new sync - Started', [
+        $class = explode('\\', __CLASS__);
+        return 'App\\Jobs\\Sync\\' . end($class) . '\\Update';
+    }
+
+    public function getDeleteSyncJob()
+    {
+        $class = explode('\\', __CLASS__);
+        return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
+    }
+
+    // TODO: Remove default parameter here, left in whilst delete/save still overridden above
+    public function createSync($type = Sync::TYPE_UPDATE)
+    {
+        Log::debug(get_class($this) . ' : Creating new sync - Started', [
             'resource_id' => $this->id,
         ]);
 
-        if ($this->getStatus() === 'in-progress') {
+        if ($this->getStatus() === Sync::STATUS_INPROGRESS) {
             Log::info(get_class($this) . ' : Failed creating new sync on ' . __CLASS__ . ' with an outstanding sync', [
                 'resource_id' => $this->id,
             ]);
@@ -90,10 +116,11 @@ trait Syncable
         }
 
         $sync = app()->make(Sync::class);
-        $sync->resource_id = $this->id;
+        $sync->resource()->associate($this);
         $sync->completed = false;
+        $sync->type = $type;
         $sync->save();
-        Log::info(get_class($this) . ' : Creating new sync - Finished', [
+        Log::debug(get_class($this) . ' : Creating new sync - Finished', [
             'resource_id' => $this->id,
         ]);
 
@@ -103,20 +130,28 @@ trait Syncable
     public function getStatus()
     {
         if (!$this->syncs()->count()) {
-            return 'complete';
+            return Sync::STATUS_COMPLETE;
         }
         if ($this->getSyncFailed()) {
-            return 'failed';
+            return Sync::STATUS_FAILED;
         }
         if ($this->syncs()->latest()->first()->completed) {
-            return 'complete';
+            return Sync::STATUS_COMPLETE;
         }
-        return 'in-progress';
+        return Sync::STATUS_INPROGRESS;
     }
 
     public function syncs()
     {
-        return $this->hasMany(Sync::class, 'resource_id', 'id');
+        return $this->morphMany(Sync::class, 'resource');
+    }
+
+    public function getSyncDeleting()
+    {
+        if (!$this->syncs()->count()) {
+            return false;
+        }
+        return $this->syncs()->latest()->first()->type == Sync::TYPE_DELETE;
     }
 
     public function getSyncFailed()

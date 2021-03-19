@@ -5,10 +5,13 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Volume;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(Volume $model)
@@ -19,6 +22,10 @@ class Deploy extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+
+        Log::debug(get_class($this) . "DEBUG :: RETURNING");
+        return;
+
 
         $volume = $this->model;
 
@@ -67,9 +74,7 @@ class Deploy extends Job
             'uuid' => $volume->vmware_uuid,
         ]);
 
-        // TODO :- Revisit this since it's saving in a saved event and only works due to an outstanding sync
-        $volume->save();
-        Log::debug(get_class($this) . ' : Ignore above sync failure ^ Its due to a hacky save in the Job');
+        $volume->saveQuietly();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

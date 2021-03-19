@@ -100,19 +100,19 @@ class FloatingIp extends Model implements Filterable, Sortable
     public function getStatus()
     {
         if (empty($this->ip_address)) {
-            return 'failed';
+            return Sync::STATUS_FAILED;
         }
 
         if ($this->syncs()->count() && !$this->syncs()->latest()->first()->completed) {
-            return 'in-progress';
+            return Sync::STATUS_INPROGRESS;
         }
 
         if (!$this->sourceNat && !$this->destinationNat) {
-            return 'complete';
+            return Sync::STATUS_COMPLETE;
         }
 
         if (!$this->sourceNat || !$this->destinationNat) {
-            return 'in-progress';
+            return Sync::STATUS_INPROGRESS;
         }
 
         if ($this->sourceNat->getStatus() !== 'complete') {
@@ -123,7 +123,7 @@ class FloatingIp extends Model implements Filterable, Sortable
             return $this->destinationNat->getStatus();
         }
 
-        return 'complete';
+        return Sync::STATUS_COMPLETE;
     }
 
     public function getSyncFailureReason()

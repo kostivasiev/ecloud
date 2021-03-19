@@ -119,10 +119,12 @@ class VolumeController extends BaseController
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
-        if (!$volume->delete()) {
+        try {
+            $volume->delete();
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
-        return response(null, 204);
+        return response('', 204);
     }
 
     public function attach(AttachRequest $request, string $volumeId)

@@ -246,6 +246,15 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Creating::class => [
             \App\Listeners\V2\Volume\DefaultIops::class,
         ],
+        \App\Events\V2\Volume\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Volume\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Volume\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
+        ],
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -266,6 +275,17 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
+        // TestSyncable
+        \App\Events\V2\TestSyncable\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\TestSyncable\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\TestSyncable\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
+        ],
+
         // Sync
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
@@ -274,6 +294,9 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
+        ],
+        \App\Events\V2\Sync\Created::class => [
+            \App\Listeners\V2\SyncCreated::class
         ]
     ];
 }

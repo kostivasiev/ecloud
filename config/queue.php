@@ -85,4 +85,7 @@ return [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
     ],
 
+    'batching' => [
+        'database' => env('QUEUE_BATCHING_DATABASE', 'ecloud'),
+    ],
 ];
