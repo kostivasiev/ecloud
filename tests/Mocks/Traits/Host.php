@@ -229,4 +229,16 @@ trait Host
                 ]));
             });
     }
+
+    /**
+     * Mock that the host already exists on Update, so that we don't run the create jobs
+     */
+    protected function syncSaveIdempotent()
+    {
+        $this->conjurerServiceMock()->expects('get')
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+    }
 }

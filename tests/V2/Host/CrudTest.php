@@ -76,6 +76,8 @@ class CrudTest extends TestCase
     public function testUpdate()
     {
         $this->host();
+        $this->syncSaveIdempotent();
+
         $this->patch('/v2/hosts/h-test', [
             'name' => 'new name',
         ])->seeInDatabase(
@@ -94,12 +96,6 @@ class CrudTest extends TestCase
          * Switch out the seeInDatabase/notSeeInDatabase with assertSoftDeleted(...) when we switch to Laravel
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
-        // Check host exists, lets say it does so we dont need to mock out all the create endpoints
-        $this->conjurerServiceMock()->expects('get')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
         $this->host();
 
         $this->delete('/v2/hosts/h-test')
