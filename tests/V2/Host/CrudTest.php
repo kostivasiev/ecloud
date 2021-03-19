@@ -3,9 +3,6 @@
 namespace Tests\V2\Host;
 
 use App\Models\V2\Host;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -19,16 +16,8 @@ class CrudTest extends TestCase
         parent::setUp();
 
         // bind data so we can use Conjurer mocks with expected host ID
-//        app()->bind(Host::class, function () {
-//            return $this->host();
-//        });
-
         app()->bind(Host::class, function () {
-            return factory(Host::class)->make([
-                'id' => 'h-test',
-                'name' => 'h-test',
-                'host_group_id' => $this->hostGroup()->id,
-            ]);
+            return $this->host();
         });
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));

@@ -42,7 +42,8 @@ class Deploy extends Job
         $response = json_decode($response->getBody()->getContents());
 
         // Create the host on the SAN
-        $availabilityZone->artisanService()->post('/api/v2/san/' . $availabilityZone->san_name . '/host',
+        $availabilityZone->artisanService()->post(
+            '/api/v2/san/' . $availabilityZone->san_name . '/host',
             [
                 'json' => [
                     'hostId' => $host->id,
