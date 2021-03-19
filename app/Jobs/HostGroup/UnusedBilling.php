@@ -21,8 +21,9 @@ class UnusedBilling
 
         $time = Carbon::now();
         $hostCount = $this->model->hosts()->count();
+        $metric = $this->model->availabilityZone->id . ': ' . $this->metric;
         if ($hostCount > 0) {
-            $currentActiveMetric = BillingMetric::getActiveByKey($this->model, $this->metric . '%', 'LIKE');
+            $currentActiveMetric = BillingMetric::getActiveByKey($this->model, $metric);
             if (!empty($currentActiveMetric)) {
                 $currentActiveMetric->end = $time;
                 $currentActiveMetric->save();
@@ -35,13 +36,13 @@ class UnusedBilling
         $billingMetric->resource_id = $this->model->id;
         $billingMetric->vpc_id = $this->model->vpc->id;
         $billingMetric->reseller_id = $this->model->vpc->reseller_id;
-        $billingMetric->key = $this->metric;
+        $billingMetric->key = $metric;
         $billingMetric->value = $this->model->hostSpec->id;
         $billingMetric->start = $time;
 
         $product = $this->model->availabilityZone
             ->products()
-            ->where('product_name', 'LIKE', '%'.$this->metric)
+            ->where('product_name', 'LIKE', '%'.$metric.'%')
             ->first();
         if (empty($product)) {
             Log::error(
