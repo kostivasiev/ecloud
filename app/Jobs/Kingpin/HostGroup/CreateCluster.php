@@ -5,6 +5,7 @@ namespace App\Jobs\Kingpin\HostGroup;
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Log;
 
@@ -27,46 +28,35 @@ class CreateCluster extends Job
         try {
             $response = $hostGroup->availabilityZone->kingpinService()
                 ->get('/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id);
-        } catch (ClientException $exception) {
-            $response = $exception->getResponse();
-        }
-        if ($response && $response->getStatusCode() === 200) {
-            Log::info(get_class($this) . ' : Skipped', [
-                'id' => $hostGroup->id,
-                'status_code' => $response->getStatusCode(),
-            ]);
-            return true;
-        }
-
-        try {
-            $response = $hostGroup->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup',
-                [
-                    'json' => [
-                        'hostGroupId' => $hostGroup->id,
-                        'shared' => false,
-                    ],
-                ]
-            );
-        } catch (ServerException $exception) {
-            $response = $exception->getResponse();
+            if ($response->getStatusCode() == 200) {
+                Log::debug(get_class($this) . ' : HostGroup already exists, nothing to do.', ['id' => $this->model->id]);
+                return true;
+            }
+        } catch (RequestException $exception) {
+            if ($exception->getCode() != 404) {
+                throw $exception;
+            }
         }
 
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $hostGroup->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents(),
-            ]);
-            $this->fail(new \Exception('Failed to create ' . $hostGroup->id));
-            return false;
-        }
+        $hostGroup->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup',
+            [
+                'json' => [
+                    'hostGroupId' => $hostGroup->id,
+                    'shared' => false,
+                ],
+            ]
+        );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+            $exception->getResponse()->getBody()->getContents() :
+            $exception->getMessage();
+        $this->model->setSyncFailureReason($message);
+
     }
 }
