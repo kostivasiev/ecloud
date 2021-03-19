@@ -57,6 +57,5 @@ class CreateCluster extends Job
             $exception->getResponse()->getBody()->getContents() :
             $exception->getMessage();
         $this->model->setSyncFailureReason($message);
-
     }
 }
