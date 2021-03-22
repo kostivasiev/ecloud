@@ -33,6 +33,7 @@ trait Mocks
         $this->createAutoDeployRule();
         $this->deploy();
         $this->powerOn();
+        $this->checkOnline();
     }
 
     protected function syncSave()
@@ -101,15 +102,7 @@ trait Mocks
             ])
             ->andReturnUsing(function () {
                 // Empty array means no stock available, array count indicates stock available
-                return new Response(200, [], json_encode([
-                    'specification' => 'DUAL-4208--32GB',
-                    'name' => 'DUAL-4208--32GB',
-                    'interfaces' => [
-                        'name' => 'eth0',
-                        'address' => '00:25:B5:C0:A0:1B',
-                        'type' => 'vNIC'
-                    ]
-                ]));
+                return new Response(200, [], $this->getHostResponse());
             });
     }
 
@@ -118,38 +111,7 @@ trait Mocks
         $this->conjurerServiceMock()->expects('get')
             ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'specification' => 'DUAL-4208--32GB',
-                    'name' => 'DUAL-4208--32GB',
-                    'hardwareVersion' => 'M4',
-                    'interfaces' => [
-                        [
-                            'name' => 'eth0',
-                            'address' => '00:25:B5:C0:A0:1B',
-                            'type' => 'vNIC'
-                        ],
-                        [
-                            'name' => 'eth1',
-                            'address' => '00:25:B5:C0:B0:11',
-                            'type' => 'vNIC'
-                        ],
-                        [
-                            'name' => 'eth2',
-                            'address' => '00:25:B5:C0:A0:10',
-                            'type' => 'vNIC'
-                        ],
-                        [
-                            'name' => 'fc0',
-                            'address' => '20:00:00:25:B5:C0:A0:0F',
-                            'type' => 'vHBA'
-                        ],
-                        [
-                            'name' => 'fc1',
-                            'address' => '20:00:00:25:B5:C0:B0:0F',
-                            'type' => 'vHBA'
-                        ]
-                    ]
-                ]));
+                return new Response(200, [], $this->getHostResponse());
             });
 
         $this->kingpinServiceMock()->expects('post')
@@ -178,37 +140,7 @@ trait Mocks
         $this->conjurerServiceMock()->expects('get')
             ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'name' => 'DUAL-4208--32GB',
-                    'hardwareVersion' => 'M4',
-                    'interfaces' => [
-                        [
-                            'name' => 'eth0',
-                            'address' => '00:25:B5:C0:A0:1B',
-                            'type' => 'vNIC'
-                        ],
-                        [
-                            'name' => 'eth1',
-                            'address' => '00:25:B5:C0:B0:11',
-                            'type' => 'vNIC'
-                        ],
-                        [
-                            'name' => 'eth2',
-                            'address' => '00:25:B5:C0:A0:10',
-                            'type' => 'vNIC'
-                        ],
-                        [
-                            'name' => 'fc0',
-                            'address' => '20:00:00:25:B5:C0:A0:0F',
-                            'type' => 'vHBA'
-                        ],
-                        [
-                            'name' => 'fc1',
-                            'address' => '20:00:00:25:B5:C0:B0:0F',
-                            'type' => 'vHBA'
-                        ]
-                    ]
-                ]));
+                return new Response(200, [], $this->getHostResponse());
             });
 
         $this->artisanServiceMock()->expects('post')
@@ -240,6 +172,27 @@ trait Mocks
             });
     }
 
+    protected function checkOnline()
+    {
+        $this->conjurerServiceMock()->expects('get')
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], $this->getHostResponse());
+            });
+
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B'])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'name' => 'DUAL-4208--32GB',
+                    'connectionState' => 'M4',
+                    'powerState' => 'M4',
+                    'macAddress' => 'M4',
+                ]));
+            });
+
+    }
+
     /**
      * Mock that the host already exists on Update, so that we don't run the create jobs
      */
@@ -250,5 +203,40 @@ trait Mocks
             ->andReturnUsing(function () {
                 return new Response(200);
             });
+    }
+
+    private function getHostResponse()
+    {
+        return json_encode([
+            'name' => 'DUAL-4208--32GB',
+            'hardwareVersion' => 'M4',
+            'interfaces' => [
+                [
+                    'name' => 'eth0',
+                    'address' => '00:25:B5:C0:A0:1B',
+                    'type' => 'vNIC'
+                ],
+                [
+                    'name' => 'eth1',
+                    'address' => '00:25:B5:C0:B0:11',
+                    'type' => 'vNIC'
+                ],
+                [
+                    'name' => 'eth2',
+                    'address' => '00:25:B5:C0:A0:10',
+                    'type' => 'vNIC'
+                ],
+                [
+                    'name' => 'fc0',
+                    'address' => '20:00:00:25:B5:C0:A0:0F',
+                    'type' => 'vHBA'
+                ],
+                [
+                    'name' => 'fc1',
+                    'address' => '20:00:00:25:B5:C0:B0:0F',
+                    'type' => 'vHBA'
+                ]
+            ]
+        ]);
     }
 }

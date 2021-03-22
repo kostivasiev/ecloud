@@ -30,7 +30,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
     // This is required for the Kingping/NSX mocks, see below
     use DatabaseMigrations,
-        Mocks\Traits\Host;
+        Mocks\Host\Mocks;
 
     /**
      * @deprecated use $this->be();

@@ -47,7 +47,6 @@ class Save extends Job
                     new CreateAutoDeployRule($this->model),
                     new Deploy($this->model),
                     new PowerOn($this->model),
-
                     new CheckOnline($this->model),
                 ];
             }
