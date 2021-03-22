@@ -7,7 +7,6 @@ use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Instance;
@@ -17,23 +16,34 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Models\V2\Image;
 use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
-    // This is required for the Kingping/NSX mocks, see below
-    use DatabaseMigrations;
+    use DatabaseMigrations,
+        Mocks\Host\Mocks;
 
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',
     ];
+
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validWriteHeaders = [
         'X-consumer-custom-id' => '0-0',
         'X-consumer-groups' => 'ecloud.read, ecloud.write',
@@ -63,6 +73,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var ConjurerService */
     private $conjurerServiceMock;
 
+    /** @var ArtisanService */
+    private $artisanServiceMock;
+
     /** @var Credential */
     private $credential;
 
@@ -77,9 +90,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Network */
     private $network;
-
-    /** @var Host */
-    private $host;
 
     /** @var HostSpec */
     private $hostSpec;
@@ -212,21 +222,29 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->network;
     }
 
-    public function host()
-    {
-        if (!$this->host) {
-            $this->host = factory(Host::class)->create([
-                'id' => 'h-test',
-                'name' => 'h-test',
-                'host_group_id' => $this->hostGroup()->id,
-            ]);
-        }
-        return $this->host;
-    }
-
     public function hostGroup()
     {
         if (!$this->hostGroup) {
+            // CreateCluster Job
+            $this->kingpinServiceMock()->expects('get')
+                ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
+                ->andReturnUsing(function () {
+                    return new Response(404);
+                });
+            $this->kingpinServiceMock()->expects('post')
+                ->withSomeOfArgs(
+                    '/api/v2/vpc/vpc-test/hostgroup',
+                    [
+                        'json' => [
+                            'hostGroupId' => 'hg-test',
+                            'shared' => false,
+                        ]
+                    ]
+                )
+                ->andReturnUsing(function () {
+                    return new Response(200);
+                });
+
             $this->hostGroup = factory(HostGroup::class)->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
@@ -378,6 +396,31 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->conjurerServiceMock;
+    }
+
+    public function artisanServiceMock()
+    {
+        if (!$this->artisanServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-3par',
+                'name' => '3PAR',
+                'username' => config('artisan.user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+
+            factory(Credential::class)->create([
+                'id' => 'cred-artisan',
+                'name' => 'Artisan API',
+                'username' => config('artisan.san_user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+
+            $this->artisanServiceMock = \Mockery::mock(new ArtisanService(new Client()))->makePartial();
+            app()->bind(ArtisanService::class, function () {
+                return $this->artisanServiceMock;
+            });
+        }
+        return $this->artisanServiceMock;
     }
 
     protected function tearDown(): void

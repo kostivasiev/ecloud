@@ -4,6 +4,7 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 class PowerOn extends Job
@@ -19,13 +20,21 @@ class PowerOn extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // TODO https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/621
+        $host = $this->model;
+        $availabilityZone = $host->hostGroup->availabilityZone;
+
+        $availabilityZone->conjurerService()->post(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id . '/power'
+        );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+            $exception->getResponse()->getBody()->getContents() :
+            $exception->getMessage();
+        $this->model->setSyncFailureReason($message);
     }
 }

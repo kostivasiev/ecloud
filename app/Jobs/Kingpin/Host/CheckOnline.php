@@ -41,6 +41,8 @@ class CheckOnline extends Job
             return false;
         }
 
+        Log::debug('MAC address: ' . $macAddress);
+
         try {
             $response = $host->hostGroup->availabilityZone->kingpinService()->get(
                 '/api/v2/vpc/' . $host->hostGroup->vpc_id . '/hostgroup/' . $host->hostGroup->id . '/host/' . $macAddress
