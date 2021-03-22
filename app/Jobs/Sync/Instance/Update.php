@@ -47,22 +47,24 @@ class Update extends Job
 
         if (!$this->sync->resource->deployed) {
             $this->updateSyncBatch([
-                new Deploy($this->sync->resource),
-                new PrepareOsDisk($this->sync->resource),
-                /*new AttachOsDisk($this->sync->resource),
-                new ConfigureNics($this->sync->resource),
-                new AssignFloatingIp($this->sync->resource),
-                new UpdateNetworkAdapter($this->sync->resource),
-                new OsCustomisation($this->sync->resource),
-                new PowerOn($this->sync->resource),
-                new WaitOsCustomisation($this->sync->resource),
-                new PrepareOsUsers($this->sync->resource),
-                new ExpandOsDisk($this->sync->resource),
-                new ConfigureWinRm($this->sync->resource),
-                new ActivateWindows($this->sync->resource),
-                new RunApplianceBootstrap($this->sync->resource),
-                new RunBootstrapScript($this->sync->resource),*/
-                new DeployCompleted($this->sync->resource),
+                [
+                    new Deploy($this->sync->resource),
+                    new PrepareOsDisk($this->sync->resource),
+                    new AttachOsDisk($this->sync->resource),
+                    new ConfigureNics($this->sync->resource),
+                    new AssignFloatingIp($this->sync->resource),
+                    new UpdateNetworkAdapter($this->sync->resource),
+                    new OsCustomisation($this->sync->resource),
+                    new PowerOn($this->sync->resource),
+                    new WaitOsCustomisation($this->sync->resource),
+                    new PrepareOsUsers($this->sync->resource),
+                    new ExpandOsDisk($this->sync->resource),
+                    new ConfigureWinRm($this->sync->resource),
+                    new ActivateWindows($this->sync->resource),
+                    new RunApplianceBootstrap($this->sync->resource),
+                    new RunBootstrapScript($this->sync->resource),
+                    new DeployCompleted($this->sync->resource),
+                ],
             ])->dispatch();
         } else {
             Log::warning("DEBUG :: instance update jobs initialization here");

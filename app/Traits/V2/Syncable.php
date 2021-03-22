@@ -28,7 +28,7 @@ trait Syncable
         return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
     }
 
-    // TODO: Remove default parameter here, left in whilst delete/save still overridden above
+    // TODO: Remove default parameter here, left in whilst delete/save still overridden in SyncableOverriddes trait
     public function createSync($type = Sync::TYPE_UPDATE)
     {
         Log::debug(get_class($this) . ' : Creating new sync - Started', [

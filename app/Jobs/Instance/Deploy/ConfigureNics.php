@@ -17,18 +17,18 @@ class ConfigureNics extends Job
     const RETRY_ATTEMPTS = 10;
     const RETRY_DELAY = 10;
     public $tries = 20;
-    private $data;
+    private $instance;
 
-    public function __construct($data)
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $network = Network::findOrFail($this->data['network_id']);
+        $network = Network::findOrFail($this->instance->deploy_data['network_id']);
         if (!$network->available) {
             if ($this->attempts() <= static::RETRY_ATTEMPTS) {
                 $this->release(static::RETRY_DELAY);
@@ -43,15 +43,13 @@ class ConfigureNics extends Job
             }
         }
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-
-        $getInstanceResponse = $instance->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id
+        $getInstanceResponse = $this->instance->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
         );
 
         $instanceData = json_decode($getInstanceResponse->getBody()->getContents());
         if (!$instanceData) {
-            throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+            throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
         }
 
         Log::info(get_class($this) . ' : ' . count($instanceData->nics) . ' NIC\'s found');
@@ -59,7 +57,7 @@ class ConfigureNics extends Job
         foreach ($instanceData->nics as $nicData) {
             $nic = app()->make(Nic::class);
             $nic->mac_address = $nicData->macAddress;
-            $nic->instance_id = $instance->id;
+            $nic->instance_id = $this->instance->id;
             $nic->network_id = $network->id;
             $nic->save();
             Log::info(get_class($this) . ' : Created NIC resource ' . $nic->id);
@@ -95,7 +93,6 @@ class ConfigureNics extends Job
                 }
                 if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
                     $message = 'Insufficient available IP\'s in subnet to assign to NIC';
-                    $nic->setSyncFailureReason($message);
                     $this->fail(new \Exception($message));
                     return;
                 }
@@ -156,10 +153,9 @@ class ConfigureNics extends Job
                 throw $exception;
             }
 
-            $nic->setSyncCompleted();
             Log::info('DHCP static binding created for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
         }
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

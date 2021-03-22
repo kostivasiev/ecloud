@@ -17,30 +17,28 @@ class AttachOsDisk extends Job
 
     public $tries = 60;
 
-    private $data;
+    private $instance;
 
-    public function __construct($data)
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-
-        $getInstanceResponse = $instance->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id
+        $getInstanceResponse = $this->instance->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
         );
 
         $instanceData = json_decode($getInstanceResponse->getBody()->getContents());
         if (!$instanceData) {
-            throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+            throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
         }
 
         if (count($instanceData->volumes) > 1) {
-            throw new \Exception('Deploy failed for ' . $instance->id . ', Multi volume instance deploy detected. Multiple volumes are not currently supported.');
+            throw new \Exception('Deploy failed for ' . $this->instance->id . ', Multi volume instance deploy detected. Multiple volumes are not currently supported.');
         }
 
         foreach ($instanceData->volumes as $volumeData) {
@@ -53,11 +51,11 @@ class AttachOsDisk extends Job
             }
 
             // Now the save from PrepareOsDisk has completed, attach it to the instance
-            $volume->instances()->attach($instance);
+            $volume->instances()->attach($this->instance);
 
             Log::info(get_class($this) . ' : Volume ' . $volume->id . ' successfully attached');
         }
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

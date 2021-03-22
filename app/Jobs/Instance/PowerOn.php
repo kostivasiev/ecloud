@@ -12,11 +12,11 @@ class PowerOn extends Job
 {
     use Batchable;
 
-    private $data;
+    private $instance;
 
-    public function __construct($data)
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     /**
@@ -24,14 +24,12 @@ class PowerOn extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power'
+        $this->instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/power'
         );
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

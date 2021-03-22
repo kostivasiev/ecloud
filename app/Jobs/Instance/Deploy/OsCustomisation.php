@@ -14,11 +14,11 @@ class OsCustomisation extends Job
 {
     use Batchable;
 
-    private $data;
+    private $instance;
 
-    public function __construct($data)
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     /**
@@ -27,31 +27,28 @@ class OsCustomisation extends Job
      */
     public function handle(PasswordService $passwordService)
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
-
-        $username = ($instance->platform == 'Linux') ? 'root' : 'graphite.rack';
+        $username = ($this->instance->platform == 'Linux') ? 'root' : 'graphite.rack';
         $credential = Credential::create([
             'name' => $username,
-            'resource_id' => $instance->id,
+            'resource_id' => $this->instance->id,
             'username' => $username,
         ]);
         $credential->password = $passwordService->generate();
         $credential->save();
 
-        $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/oscustomization',
+        $this->instance->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/oscustomization',
             [
                 'json' => [
-                    'platform' => $instance->platform,
+                    'platform' => $this->instance->platform,
                     'password' => $credential->password,
-                    'hostname' => $instance->id,
+                    'hostname' => $this->instance->id,
                 ],
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

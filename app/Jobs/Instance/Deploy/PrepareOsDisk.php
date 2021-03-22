@@ -21,7 +21,7 @@ class PrepareOsDisk extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $getInstanceResponse = $this->instance->availabilityZone->kingpinService()->get(
             '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
@@ -71,6 +71,6 @@ class PrepareOsDisk extends Job
             Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->id);
         }
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

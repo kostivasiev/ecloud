@@ -15,7 +15,7 @@ class Deploy extends Job
     
     private $instance;
 
-    public function __construct($instance)
+    public function __construct(Instance $instance)
     {
         $this->instance = $instance;
     }
@@ -25,7 +25,7 @@ class Deploy extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         if (empty($this->instance->image)) {
             $this->fail(new \Exception(
@@ -57,6 +57,6 @@ class Deploy extends Job
             throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

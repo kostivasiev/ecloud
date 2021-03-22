@@ -23,12 +23,12 @@ class DeployCompleted extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $this->instance->deployed = true;
         //this->instance->deploy_data = '';
         $this->instance->saveQuietly();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

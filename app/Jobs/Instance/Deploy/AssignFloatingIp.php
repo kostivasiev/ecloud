@@ -14,36 +14,34 @@ class AssignFloatingIp extends Job
 {
     use Batchable;
 
-    private $data;
+    private $instance;
 
-    public function __construct($data)
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-
-        if ((!empty($this->data['floating_ip_id']) || $this->data['requires_floating_ip']) && $instance->nics()->count() < 1) {
-            $this->fail(new Exception('AssignFloatingIp failed for ' . $instance->id . ': Failed. Instance has no NIC'));
+        if ((!empty($this->instance->deploy_data['floating_ip_id']) || $this->instance->deploy_data['requires_floating_ip']) && $this->instance->nics()->count() < 1) {
+            $this->fail(new Exception('AssignFloatingIp failed for ' . $this->instance->id . ': Failed. Instance has no NIC'));
             return;
         }
 
-        if (!empty($this->data['floating_ip_id'])) {
-            $floatingIp = FloatingIp::findOrFail($this->data['floating_ip_id']);
+        if (!empty($this->instance->deploy_data['floating_ip_id'])) {
+            $floatingIp = FloatingIp::findOrFail($this->instance->deploy_data['floating_ip_id']);
         }
 
-        if ($this->data['requires_floating_ip']) {
+        if ($this->instance->deploy_data['requires_floating_ip']) {
             $floatingIp = app()->make(FloatingIp::class);
             $floatingIp->vpc_id = $this->data['vpc_id'];
             $floatingIp->save();
         }
 
         if (!empty($floatingIp)) {
-            $nic = $instance->nics()->first();
+            $nic = $this->instance->nics()->first();
 
             dispatch(new Assign([
                 'floating_ip_id' => $floatingIp->id,
@@ -53,6 +51,6 @@ class AssignFloatingIp extends Job
             Log::info('Floating IP (' . $floatingIp->id . ') assigned to NIC (' . $nic->id . ')');
         }
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }
