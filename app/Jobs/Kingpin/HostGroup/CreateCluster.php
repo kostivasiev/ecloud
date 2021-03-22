@@ -4,6 +4,9 @@ namespace App\Jobs\Kingpin\HostGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Log;
 
 class CreateCluster extends Job
@@ -19,13 +22,40 @@ class CreateCluster extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        // TODO :- See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/614
+        $hostGroup = $this->model;
+
+        // Check if it already exists and if do skip creating it
+        try {
+            $response = $hostGroup->availabilityZone->kingpinService()
+                ->get('/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id);
+            if ($response->getStatusCode() == 200) {
+                Log::debug(get_class($this) . ' : HostGroup already exists, nothing to do.', ['id' => $this->model->id]);
+                return true;
+            }
+        } catch (RequestException $exception) {
+            if ($exception->getCode() != 404) {
+                throw $exception;
+            }
+        }
+
+        $hostGroup->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup',
+            [
+                'json' => [
+                    'hostGroupId' => $hostGroup->id,
+                    'shared' => false,
+                ],
+            ]
+        );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+            $exception->getResponse()->getBody()->getContents() :
+            $exception->getMessage();
+        $this->model->setSyncFailureReason($message);
     }
 }
