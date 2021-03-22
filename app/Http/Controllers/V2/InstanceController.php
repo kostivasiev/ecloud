@@ -117,11 +117,15 @@ class InstanceController extends BaseController
             'image_data' => $request->input('image_data'),
             'user_script' => $request->input('user_script'),
         ];
+
         try {
-            $instance->save();
+            if (!$instance->save()) {
+                return $instance->getSyncError();
+            }
         } catch (SyncException $exception) {
             return $instance->getSyncError();
         }
+        
         $instance->refresh();
 
         return $this->responseIdMeta($request, $instance->id, 201);
@@ -164,9 +168,14 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        if (!$instance->delete()) {
+        try {
+            if (!$instance->delete()) {
+                return $instance->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $instance->getSyncError();
         }
+
         return response('', 204);
     }
 
