@@ -6,6 +6,7 @@ use App\Events\V2\Nic\Created;
 use App\Events\V2\Nic\Creating;
 use App\Events\V2\Nic\Deleted;
 use App\Events\V2\Nic\Deleting;
+use App\Events\V2\Nic\Saved;
 use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
@@ -23,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Nic extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, Syncable;
 
     public $keyPrefix = 'nic';
     public $incrementing = false;
@@ -42,6 +43,7 @@ class Nic extends Model implements Filterable, Sortable
         'creating' => Creating::class,
         'created' => Created::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];

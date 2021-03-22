@@ -5,6 +5,7 @@ namespace App\Listeners\V2;
 use App\Jobs\Sync\Completed;
 use App\Jobs\Sync\Update;
 use App\Models\V2\Instance;
+use App\Models\V2\Nic;
 use App\Models\V2\Sync;
 use App\Models\V2\TestSyncable;
 use App\Models\V2\Volume;
@@ -22,6 +23,7 @@ class SyncCreated
             TestSyncable::class,
             Volume::class,
             Instance::class,
+            Nic::class,
         ])) {
             return true;
         }

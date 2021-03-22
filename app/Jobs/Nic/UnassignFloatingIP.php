@@ -1,25 +1,32 @@
 <?php
 
-namespace App\Listeners\V2\Nic;
+namespace App\Jobs\Nic;
 
-use App\Events\V2\Nic\Deleted;
+use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Bus\Batchable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class UnassignFloatingIp implements ShouldQueue
+class UnassignFloatingIP extends Job
 {
-    use InteractsWithQueue;
+    use Batchable;
+    
+    private $nic;
 
-    public function handle(Deleted $event)
+    public function __construct(Nic $nic)
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        $this->nic = $nic;
+    }
 
-        $nic = $event->model;
+    public function handle()
+    {
+        Log::info(get_class($this) . ' : Started', ['id' => $this->nic->id]);
+
+        $nic = $this->nic;
         $logMessage = 'UnassignFloatingIp for NIC ' . $nic->id . ': ';
         Log::info($logMessage . 'Started');
         Nat::whereHasMorph('translated', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
@@ -33,6 +40,6 @@ class UnassignFloatingIp implements ShouldQueue
                 $nat->delete();
             });
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->nic->id]);
     }
 }

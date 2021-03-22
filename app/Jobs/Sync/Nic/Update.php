@@ -2,18 +2,14 @@
 
 namespace App\Jobs\Sync\Nic;
 
+use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Job;
-use App\Jobs\Nic\UnassignFloatingIP;
 use App\Jobs\Nsx\Nic\CreateDHCPLease;
-use App\Jobs\Nsx\Nic\RemoveDHCPLease;
-use App\Jobs\Nsx\Nic\Undeploy;
-use App\Jobs\Nsx\Nic\UndeployCheck;
-use App\Models\V2\Nic;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
-class Delete extends Job
+class Update extends Job
 {
     use SyncableBatch;
 
@@ -28,10 +24,9 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        $this->deleteSyncBatch([
+        $this->updateSyncBatch([
             [
-                new RemoveDHCPLease($this->sync->resource),
-                new UnassignFloatingIP($this->sync->resource),
+                new CreateDHCPLease($this->sync->resource),
             ]
         ])->dispatch();
 

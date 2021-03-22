@@ -6,6 +6,7 @@ use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\AttachOsDisk;
+use App\Jobs\Instance\Deploy\AwaitNicSync;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\DeployCompleted;
@@ -50,6 +51,7 @@ class Update extends Job
                     new PrepareOsDisk($this->sync->resource),
                     new AttachOsDisk($this->sync->resource),
                     new ConfigureNics($this->sync->resource),
+                    new AwaitNicSync($this->sync->resource),
                     new AssignFloatingIp($this->sync->resource),
                     new UpdateNetworkAdapter($this->sync->resource),
                     new OsCustomisation($this->sync->resource),
@@ -65,8 +67,6 @@ class Update extends Job
                 ],
             ])->dispatch();
         } else {
-            Log::warning("DEBUG :: instance update jobs initialization here");
-
             $this->updateSyncBatch([
                 [
                     new ComputeUpdate($this->sync->resource),

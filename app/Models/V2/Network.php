@@ -82,6 +82,7 @@ class Network extends Model implements Filterable, Sortable
             $response = json_decode($response->getBody()->getContents());
             return in_array($response->state, ['in_sync', 'success']);
         } catch (GuzzleException $exception) {
+            Log::error("debug :: exception", ['exception' => $exception->getMessage()]);
             Log::info('Segment state response', [
                 'id' => $this->id,
                 'response' => json_decode($exception->getResponse()->getBody()->getContents()),

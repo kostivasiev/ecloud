@@ -125,7 +125,7 @@ class InstanceController extends BaseController
         } catch (SyncException $exception) {
             return $instance->getSyncError();
         }
-        
+
         $instance->refresh();
 
         return $this->responseIdMeta($request, $instance->id, 201);
@@ -249,10 +249,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOff([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $this->dispatch(new PowerOff($instance));
 
 
         return response('', 202);

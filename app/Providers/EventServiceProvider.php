@@ -199,19 +199,16 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Nic
-        \App\Events\V2\Nic\Creating::class => [
-        ],
-        \App\Events\V2\Nic\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Nic\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Nic\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
         \App\Events\V2\Nic\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Nic\Deleted::class => [
-            \App\Listeners\V2\Nic\DeleteDhcpLease::class,       // TODO :- Needs moving to the Sync Nic delete
-            \App\Listeners\V2\Nic\UnassignFloatingIp::class,    // TODO :- Needs moving to the Sync Nic delete
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
