@@ -110,7 +110,9 @@ class VolumeController extends BaseController
         }
         $volume->fill($request->only($only));
         try {
-            $volume->save();
+            if (!$volume->save()) {
+                return $volume->getSyncError();
+            }
         } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
@@ -122,7 +124,9 @@ class VolumeController extends BaseController
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
         try {
-            $volume->delete();
+            if (!$volume->delete()) {
+                return $volume->getSyncError();
+            }
         } catch (SyncException $exception) {
             return $volume->getSyncError();
         }

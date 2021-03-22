@@ -144,7 +144,11 @@ class InstanceController extends BaseController
             'ram_capacity'
         ]));
 
-        if (!$instance->save()) {
+        try {
+            if (!$instance->save()) {
+                return $instance->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $instance->getSyncError();
         }
 

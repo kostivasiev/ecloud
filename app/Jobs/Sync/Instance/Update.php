@@ -23,7 +23,6 @@ use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Jobs\Sync\Completed;
-use App\Listeners\V2\Instance\ComputeChange;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use App\Traits\V2\SyncableBatch;
