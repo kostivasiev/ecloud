@@ -75,7 +75,7 @@ class Delete extends Command
             $availabilityZone->artisanService()->delete(
                 '/api/v2/san/' . $availabilityZone->san_name . '/host/' . $host->id
             );
-            $this->line('Deleted host from artisan');
+            $this->line('Deleted host from SAN');
         } catch (\Exception $exception) {
             $this->alert('Failed to delete host from Artisan ' . $exception->getMessage());
             return Command::FAILURE;
