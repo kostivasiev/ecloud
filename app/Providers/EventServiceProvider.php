@@ -121,7 +121,8 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\ResourceSync::class,
         ],
         \App\Events\V2\Instance\Updated::class => [
-            \App\Listeners\V2\Instance\ComputeChange::class
+            \App\Listeners\V2\Instance\HostGroupChange::class,
+            \App\Listeners\V2\Instance\ComputeChange::class,
         ],
         \App\Events\V2\Instance\Deleting::class => [
         ],

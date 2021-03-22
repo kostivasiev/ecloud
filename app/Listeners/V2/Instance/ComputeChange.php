@@ -18,12 +18,12 @@ class ComputeChange implements ShouldQueue
      */
     public function handle(Updated $event)
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         $instance = $event->model;
 
         if ($event->original['vcpu_cores'] == $instance->vcpu_cores && $event->original['ram_capacity'] == $instance->ram_capacity) {
-            Log::info(get_class($this) . ' : Finished: No changes required', ['event' => $event]);
+            Log::info(get_class($this) . ' : Finished: No changes required', ['id' => $event->model->id]);
             $instance->setSyncCompleted();
             return;
         }
@@ -57,6 +57,6 @@ class ComputeChange implements ShouldQueue
 
         $instance->setSyncCompleted();
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }
