@@ -226,10 +226,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOn([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $this->dispatch(new PowerOn($instance));
 
         return response('', 202);
     }

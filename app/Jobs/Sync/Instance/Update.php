@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Sync\Instance;
 
+use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\AttachOsDisk;
@@ -33,12 +34,10 @@ class Update extends Job
     use SyncableBatch;
 
     private $sync;
-    private $originalValues;
 
     public function __construct(Sync $sync)
     {
         $this->sync = $sync;
-        $this->originalValues = $sync->resource->getOriginal();
     }
 
     public function handle()
@@ -68,7 +67,12 @@ class Update extends Job
             ])->dispatch();
         } else {
             Log::warning("DEBUG :: instance update jobs initialization here");
-            //$jobs[] = new ComputeChange($this->sync->resource, $this->originalValues);
+
+            $this->updateSyncBatch([
+                [
+                    new ComputeUpdate($this->sync->resource),
+                ]
+            ])->dispatch();
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
