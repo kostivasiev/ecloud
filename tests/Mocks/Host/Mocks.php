@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Mocks\Traits;
+namespace Tests\Mocks\Host;
 
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
-trait Host
+trait Mocks
 {
     /** @var \App\Models\V2\Host */
     private $host;
@@ -32,6 +32,7 @@ trait Host
         $this->createProfile();
         $this->createAutoDeployRule();
         $this->deploy();
+        $this->powerOn();
     }
 
     protected function syncSave()
@@ -227,6 +228,15 @@ trait Host
                 return new Response(200, [], json_encode([
                     'name' => 'h-test'
                 ]));
+            });
+    }
+
+    protected function powerOn()
+    {
+        $this->conjurerServiceMock()->expects('post')
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test/power'])
+            ->andReturnUsing(function () {
+                return new Response(200);
             });
     }
 
