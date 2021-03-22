@@ -45,7 +45,6 @@ class Save extends Job
                     new CheckAvailableCompute($this->model),
                     new CreateProfile($this->model),
                     new CreateAutoDeployRule($this->model),
-
                     new Deploy($this->model),
 
                     new PowerOn($this->model),
@@ -66,6 +65,7 @@ class Save extends Job
         $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
             $exception->getResponse()->getBody()->getContents() :
             $exception->getMessage();
+
         $this->model->setSyncFailureReason($message);
     }
 }

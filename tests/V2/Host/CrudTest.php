@@ -71,14 +71,13 @@ class CrudTest extends TestCase
             'name' => 'new name',
         ])->seeInDatabase(
             'hosts',
-                        [
-                            'name' => 'eth2',
-                            'address' => '00:25:B5:C0:A0:10',
-                            'type' => 'vNIC'
-                        ],
-                    ]
-                ]));
-            });
+            [
+                'id' => 'h-test',
+                'name' => 'new name',
+            ],
+            'ecloud'
+        )->assertResponseStatus(200);
+    }
 
     public function testDestroy()
     {
