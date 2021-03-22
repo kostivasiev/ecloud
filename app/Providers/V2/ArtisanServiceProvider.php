@@ -16,7 +16,6 @@ class ArtisanServiceProvider extends ServiceProvider
             if (!$availabilityZone instanceof AvailabilityZone) {
                 throw new \Exception(get_class($this) . ' : Failed to create connection: Invalid AvailabilityZone');
             }
-
             $artisanCredentials = $availabilityZone->credentials()
                 ->where('username', '=', config('artisan.user'))
                 ->first();
