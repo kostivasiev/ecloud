@@ -3,6 +3,8 @@
 namespace Tests\V2\HostGroup;
 
 use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
+use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -48,6 +50,32 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
+        app()->bind(HostGroup::class, function () {
+            return new HostGroup([
+                'id' => 'hg-test',
+            ]);
+        });
+
+        // CreateCluster Job
+        $this->kingpinServiceMock()->expects('get')
+            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
+            ->andReturnUsing(function () {
+                return new Response(404);
+            });
+        $this->kingpinServiceMock()->expects('post')
+            ->withSomeOfArgs(
+                '/api/v2/vpc/vpc-test/hostgroup',
+                [
+                    'json' => [
+                        'hostGroupId' => 'hg-test',
+                        'shared' => false,
+                    ]
+                ]
+            )
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $data = [
             'name' => 'hg-test',
             'vpc_id' => $this->vpc()->id,
@@ -84,6 +112,14 @@ class CrudTest extends TestCase
     public function testUpdate()
     {
         $this->hostGroup();
+
+        // CreateCluster Job
+        $this->kingpinServiceMock()->expects('get')
+            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $this->patch('/v2/host-groups/hg-test', [
             'name' => 'new name',
         ])->seeInDatabase(
@@ -99,6 +135,14 @@ class CrudTest extends TestCase
     public function testUpdateCantChangeHostSpecId()
     {
         $this->hostGroup();
+
+        // CreateCluster Job
+        $this->kingpinServiceMock()->expects('get')
+            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $this->patch('/v2/host-groups/hg-test', [
             'host_spec_id' => 'hs-new',
         ])->seeInDatabase(
