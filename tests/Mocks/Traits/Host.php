@@ -152,7 +152,7 @@ trait Host
             });
 
         $this->kingpinServiceMock()->expects('post')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id .'/hostgroup/' . $this->hostGroup()->id .'/host',
+            ->withArgs(['/api/v2/vpc/vpc-test/hostgroup/hg-test/host',
                 [
                     'json' => [
                         'hostId' => 'h-test',
