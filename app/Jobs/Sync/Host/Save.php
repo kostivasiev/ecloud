@@ -59,6 +59,11 @@ class Save extends Job
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+            $exception->getResponse()->getBody()->getContents() :
+            $exception->getMessage();
+
+        $this->model->setSyncFailureReason($message);
+
     }
 }
