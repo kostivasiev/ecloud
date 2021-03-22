@@ -34,7 +34,8 @@ class AwaitNicRemoval extends Job
                 }
             });
 
-            throw new \Exception("Waiting for NICs to be removed from instance, currently '" . $this->instance->nics()->count() . "' attached");
+            Log::warning("'" . $this->instance->nics()->count() . "' NICs still attached, retrying", ['id' => $this->instance->id]);
+            throw new \Exception("'" . $this->instance->nics()->count() . "' NICs still attached");
         }
 
         Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
