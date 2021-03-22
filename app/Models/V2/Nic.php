@@ -13,6 +13,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -47,16 +48,6 @@ class Nic extends Model implements Filterable, Sortable
         'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($instance) {
-            $instance->attributes['deleted'] = time();
-            $instance->save();
-        });
-    }
 
     public function instance()
     {
