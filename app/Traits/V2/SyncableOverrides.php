@@ -9,7 +9,6 @@ use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
-use App\Models\V2\TestSyncable;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;

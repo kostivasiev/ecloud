@@ -7,7 +7,6 @@ use App\Jobs\Sync\Update;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Sync;
-use App\Models\V2\TestSyncable;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +19,6 @@ class SyncCreated
 
         // TODO: Remove following once all syncable resources are using update/delete functionality
         if (!in_array(get_class($event->model->resource), [
-            TestSyncable::class,
             Volume::class,
             Instance::class,
             Nic::class,

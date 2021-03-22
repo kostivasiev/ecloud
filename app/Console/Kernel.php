@@ -27,7 +27,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Conjurer\TestAuth::class,
         \App\Console\Commands\Queue\PopulateFailedJobsUuids::class,
         \App\Console\Commands\Artisan\TestAuth::class,
-        \App\Console\Commands\TestSyncableCommand::class,
         \App\Console\Commands\Host\Delete::class,
     ];
 

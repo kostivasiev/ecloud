@@ -2,20 +2,8 @@
 
 namespace App\Traits\V2;
 
-use App\Jobs\Sync\TestSyncable\Test1;
-use App\Jobs\Sync\TestSyncable\Test2;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Host;
-use App\Models\V2\HostGroup;
-use App\Models\V2\NetworkPolicy;
-use App\Models\V2\Sync;
-use App\Models\V2\Volume;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 trait SyncableBatch

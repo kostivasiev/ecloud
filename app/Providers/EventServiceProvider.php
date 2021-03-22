@@ -267,17 +267,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
-        // TestSyncable
-        \App\Events\V2\TestSyncable\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\TestSyncable\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\TestSyncable\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
-
         // Sync
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
