@@ -23,7 +23,7 @@ class CreateProfile extends Job
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
-        $availabilityZone->conjurerService()->post(
+        $response = $availabilityZone->conjurerService()->post(
             '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host',
             [
                 'json' => [
@@ -32,6 +32,14 @@ class CreateProfile extends Job
                 ],
             ]
         );
+
+        $response = json_decode($response->getBody()->getContents());
+
+        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
+
+        if (!empty($macAddress)) {
+            Log::debug('Host was created on UCS, MAC address: ' . $macAddress);
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

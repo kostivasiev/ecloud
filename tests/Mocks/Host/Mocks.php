@@ -101,7 +101,6 @@ trait Mocks
                 ]
             ])
             ->andReturnUsing(function () {
-                // Empty array means no stock available, array count indicates stock available
                 return new Response(200, [], $this->getHostResponse());
             });
     }
@@ -184,10 +183,10 @@ trait Mocks
             ->withArgs(['/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
-                    'name' => 'DUAL-4208--32GB',
-                    'connectionState' => 'M4',
-                    'powerState' => 'M4',
-                    'macAddress' => 'M4',
+                    'name' => '172.19.0.38',
+                    'connectionState' => 'connected',
+                    'powerState' => 'poweredOn',
+                    'macAddress' => '00:25:B5:C0:A0:1B',
                 ]));
             });
 

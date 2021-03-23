@@ -38,6 +38,8 @@ class CreateAutoDeployRule extends Job
             return false;
         }
 
+        Log::info(get_class($this) . 'Host MAC address: ' . $macAddress);
+
         // Add the host to the host group on VMWare
         $availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $host->hostGroup->vpc_id .'/hostgroup/' . $host->hostGroup->id .'/host',
