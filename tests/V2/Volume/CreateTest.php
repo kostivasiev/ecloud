@@ -20,18 +20,9 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
-                [
-                    'json' => [
-                        'volumeId' => 'vol-test',
-                        'sizeGiB' => '100',
-                        'shared' => false,
-                    ]
-                ]
-            ])
+            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
+                return new Response(200, [], json_encode(true));
             });
 
         $this->volume = factory(Volume::class)->create([
@@ -39,6 +30,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
+        dd("test");
     }
 
     public function testNotOwnedVpcIdIsFailed()
