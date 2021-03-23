@@ -124,9 +124,7 @@ class VolumeController extends BaseController
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
         try {
-            if (!$volume->delete()) {
-                return $volume->getSyncError();
-            }
+            $volume->delete();
         } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
