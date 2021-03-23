@@ -86,6 +86,7 @@ class CrudTest extends TestCase
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
         $this->host();
+        $this->deleteHostMocks();
 
         $this->delete('/v2/hosts/h-test')
             ->seeInDatabase(
