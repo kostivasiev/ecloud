@@ -25,6 +25,11 @@ class DeleteTest extends TestCase
             ->andReturn(
                 new Response(200)
             );
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->withArgs(['/policy/api/v1/infra/tier-1s/' . $this->router()->id . '/segments/' . $this->network()->id . '/dhcp-static-binding-configs/' . $this->instance()->nics()->first()->id . ''])
+            ->andReturn(
+                new Response(200)
+            );
     }
 
     public function testSuccessfulDelete()

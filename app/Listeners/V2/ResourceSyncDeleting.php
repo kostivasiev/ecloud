@@ -5,6 +5,7 @@ namespace App\Listeners\V2;
 use App\Exceptions\SyncException;
 use App\Jobs\Sync\Completed;
 use App\Models\V2\Sync;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -16,17 +17,14 @@ class ResourceSyncDeleting
 
         $model = $event->model;
 
+        if (($model->getStatus() === Sync::STATUS_COMPLETE) && $model->getSyncDeleting()) {
+            Log::info(get_class($this) . ' : Delete sync complete, not blocking deletion', ['resource_id' => $model->id]);
+            return true;
+        }
+
         $lock = Cache::lock("sync." . $model->id, 60);
         try {
-            if (!$lock->get()) {
-                Log::error(get_class($this) . ' : Delete blocked, cannot obtain sync lock', ['resource_id' => $model->id]);
-                throw new SyncException("Cannot obtain sync lock");
-            }
-
-            if (($model->getStatus() === Sync::STATUS_COMPLETE) && $model->getSyncDeleting()) {
-                Log::info(get_class($this) . ' : Delete sync complete, not blocking deletion', ['resource_id' => $model->id]);
-                return true;
-            }
+            $lock->block(60);
 
             if ($model->getStatus() === Sync::STATUS_INPROGRESS) {
                 Log::warning(get_class($this) . ' : Delete blocked, resource has outstanding sync', ['resource_id' => $model->id]);
@@ -37,6 +35,9 @@ class ResourceSyncDeleting
                 Log::error(get_class($this) . ' : Failed to create sync for delete', ['resource_id' => $model->id]);
                 throw new SyncException("Failed to create sync");
             }
+        } catch (LockTimeoutException $e) {
+            Log::error(get_class($this) . ' : Delete blocked, cannot obtain sync lock', ['resource_id' => $model->id]);
+            throw new SyncException("Cannot obtain sync lock");
         } finally {
             $lock->release();
         }
