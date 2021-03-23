@@ -39,7 +39,7 @@ class RemoveFromHostGroup extends Job
             return false;
         }
 
-        // Check host exists
+        // Remove from HostGroup
         try {
             $response = $availabilityZone->kingpinService()
                 ->delete(

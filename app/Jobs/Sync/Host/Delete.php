@@ -23,7 +23,7 @@ class Delete extends Job
             new \App\Jobs\Kingpin\Host\CheckExists($this->model),
             new \App\Jobs\Kingpin\Host\MaintenanceMode($this->model),
             new \App\Jobs\Conjurer\Host\PowerOff($this->model),
-//            new \App\Jobs\Artisan\Host\RemoveFrom3Par($this->model),
+            new \App\Jobs\Artisan\Host\RemoveFrom3Par($this->model),
             new \App\Jobs\Kingpin\Host\RemoveFromHostGroup($this->model),
             new \App\Jobs\Conjurer\Host\DeleteServiceProfile($this->model),
             new \App\Jobs\Sync\Completed($this->model),

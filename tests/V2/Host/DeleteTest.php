@@ -7,14 +7,13 @@ use App\Jobs\Conjurer\Host\PowerOff;
 use App\Jobs\Kingpin\Host\CheckExists;
 use App\Jobs\Kingpin\Host\MaintenanceMode;
 use App\Jobs\Kingpin\Host\RemoveFromHostGroup;
+use Tests\Mocks\Traits\Host;
 use Tests\TestCase;
-use Tests\V2\Host\Mocks\ArtisanMocks;
-use Tests\V2\Host\Mocks\ConjurerMocks;
-use Tests\V2\Host\Mocks\KingpinMocks;
 
 class DeleteTest extends TestCase
 {
-    use ArtisanMocks, ConjurerMocks, KingpinMocks;
+
+    use Host;
 
     public function setUp(): void
     {
@@ -23,16 +22,17 @@ class DeleteTest extends TestCase
 
     public function testCheckExistsSuccess()
     {
-        $this->conjurerCheckExistsMock()
-            ->kingpinCheckOnlineMock();
-
+        $this->host();
+        $this->checkExists()
+            ->checkOnline();
         $job = app()->make(CheckExists::class, ['model' => $this->host()]);
         $this->assertNull($job->handle());
     }
 
     public function testGetHostSpecFails()
     {
-        $this->conjurerCheckExistsMock(true);
+        $this->host();
+        $this->checkExists(true);
 
         $job = app()->make(CheckExists::class, ['model' => $this->host()]);
         $this->assertFalse($job->handle());
@@ -40,8 +40,9 @@ class DeleteTest extends TestCase
 
     public function testCheckHostOnlineFails()
     {
-        $this->conjurerCheckExistsMock()
-            ->kingpinCheckOnlineMock(true);
+        $this->host();
+        $this->checkExists()
+            ->checkOnline(true);
 
         $job = app()->make(CheckExists::class, ['model' => $this->host()]);
         $this->assertFalse($job->handle());
@@ -49,77 +50,80 @@ class DeleteTest extends TestCase
 
     public function testMaintenanceModeSuccess()
     {
-        $this->conjurerCheckExistsMock()
-            ->kingpinMaintenanceModeOnMock();
+        $this->host();
+        $this->checkExists()
+            ->maintenanceModeOn();
         $job = app()->make(MaintenanceMode::class, ['model' => $this->host()]);
         $this->assertNull($job->handle());
     }
 
     public function testMaintenanceModeFails()
     {
-        $this->conjurerCheckExistsMock()
-            ->kingpinMaintenanceModeOnMock(true);
+        $this->host();
+        $this->checkExists()
+            ->maintenanceModeOn(true);
         $job = app()->make(MaintenanceMode::class, ['model' => $this->host()]);
         $this->assertFalse($job->handle());
     }
 
     public function testPowerOffSuccess()
     {
-        $this->conjurerCheckExistsMock()
-            ->conjurerPowerOffMock();
+        $this->host();
+        $this->checkExists()
+            ->powerOff();
         $job = app()->make(PowerOff::class, ['model' => $this->host()]);
         $this->assertNull($job->handle());
     }
 
     public function testPowerOffFails()
     {
-        $this->conjurerCheckExistsMock()
-            ->conjurerPowerOffMock(true);
+        $this->host();
+        $this->checkExists()
+            ->powerOff(true);
         $job = app()->make(PowerOff::class, ['model' => $this->host()]);
         $this->assertFalse($job->handle());
     }
 
     public function testRemoveFromHostGroupSuccess()
     {
-        $this->conjurerCheckExistsMock()
-            ->kingpinRemoveFromHostGroupMock();
+        $this->host();
+        $this->checkExists()
+            ->removeFromHostGroup();
         $job = app()->make(RemoveFromHostGroup::class, ['model' => $this->host()]);
         $this->assertNull($job->handle());
     }
 
     public function testRemoveFromHostGroupFails()
     {
-        $this->conjurerCheckExistsMock()
-            ->kingpinRemoveFromHostGroupMock(true);
+        $this->host();
+        $this->checkExists()
+            ->removeFromHostGroup(true);
         $job = app()->make(RemoveFromHostGroup::class, ['model' => $this->host()]);
         $this->assertFalse($job->handle());
     }
 
     public function testDeleteServiceProfileSuccess()
     {
-        $this->conjurerCheckExistsMock()
-            ->conjurerDeleteServiceProfileMock();
+        $this->host();
+        $this->checkExists()
+            ->deleteServiceProfile();
         $job = app()->make(DeleteServiceProfile::class, ['model' => $this->host()]);
         $this->assertNull($job->handle());
     }
 
     public function testDeleteServiceProfileFails()
     {
-        $this->conjurerCheckExistsMock()
-            ->conjurerDeleteServiceProfileMock(true);
+        $this->host();
+        $this->checkExists()
+            ->deleteServiceProfile(true);
         $job = app()->make(DeleteServiceProfile::class, ['model' => $this->host()]);
         $this->assertFalse($job->handle());
     }
 
     public function testDeleteHost()
     {
-        $this->conjurerCheckExistsMock()
-            ->kingpinCheckOnlineMock()
-            ->kingpinMaintenanceModeOnMock()
-            ->conjurerPowerOffMock()
-            ->artisanRemoveHostfrom3ParMock() // @todo
-            ->kingpinRemoveFromHostGroupMock()
-            ->conjurerDeleteServiceProfileMock();
+        $this->host();
+        $this->deleteHostMocks();
         $this->host()->delete();
         $this->host()->refresh();
         $this->assertNotNull($this->host()->deleted_at);

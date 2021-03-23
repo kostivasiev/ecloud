@@ -241,4 +241,108 @@ trait Host
                 return new Response(200);
             });
     }
+
+    public function deleteHostMocks()
+    {
+        $this->checkExists()
+            ->checkOnline()
+            ->maintenanceModeOn()
+            ->powerOff()
+            ->removeHostfrom3Par()
+            ->removeFromHostGroup()
+            ->deleteServiceProfile();
+    }
+
+    protected function checkExists(bool $fail = false)
+    {
+        $responseCode = ($fail) ? 500 : 200;
+        // Conjurer Mock for retrieving MAC Address
+        $this->conjurerServiceMock()->shouldReceive('get')
+            ->withSomeofArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () use ($responseCode) {
+                if ($responseCode === 500) {
+                    return new Response($responseCode);
+                }
+                return new Response($responseCode, [], json_encode(
+                    [
+                        'specification' => 'DUAL-4208--32GB',
+                        'name' => 'DUAL-4208--32GB',
+                        'interfaces' => [
+                            [
+                                'name' => 'eth0',
+                                'address' => '00:25:B5:C0:A0:1B',
+                                'type' => 'vNIC'
+                            ]
+                        ]
+                    ]
+                ));
+            });
+        return $this;
+    }
+
+    protected function checkOnline(bool $fail = false)
+    {
+        $responseCode = ($fail) ? 500 : 200;
+        $this->kingpinServiceMock()->shouldReceive('get')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B')
+            ->andReturnUsing(function () use ($responseCode) {
+                return new Response($responseCode);
+            });
+        return $this;
+    }
+
+    protected function maintenanceModeOn(bool $fail = false)
+    {
+        $responseCode = ($fail) ? 500 : 200;
+        $this->kingpinServiceMock()->shouldReceive('post')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B/maintenance')
+            ->andReturnUsing(function () use ($responseCode) {
+                return new Response($responseCode);
+            });
+        return $this;
+    }
+
+    protected function powerOff(bool $fail = false)
+    {
+        $responseCode = ($fail) ? 500 : 200;
+        $this->conjurerServiceMock()->shouldReceive('delete')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test/power')
+            ->andReturnUsing(function () use ($responseCode) {
+                return new Response($responseCode);
+            });
+        return $this;
+    }
+
+    protected function removeHostfrom3Par(bool $fail = false)
+    {
+        $responseCode = ($fail) ? 500 : 200;
+        $this->artisanServiceMock()->shouldReceive('delete')
+            ->withSomeOfArgs('/api/v2/san/' . $this->availabilityZone()->san_name . '/host/' . $this->host()->id)
+            ->andReturnUsing(function () use ($responseCode) {
+                return new Response($responseCode);
+            });
+        return $this;
+    }
+
+    protected function removeFromHostGroup(bool $fail = false)
+    {
+        $responseCode = ($fail) ? 500 : 200;
+        $this->kingpinServiceMock()->shouldReceive('delete')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B')
+            ->andReturnUsing(function () use ($responseCode) {
+                return new Response($responseCode);
+            });
+        return $this;
+    }
+
+    protected function deleteServiceProfile(bool $fail = false)
+    {
+        $responseCode = ($fail) ? 500 : 200;
+        $this->conjurerServiceMock()->shouldReceive('delete')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () use ($responseCode) {
+                return new Response($responseCode);
+            });
+        return $this;
+    }
 }
