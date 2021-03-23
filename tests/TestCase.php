@@ -15,12 +15,14 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
@@ -131,27 +133,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->vpc;
-    }
-
-    public function region()
-    {
-        if (!$this->region) {
-            $this->region = factory(Region::class)->create([
-                'id' => 'reg-test',
-            ]);
-        }
-        return $this->region;
-    }
-
-    public function availabilityZone()
-    {
-        if (!$this->availabilityZone) {
-            $this->availabilityZone = factory(AvailabilityZone::class)->create([
-                'id' => 'az-test',
-                'region_id' => $this->region()->id,
-            ]);
-        }
-        return $this->availabilityZone;
     }
 
     public function instance()
@@ -355,39 +336,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
     }
 
-    public function kingpinServiceMock()
-    {
-        if (!$this->kingpinServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-kingpin',
-                'name' => 'kingpinapi',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-            app()->bind(KingpinService::class, function () {
-                return $this->kingpinServiceMock;
-            });
-        }
-        return $this->kingpinServiceMock;
-    }
-
-    public function nsxServiceMock()
-    {
-        if (!$this->nsxServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-nsx',
-                'name' => 'NSX',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
-            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
-            app()->bind(NsxService::class, function () {
-                return $this->nsxServiceMock;
-            });
-        }
-        return $this->nsxServiceMock;
-    }
-
     public function hostSpec()
     {
         if (!$this->hostSpec) {
@@ -447,6 +395,133 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->artisanServiceMock;
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
+            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncryptionServiceProvider;
+        });
+
+        // Using these mocks means we have to use DatabaseMigration by default, but the ability to catch 3rd party
+        // API calls being performed in tests is more than worth the extra overhead.
+        $this->kingpinServiceMock();
+        $this->nsxServiceMock();
+
+        Event::fake([
+            // V1 hack
+            \App\Events\V1\DatastoreCreatedEvent::class,
+
+            // Creating
+            \App\Events\V2\Instance\Creating::class,
+
+            // Created
+            \App\Events\V2\AvailabilityZone\Created::class,
+            \App\Events\V2\Dhcp\Created::class,
+            \App\Events\V2\Instance\Created::class,
+            \App\Events\V2\Network\Created::class,
+            \App\Events\V2\Router\Created::class,
+            \App\Events\V2\Vpc\Created::class,
+            \App\Events\V2\FloatingIp\Created::class,
+            \App\Events\V2\Nat\Created::class,
+            \App\Events\V2\Nic\Created::class,
+
+            // Deleting
+            \App\Events\V2\Nat\Deleting::class,
+
+            // Deleted
+            \App\Events\V2\AvailabilityZone\Deleted::class,
+            \App\Events\V2\Nat\Deleted::class,
+            \App\Events\V2\Vpc\Deleted::class,
+            \App\Events\V2\Dhcp\Deleted::class,
+            \App\Events\V2\Nic\Deleted::class,
+            \App\Events\V2\FloatingIp\Deleted::class,
+            \App\Events\V2\Network\Deleted::class,
+            \App\Events\V2\Router\Deleted::class,
+
+            // Saved
+            \App\Events\V2\Router\Saved::class,
+            \App\Events\V2\Network\Saved::class,
+            \App\Events\V2\Nat\Saved::class,
+            \App\Events\V2\AvailabilityZoneCapacity\Saved::class,
+
+            // Updated
+            \App\Events\V2\Sync\Updated::class,
+            \App\Events\V2\Instance\Updated::class,
+
+            // Saving
+            \App\Events\V2\Router\Saving::class,
+            \App\Events\V2\Network\Saving::class,
+            \App\Events\V2\Nic\Saving::class,
+            \App\Events\V2\Nat\Saving::class,
+
+            // Deleting
+            \App\Events\V2\Instance\Saving::class,
+
+            // Deploy
+            \App\Events\V2\Instance\Deploy::class,
+        ]);
+    }
+
+    public function kingpinServiceMock()
+    {
+        if (!$this->kingpinServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-kingpin',
+                'name' => 'kingpinapi',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+            app()->bind(KingpinService::class, function () {
+                return $this->kingpinServiceMock;
+            });
+        }
+        return $this->kingpinServiceMock;
+    }
+
+    public function availabilityZone()
+    {
+        if (!$this->availabilityZone) {
+            $this->availabilityZone = factory(AvailabilityZone::class)->create([
+                'id' => 'az-test',
+                'region_id' => $this->region()->id,
+            ]);
+        }
+        return $this->availabilityZone;
+    }
+
+    public function region()
+    {
+        if (!$this->region) {
+            $this->region = factory(Region::class)->create([
+                'id' => 'reg-test',
+            ]);
+        }
+        return $this->region;
+    }
+
+    public function nsxServiceMock()
+    {
+        if (!$this->nsxServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-nsx',
+                'name' => 'NSX',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
+            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
+            app()->bind(NsxService::class, function () {
+                return $this->nsxServiceMock;
+            });
+        }
+        return $this->nsxServiceMock;
     }
 
     protected function tearDown(): void
