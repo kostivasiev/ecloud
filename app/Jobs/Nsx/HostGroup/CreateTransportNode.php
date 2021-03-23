@@ -115,37 +115,41 @@ class CreateTransportNode extends Job
 
     private function getTransportNodeProfiles(AvailabilityZone $availabilityZone): ?\stdClass
     {
-        return json_decode($availabilityZone->nsxService()
-            ->get('/api/v1/transport-node-profiles')
-            ->getBody()
-            ->getContents()
+        return json_decode(
+            $availabilityZone->nsxService()
+                ->get('/api/v1/transport-node-profiles')
+                ->getBody()
+                ->getContents()
         );
     }
 
     private function getNetworkSwitchDetails(AvailabilityZone $availabilityZone, Vpc $vpc): ?\stdClass
     {
-        return json_decode($availabilityZone->kingpinService()
-            ->get('/api/v2/vpc/' . $vpc->id . '/network/switch')
-            ->getBody()
-            ->getContents()
+        return json_decode(
+            $availabilityZone->kingpinService()
+                ->get('/api/v2/vpc/' . $vpc->id . '/network/switch')
+                ->getBody()
+                ->getContents()
         );
     }
 
     private function getTransportZones(AvailabilityZone $availabilityZone): ?\stdClass
     {
-        return json_decode($availabilityZone->nsxService()
-            ->get('/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz')
-            ->getBody()
-            ->getContents()
+        return json_decode(
+            $availabilityZone->nsxService()
+                ->get('/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz')
+                ->getBody()
+                ->getContents()
         );
     }
 
     private function getUplinkHostSwitchProfiles(AvailabilityZone $availabilityZone): ?\stdClass
     {
-        return json_decode($availabilityZone->nsxService()
-            ->get('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile')
-            ->getBody()
-            ->getContents()
+        return json_decode(
+            $availabilityZone->nsxService()
+                ->get('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile')
+                ->getBody()
+                ->getContents()
         );
     }
 
