@@ -164,13 +164,6 @@ class CrudTest extends TestCase
             ]);
         });
 
-        // Check host exists, lets say it does so we dont need to mock out all the create endpoints
-        $this->conjurerServiceMock()->expects('get')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
         $this->hostGroup();
         $this->host()->hostGroup()->associate($this->hostGroup());
         $this->delete('/v2/host-groups/hg-test')
