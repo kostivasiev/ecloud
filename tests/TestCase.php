@@ -338,6 +338,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->nsxServiceMock;
     }
 
+    public function hostSpec()
+    {
+        if (!$this->hostSpec) {
+            $this->hostSpec = factory(HostSpec::class)->create([
+                'id' => 'hs-test',
+                'name' => 'test-host-spec',
+            ]);
+        }
+        return $this->hostSpec;
+    }
+
     public function artisanServiceMock()
     {
         if (!$this->artisanServiceMock) {
@@ -361,17 +372,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->artisanServiceMock;
-    }
-
-    public function hostSpec()
-    {
-        if (!$this->hostSpec) {
-            $this->hostSpec = factory(HostSpec::class)->create([
-                'id' => 'hs-test',
-                'name' => 'test-host-spec',
-            ]);
-        }
-        return $this->hostSpec;
     }
 
     public function conjurerServiceMock()
