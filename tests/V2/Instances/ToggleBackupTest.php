@@ -104,13 +104,8 @@ class ToggleBackupTest extends TestCase
             return $event->model->id === $this->instance()->id;
         });
 
-        $resourceSyncListener = \Mockery::mock(\App\Listeners\V2\ResourceSync::class)->makePartial();
-        $resourceSyncListener->handle(new \App\Events\V2\Instance\Saving($this->instance()));
 
         $sync = Sync::where('resource_id', $this->instance()->id)->first();
-
-        $computeChangeListener = \Mockery::mock(\App\Listeners\V2\Instance\ComputeChange::class)->makePartial();
-        $computeChangeListener->handle(new \App\Events\V2\Instance\Updated($this->instance()));
 
         // sync set to complete by the ComputeChange listener
         Event::assertDispatched(\App\Events\V2\Sync\Updated::class, function ($event) use ($sync) {

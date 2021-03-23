@@ -35,36 +35,8 @@ class AssignTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        factory(Credential::class)->create([
-            'name' => 'NSX',
-            'resource_id' => $this->availability_zone->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availability_zone->id,
-        ]);
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availability_zone->id
-        ]);
-        $this->network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
-            'router_id' => $this->router->id
-        ]);
-        $this->nic = factory(Nic::class)->create([
-            'mac_address' => 'abcd',
-            'instance_id' => $this->instance->id,
-            'network_id' => $this->network->id,
-        ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc()->id
         ]);
 
         $this->nsxServiceMock()->shouldReceive('delete')
@@ -80,27 +52,27 @@ class AssignTest extends TestCase
     public function testAssignIsSuccessful()
     {
         $this->post('/v2/floating-ips/' . $this->floatingIp->id . '/assign', [
-            'resource_id' => $this->nic->id
+            'resource_id' => $this->nic()->id
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeInDatabase('nats', [
             'destination_id' => $this->floatingIp->id,
             'destinationable_type' => 'fip',
-            'translated_id' => $this->nic->id,
+            'translated_id' => $this->nic()->id,
             'translatedable_type' => 'nic'
         ],
             'ecloud'
         )->assertResponseStatus(202);
 
-        $this->assertEquals($this->nic->id, $this->floatingIp->resourceId);
+        $this->assertEquals($this->nic()->id, $this->floatingIp->resourceId);
 
         $this->get('/v2/floating-ips/' . $this->floatingIp->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'id' => $this->floatingIp->id,
-            'resource_id' => $this->nic->id
+            'resource_id' => $this->nic()->id
         ])->assertResponseStatus(200);
     }
 
@@ -109,11 +81,11 @@ class AssignTest extends TestCase
         $this->nat = factory(Nat::class)->create([
             'destination_id' => $this->floatingIp->id,
             'destinationable_type' => 'fip',
-            'translated_id' => $this->nic->id,
+            'translated_id' => $this->nic()->id,
             'translatedable_type' => 'nic'
         ]);
         $this->post('/v2/floating-ips/' . $this->floatingIp->id . '/unassign', [
-            'resource_id' => $this->nic->id
+            'resource_id' => $this->nic()->id
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',

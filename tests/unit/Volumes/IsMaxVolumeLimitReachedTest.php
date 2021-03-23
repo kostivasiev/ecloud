@@ -48,7 +48,9 @@ class IsMaxVolumeLimitReachedTest extends TestCase
             ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
-                    'volumes' => []
+                    'volumes' => [
+                        ['uuid' => 'uuid-test-uuid-test-uuid-test']
+                    ]
                 ]));
             });
 

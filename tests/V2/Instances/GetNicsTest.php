@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Instances;
 
+use App\Events\V2\Sync\Created;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
@@ -14,6 +15,7 @@ use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -28,23 +30,13 @@ class GetNicsTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('get')->andReturn(
+        $this->kingpinServiceMock()->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode(['powerState' => 'poweredOn']))
         );
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
     }
 
     public function testGetCollection()
     {
-        $nic = factory(Nic::class)->create([
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance()->id,
-            'network_id' => $this->network()->id,
-        ]);
-
         $this->get(
             '/v2/instances/' . $this->instance()->id . '/nics',
             [
@@ -53,10 +45,10 @@ class GetNicsTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'          => $nic->id,
-                'mac_address' => $nic->mac_address,
-                'instance_id' => $nic->instance_id,
-                'network_id'  => $nic->network_id,
+                'id'          => $this->nic()->id,
+                'mac_address' => $this->nic()->mac_address,
+                'instance_id' => $this->nic()->instance_id,
+                'network_id'  => $this->nic()->network_id,
             ])
             ->assertResponseStatus(200);
     }

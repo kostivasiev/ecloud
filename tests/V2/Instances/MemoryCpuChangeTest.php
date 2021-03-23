@@ -21,70 +21,21 @@ class MemoryCpuChangeTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected AvailabilityZone $availability_zone;
-    protected $instance;
-    protected Region $region;
-    protected $appliance;
-    protected $appliance_version;
-    protected $vpc;
-    protected $image;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
-        $this->image = factory(Image::class)->create([
-            'appliance_version_id' => $this->appliance_version->appliance_version_id,
-        ])->refresh();
-
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('put')->andReturn(
-            new Response(200)
-        );
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
     }
 
     public function testMemoryChangeRamCapacity()
     {
-        Event::fake();
+        $this->kingpinServiceMock()->expects('put')
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/resize')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(true));
+            });
 
-        $instance = factory(Instance::class)->create([
-            'id' => 'i-abc123',
-            'vpc_id' => $this->vpc->id,
-            'name' => 'UpdateTest Default',
-            'image_id' => $this->image->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'backup_enabled' => false,
-        ]);
-
-        $instance->vcpu_cores = 2;
-        $instance->ram_capacity = 2048;
-        $instance->save();
-
-        Event::assertDispatched(\App\Events\V2\Instance\Updated::class, function ($event) use ($instance) {
-            return $event->model->id === $instance->id;
-        });
-
-        $listener = \Mockery::mock(ComputeChange::class)->makePartial();
-
-        $listener->handle(new \App\Events\V2\Instance\Updated($instance));
+        $this->instance()->vcpu_cores = 2;
+        $this->instance()->ram_capacity = 2048;
+        $this->instance()->save();
     }
 }

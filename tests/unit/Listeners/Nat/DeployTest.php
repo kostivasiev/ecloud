@@ -57,11 +57,20 @@ class DeployTest extends TestCase
         $this->floating_ip = factory(FloatingIp::class)->create([
             'ip_address' => $this->faker->ipv4,
         ]);
+
+
+        $this->nsxServiceMock()->expects('put')
+            ->withSomeOfArgs('/policy/api/v1/infra/tier-1s/' . $this->router->id . '/segments/' . $this->network->id . '/dhcp-static-binding-configs/nic-a1ae98ce')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
         $this->nic = factory(Nic::class)->create([
+            'id' => 'nic-a1ae98ce',
             'instance_id' => $this->instance->id,
             'network_id' => $this->network->id,
             'ip_address' => $this->faker->ipv4,
         ]);
+
         $this->nat = factory(Nat::class)->create([
             'destination_id' => $this->floating_ip->id,
             'destinationable_type' => FloatingIp::class,

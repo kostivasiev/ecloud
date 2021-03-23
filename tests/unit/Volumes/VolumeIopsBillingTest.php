@@ -35,6 +35,13 @@ class VolumeIopsBillingTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200);
             });
+
+        $this->kingpinServiceMock()
+            ->shouldReceive('post')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/fromtemplate')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(

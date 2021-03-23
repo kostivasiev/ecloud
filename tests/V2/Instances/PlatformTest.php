@@ -33,23 +33,9 @@ class PlatformTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
 
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
-        $this->image = factory(Image::class)->create([
-            'appliance_version_id' => $this->appliance_version->appliance_version_uuid
-        ])->refresh();
+        $this->instance();
+
         $mockAdminDevices = \Mockery::mock(AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
         app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
