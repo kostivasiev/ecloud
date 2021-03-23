@@ -59,10 +59,7 @@ class CheckExists extends Job
                     '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress
                 );
         } catch (ClientException|ServerException $e) {// handle 40x/50x response if host not found
-            $message = 'Error while checking if Host ' . $host->id . ' exists.';
-            Log::debug($message);
-            $this->fail(new \Exception($message));
-            return false;
+            $response = $e->getResponse();
         }
 
         if (!$response || $response->getStatusCode() !== 200) {
