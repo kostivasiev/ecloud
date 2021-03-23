@@ -71,7 +71,7 @@ class Delete extends Command
                 );
                 $this->line('Deleted host from VMWare');
             } catch (\Exception $exception) {
-                $this->alert('Failed to delete Kingpin host profile for host ' . $host->id);
+                $this->alert('Failed to delete Kingpin host profile for host ' . $exception->getMessage());
                 //return Command::FAILURE;
             }
         } catch (RequestException $exception) {
