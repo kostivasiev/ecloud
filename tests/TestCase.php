@@ -253,7 +253,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
         // CreateTransportNode Job
         $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v1/vpc/vpc-test/network/switch')
+            ->with('/api/v2/vpc/vpc-test/network/switch')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'name' => 'test-network-switch-name',
