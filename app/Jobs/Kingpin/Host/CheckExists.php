@@ -26,10 +26,14 @@ class CheckExists extends Job
         $availabilityZone = $hostGroup->availabilityZone;
 
         // Get the host spec from Conjurer
-        $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host/' . $host->id
-        );
-        $responseJson = json_decode($response->getBody()->getContents());
+        try {
+            $response = $availabilityZone->conjurerService()->get(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id
+            );
+            $responseJson = json_decode($response->getBody()->getContents());
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+        }
         if (!$response || $response->getStatusCode() !== 200) {
             Log::error(get_class($this) . ' : Failed', [
                 'id' => $host->id,
