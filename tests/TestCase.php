@@ -7,7 +7,6 @@ use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
@@ -16,20 +15,20 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
+use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
     // This is required for the Kingping/NSX mocks, see below
-    use DatabaseMigrations;
+    use DatabaseMigrations,
+        Mocks\Traits\Host;
 
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
@@ -64,6 +63,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var ConjurerService */
     private $conjurerServiceMock;
 
+    /** @var ArtisanService */
+    private $artisanServiceMock;
+
     /** @var Credential */
     private $credential;
 
@@ -78,9 +80,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Network */
     private $network;
-
-    /** @var Host */
-    private $host;
 
     /** @var HostSpec */
     private $hostSpec;
@@ -211,18 +210,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->network;
-    }
-
-    public function host()
-    {
-        if (!$this->host) {
-            $this->host = factory(Host::class)->create([
-                'id' => 'h-test',
-                'name' => 'h-test',
-                'host_group_id' => $this->hostGroup()->id,
-            ]);
-        }
-        return $this->host;
     }
 
     public function hostGroup()
@@ -437,77 +424,29 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->conjurerServiceMock;
     }
 
-    protected function setUp(): void
+    public function artisanServiceMock()
     {
-        parent::setUp();
+        if (!$this->artisanServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-3par',
+                'name' => '3PAR',
+                'username' => config('artisan.user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
 
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods()
-            ->makePartial();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
-        });
+            factory(Credential::class)->create([
+                'id' => 'cred-artisan',
+                'name' => 'Artisan API',
+                'username' => config('artisan.san_user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
 
-        // Using these mocks means we have to use DatabaseMigration by default, but the ability to catch 3rd party
-        // API calls being performed in tests is more than worth the extra overhead.
-        $this->kingpinServiceMock();
-        $this->nsxServiceMock();
-
-        Event::fake([
-            // V1 hack
-            \App\Events\V1\DatastoreCreatedEvent::class,
-
-            // Creating
-            \App\Events\V2\Instance\Creating::class,
-
-            // Created
-            \App\Events\V2\AvailabilityZone\Created::class,
-            \App\Events\V2\Dhcp\Created::class,
-            \App\Events\V2\Instance\Created::class,
-            \App\Events\V2\Network\Created::class,
-            \App\Events\V2\Router\Created::class,
-            \App\Events\V2\Vpc\Created::class,
-            \App\Events\V2\FloatingIp\Created::class,
-            \App\Events\V2\Nat\Created::class,
-            \App\Events\V2\Nic\Created::class,
-
-            // Deleting
-            \App\Events\V2\Nat\Deleting::class,
-
-            // Deleted
-            \App\Events\V2\AvailabilityZone\Deleted::class,
-            \App\Events\V2\Nat\Deleted::class,
-            \App\Events\V2\Vpc\Deleted::class,
-            \App\Events\V2\Dhcp\Deleted::class,
-            \App\Events\V2\Nic\Deleted::class,
-            \App\Events\V2\FloatingIp\Deleted::class,
-            \App\Events\V2\Network\Deleted::class,
-            \App\Events\V2\Router\Deleted::class,
-
-            // Saved
-            \App\Events\V2\Router\Saved::class,
-            \App\Events\V2\Network\Saved::class,
-            \App\Events\V2\Nat\Saved::class,
-            \App\Events\V2\AvailabilityZoneCapacity\Saved::class,
-
-            // Updated
-            \App\Events\V2\Sync\Updated::class,
-            \App\Events\V2\Instance\Updated::class,
-
-            // Saving
-            \App\Events\V2\Router\Saving::class,
-            \App\Events\V2\Network\Saving::class,
-            \App\Events\V2\Nic\Saving::class,
-            \App\Events\V2\Nat\Saving::class,
-
-            // Deleting
-            \App\Events\V2\Instance\Saving::class,
-
-            // Deploy
-            \App\Events\V2\Instance\Deploy::class,
-        ]);
+            $this->artisanServiceMock = \Mockery::mock(new ArtisanService(new Client()))->makePartial();
+            app()->bind(ArtisanService::class, function () {
+                return $this->artisanServiceMock;
+            });
+        }
+        return $this->artisanServiceMock;
     }
 
     protected function tearDown(): void
