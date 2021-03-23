@@ -130,7 +130,7 @@ class CreateTransportNode extends Job
             return null;
         }
         $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return $json ?: null;
     }
 
     private function getNetworkSwitchDetails(AvailabilityZone $availabilityZone, Vpc $vpc): ?array
@@ -141,7 +141,7 @@ class CreateTransportNode extends Job
             return null;
         }
         $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return $json ?: null;
     }
 
     private function getTransportZones(AvailabilityZone $availabilityZone): ?array
@@ -152,7 +152,7 @@ class CreateTransportNode extends Job
             return null;
         }
         $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return $json ?: null;
     }
 
     private function getUplinkHostSwitchProfiles(AvailabilityZone $availabilityZone): ?array
@@ -163,7 +163,7 @@ class CreateTransportNode extends Job
             return null;
         }
         $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return $json ?: null;
     }
 
     public function failed($exception)
