@@ -67,6 +67,5 @@ class Save extends Job
             $exception->getMessage();
 
         $this->model->setSyncFailureReason($message);
-
     }
 }
