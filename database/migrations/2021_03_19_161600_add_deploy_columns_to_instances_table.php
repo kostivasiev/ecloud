@@ -27,8 +27,7 @@ class AddDeployColumnsToInstancesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->dropColumn('deployed');
-            $table->dropColumn('deploy_data');
+            $table->dropColumn(['deployed', 'deploy_data']);
         });
     }
 }
