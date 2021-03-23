@@ -11,7 +11,7 @@ class CheckOnline extends Job
 {
     public $tries = 500;
 
-    public $backoff = 20;
+    const RETRY_DELAY = 10;
 
     private $model;
 
@@ -52,14 +52,14 @@ class CheckOnline extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() == 404) {
                 Log::debug('Waiting for Host ' . $host->id . ' to come online...');
-                $this->release();
+                $this->release(static::RETRY_DELAY);
                 return false;
             }
         }
 
         if ($response->powerState !== 'poweredOn') {
             Log::debug('Waiting for Host ' . $host->id . ' power state...');
-            $this->release();
+            $this->release(static::RETRY_DELAY);
             return false;
         }
 
