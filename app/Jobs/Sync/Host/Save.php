@@ -3,12 +3,15 @@
 namespace App\Jobs\Sync\Host;
 
 use App\Jobs\Artisan\Host\Deploy;
+use App\Jobs\Conjurer\Host\CheckAvailableCompute;
 use App\Jobs\Conjurer\Host\CreateAutoDeployRule;
+use App\Jobs\Conjurer\Host\CreateLanPolicy;
 use App\Jobs\Conjurer\Host\CreateProfile;
 use App\Jobs\Conjurer\Host\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Host\CheckOnline;
 use App\Models\V2\Host;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 class Save extends Job
