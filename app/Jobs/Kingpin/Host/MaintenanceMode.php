@@ -30,7 +30,6 @@ class MaintenanceMode extends Job
             $response = $availabilityZone->conjurerService()->get(
                 '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id
             );
-            $responseJson = json_decode($response->getBody()->getContents());
         } catch (ClientException $e) {
             $response = $e->getResponse();
         }
@@ -43,8 +42,9 @@ class MaintenanceMode extends Job
             $this->fail(new \Exception('Host Spec for ' . $host->id . ' could not be retrieved.'));
             return false;
         }
+        $responseJson = json_decode($response->getBody()->getContents());
 
-        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
+        $macAddress = collect($responseJson->interfaces)->firstWhere('name', 'eth0')->address;
         if (empty($macAddress)) {
             $message = 'Failed to load eth0 address for host ' . $host->id;
             Log::error($message);
