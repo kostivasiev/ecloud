@@ -14,26 +14,6 @@ class ConsoleTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testInstanceLockedNonAdmin()
-    {
-        $this->instance()->locked = true;
-        $this->instance()->save();
-        $this->put(
-            '/v2/instances/'.$this->instance()->id.'/console-session',
-            [],
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->seeJson(
-            [
-                'title' => 'Forbidden',
-                'details' => 'Console access to this instance is not available',
-                'status' => 403,
-            ]
-        )->assertResponseStatus(403);
-    }
-
     public function testFailedSessionResponse()
     {
         $this->kingpinServiceMock()
