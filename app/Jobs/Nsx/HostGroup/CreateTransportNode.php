@@ -30,7 +30,7 @@ class CreateTransportNode extends Job
             return false;
         }
 
-        $transportNodeProfileDisplayName = $this->model->id . '-tnp';
+        $transportNodeProfileDisplayName =  'tnp-' . $this->model->id;
         $exists = collect($transportNodeProfiles->results)->filter(function ($result) use (
             $transportNodeProfileDisplayName
         ) {
