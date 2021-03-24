@@ -6,6 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Vpc;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 class CreateTransportNode extends Job
@@ -24,16 +25,16 @@ class CreateTransportNode extends Job
         $hostGroup = $this->model;
 
         $transportNodeProfiles = $this->getTransportNodeProfiles($hostGroup->availabilityZone);
-        if ($transportNodeProfiles === null) {
+        if (!$transportNodeProfiles) {
             $this->fail(new \Exception('Failed to get TransportNodeProfiles'));
             return false;
         }
 
         $transportNodeProfileDisplayName = $this->model->id . '-tnp';
-        $exists = collect($transportNodeProfiles['results'])->filter(function ($result) use (
+        $exists = collect($transportNodeProfiles->results)->filter(function ($result) use (
             $transportNodeProfileDisplayName
         ) {
-            return ($result['display_name'] === $transportNodeProfileDisplayName);
+            return ($result->display_name === $transportNodeProfileDisplayName);
         })->count();
         if ($exists) {
             Log::info(get_class($this) . ' : Skipped', [
@@ -43,26 +44,26 @@ class CreateTransportNode extends Job
         }
 
         $networkSwitch = $this->getNetworkSwitchDetails($hostGroup->availabilityZone, $hostGroup->vpc);
-        if ($networkSwitch === null) {
+        if (!$networkSwitch) {
             $this->fail(new \Exception('Failed to get NetworkSwitch'));
             return false;
         }
 
         $transportZones = $this->getTransportZones($hostGroup->availabilityZone);
-        if (!isset($transportZones['results']) || !count($transportZones['results'])) {
+        if (!$transportZones || !isset($transportZones->results) || !count($transportZones->results)) {
             $this->fail(new \Exception('Failed to get TransportZones'));
             return false;
         }
-        $transportZone = collect($transportZones['results'])->first();
+        $transportZone = collect($transportZones->results)->first();
 
         $uplinkHostSwitchProfiles = $this->getUplinkHostSwitchProfiles($hostGroup->availabilityZone);
-        if (!isset($uplinkHostSwitchProfiles['results']) || !count($uplinkHostSwitchProfiles['results'])) {
+        if (!$uplinkHostSwitchProfiles || !isset($uplinkHostSwitchProfiles->results) || !count($uplinkHostSwitchProfiles->results)) {
             $this->fail(new \Exception('Failed to get UplinkHostSwitchProfiles'));
             return false;
         }
-        $uplinkHostSwitchProfile = collect($uplinkHostSwitchProfiles['results'])->first();
+        $uplinkHostSwitchProfile = collect($uplinkHostSwitchProfiles->results)->first();
 
-        $response = $hostGroup->availabilityZone->nsxService()->post(
+        $hostGroup->availabilityZone->nsxService()->post(
             '/api/v1/transport-node-profiles',
             [
                 'json' => [
@@ -74,19 +75,19 @@ class CreateTransportNode extends Job
                         'host_switches' => [
                             [
                                 'host_switch_name' => $hostGroup->vpc->id,
-                                'host_switch_id' => $networkSwitch['uuid'],
+                                'host_switch_id' => $networkSwitch->uuid,
                                 'host_switch_mode' => 'STANDARD',
                                 'host_switch_type' => 'VDS',
                                 'host_switch_profile_ids' => [
                                     [
-                                        'value' => $uplinkHostSwitchProfile['id'],
+                                        'value' => $uplinkHostSwitchProfile->id,
                                         'key' => 'UplinkHostSwitchProfile'
                                     ]
                                 ],
                                 'transport_zone_endpoints' => [
                                     [
-                                        'transport_zone_id' => $transportZone['id'],
-                                        'transport_zone_profile_ids' => $transportZone['transport_zone_profile_ids'],
+                                        'transport_zone_id' => $transportZone->id,
+                                        'transport_zone_profile_ids' => $transportZone->transport_zone_profile_ids,
                                     ]
                                 ],
                                 'uplinks' => [
@@ -109,65 +110,59 @@ class CreateTransportNode extends Job
             ]
         );
 
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->model->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Failed to create "' . $this->model->id . '"'));
-            return false;
-        }
-
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
-    private function getTransportNodeProfiles(AvailabilityZone $availabilityZone): ?array
+    private function getTransportNodeProfiles(AvailabilityZone $availabilityZone): ?\stdClass
     {
-        $response = $availabilityZone->nsxService()
-            ->get('/api/v1/transport-node-profiles');
-        if (!$response || $response->getStatusCode() !== 200) {
-            return null;
-        }
-        $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return json_decode(
+            $availabilityZone->nsxService()
+                ->get('/api/v1/transport-node-profiles')
+                ->getBody()
+                ->getContents()
+        );
     }
 
-    private function getNetworkSwitchDetails(AvailabilityZone $availabilityZone, Vpc $vpc): ?array
+    private function getNetworkSwitchDetails(AvailabilityZone $availabilityZone, Vpc $vpc): ?\stdClass
     {
-        $response = $availabilityZone->kingpinService()
-            ->get('/api/v1/vpc/' . $vpc->id . '/network/switch');
-        if (!$response || $response->getStatusCode() !== 200) {
-            return null;
-        }
-        $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return json_decode(
+            $availabilityZone->kingpinService()
+                ->get('/api/v2/vpc/' . $vpc->id . '/network/switch')
+                ->getBody()
+                ->getContents()
+        );
     }
 
-    private function getTransportZones(AvailabilityZone $availabilityZone): ?array
+    private function getTransportZones(AvailabilityZone $availabilityZone): ?\stdClass
     {
-        $response = $availabilityZone->nsxService()
-            ->get('/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz');
-        if (!$response || $response->getStatusCode() !== 200) {
-            return null;
-        }
-        $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return json_decode(
+            $availabilityZone->nsxService()
+                ->get('/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz')
+                ->getBody()
+                ->getContents()
+        );
     }
 
-    private function getUplinkHostSwitchProfiles(AvailabilityZone $availabilityZone): ?array
+    private function getUplinkHostSwitchProfiles(AvailabilityZone $availabilityZone): ?\stdClass
     {
-        $response = $availabilityZone->nsxService()
-            ->get('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile');
-        if (!$response || $response->getStatusCode() !== 200) {
-            return null;
-        }
-        $json = json_decode($response->getBody()->getContents(), true);
-        return (!$json) ? null : $json;
+        return json_decode(
+            $availabilityZone->nsxService()
+                ->get('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile')
+                ->getBody()
+                ->getContents()
+        );
     }
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $message = $exception->getMessage();
+        if ($exception instanceof RequestException && $exception->hasResponse()) {
+            $json = json_decode($exception->getResponse()->getBody()->getContents());
+            Log::error('Request Exception', [
+                'response_json' => $json,
+                'exception' => $exception,
+            ]);
+        }
+        $this->model->setSyncFailureReason($message);
     }
 }

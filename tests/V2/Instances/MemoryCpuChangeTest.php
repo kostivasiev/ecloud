@@ -63,6 +63,8 @@ class MemoryCpuChangeTest extends TestCase
 
     public function testMemoryChangeRamCapacity()
     {
+        $this->hostGroup();
+
         Event::fake();
 
         $instance = factory(Instance::class)->create([
@@ -73,6 +75,7 @@ class MemoryCpuChangeTest extends TestCase
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'backup_enabled' => false,
+            'host_group_id' => $this->hostGroup()->id,
         ]);
 
         $instance->vcpu_cores = 2;
