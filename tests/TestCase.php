@@ -345,7 +345,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 [
                     'json' => [
                         'resource_type' => 'TransportNodeCollection',
-                        'display_name' => 'hg-test-tnc',
+                        'display_name' => 'tnc-hg-test',
                         'description' => 'API created Transport Node Collection',
                         'compute_collection_id' => 'TEST-COMPUTE-COLLECTION-ID',
                         'transport_node_profile_id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
@@ -449,31 +449,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->conjurerServiceMock;
-    }
-
-    public function artisanServiceMock()
-    {
-        if (!$this->artisanServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-3par',
-                'name' => '3PAR',
-                'username' => config('artisan.user'),
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-
-            factory(Credential::class)->create([
-                'id' => 'cred-artisan',
-                'name' => 'Artisan API',
-                'username' => config('artisan.san_user'),
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-
-            $this->artisanServiceMock = \Mockery::mock(new ArtisanService(new Client()))->makePartial();
-            app()->bind(ArtisanService::class, function () {
-                return $this->artisanServiceMock;
-            });
-        }
-        return $this->artisanServiceMock;
     }
 
     protected function setUp(): void
