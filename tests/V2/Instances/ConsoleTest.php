@@ -24,7 +24,7 @@ class ConsoleTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(502);
             });
-        $this->put(
+        $this->post(
             '/v2/instances/'.$this->instance()->id.'/console-session',
             [],
             [
@@ -53,7 +53,7 @@ class ConsoleTest extends TestCase
                     'ticket' => '1234567890',
                 ]));
             });
-        $this->put(
+        $this->post(
             '/v2/instances/'.$this->instance()->id.'/console-session',
             [],
             [
@@ -90,7 +90,7 @@ class ConsoleTest extends TestCase
                     'ticket' => '1234567890',
                 ]));
             });
-        $this->put(
+        $this->post(
             '/v2/instances/'.$this->instance()->id.'/console-session',
             [],
             [
@@ -144,7 +144,7 @@ class ConsoleTest extends TestCase
         });
 
         // run test
-        $this->put(
+        $this->post(
             '/v2/instances/'.$this->instance()->id.'/console-session',
             [],
             [
