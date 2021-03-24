@@ -180,45 +180,57 @@ GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:Tier0%2
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
-
-###
-
 ###
 GET https://185.197.63.88/policy/api/v1/infra/domains/default/groups
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
-###
 
+###
 GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/np-5470ba95
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
-###
 
+###
 GET https://185.197.63.88/policy/api/v1/aaa/effective-permissions?feature_name=policy_grouping&object_path=/infra/domains/default/groups/ptest
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
-###
 
-# %20AND%20
+###
 GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:Group
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
 ###
-
-
 GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-9d0b08c0
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
-
-
 ###
-
 DELETE https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/np-acb5a46d
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 ### GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/?include_mark_for_delete_objects=truee
 GET https://185.197.63.88/policy/api/v1/search/query?query=path:/infra/domains/default/security-policies/np-5470ba95
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/api/v1/transport-node-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-18bb0f21
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of TransportZones
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of UplinkHostSwitchProfiles
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
