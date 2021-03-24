@@ -327,9 +327,12 @@ class InstanceController extends BaseController
                 '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/console/session'
             );
         if (!$response || $response->getStatusCode() !== 200) {
-            Log::info(
+            Log::debug(
                 __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console session',
-                ['instance' => $instance]
+                [
+                    'instance' => $instance,
+                    'response' => $response,
+                ]
             );
             return ErrorResponse::create(
                 'Bad Gateway',
