@@ -50,6 +50,7 @@ class InstanceResource extends UKFastResource
             'locked' => $this->locked,
             'platform' => $this->platform,
             'backup_enabled' => $this->backup_enabled,
+            'host_group_id' => $this->host_group_id,
             'volume_capacity' => $this->volume_capacity,
             'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(

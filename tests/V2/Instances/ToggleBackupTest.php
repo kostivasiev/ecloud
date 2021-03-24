@@ -88,6 +88,7 @@ class ToggleBackupTest extends TestCase
 
         $this->patch('/v2/instances/' . $this->instance()->id, [
             'backup_enabled' => true,
+            'host_group_id' => $this->hostGroup()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -95,7 +96,8 @@ class ToggleBackupTest extends TestCase
             'instances',
             [
                 'id' => $this->instance()->id,
-                'backup_enabled' => true
+                'backup_enabled' => true,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             'ecloud'
         )->assertResponseStatus(200);
@@ -143,6 +145,7 @@ class ToggleBackupTest extends TestCase
 
         $this->patch('/v2/instances/' . $this->instance()->id, [
             'backup_enabled' => false,
+            'host_group_id' => $this->hostGroup()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -150,7 +153,8 @@ class ToggleBackupTest extends TestCase
             'instances',
             [
                 'id' => $this->instance()->id,
-                'backup_enabled' => false
+                'backup_enabled' => false,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             'ecloud'
         )->assertResponseStatus(200);

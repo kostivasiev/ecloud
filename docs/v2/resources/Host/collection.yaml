@@ -42,7 +42,7 @@ post:
         schema:
           $ref: '../../resources/Host/schema.yaml'
   responses:
-    201:
+    202:
       $ref: '../../resources/Host/responses/idResponse.yaml'
   tags:
     - Hosts

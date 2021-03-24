@@ -7,7 +7,7 @@ use App\Models\V2\Host;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
-class CreateAutoDeployRule extends Job
+class CheckAvailableCompute extends Job
 {
     private $model;
 
@@ -16,6 +16,10 @@ class CreateAutoDeployRule extends Job
         $this->model = $model;
     }
 
+    /**
+     * Check available stock of requested host speck on the UCS
+     * @see https://185.197.63.78:8444/swagger/ui/index#/Compute_v2/Compute_v2_RetrieveAvailableNodes
+     */
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
@@ -23,32 +27,25 @@ class CreateAutoDeployRule extends Job
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
-        // Get the host spec from Conjurer
         $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/specification/' . $host->hostGroup->hostSpec->name . '/host/available'
         );
+
         $response = json_decode($response->getBody()->getContents());
 
-        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
-
-        if (empty($macAddress)) {
-            $message = 'Failed to load eth0 address for host ' . $host->id;
+        if (!is_array($response)) {
+            $message = 'Failed to determine available stock for specification ' . $host->hostGroup->hostSpec->name;
             Log::error($message);
             $this->fail(new \Exception($message));
             return false;
         }
 
-        // Add the host to the host group on VMWare
-        $availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $host->hostGroup->vpc_id .'/hostgroup/' . $host->hostGroup->id .'/host',
-            [
-                'json' => [
-                    'hostId' => $host->id,
-                    'hardwareVersion' => $response->hardwareVersion,
-                    'macAddress' => $macAddress,
-                ],
-            ]
-        );
+        if (count($response) < 1) {
+            $message = 'Insufficient stock for specification ' . $host->hostGroup->hostSpec->name;
+            Log::error($message);
+            $this->fail(new \Exception($message));
+            return false;
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

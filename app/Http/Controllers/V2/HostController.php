@@ -33,13 +33,13 @@ class HostController extends BaseController
 
     public function store(StoreRequest $request)
     {
-        $model = new Host();
+        $model = app()->make(Host::class);
         $model->fill($request->only([
             'name',
             'host_group_id',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateRequest $request, string $id)
