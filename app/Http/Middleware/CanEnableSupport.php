@@ -30,10 +30,10 @@ class CanEnableSupport
                         [
                             'title' => 'Not Found',
                             'detail' => 'The customer account is not available',
-                            'status' => 503,
+                            'status' => 403,
                         ]
                     ]
-                ], 503);
+                ], 403);
             }
 
             if ($customer->paymentMethod == 'Credit Card') {
