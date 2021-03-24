@@ -29,7 +29,7 @@ class PrepareCluster extends Job
             return false;
         }
 
-        $transportNodeCollectionDisplayName = $this->model->id . '-tnc';
+        $transportNodeCollectionDisplayName = 'tnc-' . $this->model->id;
         $exists = collect($transportNodeCollections->results)->filter(function ($result) use (
             $transportNodeCollectionDisplayName
         ) {
