@@ -345,7 +345,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 [
                     'json' => [
                         'resource_type' => 'TransportNodeCollection',
-                        'display_name' => 'hg-test-tnc',
+                        'display_name' => 'tnc-hg-test',
                         'description' => 'API created Transport Node Collection',
                         'compute_collection_id' => 'TEST-COMPUTE-COLLECTION-ID',
                         'transport_node_profile_id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
