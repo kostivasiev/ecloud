@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\V2\Instance;
 
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
+use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
@@ -68,6 +70,13 @@ class UpdateRequest extends FormRequest
             ],
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
+            'host_group_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.host_groups,id,deleted_at,NULL',
+                new ExistsForUser(HostGroup::class),
+            ],
         ];
 
         return $rules;

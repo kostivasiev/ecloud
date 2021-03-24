@@ -69,6 +69,7 @@ class PlatformTest extends TestCase
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
+            'host_group_id' => $this->hostGroup()->id,
         ];
         $this->post(
             '/v2/instances',
