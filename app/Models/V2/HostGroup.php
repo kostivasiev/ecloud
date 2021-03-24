@@ -61,6 +61,11 @@ class HostGroup extends Model implements Filterable, Sortable
         return $this->hasMany(Host::class);
     }
 
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
+    }
+
     /**
      * @param $query
      * @param $user

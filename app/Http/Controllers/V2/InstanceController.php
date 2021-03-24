@@ -104,6 +104,7 @@ class InstanceController extends BaseController
             'ram_capacity',
             'locked',
             'backup_enabled',
+            'host_group_id',
         ]));
 
         $instance->locked = $request->input('locked', false);
@@ -140,7 +141,8 @@ class InstanceController extends BaseController
             'locked',
             'backup_enabled',
             'vcpu_cores',
-            'ram_capacity'
+            'ram_capacity',
+            'host_group_id',
         ]));
 
         if (!$instance->save()) {
