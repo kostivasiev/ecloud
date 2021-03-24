@@ -35,7 +35,7 @@ class UpdateBilling
             'key' => 'hostgroup',
             'value' => 1,
             'start' => Carbon::now(),
-            'category' => 'Networking',
+            'category' => 'Compute',
             'price' => 0,
         ]);
         $billingMetric->save();
