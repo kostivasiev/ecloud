@@ -135,6 +135,27 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->vpc;
     }
 
+    public function region()
+    {
+        if (!$this->region) {
+            $this->region = factory(Region::class)->create([
+                'id' => 'reg-test',
+            ]);
+        }
+        return $this->region;
+    }
+
+    public function availabilityZone()
+    {
+        if (!$this->availabilityZone) {
+            $this->availabilityZone = factory(AvailabilityZone::class)->create([
+                'id' => 'az-test',
+                'region_id' => $this->region()->id,
+            ]);
+        }
+        return $this->availabilityZone;
+    }
+
     public function instance()
     {
         if (!$this->instance) {
@@ -232,7 +253,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
         // CreateTransportNode Job
         $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v1/vpc/vpc-test/network/switch')
+            ->with('/api/v2/vpc/vpc-test/network/switch')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'name' => 'test-network-switch-name',
@@ -336,6 +357,39 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
     }
 
+    public function kingpinServiceMock()
+    {
+        if (!$this->kingpinServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-kingpin',
+                'name' => 'kingpinapi',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
+            app()->bind(KingpinService::class, function () {
+                return $this->kingpinServiceMock;
+            });
+        }
+        return $this->kingpinServiceMock;
+    }
+
+    public function nsxServiceMock()
+    {
+        if (!$this->nsxServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-nsx',
+                'name' => 'NSX',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
+            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
+            app()->bind(NsxService::class, function () {
+                return $this->nsxServiceMock;
+            });
+        }
+        return $this->nsxServiceMock;
+    }
+
     public function hostSpec()
     {
         if (!$this->hostSpec) {
@@ -345,31 +399,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->hostSpec;
-    }
-
-    public function conjurerServiceMock()
-    {
-        if (!$this->conjurerServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-ucs',
-                'name' => 'UCS API',
-                'username' => config('conjurer.ucs_user'),
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-
-            factory(Credential::class)->create([
-                'id' => 'cred-conjurer',
-                'name' => 'Conjurer API',
-                'username' => config('conjurer.user'),
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-
-            $this->conjurerServiceMock = \Mockery::mock(new ConjurerService(new Client()))->makePartial();
-            app()->bind(ConjurerService::class, function () {
-                return $this->conjurerServiceMock;
-            });
-        }
-        return $this->conjurerServiceMock;
     }
 
     public function artisanServiceMock()
@@ -395,6 +424,31 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->artisanServiceMock;
+    }
+
+    public function conjurerServiceMock()
+    {
+        if (!$this->conjurerServiceMock) {
+            factory(Credential::class)->create([
+                'id' => 'cred-ucs',
+                'name' => 'UCS API',
+                'username' => config('conjurer.ucs_user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+
+            factory(Credential::class)->create([
+                'id' => 'cred-conjurer',
+                'name' => 'Conjurer API',
+                'username' => config('conjurer.user'),
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
+
+            $this->conjurerServiceMock = \Mockery::mock(new ConjurerService(new Client()))->makePartial();
+            app()->bind(ConjurerService::class, function () {
+                return $this->conjurerServiceMock;
+            });
+        }
+        return $this->conjurerServiceMock;
     }
 
     protected function setUp(): void
@@ -468,60 +522,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Deploy
             \App\Events\V2\Instance\Deploy::class,
         ]);
-    }
-
-    public function kingpinServiceMock()
-    {
-        if (!$this->kingpinServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-kingpin',
-                'name' => 'kingpinapi',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-            $this->kingpinServiceMock = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-            app()->bind(KingpinService::class, function () {
-                return $this->kingpinServiceMock;
-            });
-        }
-        return $this->kingpinServiceMock;
-    }
-
-    public function availabilityZone()
-    {
-        if (!$this->availabilityZone) {
-            $this->availabilityZone = factory(AvailabilityZone::class)->create([
-                'id' => 'az-test',
-                'region_id' => $this->region()->id,
-            ]);
-        }
-        return $this->availabilityZone;
-    }
-
-    public function region()
-    {
-        if (!$this->region) {
-            $this->region = factory(Region::class)->create([
-                'id' => 'reg-test',
-            ]);
-        }
-        return $this->region;
-    }
-
-    public function nsxServiceMock()
-    {
-        if (!$this->nsxServiceMock) {
-            factory(Credential::class)->create([
-                'id' => 'cred-nsx',
-                'name' => 'NSX',
-                'resource_id' => $this->availabilityZone()->id,
-            ]);
-            $nsxService = app()->makeWith(NsxService::class, [$this->availabilityZone()]);
-            $this->nsxServiceMock = \Mockery::mock($nsxService)->makePartial();
-            app()->bind(NsxService::class, function () {
-                return $this->nsxServiceMock;
-            });
-        }
-        return $this->nsxServiceMock;
     }
 
     protected function tearDown(): void
