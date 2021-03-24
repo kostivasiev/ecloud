@@ -327,7 +327,7 @@ class InstanceController extends BaseController
                 '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/console/session'
             );
         if (!$response || $response->getStatusCode() !== 200) {
-            Log::debug(
+            Log::info(
                 __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console session',
                 [
                     'instance' => $instance,
@@ -399,7 +399,12 @@ class InstanceController extends BaseController
         $responseJson = json_decode($response->getBody()->getContents());
         $uuid = $responseJson->uuid ?? '';
         if (empty($uuid)) {
-            abort(503);
+            Log::info(__CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session UUID from host', [
+                'instance' => $instance,
+                'base_uri' => $consoleResource->host.':'.$consoleResource->port,
+                'status_code' => Response::HTTP_SERVICE_UNAVAILABLE,
+            ]);
+            abort(Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
