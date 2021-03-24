@@ -62,8 +62,10 @@ class NetworkController extends BaseController
 
                 $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
                     return !$network->router
-                        || preg_match('/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
-                            $network->router->vpc_id) === 0;
+                        || preg_match(
+                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
+                            $network->router->vpc_id
+                        ) === 0;
                 });
             }
 
@@ -73,8 +75,10 @@ class NetworkController extends BaseController
 
                 $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
                     return !$network->router
-                        || preg_match('/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
-                            $network->router->vpc_id) === 1;
+                        || preg_match(
+                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
+                            $network->router->vpc_id
+                        ) === 1;
                 });
             }
 
