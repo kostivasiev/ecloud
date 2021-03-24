@@ -45,6 +45,10 @@ class HostGroup extends Model implements Filterable, Sortable
             'host_spec_id',
         ]);
 
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class
+        ];
+
         parent::__construct($attributes);
     }
 
@@ -66,6 +70,11 @@ class HostGroup extends Model implements Filterable, Sortable
     public function hosts()
     {
         return $this->hasMany(Host::class);
+    }
+
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
     }
 
     /**

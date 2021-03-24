@@ -285,10 +285,16 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
+        // HostGroup
+        \App\Events\V2\HostGroup\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
         // Sync
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
+            \App\Listeners\V2\HostGroup\UpdateBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
