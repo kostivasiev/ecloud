@@ -312,13 +312,6 @@ class InstanceController extends BaseController
     public function consoleSession(Request $request, $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
-        if (!$this->isAdmin) {
-            return ErrorResponse::create(
-                'Forbidden',
-                'Console access to this instance is not available',
-                Response::HTTP_FORBIDDEN
-            );
-        }
 
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $instance->availabilityZone
