@@ -334,7 +334,7 @@ class InstanceController extends BaseController
             return ErrorResponse::create(
                 'Bad Gateway',
                 'Console access to this instance is not available',
-                $response->getStatusCode()
+                Response::HTTP_BAD_GATEWAY
             );
         }
         $json = json_decode($response->getBody()->getContents());
