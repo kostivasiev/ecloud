@@ -51,14 +51,6 @@ class MemoryCpuChangeTest extends TestCase
         $this->image = factory(Image::class)->create([
             'appliance_version_id' => $this->appliance_version->appliance_version_id,
         ])->refresh();
-
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('put')->andReturn(
-            new Response(200)
-        );
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
     }
 
     public function testMemoryChangeRamCapacity()
