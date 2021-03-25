@@ -27,9 +27,11 @@ class TestAuth extends Command
         } catch (RequestException $exception) {
             if ($exception->getCode() == 404) {
                 $this->info('Auth test passed');
-                return;
+                return Command::SUCCESS;
             }
         }
+
         $this->error('Auth test failed');
+        return Command::FAILURE;
     }
 }

@@ -35,21 +35,17 @@ class Instance extends Model implements Filterable, Sortable
         'id',
         'name',
         'vpc_id',
-        'appliance_version_id',
+        'image_id',
         'vcpu_cores',
         'ram_capacity',
         'availability_zone_id',
         'locked',
         'platform',
         'backup_enabled',
-    ];
-
-    protected $hidden = [
-        'appliance_version_id'
+        'host_group_id',
     ];
 
     protected $appends = [
-        'appliance_id',
         'volume_capacity',
     ];
 
@@ -118,24 +114,14 @@ class Instance extends Model implements Filterable, Sortable
         });
     }
 
-    public function getApplianceIdAttribute()
+    public function image()
     {
-        return !empty($this->applianceVersion) ? $this->applianceVersion->appliance_uuid : null;
+        return $this->belongsTo(Image::class);
     }
 
-    public function applianceVersion()
+    public function hostGroup()
     {
-        return $this->belongsTo(
-            ApplianceVersion::class,
-            'appliance_version_id',
-            'appliance_version_uuid'
-        );
-    }
-
-    public function setApplianceVersionId(string $applianceUuid)
-    {
-        $version = app()->make(ApplianceVersion::class)->getLatest($applianceUuid);
-        $this->attributes['appliance_version_id'] = $version;
+        return $this->belongsTo(HostGroup::class);
     }
 
     /**
@@ -148,13 +134,14 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('appliance_version_id', Filter::$stringDefaults),
+            $factory->create('image_id', Filter::$stringDefaults),
             $factory->create('vcpu_cores', Filter::$stringDefaults),
             $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('locked', Filter::$stringDefaults),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup_enabled', Filter::$stringDefaults),
+            $factory->create('host_group_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -171,13 +158,14 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
-            $factory->create('appliance_version_id'),
+            $factory->create('image_id'),
             $factory->create('vcpu_cores'),
             $factory->create('ram_capacity'),
             $factory->create('availability_zone_id'),
             $factory->create('locked'),
             $factory->create('platform'),
             $factory->create('backup_enabled'),
+            $factory->create('host_group_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -204,13 +192,14 @@ class Instance extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'vpc_id' => 'vpc_id',
-            'appliance_version_id' => 'appliance_version_id',
+            'image_id' => 'image_id',
             'vcpu_cores' => 'vcpu_cores',
             'ram_capacity' => 'ram_capacity',
             'availability_zone_id' => 'availability_zone_id',
             'locked' => 'locked',
             'platform' => 'platform',
             'backup_enabled' => 'backup_enabled',
+            'host_group_id' => 'host_group_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

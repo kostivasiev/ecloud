@@ -6,6 +6,7 @@ use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\ApplianceVersionData;
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
@@ -27,6 +28,7 @@ class CreateTest extends TestCase
     protected $vpc;
     protected $appliance;
     protected $applianceVersion;
+    protected $image;
 
     public function setUp(): void
     {
@@ -45,9 +47,12 @@ class CreateTest extends TestCase
         $this->applianceVersion = factory(ApplianceVersion::class)->create([
             'appliance_version_appliance_id' => $this->appliance->appliance_id,
         ])->refresh();  // Hack needed since this is a V1 resource
+        $this->image = factory(Image::class)->create([
+            'appliance_version_id' => $this->applianceVersion->appliance_version_uuid,
+        ])->refresh();
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc->id,
-            'appliance_version_id' => $this->applianceVersion->uuid,
+            'image_id' => $this->image->id,
             'availability_zone_id' => $this->availability_zone->id,
         ]);
         $mockAdminDevices = \Mockery::mock(AdminClient::class)
@@ -66,12 +71,13 @@ class CreateTest extends TestCase
         // No name defined - defaults to ID
         $this->post('/v2/instances', [
             'vpc_id' => $this->vpc->id,
-            'appliance_id' => $this->appliance->uuid,
+            'image_id' => $this->image->id,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
             'volume_iops' => 600,
             'backup_enabled' => true,
+            'host_group_id' => $this->hostGroup()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -84,6 +90,7 @@ class CreateTest extends TestCase
             'id' => $id,
             'name' => $id,
             'backup_enabled' => 1,
+            'host_group_id' => $this->hostGroup()->id,
         ], 'ecloud');
     }
 
@@ -97,12 +104,13 @@ class CreateTest extends TestCase
             [
                 'name' => $name,
                 'vpc_id' => $this->vpc->id,
-                'appliance_id' => $this->appliance->uuid,
+                'image_id' => $this->image->id,
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
                 'volume_iops' => 600,
                 'backup_enabled' => true,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -118,6 +126,7 @@ class CreateTest extends TestCase
                 'id' => $id,
                 'name' => $name,
                 'backup_enabled' => 1,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             'ecloud'
         );
@@ -129,11 +138,12 @@ class CreateTest extends TestCase
             '/v2/instances',
             [
                 'vpc_id' => $this->vpc->id,
-                'appliance_id' => $this->appliance->uuid,
+                'image_id' => $this->image->id,
                 'network_id' => $this->network->id,
                 'vcpu_cores' => 1,
                 'ram_capacity' => 1024,
                 'volume_iops' => 600,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -147,38 +157,11 @@ class CreateTest extends TestCase
         $this->assertNotNull($instance->availability_zone_id);
     }
 
-    public function testSettingApplianceVersionId()
-    {
-        // No name defined - defaults to ID
-        $data = [
-            'vpc_id' => $this->vpc->id,
-            'appliance_id' => $this->appliance->uuid,
-            'network_id' => $this->network->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'volume_iops' => 600,
-        ];
-        $this->post(
-            '/v2/instances',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->assertResponseStatus(201);
-
-        $id = json_decode($this->response->getContent())->data->id;
-        $instance = Instance::findOrFail($id);
-        // Check that the appliance id has been converted to the appliance version id
-        $this->assertEquals($this->applianceVersion->uuid, $instance->appliance_version_id);
-    }
-
     public function testApplianceSpecDefaultConfigFallbacks()
     {
         $data = [
             'vpc_id' => $this->vpc->id,
-            'appliance_id' => $this->appliance->uuid,
+            'image_id' => $this->image->id,
             'network_id' => $this->network->id,
             'vcpu_cores' => 11,
             'ram_capacity' => 512,
@@ -213,6 +196,8 @@ class CreateTest extends TestCase
                 'source' => 'ram_capacity'
             ])
             ->assertResponseStatus(422);
+
+        //dd($this->response->getContent());
     }
 
     public function testApplianceSpecRamMin()
@@ -225,7 +210,7 @@ class CreateTest extends TestCase
 
         $data = [
             'vpc_id' => $this->vpc->id,
-            'appliance_id' => $this->appliance->uuid,
+            'image_id' => $this->image->id,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
@@ -259,7 +244,7 @@ class CreateTest extends TestCase
 
         $data = [
             'vpc_id' => $this->vpc->id,
-            'appliance_id' => $this->appliance->uuid,
+            'image_id' => $this->image->id,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
@@ -293,7 +278,7 @@ class CreateTest extends TestCase
 
         $data = [
             'vpc_id' => $this->vpc->id,
-            'appliance_id' => $this->appliance->uuid,
+            'image_id' => $this->image->id,
             'network_id' => $this->network->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,

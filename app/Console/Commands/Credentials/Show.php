@@ -26,5 +26,7 @@ class Show extends Command
         } else {
             $this->info('No credentials found');
         }
+
+        return Command::SUCCESS;
     }
 }

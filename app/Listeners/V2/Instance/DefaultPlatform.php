@@ -18,15 +18,15 @@ class DefaultPlatform
             return;
         }
 
-        if (!$model->applianceVersion) {
-            Log::error('Failed to find appliance version for instance ' . $model->id);
+        if (!$model->image) {
+            Log::error('Failed to find appliance version for instance ' . $model->id . ': image not set');
             return;
         }
 
         try {
-            $model->platform = $model->applianceVersion->serverLicense()->category;
+            $model->platform = $model->image->platform;
         } catch (\Exception $exception) {
-            Log::error('Failed to determine default platform from appliance version', [$exception]);
+            Log::error('Failed to determine default platform from image', [$exception]);
             throw $exception;
         }
 

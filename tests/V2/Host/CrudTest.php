@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Host;
 
+use App\Models\V2\Host;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -14,12 +15,18 @@ class CrudTest extends TestCase
     {
         parent::setUp();
 
+        // bind data so we can use Conjurer mocks with expected host ID
+        app()->bind(Host::class, function () {
+            return $this->host();
+        });
+
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
     public function testIndex()
     {
         $this->host();
+
         $this->get('/v2/hosts')
             ->seeJson([
                 'id' => 'h-test',
@@ -32,6 +39,7 @@ class CrudTest extends TestCase
     public function testShow()
     {
         $this->host();
+
         $this->get('/v2/hosts/h-test')
             ->seeJson([
                 'id' => 'h-test',
@@ -43,18 +51,22 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
+        $this->createHostMocks();
+
         $data = [
             'name' => 'h-test',
             'host_group_id' => $this->hostGroup()->id,
         ];
         $this->post('/v2/hosts', $data)
             ->seeInDatabase('hosts', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
     }
 
     public function testUpdate()
     {
         $this->host();
+        $this->syncSaveIdempotent();
+
         $this->patch('/v2/hosts/h-test', [
             'name' => 'new name',
         ])->seeInDatabase(
@@ -74,6 +86,7 @@ class CrudTest extends TestCase
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
         $this->host();
+
         $this->delete('/v2/hosts/h-test')
             ->seeInDatabase(
                 'hosts',
