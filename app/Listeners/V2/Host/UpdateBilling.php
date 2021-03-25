@@ -1,7 +1,6 @@
 <?php
 namespace App\Listeners\V2\Host;
 
-use App\Jobs\HostGroup\UnusedBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
 use App\Models\V2\Sync;
@@ -15,67 +14,62 @@ class UpdateBilling
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
-        if ($event->model instanceof Host) {
-            $model = $event->model;
-        }
-
-        if ($event->model instanceof Sync) {
-            if (!$event->model->completed) {
-                return;
-            }
-
-            if (Resource::classFromId($event->model->resource_id) != Host::class) {
-                return;
-            }
-
-            $model = Host::find($event->model->resource_id);
-        }
-
-        if (empty($model)) {
+        if (!($event->model instanceof Sync)) {
             return;
         }
 
-        // calculate metric here
-        $spec = $model->hostGroup->hostSpec;
-        $availabilityZoneId = $model->hostGroup->availabilityZone->id;
-        $metric = $availabilityZoneId . ': host-' . $spec->cpu_cores . '-' . $spec->cpu_clock_speed.'-'.$spec->ram_capacity;
+        if (!$event->model->completed) {
+            return;
+        }
 
-        $time = Carbon::now();
-        $currentActiveMetric = BillingMetric::getActiveByKey($model, $metric . '%', 'LIKE');
+        if (Resource::classFromId($event->model->resource_id) != Host::class) {
+            return;
+        }
+
+        $host = Host::find($event->model->resource_id);
+
+        if (empty($host)) {
+            return;
+        }
+
+        $currentActiveMetric = BillingMetric::getActiveByKey($host, 'host');
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->key == $metric) {
-                return;
-            }
-            $currentActiveMetric->end = $time;
-            $currentActiveMetric->save();
+            return;
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $model->id;
-        $billingMetric->vpc_id = $model->hostGroup->vpc->id;
-        $billingMetric->reseller_id = $model->hostGroup->vpc->reseller_id;
-        $billingMetric->key = $metric;
-        $billingMetric->value = $spec->id;
-        $billingMetric->start = $time;
+        $billingMetric->fill([
+            'resource_id' => $host->id,
+            'vpc_id' => $host->hostGroup->vpc->id,
+            'reseller_id' => $host->hostGroup->vpc->reseller_id,
+            'key' => $host->hostGroup->hostSpec->id,
+            'value' => 1,
+            'start' => Carbon::now(),
+            'category' => 'Compute',
+        ]);
 
-        $product = $model->hostGroup->availabilityZone
+        $product = $host->hostGroup->availabilityZone
             ->products()
-            ->where('product_name', 'LIKE', '%'.$metric)
+            ->where('product_name', 'LIKE', '%' . $host->hostGroup->hostSpec->id)
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'host\' billing product for availability zone ' . $model->hostGroup->availabilityZone->id
+                'Failed to load \'host spec\' billing product \'' . $host->hostGroup->hostSpec->id
+                . '\' for availability zone ' . $host->hostGroup->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;
-            $billingMetric->price = $product->getPrice($model->hostGroup->vpc->reseller_id);
+            $billingMetric->price = $product->getPrice($host->hostGroup->vpc->reseller_id);
         }
 
         $billingMetric->save();
-        $model->setSyncCompleted();
-
-        dispatch(new UnusedBilling($model->hostGroup));
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
+
+    // TODO: what if the host is deleted?
+
+    // todo: what of the host group is no longer empty?
+
+    // todo: what if the host group is empty after delete?
 }
