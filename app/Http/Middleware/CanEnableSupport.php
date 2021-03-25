@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class CanEnableSupport
@@ -17,6 +18,7 @@ class CanEnableSupport
      * @param $request
      * @param Closure $next
      * @return mixed
+     * @throws \Exception
      */
     public function handle($request, Closure $next)
     {
@@ -25,6 +27,10 @@ class CanEnableSupport
             try {
                 $customer = $accountAdminClient->customers()->getById($request->user()->resellerId());
             } catch (\Exception $e) {
+                if ($e->getResponse()->getStatusCode() !== 404) {
+                    Log::info($e);
+                    throw($e);
+                }
                 return response()->json([
                     'errors' => [
                         [
