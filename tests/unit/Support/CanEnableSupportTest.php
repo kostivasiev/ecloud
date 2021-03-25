@@ -3,10 +3,13 @@
 namespace Tests\unit\Support;
 
 use App\Http\Middleware\CanEnableSupport;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
+use UKFast\Admin\Account\AdminCustomerClient;
 use UKFast\Api\Auth\Consumer;
 
 class CanEnableSupportTest extends TestCase
@@ -23,6 +26,21 @@ class CanEnableSupportTest extends TestCase
 
     public function testInvalidResellerId()
     {
+        app()->bind(AdminClient::class, function () {
+            $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
+            $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
+
+            $mockCustomer->shouldReceive('getById')
+                ->andThrow(
+                    new ClientException(
+                        'Not Found',
+                        new \GuzzleHttp\Psr7\Request('GET', '/'),
+                        new Response(404)
+                    )
+                );
+            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            return $mockClient;
+        });
         $request = \Mockery::mock(Request::class)->makePartial();
         $request->shouldReceive('user')->andReturnSelf();
         $request->shouldReceive('isScoped')->andReturnTrue();
@@ -36,7 +54,7 @@ class CanEnableSupportTest extends TestCase
                 'errors' => [
                     'title' => 'Not Found',
                     'detail' => 'The customer account is not available',
-                    'status' => 404
+                    'status' => 403
                 ]
             ]),
             $response->getContent()
