@@ -48,7 +48,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "host_group_id": {{host_group_id}}
+    "host_group_id": "{{host_group_id}}"
 }
 
 ### Move back to {{dev_host_group_id}}
