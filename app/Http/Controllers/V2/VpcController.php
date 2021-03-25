@@ -11,7 +11,6 @@ use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
-use App\Resources\V2\ErrorResponse;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
@@ -47,11 +46,13 @@ class VpcController extends BaseController
         $vpc = new Vpc($request->only(['name', 'region_id']));
         if ($request->has('console_enabled')) {
             if (!$this->isAdmin) {
-                return ErrorResponse::create(
-                    'Forbidden',
-                    'Request contains invalid parameters',
-                    Response::HTTP_FORBIDDEN
-                );
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Request contains invalid parameters',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
             }
             $vpc->console_enabled = $request->input('console_enabled', true);
         }
@@ -67,11 +68,13 @@ class VpcController extends BaseController
 
         if ($request->has('console_enabled')) {
             if (!$this->isAdmin) {
-                return ErrorResponse::create(
-                    'Forbidden',
-                    'Request contains invalid parameters',
-                    Response::HTTP_FORBIDDEN
-                );
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Request contains invalid parameters',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
             }
             $vpc->console_enabled = $request->input('console_enabled', $vpc->console_enabled);
         }
