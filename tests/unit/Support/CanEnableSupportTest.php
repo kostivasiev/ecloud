@@ -30,7 +30,7 @@ class CanEnableSupportTest extends TestCase
         $response = $this->canEnableSupport->handle($request, function () {
             return true;
         });
-        $this->assertEquals(503, $response->getStatusCode());
+        $this->assertEquals(403, $response->getStatusCode());
         $this->assertJson(
             json_encode([
                 'errors' => [
