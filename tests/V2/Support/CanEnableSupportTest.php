@@ -3,6 +3,8 @@
 namespace Tests\V2\Support;
 
 use App\Http\Middleware\CanEnableSupport;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -25,6 +27,21 @@ class CanEnableSupportTest extends TestCase
 
     public function testWithBadCustomerAccount()
     {
+        app()->bind(AdminClient::class, function () {
+            $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
+            $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
+
+            $mockCustomer->shouldReceive('getById')
+                ->andThrow(
+                    new ClientException(
+                        'Not Found',
+                        new \GuzzleHttp\Psr7\Request('GET', '/'),
+                        new Response(404)
+                    )
+                );
+            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            return $mockClient;
+        });
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->post('/v2/support', [
             'vpc_id' => $this->vpc()->id
