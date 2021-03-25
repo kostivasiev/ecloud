@@ -49,7 +49,7 @@ class VpcController extends BaseController
                 return response()->json([
                     'errors' => [
                         'title' => 'Forbidden',
-                        'details' => 'Request contains invalid parameters',
+                        'details' => 'Console access cannot be modified',
                         'status' => Response::HTTP_FORBIDDEN,
                     ]
                 ], Response::HTTP_FORBIDDEN);
@@ -71,7 +71,7 @@ class VpcController extends BaseController
                 return response()->json([
                     'errors' => [
                         'title' => 'Forbidden',
-                        'details' => 'Request contains invalid parameters',
+                        'details' => 'Console access cannot be modified',
                         'status' => Response::HTTP_FORBIDDEN,
                     ]
                 ], Response::HTTP_FORBIDDEN);
