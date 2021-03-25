@@ -17,7 +17,6 @@ use App\Models\V2\Nic;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
-use App\Resources\V2\ErrorResponse;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\VolumeResource;
@@ -327,11 +326,13 @@ class InstanceController extends BaseController
                     'response' => $response,
                 ]
             );
-            return ErrorResponse::create(
-                'Bad Gateway',
-                'Console access to this instance is not available',
-                Response::HTTP_BAD_GATEWAY
-            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Bad Gateway',
+                    'details' => 'Console access to this instance is not available',
+                    'status' => Response::HTTP_BAD_GATEWAY,
+                ]
+            ], Response::HTTP_BAD_GATEWAY);
         }
         $json = json_decode($response->getBody()->getContents());
         $host = $json->host ?? null;
@@ -346,11 +347,13 @@ class InstanceController extends BaseController
                 __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console credentials',
                 ['instance' => $instance]
             );
-            return ErrorResponse::create(
-                'Upstream API Failure',
-                'Console access is not available due to an upstream api failure',
-                Response::HTTP_SERVICE_UNAVAILABLE
-            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Upstream API Failure',
+                    'details' => 'Console access is not available due to an upstream api failure',
+                    'status' => Response::HTTP_SERVICE_UNAVAILABLE,
+                ]
+            ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         try {
@@ -382,11 +385,13 @@ class InstanceController extends BaseController
                     ]
                 ]
             );
-            return ErrorResponse::create(
-                'Upstream API Failure',
-                'Console session is not available due to an upstream api failure',
-                Response::HTTP_SERVICE_UNAVAILABLE
-            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Upstream API Failure',
+                    'details' => 'Console session is not available due to an upstream api failure',
+                    'status' => Response::HTTP_SERVICE_UNAVAILABLE,
+                ]
+            ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         $responseJson = json_decode($response->getBody()->getContents());
