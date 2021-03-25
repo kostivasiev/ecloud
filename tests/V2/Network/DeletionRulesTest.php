@@ -28,12 +28,14 @@ class DeletionRulesTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->nics = factory(Nic::class)->create([
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance()->id,
-            'network_id' => $this->network()->id,
-            'ip_address' => $this->faker->ipv4,
-        ]);
+        Nic::withoutEvents(function() {
+            $this->nics = factory(Nic::class)->create([
+                'mac_address' => $this->faker->macAddress,
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
+                'ip_address' => $this->faker->ipv4,
+            ]);
+        });
     }
 
     public function testFailedDeletion()

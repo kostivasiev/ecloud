@@ -37,6 +37,8 @@ class GetNicsTest extends TestCase
 
     public function testGetCollection()
     {
+        $this->nic();
+
         $this->get(
             '/v2/instances/' . $this->instance()->id . '/nics',
             [

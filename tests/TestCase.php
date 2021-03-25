@@ -312,12 +312,14 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]);
             });
         }
+        return $this->nic;
     }
 
     public function image()
     {
         if (!$this->image) {
             $this->image = factory(Image::class)->create([
+                'id' => 'img-abcdef12',
                 'appliance_version_id' => $this->applianceVersion()->id,
             ]);
         }
@@ -328,6 +330,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->applianceVersion) {
             $this->applianceVersion = factory(ApplianceVersion::class)->create([
+                'appliance_version_uuid' => 'd7c4a253-0718-4ef7-adb2-ad348ae96371',
                 'appliance_version_appliance_id' => $this->appliance()->id,
             ]);
         }
@@ -338,6 +341,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->appliance) {
             $this->appliance = factory(Appliance::class)->create([
+                'appliance_uuid' => 'aa085bfc-bbe9-4825-b636-1f221d6c3fa9',
                 'appliance_name' => 'Test Appliance',
             ])->refresh();
         }
@@ -348,6 +352,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->network) {
             $this->network = factory(Network::class)->create([
+                'id' => 'net-abcdef12',
                 'name' => 'Manchester Network',
                 'router_id' => $this->router()->id
             ]);

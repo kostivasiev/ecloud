@@ -23,20 +23,15 @@ class UpdateBackupBilling
             return;
         }
 
-        if (!in_array(Resource::classFromId($event->model->resource_id), [Instance::class, Volume::class])) {
+        if (!in_array(get_class($event->model->resource), [Instance::class, Volume::class])) {
             return;
         }
 
-        if (Resource::classFromId($event->model->resource_id) == Volume::class) {
-            $volume = Volume::withTrashed()->find($event->model->resource_id);
+        if (get_class($event->model->resource) == Volume::class) {
             // TODO: We will need to look at this when we support volumes being attached to multiple instances.
-            $instance = $volume->instances()->first();
+            $instance = $event->model->resource->instances()->first();
         } else {
-            $instance = Instance::find($event->model->resource_id);
-        }
-
-        if (empty($instance)) {
-            return;
+            $instance = $event->model->resource;
         }
 
         $time = Carbon::now();

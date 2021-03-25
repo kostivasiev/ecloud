@@ -22,13 +22,9 @@ class UpdateRamBilling
             return;
         }
 
-        if (Resource::classFromId($event->model->resource_id) != Instance::class) {
-            return;
-        }
+        $instance = $event->model->resource;
 
-        $instance = Instance::find($event->model->resource_id);
-
-        if (empty($instance)) {
+        if (get_class($instance) != Instance::class) {
             return;
         }
 
