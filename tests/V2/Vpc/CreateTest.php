@@ -123,7 +123,7 @@ class CreateTest extends TestCase
         )->seeJson(
             [
                 'title' => 'Forbidden',
-                'details' => 'Request contains invalid parameters',
+                'details' => 'Console access cannot be modified',
                 'status' => 403
             ]
         )->assertResponseStatus(403);
