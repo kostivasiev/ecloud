@@ -33,6 +33,10 @@ class UpdateBackupBilling
         } else {
             $instance = $event->model->resource;
         }
+        
+        if (empty($instance)) {
+            return;
+        }
 
         $time = Carbon::now();
 
