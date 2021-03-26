@@ -45,6 +45,7 @@ class Instance extends Model implements Filterable, Sortable
         'backup_enabled',
         'deployed',
         'deploy_data',
+        'host_group_id',
     ];
 
     protected $appends = [
@@ -124,6 +125,11 @@ class Instance extends Model implements Filterable, Sortable
         return $this->belongsTo(Image::class);
     }
 
+    public function hostGroup()
+    {
+        return $this->belongsTo(HostGroup::class);
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -141,6 +147,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('locked', Filter::$stringDefaults),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup_enabled', Filter::$stringDefaults),
+            $factory->create('host_group_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -164,6 +171,7 @@ class Instance extends Model implements Filterable, Sortable
             $factory->create('locked'),
             $factory->create('platform'),
             $factory->create('backup_enabled'),
+            $factory->create('host_group_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -197,6 +205,7 @@ class Instance extends Model implements Filterable, Sortable
             'locked' => 'locked',
             'platform' => 'platform',
             'backup_enabled' => 'backup_enabled',
+            'host_group_id' => 'host_group_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

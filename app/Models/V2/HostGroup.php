@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\HostGroup\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -39,6 +40,10 @@ class HostGroup extends Model implements Filterable, Sortable
             'host_spec_id',
         ]);
 
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class
+        ];
+
         parent::__construct($attributes);
     }
 
@@ -60,6 +65,11 @@ class HostGroup extends Model implements Filterable, Sortable
     public function hosts()
     {
         return $this->hasMany(Host::class);
+    }
+
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
     }
 
     /**

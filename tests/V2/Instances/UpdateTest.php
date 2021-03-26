@@ -25,6 +25,7 @@ class UpdateTest extends TestCase
             [
                 'name' => 'Changed',
                 'backup_enabled' => true,
+                'host_group_id' => $this->hostGroup()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
