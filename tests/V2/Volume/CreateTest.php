@@ -2,10 +2,14 @@
 
 namespace Tests\V2\Volume;
 
+use App\Events\V2\Volume\Created;
+use App\Events\V2\Volume\Creating;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -18,19 +22,6 @@ class CreateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(true));
-            });
-
-        $this->volume = factory(Volume::class)->create([
-            'id' => 'vol-test',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
-        ]);
-        dd("test");
     }
 
     public function testNotOwnedVpcIdIsFailed()
@@ -91,27 +82,5 @@ class CreateTest extends TestCase
         $volumeId = (json_decode($this->response->getContent()))->data->id;
         $volume = Volume::find($volumeId);
         $this->assertNotNull($volume);
-    }
-
-    public function testAzIsOptionalParameter()
-    {
-        $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
-
-        $this->post('/v2/volumes', [
-            'vpc_id' => $this->vpc()->id,
-            'capacity' => '1',
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(201);
-
-        $volumeId = (json_decode($this->response->getContent()))->data->id;
-        $volume = Volume::find($volumeId);
-        $this->assertNotNull($volume);
-        $this->assertNotNull($volume->availability_zone_id);
     }
 }
