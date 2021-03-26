@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 trait DeleteTransportNodeProfileJob
 {
-    protected $detachTransportNode;
+    protected $deleteTransportNode;
 
     public function transportNodeSetup()
     {
-        $this->detachTransportNode = \Mockery::mock(DeleteTransportNodeProfile::class)->makePartial();
-        $this->detachTransportNode->model = $this->hostGroup();
+        $this->deleteTransportNode = \Mockery::mock(DeleteTransportNodeProfile::class)->makePartial();
+        $this->deleteTransportNode->model = $this->hostGroup();
         $this->logStarted();
     }
 
@@ -52,7 +52,7 @@ trait DeleteTransportNodeProfileJob
                 '/api/v1/fabric/compute-collections' .
                 '?origin_type=VC_Cluster&display_name=' . $this->hostGroup()->id
             )->andReturnNull();
-        $this->detachTransportNode->expects('fail')
+        $this->deleteTransportNode->expects('fail')
             ->with(\Mockery::on(function ($argument) {
                 return $argument->getMessage() === 'Failed to get ComputeCollection item';
             }));
@@ -86,7 +86,7 @@ trait DeleteTransportNodeProfileJob
                 '/api/v1/transport-node-collections'.
                 '?compute_collection_id=e8040fd9-c4d2-4435-a1c8-0d8ee6b2fc84:domain-c57728'
             )->andReturnNull();
-        $this->detachTransportNode->expects('fail')
+        $this->deleteTransportNode->expects('fail')
             ->with(\Mockery::on(function ($argument) {
                 return $argument->getMessage() === 'Failed to get TransportNode item';
             }));
@@ -102,7 +102,7 @@ trait DeleteTransportNodeProfileJob
                 return new Response(404);
             });
         $this->logDebug();
-        $this->detachTransportNode->expects('fail')
+        $this->deleteTransportNode->expects('fail')
             ->with(\Mockery::on(function ($argument) {
                 return strpos($argument->getMessage(), 'Failed to detach') !== false;
             }));
@@ -129,7 +129,7 @@ trait DeleteTransportNodeProfileJob
                 return new Response(404);
             });
         $this->logDebug();
-        $this->detachTransportNode->expects('fail')
+        $this->deleteTransportNode->expects('fail')
             ->with(\Mockery::on(function ($argument) {
                 return strpos($argument->getMessage(), 'Failed to delete') !== false;
             }));

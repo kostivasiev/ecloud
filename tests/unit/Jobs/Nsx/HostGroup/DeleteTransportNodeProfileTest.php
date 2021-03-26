@@ -19,30 +19,30 @@ class DeleteTransportNodeProfileTest extends TestCase
     public function testInvalidComputeCollectionItem()
     {
         $this->computeCollectionItemNull();
-        $this->assertFalse($this->detachTransportNode->handle());
+        $this->assertFalse($this->deleteTransportNode->handle());
     }
 
     public function testInvalidTransportNodeCollection()
     {
         $this->transportNodeCollectionNull();
-        $this->assertFalse($this->detachTransportNode->handle());
+        $this->assertFalse($this->deleteTransportNode->handle());
     }
 
     public function testFailedDetach()
     {
         $this->detachNodeFail();
-        $this->assertFalse($this->detachTransportNode->handle());
+        $this->assertFalse($this->deleteTransportNode->handle());
     }
 
     public function testFailedDelete()
     {
         $this->deleteNodeFail();
-        $this->assertFalse($this->detachTransportNode->handle());
+        $this->assertFalse($this->deleteTransportNode->handle());
     }
 
     public function testSuccessfulDelete()
     {
         $this->deleteNodeSuccess();
-        $this->assertNull($this->detachTransportNode->handle());
+        $this->assertNull($this->deleteTransportNode->handle());
     }
 }
