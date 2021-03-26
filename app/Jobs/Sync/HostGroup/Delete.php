@@ -20,8 +20,8 @@ class Delete extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $jobs = [
+            new \App\Jobs\Nsx\HostGroup\DetachTransportNode($this->model),
             new \App\Jobs\Nsx\HostGroup\RemoveCluster($this->model),
-            new \App\Jobs\Nsx\HostGroup\DeleteTransportNode($this->model),
             new \App\Jobs\Kingpin\HostGroup\DeleteCluster($this->model),
             new \App\Jobs\Sync\Completed($this->model),
             new \App\Jobs\Sync\Delete($this->model),
