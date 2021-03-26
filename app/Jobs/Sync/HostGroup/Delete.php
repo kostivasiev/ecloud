@@ -21,7 +21,6 @@ class Delete extends Job
 
         $jobs = [
             new \App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile($this->model),
-            new \App\Jobs\Nsx\HostGroup\RemoveCluster($this->model),
             new \App\Jobs\Kingpin\HostGroup\DeleteCluster($this->model),
             new \App\Jobs\Sync\Completed($this->model),
             new \App\Jobs\Sync\Delete($this->model),
