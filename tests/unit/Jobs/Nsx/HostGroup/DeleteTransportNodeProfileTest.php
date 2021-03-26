@@ -2,13 +2,13 @@
 
 namespace Tests\unit\Jobs\Nsx\HostGroup;
 
-use App\Jobs\Nsx\HostGroup\DetachTransportNode;
-use Tests\Mocks\Traits\HostGroup\DetachTransportNodeJob;
+use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
+use Tests\Mocks\Traits\HostGroup\DeleteTransportNodeProfileJob;
 use Tests\TestCase;
 
-class DetachTransportNodeTest extends TestCase
+class DeleteTransportNodeProfileTest extends TestCase
 {
-    use DetachTransportNodeJob;
+    use DeleteTransportNodeProfileJob;
 
     public function setUp(): void
     {
@@ -28,15 +28,21 @@ class DetachTransportNodeTest extends TestCase
         $this->assertFalse($this->detachTransportNode->handle());
     }
 
-    public function testFailedDelete()
+    public function testFailedDetach()
     {
         $this->detachNodeFail();
         $this->assertFalse($this->detachTransportNode->handle());
     }
 
+    public function testFailedDelete()
+    {
+        $this->deleteNodeFail();
+        $this->assertFalse($this->detachTransportNode->handle());
+    }
+
     public function testSuccessfulDelete()
     {
-        $this->detachNodeSuccess();
+        $this->deleteNodeSuccess();
         $this->assertNull($this->detachTransportNode->handle());
     }
 }

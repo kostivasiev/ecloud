@@ -2,17 +2,17 @@
 
 namespace Tests\Mocks\Traits\HostGroup;
 
-use App\Jobs\Nsx\HostGroup\DetachTransportNode;
+use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
-trait DetachTransportNodeJob
+trait DeleteTransportNodeProfileJob
 {
     protected $detachTransportNode;
 
     public function transportNodeSetup()
     {
-        $this->detachTransportNode = \Mockery::mock(DetachTransportNode::class)->makePartial();
+        $this->detachTransportNode = \Mockery::mock(DeleteTransportNodeProfile::class)->makePartial();
         $this->detachTransportNode->model = $this->hostGroup();
         $this->logStarted();
     }
@@ -97,6 +97,33 @@ trait DetachTransportNodeJob
         $this->transportNodeCollection();
         $this->nsxServiceMock()
             ->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-collections/8d43b1a7-b210-496b-b93f-3e091968de9c')
+            ->andReturnUsing(function () {
+                return new Response(404);
+            });
+        $this->logDebug();
+        $this->detachTransportNode->expects('fail')
+            ->with(\Mockery::on(function ($argument) {
+                return strpos($argument->getMessage(), 'Failed to detach') !== false;
+            }));
+    }
+
+    public function detachNodeSuccess()
+    {
+        $this->transportNodeCollection();
+        $this->nsxServiceMock()
+            ->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-collections/8d43b1a7-b210-496b-b93f-3e091968de9c')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+    }
+
+    public function deleteNodeFail()
+    {
+        $this->detachNodeSuccess();
+        $this->nsxServiceMock()
+            ->expects('delete')
             ->withSomeOfArgs('/api/v1/transport-node-profiles/8d43b1a7-b210-496b-b93f-3e091968de9c')
             ->andReturnUsing(function () {
                 return new Response(404);
@@ -108,9 +135,9 @@ trait DetachTransportNodeJob
             }));
     }
 
-    public function detachNodeSuccess()
+    public function deleteNodeSuccess()
     {
-        $this->transportNodeCollection();
+        $this->detachNodeSuccess();
         $this->nsxServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v1/transport-node-profiles/8d43b1a7-b210-496b-b93f-3e091968de9c')

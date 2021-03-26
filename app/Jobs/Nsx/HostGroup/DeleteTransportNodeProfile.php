@@ -10,7 +10,7 @@ use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
-class DetachTransportNode extends Job
+class DeleteTransportNodeProfile extends Job
 {
     public $model;
 
@@ -45,6 +45,22 @@ class DetachTransportNode extends Job
         $transportNodeItem = collect(json_decode($response->getBody()->getContents())->results)->first();
 
         // Detach the node
+        try {
+            $response = $this->model->availabilityZone->nsxService()->delete(
+                '/api/v1/transport-node-collections/' . $transportNodeItem->id
+            );
+        } catch (ClientException|ServerException $e) {
+            $response = $e->getResponse();
+            $message = $e->getMessage();
+        }
+        if ($response->getStatusCode() !== 200) {
+            $message = $message ?? 'Failed to detach transport node profile for Host Group ' . $hostGroup->id;
+            Log::debug($message);
+            $this->fail(new \Exception($message));
+            return false;
+        }
+
+        // Once the Profile is Detached it can be deleted
         try {
             $response = $this->model->availabilityZone->nsxService()->delete(
                 '/api/v1/transport-node-profiles/' . $transportNodeItem->id
