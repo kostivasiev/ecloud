@@ -136,6 +136,8 @@ class CrudTest extends TestCase
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
         $this->hostGroup();
+        $this->hostGroupDestroyMocks();
+
         $this->delete('/v2/host-groups/hg-test')
             ->seeInDatabase(
                 'host_groups',
