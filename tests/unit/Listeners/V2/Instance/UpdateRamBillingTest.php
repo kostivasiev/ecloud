@@ -1,5 +1,5 @@
 <?php
-namespace Tests\unit\Listeners\Instance;
+namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Jobs\Sync\Instance\Update;
 use App\Listeners\V2\Instance\ComputeChange;

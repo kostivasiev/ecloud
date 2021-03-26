@@ -1,5 +1,5 @@
 <?php
-namespace Tests\unit\Listeners\Instance;
+namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Listeners\V2\Instance\ComputeChange;
 use App\Models\V2\BillingMetric;

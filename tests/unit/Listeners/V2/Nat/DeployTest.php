@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Listeners\Nat;
+namespace Tests\unit\Listeners\V2\Nat;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;

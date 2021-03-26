@@ -14,7 +14,8 @@ class RemoveUniqueConstraintFromNicsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
-            $table->dropUnique('idx_unique_ip');
+            //table->dropUnique('idx_unique_ip');
+            $table->dropColumn('deleted');
         });
     }
 
@@ -27,6 +28,7 @@ class RemoveUniqueConstraintFromNicsTable extends Migration
     {
         Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
             $table->unique(['ip_address', 'network_id', 'deleted'], 'idx_unique_ip');
+            $table->boolean('deleted')->default(false);
         });
     }
 }
