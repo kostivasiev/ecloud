@@ -31,7 +31,8 @@ class HostSpecController extends BaseController
 
     public function store(Create $request)
     {
-        $resource = new HostSpec($request->only([
+        $model = app()->make(HostSpec::class);
+        $model->fill($request->only([
             'name',
             'cpu_sockets',
             'cpu_type',
@@ -39,20 +40,20 @@ class HostSpecController extends BaseController
             'cpu_clock_speed',
             'ram_capacity',
         ]));
-        $resource->save();
+        $model->save();
 
         if ($request->has('availability_zones')) {
             // Sync the pivot table
-            $resource->availabilityZones()->sync(collect($request->input('availability_zones'))->pluck('id')->toArray());
+            $model->availabilityZones()->sync(collect($request->input('availability_zones'))->pluck('id')->toArray());
         }
 
-        return $this->responseIdMeta($request, $resource->id, 201);
+        return $this->responseIdMeta($request, $model->id, 201);
     }
 
     public function update(Update $request, string $hostSpecId)
     {
-        $resource = HostSpec::findOrFail($hostSpecId);
-        $resource->fill($request->only([
+        $model = HostSpec::findOrFail($hostSpecId);
+        $model->fill($request->only([
             'name',
             'cpu_sockets',
             'cpu_type',
@@ -60,22 +61,22 @@ class HostSpecController extends BaseController
             'cpu_clock_speed',
             'ram_capacity',
         ]));
-        $resource->save();
+        $model->save();
 
         if ($request->has('availability_zones')) {
             // Sync the pivot table
-            $resource->availabilityZones()->sync(collect($request->input('availability_zones'))->pluck('id')->toArray());
+            $model->availabilityZones()->sync(collect($request->input('availability_zones'))->pluck('id')->toArray());
         }
 
-        return $this->responseIdMeta($request, $resource->id, 200);
+        return $this->responseIdMeta($request, $model->id, 200);
     }
 
     public function destroy(Request $request, string $hostSpecId)
     {
-        $resource = HostSpec::findOrFail($hostSpecId);
+        $model = HostSpec::findOrFail($hostSpecId);
         // Delete from pivot table
-        $resource->availabilityZones()->sync([]);
-        $resource->delete();
+        $model->availabilityZones()->sync([]);
+        $model->delete();
         return response(null, 204);
     }
 }

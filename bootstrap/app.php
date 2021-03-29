@@ -36,6 +36,7 @@ $app->configure('instance');
 $app->configure('volume');
 $app->configure('kingpin');
 $app->configure('conjurer');
+$app->configure('artisan');
 $app->configure('job-status');
 $app->configure('firewall');
 $app->configure('alerts');
@@ -104,6 +105,7 @@ $app->routeMiddleware([
 
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
+$app->register(Illuminate\Database\Eloquent\LegacyFactoryServiceProvider::class);
 
 // ukfast
 $app->register(App\Providers\AppServiceProvider::class);
@@ -130,6 +132,7 @@ $app->register(App\Providers\ArtisanServiceProvider::class);
 $app->register(\App\Providers\EncryptionServiceProvider::class);
 $app->register(App\Providers\V2\KingpinServiceProvider::class);
 $app->register(App\Providers\V2\ConjurerServiceProvider::class);
+$app->register(App\Providers\V2\ArtisanServiceProvider::class);
 
 
 // apio service providers
