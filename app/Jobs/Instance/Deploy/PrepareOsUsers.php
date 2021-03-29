@@ -42,7 +42,7 @@ class PrepareOsUsers extends Job
 
         if ($instance->platform == 'Windows') {
             // Rename the Windows "administrator" account to "graphite.rack"
-            Log::info('PrepareOsUsers for instance ' . $instance->vpc->id . ' : Rename "Administrator" user');
+            Log::info('PrepareOsUsers for instance ' . $instance->id . ' : Rename "Administrator" user');
             $instance->availabilityZone->kingpinService()->put(
                 '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/user/administrator/username',
                 [
