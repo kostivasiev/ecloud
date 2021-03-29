@@ -4,21 +4,26 @@ namespace App\Jobs\Instance\Undeploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteVolumes extends Job
 {
-    private $data;
+    use Batchable;
 
-    public function __construct($data)
+    private $instance;
+
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
-        $instance = Instance::withTrashed()->findOrFail($this->data['instance_id']);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+
+        $instance = $this->instance;
+
         $instance->volumes()->each(function ($volume) use ($instance) {
             // $instance->volumes()->detach($volume); // No need to detach from deleted instance?!
             if ($volume->instances()->count() == 0) {
@@ -26,6 +31,7 @@ class DeleteVolumes extends Job
                 $volume->delete();
             }
         });
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

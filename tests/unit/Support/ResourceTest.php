@@ -9,6 +9,7 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Support\Resource;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -27,19 +28,30 @@ class ResourceTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->instance = factory(Instance::class)->create([
-            'availability_zone_id' => $this->availability_zone->id,
-            'vpc_id' => $this->vpc->id,
-        ]);
-        $this->floating_ip = factory(FloatingIp::class)->create();
-        $this->nic = factory(Nic::class)->create();
+        Model::withoutEvents(function() {
+            $this->region = factory(Region::class)->create([
+                'id' => 'reg-test1',
+            ]);
+            $this->availability_zone = factory(AvailabilityZone::class)->create([
+                'id' => 'az-test1',
+                'region_id' => $this->region->id,
+            ]);
+            $this->vpc = factory(Vpc::class)->create([
+                'id' => 'vpc-test1',
+                'region_id' => $this->region->id,
+            ]);
+            $this->instance = factory(Instance::class)->create([
+                'id' => 'i-test1',
+                'availability_zone_id' => $this->availability_zone->id,
+                'vpc_id' => $this->vpc->id,
+            ]);
+            $this->floating_ip = factory(FloatingIp::class)->create([
+                'id' => 'fip-test1',
+            ]);
+            $this->nic = factory(Nic::class)->create([
+                'id' => 'nic-test1',
+            ]);
+        });
     }
 
     public function loadFromIdReturnsCorrectResourcesProvider()
