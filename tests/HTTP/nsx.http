@@ -249,3 +249,13 @@ Content-Type:  application/json
 GET https://185.197.63.88/api/v1/transport-node-profiles
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+### Compute Collections
+GET https://185.197.63.88/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-leef9000
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get transport node collection
+GET https://185.197.63.88/api/v1/transport-node-collections?compute_collection_id=e8040fd9-c4d2-4435-a1c8-0d8ee6b2fc84:domain-c23210
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
