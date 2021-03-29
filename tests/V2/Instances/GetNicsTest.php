@@ -2,20 +2,8 @@
 
 namespace Tests\V2\Instances;
 
-use App\Events\V2\Sync\Created;
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
-use App\Models\V2\Nic;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 

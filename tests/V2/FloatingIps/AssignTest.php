@@ -2,16 +2,8 @@
 
 namespace Tests\V2\FloatingIps;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Instance;
 use App\Models\V2\Nat;
-use App\Models\V2\Network;
-use App\Models\V2\Nic;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;

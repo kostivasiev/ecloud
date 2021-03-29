@@ -3,7 +3,6 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;

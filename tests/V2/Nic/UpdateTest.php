@@ -22,7 +22,7 @@ class UpdateTest extends TestCase
         $this->faker = Faker::create();
         $this->macAddress = $this->faker->macAddress;
 
-        Nic::withoutEvents(function() {
+        Nic::withoutEvents(function () {
             $this->nic = factory(Nic::class)->create([
                 'id' => 'nic-test',
                 'mac_address' => $this->macAddress,

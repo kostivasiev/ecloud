@@ -2,14 +2,8 @@
 
 namespace Tests\V2\Nic;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
 use App\Models\V2\Nic;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
