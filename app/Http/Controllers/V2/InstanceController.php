@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Instance\Deploy;
-use App\Events\V2\Instance\Deploy\Data;
 use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
