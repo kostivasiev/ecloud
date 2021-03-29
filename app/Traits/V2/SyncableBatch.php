@@ -2,6 +2,7 @@
 
 namespace App\Traits\V2;
 
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
 use Throwable;
@@ -11,7 +12,9 @@ trait SyncableBatch
     public function syncBatchExceptionCallback()
     {
         return function (Throwable $e) {
-            return $e->getMessage();
+            return ($e instanceof RequestException && $e->hasResponse()) ?
+                $e->getResponse()->getBody()->getContents() :
+                $e->getMessage();
         };
     }
 
