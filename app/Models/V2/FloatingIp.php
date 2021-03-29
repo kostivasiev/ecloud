@@ -4,7 +4,6 @@ namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
-use App\Jobs\Nsx\FloatingIp\Undeploy;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;

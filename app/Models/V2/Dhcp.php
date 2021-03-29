@@ -3,7 +3,6 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Dhcp\Created;
-use App\Events\V2\Dhcp\Creating;
 use App\Events\V2\Dhcp\Deleted;
 use App\Events\V2\Dhcp\Deleting;
 use App\Events\V2\Dhcp\Saving;
