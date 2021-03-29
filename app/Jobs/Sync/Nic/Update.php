@@ -2,7 +2,6 @@
 
 namespace App\Jobs\Sync\Nic;
 
-use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Job;
 use App\Jobs\Nsx\Nic\CreateDHCPLease;
 use App\Models\V2\Sync;

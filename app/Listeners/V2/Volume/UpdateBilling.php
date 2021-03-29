@@ -6,7 +6,6 @@ use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 

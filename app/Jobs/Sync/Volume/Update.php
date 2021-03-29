@@ -6,9 +6,7 @@ use App\Jobs\Job;
 use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
-use App\Jobs\Sync\Completed;
 use App\Models\V2\Sync;
-use App\Models\V2\Volume;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
