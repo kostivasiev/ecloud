@@ -36,8 +36,7 @@ class Nic extends Model implements Filterable, Sortable
         'mac_address',
         'instance_id',
         'network_id',
-        'ip_address',
-        'deleted'
+        'ip_address'
     ];
 
     protected $dispatchesEvents = [
