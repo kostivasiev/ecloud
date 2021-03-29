@@ -11,7 +11,6 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Services\V2\NsxService;
 use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;

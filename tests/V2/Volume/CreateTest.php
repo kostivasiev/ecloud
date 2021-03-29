@@ -2,14 +2,10 @@
 
 namespace Tests\V2\Volume;
 
-use App\Events\V2\Volume\Created;
-use App\Events\V2\Volume\Creating;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 

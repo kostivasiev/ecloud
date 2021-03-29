@@ -3,7 +3,6 @@
 namespace Tests\V2\Volume;
 
 use App\Models\V2\Volume;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,7 +16,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        Volume::withoutEvents(function() {
+        Volume::withoutEvents(function () {
             $this->volume = factory(Volume::class)->create([
                 'id' => 'vol-test',
                 'name' => 'Volume',

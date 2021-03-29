@@ -1,11 +1,9 @@
 <?php
 namespace Tests\unit\Listeners\V2\Instance;
 
-use App\Listeners\V2\Instance\ComputeChange;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -21,7 +19,7 @@ class UpdateBackupBillingTest extends TestCase
     {
         parent::setUp();
 
-        Volume::withoutEvents(function() {
+        Volume::withoutEvents(function () {
             $this->volume = factory(Volume::class)->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
@@ -40,7 +38,7 @@ class UpdateBackupBillingTest extends TestCase
         // Update the instance compute values
         $this->instance()->backup_enabled = true;
 
-        Sync::withoutEvents(function() {
+        Sync::withoutEvents(function () {
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
@@ -73,7 +71,7 @@ class UpdateBackupBillingTest extends TestCase
         // Update the instance compute values
         $this->instance()->backup_enabled = false;
 
-        Sync::withoutEvents(function() {
+        Sync::withoutEvents(function () {
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
@@ -94,7 +92,7 @@ class UpdateBackupBillingTest extends TestCase
 
     public function testResizingVolumeUpdatesBackupBillingMetric()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->instance()->backup_enabled = true;
             $this->instance()->save();
 
@@ -132,7 +130,7 @@ class UpdateBackupBillingTest extends TestCase
         $this->assertEquals(1, BillingMetric::where('resource_id', $this->volume->id)->count());
         $this->assertNull($metric->end);
 
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->volume->capacity = 15;
             $this->volume->iops = 600;
             $this->volume->save();
