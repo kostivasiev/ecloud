@@ -13,7 +13,6 @@ use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
