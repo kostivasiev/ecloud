@@ -36,7 +36,7 @@ class AssignFloatingIp extends Job
 
         if ($this->instance->deploy_data['requires_floating_ip']) {
             $floatingIp = app()->make(FloatingIp::class);
-            $floatingIp->vpc_id = $this->data['vpc_id'];
+            $floatingIp->vpc_id = $this->instance->vpc->id;
             $floatingIp->save();
         }
 
