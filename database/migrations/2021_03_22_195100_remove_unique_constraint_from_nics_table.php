@@ -13,8 +13,12 @@ class RemoveUniqueConstraintFromNicsTable extends Migration
      */
     public function up()
     {
+        //Separate statement to satisfy SQLite dropping the index
         Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
-            //table->dropUnique('idx_unique_ip');
+            $table->dropUnique('idx_unique_ip');
+        });
+
+        Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
             $table->dropColumn('deleted');
         });
     }
