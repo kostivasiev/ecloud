@@ -4,7 +4,6 @@ namespace App\Jobs\Nic;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
 use Illuminate\Bus\Batchable;

@@ -6,7 +6,6 @@ use App\Jobs\Job;
 use App\Jobs\Kingpin\Volume\Undeploy;
 use App\Jobs\Kingpin\Volume\UndeployCheck;
 use App\Models\V2\Sync;
-use App\Models\V2\Volume;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 

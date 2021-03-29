@@ -3,7 +3,6 @@
 namespace App\Jobs\Nsx\Nic;
 
 use App\Jobs\Job;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Nic;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;

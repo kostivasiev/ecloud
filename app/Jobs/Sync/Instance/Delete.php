@@ -8,7 +8,6 @@ use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
 use App\Jobs\Instance\Undeploy\Undeploy as InstanceUndeploy;
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Instance\UndeployCheck;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
