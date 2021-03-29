@@ -2,10 +2,8 @@
 
 namespace App\Listeners\V2;
 
-use App\Jobs\Sync\Completed;
 use App\Jobs\Sync\Update;
 use App\Models\V2\Sync;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSyncSaved

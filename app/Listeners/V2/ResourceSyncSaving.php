@@ -2,8 +2,7 @@
 
 namespace App\Listeners\V2;
 
-use App\Exceptions\SyncException;
-use App\Jobs\Sync\Completed;
+use App\Exceptions\SyncException;0
 use App\Models\V2\Sync;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
