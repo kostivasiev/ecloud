@@ -31,6 +31,7 @@ class Vpc extends Model implements Filterable, Sortable
         'name',
         'reseller_id',
         'region_id',
+        'console_enabled',
     ];
 
     protected $dispatchesEvents = [
@@ -43,6 +44,10 @@ class Vpc extends Model implements Filterable, Sortable
         'instances',
         'loadBalancerClusters',
         'volumes',
+    ];
+
+    protected $casts = [
+        'console_enabled' => 'bool',
     ];
 
     public function dhcp()
@@ -133,6 +138,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
+            $factory->create('console_enabled', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -150,6 +156,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('reseller_id'),
             $factory->create('region_id'),
+            $factory->create('console_enabled'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -177,6 +184,7 @@ class Vpc extends Model implements Filterable, Sortable
             'name' => 'name',
             'reseller_id' => 'reseller_id',
             'region_id' => 'region_id',
+            'console_enabled' => 'console_enabled',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

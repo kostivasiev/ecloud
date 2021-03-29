@@ -16,6 +16,7 @@ use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -43,6 +44,18 @@ class VpcController extends BaseController
     public function create(CreateRequest $request)
     {
         $vpc = new Vpc($request->only(['name', 'region_id']));
+        if ($request->has('console_enabled')) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access cannot be modified',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+            $vpc->console_enabled = $request->input('console_enabled', true);
+        }
         $vpc->reseller_id = $this->resellerId;
         $vpc->save();
         return $this->responseIdMeta($request, $vpc->id, 201);
@@ -53,6 +66,18 @@ class VpcController extends BaseController
         $vpc = Vpc::forUser(Auth::user())->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
 
+        if ($request->has('console_enabled')) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access cannot be modified',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+            $vpc->console_enabled = $request->input('console_enabled', $vpc->console_enabled);
+        }
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
