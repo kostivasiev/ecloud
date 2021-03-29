@@ -26,9 +26,9 @@ class UpdateBilling
             return;
         }
 
-        $host = Host::find($event->model->resource_id);
+        $host = Host::withTrashed()->find($event->model->resource_id);
 
-        if (empty($host)) {
+        if (empty($host) || $host->trashed()) {
             return;
         }
 
@@ -63,13 +63,14 @@ class UpdateBilling
         }
 
         $billingMetric->save();
+        Log::debug('Added billing metric for ' . $host->id);
+
+        // End host group billing
+        $billingMetric = BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup');
+        if ($billingMetric) {
+            $billingMetric->setEndDate();
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
-
-    // TODO: what if the host is deleted?
-
-    // todo: what of the host group is no longer empty?
-
-    // todo: what if the host group is empty after delete?
 }

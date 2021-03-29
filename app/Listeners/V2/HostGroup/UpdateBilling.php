@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\HostGroup;
 
 use App\Models\V2\BillingMetric;
+use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Sync;
 use App\Support\Resource;
@@ -15,35 +16,37 @@ class UpdateBilling
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
-        if (!($event->model instanceof Sync)) {
-            return;
+        if ($event->model instanceof Sync) {
+            if (!$event->model->completed
+                || Resource::classFromId($event->model->resource_id) != HostGroup::class) {
+                return;
+            }
+
+            $hostGroup = HostGroup::find($event->model->resource_id);
+
+            if (!$hostGroup) {
+                return;
+            }
+
+            if (!BillingMetric::getActiveByKey($hostGroup, 'hostgroup')) {
+                $this->addBilling($hostGroup);;
+            }
         }
 
-        if (!$event->model->completed) {
-            return;
+        // Deleted host
+        if ($event->model instanceof Host
+            && $event->model->trashed()
+            && $event->model->hostGroup->hosts->count() < 1
+            && (!BillingMetric::getActiveByKey($event->model->hostGroup, 'hostgroup'))) {
+            $this->addBilling($event->model->hostGroup);
         }
 
-        if (Resource::classFromId($event->model->resource_id) != HostGroup::class) {
-            return;
-        }
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+    }
 
-        $hostGroup = HostGroup::find($event->model->resource_id);
-
-        if (empty($hostGroup)) {
-            return;
-        }
-
-        $currentActiveMetric = BillingMetric::getActiveByKey($hostGroup, 'hostgroup');
-        if (!empty($currentActiveMetric)) {
-            return;
-        }
-
-        if ($hostGroup->hosts()->count() > 0) {
-            return;
-        }
-
+    public function addBilling(HostGroup $hostGroup): bool
+    {
         $billingMetric = app()->make(BillingMetric::class);
-
         $billingMetric->fill([
             'resource_id' => $hostGroup->id,
             'vpc_id' => $hostGroup->vpc->id,
@@ -68,8 +71,12 @@ class UpdateBilling
             $billingMetric->price = $product->getPrice($hostGroup->vpc->reseller_id);
         }
 
-        $billingMetric->save();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+        return $billingMetric->save();
     }
+
+//    public function endBilling(HostGroup $hostGroup): bool
+//    {
+//        $billingMetric = BillingMetric::getActiveByKey($hostGroup, 'hostgroup');
+//        return $billingMetric->setEndDate();
+//    }
 }
