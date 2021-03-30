@@ -7,6 +7,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
+use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
 class SyncCreated
@@ -20,6 +21,7 @@ class SyncCreated
             Volume::class,
             Instance::class,
             Nic::class,
+            Vpc::class,
         ])) {
             return true;
         }

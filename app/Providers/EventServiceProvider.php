@@ -252,15 +252,14 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Vpc
-        \App\Events\V2\Vpc\Creating::class => [
+        \App\Events\V2\Vpc\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
-        \App\Events\V2\Vpc\Created::class => [
-            \App\Listeners\V2\Vpc\Dhcp\Create::class,
+        \App\Events\V2\Vpc\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
-        \App\Events\V2\Vpc\Deleted::class => [
-            \App\Listeners\V2\Vpc\Dhcp\Delete::class,        // TODO :- Needs moving to the Sync Vpc delete
-            \App\Listeners\V2\Vpc\Routers\Delete::class,     // TODO :- Needs moving to the Sync Vpc delete
-            \App\Listeners\V2\Vpc\FloatingIps\Delete::class, // TODO :- Needs moving to the Sync Vpc delete
+        \App\Events\V2\Vpc\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
 
         // Vpn

@@ -5,18 +5,18 @@ namespace App\Events\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Deleted
+class Saving
 {
     use SerializesModels;
 
-    public $id;
-    public $dhcpId;
     public $model;
 
-    public function __construct(Model $model)
+    /**
+     * @param Model $model
+     * @return void
+     */
+    public function __construct($model)
     {
-        $this->id = $model->id;
-        $this->dhcpId = $model->dhcp->id;
         $this->model = $model;
     }
 }

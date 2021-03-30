@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Sync\VPC;
+namespace App\Jobs\Sync\Vpc;
 
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
@@ -26,15 +26,8 @@ class Delete extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-        $this->deleteSyncBatch([
-            [
-                new PowerOff($this->sync->resource),
-                new InstanceUndeploy($this->sync->resource),
-                new DeleteVolumes($this->sync->resource),
-                new DeleteNics($this->sync->resource),
-                new AwaitNicRemoval($this->sync->resource),
-            ],
-        ])->dispatch();
+
+        $this->deleteSyncBatch([])->dispatch();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Sync\Instance;
+namespace App\Jobs\Sync\VPC;
 
 use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Instance\Deploy\ActivateWindows;

@@ -5,9 +5,13 @@ namespace App\Models\V2;
 use App\Events\V2\Vpc\Created;
 use App\Events\V2\Vpc\Creating;
 use App\Events\V2\Vpc\Deleted;
+use App\Events\V2\Vpc\Deleting;
+use App\Events\V2\Vpc\Saved;
+use App\Events\V2\Vpc\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -19,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Vpc extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
 
     public $keyPrefix = 'vpc';
     public $incrementing = false;
@@ -35,15 +39,18 @@ class Vpc extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
-        'created' => Created::class,
-        'deleted' => Deleted::class,
+        'saving' => Saving::class,
+        'saved' => Saved::class,
+        'deleting' => Deleting::class,
     ];
 
     public $children = [
+        'routers',
         'instances',
         'loadBalancerClusters',
         'volumes',
+        'floatingIps',
+        'networkPolicies',
     ];
 
     protected $casts = [
