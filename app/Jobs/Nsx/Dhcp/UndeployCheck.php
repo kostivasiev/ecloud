@@ -34,7 +34,7 @@ class UndeployCheck extends Job
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
-            if ($this->model->id === $result->id) {
+            if ($this->dhcp->id === $result->id) {
                 Log::info(
                     'Waiting for ' . $this->dhcp->id . ' to be deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
                 );
