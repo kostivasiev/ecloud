@@ -90,7 +90,7 @@ class Delete extends Command
             //return Command::FAILURE;
         }
 
-        $host->syncDelete();
+        $host->delete();
 
         return Command::SUCCESS;
     }

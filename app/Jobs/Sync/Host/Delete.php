@@ -26,11 +26,12 @@ class Delete extends Job
 
         // TODO
 //        $this->deleteSyncBatch([
-//            [],
 //        ])->dispatch();
 
-//        // TODO: delete these when we implement deleteSyncBatch
-//        $this->sync->resource->delete();
+        // TODO delete this when we implement deleteSyncBatch
+        $this->sync->completed = true;
+        $this->sync->save();
+        $this->sync->resource->delete();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $host->id]);
     }
