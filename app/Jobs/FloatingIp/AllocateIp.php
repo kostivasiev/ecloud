@@ -14,7 +14,7 @@ class AllocateIp extends Job
 {
     use Batchable;
 
-    private FloatingIp $model;
+    public FloatingIp $model;
 
     public function __construct(FloatingIp $model)
     {

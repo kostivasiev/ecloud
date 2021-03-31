@@ -2,7 +2,6 @@
 
 namespace Tests\Mocks\Traits;
 
-use GuzzleHttp\Psr7\Response;
 use UKFast\Admin\Networking\AdminClient;
 use UKFast\Admin\Networking\IpRangeClient;
 

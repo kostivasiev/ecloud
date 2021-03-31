@@ -3,16 +3,17 @@
 namespace Tests\unit\FloatingIps;
 
 use App\Events\V2\FloatingIp\Created;
-use App\Listeners\V2\FloatingIp\AllocateIp;
-use App\Models\V2\AvailabilityZone;
+use App\Events\V2\FloatingIp\Saving;
+use App\Jobs\FloatingIp\AllocateIp;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Admin\Networking\AdminClient;
+use UKFast\Admin\Networking\IpRangeClient;
 
 class AllocateIpTest extends TestCase
 {
@@ -20,33 +21,26 @@ class AllocateIpTest extends TestCase
 
     protected \Faker\Generator $faker;
 
-    protected $region;
-    protected $availability_zone;
-    protected $vpc;
     protected $instance;
     protected $floating_ip;
     protected $nic;
-    protected $listener;
+    protected $job;
     protected $event;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->vpc();
+        $this->floating_ip = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class)->create([
+                'id' => 'fip-test',
+                'ip_address' => null,
+                'vpc_id' => $this->vpc()->id
+            ]);
+        });
 
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->floating_ip = factory(FloatingIp::class)->create([
-            'ip_address' => null,
-            'vpc_id' => $this->vpc->id
-        ]);
-
-        $this->event = new Created($this->floating_ip);
+        $this->event = new Saving($this->floating_ip);
 
         $mockAdminNetworking = \Mockery::mock(\UKFast\Admin\Networking\AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
@@ -85,37 +79,40 @@ class AllocateIpTest extends TestCase
             return $mockAdminNetworking;
         });
 
-        $this->listener = \Mockery::mock(AllocateIp::class)->makePartial();
+        $this->job = \Mockery::mock(AllocateIp::class)->makePartial();
+        $this->job->model = $this->floating_ip;
     }
 
     public function testAllocateIp()
     {
-        $this->listener->handle($this->event);
+        $this->job->handle();
         $this->floating_ip->refresh();
         $this->assertEquals($this->floating_ip->ip_address, '203.0.113.1');
     }
 
     public function testAllocateNextIp()
     {
-        Event::Fake(Created::class);
-
         // Assign the first available IP, 203.0.113.1
-        $this->listener->handle($this->event);
+        $this->job->handle();
 
         // Check assigning the next
-        $floatingIp = factory(FloatingIp::class, 1)->create([
-            'ip_address' => null,
-        ])->each(function ($fip) {
-            $vpc = factory(Vpc::class)->create([
-                'region_id' => $this->region->id
-            ]);
-            $fip->vpc_id = $vpc->id;
-            $fip->save();
-        })->first();
+        $floatingIp = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class, 1)->create([
+                'id' => 'fip-nextip',
+                'ip_address' => null,
+            ])->each(function ($fip) {
+                $vpc = factory(Vpc::class)->create([
+                    'id' => 'vpc-another',
+                    'region_id' => $this->region()->id
+                ]);
+                $fip->vpc_id = $vpc->id;
+                $fip->save();
+            })->first();
+        });
 
-        $event = new Created($floatingIp);
+        $this->job->model = $floatingIp;
+        $this->job->handle();
 
-        $this->listener->handle($event);
         $floatingIp->refresh();
 
         $this->assertEquals($floatingIp->ip_address, '203.0.113.2');
@@ -123,28 +120,29 @@ class AllocateIpTest extends TestCase
 
     public function testDeletedIpAvailableAgain()
     {
-        Event::Fake(Created::class);
-
         // Assign the first available IP, 203.0.113.1
-        $this->listener->handle($this->event);
+        $this->job->handle();
         $this->floating_ip->refresh();
         $this->assertEquals($this->floating_ip->ip_address, '203.0.113.1');
         $this->floating_ip->delete();
 
         // Check assigning the IP again
-        $floatingIp = factory(FloatingIp::class, 1)->create([
-            'ip_address' => null,
-        ])->each(function ($fip) {
-            $vpc = factory(Vpc::class)->create([
-                'region_id' => $this->region->id
-            ]);
-            $fip->vpc_id = $vpc->id;
-            $fip->save();
-        })->first();
+        $floatingIp = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class, 1)->create([
+                'id' => 'fip-nextip',
+                'ip_address' => null,
+            ])->each(function ($fip) {
+                $vpc = factory(Vpc::class)->create([
+                    'id' => 'vpc-another',
+                    'region_id' => $this->region()->id
+                ]);
+                $fip->vpc_id = $vpc->id;
+                $fip->save();
+            })->first();
+        });
 
-        $event = new Created($floatingIp);
-
-        $this->listener->handle($event);
+        $this->job->model = $floatingIp;
+        $this->job->handle();
         $floatingIp->refresh();
 
         $this->assertEquals($floatingIp->ip_address, '203.0.113.1');

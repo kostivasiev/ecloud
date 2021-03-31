@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
 use App\Events\V2\FloatingIp\Deleting;
 use App\Events\V2\FloatingIp\Saved;
@@ -36,7 +35,6 @@ class FloatingIp extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => Created::class,
         'saving' => Saving::class,
         'saved' => Saved::class,
         'deleting' => Deleting::class,
