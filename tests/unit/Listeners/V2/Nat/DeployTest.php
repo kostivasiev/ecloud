@@ -22,11 +22,6 @@ class DeployTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected $region;
-    protected $availability_zone;
-    protected $vpc;
-    protected $router;
-    protected $network;
     protected $instance;
     protected $floating_ip;
     protected $nic;
@@ -36,44 +31,33 @@ class DeployTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->router = factory(Router::class)->create([
-            'availability_zone_id' => $this->availability_zone->id,
-        ]);
-        $this->network = factory(Network::class)->create([
-            'router_id' => $this->router->id,
-        ]);
         $this->instance = factory(Instance::class)->create([
-            'availability_zone_id' => $this->availability_zone->id,
-            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'vpc_id' => $this->vpc()->id,
         ]);
-        $this->floating_ip = factory(FloatingIp::class)->create([
-            'ip_address' => $this->faker->ipv4,
-        ]);
-
+        $this->floating_ip = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class)->create([
+                'id' => 'fip-test',
+                'ip_address' => $this->faker->ipv4,
+            ]);
+        });
 
         $this->nsxServiceMock()->expects('put')
-            ->withSomeOfArgs('/policy/api/v1/infra/tier-1s/' . $this->router->id . '/segments/' . $this->network->id . '/dhcp-static-binding-configs/nic-a1ae98ce')
+            ->withSomeOfArgs('/policy/api/v1/infra/tier-1s/' . $this->router()->id . '/segments/' . $this->network()->id . '/dhcp-static-binding-configs/nic-a1ae98ce')
             ->andReturnUsing(function () {
                 return new Response(200);
             });
         $this->nic = factory(Nic::class)->create([
             'id' => 'nic-a1ae98ce',
             'instance_id' => $this->instance->id,
-            'network_id' => $this->network->id,
+            'network_id' => $this->network()->id,
             'ip_address' => $this->faker->ipv4,
         ]);
 
         $this->nat = factory(Nat::class)->create([
             'destination_id' => $this->floating_ip->id,
             'destinationable_type' => FloatingIp::class,
-            'translated_id' => $this->nic->id,
+            'translated_id' => $this->nic()->id,
             'translatedable_type' => Nic::class,
         ]);
     }
@@ -90,9 +74,12 @@ class DeployTest extends TestCase
 
     public function testUpdatingNatRemovesOldRuleAndAddsNewRule()
     {
-        $newFloatingIp = factory(FloatingIp::class)->create([
-            'ip_address' => $this->faker->ipv4,
-        ]);
+        $newFloatingIp = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class)->create([
+                'id' => 'fip-another',
+                'ip_address' => $this->faker->ipv4,
+            ]);
+        });
         $this->nat->destination_id = $newFloatingIp->id;
 
         $this->nsxServiceMock()->shouldReceive('patch')
