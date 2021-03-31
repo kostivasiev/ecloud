@@ -1,37 +1,34 @@
 <?php
 
-namespace App\Listeners\V2\FloatingIp;
+namespace App\Jobs\FloatingIp;
 
-use App\Events\V2\FloatingIp\Created;
 use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
+use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
-use Exception;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 use UKFast\Admin\Networking\AdminClient;
 
-class AllocateIp implements ShouldQueue
+class AllocateIp extends Job
 {
-    use InteractsWithQueue;
+    use Batchable;
+
+    private FloatingIp $model;
+
+    public function __construct(FloatingIp $model)
+    {
+        $this->model = $model;
+    }
 
     /**
-     * @param Created $event
-     * @return void
-     * @throws Exception
+     * @throws \Exception
      */
-    public function handle(Created $event)
+    public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        $floatingIp = FloatingIp::find($event->model->id);
-        if (empty($floatingIp)) {
-            $error = 'Failed to allocate floating IP to ' . $event->model->id . '. Resource has been deleted';
-            Log::error($error);
-            $this->fail(new \Exception($error));
-            return;
-        }
+        $floatingIp = $this->model;
         $logMessage = 'Allocate external Ip to floating IP ' . $floatingIp->id . ': ';
 
         $datacentreSiteIds = $floatingIp->vpc->region->availabilityZones->pluck('datacentre_site_id')->unique();
@@ -74,7 +71,7 @@ class AllocateIp implements ShouldQueue
                 $floatingIp->ip_address = $checkIp;
 
                 try {
-                    $floatingIp->save();
+                    $floatingIp->saveQuietly();
                 } catch (\Exception $exception) {
                     // Ip already assigned
                     if ($exception->getCode() == 23000) {
@@ -101,11 +98,10 @@ class AllocateIp implements ShouldQueue
             }
         }
 
-        $error = 'Insufficient available external IP\'s to assign to floating IP resource ' . $floatingIp->id;
-        Log::error($error);
-        $this->fail(new \Exception($error));
-        return;
+        if (empty($floatingIp->ip_address)) {
+            $this->release(5);
+        }
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
