@@ -30,14 +30,22 @@ use Laravel\Lumen\Testing\DatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
-    // This is required for the Kingping/NSX mocks, see below
     use DatabaseMigrations,
-        Mocks\Traits\Host;
+        Mocks\Host\Mocks;
 
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',
     ];
+
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validWriteHeaders = [
         'X-consumer-custom-id' => '0-0',
         'X-consumer-groups' => 'ecloud.read, ecloud.write',
