@@ -2,19 +2,14 @@
 
 namespace Tests\unit\AvailabilityZoneCapacity\FloatingIp;
 
-use App\Listeners\V2\FloatingIp\AllocateIp;
+use App\Jobs\FloatingIp\AllocateIp;
 use App\Mail\AvailabilityZoneCapacityAlert;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -23,10 +18,6 @@ class UpdateCapacityTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-
-    protected $region;
-    protected $availabilityZone;
-    protected $vpc;
     protected $floatingIp;
     protected $availabilityZoneCapacity;
 
@@ -35,20 +26,17 @@ class UpdateCapacityTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->floatingIp = factory(FloatingIp::class)->create([
-            'ip_address' => '1.1.1.1',
-            'vpc_id' => $this->vpc->id
-        ]);
+        $this->vpc();
+        $this->floatingIp = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class)->create([
+                'id' => 'fip-test',
+                'ip_address' => '1.1.1.1',
+                'vpc_id' => $this->vpc()->id
+            ]);
+        });
 
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
-            'availability_zone_id' => $this->availabilityZone->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
             'current' => null
         ]);
 
@@ -94,9 +82,9 @@ class UpdateCapacityTest extends TestCase
     {
         $this->assertEquals(null, $this->availabilityZoneCapacity->current);
 
-        $allocateIpListener = \Mockery::mock(AllocateIp::class)->makePartial();
-
-        $allocateIpListener->handle(new \App\Events\V2\FloatingIp\Created($this->floatingIp));
+        $allocateIpJob = \Mockery::mock(AllocateIp::class)->makePartial();
+        $allocateIpJob->model = $this->floatingIp;
+        $allocateIpJob->handle();
 
         Event::assertDispatched(\App\Events\V2\AvailabilityZoneCapacity\Saved::class, function ($event) {
             return $event->model->id === $this->availabilityZoneCapacity->id;
@@ -116,9 +104,9 @@ class UpdateCapacityTest extends TestCase
 
         $percentUsed = round(($usedIps / $totalIps) * 100, 2); // 0.39
 
-        $allocateIpListener = \Mockery::mock(AllocateIp::class)->makePartial();
-
-        $allocateIpListener->handle(new \App\Events\V2\FloatingIp\Created($this->floatingIp));
+        $allocateIpJob = \Mockery::mock(AllocateIp::class)->makePartial();
+        $allocateIpJob->model = $this->floatingIp;
+        $allocateIpJob->handle();
 
         Event::assertDispatched(\App\Events\V2\AvailabilityZoneCapacity\Saved::class, function ($event) {
             return $event->model->id === $this->availabilityZoneCapacity->id;
