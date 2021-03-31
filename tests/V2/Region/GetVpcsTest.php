@@ -51,9 +51,9 @@ class GetVpcsTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'        => $this->vpc->id,
-                'name'      => $this->vpc->name,
-                'region_id' => $this->vpc->region_id,
+                'id'        => $this->vpc()->id,
+                'name'      => $this->vpc()->name,
+                'region_id' => $this->vpc()->region_id,
             ])
             ->assertResponseStatus(200);
     }
