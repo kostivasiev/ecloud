@@ -50,7 +50,6 @@ class Vpc extends Model implements Filterable, Sortable
         'loadBalancerClusters',
         'volumes',
         'floatingIps',
-        'networkPolicies',
     ];
 
     protected $casts = [
@@ -95,11 +94,6 @@ class Vpc extends Model implements Filterable, Sortable
     public function vpcSupports()
     {
         return $this->hasMany(VpcSupport::class);
-    }
-
-    public function networkPolicies()
-    {
-        return $this->hasMany(NetworkPolicy::class);
     }
 
 
