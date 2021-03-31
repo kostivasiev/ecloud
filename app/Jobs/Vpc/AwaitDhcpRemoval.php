@@ -27,16 +27,16 @@ class AwaitDhcpRemoval extends Job
     {
         Log::debug(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
 
-        if ($this->vpc->nics()->count() > 0) {
-            $this->vpc->nics()->each(function ($nic) {
-                if ($nic->getStatus() == Sync::STATUS_FAILED) {
-                    Log::error('NIC in failed sync state, abort', ['id' => $this->vpc->id, 'nic' => $nic->id]);
-                    $this->fail(new \Exception("NIC '" . $nic->id . "' in failed sync state"));
+        if ($this->vpc->dhcps()->count() > 0) {
+            $this->vpc->dhcps()->each(function ($dhcp) {
+                if ($dhcp->getStatus() == Sync::STATUS_FAILED) {
+                    Log::error('DHCP in failed sync state, abort', ['id' => $this->vpc->id, 'dhcp' => $dhcp->id]);
+                    $this->fail(new \Exception("DHCP '" . $dhcp->id . "' in failed sync state"));
                 }
             });
 
-            Log::warning("'" . $this->vpc->nics()->count() . "' NICs still attached, retrying", ['id' => $this->vpc->id]);
-            throw new \Exception("'" . $this->vpc->nics()->count() . "' NICs still attached");
+            Log::warning($this->vpc->dhcps()->count() . ' DHCP(s) still attached, retrying', ['id' => $this->vpc->id]);
+            throw new \Exception($this->vpc->dhcps()->count() . ' DHCP(s) still attached');
         }
 
         Log::debug(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
