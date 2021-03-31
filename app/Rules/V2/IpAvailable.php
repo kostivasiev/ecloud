@@ -16,7 +16,7 @@ class IpAvailable implements Rule
     {
         return Nic::where('network_id', $this->networkId)
                 ->where('ip_address', $value)
-                ->where('deleted', false)->count() == 0;
+                ->count() == 0;
     }
 
     /**

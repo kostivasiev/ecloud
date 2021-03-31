@@ -111,19 +111,14 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Instance\Creating::class => [
             \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
-        \App\Events\V2\Instance\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
-        \App\Events\V2\Instance\Deploy::class => [
-            \App\Listeners\V2\Instance\Deploy::class,
-        ],
         \App\Events\V2\Instance\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
-        \App\Events\V2\Instance\Updated::class => [
-            \App\Listeners\V2\Instance\ComputeChange::class
+        \App\Events\V2\Instance\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
         \App\Events\V2\Instance\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Instance\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
@@ -204,19 +199,16 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Nic
-        \App\Events\V2\Nic\Creating::class => [
-        ],
-        \App\Events\V2\Nic\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Nic\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Nic\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
         \App\Events\V2\Nic\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Nic\Deleted::class => [
-            \App\Listeners\V2\Nic\DeleteDhcpLease::class,       // TODO :- Needs moving to the Sync Nic delete
-            \App\Listeners\V2\Nic\UnassignFloatingIp::class,    // TODO :- Needs moving to the Sync Nic delete
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
@@ -246,6 +238,15 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Creating::class => [
             \App\Listeners\V2\Volume\DefaultIops::class,
         ],
+        \App\Events\V2\Volume\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Volume\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Volume\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
+        ],
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -266,14 +267,23 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
+        // HostGroup
+        \App\Events\V2\HostGroup\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
         // Sync
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
+            \App\Listeners\V2\HostGroup\UpdateBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
+        ],
+        \App\Events\V2\Sync\Created::class => [
+            \App\Listeners\V2\SyncCreated::class
         ]
     ];
 }

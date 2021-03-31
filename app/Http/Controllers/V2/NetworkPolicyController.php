@@ -43,7 +43,6 @@ class NetworkPolicyController extends BaseController
         $networkPolicy = NetworkPolicy::forUser(Auth::user())->findOrFail($networkPolicyId);
         $networkPolicy->fill($request->only([
             'name',
-            'network_id',
         ]));
         $networkPolicy->save();
         return $this->responseIdMeta($request, $networkPolicy->id, 200);

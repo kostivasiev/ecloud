@@ -5,10 +5,13 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Volume;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CapacityChange extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(Volume $model)
@@ -58,10 +61,5 @@ class CapacityChange extends Job
         Log::debug('Volume ' . $volume->id . ' capacity increased to ' . $volume->capacity);
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }
