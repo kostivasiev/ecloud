@@ -28,8 +28,7 @@ class AwaitDhcpSync extends Job
 
         $this->vpc->dhcps()->each(function ($dhcp) {
             if ($dhcp->getStatus() == Sync::STATUS_FAILED) {
-                Log::error('DHCP in failed sync state, abort',
-                    ['id' => $this->vpc->id, 'dhcp' => $dhcp->id]);
+                Log::error('DHCP in failed sync state, abort', ['id' => $this->vpc->id, 'dhcp' => $dhcp->id]);
                 $this->fail(new \Exception("DHCP '" . $dhcp->id . "' in failed sync state"));
             }
 
