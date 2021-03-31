@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2;
 
-use App\Jobs\Sync\Update;
+use App\Models\V2\Host;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Sync;
@@ -20,6 +20,7 @@ class SyncCreated
             Volume::class,
             Instance::class,
             Nic::class,
+            Host::class
         ])) {
             return true;
         }
