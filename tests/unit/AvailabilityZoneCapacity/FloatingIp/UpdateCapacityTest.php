@@ -39,12 +39,9 @@ class UpdateCapacityTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
             'ip_address' => '1.1.1.1',
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc()->id
         ]);
 
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([

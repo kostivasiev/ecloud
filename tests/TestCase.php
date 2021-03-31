@@ -6,6 +6,7 @@ use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
+use App\Models\V2\Dhcp;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
@@ -24,6 +25,7 @@ use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -59,6 +61,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Vpc */
     private $vpc;
+
+    /** @var Dhcp */
+    private $dhcp;
 
     /** @var FirewallPolicy */
     private $firewallPolicy;
@@ -140,10 +145,12 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function vpc()
     {
         if (!$this->vpc) {
-            $this->vpc = factory(Vpc::class)->create([
-                'id' => 'vpc-test',
-                'region_id' => $this->region()->id
-            ]);
+            Model::withoutEvents(function () {
+                $this->vpc = factory(Vpc::class)->create([
+                    'id' => 'vpc-test',
+                    'region_id' => $this->region()->id
+                ]);
+            });
         }
         return $this->vpc;
     }
@@ -629,10 +636,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
-            \App\Events\V2\Dhcp\Created::class,
             \App\Events\V2\Network\Created::class,
             \App\Events\V2\Router\Created::class,
-            \App\Events\V2\Vpc\Created::class,
             \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
 
@@ -642,8 +647,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Deleted
             \App\Events\V2\AvailabilityZone\Deleted::class,
             \App\Events\V2\Nat\Deleted::class,
-            \App\Events\V2\Vpc\Deleted::class,
-            \App\Events\V2\Dhcp\Deleted::class,
             \App\Events\V2\FloatingIp\Deleted::class,
             \App\Events\V2\Network\Deleted::class,
             \App\Events\V2\Router\Deleted::class,

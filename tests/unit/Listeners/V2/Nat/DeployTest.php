@@ -4,13 +4,11 @@ namespace Tests\unit\Listeners\V2\Nat;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Instance;
 use App\Models\V2\Nat;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
@@ -24,10 +22,8 @@ class DeployTest extends TestCase
     protected \Faker\Generator $faker;
     protected $region;
     protected $availability_zone;
-    protected $vpc;
     protected $router;
     protected $network;
-    protected $instance;
     protected $floating_ip;
     protected $nic;
     protected $nat;
@@ -40,18 +36,11 @@ class DeployTest extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
         $this->router = factory(Router::class)->create([
             'availability_zone_id' => $this->availability_zone->id,
         ]);
         $this->network = factory(Network::class)->create([
             'router_id' => $this->router->id,
-        ]);
-        $this->instance = factory(Instance::class)->create([
-            'availability_zone_id' => $this->availability_zone->id,
-            'vpc_id' => $this->vpc->id,
         ]);
         $this->floating_ip = factory(FloatingIp::class)->create([
             'ip_address' => $this->faker->ipv4,
@@ -65,7 +54,7 @@ class DeployTest extends TestCase
             });
         $this->nic = factory(Nic::class)->create([
             'id' => 'nic-a1ae98ce',
-            'instance_id' => $this->instance->id,
+            'instance_id' => $this->instance()->id,
             'network_id' => $this->network->id,
             'ip_address' => $this->faker->ipv4,
         ]);

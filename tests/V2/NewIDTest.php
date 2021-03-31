@@ -33,11 +33,8 @@ class NewIDTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
@@ -64,7 +61,7 @@ class NewIDTest extends TestCase
     {
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id,
         ], [
             'X-consumer-custom-id' => '0-0',

@@ -6,6 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -31,10 +32,13 @@ class GetVpcsTest extends TestCase
                 'is_public' => false,
             ]);
         });
-        $this->vpc = factory(Vpc::class)->create([
-            'name'      => 'VPC '.uniqid(),
-            'region_id' => $this->regions[0]->id,
-        ]);
+        Model::withoutEvents(function() {
+            $this->vpc = factory(Vpc::class)->create([
+                'id' => 'vpc-test',
+                'name'      => 'VPC '.uniqid(),
+                'region_id' => $this->regions[0]->id,
+            ]);
+        });
     }
 
     public function testGetVpcCollection()
