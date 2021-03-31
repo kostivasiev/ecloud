@@ -69,7 +69,7 @@ class CreateRequest extends FormRequest
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
             'host_group_id' => [
-                'required',
+                'sometimes',
                 'string',
                 'exists:ecloud.host_groups,id,deleted_at,NULL',
                 new ExistsForUser(HostGroup::class),

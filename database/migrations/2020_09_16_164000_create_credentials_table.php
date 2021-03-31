@@ -16,10 +16,10 @@ class CreateCredentialsTable extends Migration
         Schema::connection('ecloud')->create('credentials', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name')->nullable();
-            $table->uuid('resource_id');
-            $table->string('host');
-            $table->string('user');
-            $table->string('password');
+            $table->uuid('resource_id')->nullable();
+            $table->string('host')->nullable();
+            $table->string('user')->nullable();
+            $table->string('password')->nullable();
             $table->string('port')->nullable();
             $table->timestamps();
             $table->softDeletes();

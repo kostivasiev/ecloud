@@ -13,7 +13,6 @@ use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -109,7 +108,11 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        if (!$volume->save()) {
+        try {
+            if (!$volume->save()) {
+                return $volume->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
 
@@ -119,10 +122,12 @@ class VolumeController extends BaseController
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
-        if (!$volume->delete()) {
+        try {
+            $volume->delete();
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
-        return response(null, 204);
+        return response('', 204);
     }
 
     public function attach(AttachRequest $request, string $volumeId)

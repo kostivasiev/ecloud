@@ -31,7 +31,7 @@ class UpdateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
             'title' => 'Validation Error',
-            'detail' => 'The name field, when specified, cannot be null',
+            'detail' => 'The name field is required',
             'status' => 422,
             'source' => 'name'
         ])->assertResponseStatus(422);
@@ -53,11 +53,31 @@ class UpdateTest extends TestCase
         ])->assertResponseStatus(404);
     }
 
+    public function testNoAdminFailsWhenConsoleIsSet()
+    {
+        $data = [
+            'name' => 'name',
+            'reseller_id' => 2,
+            'console_enabled' => true,
+        ];
+        $this->patch('/v2/vpcs/' . $this->vpc()->id, $data, [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeJson(
+            [
+                'title' => 'Forbidden',
+                'details' => 'Console access cannot be modified',
+                'status' => 403
+            ]
+        )->assertResponseStatus(403);
+    }
+
     public function testValidDataIsSuccessful()
     {
         $data = [
             'name' => 'name',
             'reseller_id' => 2,
+            'console_enabled' => true,
         ];
         $this->patch('/v2/vpcs/' . $this->vpc()->id, $data, [
             'X-consumer-custom-id' => '0-0',

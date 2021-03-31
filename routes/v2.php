@@ -142,6 +142,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
 
+        $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
+
         $router->group(['middleware' => 'is-locked'], function () use ($router) {
             $router->patch('instances/{instanceId}', 'InstanceController@update');
             $router->delete('instances/{instanceId}', 'InstanceController@destroy');

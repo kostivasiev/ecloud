@@ -12,8 +12,10 @@ use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
@@ -28,14 +30,22 @@ use Laravel\Lumen\Testing\DatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
-    // This is required for the Kingping/NSX mocks, see below
     use DatabaseMigrations,
-        Mocks\Traits\Host;
+        Mocks\Host\Mocks;
 
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',
     ];
+
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validWriteHeaders = [
         'X-consumer-custom-id' => '0-0',
         'X-consumer-groups' => 'ecloud.read, ecloud.write',
@@ -91,6 +101,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Image */
     private $image;
+
+    /** @var Nic */
+    private $nic;
 
     /**
      * Creates the application.
@@ -159,24 +172,162 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function instance()
     {
         if (!$this->instance) {
-            $this->instance = factory(Instance::class)->create([
-                'id' => 'i-test',
-                'vpc_id' => $this->vpc()->id,
-                'name' => 'Test Instance ' . uniqid(),
-                'image_id' => $this->image()->id,
-                'vcpu_cores' => 1,
-                'ram_capacity' => 1024,
-                'platform' => 'Linux',
-                'availability_zone_id' => $this->availabilityZone()->id
-            ]);
+/*            app()->bind(Volume::class, function () {
+                return new Volume(['id' => 'vol-test']);
+            });
+
+            // Deploy :: Deploy instance from template
+            $this->kingpinServiceMock()->expects('post')
+                ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/fromtemplate')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // ConfigureNICs, PrepareOSDisk :: Return instance details
+            $this->kingpinServiceMock()->expects('get')
+                ->zeroOrMoreTimes()
+                ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode([
+                        'numCPU' => 1,
+                        'ramMiB' => 1024,
+                        'nics' => [
+                            [
+                                'macAddress' => 'AA:BB:CC:DD:EE:FF',
+                            ]
+                        ],
+                        'volumes' => [
+                            [
+                                'volumeId' => 'vol-test',
+                                'uuid' => 'uuid-test-uuid-test-uuid-test',
+                            ]
+                        ],
+                    ]));
+                });
+
+            // PrepareOSDisk :: Set volume ID for FCD
+            $this->kingpinServiceMock()->expects('put')
+                ->withSomeOfArgs('/api/v1/vpc/' . $this->vpc()->id . '/volume/uuid-test-uuid-test-uuid-test/resourceid',)
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // PrepareOSDisk :: Set volume IOPS
+            $this->kingpinServiceMock()->expects('put')
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',)
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // ConfigureNics :: Retrieve DHCP static bindings
+            $this->nsxServiceMock()->expects('get')
+                ->withSomeOfArgs('/policy/api/v1/infra/tier-1s/' . $this->router()->id . '/segments/' . $this->network()->id . '/dhcp-static-binding-configs?cursor=')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode([
+                        'results' => []
+                    ]));
+                });
+
+            // CreateDHCPLease :: Create DHCP lease in NSX
+            $this->nsxServiceMock()->expects('put')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // UpdateNetworkAdapter :: Connect NIC to network
+            $this->kingpinServiceMock()->expects('put')
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/nic/AA:BB:CC:DD:EE:FF/connect')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // OsCustomisation :: Connect NIC to network
+            $this->kingpinServiceMock()->expects('put')
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/oscustomization')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // PowerOn :: Power on instance
+            $this->kingpinServiceMock()->expects('post')
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/power')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // WaitOsCustomisation :: Wait for os customization
+            $this->kingpinServiceMock()->expects('get')
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/oscustomization/status')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(['status'=>'Succeeded']));
+                });
+
+            // PrepareOsUsers :: Create admin group
+            $this->kingpinServiceMock()->expects('post')
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/guest/linux/admingroup')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // PrepareOsUsers :: Create graphiterack/ukfastsupport accounts
+            $this->kingpinServiceMock()->expects('post')
+                ->times(2)
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/guest/linux/user')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });
+
+            // ExpandOsDisk :: Expand /
+            $this->kingpinServiceMock()->expects('put')
+                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/guest/linux/disk/lvm/extend')
+                ->andReturnUsing(function () {
+                    return new Response(200, [], json_encode(true));
+                });*/
+
+            Instance::withoutEvents(function() {
+                $this->instance = factory(Instance::class)->create([
+                    'id' => 'i-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'name' => 'Test Instance ' . uniqid(),
+                    'image_id' => $this->image()->id,
+                    'vcpu_cores' => 1,
+                    'ram_capacity' => 1024,
+                    'platform' => 'Linux',
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'deploy_data' => [
+                        'network_id' => $this->network()->id,
+                        'volume_capacity' => 20,
+                        'volume_iops' => 300,
+                        'requires_floating_ip' => false,
+                    ]
+                ]);
+            });
+
+            //app()->bind(Volume::class);
         }
         return $this->instance;
+    }
+
+    public function nic()
+    {
+        if (!$this->nic) {
+            Nic::withoutEvents(function() {
+                $this->nic = factory(Nic::class)->create([
+                    'id' => 'nic-test',
+                    'mac_address' => 'AA:BB:CC:DD:EE:FF',
+                    'instance_id' => $this->instance()->id,
+                    'network_id' => $this->network()->id,
+                ]);
+            });
+        }
+        return $this->nic;
     }
 
     public function image()
     {
         if (!$this->image) {
             $this->image = factory(Image::class)->create([
+                'id' => 'img-abcdef12',
                 'appliance_version_id' => $this->applianceVersion()->id,
             ]);
         }
@@ -187,6 +338,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->applianceVersion) {
             $this->applianceVersion = factory(ApplianceVersion::class)->create([
+                'appliance_version_uuid' => 'd7c4a253-0718-4ef7-adb2-ad348ae96371',
                 'appliance_version_appliance_id' => $this->appliance()->id,
             ]);
         }
@@ -197,6 +349,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->appliance) {
             $this->appliance = factory(Appliance::class)->create([
+                'appliance_uuid' => 'aa085bfc-bbe9-4825-b636-1f221d6c3fa9',
                 'appliance_name' => 'Test Appliance',
             ])->refresh();
         }
@@ -207,6 +360,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->network) {
             $this->network = factory(Network::class)->create([
+                'id' => 'net-abcdef12',
                 'name' => 'Manchester Network',
                 'router_id' => $this->router()->id
             ]);
@@ -480,13 +634,11 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Dhcp\Created::class,
-            \App\Events\V2\Instance\Created::class,
             \App\Events\V2\Network\Created::class,
             \App\Events\V2\Router\Created::class,
             \App\Events\V2\Vpc\Created::class,
             \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
-            \App\Events\V2\Nic\Created::class,
 
             // Deleting
             \App\Events\V2\Nat\Deleting::class,
@@ -496,7 +648,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Nat\Deleted::class,
             \App\Events\V2\Vpc\Deleted::class,
             \App\Events\V2\Dhcp\Deleted::class,
-            \App\Events\V2\Nic\Deleted::class,
             \App\Events\V2\FloatingIp\Deleted::class,
             \App\Events\V2\Network\Deleted::class,
             \App\Events\V2\Router\Deleted::class,
@@ -509,19 +660,12 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Updated
             \App\Events\V2\Sync\Updated::class,
-            \App\Events\V2\Instance\Updated::class,
 
             // Saving
             \App\Events\V2\Router\Saving::class,
             \App\Events\V2\Network\Saving::class,
-            \App\Events\V2\Nic\Saving::class,
             \App\Events\V2\Nat\Saving::class,
 
-            // Deleting
-            \App\Events\V2\Instance\Saving::class,
-
-            // Deploy
-            \App\Events\V2\Instance\Deploy::class,
         ]);
     }
 

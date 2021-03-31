@@ -5,30 +5,32 @@ namespace App\Jobs\Sync\Volume;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Volume\Undeploy;
 use App\Jobs\Kingpin\Volume\UndeployCheck;
-use App\Models\V2\Volume;
+use App\Models\V2\Sync;
+use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    /** @var Volume */
-    private $model;
+    use SyncableBatch;
 
-    public function __construct(Volume $model)
+    /** @var Sync */
+    private $sync;
+
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
+        $this->sync = $sync;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        $jobs = [
-            new Undeploy($this->model),
-            new UndeployCheck($this->model),
-        ];
+        $this->deleteSyncBatch([
+            [
+                new Undeploy($this->sync->resource),
+            ]
+        ])->dispatch();
 
-        dispatch(array_shift($jobs)->chain($jobs));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

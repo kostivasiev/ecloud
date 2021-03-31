@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Console\Commands\Host;
 
 use App\Models\V2\Host;
@@ -30,7 +31,7 @@ class Delete extends Command
         try {
             // Get the host spec from Conjurer
             $response = $availabilityZone->conjurerService()->get(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id . '/host/' . $host->id
             );
             $response = json_decode($response->getBody()->getContents());
 
@@ -45,7 +46,7 @@ class Delete extends Command
 
             try {
                 $availabilityZone->conjurerService()->delete(
-                    '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id
+                    '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id . '/host/' . $host->id
                 );
                 $this->line('Deleted host from UCS');
             } catch (\Exception $exception) {
@@ -74,7 +75,7 @@ class Delete extends Command
             $availabilityZone->artisanService()->delete(
                 '/api/v2/san/' . $availabilityZone->san_name . '/host/' . $host->id
             );
-            $this->line('Deleted host from artisan');
+            $this->line('Deleted host from SAN');
         } catch (\Exception $exception) {
             $this->alert('Failed to delete host from Artisan ' . $exception->getMessage());
             return Command::FAILURE;

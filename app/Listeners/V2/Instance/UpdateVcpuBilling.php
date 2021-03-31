@@ -5,7 +5,6 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -22,13 +21,9 @@ class UpdateVcpuBilling
             return;
         }
 
-        if (Resource::classFromId($event->model->resource_id) != Instance::class) {
-            return;
-        }
-        
-        $instance = Instance::find($event->model->resource_id);
+        $instance = $event->model->resource;
 
-        if (empty($instance)) {
+        if (get_class($instance) != Instance::class) {
             return;
         }
 

@@ -5,8 +5,10 @@ namespace App\Models\V2;
 use App\Events\V2\HostGroup\Deleted;
 use App\Events\V2\HostGroup\Saved;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class HostGroup extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides, DefaultAvailabilityZone;
 
     public string $keyPrefix = 'hg';
 

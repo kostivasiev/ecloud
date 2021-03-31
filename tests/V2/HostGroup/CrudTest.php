@@ -69,6 +69,30 @@ class CrudTest extends TestCase
             ->assertResponseStatus(201);
     }
 
+    public function testCreateWithoutAz()
+    {
+        app()->bind(HostGroup::class, function () {
+            return new HostGroup([
+                'id' => 'hg-test',
+            ]);
+        });
+
+        $this->hostGroupJobMocks();
+
+        $data = [
+            'name' => 'hg-test',
+            'vpc_id' => $this->vpc()->id,
+            'host_spec_id' => $this->hostSpec()->id,
+        ];
+        $this->post('/v2/host-groups', $data)
+            ->seeInDatabase('host_groups', $data, 'ecloud')
+            ->assertResponseStatus(201);
+
+        $hostGroupId = (json_decode($this->response->getContent()))->data->id;
+        $hostGroup = HostGroup::findOrFail($hostGroupId);
+        $this->assertEquals($this->availabilityZone()->id, $hostGroup->availability_zone_id);
+    }
+
     public function testStoreValidationWithEmptyHostSpecId()
     {
         $this->post('/v2/host-groups', [
