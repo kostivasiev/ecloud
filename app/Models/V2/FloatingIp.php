@@ -4,10 +4,12 @@ namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
+use App\Events\V2\FloatingIp\Deleting;
+use App\Events\V2\FloatingIp\Saved;
+use App\Events\V2\FloatingIp\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
-use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -19,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;
@@ -35,18 +37,11 @@ class FloatingIp extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'created' => Created::class,
+        'saving' => Saving::class,
+        'saved' => Saved::class,
+        'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($model) {
-            $model->attributes['deleted'] = time();
-            $model->save();
-        });
-    }
 
     /**
      * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)

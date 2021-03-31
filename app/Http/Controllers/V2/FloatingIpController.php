@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
@@ -96,8 +97,9 @@ class FloatingIpController extends BaseController
     public function destroy(Request $request, string $fipId)
     {
         $model = FloatingIp::forUser($request->user())->findOrFail($fipId);
-
-        if (!$model->delete()) {
+        try {
+            $model->delete();
+        } catch (SyncException $exception) {
             return $model->getSyncError();
         }
         return response()->json([], 204);
