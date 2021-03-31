@@ -7,30 +7,23 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Traits\NetworkingApio;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
-    protected $faker;
-    protected $region;
-    protected $vpc;
+    use DatabaseMigrations, NetworkingApio;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
+        $this->networkingApioSetup();
     }
 
     public function testValidDataSucceeds()
     {
         $data = [
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc()->id
         ];
         $this->post(
             '/v2/floating-ips',
@@ -44,7 +37,6 @@ class CreateTest extends TestCase
 
         $id = (json_decode($this->response->getContent()))->data->id;
         $floatingIp = FloatingIp::findOrFail($id);
-        $this->assertEquals('failed', $floatingIp->getStatus());
-        $this->assertEquals('Awaiting IP Allocation', $floatingIp->getSyncFailureReason());
+        $this->assertEquals('complete', $floatingIp->getStatus());
     }
 }

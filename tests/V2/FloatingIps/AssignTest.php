@@ -6,11 +6,12 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Traits\NetworkingApio;
 use Tests\TestCase;
 
 class AssignTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, NetworkingApio;
 
     protected $floatingIp;
     protected $nic;
@@ -26,6 +27,7 @@ class AssignTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->networkingApioSetup();
 
         $this->floatingIp = factory(FloatingIp::class)->create([
             'vpc_id' => $this->vpc()->id

@@ -7,27 +7,22 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Traits\NetworkingApio;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, NetworkingApio;
 
-    protected $region;
-    protected $vpc;
-    protected $faker;
     protected $floatingIp;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
+        $this->networkingApioSetup();
         $this->floatingIp = factory(FloatingIp::class)->create([
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc()->id,
+            'ip_address' => '0.0.0.1',
         ]);
     }
 
@@ -43,7 +38,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->floatingIp->id,
                 'name' => $this->floatingIp->id,
-                'vpc_id' => $this->vpc->id,
+                'vpc_id' => $this->vpc()->id,
                 'ip_address' => $this->floatingIp->ip_address
             ])
             ->assertResponseStatus(200);
@@ -61,7 +56,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->floatingIp->id,
                 'name' => $this->floatingIp->id,
-                'vpc_id' => $this->vpc->id,
+                'vpc_id' => $this->vpc()->id,
                 'ip_address' => $this->floatingIp->ip_address
             ])
             ->assertResponseStatus(200);

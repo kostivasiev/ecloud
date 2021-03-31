@@ -5,19 +5,24 @@ namespace Tests\V2\FloatingIps;
 use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Traits\NetworkingApio;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, NetworkingApio;
 
     protected $faker;
 
     public function setUp(): void
     {
         parent::setUp();
+        $this->networkingApioSetup();
         $this->faker = Faker::create();
-        $this->floatingIp = factory(FloatingIp::class)->create();
+        $this->floatingIp = factory(FloatingIp::class)->create([
+            'vpc_id' => $this->vpc()->id,
+            'ip_address' => '0.0.0.1',
+        ]);
     }
 
     public function testValidDataIsSuccessful()

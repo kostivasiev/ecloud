@@ -5,19 +5,26 @@ namespace Tests\V2\FloatingIps;
 use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Traits\NetworkingApio;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, NetworkingApio;
 
-    protected $faker;
+    protected \Faker\Generator $faker;
+    protected $floatingIp;
 
     public function setUp(): void
     {
         parent::setUp();
+        $this->networkingApioSetup();
         $this->faker = Faker::create();
-        $this->floatingIp = factory(FloatingIp::class)->create();
+        $this->floatingIp = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class)->create([
+                'id' => 'fip-test',
+            ]);
+        });
     }
 
     public function testNoPermsIsDenied()
@@ -62,8 +69,7 @@ class DeleteTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(204);
+        )->assertResponseStatus(204);
         $resource = FloatingIp::withTrashed()->findOrFail($this->floatingIp->id);
         $this->assertNotNull($resource->deleted_at);
     }
