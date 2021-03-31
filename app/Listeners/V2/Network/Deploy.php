@@ -49,6 +49,12 @@ class Deploy implements ShouldQueue
             }
         }
 
+        $dhcp = $router->vpc->dhcps()->where('availability_zone_id', $router->availability_zone_id)->first();
+        if (empty($dhcp)) {
+            throw new Exception('Unable to locate VPC DHCP server for availability zone');
+        }
+
+
         $subnet = Subnet::fromString($network->subnet);
         //The first address is the network identification and the last one is the broadcast, they cannot be used as regular addresses.
         $networkAddress = $subnet->getStartAddress();
@@ -57,7 +63,7 @@ class Deploy implements ShouldQueue
         $message = 'Deploying Network: ' . $network->id . ': ';
         Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
         Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
-        Log::info($message . 'DHCP ID: ' . $router->vpc->dhcp->id);
+        Log::info($message . 'DHCP ID: ' . $dhcp->id);
 
         try {
             $router->availabilityZone->nsxService()->patch(
@@ -77,7 +83,7 @@ class Deploy implements ShouldQueue
                             ]
                         ],
                         'domain_name' => config('defaults.network.domain_name'),
-                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $router->vpc->dhcp->id,
+                        'dhcp_config_path' => '/infra/dhcp-server-configs/' . $dhcp->id,
                         'advanced_config' => [
                             'connectivity' => 'ON'
                         ],

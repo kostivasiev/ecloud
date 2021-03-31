@@ -63,12 +63,14 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Dhcp
-        \App\Events\V2\Dhcp\Created::class => [
-            \App\Listeners\V2\Nsx\Dhcp\Create::class,
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Dhcp\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Dhcp\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Dhcp\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Dhcp\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,

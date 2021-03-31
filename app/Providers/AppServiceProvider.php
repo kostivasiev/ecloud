@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
+use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -49,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
             'rtr' => Router::class,
             'vol' => Volume::class,
             'vpn' => Vpn::class,
+            'vpc' => Vpc::class,
+            'dhcp' => Dhcp::class,
         ]);
 
         Queue::failing(function (JobFailed $event) {

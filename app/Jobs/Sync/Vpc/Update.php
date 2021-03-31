@@ -3,8 +3,8 @@
 namespace App\Jobs\Sync\Vpc;
 
 use App\Jobs\Job;
-use App\Jobs\Vpc\AwaitDHCPSync;
-use App\Jobs\Vpc\CreateDHCPs;
+use App\Jobs\Vpc\AwaitDhcpSync;
+use App\Jobs\Vpc\CreateDhcps;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
@@ -26,8 +26,8 @@ class Update extends Job
 
             $this->updateSyncBatch([
                 [
-                    new CreateDHCPs($this->sync->resource),
-                    new AwaitDHCPSync($this->sync->resource),
+                    new CreateDhcps($this->sync->resource),
+                    new AwaitDhcpSync($this->sync->resource),
                 ],
             ])->dispatch();
 

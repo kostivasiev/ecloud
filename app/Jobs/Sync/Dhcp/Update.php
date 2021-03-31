@@ -1,20 +1,15 @@
 <?php
 
-namespace App\Jobs\Sync\Vpc;
+namespace App\Jobs\Sync\Dhcp;
 
-use App\Jobs\Instance\PowerOff;
-use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
-use App\Jobs\Instance\Undeploy\DeleteNics;
-use App\Jobs\Instance\Undeploy\DeleteVolumes;
-use App\Jobs\Instance\Undeploy\Undeploy as InstanceUndeploy;
 use App\Jobs\Job;
-use App\Jobs\Vpc\AwaitDhcpRemoval;
-use App\Jobs\Vpc\DeleteDhcps;
+use App\Jobs\Nsx\Dhcp\Create;
+use App\Jobs\Nsx\Nic\CreateDHCPLease;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
-class Delete extends Job
+class Update extends Job
 {
     use SyncableBatch;
 
@@ -29,10 +24,9 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        $this->deleteSyncBatch([
+        $this->updateSyncBatch([
             [
-                new DeleteDhcps($this->sync->resource),
-                new AwaitDhcpRemoval($this->sync->resource),
+                new Create($this->sync->resource),
             ]
         ])->dispatch();
 

@@ -4,12 +4,11 @@ namespace App\Jobs\Vpc;
 
 use App\Jobs\Job;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateDHCPs extends Job
+class CreateDhcps extends Job
 {
     use Batchable;
 
@@ -22,7 +21,7 @@ class CreateDHCPs extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
 
         $vpc = $this->vpc;
 
@@ -33,6 +32,6 @@ class CreateDHCPs extends Job
             $dhcp->save();
         });
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
     }
 }
