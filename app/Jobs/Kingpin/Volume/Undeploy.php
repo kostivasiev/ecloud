@@ -4,6 +4,7 @@ namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,7 @@ class Undeploy extends Job
 {
     use Batchable;
 
-    private $model;
+    public $model;
 
     public function __construct(Volume $model)
     {
@@ -37,7 +38,7 @@ class Undeploy extends Job
             $response = $this->model->availabilityZone->kingpinService()->delete(
                 '/api/v1/vpc/' . $this->model->vpc->id . '/volume/' . $this->model->vmware_uuid
             );
-        } catch (ServerException $exception) {
+        } catch (ClientException|ServerException $exception) {
             $response = $exception->getResponse();
         }
 
@@ -47,8 +48,10 @@ class Undeploy extends Job
                 'status_code' => $response->getStatusCode(),
                 'content' => $response->getBody()->getContents()
             ]);
-            $this->fail(new \Exception('Volume ' . $this->model->id . ' failed to be deleted'));
-            return false;
+            if ($response->getStatusCode() !== 404) {
+                $this->fail(new \Exception('Volume ' . $this->model->id . ' failed to be deleted'));
+                return false;
+            }
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
