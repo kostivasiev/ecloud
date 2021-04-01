@@ -36,6 +36,7 @@ class UpdateRamBillingTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $this->sync->resource()->associate($this->instance());
         });
