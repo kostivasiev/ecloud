@@ -70,7 +70,6 @@ class Deploy implements ShouldQueue
         $gatewayQosProfileSearchResponse = $nsxService->get(
             'policy/api/v1/search/query?query=resource_type:GatewayQosProfile'
             . '%20AND%20committed_bandwitdth:' . $router->routerThroughput->committed_bandwidth
-            . '%20AND%20burst_size:' . ($router->routerThroughput->burst_size * 1000)
         );
 
         $gatewayQosProfileSearchResponse = json_decode($gatewayQosProfileSearchResponse->getBody()->getContents());
