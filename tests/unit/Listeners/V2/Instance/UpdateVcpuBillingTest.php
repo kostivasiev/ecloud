@@ -1,7 +1,6 @@
 <?php
 namespace Tests\unit\Listeners\V2\Instance;
 
-use App\Listeners\V2\Instance\ComputeChange;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
 use Laravel\Lumen\Testing\DatabaseMigrations;

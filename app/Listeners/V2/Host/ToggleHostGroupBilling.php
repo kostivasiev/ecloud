@@ -36,9 +36,8 @@ class ToggleHostGroupBilling
                 }
                 break;
             case Sync::TYPE_DELETE:
-                if ($host->hostGroup->hosts->count() <= 1 // because the host hasn't been trashed yet
-                    && (!BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup'))) {
-
+                // <= 1 because the host hasn't been trashed yet
+                if ($host->hostGroup->hosts->count() <= 1 && (!BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup'))) {
                     $billingMetric = app()->make(BillingMetric::class);
                     $billingMetric->fill([
                         'resource_id' => $host->hostGroup->id,
