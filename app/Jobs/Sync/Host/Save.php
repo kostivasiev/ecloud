@@ -34,24 +34,23 @@ class Save extends Job
         $jobs = [];
 
         // Only create if the host doesnt already exist
-//        try {
-//            $availabilityZone->conjurerService()->get(
-//                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id . '/host/' . $host->id
-//            );
-//        } catch (RequestException $exception) {
-//            if ($exception->getCode() == 404) {
-//                $jobs = [
-//                    new CreateLanPolicy($this->model),
-//                    new CheckAvailableCompute($this->model),
-//                    new CreateProfile($this->model),
-//                    new CreateAutoDeployRule($this->model),
-//                    new Deploy($this->model),
-//                    new PowerOn($this->model),
-//
-//                    new CheckOnline($this->model),
-//                ];
-//            }
-//        }
+        try {
+            $availabilityZone->conjurerService()->get(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id . '/host/' . $host->id
+            );
+        } catch (RequestException $exception) {
+            if ($exception->getCode() == 404) {
+                $jobs = [
+                    new CreateLanPolicy($this->model),
+                    new CheckAvailableCompute($this->model),
+                    new CreateProfile($this->model),
+                    new CreateAutoDeployRule($this->model),
+                    new Deploy($this->model),
+                    new PowerOn($this->model),
+                    new CheckOnline($this->model),
+                ];
+            }
+        }
 
         $jobs[] = new \App\Jobs\Sync\Completed($this->model);
 
