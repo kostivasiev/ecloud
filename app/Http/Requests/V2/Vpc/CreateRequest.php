@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\Vpc;
 
+use App\Rules\V2\IsMaxVpcLimitReached;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -28,7 +29,11 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
+            'name' => [
+                'nullable',
+                'string',
+                new IsMaxVpcLimitReached(),
+            ],
             'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL',
             'console_enabled' => 'sometimes|boolean',
         ];
