@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Class EndHostGroupBilling
- * Toggle billing for a host group when a host is deleted if the host group is empty.
+ * Toggle billing for a host group when a host is deleted as we want to bill for empty host groups.
  * @package App\Listeners\V2\Host
  */
 class ToggleHostGroupBilling

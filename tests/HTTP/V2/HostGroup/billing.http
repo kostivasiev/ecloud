@@ -1,4 +1,4 @@
-### Create HostGroup
+### store
 POST https://{{host}}/{{version}}/host-groups
 Accept: */*
 Cache-Control: no-cache
@@ -15,11 +15,12 @@ X-Reseller-Id: 1
 }
 
 > {%
-client.test("Create HostGroup", function() {
-    client.assert(response.status === 201, "Response status is not 201");
-    client.global.set('host_group_id', response.body.data.id);
-    client.log('Host Group ID: ' + response.body.data.id);
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
 });
+
+client.global.set('host_group_id', response.body.data.id);
+client.log('Host Group ID: ' + response.body.data.id);
 %}
 
 ### Get Billing Metric - This should be the hostgroup.unallocated
@@ -54,7 +55,7 @@ X-Reseller-Id: 1
 
 > {%
 client.test("Request executed successfully", function() {
-    client.assert(response.status === 201, "Response status is not 200");
+    client.assert(response.status === 202, "Response status is not 202");
     client.global.set('host_id', response.body.data.id);
     client.log('Host Group ID: ' + response.body.data.id);
 });
