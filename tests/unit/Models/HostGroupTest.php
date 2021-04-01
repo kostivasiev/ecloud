@@ -2,11 +2,12 @@
 
 namespace Tests\unit\Models;
 
+use App\Models\V2\HostGroup;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class InstanceTest extends TestCase
+class HostGroupTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -19,20 +20,25 @@ class InstanceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance()->vcpu_cores = 2;
-        $this->instance()->save();
-
-        Event::assertDispatched(\App\Events\V2\Instance\Updated::class, function ($event)  {
-            return $event->model->id === $this->instance()->id;
+        HostGroup::withoutEvents(function () {
+            factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+            ]);
         });
 
-        Event::assertDispatched(\App\Events\V2\Instance\Saving::class, function ($event)  {
-            return $event->model->id === $this->instance()->id;
-        });
 
-        Event::assertDispatched(\App\Events\V2\Instance\Saved::class, function ($event)  {
-            return $event->model->id === $this->instance()->id;
-        });
+
+        //$hostGroup->save();
+
+
+
+//        Event::assertDispatched(\App\Events\V2\HostGroup\Saved::class, function ($event) use ($hostGroup)  {
+//            return $event->model->id === $hostGroup->id;
+//        });
     }
 
     public function testDeleteFiresExpectedEvents()

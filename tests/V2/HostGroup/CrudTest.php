@@ -4,7 +4,6 @@ namespace Tests\V2\HostGroup;
 
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
