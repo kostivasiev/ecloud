@@ -35,18 +35,16 @@ class AllocateIp extends Job
         $networkingAdminClient = app()->make(AdminClient::class);
 
         $ipRanges = collect();
-        foreach ($datacentreSiteIds as $datacentreSiteId) {
-            $currentPage = 0;
-            do {
-                $currentPage++;
-                $page = $networkingAdminClient->ipRanges()->getPage($currentPage, 15, [
-                    'auto_deploy_environment:eq' => 'ecloud nsx',
-                    'auto_deploy_datacentre_id:eq' => $datacentreSiteId,
-                    'type:eq' => 'External'
-                ]);
-                $ipRanges = $ipRanges->merge($page->getItems());
-            } while ($currentPage < $page->totalPages());
-        }
+        $currentPage = 0;
+        do {
+            $currentPage++;
+            $page = $networkingAdminClient->ipRanges()->getPage($currentPage, 15, [
+                'auto_deploy_environment:eq' => 'ecloud nsx',
+                'auto_deploy_datacentre_id:in' => implode(',', $datacentreSiteIds->toArray()),
+                'type:eq' => 'External'
+            ]);
+            $ipRanges = $ipRanges->merge($page->getItems());
+        } while ($currentPage < $page->totalPages());
 
         foreach ($ipRanges as $ipRange) {
             $subnet = Subnet::fromString(long2ip($ipRange->networkAddress) . '/' . $ipRange->cidr);
