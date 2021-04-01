@@ -97,14 +97,14 @@ class Update implements ShouldQueue
         ]);
 
         // Update the routers default firewall rule to Reject
-        $response = $nsxService->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule');
+        $response = $nsxService->get('policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra-tier1-' . $router->id . '/rules/default_rule');
         $original = json_decode($response->getBody()->getContents(), true);
         $original['action'] = 'REJECT';
         $original = array_filter($original, function ($key) {
             return strpos($key, '_') !== 0;
         }, ARRAY_FILTER_USE_KEY);
         $nsxService->patch(
-            'policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra/rules/' . $router->id . '-tier1-default_blacklist_rule',
+            'policy/api/v1/infra/domains/default/gateway-policies/Policy_Default_Infra-tier1-' . $router->id . '/rules/default_rule',
             [
                 'json' => $original
             ]
