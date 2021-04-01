@@ -25,7 +25,7 @@ class Create extends Job
      */
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->dhcp->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->dhcp->id]);
 
         $this->dhcp->availabilityZone->nsxService()->put('/policy/api/v1/infra/dhcp-server-configs/' . $this->dhcp->id, [
             'json' => [
@@ -42,6 +42,6 @@ class Create extends Job
             ]
         ]);
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->dhcp->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->dhcp->id]);
     }
 }

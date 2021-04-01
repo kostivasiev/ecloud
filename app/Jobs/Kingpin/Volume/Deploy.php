@@ -26,7 +26,7 @@ class Deploy extends Job
         $volume = $this->model;
 
         if (!empty($volume->vmware_uuid)) {
-            Log::debug('Volume already deployed. Nothing to do.');
+            Log::info('Volume already deployed. Nothing to do.');
             return true;
         }
 

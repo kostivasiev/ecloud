@@ -23,7 +23,7 @@ class UpdateNetworkAdapter extends Job
      */
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         if (empty($this->instance->image->vm_template_name)) {
             Log::info('Skipped UpdateNetworkAdapter for instance ' . $this->instance->id . ': no vm template found');
@@ -41,6 +41,6 @@ class UpdateNetworkAdapter extends Job
             );
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

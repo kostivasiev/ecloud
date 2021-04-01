@@ -21,7 +21,7 @@ class CreateDhcps extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
 
         $vpc = $this->vpc;
 
@@ -32,6 +32,6 @@ class CreateDhcps extends Job
             $dhcp->save();
         });
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
     }
 }

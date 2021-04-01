@@ -15,7 +15,7 @@ class SyncCreated
 {
     public function handle($event)
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $event->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         // TODO: Remove following once all syncable resources are using update/delete functionality
         if (!in_array(get_class($event->model->resource), [
@@ -43,6 +43,6 @@ class SyncCreated
             dispatch(new $syncJob($event->model));
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }

@@ -24,7 +24,7 @@ class ConfigureNics extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $network = Network::findOrFail($this->instance->deploy_data['network_id']);
 
@@ -118,6 +118,6 @@ class ConfigureNics extends Job
             }
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }
