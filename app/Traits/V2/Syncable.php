@@ -23,7 +23,7 @@ trait Syncable
     // TODO: Remove default parameter here, left in whilst delete/save still overridden in SyncableOverriddes trait
     public function createSync($type = Sync::TYPE_UPDATE)
     {
-        Log::debug(get_class($this) . ' : Creating new sync - Started', [
+        Log::info(get_class($this) . ' : Creating new sync - Started', [
             'resource_id' => $this->id,
         ]);
 
@@ -39,7 +39,7 @@ trait Syncable
         $sync->completed = false;
         $sync->type = $type;
         $sync->save();
-        Log::debug(get_class($this) . ' : Creating new sync - Finished', [
+        Log::info(get_class($this) . ' : Creating new sync - Finished', [
             'resource_id' => $this->id,
         ]);
 

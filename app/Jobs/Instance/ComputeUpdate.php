@@ -20,7 +20,7 @@ class ComputeUpdate extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $instanceResponse = $this->instance->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id);
         $instanceResponseData = json_decode($instanceResponse->getBody()->getContents());
@@ -65,6 +65,6 @@ class ComputeUpdate extends Job
             ]
         );
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

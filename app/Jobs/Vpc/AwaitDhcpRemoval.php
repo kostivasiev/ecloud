@@ -25,7 +25,7 @@ class AwaitDhcpRemoval extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
 
         if ($this->vpc->dhcps()->count() > 0) {
             $this->vpc->dhcps()->each(function ($dhcp) {
@@ -39,6 +39,6 @@ class AwaitDhcpRemoval extends Job
             throw new \Exception($this->vpc->dhcps()->count() . ' DHCP(s) still attached');
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
     }
 }

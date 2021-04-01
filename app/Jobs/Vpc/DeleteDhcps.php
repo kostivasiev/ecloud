@@ -20,12 +20,12 @@ class DeleteDhcps extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
 
         $this->vpc->dhcps()->each(function ($dhcp) {
             $dhcp->delete();
         });
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
     }
 }
