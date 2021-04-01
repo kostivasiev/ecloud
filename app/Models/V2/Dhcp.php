@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Dhcp\Created;
 use App\Events\V2\Dhcp\Deleted;
 use App\Events\V2\Dhcp\Deleting;
+use App\Events\V2\Dhcp\Saved;
 use App\Events\V2\Dhcp\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
@@ -26,7 +27,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable;
 
     public $keyPrefix = 'dhcp';
     public $incrementing = false;
@@ -41,8 +42,8 @@ class Dhcp extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => Created::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];

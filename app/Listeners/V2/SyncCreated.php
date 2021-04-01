@@ -3,10 +3,12 @@
 namespace App\Listeners\V2;
 
 use App\Jobs\Sync\Update;
+use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
+use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
 class SyncCreated
@@ -20,6 +22,8 @@ class SyncCreated
             Volume::class,
             Instance::class,
             Nic::class,
+            Vpc::class,
+            Dhcp::class,
         ])) {
             return true;
         }

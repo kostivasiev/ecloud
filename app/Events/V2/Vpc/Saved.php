@@ -5,7 +5,7 @@ namespace App\Events\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Creating
+class Saved
 {
     use SerializesModels;
 
