@@ -66,7 +66,7 @@ class CrudTest extends TestCase
         ];
         $this->post('/v2/host-groups', $data)
             ->seeInDatabase('host_groups', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
     }
 
     public function testCreateWithoutAz()
@@ -86,7 +86,7 @@ class CrudTest extends TestCase
         ];
         $this->post('/v2/host-groups', $data)
             ->seeInDatabase('host_groups', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
 
         $hostGroupId = (json_decode($this->response->getContent()))->data->id;
         $hostGroup = HostGroup::findOrFail($hostGroupId);

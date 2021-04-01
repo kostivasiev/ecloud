@@ -1,38 +1,36 @@
 <?php
 namespace App\Listeners\V2\Host;
 
+use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
 use App\Models\V2\Sync;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Class UpdateBilling
+ * Add a billing metric when a dedicated host is created
+ * @package App\Listeners\V2\Host
+ */
 class UpdateBilling
 {
-    public function handle($event)
+    public function handle(Updated $event)
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
-        if (!($event->model instanceof Sync)) {
+        $sync = $event->model;
+
+        if (!$sync->completed
+            || $sync->type != Sync::TYPE_UPDATE
+            || !($sync->resource instanceof Host)
+        ) {
             return;
         }
 
-        if (!$event->model->completed) {
-            return;
-        }
+        $host = $sync->resource;
 
-        if (Resource::classFromId($event->model->resource_id) != Host::class) {
-            return;
-        }
-
-        $host = Host::withTrashed()->find($event->model->resource_id);
-
-        if (empty($host) || $host->trashed()) {
-            return;
-        }
-
-        $currentActiveMetric = BillingMetric::getActiveByKey($host, 'host');
+        $currentActiveMetric = BillingMetric::getActiveByKey($host, $host->hostGroup->hostSpec->id);
         if (!empty($currentActiveMetric)) {
             return;
         }
@@ -54,7 +52,7 @@ class UpdateBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'host spec\' billing product \'' . $host->hostGroup->hostSpec->id
+                get_class($this) . ': Failed to load \'host spec\' billing product \'' . $host->hostGroup->hostSpec->id
                 . '\' for availability zone ' . $host->hostGroup->availabilityZone->id
             );
         } else {
@@ -63,13 +61,8 @@ class UpdateBilling
         }
 
         $billingMetric->save();
-        Log::debug('Added billing metric for ' . $host->id);
 
-        // End host group billing
-        $billingMetric = BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup');
-        if ($billingMetric) {
-            $billingMetric->setEndDate();
-        }
+        Log::debug(get_class($this) . ': Added billing metric for ' . $host->id);
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }

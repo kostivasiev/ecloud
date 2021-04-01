@@ -112,7 +112,6 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Host\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
-            \App\Listeners\V2\HostGroup\UpdateBilling::class,
         ],
 
         // HostGroup
@@ -293,7 +292,9 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
 
             \App\Listeners\V2\HostGroup\UpdateBilling::class,
+
             \App\Listeners\V2\Host\UpdateBilling::class,
+            \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
         ],
         \App\Events\V2\Sync\Created::class => [
             \App\Listeners\V2\SyncCreated::class

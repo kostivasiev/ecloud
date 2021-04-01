@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\Host\Deleted;
 use App\Events\V2\Host\Saved;
+use App\Traits\V2\Billable;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
