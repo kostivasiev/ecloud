@@ -16,6 +16,7 @@ use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\RouterThroughput;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
@@ -67,6 +68,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var FirewallPolicy */
     private $firewallPolicy;
+
+    /** @var RouterThroughput */
+    private $routerThroughput;
 
     /** @var Router */
     private $router;
@@ -130,14 +134,30 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->firewallPolicy;
     }
 
+    public function routerThroughput()
+    {
+        if (!$this->routerThroughput) {
+            Model::withoutEvents(function() {
+                $this->routerThroughput = factory(RouterThroughput::class)->create([
+                    'id' => 'rtp-test',
+                    'committed_bandwidth' => '1024'
+                ]);
+            });
+        }
+        return $this->routerThroughput;
+    }
+
     public function router()
     {
         if (!$this->router) {
-            $this->router = factory(Router::class)->create([
-                'id' => 'rtr-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id
-            ]);
+            Model::withoutEvents(function() {
+                $this->router = factory(Router::class)->create([
+                    'id' => 'rtr-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'router_throughput_id' => $this->routerThroughput()->id,
+                ]);
+            });
         }
         return $this->router;
     }

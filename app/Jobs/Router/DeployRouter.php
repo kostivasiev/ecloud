@@ -24,26 +24,13 @@ class DeployRouter extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
-
-        $availabilityZone = $this->router->availabilityZone;
-        if (!$availabilityZone) {
-            $this->fail(new \Exception('Failed to find AZ for router ' . $this->router->id));
-            return;
-        }
-
-        $nsxService = $availabilityZone->nsxService();
-        if (!$nsxService) {
-            $this->fail(new \Exception('Failed to find NSX Service for router ' . $this->router->id));
-            return;
-        }
-
         if (empty($this->router->routerThroughput)) {
             $this->fail(new \Exception('Failed determine router throughput settings for router ' . $this->router->id));
             return;
         }
 
         // Load default T0 for the AZ
-        $tier0SearchResponse = $nsxService->get(
+        $tier0SearchResponse = $this->router->availabilityZone->nsxService()->get(
             '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default'
         );
         $tier0SearchResponse = json_decode($tier0SearchResponse->getBody()->getContents());
@@ -55,7 +42,7 @@ class DeployRouter extends Job
 
         $tier0 = $tier0SearchResponse->results[0];
 
-        $gatewayQosProfileSearchResponse = $nsxService->get(
+        $gatewayQosProfileSearchResponse = $this->router->availabilityZone->nsxService()->get(
             'policy/api/v1/search/query?query=resource_type:GatewayQosProfile'
             . '%20AND%20committed_bandwitdth:' . $this->router->routerThroughput->committed_bandwidth
         );
@@ -70,7 +57,7 @@ class DeployRouter extends Job
         }
 
         // Deploy the router
-        $nsxService->patch('policy/api/v1/infra/tier-1s/' . $this->router->id, [
+        $this->router->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->router->id, [
             'json' => [
                 'tier0_path' => $tier0->path,
                 'tags' => [

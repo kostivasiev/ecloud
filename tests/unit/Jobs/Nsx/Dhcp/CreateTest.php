@@ -48,9 +48,11 @@ class CreateTest extends TestCase
                 return new Response(200);
             });
 
+        Event::fake([JobFailed::class]);
+
         dispatch(new Create($this->dhcp));
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testFails()

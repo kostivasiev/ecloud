@@ -12,6 +12,7 @@ use App\Models\V2\Vpc;
 use App\Models\V2\Vpn;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -56,9 +57,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Queue::failing(function (JobFailed $event) {
-            Log::error('Exception in ' . static::class, [
-                'event' => $event,
-            ]);
+            Log::error('Job failed', ['exception' => $event->exception]);
         });
     }
 }
