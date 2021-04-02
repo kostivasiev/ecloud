@@ -24,12 +24,12 @@ class Update extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-            $this->updateSyncBatch([
-                [
-                    new CreateDhcps($this->sync->resource),
-                    new AwaitDhcpSync($this->sync->resource),
-                ],
-            ])->dispatch();
+        $this->updateSyncBatch([
+            [
+                new CreateDhcps($this->sync->resource),
+                new AwaitDhcpSync($this->sync->resource),
+            ],
+        ])->dispatch();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }

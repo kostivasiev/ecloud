@@ -26,6 +26,10 @@ class CreateDhcps extends Job
         $vpc = $this->vpc;
 
         $this->vpc->region->availabilityZones()->each(function ($availabilityZone) use ($vpc) {
+            if ($vpc->dhcps()->where('availability_zone_id', $availabilityZone->id)->count() > 0) {
+                Log::info('DHCP already exists for AZ ' . $availabilityZone->id . ', skipping');
+                return;
+            }
             $dhcp = app()->make(Dhcp::class);
             $dhcp->vpc()->associate($vpc);
             $dhcp->availabilityZone()->associate($availabilityZone);
