@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Router\Creating;
 use App\Events\V2\Router\Created;
 use App\Events\V2\Router\Deleted;
+use App\Events\V2\Router\Deleting;
 use App\Events\V2\Router\Saved;
 use App\Events\V2\Router\Saving;
 use App\Traits\V2\CustomKey;
@@ -33,7 +34,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules, Syncable;
 
     public $keyPrefix = 'rtr';
     public $incrementing = false;
@@ -60,10 +61,10 @@ class Router extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
-        'created' => Created::class,
-        'saved' => Saved::class,
-        'deleted' => Deleted::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
+        'deleting' => Deleting::class,
+        'deleted' => Deleted::class,
     ];
 
     public $children = [
@@ -86,6 +87,7 @@ class Router extends Model implements Filterable, Sortable
         return $this->hasMany(FirewallPolicy::class);
     }
 
+    // TODO: Remove this, invalid relationship
     public function firewallRules()
     {
         return $this->hasMany(FirewallRule::class);
