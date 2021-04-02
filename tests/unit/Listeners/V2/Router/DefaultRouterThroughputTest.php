@@ -1,18 +1,19 @@
 <?php
 
-namespace Tests\unit\Router;
+namespace Tests\unit\Listeners\V2\Router;
 
 use App\Listeners\V2\Router\DefaultRouterThroughput;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DefaultRouterThroughputTest extends TestCase
 {
     use DatabaseMigrations;
+
+    private Router $router;
 
     public function setUp(): void
     {
@@ -28,13 +29,13 @@ class DefaultRouterThroughputTest extends TestCase
 
         $defaultThroughputListener = \Mockery::mock(DefaultRouterThroughput::class)->makePartial();
 
-        $router = factory(Router::class)->make([
+        $this->router = factory(Router::class)->make([
             'availability_zone_id' => $this->availabilityZone()->id,
             'router_throughput_id' => null
         ]);
 
-        $defaultThroughputListener->handle(new \App\Events\V2\Router\Creating($router));
+        $defaultThroughputListener->handle(new \App\Events\V2\Router\Creating($this->router));
 
-        $this->assertEquals($routerThroughput->id, $router->router_throughput_id);
+        $this->assertEquals($routerThroughput->id, $this->router->router_throughput_id);
     }
 }
