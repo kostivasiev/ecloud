@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Router;
 
-use App\Jobs\Router\DeployRouter;
+use App\Jobs\Router\Deploy;
 use App\Models\V2\Router;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class DeployRouterTest extends TestCase
+class DeployTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -72,7 +72,7 @@ class DeployRouterTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRouter($this->router()));
+        dispatch(new Deploy($this->router()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -102,7 +102,7 @@ class DeployRouterTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRouter($this->router()));
+        dispatch(new Deploy($this->router()));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'Failed to determine gateway QoS profile for router ' . $this->router()->id . ', with router_throughput_id ' . $this->routerThroughput()->id;
@@ -119,7 +119,7 @@ class DeployRouterTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRouter($this->router));
+        dispatch(new Deploy($this->router));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'Failed determine router throughput settings for router rtr-test';

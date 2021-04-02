@@ -7,7 +7,7 @@ use App\Models\V2\Router;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class DeployRouter extends Job
+class Deploy extends Job
 {
     use Batchable;
     

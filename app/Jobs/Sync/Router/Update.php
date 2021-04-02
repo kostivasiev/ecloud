@@ -3,7 +3,7 @@
 namespace App\Jobs\Sync\Router;
 
 use App\Jobs\Job;
-use App\Jobs\Router\DeployRouter;
+use App\Jobs\Router\Deploy;
 use App\Jobs\Router\DeployRouterDefaultRule;
 use App\Jobs\Router\DeployRouterLocale;
 use App\Models\V2\Sync;
@@ -27,7 +27,7 @@ class Update extends Job
 
         $this->updateSyncBatch([
             [
-                new DeployRouter($this->sync->resource),
+                new Deploy($this->sync->resource),
                 new DeployRouterLocale($this->sync->resource),
                 new DeployRouterDefaultRule($this->sync->resource),
             ],
