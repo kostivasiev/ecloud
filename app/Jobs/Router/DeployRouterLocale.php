@@ -25,22 +25,10 @@ class DeployRouterLocale extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
 
-        $availabilityZone = $this->router->availabilityZone;
-        if (!$availabilityZone) {
-            $this->fail(new \Exception('Failed to find AZ for router ' . $this->router->id));
-            return;
-        }
-
-        $nsxService = $availabilityZone->nsxService();
-        if (!$nsxService) {
-            $this->fail(new \Exception('Failed to find NSX Service for router ' . $this->router->id));
-            return;
-        }
-
         // Deploy the router locale
-        $nsxService->patch('policy/api/v1/infra/tier-1s/' . $this->router->id . '/locale-services/' . $this->router->id, [
+        $this->router->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->router->id . '/locale-services/' . $this->router->id, [
             'json' => [
-                'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $nsxService->getEdgeClusterId(),
+                'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $this->router->availabilityZone->nsxService()->getEdgeClusterId(),
                 'tags' => [
                     [
                         'scope' => config('defaults.tag.scope'),

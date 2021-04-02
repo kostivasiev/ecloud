@@ -2,24 +2,12 @@
 
 namespace Tests\unit\Jobs\Router;
 
-use App\Events\V2\Nic\Saved;
-use App\Events\V2\Nic\Saving;
-use App\Jobs\Instance\Deploy\ConfigureNics;
-use App\Jobs\Kingpin\Volume\Undeploy;
-use App\Jobs\Nsx\Dhcp\Create;
 use App\Jobs\Router\DeployRouter;
-use App\Models\V2\Dhcp;
-use App\Models\V2\Nic;
 use App\Models\V2\Router;
-use App\Models\V2\Volume;
-use App\Rules\V2\IpAvailable;
-use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
