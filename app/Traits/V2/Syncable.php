@@ -81,6 +81,7 @@ trait Syncable
         return $this->syncs()->latest()->first()->failure_reason !== null;
     }
 
+    // TODO: Remove this once all models are using new sync
     public function setSyncCompleted()
     {
         Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
@@ -97,6 +98,7 @@ trait Syncable
         Log::info(get_class($this) . ' : Setting Sync to completed - Finished', ['resource_id' => $this->id]);
     }
 
+    // TODO: Remove this once all models are using new sync
     public function setSyncFailureReason($value)
     {
         Log::info(get_class($this) . ' : Setting Sync to failed - Started', ['resource_id' => $this->id]);
@@ -119,7 +121,8 @@ trait Syncable
     }
 
     /**
-     * TODO :- Come up with a nicer way to do this as this is disgusting!
+     * TODO :- move this to exception handler to handle exception thrown from
+     *         ResourceSyncSaving/ResourceSyncDeleting event listeners
      * @return \Illuminate\Http\JsonResponse
      */
     public function getSyncError()

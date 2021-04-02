@@ -48,15 +48,10 @@ class Router extends Model implements Filterable, Sortable
         'vpc_id',
         'availability_zone_id',
         'router_throughput_id',
-        'deployed',
     ];
 
     protected $appends = [
         'available'
-    ];
-
-    protected $casts = [
-        'deployed' => 'boolean',
     ];
 
     protected $dispatchesEvents = [
@@ -165,7 +160,6 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('router_throughput_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
-            $factory->create('deployed', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -184,7 +178,6 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('router_throughput_id'),
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
-            $factory->create('deployed'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -210,7 +203,6 @@ class Router extends Model implements Filterable, Sortable
             'router_throughput_id' => 'router_throughput_id',
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
-            'deployed' => 'deployed',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
