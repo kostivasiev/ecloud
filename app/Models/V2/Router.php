@@ -82,12 +82,6 @@ class Router extends Model implements Filterable, Sortable
         return $this->hasMany(FirewallPolicy::class);
     }
 
-    // TODO: Remove this, invalid relationship
-    public function firewallRules()
-    {
-        return $this->hasMany(FirewallRule::class);
-    }
-
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
