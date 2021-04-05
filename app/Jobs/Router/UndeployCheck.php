@@ -11,7 +11,7 @@ class UndeployCheck extends Job
 {
     use Batchable;
 
-    const RETRY_DELAY = 5;
+    public $backoff = 5;
     public $tries = 500;
     private Router $router;
 
@@ -31,8 +31,9 @@ class UndeployCheck extends Job
         foreach ($response->results as $result) {
             if ($this->router->id === $result->id) {
                 Log::info(
-                    'Waiting for ' . $this->router->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                    'Waiting for ' . $this->router->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
+                $this->release($this->backoff);
                 return;
             }
         }
