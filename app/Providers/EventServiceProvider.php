@@ -148,9 +148,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Creating::class => [
             \App\Listeners\V2\Network\DefaultSubnet::class,
         ],
-        \App\Events\V2\Network\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Network\Saving::class => [
             \App\Listeners\V2\ResourceSyncSaving::class,
         ],
