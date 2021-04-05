@@ -479,6 +479,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                     ],
                 ]));
             });
+        $this->nsxServiceMock()->expects('get')
+            ->with('/api/v1/search/query?query=resource_type:IpPool%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-vtep-ip-pool')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => 'TEST-VTEP-IP-POOL-ID',
+                        ],
+                    ],
+                ]));
+            });
         $this->nsxServiceMock()->expects('post')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () {
