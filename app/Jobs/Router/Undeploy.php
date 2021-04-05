@@ -4,7 +4,7 @@ namespace App\Jobs\Router;
 
 use App\Jobs\Job;
 use App\Models\V2\Router;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -25,7 +25,7 @@ class Undeploy extends Job
 
         try {
             $this->router->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $this->router->id);
-        } catch (RequestException $e) {
+        } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
                 Log::info("Router already removed, skipping");
                 return;

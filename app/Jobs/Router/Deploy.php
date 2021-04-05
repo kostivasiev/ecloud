@@ -4,6 +4,7 @@ namespace App\Jobs\Router;
 
 use App\Jobs\Job;
 use App\Models\V2\Router;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -29,19 +30,6 @@ class Deploy extends Job
             return;
         }
 
-        // Load default T0 for the AZ
-        $tier0SearchResponse = $this->router->availabilityZone->nsxService()->get(
-            '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default'
-        );
-        $tier0SearchResponse = json_decode($tier0SearchResponse->getBody()->getContents());
-
-        if ($tier0SearchResponse->result_count != 1) {
-            $this->fail(new \Exception('No tagged T0 could be found'));
-            return;
-        }
-
-        $tier0 = $tier0SearchResponse->results[0];
-
         $gatewayQosProfileSearchResponse = $this->router->availabilityZone->nsxService()->get(
             'policy/api/v1/search/query?query=resource_type:GatewayQosProfile'
             . '%20AND%20committed_bandwitdth:' . $this->router->routerThroughput->committed_bandwidth
@@ -56,21 +44,48 @@ class Deploy extends Job
             return;
         }
 
-        // Deploy the router
-        $this->router->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->router->id, [
-            'json' => [
-                'tier0_path' => $tier0->path,
-                'tags' => [
-                    [
-                        'scope' => config('defaults.tag.scope'),
-                        'tag' => $this->router->vpc_id,
-                    ],
+        $payload = [
+            'tags' => [
+                [
+                    'scope' => config('defaults.tag.scope'),
+                    'tag' => $this->router->vpc_id,
                 ],
-                'qos_profile' => [
-                    'egress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path,
-                    'ingress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path
-                ]
             ],
+            'qos_profile' => [
+                'egress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path,
+                'ingress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path
+            ]
+        ];
+
+        $exists = true;
+        try {
+            $this->router->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $this->router->id);
+        } catch (ClientException $e) {
+            if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
+                $exists = false;
+            } else {
+                throw $e;
+            }
+        }
+
+        if (!$exists) {
+            // Load default T0 for the AZ
+            $tier0SearchResponse = $this->router->availabilityZone->nsxService()->get(
+                '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default'
+            );
+            $tier0SearchResponse = json_decode($tier0SearchResponse->getBody()->getContents());
+
+            if ($tier0SearchResponse->result_count != 1) {
+                $this->fail(new \Exception('No tagged T0 could be found'));
+                return;
+            }
+
+            $payload['tier0_path'] = $tier0SearchResponse->results[0]->path;
+        }
+
+        // Deploy/update the router
+        $this->router->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->router->id, [
+            'json' => $payload,
         ]);
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->router->id]);
