@@ -5,6 +5,7 @@ namespace Tests\unit\Jobs\Router;
 use App\Jobs\Router\Undeploy;
 use App\Jobs\Router\UndeployRouterLocale;
 use App\Models\V2\Router;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -50,7 +51,7 @@ class UndeployTest extends TestCase
         $this->nsxServiceMock()->expects('get')
             ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router()->id])
             ->andThrow(
-                new RequestException('Not Found', new Request('GET', 'test'), new Response(404))
+                new ClientException('Not Found', new Request('GET', 'test'), new Response(404))
             );
         $this->nsxServiceMock()->shouldNotReceive('delete');
 

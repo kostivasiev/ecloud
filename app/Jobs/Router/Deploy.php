@@ -25,6 +25,7 @@ class Deploy extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
+
         if (empty($this->router->routerThroughput)) {
             $this->fail(new \Exception('Failed determine router throughput settings for router ' . $this->router->id));
             return;
