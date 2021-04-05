@@ -17,8 +17,6 @@ class DeployTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Router $router;
-
     public function setUp(): void
     {
         parent::setUp();
