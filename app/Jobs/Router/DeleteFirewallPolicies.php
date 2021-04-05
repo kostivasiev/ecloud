@@ -24,7 +24,6 @@ class DeleteFirewallPolicies extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
 
         $this->router->firewallPolicies()->each(function ($fwp) {
-            dd("in delete");
             $fwp->delete();
         });
 
