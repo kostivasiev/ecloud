@@ -32,7 +32,6 @@ class Update extends Job
                 new Deploy($this->sync->resource),
                 new DeploySecurityProfile($this->sync->resource),
                 new DeployDiscoveryProfile($this->sync->resource),
-                // TODO: Is qos profile required here? Old listener set to blank?
             ],
         ])->dispatch();
 

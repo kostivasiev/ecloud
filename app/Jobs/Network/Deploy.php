@@ -4,6 +4,7 @@ namespace App\Jobs\Network;
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
+use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
@@ -26,6 +27,7 @@ class Deploy extends Job
         $dhcp = $this->network->router->vpc->dhcps()->where('availability_zone_id', $this->network->router->availability_zone_id)->first();
         if (empty($dhcp)) {
             $this->fail(new Exception('Unable to locate VPC DHCP server for router availability zone'));
+            return;
         }
 
         $subnet = Subnet::fromString($this->network->subnet);
