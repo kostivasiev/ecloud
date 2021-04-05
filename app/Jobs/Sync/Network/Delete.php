@@ -3,6 +3,8 @@
 namespace App\Jobs\Sync\Network;
 
 use App\Jobs\Job;
+use App\Jobs\Network\Undeploy;
+use App\Jobs\Network\UndeployCheck;
 use App\Jobs\Network\UndeployDiscoveryProfile;
 use App\Jobs\Network\UndeploySecurityProfile;
 use App\Models\V2\Sync;
@@ -28,7 +30,8 @@ class Delete extends Job
             [
                 new UndeploySecurityProfile($this->sync->resource),
                 new UndeployDiscoveryProfile($this->sync->resource),
-                // TODO: Is qos profile removal required here? Old deploy listener set to blank?
+                new Undeploy($this->sync->resource),
+                new UndeployCheck($this->sync->resource),
             ],
         ])->dispatch();
 

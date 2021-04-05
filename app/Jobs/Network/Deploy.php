@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Jobs\Network;
-
 
 use App\Jobs\Job;
 use App\Models\V2\Network;

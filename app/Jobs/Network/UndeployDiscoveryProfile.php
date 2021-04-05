@@ -1,14 +1,11 @@
 <?php
 
-
 namespace App\Jobs\Network;
-
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
-use IPLib\Range\Subnet;
 
 class UndeployDiscoveryProfile extends Job
 {
