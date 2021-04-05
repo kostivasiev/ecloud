@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Nsx\Network;
+namespace App\Jobs\Network;
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
@@ -29,16 +29,13 @@ class UndeployCheck extends Job
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
             if ($this->model->id === $result->id) {
-                $this->release(static::RETRY_DELAY);
                 Log::info(
-                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                    'Waiting for ' . $this->network->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
+                $this->release($this->backoff);
                 return;
             }
         }
-
-        $this->model->setSyncCompleted();
-        $this->model->syncDelete();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

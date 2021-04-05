@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Jobs\Network;
+
+use App\Jobs\Job;
+use App\Models\V2\Network;
+use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
+
+class Undeploy extends Job
+{
+    use Batchable;
+
+    private Network $network;
+
+    public function __construct(Network $network)
+    {
+        $this->network = $network;
+    }
+
+    public function handle()
+    {
+        Log::info(get_class($this) . ' : Started', ['id' => $this->network->id]);
+
+        $router = $this->network->router;
+
+        // Delete Security profile
+        Log::info('Deleting security profile');
+
+
+        // Delete Discovery profile
+        
+
+        // Delete QOS profile
+        Log::info('Deleting QOS profile');
+        $response = $router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->network->id . '/segment-qos-profile-binding-maps',
+        );
+        $response = json_decode($response->getBody()->getContents(), true);
+        if (isset($response['results'][0])) {
+            $router->availabilityZone->nsxService()->delete(
+                'policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $this->network->id . '/segment-qos-profile-binding-maps/' . $response['results'][0]['id'],
+            );
+            Log::info('Deleted QOS profile ' . $response['results'][0]['id']);
+        }
+
+        // Delete Network
+        $this->model->router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id
+        );
+
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->network->id]);
+    }
+}

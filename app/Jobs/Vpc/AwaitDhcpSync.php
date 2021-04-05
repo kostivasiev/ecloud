@@ -33,8 +33,8 @@ class AwaitDhcpSync extends Job
             }
 
             if ($dhcp->getStatus() != Sync::STATUS_COMPLETE) {
-                Log::warning('DHCP not in sync, retrying', ['id' => $this->vpc->id, 'dhcp' => $dhcp->id]);
-                throw new \Exception('DHCP not in sync');
+                Log::warning('DHCP not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->vpc->id, 'dhcp' => $dhcp->id]);
+                return $this->release($this->backoff);
             }
         });
 

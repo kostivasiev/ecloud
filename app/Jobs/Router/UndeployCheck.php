@@ -33,8 +33,7 @@ class UndeployCheck extends Job
                 Log::info(
                     'Waiting for ' . $this->router->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
-                $this->release($this->backoff);
-                return;
+                return $this->release($this->backoff);
             }
         }
 

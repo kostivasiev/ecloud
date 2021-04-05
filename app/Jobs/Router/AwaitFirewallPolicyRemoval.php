@@ -34,8 +34,8 @@ class AwaitFirewallPolicyRemoval extends Job
                 }
             });
 
-            Log::warning($this->router->firewallPolicies()->count() . ' firewall polic(y/ies) still attached, retrying', ['id' => $this->router->id]);
-            throw new \Exception($this->router->firewallPolicies()->count() . ' firewall polic(y/ies) still attached');
+            Log::warning($this->router->firewallPolicies()->count() . ' firewall polic(y/ies) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->router->id]);
+            return $this->release($this->backoff);
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->router->id]);
