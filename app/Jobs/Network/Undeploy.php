@@ -26,7 +26,7 @@ class Undeploy extends Job
 
         try {
             $this->network->router->availabilityZone->nsxService()->get(
-                    'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id
+                'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id
             );
         } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
