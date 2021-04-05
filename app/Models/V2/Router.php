@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Router\Creating;
 use App\Events\V2\Router\Created;
 use App\Events\V2\Router\Deleted;
+use App\Events\V2\Router\Deleting;
 use App\Events\V2\Router\Saved;
 use App\Events\V2\Router\Saving;
 use App\Traits\V2\CustomKey;
@@ -33,7 +34,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules, Syncable;
 
     public $keyPrefix = 'rtr';
     public $incrementing = false;
@@ -47,23 +48,18 @@ class Router extends Model implements Filterable, Sortable
         'vpc_id',
         'availability_zone_id',
         'router_throughput_id',
-        'deployed',
     ];
 
     protected $appends = [
         'available'
     ];
 
-    protected $casts = [
-        'deployed' => 'boolean',
-    ];
-
     protected $dispatchesEvents = [
         'creating' => Creating::class,
-        'created' => Created::class,
-        'saved' => Saved::class,
-        'deleted' => Deleted::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
+        'deleting' => Deleting::class,
+        'deleted' => Deleted::class,
     ];
 
     public $children = [
@@ -84,11 +80,6 @@ class Router extends Model implements Filterable, Sortable
     public function firewallPolicies()
     {
         return $this->hasMany(FirewallPolicy::class);
-    }
-
-    public function firewallRules()
-    {
-        return $this->hasMany(FirewallRule::class);
     }
 
     public function vpc()
@@ -163,7 +154,6 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('router_throughput_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
-            $factory->create('deployed', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -182,7 +172,6 @@ class Router extends Model implements Filterable, Sortable
             $factory->create('router_throughput_id'),
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
-            $factory->create('deployed'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -208,7 +197,6 @@ class Router extends Model implements Filterable, Sortable
             'router_throughput_id' => 'router_throughput_id',
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
-            'deployed' => 'deployed',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

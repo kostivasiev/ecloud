@@ -222,18 +222,17 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Router\Creating::class => [
             \App\Listeners\V2\Router\DefaultRouterThroughput::class
         ],
-        \App\Events\V2\Router\Created::class => [
-            \App\Listeners\V2\Router\Deploy::class,
-            \App\Listeners\V2\ResourceSync::class,
+        \App\Events\V2\Router\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Router\Saved::class => [
-            \App\Listeners\V2\Router\Update::class,
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Router\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Router\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
-        ],
-        \App\Events\V2\Router\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
         ],
 
         // Volume
@@ -274,6 +273,9 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Sync
+        \App\Events\V2\Sync\Created::class => [
+            \App\Listeners\V2\SyncCreated::class
+        ],
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
@@ -283,8 +285,5 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
         ],
-        \App\Events\V2\Sync\Created::class => [
-            \App\Listeners\V2\SyncCreated::class
-        ]
     ];
 }

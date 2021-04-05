@@ -3,10 +3,13 @@
 namespace Tests\unit\Jobs\Nsx\Dhcp;
 
 use App\Jobs\Nsx\Dhcp\Undeploy;
+use App\Jobs\Nsx\Dhcp\UndeployCheck;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -37,9 +40,11 @@ class UndeployTest extends TestCase
                 return new Response(200);
             });
 
+        Event::fake([JobFailed::class]);
+
         dispatch(new Undeploy($this->dhcp));
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testFails()
