@@ -20,6 +20,7 @@ class DeleteFirewallPoliciesTest extends TestCase
 
     protected Router $router;
     protected FirewallPolicy $fwp1;
+    protected FirewallPolicy $fwp2;
 
     public function setUp(): void
     {
