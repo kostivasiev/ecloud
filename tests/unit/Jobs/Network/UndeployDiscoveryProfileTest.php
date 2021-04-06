@@ -23,6 +23,12 @@ class UndeployDiscoveryProfileTest extends TestCase
     public function testDiscoveryProfileRemovedWhenExists()
     {
         $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
+        $this->nsxServiceMock()->expects('get')
             ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id . '/segment-discovery-profile-binding-maps'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
@@ -47,8 +53,30 @@ class UndeployDiscoveryProfileTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
     }
 
+    public function testDiscoveryProfileNotRemovedWhenRouterDoesntExist()
+    {
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id])
+            ->andThrow(
+                new ClientException('Not Found', new Request('GET', 'test'), new Response(404))
+            );
+        $this->nsxServiceMock()->shouldNotReceive('delete');
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new UndeployDiscoveryProfile($this->network()));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
     public function testDiscoveryProfileNotRemovedWhenDoesntExist()
     {
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
         $this->nsxServiceMock()->expects('get')
             ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id . '/segment-discovery-profile-binding-maps'])
             ->andReturnUsing(function () {
