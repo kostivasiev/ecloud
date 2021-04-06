@@ -138,6 +138,4 @@ class ToggleHostGroupBillingTest extends TestCase
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNull($metric);
     }
-
-
 }
