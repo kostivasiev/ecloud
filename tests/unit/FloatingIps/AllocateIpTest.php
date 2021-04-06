@@ -37,10 +37,13 @@ class AllocateIpTest extends TestCase
         });
 
         $this->event = new Saving($this->floating_ip);
-        $this->floating_ip = factory(FloatingIp::class)->create([
-            'ip_address' => null,
-            'vpc_id' => $this->vpc()->id
-        ]);
+        $this->floating_ip = FloatingIp::withoutEvents(function () {
+            return factory(FloatingIp::class)->create([
+                'id' => 'fip-test2',
+                'ip_address' => null,
+                'vpc_id' => $this->vpc()->id
+            ]);
+        });
 
         $mockAdminNetworking = \Mockery::mock(\UKFast\Admin\Networking\AdminClient::class)
             ->shouldAllowMockingProtectedMethods();
