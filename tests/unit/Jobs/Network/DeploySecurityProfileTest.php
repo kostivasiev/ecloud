@@ -22,8 +22,6 @@ class DeploySecurityProfileTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->dhcp();
     }
 
     public function testUseExistingBindingMapAndSucceeds()
