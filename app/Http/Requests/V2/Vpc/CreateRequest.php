@@ -29,12 +29,13 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => [
-                'nullable',
+            'name' => 'nullable|string',
+            'region_id' => [
+                'required',
                 'string',
                 new IsMaxVpcLimitReached(),
+                'exists:ecloud.regions,id,deleted_at,NULL'
             ],
-            'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL',
             'console_enabled' => 'sometimes|boolean',
         ];
     }
