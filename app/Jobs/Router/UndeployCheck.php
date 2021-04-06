@@ -11,8 +11,10 @@ class UndeployCheck extends Job
 {
     use Batchable;
 
+    // Wait up to 30 minutes
+    public $tries = 360;
     public $backoff = 5;
-    public $tries = 500;
+
     private Router $router;
 
     public function __construct(Router $router)
@@ -33,8 +35,7 @@ class UndeployCheck extends Job
                 Log::info(
                     'Waiting for ' . $this->router->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
-                $this->release($this->backoff);
-                return;
+                return $this->release($this->backoff);
             }
         }
 

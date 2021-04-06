@@ -33,8 +33,8 @@ class AwaitNicSync extends Job
             }
 
             if ($nic->getStatus() != Sync::STATUS_COMPLETE) {
-                Log::warning('NIC not in sync, retrying', ['id' => $this->instance->id, 'nic' => $nic->id]);
-                throw new \Exception('Nic not in sync');
+                Log::warning('NIC not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->instance->id, 'nic' => $nic->id]);
+                return $this->release($this->backoff);
             }
         });
 

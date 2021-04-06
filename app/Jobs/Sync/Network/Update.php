@@ -3,15 +3,15 @@
 namespace App\Jobs\Sync\Network;
 
 use App\Jobs\Job;
-use App\Jobs\Network\Undeploy;
-use App\Jobs\Network\UndeployCheck;
-use App\Jobs\Network\UndeployDiscoveryProfile;
-use App\Jobs\Network\UndeploySecurityProfile;
+use App\Jobs\Network\AwaitRouterSync;
+use App\Jobs\Network\DeployDiscoveryProfile;
+use App\Jobs\Network\DeploySecurityProfile;
+use App\Jobs\Network\Deploy;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
-class Delete extends Job
+class Update extends Job
 {
     use SyncableBatch;
 
@@ -26,12 +26,12 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        $this->deleteSyncBatch([
+        $this->updateSyncBatch([
             [
-                new UndeploySecurityProfile($this->sync->resource),
-                new UndeployDiscoveryProfile($this->sync->resource),
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new AwaitRouterSync($this->sync->resource),
+                new Deploy($this->sync->resource),
+                new DeploySecurityProfile($this->sync->resource),
+                new DeployDiscoveryProfile($this->sync->resource),
             ],
         ])->dispatch();
 

@@ -175,6 +175,20 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->vpc;
     }
 
+    public function dhcp()
+    {
+        if (!$this->dhcp) {
+            Model::withoutEvents(function () {
+                $this->dhcp = factory(Dhcp::class)->create([
+                    'id' => 'dhcp-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                ]);
+            });
+        }
+        return $this->dhcp;
+    }
+
     public function region()
     {
         if (!$this->region) {
@@ -386,11 +400,14 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function network()
     {
         if (!$this->network) {
-            $this->network = factory(Network::class)->create([
-                'id' => 'net-abcdef12',
-                'name' => 'Manchester Network',
-                'router_id' => $this->router()->id
-            ]);
+            Model::withoutEvents(function() {
+                $this->network = factory(Network::class)->create([
+                    'id' => 'net-abcdef12',
+                    'name' => 'Manchester Network',
+                    'subnet' => '10.0.0.0/24',
+                    'router_id' => $this->router()->id
+                ]);
+            });
         }
         return $this->network;
     }
