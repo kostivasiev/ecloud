@@ -2,18 +2,14 @@
 
 namespace Tests\unit\FloatingIps;
 
-use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Saving;
 use App\Jobs\FloatingIp\AllocateIp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
-use UKFast\Admin\Networking\AdminClient;
-use UKFast\Admin\Networking\IpRangeClient;
 
 class AllocateIpTest extends TestCase
 {
@@ -41,6 +37,10 @@ class AllocateIpTest extends TestCase
         });
 
         $this->event = new Saving($this->floating_ip);
+        $this->floating_ip = factory(FloatingIp::class)->create([
+            'ip_address' => null,
+            'vpc_id' => $this->vpc()->id
+        ]);
 
         $mockAdminNetworking = \Mockery::mock(\UKFast\Admin\Networking\AdminClient::class)
             ->shouldAllowMockingProtectedMethods();

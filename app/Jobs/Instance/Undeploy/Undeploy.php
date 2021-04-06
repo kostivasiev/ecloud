@@ -20,12 +20,12 @@ class Undeploy extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $this->instance->availabilityZone
             ->kingpinService()
             ->delete('/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id);
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

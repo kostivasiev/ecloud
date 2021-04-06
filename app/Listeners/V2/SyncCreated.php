@@ -2,19 +2,22 @@
 
 namespace App\Listeners\V2;
 
-use App\Jobs\Sync\Update;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\Router;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
+use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
 class SyncCreated
 {
     public function handle($event)
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $event->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         // TODO: Remove following once all syncable resources are using update/delete functionality
         if (!in_array(get_class($event->model->resource), [
@@ -22,6 +25,10 @@ class SyncCreated
             Instance::class,
             Nic::class,
             FloatingIp::class,
+            Vpc::class,
+            Dhcp::class,
+            Router::class,
+            Network::class,
         ])) {
             return true;
         }
@@ -41,6 +48,6 @@ class SyncCreated
             dispatch(new $syncJob($event->model));
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }

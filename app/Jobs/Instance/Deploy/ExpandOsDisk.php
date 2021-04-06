@@ -26,7 +26,7 @@ class ExpandOsDisk extends Job
      */
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $volume = $this->instance->volumes->first();
 
@@ -58,6 +58,6 @@ class ExpandOsDisk extends Job
             ]
         );
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

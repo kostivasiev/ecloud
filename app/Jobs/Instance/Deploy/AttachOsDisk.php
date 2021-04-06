@@ -26,7 +26,7 @@ class AttachOsDisk extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $getInstanceResponse = $this->instance->availabilityZone->kingpinService()->get(
             '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
@@ -45,7 +45,7 @@ class AttachOsDisk extends Job
             $volume = Volume::find($volumeData->volumeId);
 
             if ($volume->getStatus() === Sync::STATUS_INPROGRESS) {
-                Log::debug('Waiting for Volume ' . $volume->id . ' to finish syncing...');
+                Log::info('Waiting for Volume ' . $volume->id . ' to finish syncing...');
                 $this->release(static::RETRY_DELAY);
                 return;
             }
@@ -56,6 +56,6 @@ class AttachOsDisk extends Job
             Log::info(get_class($this) . ' : Volume ' . $volume->id . ' successfully attached');
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

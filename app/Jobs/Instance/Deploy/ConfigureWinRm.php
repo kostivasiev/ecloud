@@ -20,7 +20,7 @@ class ConfigureWinRm extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $logMessage = 'ConfigureWinRm for ' . $this->instance->id . ': ';
         if ($this->instance->platform != 'Windows') {
@@ -48,6 +48,6 @@ class ConfigureWinRm extends Job
             ]
         );
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

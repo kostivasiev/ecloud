@@ -6,6 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -22,34 +23,22 @@ class GetVpcsTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->regions = factory(Region::class, 2)->create([
-            'name' => $this->faker->country(),
-        ])->each(function ($region) {
-            factory(AvailabilityZone::class, 2)->create([
-                'region_id' => $region->id,
-                'name'      => $this->faker->city(),
-                'is_public' => false,
-            ]);
-        });
-        $this->vpc = factory(Vpc::class)->create([
-            'name'      => 'VPC '.uniqid(),
-            'region_id' => $this->regions[0]->id,
-        ]);
+        $this->vpc();
     }
 
     public function testGetVpcCollection()
     {
         $this->get(
-            '/v2/regions/'.$this->regions[0]->id.'/vpcs',
+            '/v2/regions/'.$this->region()->id.'/vpcs',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'        => $this->vpc->id,
-                'name'      => $this->vpc->name,
-                'region_id' => $this->vpc->region_id,
+                'id'        => $this->vpc()->id,
+                'name'      => $this->vpc()->name,
+                'region_id' => $this->vpc()->region_id,
             ])
             ->assertResponseStatus(200);
     }

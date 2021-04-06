@@ -2,15 +2,10 @@
 
 namespace Tests\unit\Listeners\V2\Nat;
 
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Nat;
-use App\Models\V2\Network;
 use App\Models\V2\Nic;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
@@ -23,6 +18,10 @@ class DeployTest extends TestCase
 
     protected \Faker\Generator $faker;
     protected $instance;
+    protected $region;
+    protected $availability_zone;
+    protected $router;
+    protected $network;
     protected $floating_ip;
     protected $nic;
     protected $nat;

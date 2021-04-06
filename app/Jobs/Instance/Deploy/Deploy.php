@@ -24,7 +24,7 @@ class Deploy extends Job
      */
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         if (empty($this->instance->image)) {
             $this->fail(new \Exception(
@@ -52,6 +52,6 @@ class Deploy extends Job
             throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
 use App\Jobs\Nsx\Network\Undeploy;
@@ -138,8 +139,15 @@ class NetworkController extends BaseController
             'name',
             'subnet',
         ]));
-        $network->save();
-        $network->refresh();
+
+        try {
+            if (!$network->save()) {
+                return $network->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $network->getSyncError();
+        }
+
         return $this->responseIdMeta($request, $network->id, 201);
     }
 
@@ -154,22 +162,32 @@ class NetworkController extends BaseController
         $network->fill($request->only([
             'name',
         ]));
-        if (!$network->save()) {
+
+        try {
+            if (!$network->save()) {
+                return $network->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $network->getSyncError();
         }
+
         return $this->responseIdMeta($request, $network->id, 200);
     }
 
     public function destroy(Request $request, string $networkId)
     {
-        $model = Network::forUser($request->user())->findOrFail($networkId);
+        $network = Network::forUser($request->user())->findOrFail($networkId);
 
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
+        if (!$network->canDelete()) {
+            return $network->getDeletionError();
         }
-        if (!$model->delete()) {
-            return $model->getSyncError();
+
+        try {
+            $network->delete();
+        } catch (SyncException $exception) {
+            return $network->getSyncError();
         }
+
         return response()->json([], 204);
     }
 
