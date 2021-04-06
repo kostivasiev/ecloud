@@ -378,6 +378,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
             ]);
         }
         return $this->hostGroup;

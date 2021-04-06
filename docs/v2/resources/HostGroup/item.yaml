@@ -28,12 +28,14 @@ patch:
             - $ref: '../../resources/HostGroup/schema.yaml'
             - type : object
               properties :
-                availability_zone_id :
-                  readOnly : true
-                vpc_id :
-                  readOnly : true
-                host_spec_id :
-                  readOnly : true
+                availability_zone_id:
+                  readOnly: true
+                vpc_id:
+                  readOnly: true
+                host_spec_id:
+                  readOnly: true
+                windows_enabled:
+                  readOnly: true
   responses:
     200:
       $ref: '../../resources/HostGroup/responses/idResponse.yaml'

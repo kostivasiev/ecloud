@@ -11,7 +11,8 @@ X-Reseller-Id: 1
     "name": "test host group",
     "vpc_id": "{{dev_vpc_id}}",
     "availability_zone_id" : "{{dev_availability_zone_id}}",
-    "host_spec_id" : "{{dev_host_spec_id}}"
+    "host_spec_id" : "{{dev_host_spec_id}}",
+    "windows_enabled": true
 }
 
 > {%
@@ -53,6 +54,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.vpc_id === "vpc-aaaaaaaa");
   client.assert(response.body.data.availability_zone_id === "az-aaaaaaaa");
   client.assert(response.body.data.host_spec_id === "hs-aaaaaaaa");
+  client.assert(response.body.data.windows_enabled === true);
 });
 %}
 

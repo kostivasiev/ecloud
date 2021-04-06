@@ -39,6 +39,7 @@ class HostGroupController extends BaseController
             'vpc_id',
             'availability_zone_id',
             'host_spec_id',
+            'windows_enabled',
         ]));
         $model->save();
         return $this->responseIdMeta($request, $model->id, 202);
