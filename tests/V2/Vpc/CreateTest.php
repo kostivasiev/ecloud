@@ -106,7 +106,7 @@ class CreateTest extends TestCase
     public function testExceedMaxVpcLimit()
     {
         $counter = 1;
-        factory(Vpc::class, config('defaults.vpc.max_count', 20))
+        factory(Vpc::class, config('defaults.vpc.max_count', 10))
             ->make([
                 'reseller_id' => 1,
                 'region_id' => $this->region()->id,
@@ -134,7 +134,7 @@ class CreateTest extends TestCase
         )->seeJson(
             [
                 'title' => 'Validation Error',
-                'detail' => 'The maximum number of Vpc instances has been reached',
+                'detail' => 'The maximum number of 10 VPCs has been reached',
             ]
         )->assertResponseStatus(422);
     }

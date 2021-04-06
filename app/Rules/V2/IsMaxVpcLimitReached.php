@@ -12,17 +12,23 @@ class IsMaxVpcLimitReached implements Rule
 
     public function __construct()
     {
-        $this->vpcMaxLimit = config('defaults.vpc.max_count', 20);
+        $this->vpcMaxLimit = config('defaults.vpc.max_count');
     }
 
     public function passes($attribute, $value)
     {
+        if (is_null($this->vpcMaxLimit)) {
+            return false;
+        }
         $vpc = Vpc::forUser(Auth::user())->get();
         return ($vpc->count() < $this->vpcMaxLimit);
     }
 
     public function message()
     {
-        return 'The maximum number of Vpc instances has been reached';
+        if (is_null($this->vpcMaxLimit)) {
+            return 'The maximum number of VPCs has not been configured';
+        }
+        return 'The maximum number of ' . $this->vpcMaxLimit . ' VPCs has been reached';
     }
 }
