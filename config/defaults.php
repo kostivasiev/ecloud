@@ -3,7 +3,7 @@
 return [
     'availability_zones' => [],
     'vpc' => [
-        'max_count' => 20,
+        'max_count' => 10,
     ],
     'network' => [
         'subnets' => [
