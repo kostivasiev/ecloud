@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\unit\Listeners\V2\HostGroup;
+namespace Tests\unit\Listeners\V2\Host;
 
 use App\Models\V2\BillingMetric;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Sync;
@@ -15,19 +14,17 @@ class UpdateBillingTest extends TestCase
     use DatabaseMigrations;
 
     protected Sync $sync;
-    protected HostGroup $hostGroup;
 
     protected Product $product;
-    protected ProductPrice $productPrice;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        // Setup HostGroup product
+        // Setup Host product
         $this->product = factory(Product::class)->create([
             'product_sales_product_id' => 0,
-            'product_name' => $this->availabilityZone()->id.': hostgroup',
+            'product_name' => $this->availabilityZone()->id.': hs-test',
             'product_category' => 'eCloud',
             'product_subcategory' => 'Compute',
             'product_supplier' => 'UKFast',
@@ -35,32 +32,35 @@ class UpdateBillingTest extends TestCase
             'product_duration_type' => 'Hour',
             'product_duration_length' => 1,
         ]);
-        $this->productPrice = factory(ProductPrice::class)->create([
+        factory(ProductPrice::class)->create([
             'product_price_product_id' => $this->product->id,
-            'product_price_sale_price' => 0.0000115314,
+            'product_price_sale_price' => 0.00694444,
         ]);
     }
 
-    public function testCreatingHostGroupAddsBillingMetric()
+    public function testCreatingHostAddsBillingMetric()
     {
-        $this->hostGroup();
-
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
+        $this->host();
+        //$sync = $this->host()->syncs()->latest()->first();
+        // Even though $this->>host() will mock the sync and we can use above, use this instead
+        // as we're going to refactor host deployment sync soon so we only have to test this small unit.
+        $sync = Sync::withoutEvents(function() {
+            $sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
                 'type' => Sync::TYPE_UPDATE
             ]);
-            $this->sync->resource()->associate($this->hostGroup());
+            $sync->resource()->associate($this->host());
+            return $sync;
         });
 
         // Check that the billing metric is added
-        $UpdateBillingListener = new \App\Listeners\V2\HostGroup\UpdateBilling;
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateBilling;
+        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
 
-        $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
+        $metric = BillingMetric::getActiveByKey($this->host(), 'hs-test');
         $this->assertNotNull($metric);
-        $this->assertEquals(0.0000115314, $metric->price);
+        $this->assertEquals(0.00694444, $metric->price);
         $this->assertNotNull($metric->start);
         $this->assertNull($metric->end);
     }
