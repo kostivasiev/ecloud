@@ -51,17 +51,17 @@ class NatTest extends TestCase
 
         Model::withoutEvents(function () {
             $this->floating_ip = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
+                'id' => 'fip-test2',
                 'ip_address' => $this->faker->ipv4,
             ]);
             $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-a1ae98ce',
+                'id' => 'nic-a1ae98ce2',
                 'instance_id' => $this->instance()->id,
                 'network_id' => $this->network()->id,
                 'ip_address' => $this->faker->ipv4,
             ]);
             $this->nat = factory(Nat::class)->create([
-                'id' => 'nat-123456',
+                'id' => 'nat-1234562',
                 'destination_id' => $this->floating_ip->id,
                 'destinationable_type' => FloatingIp::class,
                 'translated_id' => $this->nic->id,
