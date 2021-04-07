@@ -45,8 +45,7 @@ class UpdateLicenseBilling
         $cores = $hostSpec->cpu_sockets * $hostSpec->cpu_cores;
         if ($cores < config('host.billing.windows.min_cores')) {
             Log::debug('Number of cores for host spec ' . $hostSpec->id . ' (' . $cores . ') is less than billing minimum of '
-                . config('host.billing.windows.min_cores') . '. Inserting billing for minimum value instead.'
-            );
+                . config('host.billing.windows.min_cores') . '. Inserting billing for minimum value instead.');
         }
 
         $billingMetric = app()->make(BillingMetric::class);
@@ -59,7 +58,7 @@ class UpdateLicenseBilling
 
         $product = $host->hostGroup->availabilityZone
             ->products()
-            ->where('product_name',$host->hostGroup->availabilityZone->id . ': host windows-os-license')
+            ->where('product_name', $host->hostGroup->availabilityZone->id . ': host windows-os-license')
             ->first();
 
         if (empty($product)) {
