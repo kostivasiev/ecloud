@@ -40,7 +40,7 @@ class UpdateBilling
             'resource_id' => $host->id,
             'vpc_id' => $host->hostGroup->vpc->id,
             'reseller_id' => $host->hostGroup->vpc->reseller_id,
-            'key' => $host->hostGroup->hostSpec->id,
+            'key' => 'host.' . $host->hostGroup->hostSpec->id,
             'value' => 1,
             'start' => Carbon::now(),
             'category' => 'Compute',

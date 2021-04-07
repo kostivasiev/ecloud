@@ -34,14 +34,17 @@ class ProcessBilling extends Command
      * @var array|string[]
      */
     protected array $billableMetrics = [
+        // Instance
         'vcpu.count',
         'ram.capacity',
         'disk.capacity',
         'license.windows',
+        // Volume
         'disk.capacity.300',
         'disk.capacity.600',
         'disk.capacity.1200',
         'disk.capacity.2500',
+        //Router
         'throughput.20Mb',
         'throughput.50Mb',
         'throughput.100Mb',
@@ -51,8 +54,10 @@ class ProcessBilling extends Command
         'throughput.2.5Gb',
         'throughput.5Gb',
         'throughput.10Gb',
-        'az-aaaaaaaa: hostgroup.unallocated',
-        'az-aaaaaaaa: host-6-4000-64',
+        // Host
+        'hostgroup',
+        'host.license.windows',
+        'host.hs-aaaaaaaa'
     ];
 
     public function __construct()

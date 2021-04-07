@@ -58,7 +58,7 @@ class UpdateBillingTest extends TestCase
         $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateBilling;
         $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
 
-        $metric = BillingMetric::getActiveByKey($this->host(), 'hs-test');
+        $metric = BillingMetric::getActiveByKey($this->host(), 'host.hs-test');
         $this->assertNotNull($metric);
         $this->assertEquals(0.00694444, $metric->price);
         $this->assertNotNull($metric->start);
