@@ -21,6 +21,7 @@ use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Instance\Deploy\Deploy;
+use App\Models\V2\Network;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
@@ -39,6 +40,12 @@ class Update extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+
+        // Check the network status
+        $network = Network::findOrFail($this->sync->resource->deploy_data['network_id']);
+        if ($network->getStatus() === Sync::STATUS_FAILED) {
+            throw new \Exception('The network is currently in a failed state and cannot be used');
+        }
 
         if (!$this->sync->resource->deployed) {
             $this->updateSyncBatch([
