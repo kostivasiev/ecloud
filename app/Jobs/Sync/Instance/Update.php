@@ -42,9 +42,11 @@ class Update extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
         // Check the network status
-        $network = Network::findOrFail($this->sync->resource->deploy_data['network_id']);
-        if ($network->getStatus() === Sync::STATUS_FAILED) {
-            throw new \Exception('The network is currently in a failed state and cannot be used');
+        if (!empty($this->sync->resource->deploy_data) && array_key_exists('network_id', $this->sync->resource->deploy_data)) {
+            $network = Network::findOrFail($this->sync->resource->deploy_data['network_id']);
+            if ($network->getStatus() === Sync::STATUS_FAILED) {
+                throw new \Exception('The network is currently in a failed state and cannot be used');
+            }
         }
 
         if (!$this->sync->resource->deployed) {
