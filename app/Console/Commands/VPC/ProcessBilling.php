@@ -57,7 +57,8 @@ class ProcessBilling extends Command
         // Host
         'hostgroup',
         'host.license.windows',
-        'host.hs-aaaaaaaa'
+        'host.hs-aaaaaaaa', // DEV
+        'host.hs-287b6a00'
     ];
 
     public function __construct()
