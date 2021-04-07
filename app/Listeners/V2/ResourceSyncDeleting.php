@@ -12,7 +12,7 @@ class ResourceSyncDeleting
 {
     public function handle($event)
     {
-        Log::debug(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
+        Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
 
         $model = $event->model;
 
@@ -41,7 +41,7 @@ class ResourceSyncDeleting
             $lock->release();
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['resource_id' => $model->id]);
+        Log::info(get_class($this) . ' : Finished', ['resource_id' => $model->id]);
         return false;
     }
 }

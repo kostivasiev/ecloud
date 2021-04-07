@@ -24,7 +24,7 @@ class AwaitNicRemoval extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         if ($this->instance->nics()->count() > 0) {
             $this->instance->nics()->each(function ($nic) {
@@ -38,6 +38,6 @@ class AwaitNicRemoval extends Job
             throw new \Exception("'" . $this->instance->nics()->count() . "' NICs still attached");
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

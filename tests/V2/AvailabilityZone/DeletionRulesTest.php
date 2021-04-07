@@ -29,12 +29,9 @@ class DeletionRulesTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->router = factory(Router::class)->create([
             'name' => 'Manchester Router 1',
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id,
         ]);
     }

@@ -26,7 +26,7 @@ class Deploy extends Job
             // Check if the host already exists on the SAN
             $response = $availabilityZone->artisanService()->get('/api/v2/san/' . $availabilityZone->san_name .'/host/' . $host->id);
             if ($response->getStatusCode() == 200) {
-                Log::debug(get_class($this) . ' : Host already exists on the SAN, nothing to do.', ['id' => $this->model->id]);
+                Log::info(get_class($this) . ' : Host already exists on the SAN, nothing to do.', ['id' => $this->model->id]);
                 return true;
             }
         } catch (RequestException $exception) {

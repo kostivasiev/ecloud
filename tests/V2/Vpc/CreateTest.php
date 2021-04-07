@@ -33,32 +33,6 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameDefaultsToId()
-    {
-        $data = [
-            'name' => '',
-            'region_id' => $this->region()->id,
-        ];
-        $this->post(
-            '/v2/vpcs',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-                'X-Reseller-Id' => 1,
-            ]
-        )->assertResponseStatus(201);
-
-        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
-
-        $this->seeJson([
-            'id' => $virtualPrivateCloudId,
-        ]);
-
-        $vpc = Vpc::findOrFail($virtualPrivateCloudId);
-        $this->assertEquals($virtualPrivateCloudId, $vpc->name);
-    }
-
     public function testNullRegionIsFailed()
     {
         $data = [
@@ -127,57 +101,5 @@ class CreateTest extends TestCase
                 'status' => 403
             ]
         )->assertResponseStatus(403);
-    }
-
-    public function testValidDataSucceeds()
-    {
-        $data = [
-            'name' => 'CreateTest Name',
-            'region_id' => $this->region()->id,
-            'reseller_id' => 1,
-            'console_enabled' => true,
-        ];
-        $this->post(
-            '/v2/vpcs',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-                'X-Reseller-Id' => 1
-            ]
-        )
-            ->seeInDatabase(
-                'vpcs',
-                $data,
-                'ecloud'
-            )
-            ->assertResponseStatus(201);
-
-        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $virtualPrivateCloudId,
-        ]);
-    }
-
-    public function testCreateTriggersDhcpDispatch()
-    {
-        Event::fake();
-
-        $vpc = factory(Vpc::class)->create([
-            'id' => 'vpc-abc123'
-        ]);
-
-        Event::assertDispatched(\App\Events\V2\Vpc\Created::class, function ($event) use ($vpc) {
-            return $event->model->id === $vpc->id;
-        });
-
-        $dhcp = factory(Dhcp::class)->create([
-            'id' => 'dhcp-abc123',
-            'vpc_id' => 'vpc-abc123'
-        ]);
-
-        Event::assertDispatched(\App\Events\V2\Dhcp\Created::class, function ($event) use ($dhcp) {
-            return $event->model->id === $dhcp->id;
-        });
     }
 }

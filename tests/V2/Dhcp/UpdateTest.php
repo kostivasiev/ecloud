@@ -7,6 +7,8 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -19,10 +21,13 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id
-        ]);
+        Model::withoutEvents(function () {
+            $this->dhcp = factory(Dhcp::class)->create([
+                'id' => 'dhcp-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id
+            ]);
+        });
     }
 
     public function testNoPermsIsDenied()
@@ -66,6 +71,8 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
+        Event::fake();
+
         $data = [
             'name' => 'Updated Name',
         ];

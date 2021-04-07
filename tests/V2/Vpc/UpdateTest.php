@@ -2,8 +2,10 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Events\V2\Vpc\Saved;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -39,6 +41,7 @@ class UpdateTest extends TestCase
 
     public function testNonMatchingResellerIdFails()
     {
+        Event::fake();
         $this->vpc()->reseller_id = 3;
         $this->vpc()->save();
         $this->patch('/v2/vpcs/' . $this->vpc()->id, [
@@ -74,6 +77,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
+        Event::fake();
         $data = [
             'name' => 'name',
             'reseller_id' => 2,
@@ -82,8 +86,8 @@ class UpdateTest extends TestCase
         $this->patch('/v2/vpcs/' . $this->vpc()->id, $data, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeInDatabase('vpcs', $data, 'ecloud')
-            ->assertResponseStatus(200);
-        $this->assertEquals($data['name'], Vpc::findOrFail($this->vpc()->id)->name);
+        ]);
+
+        Event::assertDispatched(Saved::class);
     }
 }

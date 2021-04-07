@@ -23,7 +23,7 @@ class RunApplianceBootstrap extends Job
      */
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         if ($this->instance->platform !== 'Linux') {
             Log::info('RunApplianceBootstrap for ' . $this->instance->id . ', nothing to do for non-Linux platforms, skipping');
@@ -59,6 +59,6 @@ class RunApplianceBootstrap extends Job
             ]
         );
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

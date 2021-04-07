@@ -35,20 +35,13 @@ class UpdateCapacityTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
             'ip_address' => '1.1.1.1',
-            'vpc_id' => $this->vpc->id
+            'vpc_id' => $this->vpc()->id
         ]);
 
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
-            'availability_zone_id' => $this->availabilityZone->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
             'current' => null
         ]);
 
