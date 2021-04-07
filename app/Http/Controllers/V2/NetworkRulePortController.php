@@ -46,7 +46,6 @@ class NetworkRulePortController extends BaseController
     {
         $model = NetworkRulePort::forUser(Auth::user())->findOrFail($networkRulePortId);
         $model->fill($request->only([
-            'network_rule_id',
             'name',
             'protocol',
             'source',

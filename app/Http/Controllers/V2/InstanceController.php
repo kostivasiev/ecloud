@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Instance\Deploy;
-use App\Events\V2\Instance\Deploy\Data;
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -20,12 +19,15 @@ use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\VolumeResource;
+use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -60,9 +62,6 @@ class InstanceController extends BaseController
     public function show(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
-        if ($this->isAdmin) {
-            $instance->makeVisible('appliance_version_id');
-        }
 
         return new InstanceResource(
             $instance
@@ -72,6 +71,7 @@ class InstanceController extends BaseController
     /**
      * @param CreateRequest $request
      * @return JsonResponse
+     * @throws ValidationException
      */
     public function store(CreateRequest $request)
     {
@@ -84,7 +84,7 @@ class InstanceController extends BaseController
                 $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
             }
             if (!$defaultNetworkId) {
-                return JsonResponse::create([
+                return response()->json([
                     'errors' => [
                         [
                             'title' => 'Not Found',
@@ -100,31 +100,34 @@ class InstanceController extends BaseController
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
+            'image_id',
             'vcpu_cores',
             'ram_capacity',
             'locked',
             'backup_enabled',
+            'host_group_id',
         ]));
 
         $instance->locked = $request->input('locked', false);
-        if ($request->has('appliance_id')) {
-            $instance->setApplianceVersionId($request->get('appliance_id'));
+        $instance->deploy_data = [
+            'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min')),
+            'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
+            'network_id' => $request->input('network_id', $defaultNetworkId),
+            'floating_ip_id' => $request->input('floating_ip_id'),
+            'requires_floating_ip' => $request->input('requires_floating_ip', false),
+            'image_data' => $request->input('image_data'),
+            'user_script' => $request->input('user_script'),
+        ];
+
+        try {
+            if (!$instance->save()) {
+                return $instance->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $instance->getSyncError();
         }
-        $instance->save();
+
         $instance->refresh();
-
-        $instanceDeployData = new Data();
-        $instanceDeployData->instance_id = $instance->id;
-        $instanceDeployData->vpc_id = $instance->vpc->id;
-        $instanceDeployData->volume_capacity = $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min'));
-        $instanceDeployData->volume_iops = $request->input('volume_iops', config('volume.iops.default'));
-        $instanceDeployData->network_id = $request->input('network_id', $defaultNetworkId);
-        $instanceDeployData->floating_ip_id = $request->input('floating_ip_id');
-        $instanceDeployData->requires_floating_ip = $request->input('requires_floating_ip', false);
-        $instanceDeployData->appliance_data = $request->input('appliance_data');
-        $instanceDeployData->user_script = $request->input('user_script');
-
-        event(new Deploy($instanceDeployData));
 
         return $this->responseIdMeta($request, $instance->id, 201);
     }
@@ -143,10 +146,15 @@ class InstanceController extends BaseController
             'locked',
             'backup_enabled',
             'vcpu_cores',
-            'ram_capacity'
+            'ram_capacity',
+            'host_group_id',
         ]));
 
-        if (!$instance->save()) {
+        try {
+            if (!$instance->save()) {
+                return $instance->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $instance->getSyncError();
         }
 
@@ -162,9 +170,12 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        if (!$instance->delete()) {
+        try {
+            $instance->delete();
+        } catch (SyncException $exception) {
             return $instance->getSyncError();
         }
+
         return response('', 204);
     }
 
@@ -228,10 +239,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOn([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $this->dispatch(new PowerOn($instance));
 
         return response('', 202);
     }
@@ -241,10 +249,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOff([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $this->dispatch(new PowerOff($instance));
 
 
         return response('', 202);
@@ -305,5 +310,111 @@ class InstanceController extends BaseController
         $instance->save();
 
         return response('', 204);
+    }
+
+    public function consoleSession(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $instance->availabilityZone
+            ->kingpinService()
+            ->post(
+                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/console/session'
+            );
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::info(
+                __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console session',
+                [
+                    'instance' => $instance,
+                    'response' => $response,
+                ]
+            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Bad Gateway',
+                    'details' => 'Console access to this instance is not available',
+                    'status' => Response::HTTP_BAD_GATEWAY,
+                ]
+            ], Response::HTTP_BAD_GATEWAY);
+        }
+        $json = json_decode($response->getBody()->getContents());
+        $host = $json->host ?? null;
+        $ticket = $json->ticket ?? null;
+
+        // Get Credentials
+        $consoleResource = $instance->availabilityZone->credentials()
+            ->where('username', 'envoyapi')
+            ->first();
+        if (!$consoleResource) {
+            Log::info(
+                __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console credentials',
+                ['instance' => $instance]
+            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Upstream API Failure',
+                    'details' => 'Console access is not available due to an upstream api failure',
+                    'status' => Response::HTTP_SERVICE_UNAVAILABLE,
+                ]
+            ], Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        try {
+            $client = app()->make(Client::class, [
+                'config' => [
+                    'base_uri' => $consoleResource->host.':'.$consoleResource->port,
+                    'verify' => app()->environment() === 'production',
+                    'headers' => [
+                        'X-API-Authentication' => $consoleResource->password,
+                    ],
+                ],
+            ]);
+            $response = $client->post('/session', [
+                \GuzzleHttp\RequestOptions::JSON => [
+                    'host' => $host,
+                    'ticket' => $ticket,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            $response = response('', Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+        if (!$response || $response->getStatusCode() !== 201) {
+            Log::info(
+                __CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session from host',
+                [
+                    'data' => [
+                        'instance' => $instance,
+                        'host' => $consoleResource->host,
+                    ]
+                ]
+            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Upstream API Failure',
+                    'details' => 'Console session is not available due to an upstream api failure',
+                    'status' => Response::HTTP_SERVICE_UNAVAILABLE,
+                ]
+            ], Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        $responseJson = json_decode($response->getBody()->getContents());
+        $uuid = $responseJson->uuid ?? '';
+        if (empty($uuid)) {
+            Log::info(__CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session UUID from host', [
+                'instance' => $instance,
+                'base_uri' => $consoleResource->host.':'.$consoleResource->port,
+                'status_code' => Response::HTTP_SERVICE_UNAVAILABLE,
+            ]);
+            abort(Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
+        return response()->json([
+            'data' => [
+                'url' => $consoleResource->host . '/console/?title=id' . $instance->id . '&session=' . $uuid,
+            ],
+            'meta' => (object)[]
+        ]);
     }
 }

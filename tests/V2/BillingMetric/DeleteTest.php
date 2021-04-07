@@ -37,16 +37,13 @@ class DeleteTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->billingMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->router->id,
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'reseller_id' => 1,
             'key' => 'ram.capacity',
             'value' => '16GB',

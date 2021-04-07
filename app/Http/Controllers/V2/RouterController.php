@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Router\CreateRequest;
 use App\Http\Requests\V2\Router\UpdateRequest;
 use App\Jobs\FirewallPolicy\ConfigureDefaults;
@@ -42,17 +43,31 @@ class RouterController extends BaseController
     public function create(CreateRequest $request)
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
-        $router->save();
+
+        try {
+            if (!$router->save()) {
+                return $router->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $router->getSyncError();
+        }
+
         return $this->responseIdMeta($request, $router->id, 201);
     }
 
     public function update(UpdateRequest $request, string $routerId)
     {
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
-        $router->fill($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
-        if (!$router->save()) {
+        $router->fill($request->only(['name', 'vpc_id', 'router_throughput_id']));
+
+        try {
+            if (!$router->save()) {
+                return $router->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $router->getSyncError();
         }
+
         return $this->responseIdMeta($request, $router->id, 200);
     }
 
@@ -63,7 +78,9 @@ class RouterController extends BaseController
         if (!$model->canDelete()) {
             return $model->getDeletionError();
         }
-        if (!$model->delete()) {
+        try {
+            $model->delete();
+        } catch (SyncException $exception) {
             return $model->getSyncError();
         }
         return response()->json([], 204);

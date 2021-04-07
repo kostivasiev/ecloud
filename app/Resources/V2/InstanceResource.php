@@ -26,7 +26,6 @@ use Log;
  * @property string agent_running
  * @property string platform
  * @property integer volume_capacity
- * @property boolean task_running
  * @property boolean backup_enabled
  * @property string status
  * @property string created_at
@@ -45,12 +44,13 @@ class InstanceResource extends UKFastResource
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
-            'appliance_id' => $this->appliance_id,
+            'image_id' => $this->image_id,
             'vcpu_cores' => $this->vcpu_cores,
             'ram_capacity' => $this->ram_capacity,
             'locked' => $this->locked,
             'platform' => $this->platform,
             'backup_enabled' => $this->backup_enabled,
+            'host_group_id' => $this->host_group_id,
             'volume_capacity' => $this->volume_capacity,
             'sync' => $this->getStatus(),
             'created_at' => $this->created_at === null ? null : Carbon::parse(
@@ -62,10 +62,6 @@ class InstanceResource extends UKFastResource
                 new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
-        if ($request->user()->isAdmin()) {
-            $response['appliance_version_id'] = $this->appliance_version_id;
-            $response['task_running'] = $this->task_running;
-        }
         if ($request->route('instanceId')) {
             $kingpinData = null;
             try {

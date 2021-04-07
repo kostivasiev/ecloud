@@ -13,7 +13,7 @@ class RouterThroughputController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = RouterThroughput::query();
+        $collection = RouterThroughput::forUser($request->user());
         $queryTransformer->config(RouterThroughput::class)
             ->transform($collection);
 
@@ -25,7 +25,7 @@ class RouterThroughputController extends BaseController
     public function show(Request $request, string $routerThroughputId)
     {
         return new RouterThroughputResource(
-            RouterThroughput::findOrFail($routerThroughputId)
+            RouterThroughput::forUser($request->user())->findOrFail($routerThroughputId)
         );
     }
 

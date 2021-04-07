@@ -13,7 +13,6 @@ use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -76,7 +75,7 @@ class VolumeController extends BaseController
                 });
 
             if (!$availabilityZone) {
-                return Response::create([
+                return response()->json([
                     'errors' => [
                         'title' => 'Not Found',
                         'detail' => 'The specified availability zone is not available to that VPC',
@@ -104,39 +103,16 @@ class VolumeController extends BaseController
     public function update(UpdateRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
-        if ($request->has('availability_zone_id')) {
-            $availabilityZone = Vpc::forUser(Auth::user())
-                ->findOrFail($request->input('vpc_id', $volume->vpc_id))
-                ->region
-                ->availabilityZones
-                ->first(function ($availabilityZone) use ($request) {
-                    return $availabilityZone->id == $request->availability_zone_id;
-                });
-
-            if (!$availabilityZone) {
-                return Response::create([
-                    'errors' => [
-                        'title' => 'Not Found',
-                        'detail' => 'The specified availability zone is not available to that VPC',
-                        'status' => 404,
-                        'source' => 'availability_zone_id'
-                    ]
-                ], 404);
-            }
-        }
-
-        $only = [
-            'name',
-            'vpc_id',
-            'capacity',
-            'availability_zone_id',
-            'iops',
-        ];
+        $only = ['name', 'capacity', 'iops'];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        if (!$volume->save()) {
+        try {
+            if (!$volume->save()) {
+                return $volume->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
 
@@ -146,10 +122,12 @@ class VolumeController extends BaseController
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
-        if (!$volume->delete()) {
+        try {
+            $volume->delete();
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
-        return response(null, 204);
+        return response('', 204);
     }
 
     public function attach(AttachRequest $request, string $volumeId)

@@ -55,5 +55,7 @@ class ProductPopulation extends Command
                 $this->info('Created product "' . $productName . '" (' . $product->product_id . ')');
             });
         });
+
+        return Command::SUCCESS;
     }
 }

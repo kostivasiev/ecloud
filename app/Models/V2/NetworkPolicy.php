@@ -2,9 +2,11 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkPolicy\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -16,7 +18,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class NetworkPolicy extends Model implements Filterable, Sortable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable;
+    use CustomKey, DefaultName, SoftDeletes, Syncable, SyncableOverrides;
 
     public string $keyPrefix = 'np';
 
@@ -31,12 +33,20 @@ class NetworkPolicy extends Model implements Filterable, Sortable
             'network_id',
             'name',
         ];
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class,
+        ];
         parent::__construct($attributes);
     }
 
     public function network()
     {
         return $this->belongsTo(Network::class);
+    }
+
+    public function networkRules()
+    {
+        return $this->hasMany(NetworkRule::class);
     }
 
     public function scopeForUser($query, Consumer $user)
