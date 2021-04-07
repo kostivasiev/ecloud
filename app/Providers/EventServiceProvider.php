@@ -293,6 +293,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\HostGroup\UpdateBilling::class,
             \App\Listeners\V2\Host\UpdateBilling::class,
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
+            \App\Listeners\V2\Host\UpdateLicenseBilling::class,
         ],
         \App\Events\V2\Sync\Created::class => [
             \App\Listeners\V2\SyncCreated::class

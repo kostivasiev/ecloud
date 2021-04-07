@@ -5,9 +5,7 @@ namespace App\Listeners\V2\Host;
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
-use App\Models\V2\Instance;
 use App\Models\V2\Sync;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -31,35 +29,43 @@ class UpdateLicenseBilling
 
         $host = $sync->resource;
 
-//        if ($instance->platform != 'Windows') {
-//            return;
-//        }
-//
-//        $time = Carbon::now();
-//
-//        $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.windows');
-//        if (!empty($currentActiveMetric)) {
-//            return;
-//        }
-//
-//        $billingMetric = app()->make(BillingMetric::class);
-//        $billingMetric->resource_id = $instance->id;
-//        $billingMetric->vpc_id = $instance->vpc->id;
-//        $billingMetric->reseller_id = $instance->vpc->reseller_id;
-//        $billingMetric->key = 'license.windows';
-//        $billingMetric->value = 1;
-//        $billingMetric->start = $time;
-//
-//        $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'windows');
-//        if (empty($product)) {
-//            Log::error(
-//                'Failed to load \'windows\' billing product for availability zone ' . $instance->availabilityZone->id
-//            );
-//        } else {
-//            $billingMetric->category = $product->category;
-//            $billingMetric->price = $product->getPrice($instance->vpc->reseller_id);
-//        }
-//
-//        $billingMetric->save();
+        if (!$host->hostGroup->windows_enabled) {
+            return;
+        }
+
+        $currentActiveMetric = BillingMetric::getActiveByKey($host, 'host.license.windows');
+        if (!empty($currentActiveMetric)) {
+            return;
+        }
+
+        $hostSpec = $host->hostGroup->hostSpec;
+
+        // We need to charge by the total number of cores, with a minimum of 16 cores
+        // cpu_sockets is the number of actual CPU's and cpu_cores is the number of cores each CPU has.
+        $cores = $hostSpec->cpu_sockets * $hostSpec->cpu_cores;
+
+        $billingMetric = app()->make(BillingMetric::class);
+        $billingMetric->resource_id = $host->id;
+        $billingMetric->vpc_id = $host->hostGroup->vpc->id;
+        $billingMetric->reseller_id = $host->hostGroup->vpc->reseller_id;
+        $billingMetric->key = 'host.license.windows';
+        $billingMetric->value = ($cores >= 16) ? $cores : 16;
+        $billingMetric->start = Carbon::now();
+
+        $product = $host->hostGroup->availabilityZone
+            ->products()
+            ->where('product_name',$host->hostGroup->availabilityZone->id . ': host windows-os-license')
+            ->first();
+
+        if (empty($product)) {
+            Log::error(
+                'Failed to load \'host windows-os-license\' billing product for availability zone ' . $host->hostGroup->availabilityZone->id
+            );
+        } else {
+            $billingMetric->category = $product->category;
+            $billingMetric->price = $product->getPrice($host->hostGroup->vpc->reseller_id);
+        }
+
+        $billingMetric->save();
     }
 }
