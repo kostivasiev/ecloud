@@ -7,7 +7,6 @@ use App\Models\V2\HostGroup;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Sync;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -42,15 +41,20 @@ class UpdateLicenseBillingTest extends TestCase
 
     public function testCreatingHostInWindowsEnabledHostGroupAddsBilling()
     {
-        $this->host();
+        $this->syncSaveIdempotent('h-test-2');
+        $host = factory(\App\Models\V2\Host::class)->create([
+            'id' => 'h-test-2',
+            'name' => 'h-test-2',
+            'host_group_id' => $this->hostGroup()->id,
+        ]);
 
-        $sync = Sync::withoutEvents(function() {
+        $sync = Sync::withoutEvents(function() use ($host) {
             $sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
                 'type' => Sync::TYPE_UPDATE
             ]);
-            $sync->resource()->associate($this->host());
+            $sync->resource()->associate($host);
             return $sync;
         });
 
@@ -58,21 +62,16 @@ class UpdateLicenseBillingTest extends TestCase
         $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateLicenseBilling();
         $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
 
-        $metric = BillingMetric::getActiveByKey($this->host(), 'host.license.windows');
+        $metric = BillingMetric::getActiveByKey($host, 'host.license.windows');
         $this->assertNotNull($metric);
         $this->assertEquals(0.0164384, $metric->price);
         $this->assertNotNull($metric->start);
         $this->assertNull($metric->end);
     }
 
-    public function testCreatingHostInWindowsNotEnabledHostGroupDoesNothing()
+    public function testCreatingHostInWindowsNotEnabledHostGroupDoesNotAddBilling()
     {
-        $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test-2')
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
+        $this->hostGroupJobMocks('hg-test-2');
         $hostGroup = factory(HostGroup::class)->create([
             'id' => 'hg-test-2',
             'name' => 'hg-test-2',
@@ -82,5 +81,28 @@ class UpdateLicenseBillingTest extends TestCase
             'windows_enabled' => false,
         ]);
 
+        $this->syncSaveIdempotent('h-test-2');
+        $host = factory(\App\Models\V2\Host::class)->create([
+            'id' => 'h-test-2',
+            'name' => 'h-test-2',
+            'host_group_id' => $hostGroup->id,
+        ]);
+
+        $sync = Sync::withoutEvents(function() use ($host) {
+            $sync = new Sync([
+                'id' => 'sync-1',
+                'completed' => true,
+                'type' => Sync::TYPE_UPDATE
+            ]);
+            $sync->resource()->associate($host);
+            return $sync;
+        });
+
+        // Check that no the billing metric is added
+        $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateLicenseBilling();
+        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+
+        $metric = BillingMetric::getActiveByKey($host, 'host.license.windows');
+        $this->assertNull($metric);
     }
 }

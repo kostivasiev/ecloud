@@ -11,7 +11,8 @@ X-Reseller-Id: 1
     "name": "test host group",
     "vpc_id": "{{dev_vpc_id}}",
     "availability_zone_id" : "{{dev_availability_zone_id}}",
-    "host_spec_id" : "{{dev_host_spec_id}}"
+    "host_spec_id" : "{{dev_host_spec_id}}",
+    "windows_enabled": true
 }
 
 > {%

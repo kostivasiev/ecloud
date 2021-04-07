@@ -242,11 +242,12 @@ trait Mocks
 
     /**
      * Mock that the host already exists on Update, so that we don't run the create jobs
+     * @param string $id
      */
-    protected function syncSaveIdempotent()
+    protected function syncSaveIdempotent($id = 'h-test')
     {
         $this->conjurerServiceMock()->expects('get')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test'])
+            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/' . $id])
             ->andReturnUsing(function () {
                 return new Response(200);
             });

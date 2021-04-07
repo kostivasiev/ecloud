@@ -43,6 +43,11 @@ class UpdateLicenseBilling
         // We need to charge by the total number of cores, with a minimum of 16 cores
         // cpu_sockets is the number of actual CPU's and cpu_cores is the number of cores each CPU has.
         $cores = $hostSpec->cpu_sockets * $hostSpec->cpu_cores;
+        if ($cores < config('host.billing.windows.min_cores')) {
+            Log::debug('Number of cores for host spec ' . $hostSpec->id . ' (' . $cores . ') is less than billing minimum of '
+                . config('host.billing.windows.min_cores') . '. Inserting billing for minimum value instead.'
+            );
+        }
 
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->resource_id = $host->id;
