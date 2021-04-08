@@ -40,6 +40,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('vpc:process-billing')->monthlyOn(1, '01:00')->emailOutputTo(config('alerts.billing.to'));
+        if ($this->app->environment() == 'production') {
+            $schedule->command('vpc:process-billing')
+                ->monthlyOn(1, '01:00')
+                ->emailOutputTo(config('alerts.billing.to'));
+        }
     }
 }

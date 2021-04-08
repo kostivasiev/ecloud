@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Vpc\CreateRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\FirewallPolicy\ConfigureDefaults;
@@ -57,7 +58,13 @@ class VpcController extends BaseController
             $vpc->console_enabled = $request->input('console_enabled', true);
         }
         $vpc->reseller_id = $this->resellerId;
-        $vpc->save();
+        try {
+            if (!$vpc->save()) {
+                return $vpc->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $vpc->getSyncError();
+        }
         return $this->responseIdMeta($request, $vpc->id, 201);
     }
 
@@ -81,7 +88,13 @@ class VpcController extends BaseController
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
-        $vpc->save();
+        try {
+            if (!$vpc->save()) {
+                return $vpc->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $vpc->getSyncError();
+        }
         return $this->responseIdMeta($request, $vpc->id, 200);
     }
 
@@ -91,7 +104,11 @@ class VpcController extends BaseController
         if (!$model->canDelete()) {
             return $model->getDeletionError();
         }
-        $model->delete();
+        try {
+            $model->delete();
+        } catch (SyncException $exception) {
+            return $model->getSyncError();
+        }
         return response()->json([], 204);
     }
 

@@ -22,7 +22,6 @@ class SetDefaultBilling extends Command
                 $this->info('Running default billing listener against ' . $router->id);
                 $event = new Creating($router);
                 $listener->handle($event);
-                $event->model->setSyncCompleted();
                 $event->model->save();
             } catch (\Throwable $exception) {
                 Log::error('Failed to set default router throughput', [

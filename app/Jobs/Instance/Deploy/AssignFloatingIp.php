@@ -23,7 +23,7 @@ class AssignFloatingIp extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         if ((!empty($this->instance->deploy_data['floating_ip_id']) || $this->instance->deploy_data['requires_floating_ip']) && $this->instance->nics()->count() < 1) {
             $this->fail(new Exception('AssignFloatingIp failed for ' . $this->instance->id . ': Failed. Instance has no NIC'));
@@ -51,6 +51,6 @@ class AssignFloatingIp extends Job
             Log::info('Floating IP (' . $floatingIp->id . ') assigned to NIC (' . $nic->id . ')');
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

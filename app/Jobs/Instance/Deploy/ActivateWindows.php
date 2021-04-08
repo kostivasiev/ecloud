@@ -20,7 +20,7 @@ class ActivateWindows extends Job
 
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $logMessage = 'ActivateWindows for ' . $this->instance->id . ': ';
         if ($this->instance->platform != 'Windows') {
@@ -48,6 +48,6 @@ class ActivateWindows extends Job
             ]
         );
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

@@ -26,7 +26,7 @@ class OsCustomisation extends Job
      */
     public function handle(PasswordService $passwordService)
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $username = ($this->instance->platform == 'Linux') ? 'root' : 'graphite.rack';
         $credential = Credential::create([
@@ -48,6 +48,6 @@ class OsCustomisation extends Job
             ]
         );
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

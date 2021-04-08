@@ -26,7 +26,7 @@ class WaitOsCustomisation extends Job
      */
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $response = $this->instance->availabilityZone->kingpinService()->get(
             '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/oscustomization/status'
@@ -61,6 +61,6 @@ class WaitOsCustomisation extends Job
             }
         }
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

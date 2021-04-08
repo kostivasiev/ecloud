@@ -360,6 +360,7 @@ class InstanceController extends BaseController
             ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
+        $message = $e = null;
         try {
             $client = app()->make(Client::class, [
                 'config' => [
@@ -378,14 +379,17 @@ class InstanceController extends BaseController
             ]);
         } catch (\Exception $e) {
             $response = response('', Response::HTTP_SERVICE_UNAVAILABLE);
+            $message = $e->getMessage();
         }
         if (!$response || $response->getStatusCode() !== 201) {
+            $message = $message ?? __CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session from host';
             Log::info(
-                __CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session from host',
+                $message,
                 [
                     'data' => [
                         'instance' => $instance,
                         'host' => $consoleResource->host,
+                        'exception' => $e ?? '',
                     ]
                 ]
             );
@@ -412,7 +416,7 @@ class InstanceController extends BaseController
         // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
         return response()->json([
             'data' => [
-                'url' => $consoleResource->host . '/console/?title=id' . $instance->id . '&session=' . $uuid,
+                'url' => $consoleResource->host . '/console/?title=' . $instance->id . '&session=' . $uuid,
             ],
             'meta' => (object)[]
         ]);
