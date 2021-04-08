@@ -2,7 +2,6 @@
 namespace Tests\V2\Vpc;
 
 use App\Models\V2\Vpc;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -18,11 +17,6 @@ class AdvancedNetworkingTest extends TestCase
         Event::fake();
         $this->vpc()->advanced_networking = true;
         $this->vpc()->save();
-        app()->bind(Vpc::class, function () {
-            return factory(Vpc::class)->create([
-                'id' => 'vpc-test',
-            ]);
-        });
     }
 
     /**
@@ -60,6 +54,11 @@ class AdvancedNetworkingTest extends TestCase
      */
     public function testCreateAVpcWithAdvancedNetworking()
     {
+        app()->bind(Vpc::class, function () {
+            return factory(Vpc::class)->create([
+                'id' => 'vpc-test2',
+            ]);
+        });
         $this->post(
             '/v2/vpcs',
             [
@@ -109,6 +108,6 @@ class AdvancedNetworkingTest extends TestCase
      */
     public function testCreateARouterWithAdvancedNetworking()
     {
-
+        $this->markTestSkipped('Not yet implemented - awaiting clarification on tag to use');
     }
 }
