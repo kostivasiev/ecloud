@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2;
 
-use App\Jobs\Sync\Update;
+use App\Models\V2\Host;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
@@ -28,6 +28,7 @@ class SyncCreated
             Dhcp::class,
             Router::class,
             Network::class,
+            Host::class
         ])) {
             return true;
         }
