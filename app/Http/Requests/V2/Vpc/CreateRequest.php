@@ -31,6 +31,7 @@ class CreateRequest extends FormRequest
             'name' => 'nullable|string',
             'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL',
             'console_enabled' => 'sometimes|boolean',
+            'advanced_networking' => 'sometimes|boolean',
         ];
     }
 }

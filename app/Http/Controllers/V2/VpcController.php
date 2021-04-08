@@ -44,7 +44,8 @@ class VpcController extends BaseController
 
     public function create(CreateRequest $request)
     {
-        $vpc = new Vpc($request->only(['name', 'region_id']));
+        $vpc = app()->make(Vpc::class);
+        $vpc->fill($request->only(['name', 'region_id', 'advanced_networking']));
         if ($request->has('console_enabled')) {
             if (!$this->isAdmin) {
                 return response()->json([
@@ -85,6 +86,7 @@ class VpcController extends BaseController
             }
             $vpc->console_enabled = $request->input('console_enabled', $vpc->console_enabled);
         }
+        $vpc->update($request->only(['advanced_networking']));
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }

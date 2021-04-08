@@ -14,6 +14,7 @@ use UKFast\Responses\UKFastResource;
  * @property string region_id
  * @property bool support_enabled
  * @property bool console_enabled
+ * @property bool advanced_networking
  * @property string created_at
  * @property string updated_at
  */
@@ -32,6 +33,7 @@ class VpcResource extends UKFastResource
             'sync' => $this->getStatus(),
             'support_enabled' => $this->support_enabled,
             'console_enabled' => $this->console_enabled,
+            'advanced_networking' => $this->advanced_networking,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
