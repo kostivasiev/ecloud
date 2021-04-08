@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Models\V2\Sync;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -30,7 +31,7 @@ class ExpandOsDisk extends Job
 
         $volume = $this->instance->volumes->first();
 
-        if ($volume->sync->status != 'complete') {
+        if ($volume->sync->status != Sync::STATUS_COMPLETE) {
             $this->release(static::RETRY_DELAY);
             Log::info(get_class($this) . ' : primary volume is not in sync, retrying in ' . static::RETRY_DELAY . ' seconds');
             return;
