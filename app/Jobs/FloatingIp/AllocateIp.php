@@ -49,7 +49,7 @@ class AllocateIp extends Job
         foreach ($ipRanges as $ipRange) {
             $subnet = Subnet::fromString(long2ip($ipRange->networkAddress) . '/' . $ipRange->cidr);
             if (empty($subnet)) {
-                Log::error($logMessage . 'Failed to load subnet details from IP range ' . $ipRange->id);
+                Log::info($logMessage . 'Failed to load subnet details from IP range ' . $ipRange->id);
                 continue;
             }
 
