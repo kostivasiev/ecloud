@@ -8,9 +8,8 @@ use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
-use App\Services\V2\NsxService;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -21,7 +20,7 @@ class DeleteTest extends TestCase
     protected $faker;
 
     protected $region;
-    protected $availability_zone;
+    protected $availabilityZone;
     protected $vpc;
     protected $router;
     protected $network;
@@ -30,45 +29,31 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
 
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
-        });
-
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
         factory(Credential::class)->create([
             'name' => 'NSX',
-            'resource_id' => $this->availability_zone->id,
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
+            'resource_id' => $this->availabilityZone->id,
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->network = factory(Network::class)->create([
             'name' => 'Manchester Network',
             'router_id' => $this->router->id,
         ]);
-        $nsxService = app()->makeWith(NsxService::class, [$this->availability_zone]);
-        $mockNsxService = \Mockery::mock($nsxService)->makePartial();
-        app()->bind(NsxService::class, function () use ($mockNsxService) {
-            $mockNsxService->shouldReceive('delete')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], '');
-                });
-            $mockNsxService->shouldReceive('get')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
-                });
-            return $mockNsxService;
-        });
+
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+        $this->nsxServiceMock()->shouldReceive('get')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
+            });
     }
 
     public function testNoPermsIsDenied()
@@ -79,8 +64,8 @@ class DeleteTest extends TestCase
             []
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);
@@ -106,6 +91,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
+        Event::fake();
         $this->delete(
             '/v2/networks/' . $this->network->id,
             [],

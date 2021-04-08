@@ -3,6 +3,11 @@ properties:
     type: string
     example: 'dhcp-2b66bb79'
     readOnly: true
+  name :
+    type : string
+    required : false
+    example : 'My DHCP'
+    readOnly : false
   vpc_id:
     type: string
     required: true

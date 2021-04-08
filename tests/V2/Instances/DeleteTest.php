@@ -2,92 +2,41 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
-use Faker\Factory as Faker;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected $availability_zone;
-    protected $vpc;
-    protected $appliance;
-    protected $appliance_version;
-    protected $instance;
-    protected $region;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'name' => 'DeleteTest Default',
-            'appliance_version_id' => $this->appliance_version->uuid,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-        ]);
-
-        $mockKingpinService = \Mockery::mock(new KingpinService(new Client()))->makePartial();
-        $mockKingpinService->shouldReceive('delete')
-            ->withArgs(['/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/power'])
-            ->andReturn(
-                new Response(200)
-            );
-        $mockKingpinService->shouldReceive('delete')
-            ->withArgs(['/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id])
-            ->andReturn(
-                new Response(200)
-            );
-
-        app()->bind(KingpinService::class, function () use ($mockKingpinService) {
-            return $mockKingpinService;
-        });
     }
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/instances/' . $this->instance->id, [], [
+        Event::fake();
+
+        $this->delete('/v2/instances/' . $this->instance()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(204);
-        $this->instance->refresh();
-        $this->assertNotNull($this->instance->deleted_at);
+        $this->instance()->refresh();
+        $this->assertNotNull($this->instance()->deleted_at);
     }
 
     public function testAdminInstanceLocking()
     {
+        Event::fake();
+
         // Lock the instance
-        $this->instance->locked = true;
-        $this->instance->save();
+        $this->instance()->locked = true;
+        $this->instance()->save();
         $this->delete(
-            '/v2/instances/' . $this->instance->id,
+            '/v2/instances/' . $this->instance()->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -95,17 +44,19 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $instance = Instance::withTrashed()->findOrFail($this->instance->id);
+        $instance = Instance::withTrashed()->findOrFail($this->instance()->id);
         $this->assertNotNull($instance->deleted_at);
     }
 
     public function testNonAdminInstanceLocking()
     {
+        Event::fake();
+
         // First lock the instance
-        $this->instance->locked = true;
-        $this->instance->save();
+        $this->instance()->locked = true;
+        $this->instance()->save();
         $this->delete(
-            '/v2/instances/' . $this->instance->id,
+            '/v2/instances/' . $this->instance()->id,
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -119,10 +70,10 @@ class DeleteTest extends TestCase
             ])
             ->assertResponseStatus(403);
         // Now unlock the instance
-        $this->instance->locked = false;
-        $this->instance->save();
+        $this->instance()->locked = false;
+        $this->instance()->save();
         $this->delete(
-            '/v2/instances/' . $this->instance->id,
+            '/v2/instances/' . $this->instance()->id,
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -130,7 +81,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $instance = Instance::withTrashed()->findOrFail($this->instance->id);
+        $instance = Instance::withTrashed()->findOrFail($this->instance()->id);
         $this->assertNotNull($instance->deleted_at);
     }
 }

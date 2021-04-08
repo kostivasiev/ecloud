@@ -18,9 +18,6 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create([
-            'name' => 'Manchester',
-        ]);
     }
 
     public function testNonAdminIsDenied()
@@ -29,7 +26,7 @@ class CreateTest extends TestCase
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/availability-zones',
@@ -40,8 +37,8 @@ class CreateTest extends TestCase
             ]
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);
@@ -52,7 +49,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/availability-zones',
@@ -76,7 +73,7 @@ class CreateTest extends TestCase
         $data = [
             'code' => 'MAN1',
             'datacentre_site_id' => $this->faker->randomDigit(),
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/availability-zones',
@@ -100,7 +97,7 @@ class CreateTest extends TestCase
         $data = [
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/availability-zones',
@@ -151,7 +148,7 @@ class CreateTest extends TestCase
             'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
             'is_public' => false,
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/availability-zones',

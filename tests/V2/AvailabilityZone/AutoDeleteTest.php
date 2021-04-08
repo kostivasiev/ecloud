@@ -9,6 +9,7 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -17,7 +18,6 @@ class AutoDeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected AvailabilityZone $availabilityZone;
     protected Dhcp $dhcp;
     protected Credential $credential;
 
@@ -33,33 +33,23 @@ class AutoDeleteTest extends TestCase
     {
         parent::setUp();
 
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            return $mockEncryptionServiceProvider;
+        Model::withoutEvents(function() {
+            $this->dhcp = factory(Dhcp::class)->create([
+                'id' => 'dhcp-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+            ]);
+            $this->credential = factory(Credential::class)->create([
+                'id' => 'cred-test',
+                'resource_id' => $this->availabilityZone()->id,
+            ]);
         });
-        $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-        $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-
-        $region = factory(Region::class)->create();
-        $vpc = factory(Vpc::class)->create([
-            'region_id' => $region->getKey(),
-        ]);
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->getKey(),
-        ]);
-        $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $vpc->getKey(),
-        ]);
-        $this->credential = factory(Credential::class)->create([
-            'resource_id' => $this->availabilityZone->getKey(),
-        ]);
     }
 
     public function testDeleteCredentialAndDhcp()
     {
         $this->delete(
-            '/v2/availability-zones/'.$this->availabilityZone->getKey(),
+            '/v2/availability-zones/' . $this->availabilityZone()->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -68,7 +58,7 @@ class AutoDeleteTest extends TestCase
         )->assertResponseStatus(204);
 
         Event::assertDispatched(Deleted::class, function ($event) {
-            return $event->model->getKey() == $this->availabilityZone->getKey();
+            return $event->model->id == $this->availabilityZone()->id;
         });
     }
 }

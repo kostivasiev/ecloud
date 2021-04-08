@@ -6,7 +6,6 @@ use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -30,17 +29,18 @@ class UpdateBilling
                 return;
             }
 
-            if (Resource::classFromId($event->model->resource_id) != Volume::class) {
+            if (get_class($event->model->resource) != Volume::class) {
                 return;
             }
 
-            $volume = Volume::find($event->model->resource_id);
+            $volume = $event->model->resource;
         }
 
         if (empty($volume)) {
             return;
         }
 
+        // If iops is empty, get the default value
         if (empty($volume->iops)) {
             $volume->iops = config('volume.iops.default', 300);
         }
@@ -59,8 +59,8 @@ class UpdateBilling
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $volume->getKey();
-        $billingMetric->vpc_id = $volume->vpc->getKey();
+        $billingMetric->resource_id = $volume->id;
+        $billingMetric->vpc_id = $volume->vpc->id;
         $billingMetric->reseller_id = $volume->vpc->reseller_id;
         $billingMetric->key = 'disk.capacity.'.$volume->iops;
         $billingMetric->value = $volume->capacity;
@@ -72,7 +72,7 @@ class UpdateBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'volume\' billing product for availability zone ' . $volume->availabilityZone->getKey()
+                'Failed to load \'volume\' billing product for availability zone ' . $volume->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;

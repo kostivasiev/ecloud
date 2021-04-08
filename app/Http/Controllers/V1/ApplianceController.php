@@ -460,7 +460,7 @@ class ApplianceController extends BaseController
     {
         $applianceQuery = Appliance::query();
 
-        if ($request->user->resellerId != 0) {
+        if ($request->user()->isScoped()) {
             $applianceQuery->where('appliance_active', 'Yes');
             $applianceQuery->where('appliance_is_public', 'Yes');
         }

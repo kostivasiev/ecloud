@@ -7,8 +7,10 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -23,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallPolicy extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, SyncableOverrides;
 
     public $keyPrefix = 'fwp';
     public $incrementing = false;
@@ -55,17 +57,14 @@ class FirewallPolicy extends Model implements Filterable, Sortable
         return $this->belongsTo(Router::class);
     }
 
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('router.vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
-        return $query;
+        return $query->whereHas('router.vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
     }
 
     /**

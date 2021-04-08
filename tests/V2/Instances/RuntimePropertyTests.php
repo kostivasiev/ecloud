@@ -27,13 +27,10 @@ class RuntimePropertyTests extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
+            'vpc_id' => $this->vpc()->id,
             'name' => 'GetTest Default',
         ]);
 
@@ -83,7 +80,7 @@ class RuntimePropertyTests extends TestCase
         });
 
         $this->get(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -102,7 +99,7 @@ class RuntimePropertyTests extends TestCase
     public function testGetRuntimePropertiesInItem()
     {
         $this->get(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

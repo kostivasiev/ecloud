@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2;
 
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateCredentialRequest extends FormRequest
@@ -27,11 +28,11 @@ class CreateCredentialRequest extends FormRequest
             'name' => ['nullable', 'string'],
             'resource_id' => ['required', 'string'],
             'host' => ['nullable', 'string'],
-            'username' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'username' => ['nullable', 'string'],
+            'password' => ['nullable', 'string'],
             'port' => ['nullable', 'integer'],
         ];
-        if (app('request')->user->isAdministrator) {
+        if (Auth::user()->isAdmin()) {
             $rules['is_hidden'] = ['sometimes', 'boolean'];
         }
         return $rules;

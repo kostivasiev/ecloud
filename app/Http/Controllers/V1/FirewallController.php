@@ -133,12 +133,12 @@ class FirewallController extends BaseController
      */
     public static function getFirewallQuery(Request $request)
     {
-        $firewallQuery = Firewall::withReseller($request->user->resellerId)
+        $firewallQuery = Firewall::withReseller($request->user()->resellerId())
             ->whereIn('servers_type', ['firewall', 'virtual firewall'])
             ->join('server_subtype', 'server_subtype_id', '=', 'servers_subtype_id')
             ->where('server_subtype_name', 'eCloud Dedicated');
 
-        if (!$request->user->isAdministrator) {
+        if (!$request->user()->isAdmin()) {
             $firewallQuery->where('servers_active', 'y');
         }
 

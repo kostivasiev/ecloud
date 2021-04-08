@@ -5,7 +5,7 @@ namespace Tests\V1\Appliances\Pods;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\Pod;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class DeleteTest extends ApplianceTestCase
 {
@@ -59,6 +59,6 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(401);
     }
 }

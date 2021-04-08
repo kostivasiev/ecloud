@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Listeners\V2\Volume\ModifyVolume;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -64,12 +63,14 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Dhcp
-        \App\Events\V2\Dhcp\Created::class => [
-            \App\Listeners\V2\Nsx\Dhcp\Create::class,
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Dhcp\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Dhcp\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Dhcp\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Dhcp\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
@@ -112,22 +113,31 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Instance\Creating::class => [
             \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
-        \App\Events\V2\Instance\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
-        \App\Events\V2\Instance\Deploy::class => [
-            \App\Listeners\V2\Instance\Deploy::class,
-        ],
         \App\Events\V2\Instance\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
-        \App\Events\V2\Instance\Updated::class => [
-            \App\Listeners\V2\Instance\ComputeChange::class
+        \App\Events\V2\Instance\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
         \App\Events\V2\Instance\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Instance\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
+        // InstanceVolume
+        \App\Events\V2\InstanceVolume\Creating::class => [
+            \App\Listeners\V2\InstanceVolume\MarkSyncing::class,
+        ],
+        \App\Events\V2\InstanceVolume\Created::class => [
+            \App\Listeners\V2\InstanceVolume\Attach::class,
+        ],
+        \App\Events\V2\InstanceVolume\Deleting::class => [
+            \App\Listeners\V2\InstanceVolume\MarkSyncing::class,
+        ],
+        \App\Events\V2\InstanceVolume\Deleted::class => [
+            \App\Listeners\V2\InstanceVolume\Detach::class,
         ],
 
         // LoadBalancerCluster
@@ -138,18 +148,44 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Network\Creating::class => [
             \App\Listeners\V2\Network\DefaultSubnet::class,
         ],
-        \App\Events\V2\Network\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Network\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Network\Saved::class => [
-            \App\Listeners\V2\Network\Deploy::class,
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Network\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Network\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
+
+        // NetworkPolicy
+        \App\Events\V2\NetworkPolicy\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
+        // NetworkRule
+        \App\Events\V2\NetworkRule\Deleted::class => [
+            \App\Listeners\V2\NetworkRule\Undeploy::class,
+            \App\Listeners\V2\BillingMetric\End::class,
+            // TODO: not convinced we need to re-deploy the policy here. Undeploy will delete the rule, this just pointlessly redeploys the policy.
+            \App\Listeners\V2\NetworkRule\UpdateNetworkPolicy::class,
+        ],
+        \App\Events\V2\NetworkRule\Saved::class => [
+            \App\Listeners\V2\NetworkRule\UpdateNetworkPolicy::class,
+        ],
+
+        // NetworkRulePort
+        \App\Events\V2\NetworkRulePort\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+            \App\Listeners\V2\NetworkRulePort\UpdateNetworkPolicy::class,
+        ],
+        \App\Events\V2\NetworkRulePort\Saved::class => [
+            \App\Listeners\V2\NetworkRulePort\UpdateNetworkPolicy::class,
+        ],
+
         // Nat
         \App\Events\V2\Nat\Created::class => [
             \App\Listeners\V2\ResourceSync::class,
@@ -165,19 +201,16 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Nic
-        \App\Events\V2\Nic\Creating::class => [
-        ],
-        \App\Events\V2\Nic\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Nic\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Nic\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
         \App\Events\V2\Nic\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Nic\Deleted::class => [
-            \App\Listeners\V2\Nic\DeleteDhcpLease::class,       // TODO :- Needs moving to the Sync Nic delete
-            \App\Listeners\V2\Nic\UnassignFloatingIp::class,    // TODO :- Needs moving to the Sync Nic delete
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
@@ -189,61 +222,68 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Router\Creating::class => [
             \App\Listeners\V2\Router\DefaultRouterThroughput::class
         ],
-        \App\Events\V2\Router\Created::class => [
-            \App\Listeners\V2\Router\Deploy::class,
-            \App\Listeners\V2\ResourceSync::class,
+        \App\Events\V2\Router\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Router\Saved::class => [
-            \App\Listeners\V2\Router\Update::class,
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Router\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Router\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
-        \App\Events\V2\Router\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
 
         // Volume
-        \App\Events\V2\Volume\Created::class => [
-            \App\Listeners\V2\Volume\UpdateBilling::class,
+        \App\Events\V2\Volume\Creating::class => [
+            \App\Listeners\V2\Volume\DefaultIops::class,
         ],
         \App\Events\V2\Volume\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Volume\Saved::class => [
-            \App\Listeners\V2\Volume\ModifyVolume::class,
-            \App\Listeners\V2\Volume\UpdateBilling::class,
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
         \App\Events\V2\Volume\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // Vpc
-        \App\Events\V2\Vpc\Creating::class => [
+        \App\Events\V2\Vpc\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
-        \App\Events\V2\Vpc\Created::class => [
-            \App\Listeners\V2\Vpc\Dhcp\Create::class,
+        \App\Events\V2\Vpc\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
         ],
-        \App\Events\V2\Vpc\Deleted::class => [
-            \App\Listeners\V2\Vpc\Dhcp\Delete::class,        // TODO :- Needs moving to the Sync Vpc delete
-            \App\Listeners\V2\Vpc\Routers\Delete::class,     // TODO :- Needs moving to the Sync Vpc delete
-            \App\Listeners\V2\Vpc\FloatingIps\Delete::class, // TODO :- Needs moving to the Sync Vpc delete
+        \App\Events\V2\Vpc\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
 
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
+        // HostGroup
+        \App\Events\V2\HostGroup\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
         // Sync
+        \App\Events\V2\Sync\Created::class => [
+            \App\Listeners\V2\SyncCreated::class
+        ],
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
+            \App\Listeners\V2\HostGroup\UpdateBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
-        ]
+        ],
     ];
 }

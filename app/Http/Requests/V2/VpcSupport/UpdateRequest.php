@@ -39,7 +39,7 @@ class UpdateRequest extends FormRequest
                 new ExistsForUser(Vpc::class)
             ],
             'start_date' => 'sometimes|date_format:Y-m-d',
-            'end_date' => 'sometimes|date_format:Y-m-d',
+            'end_date' => 'sometimes|nullable|date_format:Y-m-d',
         ];
     }
 

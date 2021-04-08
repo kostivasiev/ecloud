@@ -3,13 +3,11 @@
 namespace Tests\V2\DiscountPlan;
 
 use App\Models\V2\DiscountPlan;
-use App\Rules\V2\CommitmentIsGreater;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     protected DiscountPlan $discountPlan;
@@ -29,31 +27,6 @@ class UpdateTest extends TestCase
         ]);
     }
 
-    public function testCommitmentIsGreaterRule()
-    {
-        $validationRule = new CommitmentIsGreater($this->discountPlan->getKey());
-
-        // commitment_amount
-        $this->assertFalse($validationRule->passes('commitment_amount', 1000));
-        $this->assertTrue($validationRule->passes('commitment_amount', 2500));
-
-        // commitment_before_discount
-        $this->assertFalse($validationRule->passes('commitment_before_discount', 500));
-        $this->assertTrue($validationRule->passes('commitment_before_discount', 1500));
-
-        // term_length
-        $this->assertFalse($validationRule->passes('term_length', 12));
-        $this->assertTrue($validationRule->passes('term_length', 36));
-
-        // term_start_date
-        $this->assertFalse($validationRule->passes('term_start_date', date('Y-m-d H:i:s', strtotime('yesterday'))));
-        $this->assertTrue($validationRule->passes('term_start_date', date('Y-m-d H:i:s', strtotime('tomorrow'))));
-
-        // term_end_date
-        $this->assertFalse($validationRule->passes('term_end_date', date('Y-m-d H:i:s', strtotime('yesterday'))));
-        $this->assertTrue($validationRule->passes('term_end_date', date('Y-m-d H:i:s', strtotime('3 days'))));
-    }
-
     public function testUpdateItem()
     {
         $data = [
@@ -66,7 +39,7 @@ class UpdateTest extends TestCase
             'term_end_date' => date('Y-m-d', strtotime('4 days')),
         ];
         $this->patch(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -82,7 +55,7 @@ class UpdateTest extends TestCase
                 strtotime($data['term_start_date'])
             )
         );
-        $plan = DiscountPlan::findOrFail($this->discountPlan->getKey());
+        $plan = DiscountPlan::findOrFail($this->discountPlan->id);
         $this->assertEquals($data['name'], $plan->name);
         $this->assertEquals($data['commitment_amount'], $plan->commitment_amount);
         $this->assertEquals($data['commitment_before_discount'], $plan->commitment_before_discount);
@@ -104,7 +77,7 @@ class UpdateTest extends TestCase
             'term_end_date' => date('Y-m-d 00:00:00', strtotime('tomorrow')),
         ];
         $this->patch(
-            '/v2/discount-plans/'.$this->discountPlan->getKey(),
+            '/v2/discount-plans/'.$this->discountPlan->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

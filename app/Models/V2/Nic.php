@@ -6,11 +6,13 @@ use App\Events\V2\Nic\Created;
 use App\Events\V2\Nic\Creating;
 use App\Events\V2\Nic\Deleted;
 use App\Events\V2\Nic\Deleting;
+use App\Events\V2\Nic\Saved;
 use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -32,27 +34,17 @@ class Nic extends Model implements Filterable, Sortable
         'mac_address',
         'instance_id',
         'network_id',
-        'ip_address',
-        'deleted'
+        'ip_address'
     ];
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($instance) {
-            $instance->attributes['deleted'] = time();
-            $instance->save();
-        });
-    }
 
     public function instance()
     {
@@ -66,20 +58,17 @@ class Nic extends Model implements Filterable, Sortable
 
     /**
      * @param $query
-     * @param $user
+     * @param Consumer $user
      * @return mixed
      */
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('network.router.vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
-        return $query;
+        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
     }
 
     /**

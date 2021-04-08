@@ -20,20 +20,17 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
         $this->vpcSupport = factory(VpcSupport::class)->create([
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc()->id
         ]);
     }
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/support/' . $this->vpcSupport->getKey(), [], [
+        $this->delete('/v2/support/' . $this->vpcSupport->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(204);
-        $this->assertNotNull(VpcSupport::withTrashed()->findOrFail($this->vpcSupport->getKey())->deleted_at);
+        $this->assertNotNull(VpcSupport::withTrashed()->findOrFail($this->vpcSupport->id)->deleted_at);
     }
 }

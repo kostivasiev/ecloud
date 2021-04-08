@@ -6,6 +6,7 @@ use App\Traits\V2\CustomKey;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -42,13 +43,12 @@ class BillingMetric extends Model implements Filterable, Sortable
         'price' => 'float',
     ];
 
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
-        if (empty($user->resellerId)) {
+        if (!$user->isScoped()) {
             return $query;
         }
-        $query->where('reseller_id', '=', $user->resellerId);
-        return $query;
+        return $query->where('reseller_id', '=', $user->resellerId());
     }
 
     /**
@@ -59,7 +59,7 @@ class BillingMetric extends Model implements Filterable, Sortable
      */
     public static function getActiveByKey($resource, $key, $operator = '='): ?BillingMetric
     {
-        return self::where('resource_id', $resource->getKey())
+        return self::where('resource_id', $resource->id)
             ->whereNull('end')
             ->where('key', $operator, $key)
             ->first();

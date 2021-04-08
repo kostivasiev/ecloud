@@ -52,12 +52,12 @@ class VolumeSetController extends BaseController
      * Show item
      *
      * @param Request $request
-     * @param $id
+     * @param $volumeSetId
      * @return Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $volumeSetId)
     {
-        return $this->respondItem($request, static::getById($request, $id));
+        return $this->respondItem($request, static::getById($request, $volumeSetId));
     }
 
 
@@ -387,8 +387,9 @@ class VolumeSetController extends BaseController
     public function volumes(Request $request, $volumeSetId)
     {
         $volumeSet = VolumeSet::find($volumeSetId);
-        if (!$volumeSet || ($request->user->resellerId !== 0 && $volumeSet->solution->reseller_id !== $request->user->resellerId)) {
-            return Response::create([
+
+        if (!$volumeSet || ($request->user()->isScoped() && $volumeSet->solution->reseller_id !== $request->user()->resellerId())) {
+            return response([
                 'errors' => [
                     'title' => 'Not found',
                     'detail' => 'No Volume Set with that ID was found',
@@ -407,7 +408,7 @@ class VolumeSetController extends BaseController
             $data['volumes'] = array_shift($sanVolumes);
         }
 
-        return Response::create([
+        return response([
             'data' => $data,
             'meta' => [],
         ]);
@@ -432,14 +433,14 @@ class VolumeSetController extends BaseController
     public static function getQuery(Request $request)
     {
         $query = self::$model::query();
-        if ($request->user->resellerId != 0) {
+        if ($request->user()->isScoped()) {
             $query->join(
                 'ucs_reseller',
                 (new self::$model)->getTable() . '.ucs_reseller_id',
                 '=',
                 'ucs_reseller.ucs_reseller_id'
             )
-                ->where('ucs_reseller_reseller_id', '=', $request->user->resellerId);
+                ->where('ucs_reseller_reseller_id', '=', $request->user()->resellerId());
         }
 
         return $query;

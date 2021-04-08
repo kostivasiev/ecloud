@@ -2,10 +2,11 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkRulePort\Deleted;
+use App\Events\V2\NetworkRulePort\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
-use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,6 +20,7 @@ class NetworkRulePort extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
+    const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
     public string $keyPrefix = 'nrp';
 
     public function __construct(array $attributes = [])
@@ -33,6 +35,10 @@ class NetworkRulePort extends Model implements Filterable, Sortable
             'protocol',
             'source',
             'destination',
+        ];
+        $this->dispatchesEvents = [
+            'saved' => Saved::class,
+            'deleted' => Deleted::class,
         ];
         parent::__construct($attributes);
     }

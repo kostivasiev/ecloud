@@ -23,20 +23,20 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->region = factory(Region::class)->create();
         $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
+            'region_id' => $this->region->id
         ]);
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey()
+            'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
     public function testValidDataSucceeds()
     {
         $data = [
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'availability_zone_id' => $this->availabilityZone->id,
             'type' => 'floating_ips',
             'alert_warning' => 60,
             'alert_critical' => 80,

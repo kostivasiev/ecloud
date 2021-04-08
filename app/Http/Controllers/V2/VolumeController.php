@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Events\V2\Volume\Data;
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Volume\AttachRequest;
+use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
-use App\Jobs\Volume\AttachToInstance;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VolumeController extends BaseController
@@ -39,12 +39,12 @@ class VolumeController extends BaseController
             }
 
             if ($mounted) {
-                $collection = Volume::forUser($request->user)->has('instances', '>', 0);
+                $collection = Volume::forUser($request->user())->has('instances', '>', 0);
             } else {
-                $collection = Volume::forUser($request->user)->has('instances', '=', 0);
+                $collection = Volume::forUser($request->user())->has('instances', '=', 0);
             }
         } else {
-            $collection = Volume::forUser($request->user);
+            $collection = Volume::forUser($request->user());
         }
 
         (new QueryTransformer($request))
@@ -59,14 +59,14 @@ class VolumeController extends BaseController
     public function show(Request $request, string $volumeId)
     {
         return new VolumeResource(
-            Volume::forUser($request->user)->findOrFail($volumeId)
+            Volume::forUser($request->user())->findOrFail($volumeId)
         );
     }
 
     public function store(CreateRequest $request)
     {
         if ($request->has('availability_zone_id')) {
-            $availabilityZone = Vpc::forUser(app('request')->user)
+            $availabilityZone = Vpc::forUser(Auth::user())
                 ->findOrFail($request->vpc_id)
                 ->region
                 ->availabilityZones
@@ -75,7 +75,7 @@ class VolumeController extends BaseController
                 });
 
             if (!$availabilityZone) {
-                return Response::create([
+                return response()->json([
                     'errors' => [
                         'title' => 'Not Found',
                         'detail' => 'The specified availability zone is not available to that VPC',
@@ -86,74 +86,82 @@ class VolumeController extends BaseController
             }
         }
 
-        $volume = new Volume($request->only(['name', 'vpc_id', 'availability_zone_id', 'capacity']));
-        $volume->save();
-        $volume->refresh();
-        return $this->responseIdMeta($request, $volume->getKey(), 201);
+        $model = app()->make(Volume::class);
+        $model->fill($request->only([
+            'name',
+            'vpc_id',
+            'availability_zone_id',
+            'capacity',
+            'iops',
+        ]));
+        if (!$model->save()) {
+            return $model->getSyncError();
+        }
+        return $this->responseIdMeta($request, $model->id, 201);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
     {
-        $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
-        if ($request->has('availability_zone_id')) {
-            $availabilityZone = Vpc::forUser(app('request')->user)
-                ->findOrFail($request->input('vpc_id', $volume->vpc_id))
-                ->region
-                ->availabilityZones
-                ->first(function ($availabilityZone) use ($request) {
-                    return $availabilityZone->id == $request->availability_zone_id;
-                });
-
-            if (!$availabilityZone) {
-                return Response::create([
-                    'errors' => [
-                        'title' => 'Not Found',
-                        'detail' => 'The specified availability zone is not available to that VPC',
-                        'status' => 404,
-                        'source' => 'availability_zone_id'
-                    ]
-                ], 404);
-            }
-        }
-
-        $only = ['name', 'vpc_id', 'capacity', 'availability_zone_id', 'iops'];
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $only = ['name', 'capacity', 'iops'];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        if (!$volume->save()) {
+        try {
+            if (!$volume->save()) {
+                return $volume->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
 
-        return $this->responseIdMeta($request, $volume->getKey(), 200);
+        return $this->responseIdMeta($request, $volume->id, 200);
+    }
+
+    public function destroy(Request $request, string $volumeId)
+    {
+        $volume = Volume::forUser($request->user())->findOrFail($volumeId);
+        try {
+            $volume->delete();
+        } catch (SyncException $exception) {
+            return $volume->getSyncError();
+        }
+        return response('', 204);
+    }
+
+    public function attach(AttachRequest $request, string $volumeId)
+    {
+        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
+        try {
+            $instance->volumes()->attach($model);
+        } catch (SyncException $exception) {
+            return $model->getSyncError();
+        }
+        return response('', 202);
+    }
+
+    public function detach(DetachRequest $request, string $volumeId)
+    {
+        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
+        try {
+            $instance->volumes()->detach($model);
+        } catch (SyncException $exception) {
+            return $model->getSyncError();
+        }
+        return response('', 202);
     }
 
     public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
     {
-        $collection = Volume::forUser($request->user)->findOrFail($volumeId)->instances();
+        $collection = Volume::forUser($request->user())->findOrFail($volumeId)->instances();
         $queryTransformer->config(Instance::class)
             ->transform($collection);
 
         return InstanceResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
-    }
-
-    public function destroy(Request $request, string $volumeId)
-    {
-        $volume = Volume::forUser($request->user)->findOrFail($volumeId);
-        if (!$volume->delete()) {
-            return $volume->getSyncError();
-        }
-        return response(null, 204);
-    }
-
-    public function attachToInstance(AttachRequest $request, string $volumeId)
-    {
-        $volume = Volume::forUser(app('request')->user)->findOrFail($volumeId);
-        $instance = Instance::forUser(app('request')->user)->findOrFail($request->get('instance_id'));
-        $instance->volumes()->attach($volume);
-        $this->dispatch(new AttachToInstance($volume, $instance));
-        return response('', 202);
     }
 }

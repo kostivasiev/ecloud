@@ -7,13 +7,15 @@ use App\Http\Requests\V2\VpcSupport\UpdateRequest;
 use App\Models\V2\VpcSupport;
 use App\Resources\V2\VpcSupportResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VpcSupportController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = VpcSupport::forUser($request->user);
+        $collection = VpcSupport::forUser($request->user());
 
         $queryTransformer->config(VpcSupport::class)
             ->transform($collection);
@@ -26,7 +28,7 @@ class VpcSupportController extends BaseController
     public function show(Request $request, string $vpcSupportId)
     {
         return new VpcSupportResource(
-            VpcSupport::forUser($request->user)->findOrFail($vpcSupportId)
+            VpcSupport::forUser($request->user())->findOrFail($vpcSupportId)
         );
     }
 
@@ -38,12 +40,12 @@ class VpcSupportController extends BaseController
             'end_date',
         ]));
         $vpcSupport->save();
-        return $this->responseIdMeta($request, $vpcSupport->getKey(), 201);
+        return $this->responseIdMeta($request, $vpcSupport->id, 201);
     }
 
     public function update(UpdateRequest $request, string $vpcSupportId)
     {
-        $vpcSupport = VpcSupport::forUser(app('request')->user)->findOrFail($vpcSupportId);
+        $vpcSupport = VpcSupport::forUser(Auth::user())->findOrFail($vpcSupportId);
 
         $vpcSupport->fill($request->only([
             'vpc_id',
@@ -51,13 +53,17 @@ class VpcSupportController extends BaseController
             'end_date',
         ]))->save();
 
-        return $this->responseIdMeta($request, $vpcSupport->getKey(), 200);
+        return $this->responseIdMeta($request, $vpcSupport->id, 200);
     }
 
-    public function destroy(Request $request, string $vpcId)
+    /**
+     * @param Request $request
+     * @param string $vpcSupportId
+     * @return Response|\Laravel\Lumen\Http\ResponseFactory
+     */
+    public function destroy(Request $request, string $vpcSupportId)
     {
-        VpcSupport::forUser($request->user)->findOrFail($vpcId)
-            ->delete();
+        VpcSupport::forUser($request->user())->findOrFail($vpcSupportId)->delete();
         return response(null, 204);
     }
 }

@@ -36,7 +36,7 @@ class DatastoreCreatedListener
             'New Datastore Creation was scheduled',
             [
                 'id' => $event->datastore->getKey(),
-                'reseller_id' => $this->request->user->resellerId,
+                'reseller_id' => $this->request->user()->resellerId(),
                 'sizeGB' => $event->datastore->reseller_lun_size_gb
             ]
         );

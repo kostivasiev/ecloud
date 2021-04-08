@@ -4,13 +4,13 @@ namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
-use App\Jobs\Nsx\FloatingIp\Undeploy;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;
@@ -79,17 +79,14 @@ class FloatingIp extends Model implements Filterable, Sortable
         return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
     }
 
-    public function scopeForUser($query, $user)
+    public function scopeForUser($query, Consumer $user)
     {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
-        return $query;
+        return $query->whereHas('vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
     }
 
     public function scopeWithRegion($query, $regionId)
@@ -102,19 +99,19 @@ class FloatingIp extends Model implements Filterable, Sortable
     public function getStatus()
     {
         if (empty($this->ip_address)) {
-            return 'failed';
+            return Sync::STATUS_FAILED;
         }
 
         if ($this->syncs()->count() && !$this->syncs()->latest()->first()->completed) {
-            return 'in-progress';
+            return Sync::STATUS_INPROGRESS;
         }
 
         if (!$this->sourceNat && !$this->destinationNat) {
-            return 'complete';
+            return Sync::STATUS_COMPLETE;
         }
 
         if (!$this->sourceNat || !$this->destinationNat) {
-            return 'in-progress';
+            return Sync::STATUS_INPROGRESS;
         }
 
         if ($this->sourceNat->getStatus() !== 'complete') {
@@ -125,7 +122,7 @@ class FloatingIp extends Model implements Filterable, Sortable
             return $this->destinationNat->getStatus();
         }
 
-        return 'complete';
+        return Sync::STATUS_COMPLETE;
     }
 
     public function getSyncFailureReason()

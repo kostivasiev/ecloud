@@ -5,7 +5,6 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -22,13 +21,9 @@ class UpdateRamBilling
             return;
         }
 
-        if (Resource::classFromId($event->model->resource_id) != Instance::class) {
-            return;
-        }
+        $instance = $event->model->resource;
 
-        $instance = Instance::find($event->model->resource_id);
-
-        if (empty($instance)) {
+        if (get_class($instance) != Instance::class) {
             return;
         }
 
@@ -44,8 +39,8 @@ class UpdateRamBilling
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $instance->getKey();
-        $billingMetric->vpc_id = $instance->vpc->getKey();
+        $billingMetric->resource_id = $instance->id;
+        $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->key = 'ram.capacity';
         $billingMetric->value = $instance->ram_capacity;
@@ -54,7 +49,7 @@ class UpdateRamBilling
         $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'ram');
         if (empty($product)) {
             Log::error(
-                'Failed to load \'ram\' billing product for availability zone ' . $instance->availabilityZone->getKey()
+                'Failed to load \'ram\' billing product for availability zone ' . $instance->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;

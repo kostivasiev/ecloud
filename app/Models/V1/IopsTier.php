@@ -24,6 +24,8 @@ class IopsTier extends Model implements Filterable, Sortable
         'max_iops' => 'integer'
     ];
 
+    protected $keyType = 'string';
+
     protected $primaryKey = 'uuid';
 
     public $incrementing = false;
