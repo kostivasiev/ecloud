@@ -1,0 +1,14 @@
+description: Success
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            url:
+              type: string
+              example: 'https:\/\/185.197.63.87\/console\/?title=idi-2b66bb79&session=cdfa6d4d-e43a-43c9-a910-9e8308105fd2'
+        meta:
+          type: object

@@ -29,25 +29,22 @@ class UniqueSubnetPerRouterTest extends TestCase
             'name' => 'testregion',
         ]);
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey(),
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey(),
+            'region_id' => $this->region->id,
         ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone->id,
         ]);
         $this->router2 = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone->id,
         ]);
         $this->network = factory(Network::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
             'subnet' => '10.0.0.1/30',
         ]);
         $this->network2 = factory(Network::class)->create([
-            'router_id' => $this->router->getKey(),
+            'router_id' => $this->router->id,
             'subnet' => '10.0.0.2/30',
         ]);
     }
@@ -58,7 +55,7 @@ class UniqueSubnetPerRouterTest extends TestCase
             '/v2/networks',
             [
                 'name' => 'Manchester Network',
-                'router_id' => $this->router->getKey(),
+                'router_id' => $this->router->id,
                 'subnet' => '10.0.0.1/22'
             ],
             [
@@ -77,7 +74,7 @@ class UniqueSubnetPerRouterTest extends TestCase
             '/v2/networks',
             [
                 'name' => 'Manchester Network',
-                'router_id' => $this->router2->getKey(),
+                'router_id' => $this->router2->id,
                 'subnet' => '10.0.0.1/22'
             ],
             [
@@ -93,7 +90,7 @@ class UniqueSubnetPerRouterTest extends TestCase
             '/v2/networks',
             [
                 'name' => 'Manchester Network',
-                'router_id' => $this->router2->getKey(),
+                'router_id' => $this->router2->id,
                 'subnet' => '10.0.0.1/22'
             ],
             [
@@ -110,7 +107,7 @@ class UniqueSubnetPerRouterTest extends TestCase
             '/v2/networks/'.$networkId,
             [
                 'name' => 'Updated Network',
-                'router_id' => $this->router2->getKey(),
+                'router_id' => $this->router2->id,
                 'subnet' => '10.0.0.1/22'
             ],
             [

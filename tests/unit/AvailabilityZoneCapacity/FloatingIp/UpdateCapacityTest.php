@@ -35,20 +35,13 @@ class UpdateCapacityTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
         $this->floatingIp = factory(FloatingIp::class)->create([
             'ip_address' => '1.1.1.1',
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc()->id
         ]);
 
         $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
-            'availability_zone_id' => $this->availabilityZone->getKey(),
+            'availability_zone_id' => $this->availabilityZone()->id,
             'current' => null
         ]);
 
@@ -99,7 +92,7 @@ class UpdateCapacityTest extends TestCase
         $allocateIpListener->handle(new \App\Events\V2\FloatingIp\Created($this->floatingIp));
 
         Event::assertDispatched(\App\Events\V2\AvailabilityZoneCapacity\Saved::class, function ($event) {
-            return $event->model->id === $this->availabilityZoneCapacity->getKey();
+            return $event->model->id === $this->availabilityZoneCapacity->id;
         });
 
         $this->availabilityZoneCapacity->refresh();
@@ -121,7 +114,7 @@ class UpdateCapacityTest extends TestCase
         $allocateIpListener->handle(new \App\Events\V2\FloatingIp\Created($this->floatingIp));
 
         Event::assertDispatched(\App\Events\V2\AvailabilityZoneCapacity\Saved::class, function ($event) {
-            return $event->model->id === $this->availabilityZoneCapacity->getKey();
+            return $event->model->id === $this->availabilityZoneCapacity->id;
         });
 
         $this->availabilityZoneCapacity->refresh();

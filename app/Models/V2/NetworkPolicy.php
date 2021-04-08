@@ -2,11 +2,14 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\NetworkPolicy\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -15,7 +18,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class NetworkPolicy extends Model implements Filterable, Sortable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable;
+    use CustomKey, DefaultName, SoftDeletes, Syncable, SyncableOverrides;
 
     public string $keyPrefix = 'np';
 
@@ -30,6 +33,9 @@ class NetworkPolicy extends Model implements Filterable, Sortable
             'network_id',
             'name',
         ];
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class,
+        ];
         parent::__construct($attributes);
     }
 
@@ -38,17 +44,19 @@ class NetworkPolicy extends Model implements Filterable, Sortable
         return $this->belongsTo(Network::class);
     }
 
-    public function scopeForUser($query, $user)
+    public function networkRules()
     {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('network.router.vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
+        return $this->hasMany(NetworkRule::class);
+    }
+
+    public function scopeForUser($query, Consumer $user)
+    {
+        if (!$user->isScoped()) {
+            return $query;
         }
-        return $query;
+        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
     }
 
     /**

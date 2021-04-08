@@ -5,7 +5,6 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -22,13 +21,9 @@ class UpdateVcpuBilling
             return;
         }
 
-        if (Resource::classFromId($event->model->resource_id) != Instance::class) {
-            return;
-        }
-        
-        $instance = Instance::find($event->model->resource_id);
+        $instance = $event->model->resource;
 
-        if (empty($instance)) {
+        if (get_class($instance) != Instance::class) {
             return;
         }
 
@@ -44,8 +39,8 @@ class UpdateVcpuBilling
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $instance->getKey();
-        $billingMetric->vpc_id = $instance->vpc->getKey();
+        $billingMetric->resource_id = $instance->id;
+        $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->key = 'vcpu.count';
         $billingMetric->value = $instance->vcpu_cores;
@@ -54,7 +49,7 @@ class UpdateVcpuBilling
         $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'vcpu');
         if (empty($product)) {
             Log::error(
-                'Failed to load \'vcpu\' billing product for availability zone ' . $instance->availabilityZone->getKey()
+                'Failed to load \'vcpu\' billing product for availability zone ' . $instance->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;

@@ -1,0 +1,5 @@
+properties:
+  instance_id:
+    type: string
+    example: 'i-abc123xyz'
+description: 'Volumes'

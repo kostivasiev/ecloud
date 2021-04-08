@@ -9,6 +9,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -20,30 +21,16 @@ class AllocateIpTest extends TestCase
 
     protected \Faker\Generator $faker;
 
-    protected $region;
-    protected $availability_zone;
-    protected $vpc;
-    protected $instance;
     protected $floating_ip;
-    protected $nic;
-    protected $listener;
-    protected $event;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
         $this->floating_ip = factory(FloatingIp::class)->create([
             'ip_address' => null,
-            'vpc_id' => $this->vpc->getKey()
+            'vpc_id' => $this->vpc()->id
         ]);
 
         $this->event = new Created($this->floating_ip);
@@ -106,10 +93,13 @@ class AllocateIpTest extends TestCase
         $floatingIp = factory(FloatingIp::class, 1)->create([
             'ip_address' => null,
         ])->each(function ($fip) {
-            $vpc = factory(Vpc::class)->create([
-                'region_id' => $this->region->getKey()
-            ]);
-            $fip->vpc_id = $vpc->getKey();
+            Model::withoutEvents(function() use ($fip) {
+                $vpc = factory(Vpc::class)->create([
+                    'id' => 'vpc-test2',
+                    'region_id' => $this->region()->id
+                ]);
+                $fip->vpc_id = $vpc->id;
+            });
             $fip->save();
         })->first();
 
@@ -135,10 +125,13 @@ class AllocateIpTest extends TestCase
         $floatingIp = factory(FloatingIp::class, 1)->create([
             'ip_address' => null,
         ])->each(function ($fip) {
-            $vpc = factory(Vpc::class)->create([
-                'region_id' => $this->region->getKey()
-            ]);
-            $fip->vpc_id = $vpc->getKey();
+            Model::withoutEvents(function() use ($fip) {
+                $vpc = factory(Vpc::class)->create([
+                    'id' => 'vpc-test2',
+                    'region_id' => $this->region()->id
+                ]);
+                $fip->vpc_id = $vpc->id;
+            });
             $fip->save();
         })->first();
 

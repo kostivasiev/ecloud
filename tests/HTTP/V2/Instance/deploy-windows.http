@@ -11,7 +11,7 @@ Content-Type:  application/json
   "appliance_id": "ced9e02a-b3fa-4324-9ebc-42250a462e9a",
   "requires_floating_ip": true,
   "network_id": "{{dev_network_id}}",
-  "volume_capacity": 30
+  "volume_capacity": 50
 }
 
 > {%

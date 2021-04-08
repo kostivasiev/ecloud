@@ -8,7 +8,7 @@ use App\Models\V1\San;
 use App\Models\V1\Solution;
 use App\Models\V1\Storage;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class CreateTest extends TestCase
 {

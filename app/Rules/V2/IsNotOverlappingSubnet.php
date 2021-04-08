@@ -40,7 +40,7 @@ class IsNotOverlappingSubnet implements Rule
         $submittedRange = Factory::rangeFromString($value);
         $networks = Router::find($this->router_id)->networks;
         foreach ($networks as $network) {
-            if (!empty($this->network_id) && $network->getKey() == $this->network_id) {
+            if (!empty($this->network_id) && $network->id == $this->network_id) {
                 continue;
             }
             $storedRange = Factory::rangeFromString($network->subnet);

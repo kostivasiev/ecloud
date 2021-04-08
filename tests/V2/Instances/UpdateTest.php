@@ -2,14 +2,8 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
 use App\Models\V2\ApplianceVersionData;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,46 +11,16 @@ class UpdateTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected \Faker\Generator $faker;
-    protected $vpc;
-    protected $appliance;
-    protected $applianceVersion;
-    protected $instance;
-    protected $region;
-    protected $availability_zone;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->getKey()
-        ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->applianceVersion = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->appliance_id,
-        ])->refresh();
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->getKey(),
-            'name' => 'UpdateTest Default',
-            'appliance_version_id' => $this->applianceVersion->uuid,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'backup_enabled' => false,
-        ]);
     }
 
     public function testValidDataIsSuccessful()
     {
+        Event::fake();
         $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             [
                 'name' => 'Changed',
                 'backup_enabled' => true,
@@ -68,28 +32,31 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance->getKey(),
+                'id' => $this->instance()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
         )
             ->assertResponseStatus(200);
 
-        $instance = Instance::findOrFail($this->instance->getKey());
-        $this->assertEquals($this->vpc->getKey(), $instance->vpc_id);
-        $this->assertTrue($instance->backup_enabled);
+        $this->instance()->refresh();
+        $this->assertEquals('Changed', $this->instance()->name);
+        $this->assertTrue($this->instance()->backup_enabled);
     }
 
     public function testAdminCanModifyLockedInstance()
     {
+        Event::fake();
+
         // Lock the instance
-        $this->instance->locked = true;
-        $this->instance->save();
+        $this->instance()->locked = true;
+        $this->instance()->save();
+
         $data = [
             'name' => 'Changed',
         ];
         $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -98,20 +65,23 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance->getKey(),
+                'id' => $this->instance()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
         )
             ->assertResponseStatus(200);
+
     }
 
     public function testScopedAdminCanNotModifyLockedInstance()
     {
-        $this->instance->locked = true;
-        $this->instance->save();
+        Event::fake();
+
+        $this->instance()->locked = true;
+        $this->instance()->save();
         $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             [
                 'name' => 'Testing Locked Instance',
             ],
@@ -131,11 +101,13 @@ class UpdateTest extends TestCase
 
     public function testLockedInstanceIsNotEditable()
     {
+        Event::fake();
+
         // Lock the instance
-        $this->instance->locked = true;
-        $this->instance->save();
+        $this->instance()->locked = true;
+        $this->instance()->save();
         $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             [
                 'name' => 'Testing Locked Instance',
             ],
@@ -152,14 +124,14 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(403);
 
         // Unlock the instance
-        $this->instance->locked = false;
-        $this->instance->save();
+        $this->instance()->locked = false;
+        $this->instance()->saveQuietly();
 
         $data = [
             'name' => 'Changed',
         ];
         $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-1',
@@ -168,7 +140,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance->getKey(),
+                'id' => $this->instance()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
@@ -181,7 +153,7 @@ class UpdateTest extends TestCase
         factory(ApplianceVersionData::class)->create([
             'key' => 'ukfast.spec.ram.max',
             'value' => 2048,
-            'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+            'appliance_version_uuid' => $this->applianceVersion()->appliance_version_uuid,
         ]);
 
         $data = [
@@ -189,7 +161,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -209,7 +181,7 @@ class UpdateTest extends TestCase
         factory(ApplianceVersionData::class)->create([
             'key' => 'ukfast.spec.cpu_cores.max',
             'value' => 5,
-            'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+            'appliance_version_uuid' => $this->applianceVersion()->appliance_version_uuid,
         ]);
 
         $data = [
@@ -217,7 +189,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/instances/' . $this->instance->getKey(),
+            '/v2/instances/' . $this->instance()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

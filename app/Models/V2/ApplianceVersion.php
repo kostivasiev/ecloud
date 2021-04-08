@@ -7,17 +7,19 @@ namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Devices\AdminClient;
+use UKFast\SDK\Exception\ServerException;
 
-class ApplianceVersion extends Model
+class ApplianceVersion extends V1ModelWrapper
 {
     use ColumnPrefixHelper, UUIDHelper, SoftDeletes;
 
     protected $connection = 'ecloud';
     protected $table = 'appliance_version';
     protected $primaryKey = 'appliance_version_uuid';
+    protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = true;
 
@@ -62,6 +64,18 @@ class ApplianceVersion extends Model
         );
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function applianceScriptParameters()
+    {
+        return $this->hasMany(
+            ApplianceScriptParameters::class,
+            'appliance_script_parameters_appliance_version_id',
+            'appliance_version_id'
+        );
+    }
+
     public function applianceVersionData()
     {
         return $this->hasMany(
@@ -74,9 +88,14 @@ class ApplianceVersion extends Model
     public function serverLicense()
     {
         $devicesAdminClient = app()->make(AdminClient::class);
-        return $devicesAdminClient->licenses()->getById(
-            $this->appliance_version_server_license_id
-        );
+        try {
+            return $devicesAdminClient->licenses()->getById(
+                $this->appliance_version_server_license_id
+            );
+        } catch (ServerException $exception) {
+            Log::error($exception->getMessage(), ['response' => $exception->getResponse()]);
+            throw $exception;
+        }
     }
 
     public function getLatest(string $applianceUuid)
@@ -87,5 +106,16 @@ class ApplianceVersion extends Model
             ->orderBy('appliance_version_version', 'desc')
             ->first()
             ->appliance_version_uuid;
+    }
+
+    public function getScriptParameters(): array
+    {
+        $params = [];
+        $parameters = $this->applianceScriptParameters()->get();
+        foreach ($parameters as $parameter) {
+            $params[$parameter->key] = $parameter;
+        }
+
+        return $params;
     }
 }

@@ -4,17 +4,18 @@ namespace App\Rules\V2;
 
 use App\Models\V2\Volume;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class IsVolumeAttached implements Rule
 {
 
     public Volume $volume;
 
-    public function __construct()
+    public function __construct($id = null)
     {
-        $volumeId = app('request')->route('volumeId');
-        $this->volume = Volume::forUser(app('request')->user)
-            ->findOrFail($volumeId);
+        $this->volume = Volume::forUser(Auth::user())->findOrFail(
+            ($id !== null) ? $id : app('request')->route('volumeId')
+        );
     }
 
     public function passes($attribute, $value)
@@ -24,6 +25,6 @@ class IsVolumeAttached implements Rule
 
     public function message()
     {
-        return 'The Iops value can only be set on mounted volumes';
+        return 'The IOPS value can only be set on mounted volumes';
     }
 }

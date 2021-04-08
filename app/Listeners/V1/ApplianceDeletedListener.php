@@ -38,7 +38,7 @@ class ApplianceDeletedListener
             'Appliance Deleted',
             [
                 'id' => $event->appliance->id,
-                'reseller_id' => $this->request->user->resellerId
+                'reseller_id' => $this->request->user()->resellerId()
             ]
         );
 

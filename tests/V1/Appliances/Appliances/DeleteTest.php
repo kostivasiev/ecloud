@@ -3,7 +3,7 @@
 namespace Tests\V1\Appliances\Appliances;
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\ApplianceTestCase;
+use Tests\V1\ApplianceTestCase;
 
 class DeleteTest extends ApplianceTestCase
 {
@@ -58,6 +58,6 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
 
-        $this->assertResponseStatus(403);
+        $this->assertResponseStatus(401);
     }
 }

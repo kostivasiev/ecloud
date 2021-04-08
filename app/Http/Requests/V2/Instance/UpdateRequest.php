@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests\V2\Instance;
 
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
+use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsValidRamMultiple;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
@@ -43,26 +46,13 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $instance = Instance::forUser(app('request')->user)
+        $instance = Instance::forUser(Auth::user())
             ->findOrFail($this->instanceId);
 
-        $this->config = $instance->applianceVersion->applianceVersionData->pluck('key', 'value')->flip();
+        $this->config = $instance->image->metadata->pluck('key', 'value')->flip();
 
         $rules = [
             'name' => 'nullable|string',
-            /*            'vpc_id' => [
-                            'sometimes',
-                            'required',
-                            'string',
-                            'exists:ecloud.vpcs,id',
-                            new ExistsForUser(Vpc::class)
-                        ],*/
-            /*            'appliance_id' => [
-                            'sometimes',
-                            'required',
-                            'uuid',
-                            'exists:ecloud.appliance,appliance_uuid'
-                        ],*/
             'vcpu_cores' => [
                 'sometimes',
                 'required',
@@ -80,7 +70,13 @@ class UpdateRequest extends FormRequest
             ],
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
-            // 'platform' => 'sometimes|required|in:Windows,Linux',
+            'host_group_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'exists:ecloud.host_groups,id,deleted_at,NULL',
+                new ExistsForUser(HostGroup::class),
+            ],
         ];
 
         return $rules;
@@ -95,8 +91,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'required' => 'The :attribute field is required',
-            'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
-            'appliance_id.exists' => 'The :attribute is not a valid Appliance',
             'vcpu_cores.min' => 'Specified :attribute is below the minimum of '
                 . ($this->config->get('ukfast.spec.cpu_cores.min') ?? config('instance.cpu_cores.min')),
             'vcpu_cores.max' => 'Specified :attribute is above the maximum of '

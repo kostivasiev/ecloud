@@ -3,34 +3,40 @@
 namespace App\Jobs\Sync\Router;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\Router\Undeploy;
-use App\Jobs\Nsx\Router\UndeployCheck;
-use App\Models\V2\Router;
+use App\Jobs\Router\AwaitFirewallPolicyRemoval;
+use App\Jobs\Router\DeleteFirewallPolicies;
+use App\Jobs\Router\UndeployRouterLocale;
+use App\Jobs\Router\Undeploy;
+use App\Jobs\Router\UndeployCheck;
+use App\Models\V2\Sync;
+use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    /** @var Router */
-    private $model;
+    use SyncableBatch;
 
-    public function __construct(Router $model)
+    private $sync;
+
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
+        $this->sync = $sync;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        $jobs = [
-            new Undeploy($this->model),
-            new UndeployCheck($this->model),
-        ];
+        $this->deleteSyncBatch([
+            [
+                new DeleteFirewallPolicies($this->sync->resource),
+                new AwaitFirewallPolicyRemoval($this->sync->resource),
+                new UndeployRouterLocale($this->sync->resource),
+                new Undeploy($this->sync->resource),
+                new UndeployCheck($this->sync->resource),
+            ]
+        ])->dispatch();
 
-        // TODO :- Delete linked Networks and FirewallPolicies
-
-        dispatch(array_shift($jobs)->chain($jobs));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

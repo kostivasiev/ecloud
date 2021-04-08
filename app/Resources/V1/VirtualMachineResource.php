@@ -124,7 +124,7 @@ class VirtualMachineResource extends CustomResource
         }
 
         // admin only properties
-        if ($request->user->isAdministrator) {
+        if ($request->user()->isAdmin()) {
             $data = array_merge($data, [
                 'reseller_id' => $this->resource->servers_reseller_id,
                 'active' => ($this->resource->servers_active == 'y'),

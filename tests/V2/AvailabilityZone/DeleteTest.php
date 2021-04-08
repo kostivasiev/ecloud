@@ -23,7 +23,7 @@ class DeleteTest extends TestCase
     {
         $zone = factory(AvailabilityZone::class)->create();
         $this->delete(
-            '/v2/availability-zones/' . $zone->getKey(),
+            '/v2/availability-zones/' . $zone->id,
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -31,8 +31,8 @@ class DeleteTest extends TestCase
             ]
         )
             ->seeJson([
-                'title' => 'Unauthorised',
-                'detail' => 'Unauthorised',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
                 'status' => 401,
             ])
             ->assertResponseStatus(401);
@@ -60,7 +60,7 @@ class DeleteTest extends TestCase
     {
         $zone = factory(AvailabilityZone::class)->create();
         $this->delete(
-            '/v2/availability-zones/' . $zone->getKey(),
+            '/v2/availability-zones/' . $zone->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -68,7 +68,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($zone->getKey());
+        $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($zone->id);
         $this->assertNotNull($availabilityZone->deleted_at);
     }
 

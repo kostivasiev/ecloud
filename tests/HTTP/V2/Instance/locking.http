@@ -7,7 +7,7 @@ Content-Type:  application/json
   "name": "Test Locking",
   "vpc_id": "{{dev_vpc_id}}",
   "availability_zone_id": "{{dev_availability_zone_id}}",
-  "appliance_id": "eed603bf-d40e-47d7-bb98-66d2940e0dc2",
+  "image_id": "img-c879f613",
   "vcpu_cores": 1,
   "ram_capacity": 1024,
   "locked": true,

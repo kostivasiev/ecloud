@@ -8,7 +8,7 @@ use App\Models\V1\Solution;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\TestCase;
+use Tests\V1\TestCase;
 
 class HardwareTest extends TestCase
 {

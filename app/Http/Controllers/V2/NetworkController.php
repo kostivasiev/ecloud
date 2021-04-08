@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
 use App\Jobs\Nsx\Network\Undeploy;
@@ -10,6 +11,7 @@ use App\Models\V2\Nic;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -30,6 +32,8 @@ class NetworkController extends BaseController
             'vpc_id:eq', 'vpc_id:in', 'vpc_id:lk',
             'vpc_id:neq', 'vpc_id:nin', 'vpc_id:nlk',
         ])) {
+            $networkIds = Network::forUser($request->user())->get();
+
             if ($request->has('vpc_id') || $request->has('vpc_id:eq')) {
                 if ($request->has('vpc_id')) {
                     $vpcId = $request->get('vpc_id');
@@ -39,72 +43,69 @@ class NetworkController extends BaseController
                     $request->query->remove('vpc_id:eq');
                 }
 
-                $networkIds = Network::forUser($request->user)->get()
-                    ->reject(function ($network) use ($vpcId) {
-                        return !$network->router || $network->router->vpc_id != $vpcId;
-                    })
-                    ->map(function ($network) {
-                        return $network->id;
-                    });
-            } elseif ($request->has('vpc_id:neq')) {
+                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
+                    return !$network->router || $network->router->vpc_id != $vpcId;
+                });
+            }
+
+            if ($request->has('vpc_id:neq')) {
                 $vpcId = $request->get('vpc_id:neq');
                 $request->query->remove('vpc_id:neq');
 
-                $networkIds = Network::forUser($request->user)->get()
-                    ->reject(function ($network) use ($vpcId) {
-                        return !$network->router || $network->router->vpc_id == $vpcId;
-                    })
-                    ->map(function ($network) {
-                        return $network->id;
-                    });
-            } elseif ($request->has('vpc_id:lk')) {
+                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
+                    return !$network->router || $network->router->vpc_id == $vpcId;
+                });
+            }
+
+            if ($request->has('vpc_id:lk')) {
                 $vpcId = $request->get('vpc_id:lk');
                 $request->query->remove('vpc_id:lk');
 
-                $networkIds = Network::forUser($request->user)->get()
-                    ->reject(function ($network) use ($vpcId) {
-                        return !$network->router || strpos($network->router->vpc_id, $vpcId) === false;
-                    })
-                    ->map(function ($network) {
-                        return $network->id;
-                    });
-            } elseif ($request->has('vpc_id:nlk')) {
+                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
+                    return !$network->router
+                        || preg_match(
+                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
+                            $network->router->vpc_id
+                        ) === 0;
+                });
+            }
+
+            if ($request->has('vpc_id:nlk')) {
                 $vpcId = $request->get('vpc_id:nlk');
                 $request->query->remove('vpc_id:nlk');
 
-                $networkIds = Network::forUser($request->user)->get()
-                    ->reject(function ($network) use ($vpcId) {
-                        return !$network->router || strpos($network->router->vpc_id, $vpcId) !== false;
-                    })
-                    ->map(function ($network) {
-                        return $network->id;
-                    });
-            } elseif ($request->has('vpc_id:in')) {
+                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
+                    return !$network->router
+                        || preg_match(
+                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
+                            $network->router->vpc_id
+                        ) === 1;
+                });
+            }
+
+            if ($request->has('vpc_id:in')) {
                 $ids = explode(',', $request->get('vpc_id:in'));
                 $request->query->remove('vpc_id:in');
 
-                $networkIds = Network::forUser($request->user)->get()
-                    ->reject(function ($network) use ($ids) {
-                        return !$network->router || !in_array($network->router->vpc_id, $ids);
-                    })
-                    ->map(function ($network) {
-                        return $network->id;
-                    });
-            } elseif ($request->has('vpc_id:nin')) {
+                $networkIds = $networkIds->reject(function ($network) use ($ids) {
+                    return !$network->router || !in_array($network->router->vpc_id, $ids);
+                });
+            }
+
+            if ($request->has('vpc_id:nin')) {
                 $ids = explode(',', $request->get('vpc_id:nin'));
                 $request->query->remove('vpc_id:nin');
 
-                $networkIds = Network::forUser($request->user)->get()
-                    ->reject(function ($network) use ($ids) {
-                        return !$network->router || in_array($network->router->vpc_id, $ids);
-                    })
-                    ->map(function ($network) {
-                        return $network->id;
-                    });
+                $networkIds = $networkIds->reject(function ($network) use ($ids) {
+                    return !$network->router || in_array($network->router->vpc_id, $ids);
+                });
             }
-            $collection = Network::whereIn('id', $networkIds);
+
+            $collection = Network::whereIn('id', $networkIds->map(function ($network) {
+                return $network->id;
+            }));
         } else {
-            $collection = Network::forUser($request->user);
+            $collection = Network::forUser($request->user());
         }
 
         $queryTransformer->config(Network::class)
@@ -123,7 +124,7 @@ class NetworkController extends BaseController
     public function show(Request $request, string $networkId)
     {
         return new NetworkResource(
-            Network::forUser($request->user)->findOrFail($networkId)
+            Network::forUser($request->user())->findOrFail($networkId)
         );
     }
 
@@ -138,9 +139,16 @@ class NetworkController extends BaseController
             'name',
             'subnet',
         ]));
-        $network->save();
-        $network->refresh();
-        return $this->responseIdMeta($request, $network->getKey(), 201);
+
+        try {
+            if (!$network->save()) {
+                return $network->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $network->getSyncError();
+        }
+
+        return $this->responseIdMeta($request, $network->id, 201);
     }
 
     /**
@@ -150,39 +158,48 @@ class NetworkController extends BaseController
      */
     public function update(UpdateRequest $request, string $networkId)
     {
-        $network = Network::forUser(app('request')->user)->findOrFail($networkId);
+        $network = Network::forUser(Auth::user())->findOrFail($networkId);
         $network->fill($request->only([
-            'router_id',
             'name',
-            'subnet',
         ]));
-        if (!$network->save()) {
+
+        try {
+            if (!$network->save()) {
+                return $network->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $network->getSyncError();
         }
-        return $this->responseIdMeta($request, $network->getKey(), 200);
+
+        return $this->responseIdMeta($request, $network->id, 200);
     }
 
     public function destroy(Request $request, string $networkId)
     {
-        $model = Network::forUser($request->user)->findOrFail($networkId);
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
+        $network = Network::forUser($request->user())->findOrFail($networkId);
+
+        if (!$network->canDelete()) {
+            return $network->getDeletionError();
         }
-        if (!$model->delete()) {
-            return $model->getSyncError();
+
+        try {
+            $network->delete();
+        } catch (SyncException $exception) {
+            return $network->getSyncError();
         }
+
         return response()->json([], 204);
     }
 
     /**
      * @param \Illuminate\Http\Request $request
      * @param QueryTransformer $queryTransformer
-     * @param string $zoneId
+     * @param string $networkId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function nics(Request $request, QueryTransformer $queryTransformer, string $networkId)
     {
-        $collection = Network::forUser($request->user)->findOrFail($zoneId)->nics();
+        $collection = Network::forUser($request->user())->findOrFail($networkId)->nics();
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 
