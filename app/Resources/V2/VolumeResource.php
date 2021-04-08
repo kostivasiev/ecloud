@@ -34,7 +34,7 @@ class VolumeResource extends UKFastResource
             'capacity' => $this->capacity,
             'iops' => $this->iops,
             'mounted' => $this->mounted,
-            'sync' => $this->getStatus(),
+            'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

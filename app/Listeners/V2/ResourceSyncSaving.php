@@ -25,12 +25,12 @@ class ResourceSyncSaving
         try {
             $lock->block(60);
 
-            if ($model->syncs()->count() == 1 && $model->getStatus() === Sync::STATUS_FAILED) {
+            if ($model->syncs()->count() == 1 && $model->sync->status === Sync::STATUS_FAILED) {
                 Log::warning(get_class($this) . ' : Update blocked, resource has a single failed sync', ['resource_id' => $model->id]);
                 return false;
             }
 
-            if ($model->getStatus() === Sync::STATUS_INPROGRESS) {
+            if ($model->sync->status === Sync::STATUS_INPROGRESS) {
                 Log::warning(get_class($this) . ' : Update blocked, resource has outstanding sync', ['resource_id' => $model->id]);
                 return false;
             }

@@ -30,7 +30,7 @@ class ExpandOsDisk extends Job
 
         $volume = $this->instance->volumes->first();
 
-        if ($volume->getStatus() != 'complete') {
+        if ($volume->sync->status != 'complete') {
             $this->release(static::RETRY_DELAY);
             Log::info(get_class($this) . ' : primary volume is not in sync, retrying in ' . static::RETRY_DELAY . ' seconds');
             return;

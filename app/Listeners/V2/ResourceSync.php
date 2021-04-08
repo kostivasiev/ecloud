@@ -18,12 +18,12 @@ class ResourceSync
             return true;
         }
 
-        if ($model->getStatus() === 'failed') {
+        if ($model->sync->status === 'failed') {
             Log::warning(get_class($this) . ' : Save blocked, resource has failed sync', ['resource_id' => $model->id]);
             return false;
         }
 
-        if ($model->getStatus() !== 'complete') {
+        if ($model->sync->status !== 'complete') {
             Log::warning(get_class($this) . ' : Save blocked, resource has outstanding sync', ['resource_id' => $model->id]);
             return false;
         }

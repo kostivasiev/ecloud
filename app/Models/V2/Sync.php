@@ -45,4 +45,15 @@ class Sync extends Model
     {
         return $this->morphTo();
     }
+
+    public function getStatusAttribute()
+    {
+        if ($this->failure_reason !== null) {
+            return Sync::STATUS_FAILED;
+        }
+        if ($this->completed) {
+            return Sync::STATUS_COMPLETE;
+        }
+        return Sync::STATUS_INPROGRESS;
+    }
 }
