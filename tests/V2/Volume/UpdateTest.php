@@ -133,7 +133,7 @@ class UpdateTest extends TestCase
                 '/api/v1/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
                 [
                     'json' => [
-                        'sizeGiB' => '999'
+                        'sizeGiB' => '1999'
                     ]
                 ]
             )->andReturnUsing(function () {
