@@ -60,7 +60,7 @@ class AllocateIp extends Job
                 $iterator++;
 
                 if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                    Log::warning($logMessage . 'Insufficient available IP\'s in range ' . $ipRange->id);
+                    Log::info($logMessage . 'Insufficient available IP\'s in range ' . $ipRange->id);
                     continue 2;
                 }
 
