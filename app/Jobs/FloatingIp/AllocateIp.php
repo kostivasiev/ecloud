@@ -26,7 +26,7 @@ class AllocateIp extends Job
      */
     public function handle()
     {
-        Log::debug(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $floatingIp = $this->model;
         $logMessage = 'Allocate external Ip to floating IP ' . $floatingIp->id . ': ';
@@ -49,7 +49,7 @@ class AllocateIp extends Job
         foreach ($ipRanges as $ipRange) {
             $subnet = Subnet::fromString(long2ip($ipRange->networkAddress) . '/' . $ipRange->cidr);
             if (empty($subnet)) {
-                Log::info($logMessage . 'Failed to load subnet details from IP range ' . $ipRange->id);
+                Log::error($logMessage . 'Failed to load subnet details from IP range ' . $ipRange->id);
                 continue;
             }
 
@@ -60,7 +60,7 @@ class AllocateIp extends Job
                 $iterator++;
 
                 if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                    Log::info($logMessage . 'Insufficient available IP\'s in range ' . $ipRange->id);
+                    Log::warning($logMessage . 'Insufficient available IP\'s in range ' . $ipRange->id);
                     continue 2;
                 }
 
@@ -96,10 +96,11 @@ class AllocateIp extends Job
             }
         }
 
-        if (empty($floatingIp->ip_address)) {
-            $this->release(5);
-        }
+        $error = 'Insufficient available external IP\'s to assign to floating IP resource ' . $floatingIp->id;
+        Log::error($error);
+        $this->fail(new \Exception($error));
+        return;
 
-        Log::debug(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
