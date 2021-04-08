@@ -3,7 +3,7 @@
 return [
     'availability_zones' => [],
     'vpc' => [
-        'max_count' => 10,
+        'max_count' => env('VPC_MAX_COUNT', 10),
     ],
     'network' => [
         'subnets' => [
