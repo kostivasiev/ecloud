@@ -29,7 +29,7 @@ class UndeploySecurityProfile extends Job
             );
         } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
-                Log::info("Router already removed, skipping");
+                Log::info("Network already removed, skipping");
                 return;
             }
 
