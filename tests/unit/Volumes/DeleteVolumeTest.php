@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Volume;
+namespace Tests\unit\Volumes;
 
 use App\Jobs\Kingpin\Volume\Undeploy;
 use App\Models\V2\Volume;
