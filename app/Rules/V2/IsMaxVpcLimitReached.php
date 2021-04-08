@@ -8,20 +8,13 @@ use Illuminate\Support\Facades\Auth;
 
 class IsMaxVpcLimitReached implements Rule
 {
-    private int $vpcMaxLimit;
-
-    public function __construct()
-    {
-        $this->vpcMaxLimit = config('defaults.vpc.max_count');
-    }
-
     public function passes($attribute, $value)
     {
-        return (Vpc::forUser(Auth::user())->get()->count() < $this->vpcMaxLimit);
+        return (Vpc::forUser(Auth::user())->get()->count() < config('defaults.vpc.max_count'));
     }
 
     public function message()
     {
-        return 'The maximum number of ' . $this->vpcMaxLimit . ' VPCs has been reached';
+        return 'The maximum number of ' . config('defaults.vpc.max_count') . ' VPCs has been reached';
     }
 }
