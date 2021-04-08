@@ -25,20 +25,27 @@ class AwaitPortRemovalTest extends TestCase
         parent::setUp();
     }
 
-    public function testSuccessWhenNoPortsFound()
+    public function testSuccessWhenNoVIFPortsFound()
     {
         $this->nsxServiceMock()->expects('get')
             ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id])
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([]));
+                return new Response(200, [], json_encode([
+                    'unique_id' => '77bcbe70-4619-47f8-ac25-d2bd4217f603',
+                ]));
             });
 
         $this->nsxServiceMock()->expects('get')
-            ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id . '/ports?include_mark_for_delete_objects=true'])
+            ->withArgs(['/api/v1/logical-ports?logical_switch_id=77bcbe70-4619-47f8-ac25-d2bd4217f603'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
-                    'result_count' => 0,
-                    'results' => []
+                    'results' => [
+                        [
+                            'attachment' => [
+                                'attachment_type' => 'DHCP',
+                            ],
+                        ]
+                    ],
                 ]));
             });
 
@@ -64,20 +71,27 @@ class AwaitPortRemovalTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testJobReleasedWhenPortsExist()
+    public function testJobReleasedWhenVIFPortsExist()
     {
         $this->nsxServiceMock()->expects('get')
             ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id])
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([]));
+                return new Response(200, [], json_encode([
+                    'unique_id' => '77bcbe70-4619-47f8-ac25-d2bd4217f603',
+                ]));
             });
 
         $this->nsxServiceMock()->expects('get')
-            ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->network()->router->id . '/segments/' . $this->network()->id . '/ports?include_mark_for_delete_objects=true'])
+            ->withArgs(['/api/v1/logical-ports?logical_switch_id=77bcbe70-4619-47f8-ac25-d2bd4217f603'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
-                    'result_count' => 1,
-                    'results' => []
+                    'results' => [
+                        [
+                            'attachment' => [
+                                'attachment_type' => 'VIF',
+                            ],
+                        ]
+                    ],
                 ]));
             });
 

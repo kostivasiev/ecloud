@@ -29,10 +29,13 @@ class AwaitPortRemoval extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->network->id]);
 
+        $segmentUniqueID = null;
         try {
-            $this->network->router->availabilityZone->nsxService()->get(
+            $response = $this->network->router->availabilityZone->nsxService()->get(
                 'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id
             );
+            $response = json_decode($response->getBody()->getContents());
+            $segmentUniqueID = $response->unique_id;
         } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
                 Log::info("Network already removed, skipping");
@@ -43,14 +46,16 @@ class AwaitPortRemoval extends Job
         }
 
         $response = $this->network->router->availabilityZone->nsxService()->get(
-            'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id . '/ports?include_mark_for_delete_objects=true'
+            '/api/v1/logical-ports?logical_switch_id=' . $segmentUniqueID
         );
         $response = json_decode($response->getBody()->getContents());
-        if ($response->result_count > 0) {
-            Log::info(
-                'Waiting for all ports to be removed, retrying in ' . $this->backoff . ' seconds'
-            );
-            return $this->release($this->backoff);
+        foreach ($response->results as $result) {
+            if ($result->attachment->attachment_type == 'VIF') {
+                Log::info(
+                    'Waiting for all ports to be removed, retrying in ' . $this->backoff . ' seconds'
+                );
+                return $this->release($this->backoff);
+            }
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->network->id]);
