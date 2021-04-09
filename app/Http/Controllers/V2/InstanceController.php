@@ -316,6 +316,18 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
+        if (!$instance->vpc->console_enabled) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access has been disabled for this resource',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+        }
+
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $instance->availabilityZone
             ->kingpinService()
