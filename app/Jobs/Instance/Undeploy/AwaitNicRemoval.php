@@ -28,7 +28,7 @@ class AwaitNicRemoval extends Job
 
         if ($this->instance->nics()->count() > 0) {
             $this->instance->nics()->each(function ($nic) {
-                if ($nic->getStatus() == Sync::STATUS_FAILED) {
+                if ($nic->sync->status == Sync::STATUS_FAILED) {
                     Log::error('NIC in failed sync state, abort', ['id' => $this->instance->id, 'nic' => $nic->id]);
                     $this->fail(new \Exception("NIC '" . $nic->id . "' in failed sync state"));
                 }

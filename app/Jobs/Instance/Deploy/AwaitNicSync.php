@@ -27,12 +27,12 @@ class AwaitNicSync extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $this->instance->nics()->each(function ($nic) {
-            if ($nic->getStatus() == Sync::STATUS_FAILED) {
+            if ($nic->sync->status == Sync::STATUS_FAILED) {
                 Log::error('NIC in failed sync state, abort', ['id' => $this->instance->id, 'nic' => $nic->id]);
                 $this->fail(new \Exception("NIC '" . $nic->id . "' in failed sync state"));
             }
 
-            if ($nic->getStatus() != Sync::STATUS_COMPLETE) {
+            if ($nic->sync->status != Sync::STATUS_COMPLETE) {
                 Log::warning('NIC not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->instance->id, 'nic' => $nic->id]);
                 return $this->release($this->backoff);
             }
