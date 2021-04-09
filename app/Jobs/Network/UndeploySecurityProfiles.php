@@ -8,7 +8,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class UndeploySecurityProfile extends Job
+class UndeploySecurityProfiles extends Job
 {
     use Batchable;
 
@@ -39,12 +39,12 @@ class UndeploySecurityProfile extends Job
         $response = $this->network->router->availabilityZone->nsxService()->get(
             'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id . '/segment-security-profile-binding-maps',
         );
-        $response = json_decode($response->getBody()->getContents(), true);
-        if (isset($response['results'][0])) {
+        $response = json_decode($response->getBody()->getContents());
+        foreach ($response->results as $result) {
             $this->network->router->availabilityZone->nsxService()->delete(
-                'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id . '/segment-security-profile-binding-maps/' . $response['results'][0]['id']
+                'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id . '/segment-security-profile-binding-maps/' . $result->id
             );
-            Log::info('Deleted security profile ' . $response['results'][0]['id']);
+            Log::info('Deleted security profile ' . $result->id);
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->network->id]);

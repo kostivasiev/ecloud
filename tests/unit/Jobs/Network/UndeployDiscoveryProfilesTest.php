@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Network;
 
-use App\Jobs\Network\UndeployDiscoveryProfile;
+use App\Jobs\Network\UndeployDiscoveryProfiles;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class UndeployDiscoveryProfileTest extends TestCase
+class UndeployDiscoveryProfilesTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -48,7 +48,7 @@ class UndeployDiscoveryProfileTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new UndeployDiscoveryProfile($this->network()));
+        dispatch(new UndeployDiscoveryProfiles($this->network()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -64,7 +64,7 @@ class UndeployDiscoveryProfileTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new UndeployDiscoveryProfile($this->network()));
+        dispatch(new UndeployDiscoveryProfiles($this->network()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -89,7 +89,7 @@ class UndeployDiscoveryProfileTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new UndeployDiscoveryProfile($this->network()));
+        dispatch(new UndeployDiscoveryProfiles($this->network()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
