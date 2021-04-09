@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\Network;
 
 use App\Jobs\Job;
+use App\Jobs\Network\AwaitPortRemoval;
 use App\Jobs\Network\Undeploy;
 use App\Jobs\Network\UndeployCheck;
 use App\Jobs\Network\UndeployDiscoveryProfile;
@@ -28,6 +29,7 @@ class Delete extends Job
 
         $this->deleteSyncBatch([
             [
+                new AwaitPortRemoval($this->sync->resource),
                 new UndeploySecurityProfile($this->sync->resource),
                 new UndeployDiscoveryProfile($this->sync->resource),
                 new Undeploy($this->sync->resource),
