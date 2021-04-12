@@ -38,7 +38,7 @@ class Deploy extends Job
         Log::info("DEBUG :: Testing instance deployment", ['rand'=>$rand, 'attempt'=>$this->attempts()]);
 
         /** @var Response $deployResponse */
-        try{
+        try {
             $deployResponse = $this->instance->availabilityZone->kingpinService()->post(
                 '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/fromtemplate',
                 [
