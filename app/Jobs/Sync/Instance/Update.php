@@ -7,6 +7,7 @@ use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\AttachOsDisk;
 use App\Jobs\Instance\Deploy\AwaitNicSync;
+use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\DeployCompleted;
@@ -41,17 +42,10 @@ class Update extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        // Check the network status
-        if (!empty($this->sync->resource->deploy_data) && array_key_exists('network_id', $this->sync->resource->deploy_data)) {
-            $network = Network::findOrFail($this->sync->resource->deploy_data['network_id']);
-            if ($network->getStatus() === Sync::STATUS_FAILED) {
-                throw new \Exception('The network is currently in a failed state and cannot be used');
-            }
-        }
-
         if (!$this->sync->resource->deployed) {
             $this->updateSyncBatch([
                 [
+                    new CheckNetworkAvailable($this->sync->resource),
                     new Deploy($this->sync->resource),
                     new PrepareOsDisk($this->sync->resource),
                     new AttachOsDisk($this->sync->resource),
