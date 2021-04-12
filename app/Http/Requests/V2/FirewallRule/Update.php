@@ -18,13 +18,6 @@ class Update extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:50',
             'sequence' => 'sometimes|required|integer',
-            'firewall_policy_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.firewall_policies,id,deleted_at,NULL',
-                new ExistsForUser(FirewallPolicy::class)
-            ],
             'source' => [
                 'sometimes',
                 'required',
@@ -42,7 +35,7 @@ class Update extends FormRequest
             'enabled' => 'sometimes|required|boolean',
             'ports' => [
                 'sometimes',
-                'required',
+                'present',
                 'array'
             ],
             'ports.*.protocol' => [
@@ -72,7 +65,6 @@ class Update extends FormRequest
             'required' => 'The :attribute field is required',
             'string' => 'The :attribute field must contain a string',
             'name.max' => 'The :attribute field must be less than 50 characters',
-            'firewall_policy_id.exists' => 'The specified :attribute was not found',
             'in' => 'The :attribute field contains an invalid option',
             'service_type.in' => 'The :attribute field must contain one of TCP or UDP',
             'enabled.boolean' => 'The :attribute field is not a valid boolean value',

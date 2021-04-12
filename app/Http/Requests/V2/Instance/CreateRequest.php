@@ -2,20 +2,24 @@
 
 namespace App\Http\Requests\V2\Instance;
 
-use App\Models\V2\Appliance;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\HostGroup;
+use App\Models\V2\Image;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsMaxInstanceForCustomer;
+use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Log;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
 {
+    protected $image;
     protected $config;
-
     protected string $platform;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -33,30 +37,24 @@ class CreateRequest extends FormRequest
      */
     public function rules()
     {
-        $applianceVersion = Appliance::findOrFail($this->request->get('appliance_id'))->getLatestVersion();
+        $this->image = Image::findOrFail($this->request->get('image_id'));
+        $this->config = $this->image->metadata->pluck('key', 'value')->flip();
+        $this->platform = strtolower($this->image->platform);
 
-        $this->config = $applianceVersion->applianceVersionData->pluck('key', 'value')->flip();
-
-        try {
-            $this->platform = strtolower($applianceVersion->serverLicense()->category);
-        } catch (\Exception $exception) {
-            Log::error('Failed to load server license for appliance version', [$exception]);
-            throw $exception;
-        }
-
-        return [
+        $rules = [
             'name' => 'nullable|string',
             'vpc_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class)
+                new ExistsForUser(Vpc::class),
+                new IsMaxInstanceForVpc(),
+                new IsMaxInstanceForCustomer(),
             ],
-            'appliance_id' => [
+            'image_id' => [
                 'required',
-                'uuid',
-                'exists:ecloud.appliance,appliance_uuid'
+                'string',
+                'exists:ecloud.images,id,deleted_at,NULL'
             ],
             'vcpu_cores' => [
                 'required',
@@ -72,8 +70,13 @@ class CreateRequest extends FormRequest
                 new IsValidRamMultiple()
             ],
             'locked' => 'sometimes|required|boolean',
-            'platform' => 'sometimes|required|in:Windows,Linux',
             'backup_enabled' => 'sometimes|required|boolean',
+            'host_group_id' => [
+                'sometimes',
+                'string',
+                'exists:ecloud.host_groups,id,deleted_at,NULL',
+                new ExistsForUser(HostGroup::class),
+            ],
             'network_id' => [
                 'sometimes',
                 'string',
@@ -91,11 +94,6 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'required_without:floating_ip_id',
                 'boolean',
-            ],
-            'appliance_data' => [
-                'sometimes',
-                'required',
-                'string',
             ],
             'user_script' => [
                 'sometimes',
@@ -116,6 +114,39 @@ class CreateRequest extends FormRequest
                 'in:300,600,1200,2500',
             ],
         ];
+
+        $rules = array_merge($rules, $this->generateImageDataRules());
+        return $rules;
+    }
+
+    public function generateImageDataRules()
+    {
+        // Now for the dynamic rules for the appliance data
+        $scriptRules = [];
+
+        // So, we need to retrieve the validation rules
+        $parameters = $this->image->parameters;
+        foreach ($parameters as $parameterKey => $parameter) {
+            $key = 'image_data.' . $parameter->appliance_script_parameters_key;
+            $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
+            //validation rules regex
+            if (!empty($parameter->appliance_script_parameters_validation_rule)) {
+                $scriptRules[$key][] = 'regex:' . $parameter->appliance_script_parameters_validation_rule;
+            }
+
+            // For data types String,Numeric,Boolean we can use Laravel validation
+            switch ($parameter->appliance_script_parameters_type) {
+                case 'String':
+                case 'Numeric':
+                case 'Boolean':
+                    $scriptRules[$key][] = strtolower($parameter->appliance_script_parameters_type);
+                    break;
+                case 'Password':
+                    $scriptRules[$key][] = 'string';
+            }
+        }
+
+        return $scriptRules;
     }
 
     /**
@@ -129,14 +160,14 @@ class CreateRequest extends FormRequest
             // TODO: Clean these up - so many duplicates :/
             'required' => 'The :attribute field is required',
             'vpc_id.exists' => 'No valid Vpc record found for specified :attribute',
-            'appliance_id.exists' => 'The :attribute is not a valid Appliance',
+            'image_id.exists' => 'The :attribute is not a valid Image',
             'vcpu_cores.required' => 'The :attribute field is required',
             'availability_zone_id.exists' => 'No valid Availability Zone exists for :attribute',
             'network_id.required' => 'The :attribute field, when specified, cannot be null',
             'network_id.exists' => 'The specified :attribute was not found',
             'floating_ip_id.required' => 'The :attribute field, when specified, cannot be null',
             'floating_ip_id.exists' => 'The specified :attribute was not found',
-            'appliance_data.required' => 'The :attribute field, when specified, cannot be null',
+            'image_data.required' => 'The :attribute field, when specified, cannot be null',
             'user_script.required' => 'The :attribute field, when specified, cannot be null',
             'volume_capacity.required' => 'The :attribute field, when specified, cannot be null',
             'ram_capacity.required' => 'The :attribute field is required',

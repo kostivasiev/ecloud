@@ -104,7 +104,6 @@ class FirewallRuleController extends BaseController
             'name',
             'sequence',
             'deployed',
-            'firewall_policy_id',
             'source',
             'destination',
             'action',
@@ -112,24 +111,16 @@ class FirewallRuleController extends BaseController
             'enabled'
         ]));
 
-        if ($request->has('ports') && $firewallRule->firewallPolicy->getStatus() !== 'in-progress') {
-            FirewallRule::withoutEvents(
-                function () use ($request, $firewallRule) {
-                    $firewallRule->firewallRulePorts->each(function ($rule) {
-                        $rule->delete();
-                    });
-                    foreach ($request->input('ports') as $port) {
-                        $port['firewall_rule_id'] = $firewallRule->id;
-                        $firewallRulePort = new FirewallRulePort($port);
-                        FirewallRulePort::addCustomKey($firewallRulePort);
-                        $firewallRulePort->save();
-                    }
-                }
-            );
-        }
 
-        if (!$firewallRule->save()) {
-            return $firewallRule->getSyncError();
+        if ($request->filled('ports')) {
+            $firewallRule->firewallRulePorts->each(function ($rule) {
+                $rule->delete();
+            });
+            foreach ($request->input('ports') as $port) {
+                $port['firewall_rule_id'] = $firewallRule->id;
+                $firewallRulePort = new FirewallRulePort($port);
+                $firewallRulePort->save();
+            }
         }
 
         return $this->responseIdMeta($request, $firewallRule->id, 200);

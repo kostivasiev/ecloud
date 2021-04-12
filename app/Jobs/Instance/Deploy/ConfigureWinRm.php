@@ -4,40 +4,42 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class ConfigureWinRm extends Job
 {
-    private $data;
+    use Batchable;
 
-    public function __construct($data)
+    private $instance;
+
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-        $logMessage = 'ConfigureWinRm for ' . $instance->id . ': ';
-        if ($instance->platform != 'Windows') {
+        $logMessage = 'ConfigureWinRm for ' . $this->instance->id . ': ';
+        if ($this->instance->platform != 'Windows') {
             Log::info($logMessage . 'Platform is not Windows. Skipped.');
             return;
         }
 
-        $guestAdminCredential = $instance->credentials()
+        $guestAdminCredential = $this->instance->credentials()
             ->where('username', 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
-            $message = 'ConfigureWinRm failed for ' . $instance->id . ', no admin credentials found';
+            $message = 'ConfigureWinRm failed for ' . $this->instance->id . ', no admin credentials found';
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
         }
 
-        $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/winrm',
+        $this->instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/guest/windows/winrm',
             [
                 'json' => [
                     'username' => $guestAdminCredential->username,
@@ -46,6 +48,6 @@ class ConfigureWinRm extends Job
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

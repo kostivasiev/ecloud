@@ -36,17 +36,13 @@ class PowerOffTest extends TestCase
             'region_id' => $this->region->id
         ]);
 
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'name' => 'GetTest Default',
         ]);
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
-        $mockKingpinService->shouldReceive('delete')->withArgs(['/api/v2/vpc/' . $this->vpc->id . '/instance/' . $this->instance->id . '/power'])->andReturn(
+        $mockKingpinService->shouldReceive('delete')->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance->id . '/power'])->andReturn(
             new Response(200)
         );
 
@@ -60,7 +56,7 @@ class PowerOffTest extends TestCase
         $mockKingpinService = \Mockery::mock();
         app()->bind(KingpinService::class, function () use ($mockKingpinService) {
             $mockKingpinService->shouldReceive('delete')
-                ->withArgs(['/api/v2/vpc/' . $this->vpc->id . '/instance/' . $this->instance->id . '/power'])
+                ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance->id . '/power'])
                 ->andReturn(
                     new Response(200)
                 );

@@ -33,7 +33,7 @@ class NetworkResource extends UKFastResource
             'router_id' => $this->router_id,
             'vpc_id' => ($this->router) ? $this->router->vpc_id : null,
             'subnet' => $this->subnet,
-            'sync' => $this->getStatus(),
+            'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

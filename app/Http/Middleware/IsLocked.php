@@ -24,7 +24,7 @@ class IsLocked
         $instance = Instance::forUser($request->user())->findOrFail($request->route('instanceId'));
 
         if ($request->user()->isScoped() && $instance->locked) {
-            return JsonResponse::create([
+            return response()->json([
                 'errors' => [
                     [
                         'title' => 'Forbidden',

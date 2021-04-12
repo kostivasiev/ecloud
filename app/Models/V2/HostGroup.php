@@ -2,8 +2,12 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\HostGroup\Deleted;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -19,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class HostGroup extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides, DefaultAvailabilityZone;
 
     public string $keyPrefix = 'hg';
 
@@ -34,8 +38,12 @@ class HostGroup extends Model implements Filterable, Sortable
             'name',
             'vpc_id',
             'availability_zone_id',
-            'host_spec_id'
+            'host_spec_id',
         ]);
+
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class
+        ];
 
         parent::__construct($attributes);
     }
@@ -58,6 +66,11 @@ class HostGroup extends Model implements Filterable, Sortable
     public function hosts()
     {
         return $this->hasMany(Host::class);
+    }
+
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
     }
 
     /**

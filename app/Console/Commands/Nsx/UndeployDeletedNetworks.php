@@ -2,11 +2,8 @@
 
 namespace App\Console\Commands\Nsx;
 
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
 
 class UndeployDeletedNetworks extends Command
@@ -45,5 +42,7 @@ class UndeployDeletedNetworks extends Command
 
             $this->info('Network ' . $network->id . ' Undeployed.');
         });
+
+        return Command::SUCCESS;
     }
 }

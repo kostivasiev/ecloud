@@ -2,11 +2,11 @@
 
 namespace App\Listeners\V2;
 
-use App\Models\V2\Sync;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSync
 {
+    // Old - replaced with Deleting/Saved/Saving events
     public function handle($event)
     {
         Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
@@ -18,12 +18,12 @@ class ResourceSync
             return true;
         }
 
-        if ($model->getStatus() === 'failed') {
+        if ($model->sync->status === 'failed') {
             Log::warning(get_class($this) . ' : Save blocked, resource has failed sync', ['resource_id' => $model->id]);
             return false;
         }
 
-        if ($model->getStatus() !== 'complete') {
+        if ($model->sync->status !== 'complete') {
             Log::warning(get_class($this) . ' : Save blocked, resource has outstanding sync', ['resource_id' => $model->id]);
             return false;
         }
