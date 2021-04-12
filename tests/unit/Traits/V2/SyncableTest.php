@@ -54,7 +54,7 @@ class SyncableTest extends TestCase
         $this->assertEquals(Sync::TYPE_UPDATE, $attribute->type);
     }
 
-    public function testGetSyncAttributeReturnsNullWithNoSync()
+    public function testGetSyncAttributeReturnsUnknownWithNoSync()
     {
         Model::withoutEvents(function() {
             $this->model = new TestModel([
@@ -64,7 +64,7 @@ class SyncableTest extends TestCase
 
         $attribute = $this->model->sync;
 
-        $this->assertNull($attribute->status);
-        $this->assertNull($attribute->type);
+        $this->assertEquals('unknown', $attribute->status);
+        $this->assertEquals('unknown', $attribute->type);
     }
 }

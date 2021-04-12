@@ -54,8 +54,8 @@ trait Syncable
 
     public function getSyncAttribute()
     {
-        $status = null;
-        $type = null;
+        $status = 'unknown';
+        $type = 'unknown';
 
         if ($this->syncs()->count()) {
             $latest = $this->syncs()->latest()->first();
