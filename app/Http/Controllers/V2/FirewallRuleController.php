@@ -122,6 +122,9 @@ class FirewallRuleController extends BaseController
                 $firewallRulePort->save();
             }
         }
+        if (!$firewallRule->save()) {
+            return $firewallRule->getSyncError();
+        }
 
         return $this->responseIdMeta($request, $firewallRule->id, 200);
     }
