@@ -53,7 +53,7 @@ class FailedNetworkInstanceDeployTest extends TestCase
         $job->backoff = 0;
         $job->handle();
 
-        $this->assertEquals(Sync::STATUS_FAILED, $this->instance()->getStatus());
+        $this->assertEquals(Sync::STATUS_FAILED, $this->instance()->sync->status);
 
         $sync = Sync::where('resource_id', '=', $this->instance()->id)->first();
         $this->assertEquals("Network 'net-abcdef12' in failed sync state", $sync->failure_reason);

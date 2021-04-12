@@ -27,7 +27,7 @@ class CheckNetworkAvailable extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
         $this->instance->nics()->each(function ($nic) {
-            if ($nic->network->getStatus() == Sync::STATUS_FAILED) {
+            if ($nic->network->sync->status == Sync::STATUS_FAILED) {
                 Log::error('Network in failed sync state, abort', [
                     'id' => $this->instance->id,
                     'nic' => $nic->id,
@@ -36,7 +36,7 @@ class CheckNetworkAvailable extends Job
                 $this->fail(new \Exception("Network '" . $nic->network->id . "' in failed sync state"));
             }
 
-            if ($nic->network->getStatus() != Sync::STATUS_COMPLETE) {
+            if ($nic->network->sync->status != Sync::STATUS_COMPLETE) {
                 Log::warning('Network not in sync, retrying in ' . $this->backoff . ' seconds', [
                     'id' => $this->instance->id,
                     'nic' => $nic->id,
