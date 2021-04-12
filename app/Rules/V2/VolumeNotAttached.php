@@ -26,6 +26,6 @@ class VolumeNotAttached implements Rule
 
     public function message()
     {
-        return 'The specified volume is already mounted on this instance';
+        return 'The specified volume is already attached to this instance';
     }
 }

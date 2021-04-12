@@ -2,10 +2,12 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Host\Deleting;
+use App\Events\V2\Host\Saved;
+use App\Events\V2\Host\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
-use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -21,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Host extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public string $keyPrefix = 'h';
 
@@ -36,6 +38,12 @@ class Host extends Model implements Filterable, Sortable
             'name',
             'host_group_id',
         ]);
+
+        $this->dispatchesEvents = [
+            'saving' => Saving::class,
+            'saved' => Saved::class,
+            'deleting' => Deleting::class
+        ];
 
         parent::__construct($attributes);
     }

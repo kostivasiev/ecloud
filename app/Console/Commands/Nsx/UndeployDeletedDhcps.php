@@ -3,7 +3,9 @@ namespace App\Console\Commands\Nsx;
 
 use App\Models\V2\Dhcp;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class UndeployDeletedDhcps extends Command
 {
@@ -40,8 +42,15 @@ class UndeployDeletedDhcps extends Command
                 }
             }
 
-            $nsxService->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
-            $this->info('Dhcp ' . $dhcp->id . ' Undeployed.');
+            try {
+                $nsxService->delete('/policy/api/v1/infra/dhcp-server-configs/' . $dhcp->id);
+                $this->info('Dhcp ' . $dhcp->id . ' Undeployed.');
+            } catch (ClientException|RequestException $e) {
+                Log::warning('Unable to delete DHCP server ' . $dhcp->id, [
+                    'detail' => $e,
+                ]);
+                $this->info('Unable to delete ' . $dhcp->id);
+            }
         });
 
         return Command::SUCCESS;
