@@ -25,6 +25,7 @@ class FailedNetworkInstanceDeployTest extends TestCase
     {
         // Create network fail sync
         Sync::withoutEvents(function () {
+            $this->nic();
             $model = new Sync([
                 'id' => 'sync-deployfail',
                 'completed' => true,
@@ -42,14 +43,20 @@ class FailedNetworkInstanceDeployTest extends TestCase
             ]);
             $model->resource()->associate($this->instance());
             $model->save();
+            $this->instance()->deployed = false;
+            $this->instance()->save();
             return $model;
         });
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The network is currently in a failed state and cannot be used');
-
         $job = new Update($sync);
+        $job->tries = 1;
+        $job->backoff = 0;
         $job->handle();
+
+        $this->assertEquals(Sync::STATUS_FAILED, $this->instance()->getStatus());
+
+        $sync = Sync::where('resource_id', '=', $this->instance()->id)->first();
+        $this->assertEquals("Network 'net-abcdef12' in failed sync state", $sync->failure_reason);
     }
 
     public function testSuccessfulNetworkDeploys()
