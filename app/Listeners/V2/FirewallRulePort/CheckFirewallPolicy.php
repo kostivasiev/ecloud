@@ -10,10 +10,8 @@ class CheckFirewallPolicy
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        if (!empty($event->model->firewallRule) && !empty($event->model->firewallRule->firewallPolicy)) {
-            if ($event->model->firewallRule->firewallPolicy->getStatus() === 'in-progress') {
-                return false;
-            }
+        if ($event->model->firewallRule->firewallPolicy->getStatus() === 'in-progress') {
+            return false;
         }
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
