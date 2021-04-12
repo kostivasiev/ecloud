@@ -75,7 +75,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testUnmountedVolumeWithNonDefaultIops()
+    public function testUnattachedVolumeWithNonDefaultIops()
     {
         Volume::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -96,7 +96,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testMountedVolumeWithDefaultIops()
+    public function testAttachedVolumeWithDefaultIops()
     {
         Model::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -124,7 +124,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testMountedVolumeWithNonDefaultIops()
+    public function testAttachedVolumeWithNonDefaultIops()
     {
         Model::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -154,7 +154,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testMountedVolumeNewIopsExistingMetric()
+    public function testAttachedVolumeNewIopsExistingMetric()
     {
         $originalBilling = factory(BillingMetric::class)->create([
             'id' => 'bm-test',

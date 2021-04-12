@@ -3,10 +3,12 @@
 namespace App\Jobs\Sync\Network;
 
 use App\Jobs\Job;
+use App\Jobs\Network\AwaitPortRemoval;
 use App\Jobs\Network\Undeploy;
 use App\Jobs\Network\UndeployCheck;
-use App\Jobs\Network\UndeployDiscoveryProfile;
-use App\Jobs\Network\UndeploySecurityProfile;
+use App\Jobs\Network\UndeployDiscoveryProfiles;
+use App\Jobs\Network\UndeployQoSProfiles;
+use App\Jobs\Network\UndeploySecurityProfiles;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
@@ -28,8 +30,10 @@ class Delete extends Job
 
         $this->deleteSyncBatch([
             [
-                new UndeploySecurityProfile($this->sync->resource),
-                new UndeployDiscoveryProfile($this->sync->resource),
+                new AwaitPortRemoval($this->sync->resource),
+                new UndeploySecurityProfiles($this->sync->resource),
+                new UndeployDiscoveryProfiles($this->sync->resource),
+                new UndeployQoSProfiles($this->sync->resource),
                 new Undeploy($this->sync->resource),
                 new UndeployCheck($this->sync->resource),
             ],
