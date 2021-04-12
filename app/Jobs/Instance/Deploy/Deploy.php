@@ -33,23 +33,32 @@ class Deploy extends Job
             return;
         }
 
-        /** @var Response $deployResponse */
-        $deployResponse = $this->instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/fromtemplate',
-            [
-                'json' => [
-                    'templateName' => $this->instance->image->vm_template_name,
-                    'instanceId' => $this->instance->getKey(),
-                    'numCPU' => $this->instance->vcpu_cores,
-                    'ramMib' => $this->instance->ram_capacity,
-                    'resourceTierTags' => config('instance.resource_tier_tags')
-                ]
-            ]
-        );
+        $rand = bin2hex(random_bytes(4));
 
-        $deployResponse = json_decode($deployResponse->getBody()->getContents());
-        if (!$deployResponse) {
-            throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
+        Log::info("DEBUG :: Testing instance deployment", ['rand'=>$rand, 'attempt'=>$this->attempts()]);
+
+        /** @var Response $deployResponse */
+        try {
+            $deployResponse = $this->instance->availabilityZone->kingpinService()->post(
+                '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/fromtemplate',
+                [
+                    'json' => [
+                        'templateName' => $this->instance->image->vm_template_name,
+                        'instanceId' => $this->instance->getKey(),
+                        'numCPU' => $this->instance->vcpu_cores,
+                        'ramMib' => $this->instance->ram_capacity,
+                        'resourceTierTags' => config('instance.resource_tier_tags')
+                    ]
+                ]
+            );
+
+            $deployResponse = json_decode($deployResponse->getBody()->getContents());
+            if (!$deployResponse) {
+                throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
+            }
+        } catch (\Exception $exception) {
+            Log::info("DEBUG :: Failed instance deployment", ['rand'=>$rand, 'attempt'=>$this->attempts()]);
+            throw $exception;
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
