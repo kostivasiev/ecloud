@@ -10,7 +10,8 @@ class IsNetworkAvailable implements Rule
 {
     public function passes($attribute, $value)
     {
-        return Network::forUser(Auth::user())->findOrFail($value)->getStatus() !== Sync::STATUS_FAILED;
+        $network = Network::forUser(Auth::user())->findOrFail($value);
+        return $network->sync->status !== Sync::STATUS_FAILED;
     }
 
     public function message()
