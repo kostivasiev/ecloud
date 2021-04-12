@@ -48,6 +48,9 @@ class UpdateLicenseBillingTest extends TestCase
             'host_group_id' => $this->hostGroup()->id,
         ]);
 
+        $this->hostSpec()->cpu_sockets = 2;
+        $this->hostSpec()->cpu_cores = 6;
+
         $sync = Sync::withoutEvents(function() use ($host) {
             $sync = new Sync([
                 'id' => 'sync-1',
@@ -65,6 +68,44 @@ class UpdateLicenseBillingTest extends TestCase
         $metric = BillingMetric::getActiveByKey($host, 'host.license.windows');
         $this->assertNotNull($metric);
         $this->assertEquals(0.0164384, $metric->price);
+        $this->assertEquals(8, $metric->value); // because billing product is per 2 core pack
+        $this->assertNotNull($metric->start);
+        $this->assertNull($metric->end);
+    }
+
+    public function testCreatingHostInWindowsEnabledHostGroupAddsBillingMinCores()
+    {
+        $this->syncSaveIdempotent('h-test-2');
+        $host = factory(\App\Models\V2\Host::class)->create([
+            'id' => 'h-test-2',
+            'name' => 'h-test-2',
+            'host_group_id' => $this->hostGroup()->id,
+        ]);
+
+        $this->hostSpec()->cpu_sockets = 2;
+        $this->hostSpec()->cpu_cores = 6;
+
+        $sync = Sync::withoutEvents(function() use ($host) {
+            $sync = new Sync([
+                'id' => 'sync-1',
+                'completed' => true,
+                'type' => Sync::TYPE_UPDATE
+            ]);
+            $sync->resource()->associate($host);
+            return $sync;
+        });
+
+        // Billing is for at least config('host.billing.windows.min_cores') cores / 2
+        config()->set('host.billing.windows.min_cores', 20);
+
+        // Check that the billing metric is added
+        $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateLicenseBilling();
+        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+
+        $metric = BillingMetric::getActiveByKey($host, 'host.license.windows');
+        $this->assertNotNull($metric);
+        $this->assertEquals(0.0164384, $metric->price);
+        $this->assertEquals(10, $metric->value);
         $this->assertNotNull($metric->start);
         $this->assertNull($metric->end);
     }

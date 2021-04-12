@@ -46,14 +46,18 @@ class UpdateLicenseBilling
         if ($cores < config('host.billing.windows.min_cores')) {
             Log::debug('Number of cores for host spec ' . $hostSpec->id . ' (' . $cores . ') is less than billing minimum of '
                 . config('host.billing.windows.min_cores') . '. Inserting billing for minimum value instead.');
+            $cores = config('host.billing.windows.min_cores');
         }
+
+        // Divide by 2 because billing product is for Win license 2 core pack.
+        $cores = ceil($cores/2);
 
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->resource_id = $host->id;
         $billingMetric->vpc_id = $host->hostGroup->vpc->id;
         $billingMetric->reseller_id = $host->hostGroup->vpc->reseller_id;
         $billingMetric->key = 'host.license.windows';
-        $billingMetric->value = ($cores >= 16) ? $cores : 16;
+        $billingMetric->value = $cores;
         $billingMetric->start = Carbon::now();
 
         $product = $host->hostGroup->availabilityZone
