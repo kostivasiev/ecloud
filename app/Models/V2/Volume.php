@@ -82,7 +82,7 @@ class Volume extends Model implements Filterable, Sortable
     /**
      * @return bool
      */
-    public function getMountedAttribute()
+    public function getAttachedAttribute()
     {
         if ($this->instances()->count() > 0) {
             return true;

@@ -89,6 +89,7 @@ class FloatingIp extends Model implements Filterable, Sortable
         });
     }
 
+    // TODO: Remove this. We should be handling the nat creation inside the update sync job, and marking the floating ip sync accordingly.
     public function getStatus()
     {
         if (empty($this->ip_address)) {
@@ -107,12 +108,12 @@ class FloatingIp extends Model implements Filterable, Sortable
             return Sync::STATUS_INPROGRESS;
         }
 
-        if ($this->sourceNat->getStatus() !== 'complete') {
-            return $this->sourceNat->getStatus();
+        if ($this->sourceNat->sync->status !== Sync::STATUS_COMPLETE) {
+            return $this->sourceNat->sync->status;
         }
 
-        if ($this->destinationNat->getStatus() !== 'complete') {
-            return $this->destinationNat->getStatus();
+        if ($this->destinationNat->sync->status !== Sync::STATUS_COMPLETE) {
+            return $this->destinationNat->sync->status;
         }
 
         return Sync::STATUS_COMPLETE;

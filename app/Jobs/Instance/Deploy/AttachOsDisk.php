@@ -44,7 +44,7 @@ class AttachOsDisk extends Job
         foreach ($instanceData->volumes as $volumeData) {
             $volume = Volume::find($volumeData->volumeId);
 
-            if ($volume->getStatus() === Sync::STATUS_INPROGRESS) {
+            if ($volume->sync->status === Sync::STATUS_INPROGRESS) {
                 Log::info('Waiting for Volume ' . $volume->id . ' to finish syncing...');
                 $this->release(static::RETRY_DELAY);
                 return;

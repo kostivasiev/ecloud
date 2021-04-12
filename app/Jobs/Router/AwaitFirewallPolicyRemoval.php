@@ -28,7 +28,7 @@ class AwaitFirewallPolicyRemoval extends Job
 
         if ($this->router->firewallPolicies()->count() > 0) {
             $this->router->firewallPolicies()->each(function ($fwp) {
-                if ($fwp->getStatus() == Sync::STATUS_FAILED) {
+                if ($fwp->sync->status == Sync::STATUS_FAILED) {
                     Log::error('Firewall policy in failed sync state, abort', ['id' => $this->router->id, 'fwp' => $fwp->id]);
                     $this->fail(new \Exception("Firewall policy '" . $fwp->id . "' in failed sync state"));
                 }
