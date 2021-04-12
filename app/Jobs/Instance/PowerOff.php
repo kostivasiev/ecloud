@@ -4,6 +4,7 @@ namespace App\Jobs\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -22,16 +23,21 @@ class PowerOff extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $response = $this->instance->availabilityZone->kingpinService()->delete(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/power'
-        );
-
-        // Catch already deleted
-        $responseJson = json_decode($response->getBody()->getContents());
-        if (isset($responseJson->ExceptionType) && $responseJson->ExceptionType == 'UKFast.VimLibrary.Exception.EntityNotFoundException') {
-            Log::warning('Attempted to power off, but entity was not found, skipping.');
+        try {
+            $this->instance->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
+            );
+        } catch (RequestException $exception) {
+            if ($exception->getCode() != 404) {
+                throw $exception;
+            }
+            Log::warning(get_class($this) . ' : Attempted to power off, but instance was not found, skipping.');
             return;
         }
+
+        $this->instance->availabilityZone->kingpinService()->delete(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/power'
+        );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
