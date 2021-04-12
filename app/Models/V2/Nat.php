@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Nat extends Model
 {
-    use CustomKey, SoftDeletes, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, Syncable;
 
     public $keyPrefix = 'nat';
     public $incrementing = false;
