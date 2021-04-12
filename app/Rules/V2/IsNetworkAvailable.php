@@ -6,7 +6,7 @@ use App\Models\V2\Sync;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
-class IsNetworkNotFailed implements Rule
+class IsNetworkAvailable implements Rule
 {
     public function passes($attribute, $value)
     {

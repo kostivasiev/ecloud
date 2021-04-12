@@ -3,7 +3,7 @@ namespace Tests\unit\Network;
 
 use App\Models\V2\Network;
 use App\Models\V2\Sync;
-use App\Rules\V2\IsNetworkNotFailed;
+use App\Rules\V2\IsNetworkAvailable;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -12,12 +12,12 @@ class IsNetworkNotFailedTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected IsNetworkNotFailed $rule;
+    protected IsNetworkAvailable $rule;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->rule = new IsNetworkNotFailed();
+        $this->rule = new IsNetworkAvailable();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 

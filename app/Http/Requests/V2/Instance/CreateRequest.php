@@ -8,7 +8,7 @@ use App\Models\V2\Image;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\IsNetworkNotFailed;
+use App\Rules\V2\IsNetworkAvailable;
 use App\Rules\V2\IsValidRamMultiple;
 use UKFast\FormRequests\FormRequest;
 
@@ -79,7 +79,7 @@ class CreateRequest extends FormRequest
                 'string',
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),
-                new IsNetworkNotFailed(),
+                new IsNetworkAvailable(),
             ],
             'floating_ip_id' => [
                 'sometimes',
