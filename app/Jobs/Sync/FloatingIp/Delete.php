@@ -2,13 +2,12 @@
 
 namespace App\Jobs\Sync\FloatingIp;
 
+use App\Jobs\FloatingIp\AwaitNATRemoval;
+use App\Jobs\FloatingIp\DeleteNats;
 use App\Jobs\Job;
-use App\Jobs\Nsx\FloatingIp\UndeployCheck;
-use App\Jobs\Nsx\Nat\Undeploy as NatUndeploy;
-use App\Jobs\Nsx\Nat\UndeployCheck as NatUndeployCheck;
-use App\Models\V2\Nat;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
@@ -26,29 +25,19 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->resource->id]);
 
-        $jobs = [];
-        $nats = Nat::where('source_id', $this->sync->resource->id)
-            ->orWhere('destination_id', $this->sync->resource->id)
-            ->orWhere('translated_id', $this->sync->resource->id)
-            ->get()
-            ->filter(function ($model) {
-                return $model instanceof Nat;
-            });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeploy($nat);
-        });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeployCheck($nat);
-        });
-        $jobs[] = new UndeployCheck($this->sync->resource);
+        $floatingIp = $this->sync->resource;
 
         $this->deleteSyncBatch(
             [
-                $jobs,
+                new DeleteNats($floatingIp),
+                new AwaitNATRemoval($floatingIp),
             ]
-        )->dispatch();
-
-        dispatch(array_shift($jobs)->chain($jobs));
+        )
+            // TODO: Remove this once atomic db constraint removed
+        ->then(function (Batch $batch) use ($floatingIp) {
+            $floatingIp->deleted = time();
+            $floatingIp->saveQuietly();
+        })->dispatch();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->resource->id]);
     }

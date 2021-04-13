@@ -1,32 +1,35 @@
 <?php
 
-namespace App\Jobs\Nsx\Nat;
+namespace App\Jobs\Nat;
 
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class UndeployCheck extends Job
 {
-    const RETRY_DELAY = 5;
+    use Batchable;
 
-    public $tries = 500;
+    // Wait up to 30 minutes
+    public $tries = 360;
+    public $backoff = 5;
+    
+    private Nat $nat;
 
-    private $model;
-
-    public function __construct(Nat $model)
+    public function __construct(Nat $nat)
     {
-        $this->model = $model;
+        $this->nat = $nat;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->nat->id]);
 
         // Load NIC from destination or translated
         $nic = collect(
-            $this->model->load([
+            $this->nat->load([
                 'destination' => function ($query) {
                     $query->withTrashed();
                 },
@@ -40,12 +43,7 @@ class UndeployCheck extends Job
         )->whereInstanceOf(Nic::class)->first();
 
         if (!$nic) {
-            $error = 'Failed. Could not find NIC for destination or translated';
-            Log::error($error, [
-                'nat' => $this->model,
-            ]);
-            $this->model->setSyncFailureReason($error);
-            $this->fail(new \Exception($error));
+            $this->fail(new \Exception('Failed. Could not find NIC for destination or translated'));
             return;
         }
 
@@ -55,18 +53,15 @@ class UndeployCheck extends Job
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
-            if ($this->model->id === $result->id) {
-                $this->release(static::RETRY_DELAY);
+            if ($this->nat->id === $result->id) {
                 Log::info(
-                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                    'Waiting for ' . $this->nat->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
+                $this->release($this->backoff);
                 return;
             }
         }
 
-        $this->model->setSyncCompleted();
-        $this->model->syncDelete();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->nat->id]);
     }
 }

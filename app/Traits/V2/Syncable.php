@@ -100,15 +100,6 @@ trait Syncable
         Log::info(get_class($this) . ' : Setting Sync to failed - Finished', ['resource_id' => $this->id]);
     }
 
-    // TODO: Remove this once floating ip using new sync
-    public function getSyncFailureReason()
-    {
-        if (!$this->syncs()->count()) {
-            return null;
-        }
-        return $this->syncs()->latest()->first()->failure_reason;
-    }
-
     /**
      * TODO :- move this to exception handler to handle exception thrown from
      *         ResourceSyncSaving/ResourceSyncDeleting event listeners

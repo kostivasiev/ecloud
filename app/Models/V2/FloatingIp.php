@@ -54,7 +54,7 @@ class FloatingIp extends Model implements Filterable, Sortable
      */
     public function getResourceIdAttribute()
     {
-        return ($this->nat) ? $this->nat->translated_id : null;
+        return ($this->destinationNat()->exists()) ? $this->destinationNat->translated_id : null;
     }
 
     public function vpc()
@@ -87,53 +87,6 @@ class FloatingIp extends Model implements Filterable, Sortable
         return $query->whereHas('vpc.region', function ($query) use ($regionId) {
             $query->where('id', '=', $regionId);
         });
-    }
-
-    // TODO: Remove this. We should be handling the nat creation inside the update sync job, and marking the floating ip sync accordingly.
-    public function getStatus()
-    {
-        if (empty($this->ip_address)) {
-            return Sync::STATUS_FAILED;
-        }
-
-        if ($this->syncs()->count() && !$this->syncs()->latest()->first()->completed) {
-            return Sync::STATUS_INPROGRESS;
-        }
-
-        if (!$this->sourceNat && !$this->destinationNat) {
-            return Sync::STATUS_COMPLETE;
-        }
-
-        if (!$this->sourceNat || !$this->destinationNat) {
-            return Sync::STATUS_INPROGRESS;
-        }
-
-        if ($this->sourceNat->sync->status !== Sync::STATUS_COMPLETE) {
-            return $this->sourceNat->sync->status;
-        }
-
-        if ($this->destinationNat->sync->status !== Sync::STATUS_COMPLETE) {
-            return $this->destinationNat->sync->status;
-        }
-
-        return Sync::STATUS_COMPLETE;
-    }
-
-    public function getSyncFailureReason()
-    {
-        if (empty($this->ip_address)) {
-            return 'Awaiting IP Allocation';
-        }
-
-        if ($this->sourceNat->getSyncFailureReason() !== null) {
-            return $this->sourceNat->getSyncFailureReason();
-        }
-
-        if ($this->destinationNat->getSyncFailureReason() !== null) {
-            return $this->destinationNat->getSyncFailureReason();
-        }
-
-        return null;
     }
 
     /**

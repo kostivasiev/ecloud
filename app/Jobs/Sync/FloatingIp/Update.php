@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\FloatingIp;
 
 use App\Jobs\FloatingIp\AllocateIp;
+use App\Jobs\FloatingIp\AwaitNatSync;
 use App\Jobs\Job;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
@@ -27,6 +28,7 @@ class Update extends Job
         $this->updateSyncBatch([
             [
                 new AllocateIp($this->sync->resource),
+                new AwaitNatSync($this->sync->resource),
             ]
         ])->dispatch();
 
