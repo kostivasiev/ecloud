@@ -94,7 +94,6 @@ class AllocateIp extends Job
                     });
                     break 2;
                 }
-
             } finally {
                 $lock->release();
             }
