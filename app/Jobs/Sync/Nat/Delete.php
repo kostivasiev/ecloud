@@ -5,8 +5,6 @@ namespace App\Jobs\Sync\Nat;
 use App\Jobs\Job;
 use App\Jobs\Nat\Undeploy;
 use App\Jobs\Nat\UndeployCheck;
-use App\Jobs\Nic\UnassignFloatingIP;
-use App\Jobs\Nsx\Nic\RemoveDHCPLease;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
