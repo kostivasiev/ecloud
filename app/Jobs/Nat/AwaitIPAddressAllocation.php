@@ -27,19 +27,19 @@ class AwaitIPAddressAllocation extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->nat->id]);
 
-        if ($this->nat->source()->exists() && empty($this->nat->source->ip_address)) {
+        if (!empty($this->nat->source) && empty($this->nat->source->ip_address)) {
             Log::warning('Awaiting source NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->nat->id, 'source_id' => $this->nat->source->id]);
             $this->release($this->backoff);
             return;
         }
 
-        if ($this->nat->destination()->exists() && empty($this->nat->destination->ip_address)) {
+        if (!empty($this->nat->destination) && empty($this->nat->destination->ip_address)) {
             Log::warning('Awaiting destination NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->nat->id, 'destination_id' => $this->nat->destination->id]);
             $this->release($this->backoff);
             return;
         }
 
-        if ($this->nat->translated()->exists() && empty($this->nat->translated->ip_address)) {
+        if (!empty($this->nat->translated) && empty($this->nat->translated->ip_address)) {
             Log::warning('Awaiting translated NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->nat->id, 'translated_id' => $this->nat->translated->id]);
             $this->release($this->backoff);
             return;
