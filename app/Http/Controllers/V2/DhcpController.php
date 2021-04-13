@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Models\V2\Dhcp;
 use App\Resources\V2\DhcpResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -50,10 +52,15 @@ class DhcpController extends BaseController
      */
     public function create(CreateDhcpRequest $request)
     {
-        $dhcps = new Dhcp($request->only(['name', 'vpc_id', 'availability_zone_id']));
-        $dhcps->save();
-        $dhcps->refresh();
-        return $this->responseIdMeta($request, $dhcps->id, 201);
+        $dhcp = new Dhcp($request->only(['name', 'vpc_id', 'availability_zone_id']));
+        try {
+            if (!$dhcp->save()) {
+                return $dhcp->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $dhcp->getSyncError();
+        }
+        return $this->responseIdMeta($request, $dhcp->id, 201);
     }
 
     /**
@@ -65,15 +72,22 @@ class DhcpController extends BaseController
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->fill($request->only(['name']));
-        $dhcp->save();
-        $dhcp->setSyncCompleted();
+        try {
+            if (!$dhcp->save()) {
+                return $dhcp->getSyncError();
+            }
+        } catch (SyncException $exception) {
+            return $dhcp->getSyncError();
+        }
         return $this->responseIdMeta($request, $dhcp->id, 200);
     }
 
     public function destroy(string $dhcpId)
     {
         $model = Dhcp::findOrFail($dhcpId);
-        if (!$model->delete()) {
+        try {
+            $model->delete();
+        } catch (SyncException $exception) {
             return $model->getSyncError();
         }
         return response()->json([], 204);

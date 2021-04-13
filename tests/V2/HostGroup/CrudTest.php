@@ -56,25 +56,7 @@ class CrudTest extends TestCase
             ]);
         });
 
-        // CreateCluster Job
-        $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
-            ->andReturnUsing(function () {
-                return new Response(404);
-            });
-        $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs(
-                '/api/v2/vpc/vpc-test/hostgroup',
-                [
-                    'json' => [
-                        'hostGroupId' => 'hg-test',
-                        'shared' => false,
-                    ]
-                ]
-            )
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        $this->hostGroupJobMocks();
 
         $data = [
             'name' => 'hg-test',
@@ -85,6 +67,30 @@ class CrudTest extends TestCase
         $this->post('/v2/host-groups', $data)
             ->seeInDatabase('host_groups', $data, 'ecloud')
             ->assertResponseStatus(201);
+    }
+
+    public function testCreateWithoutAz()
+    {
+        app()->bind(HostGroup::class, function () {
+            return new HostGroup([
+                'id' => 'hg-test',
+            ]);
+        });
+
+        $this->hostGroupJobMocks();
+
+        $data = [
+            'name' => 'hg-test',
+            'vpc_id' => $this->vpc()->id,
+            'host_spec_id' => $this->hostSpec()->id,
+        ];
+        $this->post('/v2/host-groups', $data)
+            ->seeInDatabase('host_groups', $data, 'ecloud')
+            ->assertResponseStatus(201);
+
+        $hostGroupId = (json_decode($this->response->getContent()))->data->id;
+        $hostGroup = HostGroup::findOrFail($hostGroupId);
+        $this->assertEquals($this->availabilityZone()->id, $hostGroup->availability_zone_id);
     }
 
     public function testStoreValidationWithEmptyHostSpecId()
@@ -113,12 +119,8 @@ class CrudTest extends TestCase
     {
         $this->hostGroup();
 
-        // CreateCluster Job
-        $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        // The request fires the jobs a second time
+        $this->hostGroupJobMocks();
 
         $this->patch('/v2/host-groups/hg-test', [
             'name' => 'new name',
@@ -136,12 +138,8 @@ class CrudTest extends TestCase
     {
         $this->hostGroup();
 
-        // CreateCluster Job
-        $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        // The request fires the jobs a second time
+        $this->hostGroupJobMocks();
 
         $this->patch('/v2/host-groups/hg-test', [
             'host_spec_id' => 'hs-new',

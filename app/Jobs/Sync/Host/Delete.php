@@ -3,21 +3,24 @@
 namespace App\Jobs\Sync\Host;
 
 use App\Jobs\Job;
-use App\Models\V2\Host;
+use App\Models\V2\Sync;
+use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    private $model;
+    use SyncableBatch;
 
-    public function __construct(Host $model)
+    private $sync;
+
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
+        $this->sync = $sync;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
         $jobs = [
             new \App\Jobs\Kingpin\Host\CheckExists($this->model),
@@ -31,11 +34,17 @@ class Delete extends Job
         ];
         dispatch(array_shift($jobs)->chain($jobs));
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
+        $host = $this->sync->resource;
 
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        // TODO
+//        $this->deleteSyncBatch([
+//        ])->dispatch();
+
+        // TODO delete this when we implement deleteSyncBatch
+        $this->sync->completed = true;
+        $this->sync->save();
+        $this->sync->resource->delete();
+
+        Log::info(get_class($this) . ' : Finished', ['id' => $host->id]);
     }
 }

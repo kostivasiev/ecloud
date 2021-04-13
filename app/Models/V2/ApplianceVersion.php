@@ -8,7 +8,9 @@ namespace App\Models\V2;
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Devices\AdminClient;
+use UKFast\SDK\Exception\ServerException;
 
 class ApplianceVersion extends V1ModelWrapper
 {
@@ -86,9 +88,14 @@ class ApplianceVersion extends V1ModelWrapper
     public function serverLicense()
     {
         $devicesAdminClient = app()->make(AdminClient::class);
-        return $devicesAdminClient->licenses()->getById(
-            $this->appliance_version_server_license_id
-        );
+        try {
+            return $devicesAdminClient->licenses()->getById(
+                $this->appliance_version_server_license_id
+            );
+        } catch (ServerException $exception) {
+            Log::error($exception->getMessage(), ['response' => $exception->getResponse()]);
+            throw $exception;
+        }
     }
 
     public function getLatest(string $applianceUuid)

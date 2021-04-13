@@ -5,28 +5,30 @@ namespace App\Jobs\Artisan\Host;
 use App\Jobs\Job;
 use App\Models\V2\Host;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    private $model;
+    use Batchable;
 
-    public function __construct(Host $model)
+    private Host $host;
+
+    public function __construct(Host $host)
     {
-        $this->model = $model;
+        $this->host = $host;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->host->id]);
 
-        $host = $this->model;
-        $availabilityZone = $host->hostGroup->availabilityZone;
+        $availabilityZone = $this->host->hostGroup->availabilityZone;
         try {
             // Check if the host already exists on the SAN
-            $response = $availabilityZone->artisanService()->get('/api/v2/san/' . $availabilityZone->san_name .'/host/' . $host->id);
+            $response = $availabilityZone->artisanService()->get('/api/v2/san/' . $availabilityZone->san_name .'/host/' . $this->host->id);
             if ($response->getStatusCode() == 200) {
-                Log::debug(get_class($this) . ' : Host already exists on the SAN, nothing to do.', ['id' => $this->model->id]);
+                Log::info(get_class($this) . ' : Host already exists on the SAN, nothing to do.', ['id' => $this->model->id]);
                 return true;
             }
         } catch (RequestException $exception) {
@@ -37,7 +39,7 @@ class Deploy extends Job
 
         // Load the host profile from the UCS
         $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $this->host->hostGroup->vpc->id .'/host/' . $this->host->id
         );
         $response = json_decode($response->getBody()->getContents());
 
@@ -46,7 +48,7 @@ class Deploy extends Job
             '/api/v2/san/' . $availabilityZone->san_name . '/host',
             [
                 'json' => [
-                    'hostId' => $host->id,
+                    'hostId' => $this->host->id,
                     'fcWWNs' => collect($response->interfaces)->filter(function ($value) {
                         return $value->type == 'vHBA';
                     })->pluck('address')->toArray(),
@@ -55,14 +57,6 @@ class Deploy extends Job
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
-            $exception->getResponse()->getBody()->getContents() :
-            $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);
     }
 }

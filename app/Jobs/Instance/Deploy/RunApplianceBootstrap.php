@@ -4,16 +4,18 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Vpc;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class RunApplianceBootstrap extends Job
 {
-    private $data;
+    use Batchable;
 
-    public function __construct($data)
+    private $instance;
+
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     /**
@@ -21,32 +23,34 @@ class RunApplianceBootstrap extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
+        if ($this->instance->platform !== 'Linux') {
+            Log::info('RunApplianceBootstrap for ' . $this->instance->id . ', nothing to do for non-Linux platforms, skipping');
+            return;
+        }
 
-        $guestAdminCredential = $instance->credentials()
-            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
+        if (empty($this->instance->image->script_template)) {
+            Log::info('RunApplianceBootstrap for ' . $this->instance->id . ', no script template defined, skipping');
+            return;
+        }
+
+        $guestAdminCredential = $this->instance->credentials()
+            ->where('username', ($this->instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
-            $message = 'RunApplianceBootstrap failed for ' . $instance->id . ', no admin credentials found';
+            $message = 'RunApplianceBootstrap failed for ' . $this->instance->id . ', no admin credentials found';
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
         }
 
-        if ($instance->platform !== 'Linux') {
-            Log::info('RunApplianceBootstrap for ' . $instance->id . ', nothing to do for non-Linux platforms');
-            return;
-        }
-
-        $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/guest/linux/script',
+        $this->instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/guest/linux/script',
             [
                 'json' => [
                     'encodedScript' => base64_encode(
-                        (new \Mustache_Engine())->loadTemplate($instance->image->script_template)
+                        (new \Mustache_Engine())->loadTemplate($this->instance->image->script_template)
                             ->render($this->data['image_data'])
                     ),
                     'username' => $guestAdminCredential->username,
@@ -55,6 +59,6 @@ class RunApplianceBootstrap extends Job
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

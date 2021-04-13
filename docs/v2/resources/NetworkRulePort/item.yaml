@@ -26,6 +26,13 @@ patch:
           type: object
           allOf:
             - $ref: '../../components/schemas/networkRulePort.yaml'
+            - type: object
+              properties:
+                network_rule_id :
+                  type : string
+                  required : true
+                  example : nr-4c63cf58
+                  readOnly : true
   responses:
     200:
       $ref: '../../resources/NetworkRulePort/responses/idResponse.yaml'

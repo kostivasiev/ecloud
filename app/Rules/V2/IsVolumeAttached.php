@@ -25,6 +25,6 @@ class IsVolumeAttached implements Rule
 
     public function message()
     {
-        return 'The IOPS value can only be set on mounted volumes';
+        return 'The IOPS value can only be set on attached volumes';
     }
 }

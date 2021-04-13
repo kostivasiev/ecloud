@@ -3,14 +3,15 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Dhcp\Created;
-use App\Events\V2\Dhcp\Creating;
 use App\Events\V2\Dhcp\Deleted;
 use App\Events\V2\Dhcp\Deleting;
+use App\Events\V2\Dhcp\Saved;
 use App\Events\V2\Dhcp\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -41,8 +42,8 @@ class Dhcp extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => Created::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];

@@ -29,11 +29,8 @@ class RuntimePropertyTests extends TestCase
         $this->availability_zone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'name' => 'GetTest Default',
         ]);
 
