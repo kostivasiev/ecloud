@@ -25,9 +25,7 @@ class UpdateFloatingIpCapacity implements ShouldQueue
         $floatingIp = FloatingIp::withTrashed()->findOrFail($event->model->id);
 
         $floatingIp->vpc->region->availabilityZones->each(function ($availabilityZone) {
-            dispatch(new \App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity([
-                'availability_zone_id' => $availabilityZone->id
-            ]));
+            dispatch(new \App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity($availabilityZone));
         });
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

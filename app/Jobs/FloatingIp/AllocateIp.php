@@ -86,9 +86,7 @@ class AllocateIp extends Job
                     Log::info('Success. IP ' . $this->floatingIp->ip_address . ' was assigned.', ['id' => $this->floatingIp->id]);
 
                     $this->floatingIp->vpc->region->availabilityZones->each(function ($availabilityZone) {
-                        dispatch(new UpdateFloatingIpCapacity([
-                            'availability_zone_id' => $availabilityZone->id
-                        ]));
+                        dispatch(new UpdateFloatingIpCapacity($availabilityZone));
                     });
                     break 2;
                 }

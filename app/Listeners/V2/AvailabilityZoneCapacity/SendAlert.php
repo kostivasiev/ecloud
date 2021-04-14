@@ -17,10 +17,6 @@ class SendAlert implements ShouldQueue
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        // TODO: Remove before committing
-        Log::warning("DEBUG :: RETURNING FROM SendAlert");
-        return;
-
         $availabilityZoneCapacity = $event->model;
 
         if ($availabilityZoneCapacity->current >= $availabilityZoneCapacity->alert_warning) {
