@@ -5,6 +5,7 @@ namespace App\Jobs\Nat;
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -45,6 +46,20 @@ class Undeploy extends Job
         }
 
         $router = $nic->network->router;
+
+        try {
+            $router->availabilityZone->nsxService()->get(
+                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->nat->id
+            );
+        } catch (ClientException $e) {
+            if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
+                Log::info("NAT already removed, skipping");
+                return;
+            }
+
+            throw $e;
+        }
+
         $router->availabilityZone->nsxService()->delete(
             '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->nat->id
         );
