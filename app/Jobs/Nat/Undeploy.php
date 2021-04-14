@@ -40,7 +40,7 @@ class Undeploy extends Job
             ->whereInstanceOf(Nic::class)->first();
 
         if (!$nic) {
-            $this->fail(new \Exception('Failed. Could not find NIC for destination or translated'));
+            $this->fail(new \Exception('Could not find NIC for destination or translated'));
             return;
         }
 

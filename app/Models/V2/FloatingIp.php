@@ -44,14 +44,6 @@ class FloatingIp extends Model implements Filterable, Sortable
     /**
      * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
      */
-    public function nat()
-    {
-        return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
-    }
-
-    /**
-     * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
-     */
     public function getResourceIdAttribute()
     {
         return ($this->destinationNat()->exists()) ? $this->destinationNat->translated_id : null;
