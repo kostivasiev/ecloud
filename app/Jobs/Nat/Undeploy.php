@@ -46,7 +46,7 @@ class Undeploy extends Job
 
         $router = $nic->network->router;
         $router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->nat->id
+            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->nat->id
         );
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->nat->id]);

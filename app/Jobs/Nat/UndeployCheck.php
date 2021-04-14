@@ -43,13 +43,13 @@ class UndeployCheck extends Job
         )->whereInstanceOf(Nic::class)->first();
 
         if (!$nic) {
-            $this->fail(new \Exception('Failed. Could not find NIC for destination or translated'));
+            $this->fail(new \Exception('Could not find NIC for destination or translated'));
             return;
         }
 
         $router = $nic->network->router;
         $response = $router->availabilityZone->nsxService()->get(
-            'policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/?include_mark_for_delete_objects=true'
+            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/?include_mark_for_delete_objects=true'
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
