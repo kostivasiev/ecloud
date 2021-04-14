@@ -9,7 +9,7 @@ use App\Models\V2\Sync;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class AwaitNATRemoval extends Job
+class AwaitNatRemoval extends Job
 {
     use Batchable;
 
@@ -26,8 +26,6 @@ class AwaitNATRemoval extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->floatingIp->id]);
-
-
 
         if ($this->floatingIp->sourceNat()->exists() && $this->floatingIp->sourceNat->sync->status == Sync::STATUS_FAILED) {
             Log::error('Source NAT in failed sync state, abort', ['id' => $this->floatingIp->id, 'nat_id' => $this->floatingIp->sourceNat->id]);

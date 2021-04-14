@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Sync\FloatingIp;
 
-use App\Jobs\FloatingIp\AwaitNATRemoval;
+use App\Jobs\FloatingIp\AwaitNatRemoval;
 use App\Jobs\FloatingIp\DeleteNats;
 use App\Jobs\Job;
 use App\Models\V2\Sync;
@@ -30,7 +30,7 @@ class Delete extends Job
         $this->deleteSyncBatch(
             [
                 new DeleteNats($floatingIp),
-                new AwaitNATRemoval($floatingIp),
+                new AwaitNatRemoval($floatingIp),
             ]
         )
             // TODO: Remove this once atomic db constraint removed
