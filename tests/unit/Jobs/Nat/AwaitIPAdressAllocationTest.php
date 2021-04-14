@@ -3,16 +3,9 @@
 namespace Tests\unit\Jobs\Nat;
 
 use App\Jobs\Nat\AwaitIPAddressAllocation;
-use App\Jobs\Nat\Deploy;
-use App\Jobs\Nat\Undeploy;
-use App\Jobs\Nat\UndeployCheck;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
-use App\Models\V2\Router;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
