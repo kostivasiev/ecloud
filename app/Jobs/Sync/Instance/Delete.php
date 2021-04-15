@@ -4,6 +4,7 @@ namespace App\Jobs\Sync\Instance;
 
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
+use App\Jobs\Instance\Undeploy\AwaitVolumeRemoval;
 use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
 use App\Jobs\Instance\Undeploy\Undeploy;
@@ -31,6 +32,7 @@ class Delete extends Job
                 new PowerOff($this->sync->resource),
                 new Undeploy($this->sync->resource),
                 new DeleteVolumes($this->sync->resource),
+                new AwaitVolumeRemoval($this->sync->resource),
                 new DeleteNics($this->sync->resource),
                 new AwaitNicRemoval($this->sync->resource),
             ],
