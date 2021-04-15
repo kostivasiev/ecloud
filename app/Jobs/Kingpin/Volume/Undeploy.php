@@ -28,11 +28,6 @@ class Undeploy extends Job
             return;
         }
 
-        if ($this->model->instances()->count() !== 0) {
-            // TODO :- Move this to a deleation rule, it's not right doing it here?
-            throw new \Exception('Volume ' . $this->model->id . ' had instances when trying to delete');
-        }
-
         try {
             $this->model->availabilityZone->kingpinService()->delete(
                 '/api/v1/vpc/' . $this->model->vpc->id . '/volume/' . $this->model->vmware_uuid
