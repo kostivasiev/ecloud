@@ -12,13 +12,13 @@ client.test("Request executed successfully", function() {
 
 ###
 
-PATCH https://{{host}}/{{version}}/instances/i-1c0975b1
+PATCH https://{{host}}/{{version}}/instances/i-37cab08d
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "vcpu_cores": 2,
+  "vcpu_cores": 5,
   "ram_capacity": 2048
 }
 

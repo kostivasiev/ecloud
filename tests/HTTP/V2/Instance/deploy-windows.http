@@ -5,10 +5,10 @@ Content-Type:  application/json
 
 {
   "vpc_id": "{{dev_vpc_id}}",
-  "name": "Test",
+  "name": "Test (Windows)",
   "vcpu_cores": 1,
   "ram_capacity": 1024,
-  "image_id": "img-4acdc7c0",
+  "image_id": "{{dev_windows_image_id}}",
   "requires_floating_ip": true,
   "network_id": "{{dev_network_id}}",
   "volume_capacity": 50,
@@ -26,6 +26,14 @@ client.test("Request executed successfully", function() {
 %}
 ###
 
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+
+###
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
