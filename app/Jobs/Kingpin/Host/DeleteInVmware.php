@@ -8,7 +8,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CheckOnline extends Job
+class DeleteInVmware extends Job
 {
     use Batchable;
 
@@ -30,13 +30,20 @@ class CheckOnline extends Job
         $hostGroup = $this->host->hostGroup;
 
         // Get the host spec from Conjurer
-        $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host/' . $this->host->id
-        );
-        $response = json_decode($response->getBody()->getContents());
+        try {
+            $response = $availabilityZone->conjurerService()->get(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $this->host->id
+            );
+            $response = json_decode($response->getBody()->getContents());
+        } catch (RequestException $exception) {
+            if ($exception->getCode() != 404) {
+                throw $exception;
+            }
+            Log::warning(get_class($this) . ' : Host was not found on UCS, skipping.');
+            return;
+        }
 
-        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
-
+        $macAddress = collect($response->interfaces)->firstWhere('name', '=', 'eth0')->address;
         if (empty($macAddress)) {
             $message = 'Failed to load eth0 address for host ' . $this->host->id;
             Log::error($message);
@@ -47,18 +54,15 @@ class CheckOnline extends Job
         Log::debug('MAC address: ' . $macAddress);
 
         try {
-            $response = $availabilityZone->kingpinService()->get(
+            $availabilityZone->kingpinService()->delete(
                 '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress
             );
-            $response = json_decode($response->getBody()->getContents());
         } catch (RequestException $exception) {
-            if ($exception->getCode() == 404) {
-                throw new \Exception('Host ' . $this->host->id . ' was not found. Waiting for Host to come online...');
+            if ($exception->getCode() != 404) {
+                throw $exception;
             }
-        }
-
-        if ($response->powerState !== 'poweredOn') {
-            throw new \Exception('Host ' . $this->host->id . ' was found. Waiting for Host to power on...');
+            Log::warning(get_class($this) . ' : Host could not be deleted, skipping.');
+            return;
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);

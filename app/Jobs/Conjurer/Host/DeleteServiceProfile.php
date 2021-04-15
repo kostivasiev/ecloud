@@ -4,10 +4,14 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteServiceProfile extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(Host $model)
@@ -22,25 +26,23 @@ class DeleteServiceProfile extends Job
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
-        $response = $availabilityZone->conjurerService()->delete(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id
-        );
-
-        if (!$response || $response->getStatusCode() !== 200) {
+        try {
+            $availabilityZone->conjurerService()->delete(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id . '/host/' . $host->id
+            );
+        } catch (RequestException $exception) {
             Log::error(get_class($this) . ' : Failed', [
                 'id' => $host->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
+                'status_code' => $exception->getCode(),
+                'content' => $exception->getResponse()->getBody()->getContents(),
             ]);
-            $this->fail(new \Exception('Service Profile for Host ' . $host->id . ' was not deleted.'));
-            return false;
+            if ($exception->getCode() != 404) {
+                throw $exception;
+            }
+            Log::warning(get_class($this) . ' : Service Profile for Host ' . $host->id . ' was not found.');
+            return;
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }
