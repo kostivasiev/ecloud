@@ -24,42 +24,42 @@ class MaintenanceMode extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        if (!$this->batch()->cancelled()) {
+            $host = $this->model;
+            $hostGroup = $this->model->hostGroup;
+            $availabilityZone = $hostGroup->availabilityZone;
 
-        $host = $this->model;
-        $hostGroup = $this->model->hostGroup;
-        $availabilityZone = $hostGroup->availabilityZone;
+            $macAddress = $this->getMacAddress($host, $hostGroup, $availabilityZone);
 
-        $macAddress = $this->getMacAddress($host, $hostGroup, $availabilityZone);
-
-        // Put host into maintenance mode
-        if (!empty($macAddress)) {
-            Log::info('Mac Address: ' . $macAddress);
-            try {
-                $response = $availabilityZone->kingpinService()
-                    ->post(
-                        '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress . '/maintenance'
-                    );
-            } catch (RequestException $e) {// handle 40x/50x response if host not found
-                $message = 'Error while putting Host ' . $host->id . ' into maintenance mode.';
-                Log::error($message, [
-                    'vpc_id' => $hostGroup->vpc->id,
-                    'hostgroup' => $hostGroup->id,
-                    'macAddress' => $macAddress
-                ]);
-                $this->fail(new \Exception($message));
-                return false;
-            }
-            if (!$response || $response->getStatusCode() !== 200) {
-                Log::error(get_class($this) . ' : Failed', [
-                    'id' => $host->id,
-                    'status_code' => $response->getStatusCode(),
-                    'content' => $response->getBody()->getContents()
-                ]);
-                $this->fail(new \Exception('Host ' . $host->id . ' could not be put into maintenance mode.'));
-                return false;
+            // Put host into maintenance mode
+            if (!empty($macAddress)) {
+                Log::info('Mac Address: ' . $macAddress);
+                try {
+                    $response = $availabilityZone->kingpinService()
+                        ->post(
+                            '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress . '/maintenance'
+                        );
+                } catch (RequestException $e) {// handle 40x/50x response if host not found
+                    $message = 'Error while putting Host ' . $host->id . ' into maintenance mode.';
+                    Log::error($message, [
+                        'vpc_id' => $hostGroup->vpc->id,
+                        'hostgroup' => $hostGroup->id,
+                        'macAddress' => $macAddress
+                    ]);
+                    $this->fail(new \Exception($message));
+                    return false;
+                }
+                if (!$response || $response->getStatusCode() !== 200) {
+                    Log::error(get_class($this) . ' : Failed', [
+                        'id' => $host->id,
+                        'status_code' => $response->getStatusCode(),
+                        'content' => $response->getBody()->getContents()
+                    ]);
+                    $this->fail(new \Exception('Host ' . $host->id . ' could not be put into maintenance mode.'));
+                    return false;
+                }
             }
         }
-
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 

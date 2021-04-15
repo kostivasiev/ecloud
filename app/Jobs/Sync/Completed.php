@@ -3,11 +3,15 @@
 namespace App\Jobs\Sync;
 
 use App\Jobs\Job;
+use Illuminate\Bus\Batchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class Completed extends Job
 {
+
+    use Batchable;
+
     private $model;
 
     public function __construct(Model $model)

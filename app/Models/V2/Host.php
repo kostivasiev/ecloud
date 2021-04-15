@@ -30,6 +30,9 @@ class Host extends Model implements Filterable, Sortable
 
     protected $dispatchesEvents = [
         'deleted' => Deleted::class,
+        'deleting' => Deleting::class,
+        'saved' => Saved::class,
+        'saving' => Saving::class,
     ];
 
     public function __construct(array $attributes = [])
