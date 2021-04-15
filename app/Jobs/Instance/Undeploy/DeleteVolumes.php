@@ -5,6 +5,7 @@ namespace App\Jobs\Instance\Undeploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use Illuminate\Bus\Batchable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class DeleteVolumes extends Job
@@ -28,6 +29,10 @@ class DeleteVolumes extends Job
         //       volume is to be deleted if connected to just this instance
         $instance->volumes()->each(function ($volume) use ($instance) {
             if ($volume->instances()->count() == 1) {
+                Log::info('Detaching volume ' . $volume->id);
+                Model::withoutEvents(function() use ($instance, $volume) {
+                    $instance->volumes()->detach($volume->id);
+                });
                 Log::info('Deleting volume ' . $volume->id);
                 $volume->delete();
             }
