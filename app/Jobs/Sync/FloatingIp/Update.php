@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Jobs\Sync\Nat;
+namespace App\Jobs\Sync\FloatingIp;
 
+use App\Jobs\FloatingIp\AllocateIp;
+use App\Jobs\FloatingIp\AwaitNatSync;
 use App\Jobs\Job;
-use App\Jobs\Nat\Undeploy;
-use App\Jobs\Nat\UndeployCheck;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
-class Delete extends Job
+class Update extends Job
 {
     use SyncableBatch;
 
@@ -24,12 +24,14 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        $this->deleteSyncBatch([
+        // Here we chain AllocateIp and AllocateIpCheck
+        $this->updateSyncBatch([
             [
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new AllocateIp($this->sync->resource),
+                new AwaitNatSync($this->sync->resource),
             ]
         ])->dispatch();
+
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }

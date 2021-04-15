@@ -32,6 +32,7 @@ class AwaitDhcpRemoval extends Job
                 if ($dhcp->sync->status == Sync::STATUS_FAILED) {
                     Log::error('DHCP in failed sync state, abort', ['id' => $this->vpc->id, 'dhcp' => $dhcp->id]);
                     $this->fail(new \Exception("DHCP '" . $dhcp->id . "' in failed sync state"));
+                    return;
                 }
             });
 

@@ -19,6 +19,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    deploy:
+      mode: replicated
+      replicas: 5
     image: apio-ecloud-dev
     command: queue
     environment:
