@@ -7,7 +7,6 @@ use App\Models\V2\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -37,25 +36,8 @@ class DeleteInVmwareTest extends TestCase
         $this->job = \Mockery::mock(DeleteInVmware::class, [$this->host])->makePartial();
     }
 
-    public function testSkipIfCancelled()
-    {
-        $this->job->expects('batch')
-            ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnTrue();
-                return $batchMock;
-            });
-        $this->assertNull($this->job->handle());
-    }
-
     public function testNoUcsHost()
     {
-        $this->job->expects('batch')
-            ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnFalse();
-                return $batchMock;
-            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andThrow(RequestException::create(new Request('GET', ''), new Response(404)));
@@ -63,17 +45,11 @@ class DeleteInVmwareTest extends TestCase
             ->withSomeOfArgs(get_class($this->job) . ' : Started');
         Log::shouldReceive('warning')
             ->withSomeOfArgs(get_class($this->job) . ' : Host was not found on UCS, skipping.');
-        $this->assertNull($this->job->handle());
+        $this->assertFalse($this->job->handle());
     }
 
     public function testUnableToDelete()
     {
-        $this->job->expects('batch')
-            ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnFalse();
-                return $batchMock;
-            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {
@@ -100,17 +76,11 @@ class DeleteInVmwareTest extends TestCase
         Log::shouldReceive('warning')
             ->withSomeOfArgs(get_class($this->job) . ' : Host could not be deleted, skipping.');
 
-        $this->assertNull($this->job->handle());
+        $this->assertFalse($this->job->handle());
     }
 
     public function testDeleteSuccess()
     {
-        $this->job->expects('batch')
-            ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnFalse();
-                return $batchMock;
-            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {

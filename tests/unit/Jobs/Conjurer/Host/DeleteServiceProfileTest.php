@@ -8,7 +8,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -38,46 +37,26 @@ class DeleteServiceProfileTest extends TestCase
         $this->job = \Mockery::mock(DeleteServiceProfile::class, [$this->host])->makePartial();
     }
 
-    public function testSkipIfCancelled()
-    {
-        $this->job->expects('batch')
-            ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnTrue();
-                return $batchMock;
-            });
-        $this->assertNull($this->job->handle());
-    }
-
     public function testDeleteHostDoesNotExist()
     {
-        $this->job->expects('batch')
-            ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnFalse();
-                return $batchMock;
-            });
         $this->conjurerServiceMock()
-            ->expects('delete')
+            ->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(404)));
         Log::shouldReceive('info')
             ->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('error')
-            ->withSomeOfArgs(get_class($this->job) . ' : Failed');
         Log::shouldReceive('warning')
-            ->withSomeOfArgs(get_class($this->job) . ' : Service Profile for Host h-test was not found.');
-
-        $this->assertNull($this->job->handle());
+            ->withSomeOfArgs(get_class($this->job) . ' : Service Profile for Host h-test not found, skipping.');
+        $this->assertFalse($this->job->handle());
     }
 
     public function testDeleteHost500Error()
     {
-        $this->job->expects('batch')
+        $this->conjurerServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnFalse();
-                return $batchMock;
+                return new Response(200);
             });
         $this->conjurerServiceMock()
             ->expects('delete')
@@ -93,11 +72,11 @@ class DeleteServiceProfileTest extends TestCase
 
     public function testDeleteHostSuccess()
     {
-        $this->job->expects('batch')
+        $this->conjurerServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {
-                $batchMock = \Mockery::mock(Batch::class)->makePartial();
-                $batchMock->expects('cancelled')->andReturnFalse();
-                return $batchMock;
+                return new Response(200);
             });
         $this->conjurerServiceMock()
             ->expects('delete')

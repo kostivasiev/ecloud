@@ -28,13 +28,11 @@ class Delete extends Job
         $host = $this->sync->resource;
 
         $this->deleteSyncBatch([
-            new \App\Jobs\Kingpin\Host\CheckExists($host),
             new \App\Jobs\Kingpin\Host\MaintenanceMode($host),
             new \App\Jobs\Kingpin\Host\DeleteInVmware($host),
             new \App\Jobs\Conjurer\Host\PowerOff($host),
             new \App\Jobs\Artisan\Host\RemoveFrom3Par($host),
             new \App\Jobs\Conjurer\Host\DeleteServiceProfile($host),
-//            new \App\Jobs\Sync\Completed($host),
         ])->dispatch();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $host->id]);

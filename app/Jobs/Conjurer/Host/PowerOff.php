@@ -22,24 +22,37 @@ class PowerOff extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-        if (!$this->batch()->cancelled()) {
-            $host = $this->model;
-            $hostGroup = $host->hostGroup;
-            $availabilityZone = $host->hostGroup->availabilityZone;
 
-            try {
-                $availabilityZone->conjurerService()->delete(
-                    '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id . '/power'
-                );
-            } catch (RequestException $exception) {
-                if ($exception->getCode() != 404) {
-                    $this->fail($exception);
-                    throw $exception;
-                }
-                Log::warning(get_class($this) . ' : Host ' . $host->id . ' was not powered off.');
-                return;
+        $host = $this->model;
+        $hostGroup = $host->hostGroup;
+        $availabilityZone = $host->hostGroup->availabilityZone;
+
+        // Check Exists
+        try {
+            $availabilityZone->conjurerService()->get(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id
+            );
+        } catch (RequestException $exception) {
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
             }
+            Log::warning(get_class($this) . ' : Host ' . $host->id . ' was not found, skipping.');
+            return;
         }
+
+        // Turn Power Off
+        try {
+            $availabilityZone->conjurerService()->delete(
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id . '/power'
+            );
+        } catch (RequestException $exception) {
+            Log::warning(get_class($this) . ' : Host ' . $host->id . ' was not powered off.');
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
+            }
+            return;
+        }
+
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
