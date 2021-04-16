@@ -34,7 +34,8 @@ class CheckExists extends Job
             }
             $message = get_class($this) . ' : Host does not exist, skipping.';
             Log::warning($message);
-            return $this->batch()->cancel();
+            $this->batch()->cancel();
+            return;
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);

@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -16,7 +17,7 @@ class PowerOffTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected PowerOff $job;
+    protected $job;
     protected Host $host;
 
     public function setUp(): void
@@ -34,27 +35,50 @@ class PowerOffTest extends TestCase
                 'host_group_id' => $this->hostGroup()->id,
             ]);
         });
-        $this->job = new PowerOff($this->host);
+        $this->job = \Mockery::mock(PowerOff::class, [$this->host])->makePartial();
+    }
+
+    public function testSkipIfCancelled()
+    {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnTrue();
+                return $batchMock;
+            });
+        $this->assertNull($this->job->handle());
     }
 
     public function testPowerOff404Error()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test/power')
             ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(404)));
         Log::shouldReceive('info')
-            ->withSomeOfArgs(PowerOff::class . ' : Started');
+            ->withSomeOfArgs(get_class($this->job) . ' : Started');
         Log::shouldReceive('error')
-            ->withSomeOfArgs(PowerOff::class . ' : Failed');
+            ->withSomeOfArgs(get_class($this->job) . ' : Failed');
         Log::shouldReceive('warning')
-            ->withSomeOfArgs(PowerOff::class . ' : Host h-test was not powered off.');
+            ->withSomeOfArgs(get_class($this->job) . ' : Host h-test was not powered off.');
 
         $this->assertNull($this->job->handle());
     }
 
     public function testPowerOff500Error()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test/power')
@@ -69,6 +93,12 @@ class PowerOffTest extends TestCase
 
     public function testPowerOffSuccess()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test/power')

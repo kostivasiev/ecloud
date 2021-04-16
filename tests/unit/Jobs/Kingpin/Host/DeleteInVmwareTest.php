@@ -3,11 +3,11 @@ namespace Tests\unit\Jobs\Kingpin\Host;
 
 use App\Jobs\Kingpin\Host\DeleteInVmware;
 use App\Models\V2\Host;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -17,7 +17,7 @@ class DeleteInVmwareTest extends TestCase
     use DatabaseMigrations;
 
     protected Host $host;
-    protected DeleteInVmware $job;
+    protected $job;
 
     public function setUp(): void
     {
@@ -34,23 +34,46 @@ class DeleteInVmwareTest extends TestCase
                 'host_group_id' => $this->hostGroup()->id,
             ]);
         });
-        $this->job = new DeleteInVmware($this->host);
+        $this->job = \Mockery::mock(DeleteInVmware::class, [$this->host])->makePartial();
+    }
+
+    public function testSkipIfCancelled()
+    {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnTrue();
+                return $batchMock;
+            });
+        $this->assertNull($this->job->handle());
     }
 
     public function testNoUcsHost()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andThrow(RequestException::create(new Request('GET', ''), new Response(404)));
         Log::shouldReceive('info')
-            ->withSomeOfArgs(DeleteInVmware::class . ' : Started');
+            ->withSomeOfArgs(get_class($this->job) . ' : Started');
         Log::shouldReceive('warning')
-            ->withSomeOfArgs(DeleteInVmware::class . ' : Host was not found on UCS, skipping.');
+            ->withSomeOfArgs(get_class($this->job) . ' : Host was not found on UCS, skipping.');
         $this->assertNull($this->job->handle());
     }
 
     public function testUnableToDelete()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {
@@ -71,17 +94,23 @@ class DeleteInVmwareTest extends TestCase
             ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B')
             ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(404)));
         Log::shouldReceive('info')
-            ->withSomeOfArgs(DeleteInVmware::class . ' : Started');
+            ->withSomeOfArgs(get_class($this->job) . ' : Started');
         Log::shouldReceive('debug')
             ->withSomeOfArgs('MAC address: 00:25:B5:C0:A0:1B');
         Log::shouldReceive('warning')
-            ->withSomeOfArgs(DeleteInVmware::class . ' : Host could not be deleted, skipping.');
+            ->withSomeOfArgs(get_class($this->job) . ' : Host could not be deleted, skipping.');
 
         $this->assertNull($this->job->handle());
     }
 
     public function testDeleteSuccess()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {

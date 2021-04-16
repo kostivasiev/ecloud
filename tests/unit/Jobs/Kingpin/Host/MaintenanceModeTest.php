@@ -7,7 +7,7 @@ use App\Models\V2\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -16,7 +16,7 @@ class MaintenanceModeTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected MaintenanceMode $job;
+    protected $job;
     protected Host $host;
 
     public function setUp(): void
@@ -34,7 +34,18 @@ class MaintenanceModeTest extends TestCase
                 'host_group_id' => $this->hostGroup()->id,
             ]);
         });
-        $this->job = new MaintenanceMode($this->host);
+        $this->job = \Mockery::mock(MaintenanceMode::class, [$this->host])->makePartial();
+    }
+
+    public function testSkipIfCancelled()
+    {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnTrue();
+                return $batchMock;
+            });
+        $this->assertNull($this->job->handle());
     }
 
     public function testGetMacAddress404()
@@ -44,7 +55,7 @@ class MaintenanceModeTest extends TestCase
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andThrow(RequestException::create(new Request('GET', ''), new Response(404)));
         Log::shouldReceive('warning')
-            ->withSomeOfArgs(MaintenanceMode::class . ' : Host Spec for h-test could not be retrieved.');
+            ->withSomeOfArgs(get_class($this->job) . ' : Host Spec for h-test could not be retrieved.');
 
         $this->assertFalse($this->job->getMacAddress($this->host, $this->host->hostGroup, $this->host->hostGroup->availabilityZone));
     }
@@ -74,6 +85,12 @@ class MaintenanceModeTest extends TestCase
 
     public function testMaintenanceModeFail()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {
@@ -94,7 +111,7 @@ class MaintenanceModeTest extends TestCase
             ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B/maintenance')
             ->andThrow(RequestException::create(new Request('GET', ''), new Response(404)));
         Log::shouldReceive('info')
-            ->withSomeOfArgs(MaintenanceMode::class . ' : Started');
+            ->withSomeOfArgs(get_class($this->job) . ' : Started');
         Log::shouldReceive('info')
             ->withSomeOfArgs('Mac Address: 00:25:B5:C0:A0:1B');
         Log::shouldReceive('error')
@@ -104,6 +121,12 @@ class MaintenanceModeTest extends TestCase
 
     public function testMaintenanceModeSuccess()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->conjurerServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andReturnUsing(function () {

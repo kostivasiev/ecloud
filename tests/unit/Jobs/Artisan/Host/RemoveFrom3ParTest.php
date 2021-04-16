@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -16,7 +17,7 @@ class RemoveFrom3ParTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected RemoveFrom3Par $job;
+    protected $job;
     protected Host $host;
 
     public function setUp(): void
@@ -34,27 +35,50 @@ class RemoveFrom3ParTest extends TestCase
                 'host_group_id' => $this->hostGroup()->id,
             ]);
         });
-        $this->job = new RemoveFrom3Par($this->host);
+        $this->job = \Mockery::mock(RemoveFrom3Par::class, [$this->host])->makePartial();
+    }
+
+    public function testSkipIfCancelled()
+    {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnTrue();
+                return $batchMock;
+            });
+        $this->assertNull($this->job->handle());
     }
 
     public function testRemoveWith404Error()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->artisanServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/san/MCS-E-G0-3PAR-01/host/h-test')
             ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(404)));
         Log::shouldReceive('info')
-            ->withSomeOfArgs(RemoveFrom3Par::class . ' : Started');
+            ->withSomeOfArgs(get_class($this->job) . ' : Started');
         Log::shouldReceive('error')
-            ->withSomeOfArgs(RemoveFrom3Par::class . ' : Failed');
+            ->withSomeOfArgs(get_class($this->job) . ' : Failed');
         Log::shouldReceive('warning')
-            ->withSomeOfArgs(RemoveFrom3Par::class . ' : Host h-test was not removed from 3Par.');
+            ->withSomeOfArgs(get_class($this->job) . ' : Host h-test was not removed from 3Par.');
 
         $this->assertNull($this->job->handle());
     }
 
     public function testRemoveWith500Error()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->artisanServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/san/MCS-E-G0-3PAR-01/host/h-test')
@@ -69,6 +93,12 @@ class RemoveFrom3ParTest extends TestCase
 
     public function testRemoveSuccess()
     {
+        $this->job->expects('batch')
+            ->andReturnUsing(function () {
+                $batchMock = \Mockery::mock(Batch::class)->makePartial();
+                $batchMock->expects('cancelled')->andReturnFalse();
+                return $batchMock;
+            });
         $this->artisanServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/san/MCS-E-G0-3PAR-01/host/h-test')
