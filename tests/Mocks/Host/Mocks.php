@@ -241,22 +241,11 @@ trait Mocks
 
     public function deleteHostMocks()
     {
-        $this->checkExists();
         $this->maintenanceModeOn();
         $this->deleteInVmWare();
         $this->powerOff();
         $this->removeFrom3Par();
         $this->deleteServiceProfile();
-    }
-
-    public function checkExists()
-    {
-        $this->kingpinServiceMock()
-            ->expects('get')
-            ->withSomeOfArgs('/api/v2/san/' . $this->availabilityZone()->san_name . '/host/h-test')
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
     }
 
     public function maintenanceModeOn()
@@ -316,6 +305,12 @@ trait Mocks
     public function powerOff()
     {
         $this->conjurerServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->conjurerServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test/power')
             ->andReturnUsing(function () {
@@ -326,6 +321,12 @@ trait Mocks
     public function removeFrom3Par()
     {
         $this->artisanServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/san/MCS-E-G0-3PAR-01/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->artisanServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/san/MCS-E-G0-3PAR-01/host/h-test')
             ->andReturnUsing(function () {
@@ -335,6 +336,12 @@ trait Mocks
 
     public function deleteServiceProfile()
     {
+        $this->conjurerServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
         $this->conjurerServiceMock()
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
