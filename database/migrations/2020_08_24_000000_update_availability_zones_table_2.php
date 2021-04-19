@@ -9,7 +9,7 @@ class UpdateAvailabilityZonesTable2 extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('availability_zones', function (Blueprint $table) {
-            $table->string('nsx_edge_cluster_id')->nullable()->after('nsx_manager_endpoint');
+            $table->uuid('nsx_edge_cluster_id')->nullable()->after('nsx_manager_endpoint');
         });
     }
 

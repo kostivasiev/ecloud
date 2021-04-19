@@ -14,7 +14,7 @@ class CreateJobBatchesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->create('job_batches', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->integer('total_jobs');
             $table->integer('pending_jobs');

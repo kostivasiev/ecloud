@@ -14,7 +14,7 @@ class AddRouterIdToFirewallPoliciesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('firewall_policies', function (Blueprint $table) {
-            $table->string('router_id')->nullable()->after('sequence');
+            $table->uuid('router_id')->nullable()->after('sequence');
         });
     }
 

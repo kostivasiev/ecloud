@@ -14,7 +14,7 @@ class AddImageColumnToInstancesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->uuid('image_id')->default('')->after('appliance_version_id');;
+            $table->uuid('image_id')->default('')->after('appliance_version_id');
         });
     }
 
