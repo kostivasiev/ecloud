@@ -1,25 +1,14 @@
 <?php
 namespace Tests\unit\Listeners\V2\Instance;
 
-use App\Listeners\V2\Instance\ComputeChange;
 use App\Listeners\V2\Instance\DefaultPlatform;
 use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\BillingMetric;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
-use App\Models\V2\Region;
-use App\Models\V2\Sync;
-use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
-use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Devices\AdminClient;
