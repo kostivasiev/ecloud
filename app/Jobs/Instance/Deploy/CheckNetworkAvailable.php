@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Sync;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -26,25 +27,21 @@ class CheckNetworkAvailable extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $this->instance->nics()->each(function ($nic) {
-            if ($nic->network->sync->status == Sync::STATUS_FAILED) {
-                Log::error('Network in failed sync state, abort', [
-                    'id' => $this->instance->id,
-                    'nic' => $nic->id,
-                    'network' => $nic->network->id
-                ]);
-                $this->fail(new \Exception("Network '" . $nic->network->id . "' in failed sync state"));
-            }
+        $network = Network::findOrFail($this->instance->deploy_data['network_id']);
 
-            if ($nic->network->sync->status != Sync::STATUS_COMPLETE) {
-                Log::warning('Network not in sync, retrying in ' . $this->backoff . ' seconds', [
-                    'id' => $this->instance->id,
-                    'nic' => $nic->id,
-                    'network' => $nic->network->id
-                ]);
-                return $this->release($this->backoff);
-            }
-        });
+        if ($network->sync->status == Sync::STATUS_FAILED) {
+            $this->fail(new \Exception("Network '" . $network->id . "' in failed sync state"));
+            return;
+        }
+
+        if ($network->sync->status == Sync::STATUS_INPROGRESS) {
+            Log::warning('Network not in sync, retrying in ' . $this->backoff . ' seconds', [
+                'id' => $this->instance->id,
+                'network' => $network->id
+            ]);
+            $this->release($this->backoff);
+            return;
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
