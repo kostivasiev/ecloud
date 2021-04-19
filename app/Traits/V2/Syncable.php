@@ -2,12 +2,18 @@
 
 namespace App\Traits\V2;
 
+use App\Exceptions\SyncException;
+use App\Listeners\V2\ResourceSyncSaving;
 use App\Models\V2\Sync;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
+    protected $syncLockOwner = null;
+
     public function syncs()
     {
         return $this->morphMany(Sync::class, 'resource');
@@ -27,24 +33,62 @@ trait Syncable
         return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
     }
 
+    public function syncLock()
+    {
+        Log::debug("syncLock : Attempting to obtain previous lock owner", ['resource_id' => $this->id]);
+        if ($this->syncLockOwner) {
+            Log::debug("syncLock : Restoring lock from owner", ['resource_id' => $this->id, 'lock_owner' => $this->syncLockOwner]);
+            return Cache::restoreLock('sync.' . $this->id, $this->syncLockOwner);
+        }
+
+        Log::debug("syncLock : Attempting to obtain lock for 60s", ['resource_id' => $this->id]);
+        $lock = Cache::lock('sync.' . $this->id, 60);
+        $lock->block(60);
+
+        $this->syncLockOwner = $lock->owner();
+
+        return $lock;
+    }
+
+    public function canSync($type = Sync::TYPE_UPDATE)
+    {
+        if ($type == Sync::TYPE_UPDATE) {
+            if ($this->syncs()->count() == 1 && $this->sync->status === Sync::STATUS_FAILED) {
+                Log::warning(get_class($this) . ' : Cannot sync, resource has a single failed sync', ['resource_id' => $this->id]);
+                return false;
+            }
+        }
+
+        if ($this->sync->status === Sync::STATUS_INPROGRESS) {
+            Log::warning(get_class($this) . ' : Cannot sync, resource has sync in progress', ['resource_id' => $this->id]);
+            return false;
+        }
+
+        return true;
+    }
+
     public function createSync($type = Sync::TYPE_UPDATE)
     {
         Log::info(get_class($this) . ' : Creating new sync - Started', [
             'resource_id' => $this->id,
         ]);
 
-        if ($this->sync->status === Sync::STATUS_INPROGRESS) {
-            Log::info(get_class($this) . ' : Failed creating new sync on ' . __CLASS__ . ' with an outstanding sync', [
-                'resource_id' => $this->id,
-            ]);
-            return false;
+        try {
+            $lock = $this->syncLock();
+
+            if (!$this->canSync($type)) {
+                throw new SyncException("Cannot sync");
+            }
+
+            $sync = app()->make(Sync::class);
+            $sync->resource()->associate($this);
+            $sync->completed = false;
+            $sync->type = $type;
+            $sync->save();
+        } finally {
+            $lock->release();
         }
 
-        $sync = app()->make(Sync::class);
-        $sync->resource()->associate($this);
-        $sync->completed = false;
-        $sync->type = $type;
-        $sync->save();
         Log::info(get_class($this) . ' : Creating new sync - Finished', [
             'resource_id' => $this->id,
         ]);

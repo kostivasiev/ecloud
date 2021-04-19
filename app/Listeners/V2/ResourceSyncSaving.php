@@ -21,24 +21,11 @@ class ResourceSyncSaving
             return true;
         }
 
-        $lock = Cache::lock("sync." . $model->id, 60);
-        try {
-            $lock->block(60);
+        $lock = $model->syncLock();
 
-            if ($model->syncs()->count() == 1 && $model->sync->status === Sync::STATUS_FAILED) {
-                Log::warning(get_class($this) . ' : Update blocked, resource has a single failed sync', ['resource_id' => $model->id]);
-                return false;
-            }
-
-            if ($model->sync->status === Sync::STATUS_INPROGRESS) {
-                Log::warning(get_class($this) . ' : Update blocked, resource has outstanding sync', ['resource_id' => $model->id]);
-                return false;
-            }
-        } catch (LockTimeoutException $e) {
-            Log::error(get_class($this) . ' : Delete blocked, cannot obtain sync lock', ['resource_id' => $model->id]);
-            throw new SyncException("Cannot obtain sync lock");
-        } finally {
+        if (!$model->canSync(Sync::TYPE_UPDATE)) {
             $lock->release();
+            throw new SyncException("Cannot sync");
         }
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $model->id]);
