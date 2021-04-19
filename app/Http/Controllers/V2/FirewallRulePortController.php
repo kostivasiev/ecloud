@@ -39,8 +39,10 @@ class FirewallRulePortController extends BaseController
             'source',
             'destination'
         ]));
-        $resource->save();
-        return $this->responseIdMeta($request, $resource->id, 201);
+        if (!$resource->save()) {
+            return $resource->getSyncError();
+        }
+        return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
 
     public function update(Update $request, string $firewallRulePortId)
@@ -56,14 +58,18 @@ class FirewallRulePortController extends BaseController
             $resource->source = null;
             $resource->destination = null;
         }
-        $resource->save();
-        return $this->responseIdMeta($request, $resource->id, 200);
+        if (!$resource->save()) {
+            return $resource->getSyncError();
+        }
+        return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
 
     public function destroy(Request $request, string $firewallRulePortId)
     {
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
-        $resource->delete();
+        if (!$resource->delete()) {
+            return $resource->getSyncError();
+        }
         return response(null, 204);
     }
 }

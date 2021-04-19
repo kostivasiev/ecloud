@@ -77,7 +77,9 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
-        $firewallRule->save();
+        if (!$firewallRule->save()) {
+            return $firewallRule->getSyncError();
+        }
 
         if ($request->has('ports')) {
             foreach ($request->input('ports') as $port) {
@@ -108,7 +110,7 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
-        $firewallRule->save();
+
 
         if ($request->filled('ports')) {
             $firewallRule->firewallRulePorts->each(function ($rule) {
@@ -120,14 +122,19 @@ class FirewallRuleController extends BaseController
                 $firewallRulePort->save();
             }
         }
+        if (!$firewallRule->save()) {
+            return $firewallRule->getSyncError();
+        }
 
         return $this->responseIdMeta($request, $firewallRule->id, 200);
     }
 
     public function destroy(Request $request, string $firewallRuleId)
     {
-        FirewallRule::foruser($request->user())->findOrFail($firewallRuleId)
-            ->delete();
+        $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
+        if (!$firewallRule->delete()) {
+            return $firewallRule->getSyncError();
+        }
         return response()->json([], 204);
     }
 }
