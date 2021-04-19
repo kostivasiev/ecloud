@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
-    protected $syncLockOwner = null;
-
     public function syncs()
     {
         return $this->morphMany(Sync::class, 'resource');
@@ -35,19 +33,29 @@ trait Syncable
 
     public function syncLock()
     {
-        Log::debug("syncLock : Attempting to obtain previous lock owner", ['resource_id' => $this->id]);
-        if ($this->syncLockOwner) {
-            Log::debug("syncLock : Restoring lock from owner", ['resource_id' => $this->id, 'lock_owner' => $this->syncLockOwner]);
-            return Cache::restoreLock('sync.' . $this->id, $this->syncLockOwner);
+        $lock = Cache::lock('sync.' . $this->id, 60);
+        try {
+            Log::debug("syncLock : Attempting to obtain lock for 60s", ['resource_id' => $this->id]);
+            $lock->block(60);
+            Log::debug("syncLock : Lock obtained");
+
+            Cache::put("sync_lock." . $this->id, $lock->owner());
+        } catch (LockTimeoutException $e) {
+            Log::error("syncLock : Timed out after 60s waiting for sync lock", ["exception" => $e->getMessage()]);
+            throw new SyncException("Timed out waiting for sync lock");
         }
 
-        Log::debug("syncLock : Attempting to obtain lock for 60s", ['resource_id' => $this->id]);
-        $lock = Cache::lock('sync.' . $this->id, 60);
-        $lock->block(60);
-
-        $this->syncLockOwner = $lock->owner();
-
         return $lock;
+    }
+
+    public function syncUnlock()
+    {
+        Log::debug("syncLock : Attempting to obtain previous lock owner", ['resource_id' => $this->id]);
+        $existingLock = Cache::pull("sync_lock." . $this->id);
+        if ($existingLock) {
+            Log::debug("syncLock : Releasing existing lock", ['resource_id' => $this->id, 'lock_owner' => $existingLock]);
+            Cache::restoreLock('sync.' . $this->id, $existingLock)->release();
+        }
     }
 
     public function canSync($type = Sync::TYPE_UPDATE)
@@ -73,21 +81,11 @@ trait Syncable
             'resource_id' => $this->id,
         ]);
 
-        try {
-            $lock = $this->syncLock();
-
-            if (!$this->canSync($type)) {
-                throw new SyncException("Cannot sync");
-            }
-
-            $sync = app()->make(Sync::class);
-            $sync->resource()->associate($this);
-            $sync->completed = false;
-            $sync->type = $type;
-            $sync->save();
-        } finally {
-            $lock->release();
-        }
+        $sync = app()->make(Sync::class);
+        $sync->resource()->associate($this);
+        $sync->completed = false;
+        $sync->type = $type;
+        $sync->save();
 
         Log::info(get_class($this) . ' : Creating new sync - Finished', [
             'resource_id' => $this->id,

@@ -11,6 +11,7 @@ class UpdateFirewallPolicy
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
         $event->model->firewallPolicy->save();
+        $event->model->firewallPolicy->syncUnlock();
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);
     }

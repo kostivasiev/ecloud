@@ -50,9 +50,7 @@ class FirewallPolicyController extends BaseController
         $model = new FirewallPolicy();
         $model->fill($request->only(['name', 'sequence', 'router_id']));
         try {
-            if (!$model->save()) {
-                return $model->getSyncError();
-            }
+            $model->save();
         } catch (SyncException $exception) {
             return $model->getSyncError();
         }
@@ -66,9 +64,7 @@ class FirewallPolicyController extends BaseController
         $model->fill($request->only(['name', 'sequence']));
 
         try {
-            if (!$model->save()) {
-                return $model->getSyncError();
-            }
+            $model->save();
         } catch (SyncException $exception) {
             return $model->getSyncError();
         }

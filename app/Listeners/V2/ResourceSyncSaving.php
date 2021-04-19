@@ -21,10 +21,9 @@ class ResourceSyncSaving
             return true;
         }
 
-        $lock = $model->syncLock();
-
+        $model->syncLock();
         if (!$model->canSync(Sync::TYPE_UPDATE)) {
-            $lock->release();
+            $model->syncUnlock();
             throw new SyncException("Cannot sync");
         }
 

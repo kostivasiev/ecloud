@@ -13,6 +13,7 @@ class ResourceSyncSaved
         Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
 
         $event->model->createSync(Sync::TYPE_UPDATE);
+        $event->model->syncUnlock();
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
     }
