@@ -39,6 +39,12 @@ class PowerOffTest extends TestCase
         $this->instance = factory(Instance::class)->create([
             'vpc_id' => $this->vpc()->id,
             'name' => 'GetTest Default',
+            'deploy_data' => [
+                'network_id' => $this->network()->id,
+                'volume_capacity' => 20,
+                'volume_iops' => 300,
+                'requires_floating_ip' => false,
+            ],
         ]);
 
         $mockKingpinService = \Mockery::mock(new KingpinService(new Client()));
