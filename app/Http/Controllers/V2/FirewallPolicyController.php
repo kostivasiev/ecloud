@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateFirewallPolicyRequest;
 use App\Http\Requests\V2\UpdateFirewallPolicyRequest;
 use App\Models\V2\FirewallPolicy;
@@ -48,10 +49,14 @@ class FirewallPolicyController extends BaseController
     {
         $model = new FirewallPolicy();
         $model->fill($request->only(['name', 'sequence', 'router_id']));
-        if (!$model->save()) {
+        try {
+            if (!$model->save()) {
+                return $model->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $model->getSyncError();
         }
-        $model->refresh();
+
         return $this->responseIdMeta($request, $model->id, 201);
     }
 
@@ -59,18 +64,28 @@ class FirewallPolicyController extends BaseController
     {
         $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $model->fill($request->only(['name', 'sequence']));
-        if (!$model->save()) {
+
+        try {
+            if (!$model->save()) {
+                return $model->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $model->getSyncError();
         }
+
         return $this->responseIdMeta($request, $model->id, 200);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)
     {
         $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
-        if (!$model->delete()) {
+
+        try {
+            $model->delete();
+        } catch (SyncException $exception) {
             return $model->getSyncError();
         }
+
         return response()->json([], 204);
     }
 }

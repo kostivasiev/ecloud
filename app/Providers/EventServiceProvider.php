@@ -77,6 +77,15 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // FirewallPolicy
+        \App\Events\V2\FirewallPolicy\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\FirewallPolicy\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\FirewallPolicy\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
+        ],
         \App\Events\V2\FirewallPolicy\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -85,19 +94,19 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallRule\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
-            \App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
+            //\App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
         ],
         \App\Events\V2\FirewallRule\Saved::class => [
-            \App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
+            //\App\Listeners\V2\FirewallRule\UpdateFirewallPolicy::class,
         ],
 
         // FirewallRulePort
         \App\Events\V2\FirewallRulePort\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
-            \App\Listeners\V2\FirewallRulePort\UpdateFirewallPolicy::class,
+            //\App\Listeners\V2\FirewallRulePort\UpdateFirewallPolicy::class,
         ],
         \App\Events\V2\FirewallRulePort\Saved::class => [
-            \App\Listeners\V2\FirewallRulePort\UpdateFirewallPolicy::class,
+            //\App\Listeners\V2\FirewallRulePort\UpdateFirewallPolicy::class,
         ],
 
         // FloatingIp
