@@ -91,8 +91,6 @@ components:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
-    FipId:
-      $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
@@ -116,8 +114,6 @@ components:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
-    FipIdResponse:
-      $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
