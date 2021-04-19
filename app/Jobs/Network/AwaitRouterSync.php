@@ -31,6 +31,7 @@ class AwaitRouterSync extends Job
         if ($this->network->router->sync->status == Sync::STATUS_FAILED) {
             Log::error('Router in failed sync state, abort', ['id' => $this->network->id]);
             $this->fail(new \Exception("Router '" . $this->network->router->id . "' in failed sync state"));
+            return;
         }
 
         if ($this->network->router->sync->status != Sync::STATUS_COMPLETE) {

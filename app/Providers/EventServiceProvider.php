@@ -101,8 +101,14 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // FloatingIp
-        \App\Events\V2\FloatingIp\Created::class => [
-            \App\Listeners\V2\FloatingIp\AllocateIp::class,
+        \App\Events\V2\FloatingIp\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\FloatingIp\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\FloatingIp\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\FloatingIp\Deleted::class => [
             \App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class,
@@ -198,14 +204,14 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Nat
-        \App\Events\V2\Nat\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Nat\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Nat\Saved::class => [
-            \App\Listeners\V2\Nat\Deploy::class,
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Nat\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Nat\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,

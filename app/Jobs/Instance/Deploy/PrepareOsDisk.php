@@ -40,6 +40,7 @@ class PrepareOsDisk extends Job
         foreach ($instanceData->volumes as $volumeData) {
             $volume = app()->make(Volume::class);
             $volume->vpc()->associate($this->instance->vpc);
+            $volume->name = $this->instance->id . ' - ' . $this->instance->image->name;
             $volume->availability_zone_id = $this->instance->availability_zone_id;
             $volume->capacity = $this->instance->deploy_data['volume_capacity'];
             $volume->iops = $this->instance->deploy_data['volume_iops'];

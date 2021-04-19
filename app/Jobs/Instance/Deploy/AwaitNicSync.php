@@ -30,6 +30,7 @@ class AwaitNicSync extends Job
             if ($nic->sync->status == Sync::STATUS_FAILED) {
                 Log::error('NIC in failed sync state, abort', ['id' => $this->instance->id, 'nic' => $nic->id]);
                 $this->fail(new \Exception("NIC '" . $nic->id . "' in failed sync state"));
+                return;
             }
 
             if ($nic->sync->status != Sync::STATUS_COMPLETE) {

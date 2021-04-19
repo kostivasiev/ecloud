@@ -56,6 +56,16 @@ class Nic extends Model implements Filterable, Sortable
         return $this->belongsTo(Network::class);
     }
 
+    public function sourceNat()
+    {
+        return $this->morphOne(Nat::class, 'sourceable', null, 'source_id');
+    }
+
+    public function destinationNat()
+    {
+        return $this->morphOne(Nat::class, 'translatedable', null, 'translated_id');
+    }
+
     /**
      * @param $query
      * @param Consumer $user
