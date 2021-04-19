@@ -31,6 +31,11 @@ class StoreRequest extends FormRequest
                 'string',
                 'exists:ecloud.host_specs,id,deleted_at,NULL',
             ],
+            'windows_enabled' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ]
         ];
     }
 }

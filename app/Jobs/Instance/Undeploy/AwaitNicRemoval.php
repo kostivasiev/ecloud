@@ -31,11 +31,13 @@ class AwaitNicRemoval extends Job
                 if ($nic->sync->status == Sync::STATUS_FAILED) {
                     Log::error('NIC in failed sync state, abort', ['id' => $this->instance->id, 'nic' => $nic->id]);
                     $this->fail(new \Exception("NIC '" . $nic->id . "' in failed sync state"));
+                    return;
                 }
             });
 
-            Log::warning("'" . $this->instance->nics()->count() . "' NICs still attached, retrying", ['id' => $this->instance->id]);
-            throw new \Exception("'" . $this->instance->nics()->count() . "' NICs still attached");
+            Log::warning($this->instance->nics()->count() . ' NIC(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->instance->id]);
+            $this->release($this->backoff);
+            return;
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);

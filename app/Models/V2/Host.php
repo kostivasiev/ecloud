@@ -50,7 +50,8 @@ class Host extends Model implements Filterable, Sortable
         $this->dispatchesEvents = [
             'saving' => Saving::class,
             'saved' => Saved::class,
-            'deleting' => Deleting::class
+            'deleting' => Deleting::class,
+            'deleted' => Deleted::class,
         ];
 
         parent::__construct($attributes);

@@ -8,12 +8,6 @@ properties:
     required: false
     example: 'Host Group 1'
     readOnly: false
-  host_spec_id:
-    type: string
-    required: true
-    description : The host spec to use with this host group
-    example: hs-4c63cf58
-    readOnly: false
   vpc_id :
     type : string
     example : vpc-4c63cf58
@@ -23,6 +17,18 @@ properties:
     required: false
     example: 'az-2b66bb79'
     readOnly : false
+  host_spec_id:
+    type: string
+    required: true
+    description : The host spec to use with this host group
+    example: hs-4c63cf58
+    readOnly: false
+  windows_enabled:
+    type: bolean
+    required: false
+    description : Determines whether the host group contains windows-enabled hosts, defaults to false.
+    example: true
+    readOnly: false
   sync:
     type: string
     example: 'completed'

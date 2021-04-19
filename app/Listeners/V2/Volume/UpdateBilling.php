@@ -25,6 +25,10 @@ class UpdateBilling
         }
 
         if ($event->model instanceof Sync) {
+            if ($event->model->type !== Sync::TYPE_UPDATE) {
+                return;
+            }
+
             if (!$event->model->completed) {
                 return;
             }
