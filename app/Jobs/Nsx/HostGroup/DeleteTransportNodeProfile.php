@@ -3,15 +3,15 @@
 namespace App\Jobs\Nsx\HostGroup;
 
 use App\Jobs\Job;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteTransportNodeProfile extends Job
 {
+    use Batchable;
+
     public $model;
 
     public function __construct(HostGroup $model)
@@ -24,39 +24,57 @@ class DeleteTransportNodeProfile extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $hostGroup = $this->model;
-        $message = null;
 
         // Compute Collection Item
-        $response = $hostGroup->availabilityZone->nsxService()
-            ->get('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $hostGroup->id);
-        if (!$response || $response->getStatusCode() !== 200) {
-            $this->fail(new \Exception('Failed to get ComputeCollection item'));
+        try {
+            $response = $hostGroup->availabilityZone->nsxService()
+                ->get('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $hostGroup->id);
+            $response = json_decode($response->getBody()->getContents());
+        } catch (RequestException $exception) {
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
+            }
+            Log::warning(
+                get_class($this) . ' : Compute Collection for HostGroup ' .
+                $hostGroup->id . ' could not be retrieved, skipping.'
+            );
             return false;
         }
-        $computeItem = collect(json_decode($response->getBody()->getContents())->results)->first();
+        $computeItem = collect($response->results)->first();
+        if (empty($computeItem)) {
+            Log::warning('Compute Item for HostGroup ' . $hostGroup->id . ' not found, skipping');
+            return false;
+        }
 
-        // Transport Node Item
-        $response = $this->model->availabilityZone->nsxService()
-            ->get('/api/v1/transport-node-collections?compute_collection_id=' . $computeItem->external_id);
-        if (!$response || $response->getStatusCode() !== 200) {
-            $this->fail(new \Exception('Failed to get TransportNode item'));
+        try {
+            $response = $this->model->availabilityZone->nsxService()
+                ->get('/api/v1/transport-node-collections?compute_collection_id=' . $computeItem->external_id);
+            $response = json_decode($response->getBody()->getContents());
+        } catch (RequestException $exception) {
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
+            }
+            Log::warning(
+                get_class($this) . ' : TransportNode Collection for HostGroup ' .
+                $hostGroup->id . ' could not be retrieved, skipping.'
+            );
             return false;
         }
-        $transportNodeItem = collect(json_decode($response->getBody()->getContents())->results)->first();
+        $transportNodeItem = collect($response->results)->first();
 
         // Detach the node
         try {
             $response = $this->model->availabilityZone->nsxService()->delete(
                 '/api/v1/transport-node-collections/' . $transportNodeItem->id
             );
-        } catch (ClientException|ServerException $e) {
-            $response = $e->getResponse();
-            $message = $e->getMessage();
-        }
-        if ($response->getStatusCode() !== 200) {
-            $message = $message ?? 'Failed to detach transport node profile for Host Group ' . $hostGroup->id;
-            Log::debug($message);
-            $this->fail(new \Exception($message));
+        } catch (RequestException $exception) {
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
+            }
+            Log::warning(
+                get_class($this) . ' : Failed to detach transport node profile for Host Group ' .
+                $hostGroup->id . ', skipping'
+            );
             return false;
         }
 
@@ -65,22 +83,17 @@ class DeleteTransportNodeProfile extends Job
             $response = $this->model->availabilityZone->nsxService()->delete(
                 '/api/v1/transport-node-profiles/' . $transportNodeItem->id
             );
-        } catch (ClientException|ServerException $e) {
-            $response = $e->getResponse();
-            $message = $e->getMessage();
-        }
-        if ($response->getStatusCode() !== 200) {
-            $message = $message ?? 'Failed to delete transport node profile for Host Group ' . $hostGroup->id;
-            Log::debug($message);
-            $this->fail(new \Exception($message));
+        } catch (RequestException $exception) {
+            if ($exception->getCode() != 404) {
+                throw $exception;
+            }
+            Log::warning(
+                get_class($this) . ' : Failed to delete transport node profile for Host Group ' .
+                $hostGroup->id . ', skipping.'
+            );
             return false;
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }
