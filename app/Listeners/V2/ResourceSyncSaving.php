@@ -14,19 +14,28 @@ class ResourceSyncSaving
     {
         Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
 
-        $model = $event->model;
-
-        if ($model->id === null) {
-            Log::warning(get_class($this) . ' : Creating resource, nothing to do', ['resource_id' => $model->id]);
+        if ($event->model->id === null) {
+            Log::warning(get_class($this) . ' : Creating resource, nothing to do', ['resource_id' => $event->model->id]);
             return true;
         }
 
-        $model->syncLock();
-        if (!$model->canSync(Sync::TYPE_UPDATE)) {
-            $model->syncUnlock();
-            throw new SyncException("Cannot sync");
+        $lock = Cache::lock($event->model->syncGetLockKey(), 60);
+        try {
+            Log::debug(get_class($this) . ' : Attempting to obtain lock for 60s', ['resource_id' => $event->model->id]);
+            $lock->block(60);
+            Log::debug(get_class($this) . ' : Lock obtained', ['resource_id' => $event->model->id]);
+
+            Cache::put("sync_saving_lock." . $event->model->id, $lock->owner(), 60);
+
+            if (!$event->model->canSync(Sync::TYPE_UPDATE)) {
+                throw new SyncException("Cannot sync");
+            }
+        } catch (\Exception $e) {
+            Cache::forget("sync_saving_lock." . $event->model->id);
+            $lock->release();
+            throw $e;
         }
 
-        Log::info(get_class($this) . ' : Finished', ['resource_id' => $model->id]);
+        Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
     }
 }

@@ -31,31 +31,9 @@ trait Syncable
         return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
     }
 
-    public function syncLock()
+    public function syncGetLockKey()
     {
-        $lock = Cache::lock('sync.' . $this->id, 60);
-        try {
-            Log::debug("syncLock : Attempting to obtain lock for 60s", ['resource_id' => $this->id]);
-            $lock->block(60);
-            Log::debug("syncLock : Lock obtained");
-
-            Cache::put("sync_lock." . $this->id, $lock->owner());
-        } catch (LockTimeoutException $e) {
-            Log::error("syncLock : Timed out after 60s waiting for sync lock", ["exception" => $e->getMessage()]);
-            throw new SyncException("Timed out waiting for sync lock");
-        }
-
-        return $lock;
-    }
-
-    public function syncUnlock()
-    {
-        Log::debug("syncLock : Attempting to obtain previous lock owner", ['resource_id' => $this->id]);
-        $existingLock = Cache::pull("sync_lock." . $this->id);
-        if ($existingLock) {
-            Log::debug("syncLock : Releasing existing lock", ['resource_id' => $this->id, 'lock_owner' => $existingLock]);
-            Cache::restoreLock('sync.' . $this->id, $existingLock)->release();
-        }
+        return 'sync.' . $this->id;
     }
 
     public function canSync($type = Sync::TYPE_UPDATE)

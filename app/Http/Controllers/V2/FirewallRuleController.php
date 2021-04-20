@@ -79,16 +79,22 @@ class FirewallRuleController extends BaseController
             'enabled'
         ]));
 
+        try {
+            $firewallRule->save();
+        } catch (SyncException $exception) {
+            return $firewallRule->getSyncError();
+        }
+
         if ($request->has('ports')) {
             foreach ($request->input('ports') as $port) {
                 $port['firewall_rule_id'] = $firewallRule->id;
                 $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->saveQuietly();
+                $firewallRulePort->save();
             }
         }
 
         try {
-            $firewallRule->save();
+            $firewallRule->firewallPolicy->save();
         } catch (SyncException $exception) {
             return $firewallRule->getSyncError();
         }
@@ -130,7 +136,7 @@ class FirewallRuleController extends BaseController
             foreach ($request->input('ports') as $port) {
                 $port['firewall_rule_id'] = $firewallRule->id;
                 $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->saveQuietly();
+                $firewallRulePort->save();
             }
         }
 

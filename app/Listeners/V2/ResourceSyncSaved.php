@@ -13,7 +13,12 @@ class ResourceSyncSaved
         Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
 
         $event->model->createSync(Sync::TYPE_UPDATE);
-        $event->model->syncUnlock();
+
+        $existingLock = Cache::pull("sync_saving_lock." . $event->model->id);
+        if ($existingLock) {
+            Log::debug(get_class($this) . ' : Releasing existing lock', ['resource_id' => $event->model->id, 'lock_owner' => $existingLock]);
+            Cache::restoreLock($event->model->syncGetLockKey(), $existingLock)->release();
+        }
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
     }

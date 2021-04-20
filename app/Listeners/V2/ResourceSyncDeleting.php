@@ -14,9 +14,13 @@ class ResourceSyncDeleting
     {
         Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
 
-        $event->model->syncLock();
+        $lock = Cache::lock($event->model->syncGetLockKey(), 60);
 
         try {
+            Log::debug(get_class($this) . ' : Attempting to obtain lock for 60s', ['resource_id' => $event->model->id]);
+            $lock->block(60);
+            Log::debug(get_class($this) . ' : Lock obtained', ['resource_id' => $event->model->id]);
+
             if (($event->model->sync->status === Sync::STATUS_COMPLETE) && $event->model->sync->type == Sync::TYPE_DELETE) {
                 Log::info(get_class($this) . ' : Delete sync complete, not blocking deletion', ['resource_id' => $event->model->id]);
                 return true;
@@ -24,7 +28,7 @@ class ResourceSyncDeleting
 
             $event->model->createSync(Sync::TYPE_DELETE);
         } finally {
-            $event->model->syncUnlock();
+            $lock->release();
         }
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
