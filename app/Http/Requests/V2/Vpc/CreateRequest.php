@@ -33,7 +33,7 @@ class CreateRequest extends FormRequest
             'region_id' => [
                 'required',
                 'string',
-                new IsMaxVpcLimitReached(),
+                //new IsMaxVpcLimitReached(),
                 'exists:ecloud.regions,id,deleted_at,NULL'
             ],
             'console_enabled' => 'sometimes|boolean',
