@@ -1,7 +1,6 @@
 <?php
 namespace Tests\unit\Listeners\V2\Instance;
 
-use App\Listeners\V2\Instance\ComputeChange;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -37,6 +36,7 @@ class UpdateVcpuBillingTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $this->sync->resource()->associate($this->instance());
         });

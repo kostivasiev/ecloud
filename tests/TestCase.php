@@ -310,16 +310,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
             ]);
         }
         return $this->hostGroup;
     }
 
-    public function hostGroupJobMocks()
+    public function hostGroupJobMocks($id = 'hg-test')
     {
         // CreateCluster Job
         $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
+            ->with('/api/v2/vpc/vpc-test/hostgroup/' . $id)
             ->andReturnUsing(function () {
                 return new Response(404);
             });
@@ -328,7 +329,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 '/api/v2/vpc/vpc-test/hostgroup',
                 [
                     'json' => [
-                        'hostGroupId' => 'hg-test',
+                        'hostGroupId' => $id,
                         'shared' => false,
                     ]
                 ]
@@ -404,7 +405,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]));
             });
         $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-hg-test')
+            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $id)
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -415,7 +416,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]));
             });
         $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-test')
+            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $id)
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -431,7 +432,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 [
                     'json' => [
                         'resource_type' => 'TransportNodeCollection',
-                        'display_name' => 'tnc-hg-test',
+                        'display_name' => 'tnc-' . $id,
                         'description' => 'API created Transport Node Collection',
                         'compute_collection_id' => 'TEST-COMPUTE-COLLECTION-ID',
                         'transport_node_profile_id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
@@ -558,6 +559,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         Event::fake([
             // V1 hack
             \App\Events\V1\DatastoreCreatedEvent::class,
+
+            // Creating
+            \App\Events\V2\Instance\Creating::class,
 
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,

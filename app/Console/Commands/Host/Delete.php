@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 /**
  * Class Delete
- * Delete an instance from vmware
+ * Delete a Host and free up physical infrastructure
  * @param string instanceId
  * @package App\Console\Commands\Kingpin\Instance
  */
