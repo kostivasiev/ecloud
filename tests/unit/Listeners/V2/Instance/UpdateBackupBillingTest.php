@@ -42,6 +42,7 @@ class UpdateBackupBillingTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $this->sync->resource()->associate($this->instance());
         });
@@ -75,6 +76,7 @@ class UpdateBackupBillingTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $this->sync->resource()->associate($this->instance());
         });
@@ -102,6 +104,7 @@ class UpdateBackupBillingTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $this->sync->resource()->associate($this->volume);
         });
@@ -138,6 +141,7 @@ class UpdateBackupBillingTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $this->sync->resource()->associate($this->volume);
         });

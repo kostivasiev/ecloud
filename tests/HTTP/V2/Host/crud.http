@@ -9,7 +9,7 @@ X-Reseller-Id: 1
 
 {
     "name": "test host",
-    "host_group_id" : "{{dev_host_group_id}}"
+    "host_group_id" : "hg-2d3280ab"
 }
 
 > {%
@@ -72,7 +72,6 @@ client.test("Request executed successfully", function() {
 
 ### destroy
 DELETE https://{{host}}/{{version}}/hosts/{{host_id}}
-Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write

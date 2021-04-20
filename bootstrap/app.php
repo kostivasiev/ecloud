@@ -43,6 +43,7 @@ $app->configure('alerts');
 $app->configure('router');
 $app->configure('network');
 $app->configure('auth');
+$app->configure('host');
 $app->configure('billing');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);

@@ -31,8 +31,6 @@ patch:
               properties:
                 name:
                   required: false
-                router_id:
-                  required: false
                 network_policy_id:
                   readOnly: true
   responses:

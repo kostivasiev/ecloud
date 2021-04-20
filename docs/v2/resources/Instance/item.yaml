@@ -34,6 +34,7 @@ patch:
               required: false
               example: 1
             ram_capacity:
+              description: RAM capacity MiB
               type: integer
               required: false
               example: 1024

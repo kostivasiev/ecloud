@@ -94,6 +94,16 @@ class UpdateRamBillingTest extends TestCase
 
         $this->instance()->ram_capacity = 2048;
 
+        Sync::withoutEvents(function() {
+            $this->sync = new Sync([
+                'id' => 'sync-1',
+                'completed' => true,
+                'type' => Sync::TYPE_UPDATE
+            ]);
+            $this->sync->resource()->associate($this->instance());
+        });
+
+        // Check that the ram billing metric is added
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
         $updateRamBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
 

@@ -24,24 +24,33 @@ class BillingMetric extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes;
 
     public $keyPrefix = 'bm';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    protected $fillable = [
-        'id',
-        'resource_id',
-        'vpc_id',
-        'reseller_id',
-        'key',
-        'value',
-        'start',
-        'end',
-        'category',
-        'price',
-    ];
-    protected $casts = [
-        'price' => 'float',
-    ];
+
+    public function __construct(array $attributes = [])
+    {
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+
+        $this->fillable([
+            'id',
+            'resource_id',
+            'vpc_id',
+            'reseller_id',
+            'key',
+            'value',
+            'start',
+            'end',
+            'category',
+            'price',
+        ]);
+
+        $this->casts = [
+            'price' => 'float',
+            'value' => 'float'
+        ];
+
+        parent::__construct($attributes);
+    }
 
     public function scopeForUser($query, Consumer $user)
     {
