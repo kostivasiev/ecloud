@@ -91,24 +91,12 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // FirewallRule
-        \App\Events\V2\FirewallRule\Saving::class => [
-            //\App\Listeners\V2\FirewallRule\CheckFirewallPolicy::class,
-        ],
-        \App\Events\V2\FirewallRule\Deleting::class => [
-            //\App\Listeners\V2\FirewallRule\CheckFirewallPolicy::class,
-        ],
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallRule\Undeploy::class,
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // FirewallRulePort
-        \App\Events\V2\FirewallRulePort\Saving::class => [
-            //\App\Listeners\V2\FirewallRulePort\CheckFirewallPolicy::class,
-        ],
-        \App\Events\V2\FirewallRulePort\Deleting::class => [
-            //\App\Listeners\V2\FirewallRulePort\CheckFirewallPolicy::class,
-        ],
         \App\Events\V2\FirewallRulePort\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
