@@ -20,10 +20,12 @@ components:
       in: header
       name: Authorization
   schemas:
-    NetworkPolicy:
-      $ref: 'components/schemas/networkPolicy.yaml'
-    NetworkRule:
-      $ref : 'components/schemas/networkRule.yaml'
+#    NetworkPolicy:
+#      $ref: 'components/schemas/networkPolicy.yaml'
+#    NetworkRule:
+#      $ref : 'components/schemas/networkRule.yaml'
+#    NetworkRulePort :
+#      $ref : 'components/schemas/networkRulePort.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
@@ -50,14 +52,12 @@ components:
       $ref: 'components/schemas/region.yaml'
     Router:
       $ref: 'components/schemas/router.yaml'
-    LoadBalancerCluster:
-      $ref: 'components/schemas/lbc.yaml'
+#    LoadBalancerCluster:
+#      $ref: 'components/schemas/lbc.yaml'
     Volume:
       $ref: 'components/schemas/volume.yaml'
     RouterThroughput:
       $ref: 'components/schemas/routerThroughput.yaml'
-    NetworkRulePort:
-      $ref: 'components/schemas/networkRulePort.yaml'
     HostSpec:
       $ref: 'resources/HostSpec/schema.yaml'
     Meta:
