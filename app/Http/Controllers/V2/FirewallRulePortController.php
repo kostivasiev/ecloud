@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\FirewallRulePort\Create;
 use App\Http\Requests\V2\FirewallRulePort\Update;
 use App\Models\V2\FirewallRulePort;
@@ -39,9 +40,14 @@ class FirewallRulePortController extends BaseController
             'source',
             'destination'
         ]));
-        if (!$resource->save()) {
-            return $resource->getSyncError();
+
+        try {
+            $resource->save();
+            $resource->firewallRule->firewallPolicy->save();
+        } catch (SyncException $exception) {
+            return $resource->firewallRule->firewallPolicy->getSyncError();
         }
+
         return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
 
@@ -58,18 +64,28 @@ class FirewallRulePortController extends BaseController
             $resource->source = null;
             $resource->destination = null;
         }
-        if (!$resource->save()) {
-            return $resource->getSyncError();
+
+        try {
+            $resource->save();
+            $resource->firewallRule->firewallPolicy->save();
+        } catch (SyncException $exception) {
+            return $resource->firewallRule->firewallPolicy->getSyncError();
         }
+
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
 
     public function destroy(Request $request, string $firewallRulePortId)
     {
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
-        if (!$resource->delete()) {
-            return $resource->getSyncError();
+
+        try {
+            $resource->delete();
+            $resource->firewallRule->firewallPolicy->save();
+        } catch (SyncException $exception) {
+            return $resource->firewallRule->firewallPolicy->getSyncError();
         }
+
         return response(null, 204);
     }
 }

@@ -125,9 +125,4 @@ class FirewallRulePort extends Model implements Filterable, Sortable
             'deleted_at' => 'deleted_at',
         ];
     }
-
-    public function getSyncError()
-    {
-        return $this->firewallRule->firewallPolicy->getSyncError();
-    }
 }

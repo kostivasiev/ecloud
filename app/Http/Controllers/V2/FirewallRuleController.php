@@ -81,22 +81,18 @@ class FirewallRuleController extends BaseController
 
         try {
             $firewallRule->save();
-        } catch (SyncException $exception) {
-            return $firewallRule->getSyncError();
-        }
 
-        if ($request->has('ports')) {
-            foreach ($request->input('ports') as $port) {
-                $port['firewall_rule_id'] = $firewallRule->id;
-                $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->save();
+            if ($request->has('ports')) {
+                foreach ($request->input('ports') as $port) {
+                    $port['firewall_rule_id'] = $firewallRule->id;
+                    $firewallRulePort = new FirewallRulePort($port);
+                    $firewallRulePort->save();
+                }
             }
-        }
 
-        try {
             $firewallRule->firewallPolicy->save();
         } catch (SyncException $exception) {
-            return $firewallRule->getSyncError();
+            return $firewallRule->firewallPolicy->getSyncError();
         }
 
         return $this->responseIdMeta($request, $firewallRule->id, 201);
@@ -123,27 +119,21 @@ class FirewallRuleController extends BaseController
 
         try {
             $firewallRule->save();
-        } catch (SyncException $exception) {
-            return $firewallRule->getSyncError();
-        }
 
-        if ($request->filled('ports')) {
-            $firewallRule->firewallRulePorts->each(function ($rule) {
-                FirewallRulePort::withoutEvents(function () use ($rule) {
-                    $rule->delete();
+            if ($request->filled('ports')) {
+                $firewallRule->firewallRulePorts->each(function ($port) {
+                    $port->delete();
                 });
-            });
-            foreach ($request->input('ports') as $port) {
-                $port['firewall_rule_id'] = $firewallRule->id;
-                $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->save();
+                foreach ($request->input('ports') as $port) {
+                    $port['firewall_rule_id'] = $firewallRule->id;
+                    $firewallRulePort = new FirewallRulePort($port);
+                    $firewallRulePort->save();
+                }
             }
-        }
 
-        try {
             $firewallRule->firewallPolicy->save();
         } catch (SyncException $exception) {
-            return $firewallRule->getSyncError();
+            return $firewallRule->firewallPolicy->getSyncError();
         }
 
         return $this->responseIdMeta($request, $firewallRule->id, 200);
@@ -154,9 +144,13 @@ class FirewallRuleController extends BaseController
         $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
 
         try {
+            $firewallRule->firewallRulePorts->each(function ($port) {
+                $port->delete();
+            });
+
             $firewallRule->delete();
         } catch (SyncException $exception) {
-            return $firewallRule->getSyncError();
+            return $firewallRule->firewallPolicy->getSyncError();
         }
 
         return response()->json([], 204);

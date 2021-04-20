@@ -155,9 +155,4 @@ class FirewallRule extends Model implements Filterable, Sortable
             'deleted_at' => 'deleted_at',
         ];
     }
-
-    public function getSyncError()
-    {
-        return $this->firewallPolicy->getSyncError();
-    }
 }
