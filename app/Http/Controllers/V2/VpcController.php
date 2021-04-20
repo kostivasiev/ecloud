@@ -58,13 +58,9 @@ class VpcController extends BaseController
             $vpc->console_enabled = $request->input('console_enabled', true);
         }
         $vpc->reseller_id = $this->resellerId;
-        try {
-            if (!$vpc->save()) {
-                return $vpc->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $vpc->getSyncError();
-        }
+
+        $vpc->save();
+
         return $this->responseIdMeta($request, $vpc->id, 201);
     }
 
@@ -88,27 +84,25 @@ class VpcController extends BaseController
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
-        try {
-            if (!$vpc->save()) {
-                return $vpc->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $vpc->getSyncError();
-        }
+
+        $vpc->withSyncLock(function ($vpc) {
+            $vpc->save();
+        });
+
         return $this->responseIdMeta($request, $vpc->id, 200);
     }
 
     public function destroy(Request $request, string $vpcId)
     {
-        $model = Vpc::forUser($request->user())->findOrFail($vpcId);
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
+        $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
+        if (!$vpc->canDelete()) {
+            return $vpc->getDeletionError();
         }
-        try {
-            $model->delete();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $vpc->withSyncLock(function ($vpc) {
+            $vpc->delete();
+        });
+
         return response()->json([], 204);
     }
 

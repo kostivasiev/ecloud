@@ -83,13 +83,7 @@ class FloatingIpController extends BaseController
             $request->only(['vpc_id', 'name'])
         );
 
-        try {
-            if (!$floatingIp->save()) {
-                return $floatingIp->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $floatingIp->getSyncError();
-        }
+        $floatingIp->save();
 
         return $this->responseIdMeta($request, $floatingIp->id, 201);
     }
@@ -99,25 +93,21 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
         $floatingIp->fill($request->only(['name']));
 
-        try {
-            if (!$floatingIp->save()) {
-                return $floatingIp->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $floatingIp->getSyncError();
-        }
+        $floatingIp->withSyncLock(function ($floatingIp) {
+            $floatingIp->save();
+        });
 
         return $this->responseIdMeta($request, $floatingIp->id, 200);
     }
 
     public function destroy(Request $request, string $fipId)
     {
-        $model = FloatingIp::forUser($request->user())->findOrFail($fipId);
-        try {
-            $model->delete();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+        $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
+
+        $floatingIp->withSyncLock(function ($floatingIp) {
+            $floatingIp->delete();
+        });
+
         return response()->json([], 204);
     }
 
@@ -126,7 +116,7 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
         $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        try {
+        $floatingIp->withSyncLock(function ($floatingIp) use($resource) {
             if (!$floatingIp->destinationNat()->exists()) {
                 $nat = app()->make(Nat::class);
                 $nat->destination()->associate($floatingIp);
@@ -143,12 +133,8 @@ class FloatingIpController extends BaseController
                 $nat->save();
             }
 
-            if (!$floatingIp->save()) {
-                return $floatingIp->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $floatingIp->getSyncError();
-        }
+            $floatingIp->save();
+        });
 
         return response(null, 202);
     }
@@ -157,20 +143,17 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        if ($floatingIp->sourceNat()->exists()) {
-            $floatingIp->sourceNat->delete();
-        }
-        if ($floatingIp->destinationNat()->exists()) {
-            $floatingIp->destinationNat->delete();
-        }
+        $floatingIp->withSyncLock(function ($floatingIp) {
 
-        try {
-            if (!$floatingIp->save()) {
-                return $floatingIp->getSyncError();
+            if ($floatingIp->sourceNat()->exists()) {
+                $floatingIp->sourceNat->delete();
             }
-        } catch (SyncException $exception) {
-            return $floatingIp->getSyncError();
-        }
+            if ($floatingIp->destinationNat()->exists()) {
+                $floatingIp->destinationNat->delete();
+            }
+
+            $floatingIp->save();
+        });
 
         return new Response(null, 202);
     }

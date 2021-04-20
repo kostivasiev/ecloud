@@ -94,9 +94,9 @@ class VolumeController extends BaseController
             'capacity',
             'iops',
         ]));
-        if (!$model->save()) {
-            return $model->getSyncError();
-        }
+
+        $model->save();
+
         return $this->responseIdMeta($request, $model->id, 201);
     }
 
@@ -108,13 +108,10 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        try {
-            if (!$volume->save()) {
-                return $volume->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $volume->getSyncError();
-        }
+
+        $volume->withSyncLock(function ($volume) {
+            $volume->save();
+        });
 
         return $this->responseIdMeta($request, $volume->id, 200);
     }
@@ -122,35 +119,35 @@ class VolumeController extends BaseController
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
-        try {
-            $volume->delete();
-        } catch (SyncException $exception) {
-            return $volume->getSyncError();
-        }
+
+        $volume->withSyncLock(function ($volume) {
+            $volume->save();
+        });
+
         return response('', 204);
     }
 
     public function attach(AttachRequest $request, string $volumeId)
     {
-        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
-        try {
-            $instance->volumes()->attach($model);
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $volume->withSyncLock(function ($volume) use ($instance) {
+            $instance->volumes()->attach($volume);
+        });
+
         return response('', 202);
     }
 
     public function detach(DetachRequest $request, string $volumeId)
     {
-        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
-        try {
-            $instance->volumes()->detach($model);
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $volume->withSyncLock(function ($volume) use ($instance) {
+            $instance->volumes()->detach($volume);
+        });
+
         return response('', 202);
     }
 
