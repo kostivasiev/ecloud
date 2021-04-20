@@ -46,7 +46,7 @@ class BillingMetric extends Model implements Filterable, Sortable
 
         $this->casts = [
             'price' => 'float',
-            'value' => 'integer'
+            'value' => 'float'
         ];
 
         parent::__construct($attributes);

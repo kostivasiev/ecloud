@@ -7,11 +7,8 @@ use App\Http\Requests\V2\UpdateNicRequest;
 use App\Models\V2\Nic;
 use App\Resources\V2\NicResource;
 use App\Rules\V2\IpAvailable;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class NicController extends BaseController

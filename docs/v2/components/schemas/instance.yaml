@@ -39,6 +39,11 @@ properties:
     required: false
     example: false
     readOnly: false
+  platform:
+    type: string
+    required: false
+    example: Linux
+    readOnly: false
   backup_enabled :
     type : boolean
     required : false
@@ -49,11 +54,6 @@ properties:
     required : false
     example : hg-abc123
     readOnly : false
-  platform:
-    type: string
-    required: false
-    example: Linux
-    readOnly: false
   volume_capacity:
     required: false
     type: integer
@@ -63,9 +63,15 @@ properties:
     type: integer
     example: 300
   sync:
-    type: string
-    example: 'completed'
+    type: object
     readOnly: true
+    properties:
+      status:
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example: complete
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example: update
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
