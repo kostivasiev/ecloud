@@ -7,10 +7,13 @@ use App\Models\V2\HostGroup;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateCluster extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(HostGroup $model)
