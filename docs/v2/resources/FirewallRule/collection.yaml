@@ -42,7 +42,8 @@ post:
         schema:
           $ref: '../../components/schemas/firewallRule.yaml'
   responses:
-    201:
+    202:
+      description: Accepted
       $ref: '../../resources/FirewallRule/responses/idResponse.yaml'
   tags:
     - Firewall Rules
