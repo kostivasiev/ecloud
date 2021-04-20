@@ -34,8 +34,8 @@ components:
               required: false
               type: boolean
               example: 'true'
-    LoadBalancerCluster:
-      $ref: 'components/schemas/lbc.yaml'
+#    LoadBalancerCluster:
+#      $ref: 'components/schemas/lbc.yaml'
     Volume:
       allOf:
         - $ref: 'components/schemas/volume.yaml'
@@ -133,8 +133,8 @@ paths:
     $ref: 'resources/AvailabilityZone/credential-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/instances':
     $ref: 'resources/AvailabilityZone/instance-collection.yaml'
-  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/lbcs':
-    $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
+#  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/lbcs':
+#    $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
   '/ecloud/v2/discount-plans':
     $ref: 'resources/DiscountPlan/admin-collection.yaml'
   '/ecloud/v2/discount-plans/{discountPlanId}':
@@ -153,10 +153,10 @@ paths:
     $ref: 'resources/Region/availabilityZones.yaml'
   '/ecloud/v2/regions/{regionId}/vpcs':
     $ref: 'resources/Region/vpc-collection.yaml'
-  '/ecloud/v2/lbcs':
-    $ref: 'resources/LoadBalancerCluster/collection.yaml'
-  '/ecloud/v2/lbcs/{lbcId}':
-    $ref: 'resources/LoadBalancerCluster/item.yaml'
+#  '/ecloud/v2/lbcs':
+#    $ref: 'resources/LoadBalancerCluster/collection.yaml'
+#  '/ecloud/v2/lbcs/{lbcId}':
+#    $ref: 'resources/LoadBalancerCluster/item.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/admin-collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
@@ -169,8 +169,8 @@ paths:
     $ref: 'resources/Credential/collection.yaml'
   '/ecloud/v2/credentials/{credentialId}':
     $ref: 'resources/Credential/item.yaml'
-  '/ecloud/v2/vpcs/{vpcId}/lbcs':
-    $ref: 'resources/Vpc/cluster-collection.yaml'
+#  '/ecloud/v2/vpcs/{vpcId}/lbcs':
+#    $ref: 'resources/Vpc/cluster-collection.yaml'
   '/ecloud/v2/availability-zone-capacities':
     $ref: 'resources/AvailabilityZoneCapacity/collection.yaml'
   '/ecloud/v2/availability-zone-capacities/{AvailabilityZoneId}':

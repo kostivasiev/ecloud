@@ -97,8 +97,8 @@ components:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
-    LbcId:
-      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
+#    LbcId:
+#      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
     NetworkRulePortId:
       $ref: 'resources/NetworkRulePort/parameters/networkRulePortId.yaml'
   responses:
@@ -116,8 +116,8 @@ components:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
-    LbcIdResponse:
-      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
+#    LbcIdResponse:
+#      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
     NetworkRulePortIdResponse:
       $ref: 'resources/NetworkRulePort/responses/idResponse.yaml'
 paths:
