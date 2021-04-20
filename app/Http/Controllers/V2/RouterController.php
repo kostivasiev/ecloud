@@ -52,7 +52,7 @@ class RouterController extends BaseController
             return $router->getSyncError();
         }
 
-        return $this->responseIdMeta($request, $router->id, 201);
+        return $this->responseIdMeta($request, $router->id, 202);
     }
 
     public function update(UpdateRequest $request, string $routerId)
