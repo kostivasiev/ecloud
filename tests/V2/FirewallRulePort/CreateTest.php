@@ -57,7 +57,7 @@ class CreateTest extends TestCase
                 'destination' => '555'
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testValidICMPDataSucceeds()
@@ -75,7 +75,7 @@ class CreateTest extends TestCase
                 'protocol' => 'ICMPv4',
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testSourceANYSucceeds()
@@ -97,7 +97,7 @@ class CreateTest extends TestCase
                 'destination' => '555'
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testDestinationANYSucceeds()
@@ -119,7 +119,7 @@ class CreateTest extends TestCase
                 'destination' => 'ANY'
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testMissingSourceFails()

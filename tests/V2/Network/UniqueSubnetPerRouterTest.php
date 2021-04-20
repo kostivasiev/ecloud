@@ -22,7 +22,7 @@ class UniqueSubnetPerRouterTest extends TestCase
     protected Router $router2;
     protected Vpc $vpc;
 
-    protected function setUp(): void
+    function setUp(): void
     {
         parent::setUp();
         $this->region = factory(Region::class)->create([
@@ -81,7 +81,7 @@ class UniqueSubnetPerRouterTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testPatchIsSuccessful()
@@ -97,7 +97,7 @@ class UniqueSubnetPerRouterTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
 
         $networkId = (json_decode($this->response->getContent()))->data->id;
 

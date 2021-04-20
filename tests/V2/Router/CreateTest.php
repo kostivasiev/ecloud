@@ -71,6 +71,6 @@ class CreateTest extends TestCase
             ]
         )
            ->seeInDatabase('routers', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
     }
 }
