@@ -19,21 +19,8 @@ class ResourceSyncSaving
             return true;
         }
 
-        $lock = Cache::lock($event->model->syncGetLockKey(), 60);
-        try {
-            Log::debug(get_class($this) . ' : Attempting to obtain sync lock for 60s', ['resource_id' => $event->model->id]);
-            $lock->block(60);
-            Log::debug(get_class($this) . ' : Sync lock obtained', ['resource_id' => $event->model->id]);
-
-            Cache::put("sync_saving_lock." . $event->model->id, $lock->owner(), 60);
-
-            if (!$event->model->canSync(Sync::TYPE_UPDATE)) {
-                throw new SyncException("Cannot sync");
-            }
-        } catch (\Exception $e) {
-            Cache::forget("sync_saving_lock." . $event->model->id);
-            $lock->release();
-            throw $e;
+        if (!$event->model->canSync(Sync::TYPE_UPDATE)) {
+            throw new SyncException();
         }
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);

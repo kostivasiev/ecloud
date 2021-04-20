@@ -41,12 +41,10 @@ class FirewallRulePortController extends BaseController
             'destination'
         ]));
 
-        try {
+        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
             $resource->save();
             $resource->firewallRule->firewallPolicy->save();
-        } catch (SyncException $exception) {
-            return $resource->firewallRule->firewallPolicy->getSyncError();
-        }
+        });
 
         return $this->responseIdMeta($request, $resource->getKey(), 201);
     }
@@ -65,12 +63,10 @@ class FirewallRulePortController extends BaseController
             $resource->destination = null;
         }
 
-        try {
+        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
             $resource->save();
             $resource->firewallRule->firewallPolicy->save();
-        } catch (SyncException $exception) {
-            return $resource->firewallRule->firewallPolicy->getSyncError();
-        }
+        });
 
         return $this->responseIdMeta($request, $resource->getKey(), 200);
     }
@@ -79,12 +75,10 @@ class FirewallRulePortController extends BaseController
     {
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
 
-        try {
+        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
             $resource->delete();
             $resource->firewallRule->firewallPolicy->save();
-        } catch (SyncException $exception) {
-            return $resource->firewallRule->firewallPolicy->getSyncError();
-        }
+        });
 
         return response(null, 204);
     }

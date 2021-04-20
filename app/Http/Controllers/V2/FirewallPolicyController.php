@@ -5,10 +5,12 @@ namespace App\Http\Controllers\V2;
 use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateFirewallPolicyRequest;
 use App\Http\Requests\V2\UpdateFirewallPolicyRequest;
+use App\Models\V1\Firewall;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -49,11 +51,10 @@ class FirewallPolicyController extends BaseController
     {
         $model = new FirewallPolicy();
         $model->fill($request->only(['name', 'sequence', 'router_id']));
-        try {
-            $model->save();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $model->withSyncLock(function ($policy) {
+            $policy->save();
+        });
 
         return $this->responseIdMeta($request, $model->id, 201);
     }
@@ -63,11 +64,9 @@ class FirewallPolicyController extends BaseController
         $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $model->fill($request->only(['name', 'sequence']));
 
-        try {
-            $model->save();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+        $model->withSyncLock(function ($policy) {
+            $policy->save();
+        });
 
         return $this->responseIdMeta($request, $model->id, 200);
     }
@@ -76,11 +75,9 @@ class FirewallPolicyController extends BaseController
     {
         $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
 
-        try {
+        $model->withSyncLock(function ($model) {
             $model->delete();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+        });
 
         return response()->json([], 204);
     }

@@ -31,6 +31,20 @@ trait Syncable
         return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
     }
 
+    public function withSyncLock($callback)
+    {
+        $lock = Cache::lock($this->syncGetLockKey(), 60);
+
+        try {
+            Log::debug(get_class($this) . ' : Attempting to obtain sync lock for 60s', ['resource_id' => $this->id]);
+            $lock->block(60);
+
+            $callback($this);
+        } finally {
+            $lock->release();
+        }
+    }
+
     public function syncGetLockKey()
     {
         return 'sync.' . $this->id;
