@@ -16,9 +16,9 @@ class CheckFirewallPolicy
 
         $lock = Cache::lock($event->model->firewallPolicy->syncGetLockKey(), 60);
         try {
-            Log::debug(get_class($this) . ' : Attempting to obtain lock for 60s', ['resource_id' => $event->model->firewallPolicy->id]);
+            Log::debug(get_class($this) . ' : Attempting to obtain sync lock for 60s', ['resource_id' => $event->model->firewallPolicy->id]);
             $lock->block(60);
-            Log::debug(get_class($this) . ' : Lock obtained', ['resource_id' => $event->model->firewallPolicy->id]);
+            Log::debug(get_class($this) . ' : Sync lock obtained', ['resource_id' => $event->model->firewallPolicy->id]);
 
             if (!$event->model->firewallPolicy->canSync(Sync::TYPE_UPDATE)) {
                 throw new SyncException("Cannot sync firewall policy");
