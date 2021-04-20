@@ -26,6 +26,7 @@ class UpdateRamBillingTest extends TestCase
             $sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $sync->resource()->associate($this->instance());
             return $sync;
@@ -58,6 +59,7 @@ class UpdateRamBillingTest extends TestCase
         $updateRamBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
 
         $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+
         $this->assertNotNull($billingMetric);
         $this->assertEquals(1024, $billingMetric->value);
         $this->assertEquals(0.00000816, $billingMetric->price);
