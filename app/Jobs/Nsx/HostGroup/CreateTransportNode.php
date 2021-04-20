@@ -7,10 +7,13 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Vpc;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateTransportNode extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(HostGroup $model)
