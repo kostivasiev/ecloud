@@ -81,6 +81,10 @@ class FirewallRuleController extends BaseController
         ]));
 
         $firewallRule->firewallPolicy->withSyncLock(function () use ($request, $firewallRule) {
+            if (!$firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
             $firewallRule->save();
 
             if ($request->has('ports')) {
@@ -117,6 +121,10 @@ class FirewallRuleController extends BaseController
         ]));
 
         $firewallRule->firewallPolicy->withSyncLock(function () use ($request, $firewallRule) {
+            if (!$firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
             $firewallRule->save();
 
             if ($request->filled('ports')) {
@@ -141,6 +149,10 @@ class FirewallRuleController extends BaseController
         $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
 
         $firewallRule->firewallPolicy->withSyncLock(function () use ($firewallRule) {
+            if (!$firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
             $firewallRule->firewallRulePorts->each(function ($port) {
                 $port->delete();
             });

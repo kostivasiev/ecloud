@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\FirewallPolicy;
+namespace App\Jobs\Router\Defaults;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;

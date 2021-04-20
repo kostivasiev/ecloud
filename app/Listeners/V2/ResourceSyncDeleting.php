@@ -19,7 +19,7 @@ class ResourceSyncDeleting
             return true;
         }
 
-        if (!$event->model->canSync(Sync::TYPE_DELETE)) {
+        if (!$event->model->canSync()) {
             throw new SyncException();
         }
 

@@ -42,6 +42,10 @@ class FirewallRulePortController extends BaseController
         ]));
 
         $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
             $resource->save();
             $resource->firewallRule->firewallPolicy->save();
         });
@@ -64,6 +68,10 @@ class FirewallRulePortController extends BaseController
         }
 
         $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
             $resource->save();
             $resource->firewallRule->firewallPolicy->save();
         });
@@ -76,6 +84,10 @@ class FirewallRulePortController extends BaseController
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
 
         $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
             $resource->delete();
             $resource->firewallRule->firewallPolicy->save();
         });

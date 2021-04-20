@@ -14,7 +14,7 @@ class CheckFirewallPolicy
     {
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
-        if (!$event->model->firewallPolicy->canSync(Sync::TYPE_UPDATE)) {
+        if (!$event->model->firewallPolicy->canSync()) {
             throw new SyncException();
         }
 

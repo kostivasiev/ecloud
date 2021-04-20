@@ -19,7 +19,7 @@ class ResourceSyncSaving
             return true;
         }
 
-        if (!$event->model->canSync(Sync::TYPE_UPDATE)) {
+        if (!$event->model->canSync()) {
             throw new SyncException();
         }
 

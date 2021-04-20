@@ -50,15 +50,8 @@ trait Syncable
         return 'sync.' . $this->id;
     }
 
-    public function canSync($type = Sync::TYPE_UPDATE)
+    public function canSync()
     {
-        if ($type == Sync::TYPE_UPDATE) {
-            if ($this->syncs()->count() == 1 && $this->sync->status === Sync::STATUS_FAILED) {
-                Log::warning(get_class($this) . ' : Cannot sync, resource has a single failed sync', ['resource_id' => $this->id]);
-                return false;
-            }
-        }
-
         if ($this->sync->status === Sync::STATUS_INPROGRESS) {
             Log::warning(get_class($this) . ' : Cannot sync, resource has sync in progress', ['resource_id' => $this->id]);
             return false;

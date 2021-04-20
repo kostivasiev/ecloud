@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Vpc\CreateRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
-use App\Jobs\FirewallPolicy\ConfigureDefaults;
+use App\Jobs\Router\Defaults\ConfigureFirewallPolicyDefaults;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
@@ -157,9 +156,7 @@ class VpcController extends BaseController
         $network->save();
 
         // Configure default firewall policies
-        $this->dispatch(new ConfigureDefaults([
-            'router_id' => $router->id
-        ]));
+        $this->dispatch(new ConfigureFirewallPolicyDefaults($router));
 
         return response(null, 202);
     }
