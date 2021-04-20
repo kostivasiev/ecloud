@@ -42,7 +42,7 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
         $networkRule->save();
-        return $this->responseIdMeta($request, $networkRule->id, 201);
+        return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
     public function update(Update $request, string $networkRuleId)

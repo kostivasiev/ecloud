@@ -46,7 +46,7 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
 
         $policyId = (json_decode($this->response->getContent()))->data->id;
         $firewallPolicy = FirewallPolicy::findOrFail($policyId);

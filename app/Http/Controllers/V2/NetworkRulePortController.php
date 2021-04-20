@@ -39,7 +39,7 @@ class NetworkRulePortController extends BaseController
             'destination',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(Update $request, string $networkRulePortId)

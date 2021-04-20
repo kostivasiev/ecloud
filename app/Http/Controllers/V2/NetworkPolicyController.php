@@ -35,7 +35,7 @@ class NetworkPolicyController extends BaseController
             'network_id',
         ]));
         $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->id, 201);
+        return $this->responseIdMeta($request, $networkPolicy->id, 202);
     }
 
     public function update(Update $request, string $networkPolicyId)

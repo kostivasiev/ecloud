@@ -87,7 +87,7 @@ class FirewallRuleController extends BaseController
             }
         }
 
-        return $this->responseIdMeta($request, $firewallRule->id, 201);
+        return $this->responseIdMeta($request, $firewallRule->id, 202);
     }
 
     /**

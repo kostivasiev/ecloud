@@ -148,7 +148,7 @@ class NetworkController extends BaseController
             return $network->getSyncError();
         }
 
-        return $this->responseIdMeta($request, $network->id, 201);
+        return $this->responseIdMeta($request, $network->id, 202);
     }
 
     /**

@@ -40,7 +40,7 @@ class NicController extends BaseController
             'ip_address',
         ]));
         $nic->save();
-        return $this->responseIdMeta($request, $nic->id, 201);
+        return $this->responseIdMeta($request, $nic->id, 202);
     }
 
     public function update(UpdateNicRequest $request, string $nicId)

@@ -91,7 +91,7 @@ class FloatingIpController extends BaseController
             return $floatingIp->getSyncError();
         }
 
-        return $this->responseIdMeta($request, $floatingIp->id, 201);
+        return $this->responseIdMeta($request, $floatingIp->id, 202);
     }
 
     public function update(UpdateRequest $request, string $fipId)

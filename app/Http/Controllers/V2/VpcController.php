@@ -65,7 +65,7 @@ class VpcController extends BaseController
         } catch (SyncException $exception) {
             return $vpc->getSyncError();
         }
-        return $this->responseIdMeta($request, $vpc->id, 201);
+        return $this->responseIdMeta($request, $vpc->id, 202);
     }
 
     public function update(UpdateRequest $request, string $vpcId)

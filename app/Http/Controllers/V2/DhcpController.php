@@ -5,11 +5,9 @@ namespace App\Http\Controllers\V2;
 use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
-use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Models\V2\Dhcp;
 use App\Resources\V2\DhcpResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -60,7 +58,8 @@ class DhcpController extends BaseController
         } catch (SyncException $exception) {
             return $dhcp->getSyncError();
         }
-        return $this->responseIdMeta($request, $dhcp->id, 201);
+
+        return $this->responseIdMeta($request, $dhcp->id, 202);
     }
 
     /**

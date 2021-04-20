@@ -40,7 +40,7 @@ class FirewallRulePortController extends BaseController
             'destination'
         ]));
         $resource->save();
-        return $this->responseIdMeta($request, $resource->id, 201);
+        return $this->responseIdMeta($request, $resource->id, 202);
     }
 
     public function update(Update $request, string $firewallRulePortId)

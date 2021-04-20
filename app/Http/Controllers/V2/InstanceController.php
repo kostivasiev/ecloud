@@ -129,7 +129,7 @@ class InstanceController extends BaseController
 
         $instance->refresh();
 
-        return $this->responseIdMeta($request, $instance->id, 201);
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**

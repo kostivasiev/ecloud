@@ -43,6 +43,7 @@ post:
           $ref: '../../public-openapi.yaml#/components/schemas/Router'
   responses:
     202:
+      description: Accepted
       $ref: '../../public-openapi.yaml#/components/responses/RouterIdResponse'
   tags:
     - Routers

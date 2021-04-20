@@ -97,7 +97,7 @@ class VolumeController extends BaseController
         if (!$model->save()) {
             return $model->getSyncError();
         }
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
