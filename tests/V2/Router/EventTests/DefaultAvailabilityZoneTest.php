@@ -31,9 +31,6 @@ class DefaultAvailabilityZoneTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
     }
 
     public function testCreateRouterWithAvailabilityZone()
@@ -42,7 +39,7 @@ class DefaultAvailabilityZoneTest extends TestCase
             '/v2/routers',
             [
                 'name' => 'Manchester Network',
-                'vpc_id' => $this->vpc->id,
+                'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone->id,
             ],
             [

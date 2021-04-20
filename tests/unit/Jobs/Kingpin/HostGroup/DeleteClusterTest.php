@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Kingpin\HostGroup;
 
-use Tests\Mocks\Traits\HostGroup\DeleteClusterJob;
+use Tests\Mocks\HostGroup\DeleteClusterJob;
 use Tests\TestCase;
 
 class DeleteClusterTest extends TestCase

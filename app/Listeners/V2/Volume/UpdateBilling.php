@@ -6,7 +6,6 @@ use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
-use App\Support\Resource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -26,15 +25,19 @@ class UpdateBilling
         }
 
         if ($event->model instanceof Sync) {
+            if ($event->model->type !== Sync::TYPE_UPDATE) {
+                return;
+            }
+
             if (!$event->model->completed) {
                 return;
             }
 
-            if (Resource::classFromId($event->model->resource_id) != Volume::class) {
+            if (get_class($event->model->resource) != Volume::class) {
                 return;
             }
 
-            $volume = Volume::find($event->model->resource_id);
+            $volume = $event->model->resource;
         }
 
         if (empty($volume)) {

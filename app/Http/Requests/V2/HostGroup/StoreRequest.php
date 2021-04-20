@@ -20,6 +20,7 @@ class StoreRequest extends FormRequest
                 new ExistsForUser(Vpc::class)
             ],
             'availability_zone_id' => [
+                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
@@ -30,6 +31,11 @@ class StoreRequest extends FormRequest
                 'string',
                 'exists:ecloud.host_specs,id,deleted_at,NULL',
             ],
+            'windows_enabled' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ]
         ];
     }
 }

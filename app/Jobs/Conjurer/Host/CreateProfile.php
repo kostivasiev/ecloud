@@ -4,43 +4,45 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
-use GuzzleHttp\Exception\RequestException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateProfile extends Job
 {
-    private $model;
+    use Batchable;
 
-    public function __construct(Host $model)
+    private Host $host;
+
+    public function __construct(Host $host)
     {
-        $this->model = $model;
+        $this->host = $host;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->host->id]);
 
-        $host = $this->model;
-        $availabilityZone = $host->hostGroup->availabilityZone;
+        $availabilityZone = $this->host->hostGroup->availabilityZone;
+        $hostGroup = $this->host->hostGroup;
 
-        $availabilityZone->conjurerService()->post(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host',
+        $response = $availabilityZone->conjurerService()->post(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host',
             [
                 'json' => [
-                    'specificationName' => $host->hostGroup->hostSpec->name,
-                    'hostId' => $host->id,
+                    'specificationName' => $hostGroup->hostSpec->name,
+                    'hostId' => $this->host->id,
                 ],
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
+        $response = json_decode($response->getBody()->getContents());
 
-    public function failed($exception)
-    {
-        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
-            $exception->getResponse()->getBody()->getContents() :
-            $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
+        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
+
+        if (!empty($macAddress)) {
+            Log::debug('Host was created on UCS, MAC address: ' . $macAddress);
+        }
+
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);
     }
 }

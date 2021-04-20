@@ -8,6 +8,8 @@ use App\Models\V2\Image;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsMaxInstanceForCustomer;
+use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Log;
 use UKFast\FormRequests\FormRequest;
@@ -42,11 +44,12 @@ class CreateRequest extends FormRequest
         $rules = [
             'name' => 'nullable|string',
             'vpc_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class)
+                new ExistsForUser(Vpc::class),
+                new IsMaxInstanceForVpc(),
+                new IsMaxInstanceForCustomer(),
             ],
             'image_id' => [
                 'required',
@@ -69,7 +72,7 @@ class CreateRequest extends FormRequest
             'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
             'host_group_id' => [
-                'required',
+                'sometimes',
                 'string',
                 'exists:ecloud.host_groups,id,deleted_at,NULL',
                 new ExistsForUser(HostGroup::class),

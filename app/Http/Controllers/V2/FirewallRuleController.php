@@ -110,7 +110,7 @@ class FirewallRuleController extends BaseController
         ]));
         $firewallRule->save();
 
-        if ($request->has('ports')) {
+        if ($request->filled('ports')) {
             $firewallRule->firewallRulePorts->each(function ($rule) {
                 $rule->delete();
             });

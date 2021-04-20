@@ -13,7 +13,6 @@ use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -22,24 +21,24 @@ class VolumeController extends BaseController
     public function index(Request $request)
     {
         if ($request->hasAny([
-            'mounted',
-            'mounted:eq',
-            'mounted:neq',
+            'attached',
+            'attached:eq',
+            'attached:neq',
         ])) {
-            if ($request->has('mounted') || $request->has('mounted:eq')) {
-                if ($request->has('mounted')) {
-                    $mounted = filter_var($request->get('mounted'), FILTER_VALIDATE_BOOLEAN);
-                    $request->query->remove('mounted');
+            if ($request->has('attached') || $request->has('attached:eq')) {
+                if ($request->has('attached')) {
+                    $attached = filter_var($request->get('attached'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached');
                 } else {
-                    $mounted = filter_var($request->get('mounted:eq'), FILTER_VALIDATE_BOOLEAN);
-                    $request->query->remove('mounted:eq');
+                    $attached = filter_var($request->get('attached:eq'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached:eq');
                 }
-            } elseif ($request->has('mounted:neq')) {
-                $mounted = !filter_var($request->get('mounted:neq'), FILTER_VALIDATE_BOOLEAN);
-                $request->query->remove('mounted:neq');
+            } elseif ($request->has('attached:neq')) {
+                $attached = !filter_var($request->get('attached:neq'), FILTER_VALIDATE_BOOLEAN);
+                $request->query->remove('attached:neq');
             }
 
-            if ($mounted) {
+            if ($attached) {
                 $collection = Volume::forUser($request->user())->has('instances', '>', 0);
             } else {
                 $collection = Volume::forUser($request->user())->has('instances', '=', 0);
@@ -109,7 +108,11 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        if (!$volume->save()) {
+        try {
+            if (!$volume->save()) {
+                return $volume->getSyncError();
+            }
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
 
@@ -119,10 +122,12 @@ class VolumeController extends BaseController
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
-        if (!$volume->delete()) {
+        try {
+            $volume->delete();
+        } catch (SyncException $exception) {
             return $volume->getSyncError();
         }
-        return response(null, 204);
+        return response('', 204);
     }
 
     public function attach(AttachRequest $request, string $volumeId)

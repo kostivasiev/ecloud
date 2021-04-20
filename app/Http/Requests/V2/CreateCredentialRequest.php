@@ -28,8 +28,8 @@ class CreateCredentialRequest extends FormRequest
             'name' => ['nullable', 'string'],
             'resource_id' => ['required', 'string'],
             'host' => ['nullable', 'string'],
-            'username' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'username' => ['nullable', 'string'],
+            'password' => ['nullable', 'string'],
             'port' => ['nullable', 'integer'],
         ];
         if (Auth::user()->isAdmin()) {

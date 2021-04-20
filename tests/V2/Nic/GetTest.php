@@ -2,12 +2,7 @@
 
 namespace Tests\V2\Nic;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
 use App\Models\V2\Nic;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -17,14 +12,9 @@ class GetTest extends TestCase
     use DatabaseMigrations;
 
     protected \Faker\Generator $faker;
-    protected $availabilityZone;
-    protected $instance;
     protected $mac_address;
     protected $ip_address;
-    protected $network;
     protected $nic;
-    protected $region;
-    protected $vpc;
 
     public function setUp(): void
     {
@@ -32,26 +22,16 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
         $this->ip_address = $this->faker->ipv4;
         $this->mac_address = $this->faker->macAddress;
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ]);
-        $this->network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
-        ]);
-        $this->nic = factory(Nic::class)->create([
-            'mac_address' => $this->mac_address,
-            'instance_id' => $this->instance->id,
-            'network_id' => $this->network->id,
-            'ip_address' => $this->ip_address,
-        ]);
+
+        Nic::withoutEvents(function() {
+            $this->nic = factory(Nic::class)->create([
+                'id' => 'nic-test',
+                'mac_address' => $this->mac_address,
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
+                'ip_address' => $this->ip_address,
+            ]);
+        });
     }
 
     public function testGetCollection()
@@ -61,8 +41,8 @@ class GetTest extends TestCase
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'mac_address' => $this->mac_address,
-            'instance_id' => $this->instance->id,
-            'network_id' => $this->network->id,
+            'instance_id' => $this->instance()->id,
+            'network_id' => $this->network()->id,
             'ip_address' => $this->ip_address,
         ])->assertResponseStatus(200);
     }
@@ -74,8 +54,8 @@ class GetTest extends TestCase
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'mac_address' => $this->mac_address,
-            'instance_id' => $this->instance->id,
-            'network_id' => $this->network->id,
+            'instance_id' => $this->instance()->id,
+            'network_id' => $this->network()->id,
             'ip_address' => $this->ip_address,
         ])->assertResponseStatus(200);
     }

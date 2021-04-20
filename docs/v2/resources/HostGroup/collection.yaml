@@ -42,7 +42,7 @@ post:
         schema:
           $ref: '../../resources/HostGroup/schema.yaml'
   responses:
-    201:
+    202:
       $ref: '../../resources/HostGroup/responses/idResponse.yaml'
   tags:
     - Host Groups

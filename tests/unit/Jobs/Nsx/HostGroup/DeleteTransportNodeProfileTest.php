@@ -2,8 +2,7 @@
 
 namespace Tests\unit\Jobs\Nsx\HostGroup;
 
-use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
-use Tests\Mocks\Traits\HostGroup\DeleteTransportNodeProfileJob;
+use Tests\Mocks\HostGroup\DeleteTransportNodeProfileJob;
 use Tests\TestCase;
 
 class DeleteTransportNodeProfileTest extends TestCase

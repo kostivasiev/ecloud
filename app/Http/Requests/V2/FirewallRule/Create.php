@@ -49,7 +49,7 @@ class Create extends FormRequest
             'enabled' => 'required|boolean',
             'ports' => [
                 'sometimes',
-                'required',
+                'present',
                 'array'
             ],
             'ports.*.protocol' => [

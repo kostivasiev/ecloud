@@ -89,7 +89,7 @@ class AttachVolumeTest extends TestCase
             'errors' => [
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'The specified volume is already mounted on this instance',
+                    'detail' => 'The specified volume is already attached to this instance',
                     'status' => 422,
                     'source' => 'instance_id',
                 ]

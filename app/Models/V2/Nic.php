@@ -6,6 +6,7 @@ use App\Events\V2\Nic\Created;
 use App\Events\V2\Nic\Creating;
 use App\Events\V2\Nic\Deleted;
 use App\Events\V2\Nic\Deleting;
+use App\Events\V2\Nic\Saved;
 use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
@@ -33,27 +34,17 @@ class Nic extends Model implements Filterable, Sortable
         'mac_address',
         'instance_id',
         'network_id',
-        'ip_address',
-        'deleted'
+        'ip_address'
     ];
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($instance) {
-            $instance->attributes['deleted'] = time();
-            $instance->save();
-        });
-    }
 
     public function instance()
     {
@@ -63,6 +54,16 @@ class Nic extends Model implements Filterable, Sortable
     public function network()
     {
         return $this->belongsTo(Network::class);
+    }
+
+    public function sourceNat()
+    {
+        return $this->morphOne(Nat::class, 'sourceable', null, 'source_id');
+    }
+
+    public function destinationNat()
+    {
+        return $this->morphOne(Nat::class, 'translatedable', null, 'translated_id');
     }
 
     /**

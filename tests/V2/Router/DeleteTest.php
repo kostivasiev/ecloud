@@ -8,6 +8,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -32,11 +33,8 @@ class DeleteTest extends TestCase
             'name' => 'NSX',
             'resource_id' => $this->availability_zone->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availability_zone->id,
         ]);
 
@@ -52,6 +50,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
+        Event::fake();
         $this->assertNull($this->router->deleted_at);
         $this->delete('/v2/routers/' . $this->router->id, [], [
             'X-consumer-custom-id' => '0-0',
