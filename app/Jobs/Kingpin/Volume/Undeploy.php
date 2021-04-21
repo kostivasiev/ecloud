@@ -29,7 +29,6 @@ class Undeploy extends Job
         }
 
         if ($this->model->instances()->count() !== 0) {
-            // TODO :- Move this to a deleation rule, it's not right doing it here?
             throw new \Exception('Volume ' . $this->model->id . ' had instances when trying to delete');
         }
 
