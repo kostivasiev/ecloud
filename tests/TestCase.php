@@ -126,10 +126,12 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function firewallPolicy($id = 'fwp-test')
     {
         if (!$this->firewallPolicy) {
-            $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-                'id' => $id,
-                'router_id' => $this->router()->id,
-            ]);
+            Model::withoutEvents(function() use ($id) {
+                $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+                    'id' => $id,
+                    'router_id' => $this->router()->id,
+                ]);
+            });
         }
         return $this->firewallPolicy;
     }
