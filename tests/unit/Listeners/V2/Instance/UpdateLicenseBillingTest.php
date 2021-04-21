@@ -10,25 +10,26 @@ class UpdateLicenseBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    private $sync;
+    private Sync $sync;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Sync::withoutEvents(function() {
+            $this->sync = new Sync([
+                'id' => 'sync-1',
+                'completed' => true,
+                'type' => Sync::TYPE_UPDATE
+            ]);
+            $this->sync->resource()->associate($this->instance());
+        });
     }
 
     public function testInstertLicenseBilling()
     {
         $this->instance()->vcpu_cores = 1;
         $this->instance()->platform = 'Windows';
-
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
-                'completed' => true,
-            ]);
-            $this->sync->resource()->associate($this->instance());
-        });
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
@@ -52,21 +53,12 @@ class UpdateLicenseBillingTest extends TestCase
         $this->instance()->vcpu_cores = 5;
         $this->instance()->platform = 'Windows';
 
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
-                'completed' => true,
-            ]);
-            $this->sync->resource()->associate($this->instance());
-        });
-
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
 
         $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
         $this->assertNotNull($vcpuMetric);
-        // round up to the closes 2 core pack 5/2 = 3
-        $this->assertEquals(3, $vcpuMetric->value);
+        $this->assertEquals(5, $vcpuMetric->value);
 
         // Check existing metric was ended
         $originalVcpuMetric->refresh();

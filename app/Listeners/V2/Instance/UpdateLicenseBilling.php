@@ -36,12 +36,9 @@ class UpdateLicenseBilling
             return;
         }
 
-        // Billing is per 2 cre pack
-        $value = ceil($instance->vcpu_cores/2);
-
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.windows');
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == $value) {
+            if ($currentActiveMetric->value == $instance->vcpu_cores) {
                 return;
             }
             $currentActiveMetric->setEndDate();
@@ -52,7 +49,7 @@ class UpdateLicenseBilling
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->key = 'license.windows';
-        $billingMetric->value = $value;
+        $billingMetric->value = $instance->vcpu_cores;
         $billingMetric->start = Carbon::now();
 
         $product = $instance->availabilityZone->products()
