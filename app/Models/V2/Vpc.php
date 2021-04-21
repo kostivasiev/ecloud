@@ -141,8 +141,8 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
-            $factory->create('console_enabled', Filter::$numericDefaults),
-            $factory->create('advanced_networking', Filter::$numericDefaults),
+            $factory->create('console_enabled', Filter::$enumDefaults),
+            $factory->create('advanced_networking', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
