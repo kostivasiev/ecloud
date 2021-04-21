@@ -12,6 +12,6 @@ class SyncException extends ApiException
 
     public function __construct()
     {
-        parent::__construct("The specified resource is being modified and is unavailable at this time", "", Response::HTTP_CONFLICT, null);
+        parent::__construct("The specified resource is being modified and is unavailable at this time", "", $this->statusCode, null);
     }
 }
