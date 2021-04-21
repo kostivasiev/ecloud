@@ -80,7 +80,7 @@ class AdvancedNetworkingTest extends TestCase
     }
 
     /**
-     * @test I update a VPC, I request advanced networking be enabled, a VPC is updated with `advanced_networking` set to true
+     * @test I update a VPC, I request advanced networking be enabled, no change occurs
      */
     public function testUpdateVpcWithAdvancedNetworking()
     {
@@ -100,7 +100,7 @@ class AdvancedNetworkingTest extends TestCase
 
         $vpc = Vpc::findOrFail(json_decode($this->response->getContent())->data->id);
         $this->assertTrue(is_bool($vpc->advanced_networking));
-        $this->assertTrue($vpc->advanced_networking);
+        $this->assertFalse($vpc->advanced_networking);
     }
 
     /**
