@@ -79,7 +79,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Update firewall rule', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -117,7 +117,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Update firewall rule', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 

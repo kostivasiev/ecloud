@@ -72,6 +72,6 @@ class UpdateTest extends TestCase
                 'action' => 'REJECT',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 }

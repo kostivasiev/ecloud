@@ -60,7 +60,7 @@ X-Reseller-Id: 1
 > {%
 
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Unlocked resource was not editable");
+  client.assert(response.status === 202, "Unlocked resource was not editable");
 });
 %}
 ###

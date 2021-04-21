@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Models\V2\Dhcp;
@@ -70,7 +69,7 @@ class DhcpController extends BaseController
             $dhcp->save();
         });
 
-        return $this->responseIdMeta($request, $dhcp->id, 200);
+        return $this->responseIdMeta($request, $dhcp->id, 202);
     }
 
     public function destroy(string $dhcpId)
@@ -81,6 +80,6 @@ class DhcpController extends BaseController
             $dhcp->delete();
         });
 
-        return response()->json([], 204);
+        return response()->json([], 202);
     }
 }

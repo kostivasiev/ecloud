@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
-use App\Jobs\Nsx\Network\Undeploy;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Resources\V2\NetworkResource;
@@ -161,7 +159,7 @@ class NetworkController extends BaseController
             $network->save();
         });
 
-        return $this->responseIdMeta($request, $network->id, 200);
+        return $this->responseIdMeta($request, $network->id, 202);
     }
 
     public function destroy(Request $request, string $networkId)
@@ -176,7 +174,7 @@ class NetworkController extends BaseController
             $network->delete();
         });
 
-        return response()->json([], 204);
+        return response()->json([], 202);
     }
 
     /**

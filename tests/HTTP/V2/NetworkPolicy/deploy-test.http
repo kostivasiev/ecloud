@@ -127,7 +127,7 @@ Content-Type: application/json
 
 > {%
 client.test('CLEANUP - Delete Rule Port', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -142,7 +142,7 @@ Content-Type: application/json
 
 > {%
 client.test('CLEANUP - Delete Network Rule', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -157,7 +157,7 @@ Content-Type: application/json
 
 > {%
 client.test('CLEANUP - Delete Network Policy', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -172,7 +172,7 @@ Content-Type: application/json
 
 > {%
 client.test('CLEANUP - Delete Network', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -187,6 +187,6 @@ Content-Type: application/json
 
 > {%
 client.test('CLEANUP - Delete Router', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}

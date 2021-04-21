@@ -45,7 +45,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-  "image_id": "img-c879f613",
+  "image_id": "img-c879f613"
 }
 
 ###

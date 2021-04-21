@@ -60,7 +60,7 @@ class NicController extends BaseController
             $nic->save();
         });
 
-        return $this->responseIdMeta($request, $nic->id, 200);
+        return $this->responseIdMeta($request, $nic->id, 202);
     }
 
     public function destroy(Request $request, string $nicId)
@@ -71,6 +71,6 @@ class NicController extends BaseController
             $nic->delete();
         });
 
-        return response(null, 204);
+        return response(null, 202);
     }
 }

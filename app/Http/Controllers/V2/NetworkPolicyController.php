@@ -45,7 +45,7 @@ class NetworkPolicyController extends BaseController
             'name',
         ]));
         $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->id, 200);
+        return $this->responseIdMeta($request, $networkPolicy->id, 202);
     }
 
     public function destroy(Request $request, string $networkPolicyId)
@@ -54,6 +54,6 @@ class NetworkPolicyController extends BaseController
         if (!$networkPolicy->delete()) {
             return $networkPolicy->getSyncError();
         }
-        return response('', 204);
+        return response('', 202);
     }
 }

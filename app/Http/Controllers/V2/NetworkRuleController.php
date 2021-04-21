@@ -57,13 +57,13 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
         $networkRule->save();
-        return $this->responseIdMeta($request, $networkRule->id, 200);
+        return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
     public function destroy(Request $request, string $networkRuleId)
     {
         NetworkRule::forUser($request->user())->findOrFail($networkRuleId)
             ->delete();
-        return response('', 204);
+        return response('', 202);
     }
 }
