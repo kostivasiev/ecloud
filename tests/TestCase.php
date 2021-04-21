@@ -467,11 +467,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ->andReturnUsing(function () {
                 return new Response(200);
             });
-        $this->kingpinServiceMock()->expects('get')
-            ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup()->vpc->id . '/hostgroup/' . $this->hostGroup()->id)
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
         $this->kingpinServiceMock()->expects('delete')
             ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup()->vpc->id . '/hostgroup/' . $this->hostGroup()->id)
             ->andReturnUsing(function () {
