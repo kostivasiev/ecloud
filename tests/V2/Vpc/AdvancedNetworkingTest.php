@@ -72,7 +72,7 @@ class AdvancedNetworkingTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
                 'X-reseller-id' => 1,
             ]
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
 
         $vpc = Vpc::findOrFail(json_decode($this->response->getContent())->data->id);
         $this->assertTrue(is_bool($vpc->advanced_networking));
