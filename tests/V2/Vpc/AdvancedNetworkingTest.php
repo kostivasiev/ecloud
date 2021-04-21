@@ -80,30 +80,6 @@ class AdvancedNetworkingTest extends TestCase
     }
 
     /**
-     * @test I update a VPC, I request advanced networking be enabled, no change occurs
-     */
-    public function testUpdateVpcWithAdvancedNetworking()
-    {
-        $this->vpc()->advanced_networking = false;
-        $this->vpc()->save();
-        $this->patch(
-            '/v2/vpcs/' . $this->vpc()->id,
-            [
-                'advanced_networking' => true,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-                'X-reseller-id' => 1,
-            ]
-        )->assertResponseStatus(200);
-
-        $vpc = Vpc::findOrFail(json_decode($this->response->getContent())->data->id);
-        $this->assertTrue(is_bool($vpc->advanced_networking));
-        $this->assertFalse($vpc->advanced_networking);
-    }
-
-    /**
      * @test I create a Router, the selected VPC has advanced networking enabled, a different Edge Node is used
      */
     public function testCreateARouterWithAdvancedNetworking()
