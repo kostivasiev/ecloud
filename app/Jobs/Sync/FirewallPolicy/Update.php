@@ -3,13 +3,13 @@
 namespace App\Jobs\Sync\FirewallPolicy;
 
 use App\Jobs\Job;
-use App\Jobs\FirewallPolicy\Undeploy;
-use App\Jobs\FirewallPolicy\UndeployCheck;
+use App\Jobs\FirewallPolicy\Deploy;
+use App\Jobs\FirewallPolicy\DeployCheck;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
-class Delete extends Job
+class Update extends Job
 {
     use SyncableBatch;
 
@@ -24,10 +24,10 @@ class Delete extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
 
-        $this->deleteSyncBatch([
+        $this->updateSyncBatch([
             [
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new Deploy($this->sync->resource),
+                new DeployCheck($this->sync->resource),
             ]
         ])->dispatch();
 

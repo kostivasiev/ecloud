@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Vpc\CreateRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
-use App\Jobs\FirewallPolicy\ConfigureDefaults;
+use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
@@ -59,13 +58,9 @@ class VpcController extends BaseController
             $vpc->console_enabled = $request->input('console_enabled', true);
         }
         $vpc->reseller_id = $this->resellerId;
-        try {
-            if (!$vpc->save()) {
-                return $vpc->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $vpc->getSyncError();
-        }
+
+        $vpc->save();
+
         return $this->responseIdMeta($request, $vpc->id, 201);
     }
 
@@ -89,27 +84,25 @@ class VpcController extends BaseController
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
-        try {
-            if (!$vpc->save()) {
-                return $vpc->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $vpc->getSyncError();
-        }
+
+        $vpc->withSyncLock(function ($vpc) {
+            $vpc->save();
+        });
+
         return $this->responseIdMeta($request, $vpc->id, 200);
     }
 
     public function destroy(Request $request, string $vpcId)
     {
-        $model = Vpc::forUser($request->user())->findOrFail($vpcId);
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
+        $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
+        if (!$vpc->canDelete()) {
+            return $vpc->getDeletionError();
         }
-        try {
-            $model->delete();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $vpc->withSyncLock(function ($vpc) {
+            $vpc->delete();
+        });
+
         return response()->json([], 204);
     }
 
@@ -150,23 +143,8 @@ class VpcController extends BaseController
     {
         $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
 
-        $availabilityZone = $vpc->region()->first()->availabilityZones()->first();
-
-        // Create a new router
-        $router = app()->make(Router::class);
-        $router->vpc()->associate($vpc);
-        $router->availabilityZone()->associate($availabilityZone);
-        $router->save();
-
-        // Create a new network
-        $network = app()->make(Network::class);
-        $network->router()->associate($router);
-        $network->save();
-
-        // Configure default firewall policies
-        $this->dispatch(new ConfigureDefaults([
-            'router_id' => $router->id
-        ]));
+        // Configure VPC defaults (Rincewind)
+        $this->dispatch(new ConfigureVpcDefaults($vpc));
 
         return response(null, 202);
     }

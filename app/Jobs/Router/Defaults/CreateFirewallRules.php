@@ -1,38 +1,37 @@
 <?php
 
-namespace App\Jobs\FirewallPolicy;
+namespace App\Jobs\Router\Defaults;
 
-use App\Events\V2\FirewallPolicy\Saved;
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Router;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\V2\Sync;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class ConfigureDefaults extends Job
+class CreateFirewallRules extends Job
 {
-    private $data;
+    use Batchable;
 
-    public function __construct($data)
+    public $tries = 1;
+
+    private $firewallPolicy;
+    private $policy;
+
+    public function __construct(FirewallPolicy $firewallPolicy, $policy)
     {
-        $this->data = $data;
+        $this->firewallPolicy = $firewallPolicy;
+        $this->policy = $policy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->firewallPolicy->id]);
 
-        $router = Router::findOrFail($this->data['router_id']);
+        $policy = $this->policy;
 
-        foreach (config('firewall.policies') as $policy) {
-            Log::debug('FirewallPolicy', $policy);
-            $firewallPolicy = app()->make(FirewallPolicy::class);
-            $firewallPolicy->fill($policy);
-            $firewallPolicy->router_id = $router->id;
-            $firewallPolicy->save();
-
+        $this->firewallPolicy->withSyncLock(function ($firewallPolicy) use ($policy) {
             foreach ($policy['rules'] as $rule) {
                 Log::debug('FirewallRule', $rule);
                 $firewallRule = app()->make(FirewallRule::class);
@@ -48,8 +47,10 @@ class ConfigureDefaults extends Job
                     $firewallRulePort->save();
                 }
             }
-        }
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+            $this->firewallPolicy->save();
+        });
+
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->firewallPolicy->id]);
     }
 }
