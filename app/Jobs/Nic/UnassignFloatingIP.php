@@ -28,16 +28,15 @@ class UnassignFloatingIP extends Job
         $nic = $this->nic;
         $logMessage = 'UnassignFloatingIp for NIC ' . $nic->id . ': ';
         Log::info($logMessage . 'Started');
-        Nat::whereHasMorph('translated', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
-            $query->where('translated_id', $nic->id)->withTrashed();
-        })
-            ->orWhereHasMorph('source', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
-                $query->where('source_id', $nic->id)->withTrashed();
-            })
-            ->each(function ($nat) use ($logMessage) {
-                Log::info($logMessage . 'Floating IP ' . $nat->destination_id . ' unassigned');
-                $nat->delete();
-            });
+
+        if ($this->nic->sourceNat()->exists()) {
+            Log::info($logMessage . 'Floating IP ' . $this->nic->sourceNat->translated_id . ' unassigned');
+            $this->nic->sourceNat->delete();
+        }
+        if ($this->nic->destinationNat()->exists()) {
+            Log::info($logMessage . 'Floating IP ' . $this->nic->sourceNat->translated_id . ' unassigned');
+            $this->nic->destinationNat->delete();
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->nic->id]);
     }

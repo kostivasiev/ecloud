@@ -28,12 +28,13 @@ class AwaitRouterSync extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->network->id]);
 
-        if ($this->network->router->getStatus() == Sync::STATUS_FAILED) {
+        if ($this->network->router->sync->status == Sync::STATUS_FAILED) {
             Log::error('Router in failed sync state, abort', ['id' => $this->network->id]);
             $this->fail(new \Exception("Router '" . $this->network->router->id . "' in failed sync state"));
+            return;
         }
 
-        if ($this->network->router->getStatus() != Sync::STATUS_COMPLETE) {
+        if ($this->network->router->sync->status != Sync::STATUS_COMPLETE) {
             Log::warning('Router not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->network->id]);
             return $this->release($this->backoff);
         }

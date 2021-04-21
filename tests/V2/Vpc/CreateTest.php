@@ -102,4 +102,40 @@ class CreateTest extends TestCase
             ]
         )->assertResponseStatus(403);
     }
+
+    public function testExceedMaxVpcLimit()
+    {
+        $counter = 1;
+        factory(Vpc::class, config('defaults.vpc.max_count'))
+            ->make([
+                'reseller_id' => 1,
+                'region_id' => $this->region()->id,
+                'console_enabled' => true,
+            ])
+            ->each(function ($vpc) use (&$counter) {
+                $vpc->id = 'vpc-test' . $counter;
+                $vpc->name = 'TestVPC-' . $counter;
+                $vpc->saveQuietly();
+                $counter++;
+            });
+        $data = [
+            'name' => 'CreateTest Name',
+            'reseller_id' => 1,
+            'region_id' => $this->region()->id,
+            'console_enabled' => true,
+        ];
+        $this->post(
+            '/v2/vpcs',
+            $data,
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The maximum number of ' . config('defaults.vpc.max_count') . ' VPCs has been reached',
+            ]
+        )->assertResponseStatus(422);
+    }
 }

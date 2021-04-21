@@ -213,118 +213,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function instance()
     {
         if (!$this->instance) {
-/*            app()->bind(Volume::class, function () {
-                return new Volume(['id' => 'vol-test']);
-            });
-
-            // Deploy :: Deploy instance from template
-            $this->kingpinServiceMock()->expects('post')
-                ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/fromtemplate')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // ConfigureNICs, PrepareOSDisk :: Return instance details
-            $this->kingpinServiceMock()->expects('get')
-                ->zeroOrMoreTimes()
-                ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode([
-                        'numCPU' => 1,
-                        'ramMiB' => 1024,
-                        'nics' => [
-                            [
-                                'macAddress' => 'AA:BB:CC:DD:EE:FF',
-                            ]
-                        ],
-                        'volumes' => [
-                            [
-                                'volumeId' => 'vol-test',
-                                'uuid' => 'uuid-test-uuid-test-uuid-test',
-                            ]
-                        ],
-                    ]));
-                });
-
-            // PrepareOSDisk :: Set volume ID for FCD
-            $this->kingpinServiceMock()->expects('put')
-                ->withSomeOfArgs('/api/v1/vpc/' . $this->vpc()->id . '/volume/uuid-test-uuid-test-uuid-test/resourceid',)
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // PrepareOSDisk :: Set volume IOPS
-            $this->kingpinServiceMock()->expects('put')
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',)
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // ConfigureNics :: Retrieve DHCP static bindings
-            $this->nsxServiceMock()->expects('get')
-                ->withSomeOfArgs('/policy/api/v1/infra/tier-1s/' . $this->router()->id . '/segments/' . $this->network()->id . '/dhcp-static-binding-configs?cursor=')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode([
-                        'results' => []
-                    ]));
-                });
-
-            // CreateDHCPLease :: Create DHCP lease in NSX
-            $this->nsxServiceMock()->expects('put')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // UpdateNetworkAdapter :: Connect NIC to network
-            $this->kingpinServiceMock()->expects('put')
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/nic/AA:BB:CC:DD:EE:FF/connect')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // OsCustomisation :: Connect NIC to network
-            $this->kingpinServiceMock()->expects('put')
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/oscustomization')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // PowerOn :: Power on instance
-            $this->kingpinServiceMock()->expects('post')
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/power')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // WaitOsCustomisation :: Wait for os customization
-            $this->kingpinServiceMock()->expects('get')
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/oscustomization/status')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(['status'=>'Succeeded']));
-                });
-
-            // PrepareOsUsers :: Create admin group
-            $this->kingpinServiceMock()->expects('post')
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/guest/linux/admingroup')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // PrepareOsUsers :: Create graphiterack/ukfastsupport accounts
-            $this->kingpinServiceMock()->expects('post')
-                ->times(2)
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/guest/linux/user')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });
-
-            // ExpandOsDisk :: Expand /
-            $this->kingpinServiceMock()->expects('put')
-                ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/instance/i-test/guest/linux/disk/lvm/extend')
-                ->andReturnUsing(function () {
-                    return new Response(200, [], json_encode(true));
-                });*/
-
             Instance::withoutEvents(function() {
                 $this->instance = factory(Instance::class)->create([
                     'id' => 'i-test',
@@ -422,16 +310,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
             ]);
         }
         return $this->hostGroup;
     }
 
-    public function hostGroupJobMocks()
+    public function hostGroupJobMocks($id = 'hg-test')
     {
         // CreateCluster Job
         $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
+            ->with('/api/v2/vpc/vpc-test/hostgroup/' . $id)
             ->andReturnUsing(function () {
                 return new Response(404);
             });
@@ -440,7 +329,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 '/api/v2/vpc/vpc-test/hostgroup',
                 [
                     'json' => [
-                        'hostGroupId' => 'hg-test',
+                        'hostGroupId' => $id,
                         'shared' => false,
                     ]
                 ]
@@ -516,7 +405,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]));
             });
         $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-hg-test')
+            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $id)
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -527,7 +416,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]));
             });
         $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-test')
+            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $id)
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -543,7 +432,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 [
                     'json' => [
                         'resource_type' => 'TransportNodeCollection',
-                        'display_name' => 'tnc-hg-test',
+                        'display_name' => 'tnc-' . $id,
                         'description' => 'API created Transport Node Collection',
                         'compute_collection_id' => 'TEST-COMPUTE-COLLECTION-ID',
                         'transport_node_profile_id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
@@ -670,6 +559,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         Event::fake([
             // V1 hack
             \App\Events\V1\DatastoreCreatedEvent::class,
+
+            // Creating
+            \App\Events\V2\Instance\Creating::class,
 
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,

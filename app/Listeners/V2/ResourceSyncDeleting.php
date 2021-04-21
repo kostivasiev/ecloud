@@ -16,7 +16,7 @@ class ResourceSyncDeleting
 
         $model = $event->model;
 
-        if (($model->getStatus() === Sync::STATUS_COMPLETE) && $model->getSyncDeleting()) {
+        if (($model->sync->status === Sync::STATUS_COMPLETE) && $model->sync->type == Sync::TYPE_DELETE) {
             Log::info(get_class($this) . ' : Delete sync complete, not blocking deletion', ['resource_id' => $model->id]);
             return true;
         }
@@ -25,7 +25,7 @@ class ResourceSyncDeleting
         try {
             $lock->block(60);
 
-            if ($model->getStatus() === Sync::STATUS_INPROGRESS) {
+            if ($model->sync->status === Sync::STATUS_INPROGRESS) {
                 Log::warning(get_class($this) . ' : Delete blocked, resource has outstanding sync', ['resource_id' => $model->id]);
                 throw new SyncException("Outstanding sync");
             }

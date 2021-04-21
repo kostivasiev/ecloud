@@ -27,13 +27,6 @@ patch:
           type: object
           allOf:
             - $ref: '../../components/schemas/vpcSupport.yaml'
-            - type: object
-              properties:
-                name:
-                  required: false
-                router_id:
-                  required: false
-  responses:
     200:
       $ref: '../../resources/VpcSupport/responses/idResponse.yaml'
   tags:

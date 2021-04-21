@@ -8,26 +8,32 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
+    public function syncs()
+    {
+        return $this->morphMany(Sync::class, 'resource');
+    }
+
+    // TODO: Make this abstract - we should force objects implementing Syncable to return job class
     public function getUpdateSyncJob()
     {
         $class = explode('\\', __CLASS__);
         return 'App\\Jobs\\Sync\\' . end($class) . '\\Update';
     }
 
+    // TODO: Make this abstract - we should force objects implementing Syncable to return job class
     public function getDeleteSyncJob()
     {
         $class = explode('\\', __CLASS__);
         return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
     }
 
-    // TODO: Remove default parameter here, left in whilst delete/save still overridden in SyncableOverriddes trait
     public function createSync($type = Sync::TYPE_UPDATE)
     {
         Log::info(get_class($this) . ' : Creating new sync - Started', [
             'resource_id' => $this->id,
         ]);
 
-        if ($this->getStatus() === Sync::STATUS_INPROGRESS) {
+        if ($this->sync->status === Sync::STATUS_INPROGRESS) {
             Log::info(get_class($this) . ' : Failed creating new sync on ' . __CLASS__ . ' with an outstanding sync', [
                 'resource_id' => $this->id,
             ]);
@@ -46,39 +52,21 @@ trait Syncable
         return $sync;
     }
 
-    public function getStatus()
+    public function getSyncAttribute()
     {
-        if (!$this->syncs()->count()) {
-            return Sync::STATUS_COMPLETE;
-        }
-        if ($this->getSyncFailed()) {
-            return Sync::STATUS_FAILED;
-        }
-        if ($this->syncs()->latest()->first()->completed) {
-            return Sync::STATUS_COMPLETE;
-        }
-        return Sync::STATUS_INPROGRESS;
-    }
+        $status = 'unknown';
+        $type = 'unknown';
 
-    public function syncs()
-    {
-        return $this->morphMany(Sync::class, 'resource');
-    }
-
-    public function getSyncDeleting()
-    {
-        if (!$this->syncs()->count()) {
-            return false;
+        if ($this->syncs()->count()) {
+            $latest = $this->syncs()->latest()->first();
+            $status = $latest->status;
+            $type = $latest->type;
         }
-        return $this->syncs()->latest()->first()->type == Sync::TYPE_DELETE;
-    }
 
-    public function getSyncFailed()
-    {
-        if (!$this->syncs()->count()) {
-            return false;
-        }
-        return $this->syncs()->latest()->first()->failure_reason !== null;
+        return (object) [
+            'status' => $status,
+            'type' => $type,
+        ];
     }
 
     // TODO: Remove this once all models are using new sync
@@ -110,14 +98,6 @@ trait Syncable
         $sync->save();
         Log::debug(get_class($this), ['reason' => $value]);
         Log::info(get_class($this) . ' : Setting Sync to failed - Finished', ['resource_id' => $this->id]);
-    }
-
-    public function getSyncFailureReason()
-    {
-        if (!$this->syncs()->count()) {
-            return null;
-        }
-        return $this->syncs()->latest()->first()->failure_reason;
     }
 
     /**

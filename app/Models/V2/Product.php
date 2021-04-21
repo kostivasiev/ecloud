@@ -97,8 +97,8 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
      */
     public function getNameAttribute()
     {
-        preg_match("/(az-\w+[^:])(:\s)(\S[^-]+)/", $this->attributes['product_name'], $matches);
-        return str_replace(' ', '_', $matches[3] ?? null);
+        preg_match("/az-\w+[^:]:\s?(?(?=hs-)(hs-\S[^-]+)|(\S[^-]+))/", $this->attributes['product_name'], $matches);
+        return str_replace(' ', '_', array_pop($matches) ?? null);
     }
 
     /**
@@ -106,8 +106,8 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
      */
     public function getAvailabilityZoneIdAttribute()
     {
-        preg_match("/(az-\w+[^:])(:\s)(\S[^-]+)/", $this->attributes['product_name'], $matches);
-        return $matches[1] ?? null;
+        preg_match("/^az-\w+[^:]/", $this->attributes['product_name'], $matches);
+        return $matches[0] ?? null;
     }
 
     public function getCategoryAttribute()

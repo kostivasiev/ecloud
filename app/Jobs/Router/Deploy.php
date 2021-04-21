@@ -52,6 +52,11 @@ class Deploy extends Job
                     'tag' => $this->router->vpc_id,
                 ],
             ],
+            'route_advertisement_types' => [
+                'TIER1_IPSEC_LOCAL_ENDPOINT',
+                'TIER1_STATIC_ROUTES',
+                'TIER1_NAT'
+            ],
             'qos_profile' => [
                 'egress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path,
                 'ingress_qos_profile_path' => $gatewayQosProfileSearchResponse->results[0]->path

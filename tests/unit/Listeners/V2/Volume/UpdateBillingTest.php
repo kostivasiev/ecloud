@@ -1,14 +1,11 @@
 <?php
-namespace Tests\unit\Listeners\V2\Instance;
+namespace Tests\unit\Listeners\V2\Volume;
 
-use App\Events\V2\Sync\Updated;
-use App\Listeners\V2\Instance\ComputeChange;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use Carbon\Carbon;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -43,6 +40,7 @@ class UpdateBillingTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,
+                'type' => Sync::TYPE_UPDATE
             ]);
             $this->sync->resource()->associate($this->volume);
         });
@@ -77,7 +75,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testUnmountedVolumeWithNonDefaultIops()
+    public function testUnattachedVolumeWithNonDefaultIops()
     {
         Volume::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -98,7 +96,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testMountedVolumeWithDefaultIops()
+    public function testAttachedVolumeWithDefaultIops()
     {
         Model::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -126,7 +124,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testMountedVolumeWithNonDefaultIops()
+    public function testAttachedVolumeWithNonDefaultIops()
     {
         Model::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -156,7 +154,7 @@ class UpdateBillingTest extends TestCase
         $this->assertNull($metric->end);
     }
 
-    public function testMountedVolumeNewIopsExistingMetric()
+    public function testAttachedVolumeNewIopsExistingMetric()
     {
         $originalBilling = factory(BillingMetric::class)->create([
             'id' => 'bm-test',

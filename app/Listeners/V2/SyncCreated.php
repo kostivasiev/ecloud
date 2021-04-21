@@ -2,9 +2,11 @@
 
 namespace App\Listeners\V2;
 
-use App\Jobs\Sync\Update;
+use App\Models\V2\FloatingIp;
+use App\Models\V2\Host;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
+use App\Models\V2\Nat;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Router;
@@ -24,10 +26,13 @@ class SyncCreated
             Volume::class,
             Instance::class,
             Nic::class,
+            FloatingIp::class,
             Vpc::class,
             Dhcp::class,
             Router::class,
             Network::class,
+            Host::class,
+            Nat::class,
         ])) {
             return true;
         }

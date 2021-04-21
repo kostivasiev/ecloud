@@ -101,11 +101,39 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // FloatingIp
-        \App\Events\V2\FloatingIp\Created::class => [
-            \App\Listeners\V2\FloatingIp\AllocateIp::class,
+        \App\Events\V2\FloatingIp\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\FloatingIp\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\FloatingIp\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\FloatingIp\Deleted::class => [
             \App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class,
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
+        // Host
+        \App\Events\V2\Host\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\Host\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Host\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
+        ],
+        \App\Events\V2\Host\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
+        // HostGroup
+        \App\Events\V2\HostGroup\Saved::class => [
+//            \App\Listeners\V2\ResourceSync::class,
+        ],
+        \App\Events\V2\HostGroup\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
@@ -187,14 +215,14 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Nat
-        \App\Events\V2\Nat\Created::class => [
-            \App\Listeners\V2\ResourceSync::class,
-        ],
         \App\Events\V2\Nat\Saving::class => [
-            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Nat\Saved::class => [
-            \App\Listeners\V2\Nat\Deploy::class,
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\Nat\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\Nat\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
@@ -267,11 +295,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
-        // HostGroup
-        \App\Events\V2\HostGroup\Deleted::class => [
-            \App\Listeners\V2\BillingMetric\End::class,
-        ],
-
         // Sync
         \App\Events\V2\Sync\Created::class => [
             \App\Listeners\V2\SyncCreated::class
@@ -279,11 +302,14 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Sync\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
-            \App\Listeners\V2\HostGroup\UpdateBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
+            \App\Listeners\V2\HostGroup\UpdateBilling::class,
+            \App\Listeners\V2\Host\UpdateBilling::class,
+            \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
+            \App\Listeners\V2\Host\UpdateLicenseBilling::class,
         ],
     ];
 }

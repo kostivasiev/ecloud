@@ -3,7 +3,6 @@
 namespace App\Listeners\V2\BillingMetric;
 
 use App\Models\V2\BillingMetric;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class End
