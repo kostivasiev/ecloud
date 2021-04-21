@@ -67,7 +67,7 @@ class UndeployTest extends TestCase
                 return new Response(200, [], '');
             });
 
-        Event::fake([JobFailed::class]);
+        Event::fake([JobFailed::class, Deleted::class]);
 
         dispatch(new Undeploy($this->firewallPolicy));
 
