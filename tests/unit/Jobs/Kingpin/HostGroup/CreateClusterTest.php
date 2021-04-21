@@ -1,7 +1,7 @@
 <?php
 namespace Tests\unit\Jobs\Kingpin\HostGroup;
 
-use App\Jobs\Kingpin\HostGroup\DeleteCluster;
+use App\Jobs\Kingpin\HostGroup\CreateCluster;
 use App\Models\V2\HostGroup;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class DeleteClusterTest extends TestCase
+class CreateClusterTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -20,6 +20,7 @@ class DeleteClusterTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->hostGroup = HostGroup::withoutEvents(function () {
             return factory(HostGroup::class)->create([
                 'id' => 'hg-test',
@@ -30,32 +31,36 @@ class DeleteClusterTest extends TestCase
                 'windows_enabled' => true,
             ]);
         });
-        $this->job = \Mockery::mock(DeleteCluster::class, [$this->hostGroup])->makePartial();
+        $this->job = \Mockery::mock(CreateCluster::class, [$this->hostGroup])->makePartial();
     }
 
-    public function testDeleteClusterFails()
+    public function testHostGroupExists()
     {
-        $this->kingpinServiceMock()->expects('delete')
-            ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup->vpc->id . '/hostgroup/' . $this->hostGroup->id)
-            ->andThrow(new RequestException('Not Found', new Request('delete', '', []), new Response(404)));
-
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
-        $this->expectException(RequestException::class);
-        $this->expectExceptionMessage('Not Found');
-
-        $this->assertNull($this->job->handle());
-    }
-
-    public function testDeleteClusterSuccess()
-    {
-        $this->kingpinServiceMock()->expects('delete')
+        $this->kingpinServiceMock()
+            ->expects('get')
             ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup->vpc->id . '/hostgroup/' . $this->hostGroup->id)
             ->andReturnUsing(function () {
                 return new Response(200);
             });
         Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Finished');
+        Log::shouldReceive('debug')->withSomeOfArgs(get_class($this->job) . ' : HostGroup already exists, nothing to do.');
+        $this->assertTrue($this->job->handle());
+    }
 
+    public function testCreateSuccessful()
+    {
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup->vpc->id . '/hostgroup/' . $this->hostGroup->id)
+            ->andThrow(RequestException::create(new Request('GET', ''), new Response(404)));
+        $this->kingpinServiceMock()
+            ->expects('post')
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup->vpc->id . '/hostgroup')
+            ->andReturnUsing(function () {
+                return new Response(201);
+            });
+        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
+        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Finished');
         $this->assertNull($this->job->handle());
     }
 }

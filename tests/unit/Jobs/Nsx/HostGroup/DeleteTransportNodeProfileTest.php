@@ -1,47 +1,62 @@
 <?php
-
 namespace Tests\unit\Jobs\Nsx\HostGroup;
 
-use Tests\Mocks\HostGroup\DeleteTransportNodeProfileJob;
+use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
+use App\Models\V2\HostGroup;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\HostGroup\TransportNodeProfile;
 use Tests\TestCase;
 
 class DeleteTransportNodeProfileTest extends TestCase
 {
-    use DeleteTransportNodeProfileJob;
+    use DatabaseMigrations, TransportNodeProfile;
+
+    protected $job;
+    protected $hostGroup;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->transportNodeSetup();
+        $this->hostGroup = HostGroup::withoutEvents(function () {
+            return factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
+            ]);
+        });
+        $this->job = \Mockery::mock(DeleteTransportNodeProfile::class, [$this->hostGroup])->makePartial();
     }
 
-    public function testInvalidComputeCollectionItem()
+    public function testNoComputeCollectionFound()
     {
-        $this->computeCollectionItemNull();
-        $this->assertFalse($this->deleteTransportNode->handle());
+        $this->noComputeCollectionItem();
+        $this->assertFalse($this->job->handle());
     }
 
-    public function testInvalidTransportNodeCollection()
+    public function testNoTransportNodeCollection()
     {
-        $this->transportNodeCollectionNull();
-        $this->assertFalse($this->deleteTransportNode->handle());
+        $this->noTransportNodeCollectionItem();
+        $this->assertFalse($this->job->handle());
     }
 
-    public function testFailedDetach()
+    public function testDetachNodeUnsuccessful()
     {
         $this->detachNodeFail();
-        $this->assertFalse($this->deleteTransportNode->handle());
+        $this->assertFalse($this->job->handle());
     }
 
-    public function testFailedDelete()
+    public function testDeleteNodeUnsuccessful()
     {
         $this->deleteNodeFail();
-        $this->assertFalse($this->deleteTransportNode->handle());
+        $this->assertFalse($this->job->handle());
     }
 
-    public function testSuccessfulDelete()
+    public function testSuccessful()
     {
-        $this->deleteNodeSuccess();
-        $this->assertNull($this->deleteTransportNode->handle());
+        $this->deleteNodeSuccessful();
+        $this->assertNull($this->job->handle());
     }
 }
