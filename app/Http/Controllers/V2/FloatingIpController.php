@@ -116,7 +116,7 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
         $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        $floatingIp->withSyncLock(function ($floatingIp) use($resource) {
+        $floatingIp->withSyncLock(function ($floatingIp) use ($resource) {
             if (!$floatingIp->destinationNat()->exists()) {
                 $nat = app()->make(Nat::class);
                 $nat->destination()->associate($floatingIp);
