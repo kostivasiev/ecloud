@@ -86,7 +86,6 @@ class VpcController extends BaseController
             }
             $vpc->console_enabled = $request->input('console_enabled', $vpc->console_enabled);
         }
-        $vpc->update($request->only(['advanced_networking']));
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
