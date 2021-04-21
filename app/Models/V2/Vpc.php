@@ -36,6 +36,7 @@ class Vpc extends Model implements Filterable, Sortable
         'reseller_id',
         'region_id',
         'console_enabled',
+        'advanced_networking',
     ];
 
     protected $dispatchesEvents = [
@@ -54,6 +55,7 @@ class Vpc extends Model implements Filterable, Sortable
 
     protected $casts = [
         'console_enabled' => 'bool',
+        'advanced_networking' => 'bool',
     ];
 
     public function dhcps()
@@ -139,7 +141,8 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
-            $factory->create('console_enabled', Filter::$numericDefaults),
+            $factory->create('console_enabled', Filter::$enumDefaults),
+            $factory->create('advanced_networking', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -158,6 +161,7 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('reseller_id'),
             $factory->create('region_id'),
             $factory->create('console_enabled'),
+            $factory->create('advanced_networking'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -186,6 +190,7 @@ class Vpc extends Model implements Filterable, Sortable
             'reseller_id' => 'reseller_id',
             'region_id' => 'region_id',
             'console_enabled' => 'console_enabled',
+            'advanced_networking' => 'advanced_networking',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
