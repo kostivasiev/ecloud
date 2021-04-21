@@ -1,40 +1,43 @@
 <?php
 
-namespace App\Jobs\Nsx\FirewallPolicy;
+namespace App\Jobs\FirewallPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRulePort;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    private $model;
+    use Batchable;
 
-    public function __construct(FirewallPolicy $model)
+    private $firewallPolicy;
+
+    public function __construct(FirewallPolicy $firewallPolicy)
     {
-        $this->model = $model;
+        $this->firewallPolicy = $firewallPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->firewallPolicy->id]);
 
-        $router = $this->model->router;
+        $router = $this->firewallPolicy->router;
         $availabilityZone = $router->availabilityZone;
 
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
-        $response = $availabilityZone->nsxService()->patch(
-            'policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id,
+        $availabilityZone->nsxService()->patch(
+            'policy/api/v1/infra/domains/default/gateway-policies/' . $this->firewallPolicy->id,
             [
                 'json' => [
-                    'id' => $this->model->id,
-                    'display_name' => $this->model->id,
-                    'description' => $this->model->name,
-                    'sequence_number' => $this->model->sequence,
-                    'rules' => $this->model->firewallRules->map(function ($rule) use ($router) {
+                    'id' => $this->firewallPolicy->id,
+                    'display_name' => $this->firewallPolicy->id,
+                    'description' => $this->firewallPolicy->name,
+                    'sequence_number' => $this->firewallPolicy->sequence,
+                    'rules' => $this->firewallPolicy->firewallRules->map(function ($rule) use ($router) {
                         return [
                             'action' => $rule->action,
                             'resource_type' => 'Rule',
@@ -87,16 +90,6 @@ class Deploy extends Job
             ]
         );
 
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->model->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Failed to create "' . $this->model->id . '"'));
-            return false;
-        }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->firewallPolicy->id]);
     }
 }

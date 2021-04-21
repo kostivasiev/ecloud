@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\Router\CreateRequest;
 use App\Http\Requests\V2\Router\UpdateRequest;
-use App\Jobs\FirewallPolicy\ConfigureDefaults;
+use App\Jobs\Router\Defaults\ConfigureRouterDefaults;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -43,14 +42,7 @@ class RouterController extends BaseController
     public function create(CreateRequest $request)
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
-
-        try {
-            if (!$router->save()) {
-                return $router->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $router->getSyncError();
-        }
+        $router->save();
 
         return $this->responseIdMeta($request, $router->id, 202);
     }
@@ -60,29 +52,25 @@ class RouterController extends BaseController
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'router_throughput_id']));
 
-        try {
-            if (!$router->save()) {
-                return $router->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $router->getSyncError();
-        }
+        $router->withSyncLock(function ($router) {
+            $router->save();
+        });
 
         return $this->responseIdMeta($request, $router->id, 200);
     }
 
     public function destroy(Request $request, string $routerId)
     {
-        $model = Router::forUser($request->user())->findOrFail($routerId);
+        $router = Router::forUser($request->user())->findOrFail($routerId);
 
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
+        if (!$router->canDelete()) {
+            return $router->getDeletionError();
         }
-        try {
-            $model->delete();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $router->withSyncLock(function ($router) {
+            $router->delete();
+        });
+
         return response()->json([], 204);
     }
 
@@ -112,9 +100,7 @@ class RouterController extends BaseController
     {
         $router = Router::forUser($request->user())->findOrFail($routerId);
 
-        $this->dispatch(new ConfigureDefaults([
-            'router_id' => $router->id
-        ]));
+        $this->dispatch(new ConfigureRouterDefaults($router));
 
         return response(null, 202);
     }

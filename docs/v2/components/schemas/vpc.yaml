@@ -28,6 +28,10 @@ properties:
     type: boolean
     readOnly: true
     example: true
+  advanced_networking:
+    type: boolean
+    required: false
+    example: true
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

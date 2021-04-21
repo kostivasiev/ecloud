@@ -119,15 +119,7 @@ class InstanceController extends BaseController
             'user_script' => $request->input('user_script'),
         ];
 
-        try {
-            if (!$instance->save()) {
-                return $instance->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $instance->getSyncError();
-        }
-
-        $instance->refresh();
+        $instance->save();
 
         return $this->responseIdMeta($request, $instance->id, 202);
     }
@@ -150,13 +142,9 @@ class InstanceController extends BaseController
             'host_group_id',
         ]));
 
-        try {
-            if (!$instance->save()) {
-                return $instance->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $instance->getSyncError();
-        }
+        $instance->withSyncLock(function ($instance) {
+            $instance->save();
+        });
 
         return $this->responseIdMeta($request, $instance->id, 200);
     }
@@ -170,11 +158,9 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        try {
+        $instance->withSyncLock(function ($instance) {
             $instance->delete();
-        } catch (SyncException $exception) {
-            return $instance->getSyncError();
-        }
+        });
 
         return response('', 204);
     }
@@ -251,7 +237,6 @@ class InstanceController extends BaseController
 
         $this->dispatch(new PowerOff($instance));
 
-
         return response('', 202);
     }
 
@@ -315,6 +300,18 @@ class InstanceController extends BaseController
     public function consoleSession(Request $request, $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+
+        if (!$instance->vpc->console_enabled) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access has been disabled for this resource',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+        }
 
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $instance->availabilityZone

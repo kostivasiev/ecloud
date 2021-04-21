@@ -51,13 +51,7 @@ class DhcpController extends BaseController
     public function create(CreateDhcpRequest $request)
     {
         $dhcp = new Dhcp($request->only(['name', 'vpc_id', 'availability_zone_id']));
-        try {
-            if (!$dhcp->save()) {
-                return $dhcp->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $dhcp->getSyncError();
-        }
+        $dhcp->save();
 
         return $this->responseIdMeta($request, $dhcp->id, 202);
     }
@@ -71,24 +65,22 @@ class DhcpController extends BaseController
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->fill($request->only(['name']));
-        try {
-            if (!$dhcp->save()) {
-                return $dhcp->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $dhcp->getSyncError();
-        }
+
+        $dhcp->withSyncLock(function ($dhcp) {
+            $dhcp->save();
+        });
+
         return $this->responseIdMeta($request, $dhcp->id, 200);
     }
 
     public function destroy(string $dhcpId)
     {
-        $model = Dhcp::findOrFail($dhcpId);
-        try {
-            $model->delete();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+        $dhcp = Dhcp::findOrFail($dhcpId);
+
+        $dhcp->withSyncLock(function ($dhcp) {
+            $dhcp->delete();
+        });
+
         return response()->json([], 204);
     }
 }
