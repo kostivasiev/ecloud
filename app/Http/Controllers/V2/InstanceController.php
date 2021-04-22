@@ -225,7 +225,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOn($instance));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new PowerOn($instance));
+        });
 
         return response('', 202);
     }
@@ -235,7 +240,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOff($instance));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new PowerOff($instance));
+        });
 
         return response('', 202);
     }
@@ -245,10 +255,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new GuestRestart([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new GuestRestart($instance));
+        });
 
         return response('', 202);
     }
@@ -258,10 +270,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new GuestShutdown([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new GuestShutdown($instance));
+        });
 
         return response('', 202);
     }
@@ -271,10 +285,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerReset([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new PowerReset($instance));
+        });
 
         return response('', 202);
     }

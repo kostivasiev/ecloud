@@ -4,29 +4,25 @@ namespace App\Jobs\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;
 
 class PowerReset extends Job
 {
-    private $data;
+    private $instance;
 
-    public function __construct($data)
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
-        $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/power/reset'
+        $this->instance->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/power/reset'
         );
-        $instance->setSyncCompleted();
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }
