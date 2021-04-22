@@ -31,7 +31,7 @@ patch:
                 host_group_id :
                   readOnly : true
   responses:
-    200:
+    202:
       $ref: '../../resources/Host/responses/idResponse.yaml'
   tags:
     - Hosts
@@ -39,7 +39,7 @@ delete:
   parameters:
     - $ref: '../../resources/Host/parameters/id.yaml'
   responses:
-    204:
+    202:
       description: Success
   tags:
     - Hosts

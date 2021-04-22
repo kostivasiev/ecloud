@@ -49,7 +49,7 @@ class HostController extends BaseController
             'name',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 200);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $id)
@@ -66,6 +66,6 @@ class HostController extends BaseController
 //        }
 
         $model->delete();
-        return response()->json([], 204);
+        return response()->json([], 202);
     }
 }
