@@ -121,7 +121,7 @@ class VolumeController extends BaseController
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
 
         $volume->withSyncLock(function ($volume) {
-            $volume->save();
+            $volume->delete();
         });
 
         return response('', 202);
