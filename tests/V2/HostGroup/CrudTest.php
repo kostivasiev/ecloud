@@ -180,7 +180,7 @@ class CrudTest extends TestCase
                 'name' => 'new name',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testUpdateCantChangeHostSpecId()
@@ -199,7 +199,7 @@ class CrudTest extends TestCase
                 'host_spec_id' => 'hs-test',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testDestroy()
@@ -225,7 +225,7 @@ class CrudTest extends TestCase
                     'deleted_at' => null,
                 ],
                 'ecloud'
-            )->assertResponseStatus(204);
+            )->assertResponseStatus(202);
     }
 
     public function testDestroyCantDeleteHostGroupWhenItHasHost()
