@@ -49,7 +49,6 @@ class NetworkRuleController extends BaseController
     {
         $networkRule = NetworkRule::forUser(Auth::user())->findOrFail($networkRuleId);
         $networkRule->fill($request->only([
-            'network_policy_id',
             'name',
             'sequence',
             'source',
