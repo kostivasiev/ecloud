@@ -42,7 +42,8 @@ class Deploy extends Job
                     'instanceId' => $this->instance->getKey(),
                     'numCPU' => $this->instance->vcpu_cores,
                     'ramMib' => $this->instance->ram_capacity,
-                    'resourceTierTags' => config('instance.resource_tier_tags')
+                    'resourceTierTags' => config('instance.resource_tier_tags'),
+                    'backupEnabled' => $this->instance->backup_enabled,
                 ]
             ]
         );
