@@ -104,7 +104,7 @@ X-Reseller-Id: 1
 
 > {%
 client.test('Delete host', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -157,6 +157,6 @@ X-Reseller-Id: 1
 
 > {%
 client.test('Delete HostGroup', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}

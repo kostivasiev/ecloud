@@ -46,7 +46,7 @@ delete:
     - $ref: '../../resources/HostGroup/parameters/id.yaml'
   responses:
     202:
-      description: Success
+      description: Accepted
   tags:
     - Host Groups
 
