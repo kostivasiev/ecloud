@@ -140,13 +140,7 @@ class NetworkController extends BaseController
             'subnet',
         ]));
 
-        try {
-            if (!$network->save()) {
-                return $network->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $network->getSyncError();
-        }
+        $network->save();
 
         return $this->responseIdMeta($request, $network->id, 201);
     }
@@ -163,13 +157,9 @@ class NetworkController extends BaseController
             'name',
         ]));
 
-        try {
-            if (!$network->save()) {
-                return $network->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $network->getSyncError();
-        }
+        $network->withSyncLock(function ($network) {
+            $network->save();
+        });
 
         return $this->responseIdMeta($request, $network->id, 200);
     }
@@ -182,11 +172,9 @@ class NetworkController extends BaseController
             return $network->getDeletionError();
         }
 
-        try {
+        $network->withSyncLock(function ($network) {
             $network->delete();
-        } catch (SyncException $exception) {
-            return $network->getSyncError();
-        }
+        });
 
         return response()->json([], 204);
     }

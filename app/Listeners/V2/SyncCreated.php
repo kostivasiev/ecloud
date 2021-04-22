@@ -2,6 +2,7 @@
 
 namespace App\Listeners\V2;
 
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Host;
 use App\Models\V2\Dhcp;
@@ -28,6 +29,7 @@ class SyncCreated
             Instance::class,
             Nic::class,
             FloatingIp::class,
+            FirewallPolicy::class,
             Vpc::class,
             Dhcp::class,
             Router::class,

@@ -11,7 +11,6 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsMaxInstanceForCustomer;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsValidRamMultiple;
-use Illuminate\Support\Facades\Log;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest

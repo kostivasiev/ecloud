@@ -2,7 +2,11 @@
 
 namespace App\Traits\V2;
 
+use App\Exceptions\SyncException;
+use App\Listeners\V2\ResourceSyncSaving;
 use App\Models\V2\Sync;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,24 +31,47 @@ trait Syncable
         return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
     }
 
+    public function withSyncLock($callback)
+    {
+        $lock = Cache::lock($this->syncGetLockKey(), 60);
+
+        try {
+            Log::debug(get_class($this) . ' : Attempting to obtain sync lock for 60s', ['resource_id' => $this->id]);
+            $lock->block(60);
+
+            $callback($this);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    public function syncGetLockKey()
+    {
+        return 'sync.' . $this->id;
+    }
+
+    public function canSync()
+    {
+        if ($this->sync->status === Sync::STATUS_INPROGRESS) {
+            Log::warning(get_class($this) . ' : Cannot sync, resource has sync in progress', ['resource_id' => $this->id]);
+            return false;
+        }
+
+        return true;
+    }
+
     public function createSync($type = Sync::TYPE_UPDATE)
     {
         Log::info(get_class($this) . ' : Creating new sync - Started', [
             'resource_id' => $this->id,
         ]);
 
-        if ($this->sync->status === Sync::STATUS_INPROGRESS) {
-            Log::info(get_class($this) . ' : Failed creating new sync on ' . __CLASS__ . ' with an outstanding sync', [
-                'resource_id' => $this->id,
-            ]);
-            return false;
-        }
-
         $sync = app()->make(Sync::class);
         $sync->resource()->associate($this);
         $sync->completed = false;
         $sync->type = $type;
         $sync->save();
+
         Log::info(get_class($this) . ' : Creating new sync - Finished', [
             'resource_id' => $this->id,
         ]);

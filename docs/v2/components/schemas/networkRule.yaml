@@ -8,7 +8,6 @@ properties:
     example: 'Network Rule'
     readOnly : false
   network_policy_id :
-    writeOnly : true
     type : string
     example : 'nr-abc123xyz'
     readOnly : false

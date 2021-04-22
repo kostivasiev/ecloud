@@ -15,6 +15,8 @@ class AssignFloatingIp extends Job
 {
     use Batchable;
 
+    public $tries = 1;
+
     private $instance;
 
     public function __construct(Instance $instance)
@@ -53,8 +55,6 @@ class AssignFloatingIp extends Job
             $nat->translated()->associate($floatingIp);
             $nat->action = NAT::ACTION_SNAT;
             $nat->save();
-
-            $floatingIp->save();
 
             Log::info('Floating IP (' . $floatingIp->id . ') assigned to NIC (' . $nic->id . ')');
         }
