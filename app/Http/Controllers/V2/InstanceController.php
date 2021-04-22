@@ -136,11 +136,14 @@ class InstanceController extends BaseController
         $instance->fill($request->only([
             'name',
             'locked',
-            'backup_enabled',
             'vcpu_cores',
             'ram_capacity',
             'host_group_id',
         ]));
+
+        if ($request->has('backup_enabled') && $this->isAdmin) {
+            $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
+        }
 
         $instance->withSyncLock(function ($instance) {
             $instance->save();
