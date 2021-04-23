@@ -121,7 +121,7 @@ class InstanceController extends BaseController
 
         $instance->save();
 
-        return $this->responseIdMeta($request, $instance->id, 201);
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -149,7 +149,7 @@ class InstanceController extends BaseController
             $instance->save();
         });
 
-        return $this->responseIdMeta($request, $instance->id, 200);
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -165,7 +165,7 @@ class InstanceController extends BaseController
             $instance->delete();
         });
 
-        return response('', 204);
+        return response('', 202);
     }
 
     /**

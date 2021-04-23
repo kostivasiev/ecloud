@@ -56,7 +56,7 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
     }
 
     public function testCreateDispatchesEvent()

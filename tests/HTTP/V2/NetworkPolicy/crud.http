@@ -14,7 +14,7 @@ Content-Type: application/json
 
 > {%
 client.test('Create a Network Policy', function () {
-    client.assert(response.status === 201, '201 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.global.set('network_policy_id', response.body.data.id);
     client.log('Policy ID: ' + response.body.data.id);
 });
@@ -51,7 +51,7 @@ Content-Type: application/json
 
 > {%
 client.test('Update Network Policy', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.assert(response.body.data.id, client.global.get('network_policy_id'));
 });
 %}
@@ -83,6 +83,6 @@ Content-Type: application/json
 
 > {%
 client.test('Delete Network Policy', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}

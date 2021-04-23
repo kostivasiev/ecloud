@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V2;
 use App\Exceptions\SyncException;
 use App\Http\Requests\V2\FirewallRule\Create;
 use App\Http\Requests\V2\FirewallRule\Update;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Resources\V2\FirewallRulePortResource;
@@ -98,7 +97,7 @@ class FirewallRuleController extends BaseController
             $firewallRule->firewallPolicy->save();
         });
 
-        return $this->responseIdMeta($request, $firewallRule->id, 201);
+        return $this->responseIdMeta($request, $firewallRule->id, 202);
     }
 
     /**
@@ -141,7 +140,7 @@ class FirewallRuleController extends BaseController
             $firewallRule->firewallPolicy->save();
         });
 
-        return $this->responseIdMeta($request, $firewallRule->id, 200);
+        return $this->responseIdMeta($request, $firewallRule->id, 202);
     }
 
     public function destroy(Request $request, string $firewallRuleId)
@@ -162,6 +161,6 @@ class FirewallRuleController extends BaseController
             $firewallRule->firewallPolicy->save();
         });
 
-        return response()->json([], 204);
+        return response()->json([], 202);
     }
 }

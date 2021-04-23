@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateFirewallPolicyRequest;
 use App\Http\Requests\V2\UpdateFirewallPolicyRequest;
-use App\Models\V1\Firewall;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -56,7 +53,7 @@ class FirewallPolicyController extends BaseController
             $policy->save();
         });
 
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
@@ -68,7 +65,7 @@ class FirewallPolicyController extends BaseController
             $policy->save();
         });
 
-        return $this->responseIdMeta($request, $model->id, 200);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)
@@ -79,6 +76,6 @@ class FirewallPolicyController extends BaseController
             $model->delete();
         });
 
-        return response()->json([], 204);
+        return response()->json([], 202);
     }
 }

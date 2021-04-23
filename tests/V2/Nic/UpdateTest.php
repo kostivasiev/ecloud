@@ -119,6 +119,6 @@ class UpdateTest extends TestCase
                 ],
                 'ecloud'
             )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
     }
 }

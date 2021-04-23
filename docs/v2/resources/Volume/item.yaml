@@ -36,7 +36,8 @@ patch:
                 capacity:
                   required: false
   responses:
-    200:
+    202:
+      description: Accepted
       $ref: '../../resources/Volume/responses/idResponse.yaml'
   tags:
     - Volumes
@@ -44,7 +45,7 @@ delete:
   parameters:
     - $ref: '../../resources/Volume/parameters/volumeId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Volumes

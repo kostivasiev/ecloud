@@ -1,155 +1,3 @@
-### Setup Dependancies
-#
-#POST https://{{host}}/{{version}}/regions
-#X-consumer-custom-id:  0-0
-#X-consumer-groups:  ecloud.read, ecloud.write
-#Content-Type:  application/json
-#
-#{
-#  "name": "Test Region - Pete"
-#}
-#
-#> {%
-#client.global.set('region_id', response.body.data.id);
-#client.log('Region UUID: ' + response.body.data.id);
-#%}
-#
-####
-#POST https://{{host}}/{{version}}/availability-zones
-#X-consumer-custom-id:  0-0
-#X-consumer-groups:  ecloud.read, ecloud.write
-#Content-Type:  application/json
-#
-#{
-#  "code": "MAN1",
-#  "name": "Test AZ - Pete",
-#  "datacentre_site_id": 111,
-#  "nsx_manager_endpoint": "https://185.197.63.88/",
-#  "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
-#  "region_id": "{{region_id}}"
-#}
-#
-#> {%
-#client.global.set('availability_zone_id', response.body.data.id);
-#client.log('Availability Zone UUID: ' + response.body.data.id);
-#%}
-#
-####
-#POST https://{{host}}/{{version}}/vpcs
-#X-consumer-custom-id:  1-0
-#X-consumer-groups:  ecloud.read, ecloud.write
-#Content-Type:  application/json
-#
-#{
-#  "name": "Test VPC",
-#  "region_id": "{{region_id}}",
-#  "availability_zone_id": "{{availability_zone_id}}"
-#}
-#
-#> {%
-#client.global.set('vpc_id', response.body.data.id);
-#client.log('VPC UUID: ' + response.body.data.id);
-#%}
-#
-####
-#POST https://{{host}}/{{version}}/routers
-#Accept: */*
-#Cache-Control: no-cache
-#X-consumer-custom-id: 0-0
-#X-consumer-groups: ecloud.read, ecloud.write
-#Content-Type: application/json
-#
-#{
-#  "vpc_id": "{{vpc_id}}",
-#  "availability_zone_id": "{{availability_zone_id}}"
-#}
-#
-#> {%
-#client.test("Request executed successfully", function() {
-#  client.assert(response.status === 201, "Response status is not 200");
-#});
-#
-#client.global.set('router_id', response.body.data.id);
-#client.log('Router ID: ' + response.body.data.id);
-#%}
-#
-####
-#
-#POST https://{{host}}/{{version}}/networks
-#Accept: */*
-#Cache-Control: no-cache
-#X-consumer-custom-id: 0-0
-#X-consumer-groups: ecloud.read, ecloud.write
-#Content-Type: application/json
-#
-#{
-#  "router_id": "{{router_id}}",
-#  "subnet": "10.0.0.0/24"
-#}
-#
-#> {%
-#client.test("Request executed successfully", function() {
-#  client.assert(response.status === 201, "Response status is not 200");
-#});
-#
-#client.global.set('network_id', response.body.data.id);
-#client.log('Network ID: ' + response.body.data.id);
-#%}
-#
-####
-#
-#POST https://{{host}}/{{version}}/instances
-#X-consumer-custom-id:  0-0
-#X-consumer-groups:  ecloud.read, ecloud.write
-#Content-Type:  application/json
-#
-#{
-#  "vpc_id": "{{vpc_id}}",
-#  "availability_zone_id": "{{availability_zone_id}}",
-#  "appliance_id": "eed603bf-d40e-47d7-bb98-66d2940e0dc2",
-#  "vcpu_cores": 1,
-#  "ram_capacity": 1024
-#}
-#
-#> {%
-#client.global.set("instance_id", response.body.data.id);
-#client.log("Instance ID: " + response.body.data.id);
-#
-#client.test("Request executed successfully", function() {
-#  client.assert(response.status === 201, "Response status is not 201 Created");
-#});
-#%}
-#
-####
-#
-#POST https://{{host}}/{{version}}/networks
-#Accept: */*
-#Cache-Control: no-cache
-#X-consumer-custom-id: 0-0
-#X-consumer-groups: ecloud.read, ecloud.write
-#Content-Type: application/json
-#
-#{
-#  "router_id": "{{router_id}}",
-#  "subnet": "10.0.0.0/24"
-#}
-#
-#
-#> {%
-#client.test("Request executed successfully", function() {
-#  client.assert(response.status === 201, "Response status is not 200");
-#});
-#
-#client.global.set('network_id', response.body.data.id);
-#client.log('Network ID: ' + response.body.data.id);
-#%}
-#
-####
-####
-#
-### Test Resource CRUD
-
-
 POST https://{{host}}/{{version}}/nics
 Accept: */*
 Cache-Control: no-cache
@@ -164,10 +12,9 @@ Content-Type: application/json
   "ip_address": "10.0.0.5"
 }
 
-
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 
 client.global.set('nic_id', response.body.data.id);
@@ -175,12 +22,6 @@ client.log('NIC ID: ' + response.body.data.id);
 %}
 
 ###
-
-
-
-###
-
-
 GET https://{{host}}/{{version}}/nics
 Accept: */*
 Cache-Control: no-cache
@@ -228,7 +69,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
   client.assert(response.body.data.id === client.global.get('nic_id'), "Incorrect resource ID returned");
 });
 %}
@@ -260,7 +101,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
@@ -279,48 +120,3 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-
-
-### Tear down dependancies
-
-DELETE https://{{host}}/{{version}}/regions/{{region_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://{{host}}/{{version}}/availability_zones/{{availability_zone_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://{{host}}/{{version}}/vpc/{{vpc_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://{{host}}/{{version}}/routers/{{router_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://{{host}}/{{version}}/networks/{{network_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-###
-DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json

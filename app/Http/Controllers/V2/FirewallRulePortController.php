@@ -50,7 +50,7 @@ class FirewallRulePortController extends BaseController
             $resource->firewallRule->firewallPolicy->save();
         });
 
-        return $this->responseIdMeta($request, $resource->getKey(), 201);
+        return $this->responseIdMeta($request, $resource->getKey(), 202);
     }
 
     public function update(Update $request, string $firewallRulePortId)
@@ -76,7 +76,7 @@ class FirewallRulePortController extends BaseController
             $resource->firewallRule->firewallPolicy->save();
         });
 
-        return $this->responseIdMeta($request, $resource->getKey(), 200);
+        return $this->responseIdMeta($request, $resource->getKey(), 202);
     }
 
     public function destroy(Request $request, string $firewallRulePortId)
@@ -92,6 +92,6 @@ class FirewallRulePortController extends BaseController
             $resource->firewallRule->firewallPolicy->save();
         });
 
-        return response(null, 204);
+        return response(null, 202);
     }
 }

@@ -32,7 +32,8 @@ patch:
                   readOnly : true
 
   responses:
-    200:
+    202:
+      description: Accepted
       $ref: '../../resources/FloatingIp/responses/idResponse.yaml'
   tags:
     - Floating IPs
@@ -40,8 +41,8 @@ delete:
   parameters:
     - $ref: '../../resources/FloatingIp/parameters/fipId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Floating IPs
 

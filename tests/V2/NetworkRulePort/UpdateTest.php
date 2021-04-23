@@ -81,6 +81,6 @@ class UpdateTest extends TestCase
                 'destination' => '444',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 }
