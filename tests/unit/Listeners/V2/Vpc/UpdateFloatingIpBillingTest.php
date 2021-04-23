@@ -118,10 +118,6 @@ class UpdateFloatingIpBillingTest extends TestCase
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        FloatingIp::first()->delete();
-
-        $this->assertEquals(4, FloatingIp::all()->count());
-
         $sync = Sync::withoutEvents(function() {
             $sync = new Sync([
                 'id' => 'sync-' . uniqid(),

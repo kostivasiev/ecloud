@@ -18,6 +18,8 @@ class UpdateFloatingIpBilling
      */
     public function handle(Updated $event)
     {
+        Log::info(get_class($this) . ' : Started', ['model' => $event->model]);
+
         if (!($event->model instanceof Sync)) {
             return;
         }
@@ -34,8 +36,12 @@ class UpdateFloatingIpBilling
 
         $currentActiveMetric = BillingMetric::getActiveByKey($floatingIp->vpc, 'floating-ip.count');
 
+        // If the sync type is delete, the resource hasn't actually been soft deleted yet.
+        $value = ($event->model->type == Sync::TYPE_DELETE) ? $floatingIp->vpc->floatingIps()->count()-1 : $floatingIp->vpc->floatingIps()->count();
+
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == $floatingIp->vpc->floatingIps()->count()) {
+            if ($currentActiveMetric->value == $value) {
+                Log::info(get_class($this) . ' : No Change in number of fips, nothing to do', ['model' => $event->model]);
                 return;
             }
             $currentActiveMetric->setEndDate();
@@ -46,7 +52,7 @@ class UpdateFloatingIpBilling
         $billingMetric->vpc_id = $floatingIp->vpc->id;
         $billingMetric->reseller_id = $floatingIp->vpc->reseller_id;
         $billingMetric->key = 'floating-ip.count';
-        $billingMetric->value = $floatingIp->vpc->floatingIps()->count();
+        $billingMetric->value = $value;
         $billingMetric->start = Carbon::now();
 
         // Bit of a hack to get the az product, as technically a fip isn't associated with an az
