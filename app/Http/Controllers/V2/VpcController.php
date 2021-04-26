@@ -103,7 +103,7 @@ class VpcController extends BaseController
             $vpc->delete();
         });
 
-        return response()->json([], 202);
+        return response('', 202);
     }
 
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)

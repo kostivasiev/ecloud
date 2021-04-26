@@ -80,6 +80,6 @@ class DhcpController extends BaseController
             $dhcp->delete();
         });
 
-        return response()->json([], 202);
+        return response('', 202);
     }
 }
