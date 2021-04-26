@@ -61,7 +61,7 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/volume')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
             });

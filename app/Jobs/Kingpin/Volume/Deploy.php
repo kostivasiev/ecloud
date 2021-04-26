@@ -32,7 +32,7 @@ class Deploy extends Job
 
         try {
             $response = $volume->availabilityZone->kingpinService()->post(
-                '/api/v1/vpc/' . $volume->vpc_id . '/volume',
+                '/api/v2/vpc/' . $volume->vpc_id . '/volume',
                 [
                     'json' => [
                         'volumeId' => $volume->id,

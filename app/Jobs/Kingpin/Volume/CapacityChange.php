@@ -26,7 +26,7 @@ class CapacityChange extends Job
         $volume = $this->model;
 
         // Volume has no instances so can be resized freely
-        $endpoint = '/api/v1/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
+        $endpoint = '/api/v2/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
 
         if ($volume->instances()->count() > 0) {
             // Volume has at least one instance so needs to be resized via an instance, allowing it to expand the OS partitions AFAIK
