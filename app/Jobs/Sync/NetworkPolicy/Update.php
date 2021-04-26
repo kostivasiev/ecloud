@@ -7,21 +7,37 @@ use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
 use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
 use App\Jobs\Nsx\DeployCheck;
 use App\Jobs\Sync\Completed;
-use App\Models\V2\NetworkPolicy;
+use App\Models\V2\Sync;
+use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
-class Save extends Job
+class Update extends Job
 {
-    private $model;
+    use SyncableBatch;
 
-    public function __construct(NetworkPolicy $model)
+    private $sync;
+
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
+        $this->sync = $sync;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+
+        $this->updateSyncBatch([
+            [
+                new DeploySecurityGroup($this->sync->resource),
+                new DeployCheck(
+                    $this->model,
+                    $this->model->network->router->availabilityZone,
+                    '/infra/domains/default/groups/'
+                )
+            ]
+        ])->dispatch();
+
+
 
         $jobs = [
             new DeploySecurityGroup($this->model),

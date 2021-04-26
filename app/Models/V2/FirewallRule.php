@@ -55,7 +55,6 @@ class FirewallRule extends Model implements Filterable, Sortable
         'saving'=> Saving::class,
         'saved' => Saved::class,
         'deleted' => Deleted::class,
-        'deleting' => Deleting::class,
     ];
 
     public function firewallPolicy()
