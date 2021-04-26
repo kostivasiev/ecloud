@@ -10,7 +10,12 @@ class IsMaxVpcLimitReached implements Rule
 {
     public function passes($attribute, $value)
     {
-        if (Auth::user()->resellerId() == 7052) {
+        $reseller_bypass = [
+            7052, // UKFast - eCloud Testing
+            22114, // UKFast - eCloud Automated Testing
+        ];
+
+        if (in_array(Auth::user()->resellerId(), $reseller_bypass)) {
             return true;
         }
         return (Vpc::forUser(Auth::user())->get()->count() < config('defaults.vpc.max_count'));
