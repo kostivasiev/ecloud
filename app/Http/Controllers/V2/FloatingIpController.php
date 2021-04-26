@@ -135,7 +135,7 @@ class FloatingIpController extends BaseController
             $floatingIp->save();
         });
 
-        return response(null, 202);
+        return response('', 202);
     }
 
     public function unassign(Request $request, string $fipId)
@@ -154,6 +154,6 @@ class FloatingIpController extends BaseController
             $floatingIp->save();
         });
 
-        return new Response(null, 202);
+        return response('', 202);
     }
 }

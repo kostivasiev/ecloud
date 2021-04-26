@@ -92,6 +92,6 @@ class FirewallRulePortController extends BaseController
             $resource->firewallRule->firewallPolicy->save();
         });
 
-        return response(null, 202);
+        return response('', 202);
     }
 }

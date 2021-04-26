@@ -71,6 +71,6 @@ class NicController extends BaseController
             $nic->delete();
         });
 
-        return response(null, 202);
+        return response('', 202);
     }
 }
