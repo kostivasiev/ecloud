@@ -148,7 +148,7 @@ class VolumeController extends BaseController
         if ($instance->os_volume) {
             return response()->json([
                 'errors' => [
-                    'title' => 'Detachment Failed',
+                    'title' => 'Precondition Failed',
                     'detail' => 'The specified os volume cannot be detached.',
                     'status' => 412,
                     'source' => 'os_volume'
