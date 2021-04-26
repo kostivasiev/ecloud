@@ -93,6 +93,7 @@ class VolumeController extends BaseController
             'availability_zone_id',
             'capacity',
             'iops',
+            'os_volume',
         ]));
 
         $model->save();
@@ -143,6 +144,17 @@ class VolumeController extends BaseController
     {
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
+
+        if ($instance->os_volume) {
+            return response()->json([
+                'errors' => [
+                    'title' => 'Detachment Failed',
+                    'detail' => 'The specified os volume cannot be detached.',
+                    'status' => 412,
+                    'source' => 'os_volume'
+                ]
+            ], 412);
+        }
 
         $volume->withSyncLock(function ($volume) use ($instance) {
             $instance->volumes()->detach($volume);

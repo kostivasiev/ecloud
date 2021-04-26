@@ -47,12 +47,16 @@ class CreateRequest extends FormRequest
                 'min:' . config('volume.capacity.min'),
                 'max:' . config('volume.capacity.max')
             ],
+            'os_volume' => [
+                'required',
+                'boolean',
+            ],
             'iops' => [
                 'sometimes',
                 'required',
                 'integer',
                 'in:300,600,1200,2500',
-            ]
+            ],
         ];
     }
 
