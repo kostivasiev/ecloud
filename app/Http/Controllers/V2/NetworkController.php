@@ -174,7 +174,7 @@ class NetworkController extends BaseController
             $network->delete();
         });
 
-        return response()->json([], 202);
+        return response('', 202);
     }
 
     /**
