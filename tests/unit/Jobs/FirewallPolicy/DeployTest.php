@@ -4,9 +4,6 @@ namespace Tests\unit\Jobs\FirewallPolicy;
 
 use App\Jobs\FirewallPolicy\Deploy;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Router;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;

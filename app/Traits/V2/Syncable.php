@@ -2,10 +2,7 @@
 
 namespace App\Traits\V2;
 
-use App\Exceptions\SyncException;
-use App\Listeners\V2\ResourceSyncSaving;
 use App\Models\V2\Sync;
-use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;

@@ -569,7 +569,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Network\Created::class,
             \App\Events\V2\Router\Created::class,
-            \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
 
             // Deleting
