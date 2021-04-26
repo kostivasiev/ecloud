@@ -161,6 +161,6 @@ class FirewallRuleController extends BaseController
             $firewallRule->firewallPolicy->save();
         });
 
-        return response()->json([], 202);
+        return response('', 202);
     }
 }

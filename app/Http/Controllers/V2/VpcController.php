@@ -146,6 +146,6 @@ class VpcController extends BaseController
         // Configure VPC defaults (Rincewind)
         $this->dispatch(new ConfigureVpcDefaults($vpc));
 
-        return response(null, 202);
+        return response('', 202);
     }
 }
