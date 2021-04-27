@@ -66,7 +66,7 @@ class CreateTest extends TestCase
                 'network_id' => $this->network()->id,
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testCreateResourceNetworkAlreadyAssigned()

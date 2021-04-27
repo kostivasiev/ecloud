@@ -33,6 +33,7 @@ class OsCustomisation extends Job
             'name' => $username,
             'resource_id' => $this->instance->id,
             'username' => $username,
+            'port' => $this->instance->platform == 'Linux' ? '2020' : '3389',
         ]);
         $credential->password = $passwordService->generate();
         $credential->save();

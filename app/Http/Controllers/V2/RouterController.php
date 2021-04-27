@@ -44,7 +44,7 @@ class RouterController extends BaseController
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
         $router->save();
 
-        return $this->responseIdMeta($request, $router->id, 201);
+        return $this->responseIdMeta($request, $router->id, 202);
     }
 
     public function update(UpdateRequest $request, string $routerId)
@@ -71,7 +71,7 @@ class RouterController extends BaseController
             $router->delete();
         });
 
-        return response()->json([], 204);
+        return response('', 204);
     }
 
     public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
@@ -102,7 +102,7 @@ class RouterController extends BaseController
 
         $this->dispatch(new ConfigureRouterDefaults($router));
 
-        return response(null, 202);
+        return response('', 202);
     }
 
     public function firewallPolicies(Request $request, QueryTransformer $queryTransformer, string $routerId)

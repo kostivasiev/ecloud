@@ -52,7 +52,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/firewall-policies/' . $this->firewallPolicy()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
+        ])->assertResponseStatus(202);
         $this->firewallPolicy()->refresh();
         $this->assertNotNull($this->firewallPolicy()->deleted_at);
     }

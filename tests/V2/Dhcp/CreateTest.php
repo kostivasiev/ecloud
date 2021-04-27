@@ -2,15 +2,11 @@
 
 namespace Tests\V2\Dhcp;
 
-use App\Events\V2\Dhcp\Created;
-use App\Events\V2\Dhcp\Saved;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 

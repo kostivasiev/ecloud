@@ -116,7 +116,7 @@ class DiscountPlanController extends BaseController
     {
         $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->delete();
-        return response(null, 204);
+        return response('', 204);
     }
 
     /**

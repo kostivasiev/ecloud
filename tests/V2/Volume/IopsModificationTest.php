@@ -104,7 +104,7 @@ class IopsModificationTest extends TestCase
                 'iops' => 600,
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testSetInvalidIopsValue()

@@ -67,7 +67,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/network-rule-ports/nrp-test', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
+        ])->assertResponseStatus(202);
         $this->assertNotFalse(NetworkRulePort::find('nrp-test'));
     }
 }

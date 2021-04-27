@@ -66,6 +66,6 @@ class HostController extends BaseController
 //        }
 
         $model->delete();
-        return response()->json([], 202);
+        return response('', 204);
     }
 }

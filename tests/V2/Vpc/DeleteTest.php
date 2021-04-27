@@ -108,7 +108,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
+        ])->assertResponseStatus(202);
         $this->assertNotNull(Vpc::withTrashed()->findOrFail($this->vpc()->id)->deleted_at);
     }
 }

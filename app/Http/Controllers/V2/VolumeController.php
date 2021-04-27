@@ -97,7 +97,7 @@ class VolumeController extends BaseController
 
         $model->save();
 
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
@@ -113,7 +113,7 @@ class VolumeController extends BaseController
             $volume->save();
         });
 
-        return $this->responseIdMeta($request, $volume->id, 200);
+        return $this->responseIdMeta($request, $volume->id, 202);
     }
 
     public function destroy(Request $request, string $volumeId)
@@ -124,7 +124,7 @@ class VolumeController extends BaseController
             $volume->delete();
         });
 
-        return response('', 204);
+        return response('', 202);
     }
 
     public function attach(AttachRequest $request, string $volumeId)

@@ -37,7 +37,7 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
 
         $this->instance()->refresh();
         $this->assertEquals('Changed', $this->instance()->name);
@@ -70,7 +70,7 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
 
     }
 
@@ -145,7 +145,7 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
     }
 
     public function testApplianceSpecRamMax()

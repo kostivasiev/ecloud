@@ -83,7 +83,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
 
         $dhcp = Dhcp::findOrFail($this->dhcp->id);
         $this->assertEquals($data['name'], $dhcp->name);

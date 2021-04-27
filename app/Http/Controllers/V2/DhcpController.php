@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
-use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Models\V2\Dhcp;
 use App\Resources\V2\DhcpResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -55,7 +52,7 @@ class DhcpController extends BaseController
         $dhcp = new Dhcp($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $dhcp->save();
 
-        return $this->responseIdMeta($request, $dhcp->id, 201);
+        return $this->responseIdMeta($request, $dhcp->id, 202);
     }
 
     /**
@@ -72,7 +69,7 @@ class DhcpController extends BaseController
             $dhcp->save();
         });
 
-        return $this->responseIdMeta($request, $dhcp->id, 200);
+        return $this->responseIdMeta($request, $dhcp->id, 202);
     }
 
     public function destroy(string $dhcpId)
@@ -83,6 +80,6 @@ class DhcpController extends BaseController
             $dhcp->delete();
         });
 
-        return response()->json([], 204);
+        return response('', 202);
     }
 }

@@ -13,7 +13,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Create firewall policy', function () {
-    client.assert(response.status === 201, '201 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.global.set('firewall_policy_id', response.body.data.id);
     client.log('Policy ID: ' + response.body.data.id);
 });
@@ -39,7 +39,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Create firewall rule', function () {
-    client.assert(response.status === 201, '201 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.global.set('firewall_rule_id', response.body.data.id);
     client.log('Rule ID: ' + response.body.data.id);
 });
@@ -79,7 +79,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Update firewall rule', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -117,7 +117,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Update firewall rule', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 

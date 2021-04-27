@@ -15,16 +15,8 @@ use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
-/**
- * Class RegionController
- * @package App\Http\Controllers\V2
- */
 class RegionController extends BaseController
 {
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $collection = Region::forUser($request->user());
@@ -37,11 +29,6 @@ class RegionController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param string $regionId
-     * @return RegionResource
-     */
     public function show(Request $request, string $regionId)
     {
         return new RegionResource(
@@ -49,10 +36,6 @@ class RegionController extends BaseController
         );
     }
 
-    /**
-     * @param CreateRegionRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function create(CreateRegionRequest $request)
     {
         $region = new Region($request->only(['name', 'is_public']));
@@ -60,11 +43,6 @@ class RegionController extends BaseController
         return $this->responseIdMeta($request, $region->id, 201);
     }
 
-    /**
-     * @param UpdateRegionRequest $request
-     * @param string $regionId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(UpdateRegionRequest $request, string $regionId)
     {
         $region = Region::findOrFail($regionId);
@@ -72,12 +50,6 @@ class RegionController extends BaseController
         return $this->responseIdMeta($request, $region->id, 200);
     }
 
-
-    /**
-     * @param Request $request
-     * @param string $regionId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, string $regionId)
     {
         $model = Region::findOrFail($regionId);
@@ -85,15 +57,9 @@ class RegionController extends BaseController
             return $model->getDeletionError();
         }
         $model->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $regionId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function availabilityZones(Request $request, QueryTransformer $queryTransformer, string $regionId)
     {
         $collection = Region::forUser($request->user())->findOrFail($regionId)->availabilityZones();
@@ -105,12 +71,6 @@ class RegionController extends BaseController
         ));
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $regionId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function vpcs(Request $request, QueryTransformer $queryTransformer, string $regionId)
     {
         $collection = Region::forUser($request->user())->findOrFail($regionId)->vpcs();
@@ -122,12 +82,6 @@ class RegionController extends BaseController
         ));
     }
 
-    /**
-     * @param Request $request
-     * @param QueryTransformer $queryTransformer
-     * @param string $regionId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
-     */
     public function prices(Request $request, string $regionId)
     {
         $region = Region::forUser($request->user())->findOrFail($regionId);

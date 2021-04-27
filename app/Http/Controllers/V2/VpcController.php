@@ -61,7 +61,7 @@ class VpcController extends BaseController
 
         $vpc->save();
 
-        return $this->responseIdMeta($request, $vpc->id, 201);
+        return $this->responseIdMeta($request, $vpc->id, 202);
     }
 
     public function update(UpdateRequest $request, string $vpcId)
@@ -89,7 +89,7 @@ class VpcController extends BaseController
             $vpc->save();
         });
 
-        return $this->responseIdMeta($request, $vpc->id, 200);
+        return $this->responseIdMeta($request, $vpc->id, 202);
     }
 
     public function destroy(Request $request, string $vpcId)
@@ -103,7 +103,7 @@ class VpcController extends BaseController
             $vpc->delete();
         });
 
-        return response()->json([], 204);
+        return response('', 202);
     }
 
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
@@ -146,6 +146,6 @@ class VpcController extends BaseController
         // Configure VPC defaults (Rincewind)
         $this->dispatch(new ConfigureVpcDefaults($vpc));
 
-        return response(null, 202);
+        return response('', 202);
     }
 }

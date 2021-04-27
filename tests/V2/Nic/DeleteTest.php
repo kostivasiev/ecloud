@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/nics/' . $nic->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
+        ])->assertResponseStatus(202);
 
         Event::assertDispatched(Deleted::class);
     }

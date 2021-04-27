@@ -14,7 +14,7 @@ class BillingMetricResource extends UKFastResource
             'resource_id' => $this->resource_id,
             'vpc_id' => $this->vpc_id,
             'key' => $this->key,
-            'value' => $this->value,
+            'value' => (float) $this->value,
             'category' => $this->category,
             'price' => (float) $this->price,
             'start' => $this->start === null ? null : Carbon::parse(
