@@ -54,6 +54,10 @@ class Volume extends Model implements Filterable, Sortable
         'deleted' => Deleted::class,
     ];
 
+    protected $attributes = [
+        'os_volume' => false,
+    ];
+
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);

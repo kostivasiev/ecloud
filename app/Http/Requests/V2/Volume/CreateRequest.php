@@ -4,8 +4,7 @@ namespace App\Http\Requests\V2\Volume;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ExistsForVpc;
-use App\Rules\V2\IsValidAvailabilityZoneId;
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -27,7 +26,7 @@ class CreateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => ['nullable', 'string'],
             'vpc_id' => [
                 'required',
@@ -47,10 +46,6 @@ class CreateRequest extends FormRequest
                 'min:' . config('volume.capacity.min'),
                 'max:' . config('volume.capacity.max')
             ],
-            'os_volume' => [
-                'required',
-                'boolean',
-            ],
             'iops' => [
                 'sometimes',
                 'required',
@@ -58,6 +53,16 @@ class CreateRequest extends FormRequest
                 'in:300,600,1200,2500',
             ],
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $rules['os_volume'] = [
+                'sometimes',
+                'required',
+                'boolean',
+            ];
+        }
+
+        return $rules;
     }
 
     /**
