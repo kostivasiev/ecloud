@@ -55,6 +55,6 @@ class UpdateTest extends TestCase
                 'name' => 'New Policy Name',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 }

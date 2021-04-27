@@ -31,7 +31,8 @@ patch:
                 firewall_policy_id:
                   readOnly: true
   responses:
-    200:
+    202:
+      description: Accepted
       $ref: '../../resources/FirewallRule/responses/idResponse.yaml'
   tags:
     - Firewall Rules
@@ -39,8 +40,8 @@ delete:
   parameters:
     - $ref: '../../resources/FirewallRule/parameters/firewallRuleId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Firewall Rules
 

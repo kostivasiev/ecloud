@@ -12,7 +12,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Create Firewall Policy', function () {
-    client.assert(response.status === 201, '201 status not received');
+    client.assert(response.status === 202, '202 status not received');
     client.global.set('policy_id', response.body.data.id);
     client.log('Policy ID: ' + response.body.data.id);
 });
@@ -58,7 +58,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Create Firewall Port', function () {
-    client.assert(response.status === 201, '201 status not received');
+    client.assert(response.status === 202, '202 status not received');
     client.global.set('port_id', response.body.data.id);
     client.log('Port ID: ' + response.body.data.id);
 });
@@ -177,7 +177,7 @@ Content-Type: application/json
 
 > {%
 client.test("Test Update Policy", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 204, "Response status is not 204");
 });
 %}
 
@@ -193,7 +193,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Update Firewall Rule', function () {
-    client.assert(response.status === 200, '200 status not received');
+    client.assert(response.status === 204, '204 status not received');
 });
 %}
 
@@ -215,7 +215,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Update Firewall Rule including ports', function () {
-    client.assert(response.status === 200, '200 status not received');
+    client.assert(response.status === 204, '204 status not received');
 });
 %}
 
@@ -247,7 +247,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Update Firewall Port', function () {
-    client.assert(response.status === 200, '200 status not received');
+    client.assert(response.status === 202, '202 status not received');
 });
 %}
 
@@ -272,7 +272,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Delete Firewall Port', function () {
-    client.assert(response.status === 204, '204 status not received');
+    client.assert(response.status === 202, '202 status not received');
 });
 %}
 
@@ -284,7 +284,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Delete Firewall Rule', function () {
-    client.assert(response.status === 204, '204 status not received');
+    client.assert(response.status === 202, '202 status not received');
 });
 %}
 

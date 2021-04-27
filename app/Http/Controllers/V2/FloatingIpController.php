@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
@@ -85,7 +84,7 @@ class FloatingIpController extends BaseController
 
         $floatingIp->save();
 
-        return $this->responseIdMeta($request, $floatingIp->id, 201);
+        return $this->responseIdMeta($request, $floatingIp->id, 202);
     }
 
     public function update(UpdateRequest $request, string $fipId)
@@ -97,7 +96,7 @@ class FloatingIpController extends BaseController
             $floatingIp->save();
         });
 
-        return $this->responseIdMeta($request, $floatingIp->id, 200);
+        return $this->responseIdMeta($request, $floatingIp->id, 202);
     }
 
     public function destroy(Request $request, string $fipId)
@@ -108,7 +107,7 @@ class FloatingIpController extends BaseController
             $floatingIp->delete();
         });
 
-        return response()->json([], 204);
+        return response('', 202);
     }
 
     public function assign(AssignRequest $request, string $fipId)
@@ -136,7 +135,7 @@ class FloatingIpController extends BaseController
             $floatingIp->save();
         });
 
-        return response(null, 202);
+        return response('', 202);
     }
 
     public function unassign(Request $request, string $fipId)
@@ -155,6 +154,6 @@ class FloatingIpController extends BaseController
             $floatingIp->save();
         });
 
-        return new Response(null, 202);
+        return response('', 202);
     }
 }

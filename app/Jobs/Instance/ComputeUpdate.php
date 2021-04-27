@@ -46,13 +46,22 @@ class ComputeUpdate extends Job
             $reboot = true;
         }
 
-        if ($this->instance->ram_capacity < $ram_limit && $currentRAMMiB >= $ram_limit) {
+        if ($this->instance->ram_capacity > $ram_limit && $currentRAMMiB <= $ram_limit) {
             $reboot = true;
         }
 
         if ($this->instance->vcpu_cores < $currentVCPUCores) {
             $reboot = true;
         }
+
+        Log::info(
+            'Resizing compute resources on instance ' . $this->instance->id,
+            [
+                'ramMiB' => $this->instance->ram_capacity,
+                'numCPU' => $this->instance->vcpu_cores,
+                'guestShutdown' => $reboot
+            ]
+        );
 
         $this->instance->availabilityZone->kingpinService()->put(
             '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/resize',

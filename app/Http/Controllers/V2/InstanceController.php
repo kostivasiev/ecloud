@@ -121,7 +121,7 @@ class InstanceController extends BaseController
 
         $instance->save();
 
-        return $this->responseIdMeta($request, $instance->id, 201);
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -136,17 +136,20 @@ class InstanceController extends BaseController
         $instance->fill($request->only([
             'name',
             'locked',
-            'backup_enabled',
             'vcpu_cores',
             'ram_capacity',
             'host_group_id',
         ]));
 
+        if ($request->has('backup_enabled') && $this->isAdmin) {
+            $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
+        }
+
         $instance->withSyncLock(function ($instance) {
             $instance->save();
         });
 
-        return $this->responseIdMeta($request, $instance->id, 200);
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -162,7 +165,7 @@ class InstanceController extends BaseController
             $instance->delete();
         });
 
-        return response('', 204);
+        return response('', 202);
     }
 
     /**
@@ -225,7 +228,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOn($instance));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new PowerOn($instance));
+        });
 
         return response('', 202);
     }
@@ -235,7 +243,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOff($instance));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new PowerOff($instance));
+        });
 
         return response('', 202);
     }
@@ -245,10 +258,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new GuestRestart([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new GuestRestart($instance));
+        });
 
         return response('', 202);
     }
@@ -258,10 +273,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new GuestShutdown([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new GuestShutdown($instance));
+        });
 
         return response('', 202);
     }
@@ -271,10 +288,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerReset([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withSyncLock(function ($instance) {
+            if (!$instance->canSync()) {
+                throw new SyncException();
+            }
+            $this->dispatch(new PowerReset($instance));
+        });
 
         return response('', 202);
     }

@@ -42,7 +42,8 @@ post:
         schema:
           $ref: '../../components/schemas/volume.yaml'
   responses:
-    201:
+    202:
+      description: Accepted
       $ref: '../../resources/Volume/responses/idResponse.yaml'
   tags:
     - Volumes

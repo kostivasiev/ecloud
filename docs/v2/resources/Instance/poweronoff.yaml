@@ -3,6 +3,6 @@ put:
     - $ref: '../../resources/Instance/parameters/instanceId.yaml'
   responses:
     202:
-      description: success
+      description: Accepted
   tags:
     - Instances
