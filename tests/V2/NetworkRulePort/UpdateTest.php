@@ -23,13 +23,13 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->network();
 
-        $this->nsxServiceMock()->expects('patch')->times(4)
+        $this->nsxServiceMock()->expects('patch')->twice()
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
 
-        $this->nsxServiceMock()->expects('get')->times(4)
+        $this->nsxServiceMock()->expects('get')->twice()
             ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(
@@ -45,7 +45,7 @@ class UpdateTest extends TestCase
                 return new Response(200, [], '');
             });
 
-        $this->nsxServiceMock()->expects('get')->times(4)
+        $this->nsxServiceMock()->expects('get')->twice()
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));

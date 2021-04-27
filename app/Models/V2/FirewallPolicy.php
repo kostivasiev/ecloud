@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallPolicy\Deleted;
 use App\Events\V2\FirewallPolicy\Deleting;
 use App\Events\V2\FirewallPolicy\Saved;
 use App\Events\V2\FirewallPolicy\Saving;
@@ -30,26 +29,29 @@ class FirewallPolicy extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
 
     public $keyPrefix = 'fwp';
-    public $incrementing = false;
-    public $timestamps = true;
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    protected $fillable = [
-        'id',
-        'name',
-        'sequence',
-        'router_id',
-    ];
 
-    protected $dispatchesEvents = [
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'deleting' => Deleting::class,
-    ];
-
-    protected $casts = [
-        'sequence' => 'integer'
-    ];
+    public function __construct(array $attributes = [])
+    {
+        $this->timestamps = true;
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+        $this->fillable = [
+            'id',
+            'name',
+            'sequence',
+            'router_id',
+        ];
+        $this->dispatchesEvents = [
+            'saving' => Saving::class,
+            'saved' => Saved::class,
+            'deleting' => Deleting::class,
+        ];
+        $this->casts = [
+            'sequence' => 'integer'
+        ];
+        parent::__construct($attributes);
+    }
 
     public function firewallRules()
     {

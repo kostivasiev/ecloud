@@ -20,12 +20,12 @@ class DeleteTest extends TestCase
         parent::setUp();
         $this->network();
 
-        $this->nsxServiceMock()->expects('patch')->times(3)
+        $this->nsxServiceMock()->expects('patch')->twice()
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-abc123xyz')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
-        $this->nsxServiceMock()->expects('get')->times(3)
+        $this->nsxServiceMock()->expects('get')->twice()
             ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-abc123xyz')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(
@@ -34,7 +34,7 @@ class DeleteTest extends TestCase
                     ]
                 ));
             });
-        $this->nsxServiceMock()->expects('patch')->times(3)
+        $this->nsxServiceMock()->expects('patch')->twice()
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-abc123xyz')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
@@ -44,13 +44,11 @@ class DeleteTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
-        $this->nsxServiceMock()->expects('get')->times(3)
+        $this->nsxServiceMock()->expects('get')->twice()
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-abc123xyz'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
-
-
 
         $this->networkPolicy = factory(NetworkPolicy::class)->create([
             'id' => 'np-abc123xyz',

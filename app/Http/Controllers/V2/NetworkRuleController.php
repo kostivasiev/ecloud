@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\NetworkRule\Create;
 use App\Http\Requests\V2\NetworkRule\Update;
 use App\Models\V2\NetworkRule;
@@ -41,7 +42,17 @@ class NetworkRuleController extends BaseController
             'action',
             'enabled',
         ]));
-        $networkRule->save();
+
+        $networkRule->networkPolicy->withSyncLock(function () use ($request, $networkRule) {
+            if (!$networkRule->networkPolicy->canSync()) {
+                throw new SyncException();
+            }
+
+            $networkRule->save();
+
+            $networkRule->networkPolicy->save();
+        });
+
         return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
@@ -56,14 +67,39 @@ class NetworkRuleController extends BaseController
             'action',
             'enabled',
         ]));
-        $networkRule->save();
+
+        $networkRule->networkPolicy->withSyncLock(function () use ($request, $networkRule) {
+            if (!$networkRule->networkPolicy->canSync()) {
+                throw new SyncException();
+            }
+
+            $networkRule->save();
+
+            $networkRule->networkPolicy->save();
+        });
+
         return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
     public function destroy(Request $request, string $networkRuleId)
     {
-        NetworkRule::forUser($request->user())->findOrFail($networkRuleId)
-            ->delete();
+        $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
+            
+        $networkRule->networkPolicy->withSyncLock(function () use ($networkRule) {
+            if (!$networkRule->networkPolicy->canSync()) {
+                throw new SyncException();
+            }
+
+            $networkRule->networkRulePorts->each(function ($port) {
+                $port->delete();
+            });
+
+            $networkRule->delete();
+
+            $networkRule->networkPolicy->save();
+        });
+
+
         return response('', 202);
     }
 }

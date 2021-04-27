@@ -5,7 +5,7 @@ namespace App\Events\V2\NetworkPolicy;
 use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
 
-class Deleted extends Event
+class Saving extends Event
 {
     public $model;
 

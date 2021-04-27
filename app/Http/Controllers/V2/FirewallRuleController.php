@@ -66,7 +66,7 @@ class FirewallRuleController extends BaseController
      */
     public function store(Create $request)
     {
-        $firewallRule = new FirewallRule();
+        $firewallRule = app()->make(FirewallRule::class);
         $firewallRule->fill($request->only([
             'name',
             'sequence',

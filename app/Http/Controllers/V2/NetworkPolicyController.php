@@ -29,31 +29,39 @@ class NetworkPolicyController extends BaseController
 
     public function store(Create $request)
     {
-        $networkPolicy = app()->make(NetworkPolicy::class);
-        $networkPolicy->fill($request->only([
+        $model = app()->make(NetworkPolicy::class);
+        $model->fill($request->only([
             'name',
             'network_id',
         ]));
-        $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->id, 202);
+
+        $model->withSyncLock(function ($policy) {
+            $policy->save();
+        });
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(Update $request, string $networkPolicyId)
     {
-        $networkPolicy = NetworkPolicy::forUser(Auth::user())->findOrFail($networkPolicyId);
-        $networkPolicy->fill($request->only([
-            'name',
-        ]));
-        $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->id, 202);
+        $model = NetworkPolicy::forUser(Auth::user())->findOrFail($networkPolicyId);
+        $model->fill($request->only(['name']));
+
+        $model->withSyncLock(function ($policy) {
+            $policy->save();
+        });
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $networkPolicyId)
     {
-        $networkPolicy = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
-        if (!$networkPolicy->delete()) {
-            return $networkPolicy->getSyncError();
-        }
+        $model = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
+
+        $model->withSyncLock(function ($model) {
+            $model->delete();
+        });
+
         return response('', 202);
     }
 }
