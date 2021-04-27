@@ -145,17 +145,6 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
-        if ($volume->os_volume) {
-            return response()->json([
-                'errors' => [
-                    'title' => 'Precondition Failed',
-                    'detail' => 'The specified os volume cannot be detached.',
-                    'status' => 412,
-                    'source' => 'os_volume'
-                ]
-            ], 412);
-        }
-
         $volume->withSyncLock(function ($volume) use ($instance) {
             $instance->volumes()->detach($volume);
         });

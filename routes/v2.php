@@ -228,7 +228,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
         $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
-        $router->post('volumes/{volumeId}/detach', 'VolumeController@detach');
+        $router->group(['middleware' => 'can-detach'], function () use ($router) {
+            $router->post('volumes/{volumeId}/detach', 'VolumeController@detach');
+        });
     });
 
     /** Nics */
