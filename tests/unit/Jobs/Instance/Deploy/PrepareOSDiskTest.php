@@ -40,7 +40,7 @@ class PrepareOSDiskTest extends TestCase
             });
 
         $this->kingpinServiceMock()->expects('put')
-            ->withSomeOfArgs('/api/v1/vpc/' . $this->instance()->vpc->id . '/volume/d64169c6-4c40-4008-916c-8be822d8cc2d/resourceid')
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->instance()->vpc->id . '/volume/d64169c6-4c40-4008-916c-8be822d8cc2d/resourceid')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'volumes' => [
