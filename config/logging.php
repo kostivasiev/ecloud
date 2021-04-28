@@ -79,15 +79,6 @@ return [
             ],
         ],
 
-        'ukfastjson' => [
-            'driver' => 'monolog',
-            'handler' => StreamHandler::class,
-            'formatter' => \UKFast\Logging\JsonFormatter::class,
-            'with' => [
-                'stream' => 'php://stderr',
-            ],
-        ],
-
         'syslog' => [
             'driver' => 'syslog',
             'level' => 'debug',
@@ -102,11 +93,12 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/lumen.log'),
             'formatter' => \UKFast\Logging\JsonFormatter::class,
+            'ignore_exceptions' => true,
         ],
 
         'staging' => [
             'driver' => 'stack',
-            'channels' => ['elasticsearch', 'single', 'ukfastjson'],
+            'channels' => ['elasticsearch', 'single', 'ukfast'],
             'ignore_exceptions' => true,
         ],
 
