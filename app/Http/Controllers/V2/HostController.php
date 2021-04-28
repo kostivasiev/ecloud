@@ -50,7 +50,7 @@ class HostController extends BaseController
         ]));
 
         $model->withSyncLock(function ($model) {
-            $model->delete();
+            $model->save();
         });
         return $this->responseIdMeta($request, $model->id, 202);
     }
