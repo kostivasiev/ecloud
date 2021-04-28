@@ -48,7 +48,10 @@ class HostController extends BaseController
         $model->fill($request->only([
             'name',
         ]));
-        $model->save();
+
+        $model->withSyncLock(function ($model) {
+            $model->delete();
+        });
         return $this->responseIdMeta($request, $model->id, 202);
     }
 
@@ -65,7 +68,9 @@ class HostController extends BaseController
 //            ], 422);
 //        }
 
-        $model->delete();
+        $model->withSyncLock(function ($model) {
+            $model->delete();
+        });
         return response('', 204);
     }
 }
