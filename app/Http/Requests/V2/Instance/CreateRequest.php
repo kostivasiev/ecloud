@@ -48,7 +48,6 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class),
                 new IsMaxInstanceForVpc(),
-                new IsMaxInstanceForCustomer(),
             ],
             'image_id' => [
                 'required',

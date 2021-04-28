@@ -135,12 +135,14 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Instances */
     $router->group([], function () use ($router) {
+        $router->group(['middleware' => 'customer-max-instance'], function () use ($router) {
+            $router->post('instances', 'InstanceController@store');
+        });
         $router->get('instances', 'InstanceController@index');
         $router->get('instances/{instanceId}', 'InstanceController@show');
         $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
         $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
         $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
-        $router->post('instances', 'InstanceController@store');
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
 
