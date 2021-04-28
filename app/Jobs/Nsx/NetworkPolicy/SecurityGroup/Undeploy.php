@@ -8,27 +8,21 @@ use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    private $model;
+    private NetworkPolicy $networkPolicy;
 
-    public function __construct(NetworkPolicy $model)
+    public function __construct(NetworkPolicy $networkPolicy)
     {
-        $this->model = $model;
+        $this->networkPolicy = $networkPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->networkPolicy->id]);
 
-        $this->model->network->router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/domains/default/groups/' . $this->model->id
+        $this->networkPolicy->network->router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/domains/default/groups/' . $this->networkPolicy->id
         );
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->networkPolicy->id]);
     }
 }

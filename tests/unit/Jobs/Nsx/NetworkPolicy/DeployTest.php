@@ -57,8 +57,8 @@ class DeployTest extends TestCase
             ]);
 
             $networkRule->networkRulePorts()->create([
-                'id' => 'nr-test-2',
-                'name' => 'nr-test-2',
+                'id' => 'nrp-test',
+                'name' => 'nrp-test',
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555',
@@ -99,8 +99,8 @@ class DeployTest extends TestCase
                                 ],
                                 'service_entries' => [
                                     [
-                                        'id' => 'nr-test-2',
-                                        'display_name' => 'nr-test-2',
+                                        'id' => 'nrp-test',
+                                        'display_name' => 'nrp-test',
                                         'l4_protocol' => 'TCP',
                                         'resource_type' => 'L4PortSetServiceEntry',
                                         'source_ports' => [

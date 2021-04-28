@@ -54,14 +54,4 @@ class DeployCheck extends Job
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
-
-    /**
-     * todo: Remove this when deploycheck uses sync batch
-     * @param $exception
-     */
-    public function failed($exception)
-    {
-        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
-    }
 }

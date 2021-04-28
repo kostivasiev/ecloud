@@ -7,8 +7,10 @@ use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
@@ -21,53 +23,34 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->network();
 
-        $this->nsxServiceMock()->expects('patch')->twice()
-            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-        $this->nsxServiceMock()->expects('get')->twice()
-            ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(
-                    [
-                        'publish_status' => 'REALIZED'
-                    ]
-                ));
-            });
-        $this->nsxServiceMock()->expects('patch')->twice()
-            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-        $this->nsxServiceMock()->expects('get')->twice()
-            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        $this->networkPolicy = factory(NetworkPolicy::class)->create([
-            'id' => 'np-test',
-            'network_id' => $this->network()->id,
-        ]);
-        $this->networkRule = factory(NetworkRule::class)->create([
-            'id' => 'nr-test',
-            'network_policy_id' => $this->networkPolicy->id,
-        ]);
-        $this->networkRulePort = factory(NetworkRulePort::class)->create([
-            'id' => 'nrp-test',
-            'network_rule_id' => $this->networkRule->id,
-        ]);
+        Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-test',
+                'name' => 'nr-test',
+            ]);
+
+            $networkRule->networkRulePorts()->create([
+                'id' => 'nrp-test',
+                'name' => 'nrp-test',
+                'protocol' => 'TCP',
+                'source' => '443',
+                'destination' => '555',
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+        });
     }
 
     public function testDelete()
     {
-        $this->delete('/v2/network-rule-ports/nrp-test', [], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        $this->delete('/v2/network-rule-ports/nrp-test')
+            ->assertResponseStatus(202);
+
+
+
         $this->assertNotFalse(NetworkRulePort::find('nrp-test'));
     }
 }

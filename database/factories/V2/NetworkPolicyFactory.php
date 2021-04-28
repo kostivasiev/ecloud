@@ -6,6 +6,6 @@ use App\Models\V2\NetworkPolicy;
 
 $factory->define(NetworkPolicy::class, function () {
     return [
-        'name' => 'name',
+        'name' => 'np-test',
     ];
 });

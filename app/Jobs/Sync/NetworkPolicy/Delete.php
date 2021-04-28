@@ -30,22 +30,13 @@ class Delete extends Job
 
         $this->deleteSyncBatch([
             [
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new DeleteChildResources($this->sync->resource),
+                new \App\Jobs\Nsx\NetworkPolicy\Undeploy($this->sync->resource),
+                new \App\Jobs\Nsx\NetworkPolicy\UndeployCheck($this->sync->resource),
+                new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Undeploy($this->sync->resource),
+                new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\UndeployCheck($this->sync->resource),
             ]
         ])->dispatch();
-
-
-        $jobs = [
-            new DeleteChildResources($this->model),
-            new \App\Jobs\Nsx\NetworkPolicy\Undeploy($this->model),
-            new \App\Jobs\Nsx\NetworkPolicy\UndeployCheck($this->model),
-            new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Undeploy($this->model),
-            new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\UndeployCheck($this->model),
-            new Completed($this->model),
-            new SyncDelete($this->model),
-        ];
-        dispatch(array_shift($jobs)->chain($jobs));
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
