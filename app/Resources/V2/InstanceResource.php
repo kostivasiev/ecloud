@@ -8,29 +8,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
-use Log;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Class InstanceResource
- * @package App\Http\Resources\V2
- * @property string id
- * @property string name
- * @property string vpc_id
- * @property string appliance_id
- * @property string appliance_version_id
- * @property integer vcpu_cores
- * @property integer ram_capacity
- * @property string availability_zone_id
- * @property boolean locked
- * @property string online
- * @property string agent_running
- * @property string platform
- * @property integer volume_capacity
- * @property boolean backup_enabled
- * @property string status
- * @property string created_at
- * @property string updated_at
- */
 class InstanceResource extends UKFastResource
 {
     /**
@@ -50,9 +29,9 @@ class InstanceResource extends UKFastResource
             'locked' => $this->locked,
             'platform' => $this->platform,
             'backup_enabled' => $this->backup_enabled,
-            'host_group_id' => $this->host_group_id,
+            'host_group_id' => $this->host_group_id ?? null,
             'volume_capacity' => $this->volume_capacity,
-            'sync' => $this->getStatus(),
+            'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))

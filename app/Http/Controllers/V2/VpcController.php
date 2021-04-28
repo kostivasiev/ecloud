@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Vpc\CreateRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
-use App\Jobs\FirewallPolicy\ConfigureDefaults;
+use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
@@ -16,6 +16,7 @@ use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -42,10 +43,25 @@ class VpcController extends BaseController
 
     public function create(CreateRequest $request)
     {
-        $vpc = new Vpc($request->only(['name', 'region_id']));
+        $vpc = app()->make(Vpc::class);
+        $vpc->fill($request->only(['name', 'region_id', 'advanced_networking']));
+        if ($request->has('console_enabled')) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access cannot be modified',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+            $vpc->console_enabled = $request->input('console_enabled', true);
+        }
         $vpc->reseller_id = $this->resellerId;
+
         $vpc->save();
-        return $this->responseIdMeta($request, $vpc->id, 201);
+
+        return $this->responseIdMeta($request, $vpc->id, 202);
     }
 
     public function update(UpdateRequest $request, string $vpcId)
@@ -53,21 +69,41 @@ class VpcController extends BaseController
         $vpc = Vpc::forUser(Auth::user())->findOrFail($vpcId);
         $vpc->name = $request->input('name', $vpc->name);
 
+        if ($request->has('console_enabled')) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access cannot be modified',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+            $vpc->console_enabled = $request->input('console_enabled', $vpc->console_enabled);
+        }
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
-        $vpc->save();
-        return $this->responseIdMeta($request, $vpc->id, 200);
+
+        $vpc->withSyncLock(function ($vpc) {
+            $vpc->save();
+        });
+
+        return $this->responseIdMeta($request, $vpc->id, 202);
     }
 
     public function destroy(Request $request, string $vpcId)
     {
-        $model = Vpc::forUser($request->user())->findOrFail($vpcId);
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
+        $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
+        if (!$vpc->canDelete()) {
+            return $vpc->getDeletionError();
         }
-        $model->delete();
-        return response()->json([], 204);
+
+        $vpc->withSyncLock(function ($vpc) {
+            $vpc->delete();
+        });
+
+        return response('', 202);
     }
 
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
@@ -107,24 +143,9 @@ class VpcController extends BaseController
     {
         $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
 
-        $availabilityZone = $vpc->region()->first()->availabilityZones()->first();
+        // Configure VPC defaults (Rincewind)
+        $this->dispatch(new ConfigureVpcDefaults($vpc));
 
-        // Create a new router
-        $router = app()->make(Router::class);
-        $router->vpc()->associate($vpc);
-        $router->availabilityZone()->associate($availabilityZone);
-        $router->save();
-
-        // Create a new network
-        $network = app()->make(Network::class);
-        $network->router()->associate($router);
-        $network->save();
-
-        // Configure default firewall policies
-        $this->dispatch(new ConfigureDefaults([
-            'router_id' => $router->id
-        ]));
-
-        return response(null, 202);
+        return response('', 202);
     }
 }

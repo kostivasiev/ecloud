@@ -11,5 +11,9 @@ return [
     ],
     'resource_tier_tags' => [
         'standard_cpu'
+    ],
+    'max_limit' => [
+        'per_vpc' => env('MAX_INSTANCE_PER_VPC', 80),
+        'total' => env('MAX_INSTANCE_TOTAL', 400),
     ]
 ];

@@ -73,6 +73,6 @@ class LoadBalancerClusterController extends BaseController
     public function destroy(Request $request, string $lbcId)
     {
         LoadBalancerCluster::forUser($request->user())->findOrFail($lbcId)->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 }

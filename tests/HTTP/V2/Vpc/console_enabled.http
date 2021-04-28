@@ -1,0 +1,98 @@
+### Create VPC with Console Enabled as Non-Admin User
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  1-1
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "TEST VPC",
+    "region_id": "{{dev_region_id}}",
+    "console_enabled": true
+}
+
+> {%
+client.test('Create a VPC as Non Admin User', function () {
+    client.assert(response.status === 403, '403 response not received');
+});
+%}
+
+### Create VPC with Console Enabled as Non-Admin User
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type:  application/json
+
+{
+    "name": "TEST VPC",
+    "region_id": "{{dev_region_id}}",
+    "console_enabled": true
+}
+
+> {%
+client.test('Create a VPC as Admin User', function () {
+    client.assert(response.status === 202, '202 response not received');
+    client.global.set('vpc_id', response.body.data.id);
+    client.log('VPC Id : ' + response.body.data.id);
+});
+%}
+
+### Update VPC set Console Enabled value as non-admin user
+PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  1-1
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "console_enabled": false
+}
+
+> {%
+client.test('Update a VPC as Non Admin User', function () {
+    client.assert(response.status === 403, '403 response not received');
+});
+%}
+
+### Update VPC set Console Enabled value as admin user
+PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type:  application/json
+
+{
+    "console_enabled": false
+}
+
+> {%
+client.test('Update a VPC as Admin User', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### Verify console_enabled value has changed
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type:  application/json
+
+> {%
+client.test('Check console_enabled has changed', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.console_enabled === false, 'console_enabled value does not match');
+});
+%}
+
+### Delete the VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type:  application/json
+
+> {%
+client.test('Delete the VPC', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}

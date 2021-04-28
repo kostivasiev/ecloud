@@ -6,6 +6,7 @@ use App\Events\V2\Instance\Created;
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
 use App\Events\V2\Instance\Deleting;
+use App\Events\V2\Instance\Saved;
 use App\Events\V2\Instance\Updated;
 use App\Events\V2\Instance\Saving;
 use App\Traits\V2\CustomKey;
@@ -42,6 +43,8 @@ class Instance extends Model implements Filterable, Sortable
         'locked',
         'platform',
         'backup_enabled',
+        'deployed',
+        'deploy_data',
         'host_group_id',
     ];
 
@@ -52,11 +55,14 @@ class Instance extends Model implements Filterable, Sortable
     protected $casts = [
         'locked' => 'boolean',
         'backup_enabled' => 'boolean',
+        'deployed' => 'boolean',
+        'deploy_data' => 'array',
     ];
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'saving' => Saving::class,
+        'saved' => Saved::class,
         'updated' => Updated::class,
         'created' => Created::class,
         'deleting' => Deleting::class,

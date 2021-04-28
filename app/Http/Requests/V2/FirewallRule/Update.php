@@ -35,7 +35,7 @@ class Update extends FormRequest
             'enabled' => 'sometimes|required|boolean',
             'ports' => [
                 'sometimes',
-                'required',
+                'present',
                 'array'
             ],
             'ports.*.protocol' => [

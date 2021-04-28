@@ -42,7 +42,8 @@ post:
         schema:
           $ref: '../../admin-openapi.yaml#/components/schemas/Volume'
   responses:
-    201:
+    202:
+      description: Accepted
       $ref: '../../admin-openapi.yaml#/components/responses/VolumeIdResponse'
   tags:
     - Volumes

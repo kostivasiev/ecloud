@@ -28,15 +28,8 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->routerThroughput = factory(RouterThroughput::class)->create([
-            'availability_zone_id' => $this->availabilityZone->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
         ]);
     }
 
@@ -65,8 +58,8 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'Manchester Router 1',
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id,
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
             'router_throughput_id' => $this->routerThroughput->id
         ];
         $this->post(
@@ -78,6 +71,6 @@ class CreateTest extends TestCase
             ]
         )
            ->seeInDatabase('routers', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
     }
 }

@@ -2,97 +2,76 @@
 
 namespace App\Traits\V2;
 
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Host;
-use App\Models\V2\HostGroup;
-use App\Models\V2\NetworkPolicy;
+use App\Exceptions\SyncException;
+use App\Listeners\V2\ResourceSyncSaving;
 use App\Models\V2\Sync;
-use App\Models\V2\Volume;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
-    public function delete()
+    public function syncs()
+    {
+        return $this->morphMany(Sync::class, 'resource');
+    }
+
+    // TODO: Make this abstract - we should force objects implementing Syncable to return job class
+    public function getUpdateSyncJob()
     {
         $class = explode('\\', __CLASS__);
-        $class = 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
-        if (!class_exists($class)) {
-            throw new \Exception('Syncable "Delete" job not found for ' . __CLASS__);
-        }
+        return 'App\\Jobs\\Sync\\' . end($class) . '\\Update';
+    }
 
-        if (!$this->createSync()) {
+    // TODO: Make this abstract - we should force objects implementing Syncable to return job class
+    public function getDeleteSyncJob()
+    {
+        $class = explode('\\', __CLASS__);
+        return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
+    }
+
+    public function withSyncLock($callback)
+    {
+        $lock = Cache::lock($this->syncGetLockKey(), 60);
+
+        try {
+            Log::debug(get_class($this) . ' : Attempting to obtain sync lock for 60s', ['resource_id' => $this->id]);
+            $lock->block(60);
+
+            $callback($this);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    public function syncGetLockKey()
+    {
+        return 'sync.' . $this->id;
+    }
+
+    public function canSync()
+    {
+        if ($this->sync->status === Sync::STATUS_INPROGRESS) {
+            Log::warning(get_class($this) . ' : Cannot sync, resource has sync in progress', ['resource_id' => $this->id]);
             return false;
         }
-
-        dispatch(new $class($this));
 
         return true;
     }
 
-    public function syncDelete()
-    {
-        $response = parent::delete();
-        if (!$response) {
-            Log::error(get_class($this) . ' : Failed to delete', ['resource_id' => $this->id]);
-            return $response;
-        }
-        Log::info(get_class($this) . ' : Deleted', ['resource_id' => $this->id]);
-    }
-
-    public function save(array $options = [])
-    {
-        if (!in_array(__CLASS__, [
-            FirewallPolicy::class,
-            Volume::class,
-            NetworkPolicy::class,
-            HostGroup::class,
-            Host::class
-        ])) {
-            return parent::save($options);
-        }
-
-        $originalValues = $this->getOriginal();
-        $response = parent::save($options);
-        if (!$response) {
-            Log::error(get_class($this) . ' : Failed to save', ['resource_id' => $this->id]);
-            return $response;
-        }
-
-        $class = explode('\\', __CLASS__);
-        $class = 'App\\Jobs\\Sync\\' . end($class) . '\\Save';
-        if (!class_exists($class)) {
-            throw new \Exception('Syncable "Save" job not found for ' . __CLASS__);
-        }
-
-        if (!$this->createSync()) {
-            return false;
-        }
-
-        dispatch(new $class($this, $originalValues));
-
-        return $response;
-    }
-
-    public function createSync()
+    public function createSync($type = Sync::TYPE_UPDATE)
     {
         Log::info(get_class($this) . ' : Creating new sync - Started', [
             'resource_id' => $this->id,
         ]);
 
-        if ($this->getStatus() === 'in-progress') {
-            Log::info(get_class($this) . ' : Failed creating new sync on ' . __CLASS__ . ' with an outstanding sync', [
-                'resource_id' => $this->id,
-            ]);
-            return false;
-        }
-
         $sync = app()->make(Sync::class);
-        $sync->resource_id = $this->id;
+        $sync->resource()->associate($this);
         $sync->completed = false;
+        $sync->type = $type;
         $sync->save();
+
         Log::info(get_class($this) . ' : Creating new sync - Finished', [
             'resource_id' => $this->id,
         ]);
@@ -100,33 +79,24 @@ trait Syncable
         return $sync;
     }
 
-    public function getStatus()
+    public function getSyncAttribute()
     {
-        if (!$this->syncs()->count()) {
-            return 'complete';
+        $status = 'unknown';
+        $type = 'unknown';
+
+        if ($this->syncs()->count()) {
+            $latest = $this->syncs()->latest()->first();
+            $status = $latest->status;
+            $type = $latest->type;
         }
-        if ($this->getSyncFailed()) {
-            return 'failed';
-        }
-        if ($this->syncs()->latest()->first()->completed) {
-            return 'complete';
-        }
-        return 'in-progress';
+
+        return (object) [
+            'status' => $status,
+            'type' => $type,
+        ];
     }
 
-    public function syncs()
-    {
-        return $this->hasMany(Sync::class, 'resource_id', 'id');
-    }
-
-    public function getSyncFailed()
-    {
-        if (!$this->syncs()->count()) {
-            return false;
-        }
-        return $this->syncs()->latest()->first()->failure_reason !== null;
-    }
-
+    // TODO: Remove this once all models are using new sync
     public function setSyncCompleted()
     {
         Log::info(get_class($this) . ' : Setting Sync to completed - Started', ['resource_id' => $this->id]);
@@ -143,6 +113,7 @@ trait Syncable
         Log::info(get_class($this) . ' : Setting Sync to completed - Finished', ['resource_id' => $this->id]);
     }
 
+    // TODO: Remove this once all models are using new sync
     public function setSyncFailureReason($value)
     {
         Log::info(get_class($this) . ' : Setting Sync to failed - Started', ['resource_id' => $this->id]);
@@ -156,16 +127,9 @@ trait Syncable
         Log::info(get_class($this) . ' : Setting Sync to failed - Finished', ['resource_id' => $this->id]);
     }
 
-    public function getSyncFailureReason()
-    {
-        if (!$this->syncs()->count()) {
-            return null;
-        }
-        return $this->syncs()->latest()->first()->failure_reason;
-    }
-
     /**
-     * TODO :- Come up with a nicer way to do this as this is disgusting!
+     * TODO :- move this to exception handler to handle exception thrown from
+     *         ResourceSyncSaving/ResourceSyncDeleting event listeners
      * @return \Illuminate\Http\JsonResponse
      */
     public function getSyncError()

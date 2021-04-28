@@ -18,27 +18,6 @@ class CreateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
-                [
-                    'json' => [
-                        'volumeId' => 'vol-test',
-                        'sizeGiB' => '100',
-                        'shared' => false,
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
-
-        $this->volume = factory(Volume::class)->create([
-            'id' => 'vol-test',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
-        ]);
     }
 
     public function testNotOwnedVpcIdIsFailed()
@@ -82,7 +61,7 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/volume')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
             });
@@ -94,32 +73,10 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(201);
+        ])->assertResponseStatus(202);
 
         $volumeId = (json_decode($this->response->getContent()))->data->id;
         $volume = Volume::find($volumeId);
         $this->assertNotNull($volume);
-    }
-
-    public function testAzIsOptionalParameter()
-    {
-        $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
-
-        $this->post('/v2/volumes', [
-            'vpc_id' => $this->vpc()->id,
-            'capacity' => '1',
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(201);
-
-        $volumeId = (json_decode($this->response->getContent()))->data->id;
-        $volume = Volume::find($volumeId);
-        $this->assertNotNull($volume);
-        $this->assertNotNull($volume->availability_zone_id);
     }
 }

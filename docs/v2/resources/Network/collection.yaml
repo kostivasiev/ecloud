@@ -42,7 +42,8 @@ post:
         schema:
           $ref: '../../components/schemas/network.yaml'
   responses:
-    201:
+    202:
+      description: Accepted
       $ref: '../../resources/Network/responses/idResponse.yaml'
   tags:
     - Networks

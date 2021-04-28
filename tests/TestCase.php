@@ -6,14 +6,18 @@ use App\Models\V2\Appliance;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
+use App\Models\V2\Dhcp;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\RouterThroughput;
+use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
@@ -22,20 +26,29 @@ use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
-    // This is required for the Kingping/NSX mocks, see below
     use DatabaseMigrations,
-        Mocks\Traits\Host;
+        Mocks\Host\Mocks;
 
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',
     ];
+
+    /**
+     * @deprecated use $this->be();
+     * @var string[]
+     */
     public $validWriteHeaders = [
         'X-consumer-custom-id' => '0-0',
         'X-consumer-groups' => 'ecloud.read, ecloud.write',
@@ -50,8 +63,14 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var Vpc */
     private $vpc;
 
+    /** @var Dhcp */
+    private $dhcp;
+
     /** @var FirewallPolicy */
     private $firewallPolicy;
+
+    /** @var RouterThroughput */
+    private $routerThroughput;
 
     /** @var Router */
     private $router;
@@ -92,6 +111,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var Image */
     private $image;
 
+    /** @var Nic */
+    private $nic;
+
     /**
      * Creates the application.
      * @return Application
@@ -104,22 +126,40 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function firewallPolicy($id = 'fwp-test')
     {
         if (!$this->firewallPolicy) {
-            $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-                'id' => $id,
-                'router_id' => $this->router()->id,
-            ]);
+            Model::withoutEvents(function() use ($id) {
+                $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+                    'id' => $id,
+                    'router_id' => $this->router()->id,
+                ]);
+            });
         }
         return $this->firewallPolicy;
+    }
+
+    public function routerThroughput()
+    {
+        if (!$this->routerThroughput) {
+            Model::withoutEvents(function() {
+                $this->routerThroughput = factory(RouterThroughput::class)->create([
+                    'id' => 'rtp-test',
+                    'committed_bandwidth' => '1024'
+                ]);
+            });
+        }
+        return $this->routerThroughput;
     }
 
     public function router()
     {
         if (!$this->router) {
-            $this->router = factory(Router::class)->create([
-                'id' => 'rtr-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id
-            ]);
+            Model::withoutEvents(function() {
+                $this->router = factory(Router::class)->create([
+                    'id' => 'rtr-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'router_throughput_id' => $this->routerThroughput()->id,
+                ]);
+            });
         }
         return $this->router;
     }
@@ -127,12 +167,28 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function vpc()
     {
         if (!$this->vpc) {
-            $this->vpc = factory(Vpc::class)->create([
-                'id' => 'vpc-test',
-                'region_id' => $this->region()->id
-            ]);
+            Model::withoutEvents(function () {
+                $this->vpc = factory(Vpc::class)->create([
+                    'id' => 'vpc-test',
+                    'region_id' => $this->region()->id
+                ]);
+            });
         }
         return $this->vpc;
+    }
+
+    public function dhcp()
+    {
+        if (!$this->dhcp) {
+            Model::withoutEvents(function () {
+                $this->dhcp = factory(Dhcp::class)->create([
+                    'id' => 'dhcp-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                ]);
+            });
+        }
+        return $this->dhcp;
     }
 
     public function region()
@@ -159,24 +215,50 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function instance()
     {
         if (!$this->instance) {
-            $this->instance = factory(Instance::class)->create([
-                'id' => 'i-test',
-                'vpc_id' => $this->vpc()->id,
-                'name' => 'Test Instance ' . uniqid(),
-                'image_id' => $this->image()->id,
-                'vcpu_cores' => 1,
-                'ram_capacity' => 1024,
-                'platform' => 'Linux',
-                'availability_zone_id' => $this->availabilityZone()->id
-            ]);
+            Instance::withoutEvents(function() {
+                $this->instance = factory(Instance::class)->create([
+                    'id' => 'i-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'name' => 'Test Instance ' . uniqid(),
+                    'image_id' => $this->image()->id,
+                    'vcpu_cores' => 1,
+                    'ram_capacity' => 1024,
+                    'platform' => 'Linux',
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'deploy_data' => [
+                        'network_id' => $this->network()->id,
+                        'volume_capacity' => 20,
+                        'volume_iops' => 300,
+                        'requires_floating_ip' => false,
+                    ]
+                ]);
+            });
+
+            //app()->bind(Volume::class);
         }
         return $this->instance;
+    }
+
+    public function nic()
+    {
+        if (!$this->nic) {
+            Nic::withoutEvents(function() {
+                $this->nic = factory(Nic::class)->create([
+                    'id' => 'nic-test',
+                    'mac_address' => 'AA:BB:CC:DD:EE:FF',
+                    'instance_id' => $this->instance()->id,
+                    'network_id' => $this->network()->id,
+                ]);
+            });
+        }
+        return $this->nic;
     }
 
     public function image()
     {
         if (!$this->image) {
             $this->image = factory(Image::class)->create([
+                'id' => 'img-abcdef12',
                 'appliance_version_id' => $this->applianceVersion()->id,
             ]);
         }
@@ -187,6 +269,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->applianceVersion) {
             $this->applianceVersion = factory(ApplianceVersion::class)->create([
+                'appliance_version_uuid' => 'd7c4a253-0718-4ef7-adb2-ad348ae96371',
                 'appliance_version_appliance_id' => $this->appliance()->id,
             ]);
         }
@@ -197,6 +280,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->appliance) {
             $this->appliance = factory(Appliance::class)->create([
+                'appliance_uuid' => 'aa085bfc-bbe9-4825-b636-1f221d6c3fa9',
                 'appliance_name' => 'Test Appliance',
             ])->refresh();
         }
@@ -206,10 +290,14 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function network()
     {
         if (!$this->network) {
-            $this->network = factory(Network::class)->create([
-                'name' => 'Manchester Network',
-                'router_id' => $this->router()->id
-            ]);
+            Model::withoutEvents(function() {
+                $this->network = factory(Network::class)->create([
+                    'id' => 'net-abcdef12',
+                    'name' => 'Manchester Network',
+                    'subnet' => '10.0.0.0/24',
+                    'router_id' => $this->router()->id
+                ]);
+            });
         }
         return $this->network;
     }
@@ -224,16 +312,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
             ]);
         }
         return $this->hostGroup;
     }
 
-    public function hostGroupJobMocks()
+    public function hostGroupJobMocks($id = 'hg-test')
     {
         // CreateCluster Job
         $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
+            ->with('/api/v2/vpc/vpc-test/hostgroup/' . $id)
             ->andReturnUsing(function () {
                 return new Response(404);
             });
@@ -242,7 +331,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 '/api/v2/vpc/vpc-test/hostgroup',
                 [
                     'json' => [
-                        'hostGroupId' => 'hg-test',
+                        'hostGroupId' => $id,
                         'shared' => false,
                     ]
                 ]
@@ -318,7 +407,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]));
             });
         $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-hg-test')
+            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $id)
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -329,7 +418,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]));
             });
         $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-test')
+            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $id)
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -345,7 +434,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 [
                     'json' => [
                         'resource_type' => 'TransportNodeCollection',
-                        'display_name' => 'tnc-hg-test',
+                        'display_name' => 'tnc-' . $id,
                         'description' => 'API created Transport Node Collection',
                         'compute_collection_id' => 'TEST-COMPUTE-COLLECTION-ID',
                         'transport_node_profile_id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
@@ -478,14 +567,10 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
-            \App\Events\V2\Dhcp\Created::class,
-            \App\Events\V2\Instance\Created::class,
             \App\Events\V2\Network\Created::class,
             \App\Events\V2\Router\Created::class,
-            \App\Events\V2\Vpc\Created::class,
             \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
-            \App\Events\V2\Nic\Created::class,
 
             // Deleting
             \App\Events\V2\Nat\Deleting::class,
@@ -493,9 +578,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Deleted
             \App\Events\V2\AvailabilityZone\Deleted::class,
             \App\Events\V2\Nat\Deleted::class,
-            \App\Events\V2\Vpc\Deleted::class,
-            \App\Events\V2\Dhcp\Deleted::class,
-            \App\Events\V2\Nic\Deleted::class,
             \App\Events\V2\FloatingIp\Deleted::class,
             \App\Events\V2\Network\Deleted::class,
             \App\Events\V2\Router\Deleted::class,
@@ -508,19 +590,12 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Updated
             \App\Events\V2\Sync\Updated::class,
-            \App\Events\V2\Instance\Updated::class,
 
             // Saving
             \App\Events\V2\Router\Saving::class,
             \App\Events\V2\Network\Saving::class,
-            \App\Events\V2\Nic\Saving::class,
             \App\Events\V2\Nat\Saving::class,
 
-            // Deleting
-            \App\Events\V2\Instance\Saving::class,
-
-            // Deploy
-            \App\Events\V2\Instance\Deploy::class,
         ]);
     }
 

@@ -28,13 +28,6 @@ class Update extends FormRequest
     {
         return [
             'name' => 'sometimes|nullable|string|max:50',
-            'network_policies' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.network_policies,id,deleted_at,NULL',
-                new ExistsForUser(NetworkPolicy::class),
-            ],
             'sequence' => 'sometimes|required|integer',
             'source' => [
                 'sometimes',

@@ -5,10 +5,13 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Volume;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(Volume $model)
@@ -23,13 +26,13 @@ class Deploy extends Job
         $volume = $this->model;
 
         if (!empty($volume->vmware_uuid)) {
-            Log::debug('Volume already deployed. Nothing to do.');
+            Log::info('Volume already deployed. Nothing to do.');
             return true;
         }
 
         try {
             $response = $volume->availabilityZone->kingpinService()->post(
-                '/api/v1/vpc/' . $volume->vpc_id . '/volume',
+                '/api/v2/vpc/' . $volume->vpc_id . '/volume',
                 [
                     'json' => [
                         'volumeId' => $volume->id,
@@ -67,9 +70,7 @@ class Deploy extends Job
             'uuid' => $volume->vmware_uuid,
         ]);
 
-        // TODO :- Revisit this since it's saving in a saved event and only works due to an outstanding sync
-        $volume->save();
-        Log::debug(get_class($this) . ' : Ignore above sync failure ^ Its due to a hacky save in the Job');
+        $volume->saveQuietly();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }

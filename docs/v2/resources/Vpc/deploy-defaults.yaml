@@ -1,7 +1,7 @@
 post:
   responses:
     202:
-      description: Success
+      description: Accepted
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
   tags:

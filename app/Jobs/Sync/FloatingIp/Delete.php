@@ -2,46 +2,43 @@
 
 namespace App\Jobs\Sync\FloatingIp;
 
+use App\Jobs\FloatingIp\AwaitNatRemoval;
+use App\Jobs\FloatingIp\DeleteNats;
 use App\Jobs\Job;
-use App\Jobs\Nsx\FloatingIp\UndeployCheck;
-use App\Jobs\Nsx\Nat\Undeploy as NatUndeploy;
-use App\Jobs\Nsx\Nat\UndeployCheck as NatUndeployCheck;
-use App\Models\V2\FloatingIp;
-use App\Models\V2\Nat;
+use App\Models\V2\Sync;
+use App\Traits\V2\SyncableBatch;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    /** @var FloatingIp */
-    private $model;
+    use SyncableBatch;
 
-    public function __construct(FloatingIp $model)
+    private Sync $sync;
+
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
+        $this->sync = $sync;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->resource->id]);
 
-        $jobs = [];
-        $nats = Nat::where('source_id', $this->model->id)
-            ->orWhere('destination_id', $this->model->id)
-            ->orWhere('translated_id', $this->model->id)
-            ->get()
-            ->filter(function ($model) {
-                return $model instanceof Nat;
-            });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeploy($nat);
-        });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeployCheck($nat);
-        });
-        $jobs[] = new UndeployCheck($this->model);
+        $floatingIp = $this->sync->resource;
 
-        dispatch(array_shift($jobs)->chain($jobs));
+        $this->deleteSyncBatch(
+            [
+                new DeleteNats($floatingIp),
+                new AwaitNatRemoval($floatingIp),
+            ]
+        )
+            // TODO: Remove this once atomic db constraint removed
+        ->then(function (Batch $batch) use ($floatingIp) {
+            $floatingIp->deleted = time();
+            $floatingIp->saveQuietly();
+        })->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->resource->id]);
     }
 }

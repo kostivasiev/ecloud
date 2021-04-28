@@ -5,9 +5,7 @@ namespace Tests\V2\Vpc;
 use App\Events\V2\DhcpCreated;
 use App\Events\V2\VpcCreated;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -16,20 +14,6 @@ class CreateTest extends TestCase
 {
 
     use DatabaseMigrations;
-
-    protected $faker;
-
-    protected $region;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->faker = Faker::create();
-
-        $this->region = factory(Region::class)->create([
-            'name' => 'Manchester',
-        ]);
-    }
 
     public function testNoPermsIsDenied()
     {
@@ -49,36 +33,10 @@ class CreateTest extends TestCase
             ->assertResponseStatus(401);
     }
 
-    public function testNullNameDefaultsToId()
-    {
-        $data = [
-            'name' => '',
-            'region_id' => $this->region->id,
-        ];
-        $this->post(
-            '/v2/vpcs',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-                'X-Reseller-Id' => 1,
-            ]
-        )->assertResponseStatus(201);
-
-        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
-
-        $this->seeJson([
-            'id' => $virtualPrivateCloudId,
-        ]);
-
-        $vpc = Vpc::findOrFail($virtualPrivateCloudId);
-        $this->assertEquals($virtualPrivateCloudId, $vpc->name);
-    }
-
     public function testNullRegionIsFailed()
     {
         $data = [
-            'name' => $this->faker->word(),
+            'name' => 'CreateTest Name',
         ];
         $this->post(
             '/v2/vpcs',
@@ -101,9 +59,9 @@ class CreateTest extends TestCase
     public function testNotScopedFails()
     {
         $data = [
-            'name' => $this->faker->word(),
+            'name' => 'CreateTest Name',
             'reseller_id' => 1,
-            'region_id' => $this->region->id
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/vpcs',
@@ -121,54 +79,63 @@ class CreateTest extends TestCase
             ->assertResponseStatus(400);
     }
 
-    public function testValidDataSucceeds()
+    public function testNoAdminFailsWhenConsoleIsSet()
     {
         $data = [
-            'name' => $this->faker->word(),
-            'region_id' => $this->region->id,
-            'reseller_id' => 1
+            'name' => 'CreateTest Name',
+            'reseller_id' => 1,
+            'region_id' => $this->region()->id,
+            'console_enabled' => true,
         ];
         $this->post(
             '/v2/vpcs',
             $data,
             [
-                'X-consumer-custom-id' => '0-0',
+                'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
-                'X-Reseller-Id' => 1
             ]
-        )
-            ->seeInDatabase(
-                'vpcs',
-                $data,
-                'ecloud'
-            )
-            ->assertResponseStatus(201);
-
-        $virtualPrivateCloudId = (json_decode($this->response->getContent()))->data->id;
-        $this->seeJson([
-            'id' => $virtualPrivateCloudId,
-        ]);
+        )->seeJson(
+            [
+                'title' => 'Forbidden',
+                'details' => 'Console access cannot be modified',
+                'status' => 403
+            ]
+        )->assertResponseStatus(403);
     }
 
-    public function testCreateTriggersDhcpDispatch()
+    public function testExceedMaxVpcLimit()
     {
-        Event::fake();
-
-        $vpc = factory(Vpc::class)->create([
-            'id' => 'vpc-abc123'
-        ]);
-
-        Event::assertDispatched(\App\Events\V2\Vpc\Created::class, function ($event) use ($vpc) {
-            return $event->model->id === $vpc->id;
-        });
-
-        $dhcp = factory(Dhcp::class)->create([
-            'id' => 'dhcp-abc123',
-            'vpc_id' => 'vpc-abc123'
-        ]);
-
-        Event::assertDispatched(\App\Events\V2\Dhcp\Created::class, function ($event) use ($dhcp) {
-            return $event->model->id === $dhcp->id;
-        });
+        $counter = 1;
+        factory(Vpc::class, config('defaults.vpc.max_count'))
+            ->make([
+                'reseller_id' => 1,
+                'region_id' => $this->region()->id,
+                'console_enabled' => true,
+            ])
+            ->each(function ($vpc) use (&$counter) {
+                $vpc->id = 'vpc-test' . $counter;
+                $vpc->name = 'TestVPC-' . $counter;
+                $vpc->saveQuietly();
+                $counter++;
+            });
+        $data = [
+            'name' => 'CreateTest Name',
+            'reseller_id' => 1,
+            'region_id' => $this->region()->id,
+            'console_enabled' => true,
+        ];
+        $this->post(
+            '/v2/vpcs',
+            $data,
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The maximum number of ' . config('defaults.vpc.max_count') . ' VPCs has been reached',
+            ]
+        )->assertResponseStatus(422);
     }
 }

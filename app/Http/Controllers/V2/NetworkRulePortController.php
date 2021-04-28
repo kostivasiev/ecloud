@@ -39,27 +39,26 @@ class NetworkRulePortController extends BaseController
             'destination',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(Update $request, string $networkRulePortId)
     {
         $model = NetworkRulePort::forUser(Auth::user())->findOrFail($networkRulePortId);
         $model->fill($request->only([
-            'network_rule_id',
             'name',
             'protocol',
             'source',
             'destination',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 200);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $networkRulePortId)
     {
         NetworkRulePort::forUser($request->user())->findOrFail($networkRulePortId)
             ->delete();
-        return response('', 204);
+        return response('', 202);
     }
 }

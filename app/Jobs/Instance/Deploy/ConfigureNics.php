@@ -6,49 +6,35 @@ use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
 class ConfigureNics extends Job
 {
-    const RETRY_ATTEMPTS = 10;
-    const RETRY_DELAY = 10;
-    public $tries = 20;
-    private $data;
+    use Batchable;
 
-    public function __construct($data)
+    private $instance;
+
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $network = Network::findOrFail($this->data['network_id']);
-        if (!$network->available) {
-            if ($this->attempts() <= static::RETRY_ATTEMPTS) {
-                $this->release(static::RETRY_DELAY);
-                Log::info('Attempted to configure NICs on Network (' . $network->id
-                    . ') but Network was not available, will retry shortly');
-                return;
-            } else {
-                $message = 'Timed out waiting for Network (' . $network->id .
-                    ') to become available for prior to NIC configuration';
-                $this->fail(new \Exception($message));
-                return;
-            }
-        }
+        $network = Network::findOrFail($this->instance->deploy_data['network_id']);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-
-        $getInstanceResponse = $instance->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id
+        $getInstanceResponse = $this->instance->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
         );
 
         $instanceData = json_decode($getInstanceResponse->getBody()->getContents());
         if (!$instanceData) {
-            throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
+            throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
         }
 
         Log::info(get_class($this) . ' : ' . count($instanceData->nics) . ' NIC\'s found');
@@ -56,14 +42,12 @@ class ConfigureNics extends Job
         foreach ($instanceData->nics as $nicData) {
             $nic = app()->make(Nic::class);
             $nic->mac_address = $nicData->macAddress;
-            $nic->instance_id = $instance->id;
+            $nic->instance_id = $this->instance->id;
             $nic->network_id = $network->id;
-            $nic->save();
-            Log::info(get_class($this) . ' : Created NIC resource ' . $nic->id);
 
             $router = $network->router;
             $subnet = Subnet::fromString($network->subnet);
-            $nsxService = $nic->instance->availabilityZone->nsxService();
+            $nsxService = $this->instance->availabilityZone->nsxService();
 
             /**
              * Get DHCP static bindings to determine used IP addresses on the network
@@ -85,78 +69,55 @@ class ConfigureNics extends Job
             $iterator = 0;
 
             $ip = $subnet->getStartAddress(); //First reserved IP
-            while ($ip = $ip->getNextAddress()) {
-                $iterator++;
-                if ($iterator <= $reserved) {
-                    continue;
-                }
-                if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                    $message = 'Insufficient available IP\'s in subnet to assign to NIC';
-                    $nic->setSyncFailureReason($message);
-                    $this->fail(new \Exception($message));
-                    return;
-                }
 
-                $checkIp = $ip->toString();
+            $lock = Cache::lock("ip_address." . $network->id, 60);
+            try {
+                $lock->block(60);
 
-                //check NSX that the IP isn't in use.
-                if ($assignedIpsNsx->contains($checkIp)) {
-                    continue;
-                }
+                while ($ip = $ip->getNextAddress()) {
+                    $iterator++;
+                    if ($iterator <= $reserved) {
+                        continue;
+                    }
+                    if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
+                        $message = 'Insufficient available IP\'s in subnet to assign to NIC';
+                        $this->fail(new \Exception($message));
+                        return;
+                    }
 
-                $nic->ip_address = $checkIp;
+                    $checkIp = $ip->toString();
 
-                try {
-                    // We're using withoutEvents here so we can prevent sync issues because we're
-                    // using a database level constraint for atomic inserts of ip addresses .
-                    Nic::withoutEvents(function () use ($nic) {
-                        $nic->save();
-                    });
-                } catch (\Exception $exception) {
-                    if ($exception->getCode() == 23000) {
-                        // Ip already assigned
-                        //Log::warning('Failed to assign IP address ' . $checkIp . ' to NIC ' . $nic->id . ': IP is already used.');
+                    //check no other NICs have this IP address
+                    if (Nic::where('network_id', $network->id)
+                            ->where('ip_address', $checkIp)
+                            ->count() > 0) {
+                        Log::debug('IP address "' . $checkIp . '" in use');
                         continue;
                     }
 
-                    $this->fail(new \Exception(
-                        'Configuring NIC ' . $nic->id . ': Failed: ' . $exception->getMessage()
-                    ));
-                    return;
+                    //check NSX that the IP isn't in use.
+                    if ($assignedIpsNsx->contains($checkIp)) {
+                        Log::warning('IP address "' . $checkIp . '" in use within NSX');
+                        continue;
+                    }
+
+                    $nic->ip_address = $checkIp;
+
+                    Log::info('Ip Address ' . $nic->ip_address . ' assigned to ' . $nic->id);
+                    break;
                 }
 
-                Log::info('Ip Address ' . $nic->ip_address . ' assigned to ' . $nic->id);
-                break;
-            }
-
-
-            /**
-             * Create dhcp lease for the ip to the nic's mac address on NSX
-             * @see https://185.197.63.88/policy/api_includes/method_CreateOrReplaceSegmentDhcpStaticBinding.html
-             */
-            try {
-                $nsxService->put(
-                    '/policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id
-                    . '/dhcp-static-binding-configs/' . $nic->id,
-                    [
-                        'json' => [
-                            'resource_type' => 'DhcpV4StaticBindingConfig',
-                            'mac_address' => $nic->mac_address,
-                            'ip_address' => $nic->ip_address
-                        ]
-                    ]
-                );
-            } catch (\Exception $exception) {
-                if ($exception->hasResponse()) {
-                    Log::info(get_class($this), json_decode($exception->getResponse()->getBody()->getContents(), true));
+                if (empty($nic->ip_address)) {
+                    $this->fail(new \Exception("No available IP addresses found"));
                 }
-                throw $exception;
-            }
 
-            $nic->setSyncCompleted();
-            Log::info('DHCP static binding created for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
+                $nic->save();
+                Log::info(get_class($this) . ' : Created NIC resource ' . $nic->id);
+            } finally {
+                $lock->release();
+            }
         }
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

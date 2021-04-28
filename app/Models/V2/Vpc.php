@@ -5,9 +5,13 @@ namespace App\Models\V2;
 use App\Events\V2\Vpc\Created;
 use App\Events\V2\Vpc\Creating;
 use App\Events\V2\Vpc\Deleted;
+use App\Events\V2\Vpc\Deleting;
+use App\Events\V2\Vpc\Saved;
+use App\Events\V2\Vpc\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -19,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Vpc extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
 
     public $keyPrefix = 'vpc';
     public $incrementing = false;
@@ -31,23 +35,32 @@ class Vpc extends Model implements Filterable, Sortable
         'name',
         'reseller_id',
         'region_id',
+        'console_enabled',
+        'advanced_networking',
     ];
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
-        'created' => Created::class,
-        'deleted' => Deleted::class,
+        'saving' => Saving::class,
+        'saved' => Saved::class,
+        'deleting' => Deleting::class,
     ];
 
     public $children = [
+        'routers',
         'instances',
         'loadBalancerClusters',
         'volumes',
+        'floatingIps',
     ];
 
-    public function dhcp()
+    protected $casts = [
+        'console_enabled' => 'bool',
+        'advanced_networking' => 'bool',
+    ];
+
+    public function dhcps()
     {
-        return $this->hasOne(Dhcp::class);
+        return $this->hasMany(Dhcp::class);
     }
 
     public function routers()
@@ -83,11 +96,6 @@ class Vpc extends Model implements Filterable, Sortable
     public function vpcSupports()
     {
         return $this->hasMany(VpcSupport::class);
-    }
-
-    public function networkPolicies()
-    {
-        return $this->hasMany(NetworkPolicy::class);
     }
 
 
@@ -133,6 +141,8 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
+            $factory->create('console_enabled', Filter::$enumDefaults),
+            $factory->create('advanced_networking', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -150,6 +160,8 @@ class Vpc extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('reseller_id'),
             $factory->create('region_id'),
+            $factory->create('console_enabled'),
+            $factory->create('advanced_networking'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -177,6 +189,8 @@ class Vpc extends Model implements Filterable, Sortable
             'name' => 'name',
             'reseller_id' => 'reseller_id',
             'region_id' => 'region_id',
+            'console_enabled' => 'console_enabled',
+            'advanced_networking' => 'advanced_networking',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

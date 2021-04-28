@@ -69,6 +69,6 @@ class ImageController extends BaseController
     {
         $model = Image::findOrFail($imageId);
         $model->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 }

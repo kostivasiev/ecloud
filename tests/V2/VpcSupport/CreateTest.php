@@ -29,9 +29,6 @@ class CreateTest extends TestCase
         factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
     }
 
     public function testValidDataSucceeds()
@@ -39,7 +36,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/support',
             [
-                'vpc_id' => $this->vpc->id,
+                'vpc_id' => $this->vpc()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -49,7 +46,7 @@ class CreateTest extends TestCase
             ->seeInDatabase(
                 'vpc_support',
                 [
-                    'vpc_id' => $this->vpc->id
+                    'vpc_id' => $this->vpc()->id
                 ],
                 'ecloud'
             )
@@ -80,7 +77,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/support',
             [
-                'vpc_id' => $this->vpc->id,
+                'vpc_id' => $this->vpc()->id,
             ],
             [
                 'X-consumer-custom-id' => '1-0',
@@ -119,7 +116,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/support',
             [
-                'vpc_id' => $this->vpc->id,
+                'vpc_id' => $this->vpc()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',

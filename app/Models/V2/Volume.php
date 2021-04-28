@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Volume\Created;
 use App\Events\V2\Volume\Creating;
 use App\Events\V2\Volume\Deleted;
+use App\Events\V2\Volume\Deleting;
 use App\Events\V2\Volume\Saved;
 use App\Events\V2\Volume\Saving;
 use App\Traits\V2\CustomKey;
@@ -42,9 +43,10 @@ class Volume extends Model implements Filterable, Sortable
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'created' => Created::class,
-        'deleted' => Deleted::class,
         'saving' => Saving::class,
-        'saved' => Saved::class
+        'saved' => Saved::class,
+        'deleting' => Deleting::class,
+        'deleted' => Deleted::class,
     ];
 
     public function vpc()
@@ -80,7 +82,7 @@ class Volume extends Model implements Filterable, Sortable
     /**
      * @return bool
      */
-    public function getMountedAttribute()
+    public function getAttachedAttribute()
     {
         if ($this->instances()->count() > 0) {
             return true;

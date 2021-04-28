@@ -3,6 +3,7 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\ApplianceVersionData;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,12 +18,12 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
+        Event::fake();
         $this->patch(
             '/v2/instances/' . $this->instance()->id,
             [
                 'name' => 'Changed',
                 'backup_enabled' => true,
-                'host_group_id' => $this->hostGroup()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -36,7 +37,7 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
 
         $this->instance()->refresh();
         $this->assertEquals('Changed', $this->instance()->name);
@@ -45,9 +46,12 @@ class UpdateTest extends TestCase
 
     public function testAdminCanModifyLockedInstance()
     {
+        Event::fake();
+
         // Lock the instance
         $this->instance()->locked = true;
         $this->instance()->save();
+
         $data = [
             'name' => 'Changed',
         ];
@@ -66,11 +70,14 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
+
     }
 
     public function testScopedAdminCanNotModifyLockedInstance()
     {
+        Event::fake();
+
         $this->instance()->locked = true;
         $this->instance()->save();
         $this->patch(
@@ -94,6 +101,8 @@ class UpdateTest extends TestCase
 
     public function testLockedInstanceIsNotEditable()
     {
+        Event::fake();
+
         // Lock the instance
         $this->instance()->locked = true;
         $this->instance()->save();
@@ -116,7 +125,7 @@ class UpdateTest extends TestCase
 
         // Unlock the instance
         $this->instance()->locked = false;
-        $this->instance()->save();
+        $this->instance()->saveQuietly();
 
         $data = [
             'name' => 'Changed',
@@ -136,7 +145,7 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
     }
 
     public function testApplianceSpecRamMax()

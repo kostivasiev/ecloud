@@ -3,11 +3,15 @@
 namespace App\Models\V2;
 
 use App\Events\V2\HostGroup\Deleted;
+use App\Events\V2\HostGroup\Saved;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -21,9 +25,14 @@ use UKFast\DB\Ditto\Sortable;
  */
 class HostGroup extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides, DefaultAvailabilityZone;
 
     public string $keyPrefix = 'hg';
+
+    protected $dispatchesEvents = [
+        'saved' => Saved::class,
+        'deleted' => Deleted::class,
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -37,7 +46,12 @@ class HostGroup extends Model implements Filterable, Sortable
             'vpc_id',
             'availability_zone_id',
             'host_spec_id',
+            'windows_enabled',
         ]);
+
+        $this->casts = [
+            'windows_enabled' => 'boolean'
+        ];
 
         $this->dispatchesEvents = [
             'deleted' => Deleted::class
@@ -98,6 +112,7 @@ class HostGroup extends Model implements Filterable, Sortable
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('host_spec_id', Filter::$stringDefaults),
+            $factory->create('windows_enabled', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -116,6 +131,7 @@ class HostGroup extends Model implements Filterable, Sortable
             $factory->create('vpc_id'),
             $factory->create('availability_zone_id'),
             $factory->create('host_spec_id'),
+            $factory->create('windows_enabled'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -141,6 +157,7 @@ class HostGroup extends Model implements Filterable, Sortable
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
             'host_spec_id' => 'host_spec_id',
+            'windows_enabled' => 'windows_enabled',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

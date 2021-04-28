@@ -39,9 +39,10 @@ class HostGroupController extends BaseController
             'vpc_id',
             'availability_zone_id',
             'host_spec_id',
+            'windows_enabled',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateRequest $request, string $id)
@@ -67,6 +68,6 @@ class HostGroupController extends BaseController
         }
 
         $model->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 }

@@ -55,7 +55,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
 
         $firewallPolicy = FirewallPolicy::findOrFail((json_decode($this->response->getContent()))->data->id);
         $this->assertEquals($data['name'], $firewallPolicy->name);

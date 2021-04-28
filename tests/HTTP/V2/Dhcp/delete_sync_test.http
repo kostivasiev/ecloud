@@ -11,7 +11,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 
 client.global.set('dhcp_id', response.body.data.id);
@@ -28,7 +28,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 

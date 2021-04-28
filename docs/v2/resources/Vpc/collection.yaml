@@ -42,7 +42,8 @@ post:
         schema:
           $ref: '../../components/schemas/vpc.yaml'
   responses:
-    201:
+    202:
+      description: Accepted
       $ref: '../../resources/Vpc/responses/idResponse.yaml'
   tags:
     - Virtual Private Clouds

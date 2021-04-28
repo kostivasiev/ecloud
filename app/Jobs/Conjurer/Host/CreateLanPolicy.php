@@ -5,15 +5,18 @@ namespace App\Jobs\Conjurer\Host;
 use App\Jobs\Job;
 use App\Models\V2\Host;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateLanPolicy extends Job
 {
-    private $model;
+    use Batchable;
 
-    public function __construct(Host $model)
+    private Host $host;
+
+    public function __construct(Host $host)
     {
-        $this->model = $model;
+        $this->host = $host;
     }
 
     /**
@@ -21,11 +24,10 @@ class CreateLanPolicy extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->host->id]);
 
-        $host = $this->model;
-        $vpc = $host->hostGroup->vpc;
-        $availabilityZone = $host->hostGroup->availabilityZone;
+        $vpc = $this->host->hostGroup->vpc;
+        $availabilityZone = $this->host->hostGroup->availabilityZone;
 
         if (empty($availabilityZone->ucs_compute_name)) {
             $message = 'Failed to load UCS compute name for availability zone ' . $availabilityZone->id;
@@ -50,17 +52,9 @@ class CreateLanPolicy extends Job
                     ],
                 ]
             );
-            Log::info(get_class($this) . ' : LAN policy created on UCS for VPC', ['id' => $this->model->id]);
+            Log::info(get_class($this) . ' : LAN policy created on UCS for VPC', ['id' => $this->host->id]);
         }
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
-            $exception->getResponse()->getBody()->getContents() :
-            $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);
     }
 }

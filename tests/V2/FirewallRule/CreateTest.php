@@ -57,7 +57,7 @@ class CreateTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
-        ], 'ecloud')->assertResponseStatus(201);
+        ], 'ecloud')->assertResponseStatus(202);
     }
 
     public function testSourceANYSucceeds()
@@ -83,7 +83,7 @@ class CreateTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
-        ], 'ecloud')->assertResponseStatus(201);
+        ], 'ecloud')->assertResponseStatus(202);
     }
 
     public function testDestinationANYSucceeds()
@@ -109,7 +109,7 @@ class CreateTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
-        ], 'ecloud')->assertResponseStatus(201);
+        ], 'ecloud')->assertResponseStatus(202);
     }
 
     public function testMissingSourceFails()
@@ -167,7 +167,7 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(201);
+        ])->assertResponseStatus(202);
     }
 
     public function testPortsInvalidFails()

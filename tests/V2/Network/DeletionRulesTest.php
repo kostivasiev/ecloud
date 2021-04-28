@@ -2,18 +2,9 @@
 
 namespace Tests\V2\Network;
 
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
-use App\Services\V2\KingpinService;
 use Faker\Factory as Faker;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -28,12 +19,15 @@ class DeletionRulesTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->nics = factory(Nic::class)->create([
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance()->id,
-            'network_id' => $this->network()->id,
-            'ip_address' => $this->faker->ipv4,
-        ]);
+        Nic::withoutEvents(function() {
+            $this->nics = factory(Nic::class)->create([
+                'id' => 'nic-test',
+                'mac_address' => $this->faker->macAddress,
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
+                'ip_address' => $this->faker->ipv4,
+            ]);
+        });
     }
 
     public function testFailedDeletion()

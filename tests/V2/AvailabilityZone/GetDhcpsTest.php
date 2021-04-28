@@ -3,6 +3,7 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\Dhcp;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -16,10 +17,13 @@ class GetDhcpsTest extends TestCase
     {
         parent::setUp();
 
-        $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id
-        ]);
+        Model::withoutEvents(function () {
+            $this->dhcp = factory(Dhcp::class)->create([
+                'id' => 'dhcp-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id
+            ]);
+        });
     }
 
     public function testGetCollection()

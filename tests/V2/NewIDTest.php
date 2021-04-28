@@ -6,6 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -33,11 +34,8 @@ class NewIDTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
@@ -64,32 +62,15 @@ class NewIDTest extends TestCase
     {
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(201);
+        ])->assertResponseStatus(202);
 
         $this->assertMatchesRegularExpression(
             $this->generateRegExp(Router::class),
-            (json_decode($this->response->getContent()))->data->id
-        );
-    }
-
-    public function testFormatOfVpcId()
-    {
-        $this->post('/v2/vpcs', [
-            'name' => 'Manchester DC',
-            'region_id' => $this->region->id,
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-            'X-Reseller-Id' => 1
-        ])->assertResponseStatus(201);
-
-        $this->assertMatchesRegularExpression(
-            $this->generateRegExp(Vpc::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }

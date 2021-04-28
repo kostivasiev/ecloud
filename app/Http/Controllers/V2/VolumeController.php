@@ -13,7 +13,6 @@ use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -22,24 +21,24 @@ class VolumeController extends BaseController
     public function index(Request $request)
     {
         if ($request->hasAny([
-            'mounted',
-            'mounted:eq',
-            'mounted:neq',
+            'attached',
+            'attached:eq',
+            'attached:neq',
         ])) {
-            if ($request->has('mounted') || $request->has('mounted:eq')) {
-                if ($request->has('mounted')) {
-                    $mounted = filter_var($request->get('mounted'), FILTER_VALIDATE_BOOLEAN);
-                    $request->query->remove('mounted');
+            if ($request->has('attached') || $request->has('attached:eq')) {
+                if ($request->has('attached')) {
+                    $attached = filter_var($request->get('attached'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached');
                 } else {
-                    $mounted = filter_var($request->get('mounted:eq'), FILTER_VALIDATE_BOOLEAN);
-                    $request->query->remove('mounted:eq');
+                    $attached = filter_var($request->get('attached:eq'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached:eq');
                 }
-            } elseif ($request->has('mounted:neq')) {
-                $mounted = !filter_var($request->get('mounted:neq'), FILTER_VALIDATE_BOOLEAN);
-                $request->query->remove('mounted:neq');
+            } elseif ($request->has('attached:neq')) {
+                $attached = !filter_var($request->get('attached:neq'), FILTER_VALIDATE_BOOLEAN);
+                $request->query->remove('attached:neq');
             }
 
-            if ($mounted) {
+            if ($attached) {
                 $collection = Volume::forUser($request->user())->has('instances', '>', 0);
             } else {
                 $collection = Volume::forUser($request->user())->has('instances', '=', 0);
@@ -95,10 +94,10 @@ class VolumeController extends BaseController
             'capacity',
             'iops',
         ]));
-        if (!$model->save()) {
-            return $model->getSyncError();
-        }
-        return $this->responseIdMeta($request, $model->id, 201);
+
+        $model->save();
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
@@ -109,43 +108,46 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        if (!$volume->save()) {
-            return $volume->getSyncError();
-        }
 
-        return $this->responseIdMeta($request, $volume->id, 200);
+        $volume->withSyncLock(function ($volume) {
+            $volume->save();
+        });
+
+        return $this->responseIdMeta($request, $volume->id, 202);
     }
 
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
-        if (!$volume->delete()) {
-            return $volume->getSyncError();
-        }
-        return response(null, 204);
+
+        $volume->withSyncLock(function ($volume) {
+            $volume->delete();
+        });
+
+        return response('', 202);
     }
 
     public function attach(AttachRequest $request, string $volumeId)
     {
-        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
-        try {
-            $instance->volumes()->attach($model);
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $volume->withSyncLock(function ($volume) use ($instance) {
+            $instance->volumes()->attach($volume);
+        });
+
         return response('', 202);
     }
 
     public function detach(DetachRequest $request, string $volumeId)
     {
-        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
-        try {
-            $instance->volumes()->detach($model);
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $volume->withSyncLock(function ($volume) use ($instance) {
+            $instance->volumes()->detach($volume);
+        });
+
         return response('', 202);
     }
 

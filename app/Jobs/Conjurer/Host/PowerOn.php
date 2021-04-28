@@ -4,28 +4,30 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PowerOn extends Job
 {
-    private $model;
+    use Batchable;
 
-    public function __construct(Host $model)
+    private Host $host;
+
+    public function __construct(Host $host)
     {
-        $this->model = $model;
+        $this->host = $host;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->host->id]);
 
-        // TODO https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/621
+        $availabilityZone = $this->host->hostGroup->availabilityZone;
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
+        $availabilityZone->conjurerService()->post(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $this->host->hostGroup->vpc->id .'/host/' . $this->host->id . '/power'
+        );
 
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);
     }
 }

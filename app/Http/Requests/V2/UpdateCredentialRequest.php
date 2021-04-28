@@ -28,8 +28,8 @@ class UpdateCredentialRequest extends FormRequest
             'name' => ['sometimes', 'required', 'string'],
             'resource_id' => ['sometimes', 'nullable', 'string'],
             'host' => ['sometimes', 'nullable', 'string'],
-            'username' => ['sometimes', 'required', 'string'],
-            'password' => ['sometimes', 'required', 'string'],
+            'username' => ['sometimes', 'nullable', 'string'],
+            'password' => ['sometimes', 'nullable', 'string'],
             'port' => ['sometimes', 'nullable', 'integer'],
         ];
         if (Auth::user()->isAdmin()) {

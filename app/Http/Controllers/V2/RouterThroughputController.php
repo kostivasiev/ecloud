@@ -58,6 +58,6 @@ class RouterThroughputController extends BaseController
     {
         RouterThroughput::findOrFail($routerThroughputId)
             ->delete();
-        return response(null, 204);
+        return response('', 204);
     }
 }

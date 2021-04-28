@@ -15,7 +15,7 @@ class AttachVolumeTest extends TestCase
     {
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
+                '/api/v2/vpc/vpc-test/volume',
                 [
                     'json' => [
                         'volumeId' => 'vol-test',
@@ -89,7 +89,7 @@ class AttachVolumeTest extends TestCase
             'errors' => [
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'The specified volume is already mounted on this instance',
+                    'detail' => 'The specified volume is already attached to this instance',
                     'status' => 422,
                     'source' => 'instance_id',
                 ]
@@ -101,7 +101,7 @@ class AttachVolumeTest extends TestCase
     {
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
+                '/api/v2/vpc/vpc-test/volume',
                 [
                     'json' => [
                         'volumeId' => 'vol-test',

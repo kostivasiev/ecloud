@@ -80,6 +80,6 @@ class CredentialsController extends BaseController
     {
         Credential::findOrFail($credentialsId)
             ->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 }

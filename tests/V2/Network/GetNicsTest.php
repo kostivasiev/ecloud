@@ -21,11 +21,15 @@ class GetNicsTest extends TestCase
 
     public function testGetCollection()
     {
-        $nic = factory(Nic::class)->create([
-            'mac_address' => $this->faker->macAddress,
-            'instance_id' => $this->instance()->id,
-            'network_id' => $this->network()->id,
-        ]);
+        $nic = null;
+        Nic::withoutEvents(function() use (&$nic) {
+            $nic = factory(Nic::class)->create([
+                'id' => 'nic-test',
+                'mac_address' => $this->faker->macAddress,
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
+            ]);
+        });
 
         $this->get(
             '/v2/networks/' . $this->network()->id . '/nics',

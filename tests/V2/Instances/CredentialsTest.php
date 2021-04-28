@@ -30,12 +30,8 @@ class CredentialsTest extends TestCase
         $availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $region->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'name' => 'Manchester VPC',
-            'region_id' => $region->id,
-        ]);
         $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $availabilityZone->id,
         ]);
 

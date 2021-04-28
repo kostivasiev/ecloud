@@ -31,31 +31,9 @@ class HiddenCredentialsTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id
-        ]);
-        $this->appliance = factory(Appliance::class)->create([
-            'appliance_name' => 'Test Appliance',
-        ])->refresh();
-        $this->appliance_version = factory(ApplianceVersion::class)->create([
-            'appliance_version_appliance_id' => $this->appliance->id,
-        ])->refresh();
-        $this->image = factory(Image::class)->create([
-            'appliance_version_id' => $this->appliance_version->appliance_version_uuid,
-        ])->refresh();
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'name' => 'GetTest Default',
-            'image_id' => $this->image->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'platform' => 'Linux',
-            'availability_zone_id' => $this->availabilityZone->id
-        ]);
+        Instance::withoutEvents(function() {
+            $this->instance = new Instance(['id' => 'abc-abc132']);
+        });
 
         $this->credentials = factory(Credential::class)->create([
             'resource_id' => 'abc-abc132',
@@ -69,10 +47,11 @@ class HiddenCredentialsTest extends TestCase
 
     public function testAdminCanSetHiddenFlag()
     {
+        $instance = null;
         $this->post(
             '/v2/credentials',
             [
-                'resource_id' => $this->instance->id,
+                'resource_id' => $this->instance()->id,
                 'host' => 'https://127.0.0.1',
                 'username' => 'someuser',
                 'password' => 'somepassword',
@@ -86,7 +65,7 @@ class HiddenCredentialsTest extends TestCase
         )->seeInDatabase(
             'credentials',
             [
-                'resource_id' => 'abc-abc132',
+                'resource_id' => $this->instance()->id,
                 'host' => 'https://127.0.0.1',
                 'username' => 'someuser',
                 'port' => 8080,
@@ -112,7 +91,7 @@ class HiddenCredentialsTest extends TestCase
     public function testUserCannotSeeHiddenFlag()
     {
         $this->get(
-            '/v2/instances/' . $this->instance->id . '/credentials',
+            '/v2/instances/' . $this->instance()->id . '/credentials',
             [
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',

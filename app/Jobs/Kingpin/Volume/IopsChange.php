@@ -5,10 +5,13 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Volume;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class IopsChange extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(Volume $model)
@@ -63,10 +66,5 @@ class IopsChange extends Job
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
 
         return true;
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\SyncException;
 use App\Http\Requests\V2\FirewallRulePort\Create;
 use App\Http\Requests\V2\FirewallRulePort\Update;
 use App\Models\V2\FirewallRulePort;
@@ -39,8 +40,17 @@ class FirewallRulePortController extends BaseController
             'source',
             'destination'
         ]));
-        $resource->save();
-        return $this->responseIdMeta($request, $resource->id, 201);
+
+        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
+            $resource->save();
+            $resource->firewallRule->firewallPolicy->save();
+        });
+
+        return $this->responseIdMeta($request, $resource->getKey(), 202);
     }
 
     public function update(Update $request, string $firewallRulePortId)
@@ -56,14 +66,32 @@ class FirewallRulePortController extends BaseController
             $resource->source = null;
             $resource->destination = null;
         }
-        $resource->save();
-        return $this->responseIdMeta($request, $resource->id, 200);
+
+        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
+            $resource->save();
+            $resource->firewallRule->firewallPolicy->save();
+        });
+
+        return $this->responseIdMeta($request, $resource->getKey(), 202);
     }
 
     public function destroy(Request $request, string $firewallRulePortId)
     {
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
-        $resource->delete();
-        return response(null, 204);
+
+        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+                throw new SyncException();
+            }
+
+            $resource->delete();
+            $resource->firewallRule->firewallPolicy->save();
+        });
+
+        return response('', 202);
     }
 }

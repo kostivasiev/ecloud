@@ -57,7 +57,7 @@ class UpdateTest extends TestCase
                     'name' => 'Changed'
                 ],
                 'ecloud')
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
     }
 
     public function testEmptySourceFails()

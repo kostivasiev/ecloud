@@ -96,7 +96,7 @@ class DeleteTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(204);
+        )->assertResponseStatus(202);
         $networkPolicy = NetworkPolicy::withTrashed()->findOrFail($this->networkPolicy->id);
         $this->assertNotNull($networkPolicy->deleted_at);
     }

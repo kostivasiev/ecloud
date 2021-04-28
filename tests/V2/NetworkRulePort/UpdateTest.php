@@ -23,13 +23,13 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->network();
 
-        $this->nsxServiceMock()->expects('patch')->times(5)
+        $this->nsxServiceMock()->expects('patch')->times(4)
             ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
 
-        $this->nsxServiceMock()->expects('get')->times(5)
+        $this->nsxServiceMock()->expects('get')->times(4)
             ->withSomeOfArgs('policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(
@@ -45,7 +45,7 @@ class UpdateTest extends TestCase
                 return new Response(200, [], '');
             });
 
-        $this->nsxServiceMock()->expects('get')->times(5)
+        $this->nsxServiceMock()->expects('get')->times(4)
             ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
@@ -67,12 +67,7 @@ class UpdateTest extends TestCase
 
     public function testUpdate()
     {
-        factory(NetworkRule::class)->create([
-            'id' => 'nr-alttest',
-            'network_policy_id' => $this->networkPolicy->id,
-        ]);
         $this->patch('v2/network-rule-ports/nrp-test', [
-            'network_rule_id' => 'nr-alttest',
             'source' => '3306',
             'destination' => '444',
         ], [
@@ -82,11 +77,10 @@ class UpdateTest extends TestCase
             'network_rule_ports',
             [
                 'id' => 'nrp-test',
-                'network_rule_id' => 'nr-alttest',
                 'source' => '3306',
                 'destination' => '444',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 }

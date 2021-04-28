@@ -31,23 +31,35 @@
     </testsuites>
     <php>
         <ini name="memory_limit" value="512M"/>
+
+        <env name="APP_NAME" value="ecloud" force="true"/>
         <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_DEBUG" value="true" force="true"/>
+        <env name="APP_TIMEZONE" value="Europe/London" force="true"/>
+
+<!--        <env name="LOG_CHANNEL" value="stderr" force="true"/>-->
         <env name="CACHE_DRIVER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
-        <!--        <env name="LOG_CHANNEL" value="stderr" force="true"/>-->
-        <env name="APP_NAME" value="ecloud" force="true"/>
         <env name="PAGINATION_LIMIT" value="100" force="true"/>
-        <!--        <env name="DB_RESELLER_HOST" value="127.0.0.1" force="true"/>-->
-        <!--        <env name="DB_RESELLER_PORT" value="3307" force="true"/>-->
-        <!--        <env name="DB_ECLOUD_HOST" value="127.0.0.1" force="true"/>-->
-        <!--        <env name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
-        <env name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
-        <env name="DB_RESELLER_HOST" value="" force="true"/>
-        <env name="DB_RESELLER_DRIVER" value="sqlite" force="true"/>
-        <env name="DB_RESELLER_DATABASE" value=":memory:" force="true"/>
+
         <env name="DB_ECLOUD_CONNECTION" value="ecloud" force="true"/>
         <env name="DB_ECLOUD_HOST" value="" force="true"/>
         <env name="DB_ECLOUD_DRIVER" value="sqlite" force="true"/>
         <env name="DB_ECLOUD_DATABASE" value=":memory:" force="true"/>
+<!--        <env name="DB_ECLOUD_HOST" value="mysql-ukfast-net" force="true"/>-->
+<!--        <env name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
+<!--        <env name="DB_ECLOUD_DATABASE" value="ecloud" force="true"/>-->
+<!--        <env name="DB_ECLOUD_USERNAME" value="root" force="true"/>-->
+<!--        <env name="DB_ECLOUD_PASSWORD" value="password" force="true"/>-->
+
+        <env name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
+        <env name="DB_RESELLER_HOST" value="" force="true"/>
+        <env name="DB_RESELLER_DRIVER" value="sqlite" force="true"/>
+        <env name="DB_RESELLER_DATABASE" value=":memory:" force="true"/>
+<!--        <env name="DB_RESELLER_HOST" value="mysql-ukfast-net" force="true"/>-->
+<!--        <env name="DB_RESELLER_PORT" value="3307" force="true"/>-->
+<!--        <env name="DB_RESELLER_DATABASE" value="reseller" force="true"/>-->
+<!--        <env name="DB_RESELLER_USERNAME" value="root" force="true"/>-->
+<!--        <env name="DB_RESELLER_PASSWORD" value="password" force="true"/>-->
     </php>
 </phpunit>

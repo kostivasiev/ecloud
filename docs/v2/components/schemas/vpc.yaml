@@ -7,9 +7,15 @@ properties:
     type: string
     example: 'Manchester Cloud 1'
   sync:
-    type: string
-    example: 'completed'
+    type: object
     readOnly: true
+    properties:
+      status:
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example: complete
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example: update
   region_id:
     type: string
     required: true
@@ -17,6 +23,14 @@ properties:
   support_enabled:
     type: boolean
     readOnly: true
+    example: true
+  console_enabled:
+    type: boolean
+    readOnly: true
+    example: true
+  advanced_networking:
+    type: boolean
+    required: false
     example: true
   created_at:
     type: string

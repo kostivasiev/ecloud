@@ -81,6 +81,6 @@ class AvailabilityZoneCapacitiesController extends BaseController
     {
         AvailabilityZoneCapacity::findOrFail($capacityId)
             ->delete();
-        return response(null, 204);
+        return response('', 204);
     }
 }

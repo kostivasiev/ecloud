@@ -24,7 +24,8 @@ class UpdateTest extends TestCase
     public function testNotOwnedRouterResourceIsFailed()
     {
         $this->vpc()->reseller_id = 3;
-        $this->vpc()->save();
+        $this->vpc()->saveQuietly();
+
         $this->patch(
             '/v2/vpns/' . $this->vpn->id,
             [

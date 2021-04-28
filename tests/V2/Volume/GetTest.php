@@ -3,7 +3,6 @@
 namespace Tests\V2\Volume;
 
 use App\Models\V2\Volume;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,27 +16,15 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
-                [
-                    'json' => [
-                        'volumeId' => 'vol-test',
-                        'sizeGiB' => '100',
-                        'shared' => false,
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
-
-        $this->volume = factory(Volume::class)->create([
-            'id' => 'vol-test',
-            'name' => 'Volume',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
-        ]);
+        Volume::withoutEvents(function () {
+            $this->volume = factory(Volume::class)->create([
+                'id' => 'vol-test',
+                'name' => 'Volume',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'vmware_uuid' => 'uuid-test-uuid-test-uuid-test'
+            ]);
+        });
     }
 
     public function testGetCollection()

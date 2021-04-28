@@ -7,6 +7,8 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -33,18 +35,19 @@ class DeleteTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        $this->dhcp = factory(Dhcp::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ]);
+
+        Model::withoutEvents(function() {
+            $this->dhcp = factory(Dhcp::class)->create([
+                'id' => 'dhcp-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone->id
+            ]);
+        });
     }
 
     public function testNoPermsIsDenied()
     {
-        $this->delete('/v2/vpcs/' . $this->vpc->id)->seeJson([
+        $this->delete('/v2/vpcs/' . $this->vpc()->id)->seeJson([
             'title' => 'Unauthorized',
             'detail' => 'Unauthorized',
             'status' => 401,
@@ -65,9 +68,11 @@ class DeleteTest extends TestCase
 
     public function testNonMatchingResellerIdFails()
     {
-        $this->vpc->reseller_id = 3;
-        $this->vpc->save();
-        $this->delete('/v2/vpcs/' . $this->vpc->id, [], [
+        Event::fake();
+
+        $this->vpc()->reseller_id = 3;
+        $this->vpc()->save();
+        $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
@@ -79,12 +84,15 @@ class DeleteTest extends TestCase
 
     public function testDeleteVpcWithResourcesFails()
     {
-        factory(Instance::class)->create([
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ]);
+        Model::withoutEvents(function() {
+            factory(Instance::class)->create([
+                'id' => 'i-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone->id
+            ]);
+        });
 
-        $this->delete('/v2/vpcs/' . $this->vpc->id, [], [
+        $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->seeJson([
@@ -96,10 +104,11 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete('/v2/vpcs/' . $this->vpc->id, [], [
+        Event::fake();
+        $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
-        $this->assertNotNull(Vpc::withTrashed()->findOrFail($this->vpc->id)->deleted_at);
+        ])->assertResponseStatus(202);
+        $this->assertNotNull(Vpc::withTrashed()->findOrFail($this->vpc()->id)->deleted_at);
     }
 }

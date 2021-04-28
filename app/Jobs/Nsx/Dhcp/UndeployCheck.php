@@ -4,42 +4,45 @@ namespace App\Jobs\Nsx\Dhcp;
 
 use App\Jobs\Job;
 use App\Models\V2\Dhcp;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class UndeployCheck extends Job
 {
+    use Batchable;
+
+    const RETRY_MAX = 60;
     const RETRY_DELAY = 5;
 
-    public $tries = 500;
+    private Dhcp $dhcp;
 
-    private $model;
-
-    public function __construct(Dhcp $model)
+    public function __construct(Dhcp $dhcp)
     {
-        $this->model = $model;
+        $this->dhcp = $dhcp;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->dhcp->id]);
 
-        $response = $this->model->availabilityZone->nsxService()->get(
+        if ($this->attempts() > static::RETRY_MAX) {
+            throw new \Exception('Failed waiting for ' . $this->dhcp->id . ' to be deleted after ' . static::RETRY_MAX . ' attempts');
+        }
+
+        $response = $this->dhcp->availabilityZone->nsxService()->get(
             '/policy/api/v1/infra/dhcp-server-configs/?include_mark_for_delete_objects=true'
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
-            if ($this->model->id === $result->id) {
-                $this->release(static::RETRY_DELAY);
+            if ($this->dhcp->id === $result->id) {
                 Log::info(
-                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                    'Waiting for ' . $this->dhcp->id . ' to be deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
                 );
-                return;
+
+                return $this->release(static::RETRY_DELAY);
             }
         }
 
-        $this->model->setSyncCompleted();
-        $this->model->syncDelete();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->dhcp->id]);
     }
 }

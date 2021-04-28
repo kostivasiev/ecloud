@@ -5,17 +5,19 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
-use App\Models\V2\Vpc;
 use App\Services\V2\PasswordService;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class OsCustomisation extends Job
 {
-    private $data;
+    use Batchable;
 
-    public function __construct($data)
+    private $instance;
+
+    public function __construct(Instance $instance)
     {
-        $this->data = $data;
+        $this->instance = $instance;
     }
 
     /**
@@ -24,31 +26,29 @@ class OsCustomisation extends Job
      */
     public function handle(PasswordService $passwordService)
     {
-        Log::info(get_class($this) . ' : Started', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
 
-        $instance = Instance::findOrFail($this->data['instance_id']);
-        $vpc = Vpc::findOrFail($this->data['vpc_id']);
-
-        $username = ($instance->platform == 'Linux') ? 'root' : 'graphite.rack';
+        $username = ($this->instance->platform == 'Linux') ? 'root' : 'graphite.rack';
         $credential = Credential::create([
             'name' => $username,
-            'resource_id' => $instance->id,
+            'resource_id' => $this->instance->id,
             'username' => $username,
+            'port' => $this->instance->platform == 'Linux' ? '2020' : '3389',
         ]);
         $credential->password = $passwordService->generate();
         $credential->save();
 
-        $instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $vpc->id . '/instance/' . $instance->id . '/oscustomization',
+        $this->instance->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/oscustomization',
             [
                 'json' => [
-                    'platform' => $instance->platform,
+                    'platform' => $this->instance->platform,
                     'password' => $credential->password,
-                    'hostname' => $instance->id,
+                    'hostname' => $this->instance->id,
                 ],
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['data' => $this->data]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

@@ -2,7 +2,9 @@
 
 return [
     'availability_zones' => [],
-    'vpc' => [],
+    'vpc' => [
+        'max_count' => env('VPC_MAX_COUNT', 10),
+    ],
     'network' => [
         'subnets' => [
             'range' => '10.0.0.0/24',

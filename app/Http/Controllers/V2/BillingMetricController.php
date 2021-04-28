@@ -66,6 +66,6 @@ class BillingMetricController extends BaseController
     {
         $model = BillingMetric::forUser($request->user())->findOrFail($billingMetricId);
         $model->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 }

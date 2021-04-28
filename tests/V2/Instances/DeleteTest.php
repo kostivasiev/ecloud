@@ -3,7 +3,7 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,31 +14,24 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->kingpinServiceMock()->shouldReceive('delete')
-            ->withArgs(['/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/power'])
-            ->andReturn(
-                new Response(200)
-            );
-        $this->kingpinServiceMock()->shouldReceive('delete')
-            ->withArgs(['/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id])
-            ->andReturn(
-                new Response(200)
-            );
     }
 
     public function testSuccessfulDelete()
     {
+        Event::fake();
+
         $this->delete('/v2/instances/' . $this->instance()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
+        ])->assertResponseStatus(202);
         $this->instance()->refresh();
         $this->assertNotNull($this->instance()->deleted_at);
     }
 
     public function testAdminInstanceLocking()
     {
+        Event::fake();
+
         // Lock the instance
         $this->instance()->locked = true;
         $this->instance()->save();
@@ -50,13 +43,15 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
         $instance = Instance::withTrashed()->findOrFail($this->instance()->id);
         $this->assertNotNull($instance->deleted_at);
     }
 
     public function testNonAdminInstanceLocking()
     {
+        Event::fake();
+
         // First lock the instance
         $this->instance()->locked = true;
         $this->instance()->save();
@@ -85,7 +80,7 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
         $instance = Instance::withTrashed()->findOrFail($this->instance()->id);
         $this->assertNotNull($instance->deleted_at);
     }

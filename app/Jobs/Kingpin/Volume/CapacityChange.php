@@ -5,10 +5,13 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Volume;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CapacityChange extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(Volume $model)
@@ -23,7 +26,7 @@ class CapacityChange extends Job
         $volume = $this->model;
 
         // Volume has no instances so can be resized freely
-        $endpoint = '/api/v1/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
+        $endpoint = '/api/v2/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
 
         if ($volume->instances()->count() > 0) {
             // Volume has at least one instance so needs to be resized via an instance, allowing it to expand the OS partitions AFAIK
@@ -58,10 +61,5 @@ class CapacityChange extends Job
         Log::debug('Volume ' . $volume->id . ' capacity increased to ' . $volume->capacity);
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }

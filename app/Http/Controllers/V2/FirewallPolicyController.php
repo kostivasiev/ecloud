@@ -48,29 +48,34 @@ class FirewallPolicyController extends BaseController
     {
         $model = new FirewallPolicy();
         $model->fill($request->only(['name', 'sequence', 'router_id']));
-        if (!$model->save()) {
-            return $model->getSyncError();
-        }
-        $model->refresh();
-        return $this->responseIdMeta($request, $model->id, 201);
+
+        $model->withSyncLock(function ($policy) {
+            $policy->save();
+        });
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
         $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $model->fill($request->only(['name', 'sequence']));
-        if (!$model->save()) {
-            return $model->getSyncError();
-        }
-        return $this->responseIdMeta($request, $model->id, 200);
+
+        $model->withSyncLock(function ($policy) {
+            $policy->save();
+        });
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)
     {
         $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
-        if (!$model->delete()) {
-            return $model->getSyncError();
-        }
-        return response()->json([], 204);
+
+        $model->withSyncLock(function ($model) {
+            $model->delete();
+        });
+
+        return response('', 202);
     }
 }

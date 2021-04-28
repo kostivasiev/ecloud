@@ -50,6 +50,6 @@ class VpnController extends BaseController
     public function destroy(Request $request, string $vpnId)
     {
         Vpn::forUser($request->user())->findOrFail($vpnId)->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 }

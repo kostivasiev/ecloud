@@ -4,6 +4,7 @@ namespace Tests\V2\Nic;
 
 use App\Models\V2\Nic;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -20,11 +21,15 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
         $this->macAddress = $this->faker->macAddress;
-        $this->nic = factory(Nic::class)->create([
-            'mac_address' => $this->macAddress,
-            'instance_id' => $this->instance()->id,
-            'network_id' => $this->network()->id,
-        ])->refresh();
+
+        Nic::withoutEvents(function () {
+            $this->nic = factory(Nic::class)->create([
+                'id' => 'nic-test',
+                'mac_address' => $this->macAddress,
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
+            ]);
+        });
     }
 
     public function testInvalidMacAddressFails()
@@ -89,6 +94,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
+        Event::fake();
         $this->patch(
             '/v2/nics/' . $this->nic->id,
             [
@@ -113,6 +119,6 @@ class UpdateTest extends TestCase
                 ],
                 'ecloud'
             )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
     }
 }

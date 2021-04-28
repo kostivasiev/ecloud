@@ -30,19 +30,7 @@ class UpdateRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string',
             'reseller_id' => 'sometimes|required|integer',
-        ];
-    }
-
-    /**
-     * Get the validation messages that apply to the request.
-     *
-     * @return array|string[]
-     */
-    public function messages()
-    {
-        return [
-            'name.required' => 'The :attribute field, when specified, cannot be null',
-            'reseller_id.required' => 'The :attribute field, when specified, cannot be null',
+            'console_enabled' => 'sometimes|boolean',
         ];
     }
 }

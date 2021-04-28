@@ -9,6 +9,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -36,11 +37,8 @@ class DeleteTest extends TestCase
             'name' => 'NSX',
             'resource_id' => $this->availabilityZone->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
         $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc->id,
+            'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
         $this->network = factory(Network::class)->create([
@@ -93,6 +91,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
+        Event::fake();
         $this->delete(
             '/v2/networks/' . $this->network->id,
             [],
@@ -101,7 +100,7 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
         $network = Network::withTrashed()->findOrFail($this->network->id);
         $this->assertNotNull($network->deleted_at);
     }

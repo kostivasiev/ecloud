@@ -21,7 +21,7 @@ class CapacityIncreaseTest extends TestCase
         // Initial create
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
+                '/api/v2/vpc/vpc-test/volume',
                 [
                     'json' => [
                         'volumeId' => 'vol-test',
@@ -104,7 +104,7 @@ class CapacityIncreaseTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(200);
+        ])->assertResponseStatus(202);
     }
 
     public function testValidationRule()

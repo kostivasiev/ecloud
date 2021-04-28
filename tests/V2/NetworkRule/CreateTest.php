@@ -71,6 +71,6 @@ class CreateTest extends TestCase
             'network_rules',
             $data,
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 }

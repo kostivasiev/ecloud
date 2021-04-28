@@ -62,7 +62,7 @@ return [
             'driver' => 'redis',
             'connection' => env('QUEUE_REDIS_CONNECTION', 'default'),
             'queue' => env('QUEUE_REDIS_QUEUE', env('APP_NAME', 'default')),
-            'retry_after' => 90,
+            'retry_after' => 1200,
             'block_for' => null,
         ],
 
@@ -85,4 +85,7 @@ return [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
     ],
 
+    'batching' => [
+        'database' => env('QUEUE_BATCHING_DATABASE', 'ecloud'),
+    ],
 ];

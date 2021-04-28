@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\Vpc;
 
+use App\Rules\V2\IsMaxVpcLimitReached;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -29,20 +30,14 @@ class CreateRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string',
-            'region_id' => 'required|string|exists:ecloud.regions,id,deleted_at,NULL'
-        ];
-    }
-
-    /**
-     * Get the validation messages that apply to the request.
-     *
-     * @return array|string[]
-     */
-    public function messages()
-    {
-        return [
-            'region_id.required' => 'The :attribute field is required',
-            'region_id.exists' => 'The specified :attribute was not found'
+            'region_id' => [
+                'required',
+                'string',
+                new IsMaxVpcLimitReached(),
+                'exists:ecloud.regions,id,deleted_at,NULL'
+            ],
+            'console_enabled' => 'sometimes|boolean',
+            'advanced_networking' => 'sometimes|boolean',
         ];
     }
 }

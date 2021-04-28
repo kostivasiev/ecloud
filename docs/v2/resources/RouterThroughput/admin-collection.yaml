@@ -9,29 +9,33 @@ get:
         application/json:
           schema:
             type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: '../../components/schemas/routerThroughput.yaml'
-              meta:
-                allOf:
-                  - $ref: '../../components/schemas/meta.yaml'
-                  - type: object
-                    properties:
-                      pagination:
-                        properties:
-                          links:
-                            type: object
-                            properties:
-                              first:
-                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=1'
-                              previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=1'
-                              next:
-                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=2'
-                              last:
-                                example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=2'
+            allOf:
+              - $ref: '../../components/schemas/routerThroughput.yaml'
+              - type: object
+                properties:
+                  burst_size:
+                    description: Burst size in MB
+                    type: integer
+                    required: true
+                    example: 1024
+                meta:
+                  allOf:
+                    - $ref: '../../components/schemas/meta.yaml'
+                    - type: object
+                      properties:
+                        pagination:
+                          properties:
+                            links:
+                              type: object
+                              properties:
+                                first:
+                                  example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=1'
+                                previous:
+                                  example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=1'
+                                next:
+                                  example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=2'
+                                last:
+                                  example: 'https://api.ukfast.io/ecloud/v2/router-throughputs?page=2'
   tags:
     - Router Throughput
 post:

@@ -20,10 +20,12 @@ components:
       in: header
       name: Authorization
   schemas:
-    NetworkPolicy:
-      $ref: 'components/schemas/networkPolicy.yaml'
-    NetworkRule:
-      $ref : 'components/schemas/networkRule.yaml'
+#    NetworkPolicy:
+#      $ref: 'components/schemas/networkPolicy.yaml'
+#    NetworkRule:
+#      $ref : 'components/schemas/networkRule.yaml'
+#    NetworkRulePort :
+#      $ref : 'components/schemas/networkRulePort.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
@@ -50,14 +52,12 @@ components:
       $ref: 'components/schemas/region.yaml'
     Router:
       $ref: 'components/schemas/router.yaml'
-    LoadBalancerCluster:
-      $ref: 'components/schemas/lbc.yaml'
+#    LoadBalancerCluster:
+#      $ref: 'components/schemas/lbc.yaml'
     Volume:
       $ref: 'components/schemas/volume.yaml'
     RouterThroughput:
       $ref: 'components/schemas/routerThroughput.yaml'
-    NetworkRulePort:
-      $ref: 'components/schemas/networkRulePort.yaml'
     HostSpec:
       $ref: 'resources/HostSpec/schema.yaml'
     Meta:
@@ -91,18 +91,14 @@ components:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
-    FipId:
-      $ref: 'resources/FloatingIp/parameters/fipId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
-    LbcId:
-      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
-    VolumeId:
-      $ref: 'resources/Volume/parameters/volumeId.yaml'
+#    LbcId:
+#      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
     NetworkRulePortId:
       $ref: 'resources/NetworkRulePort/parameters/networkRulePortId.yaml'
   responses:
@@ -116,16 +112,12 @@ components:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
-    FipIdResponse:
-      $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
-    LbcIdResponse:
-      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
-    VolumeIdResponse:
-      $ref: 'resources/Volume/responses/idResponse.yaml'
+#    LbcIdResponse:
+#      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
     NetworkRulePortIdResponse:
       $ref: 'resources/NetworkRulePort/responses/idResponse.yaml'
 paths:
@@ -183,6 +175,8 @@ paths:
     $ref: 'resources/Instance/lockUnlock.yaml'
   '/ecloud/v2/instances/{instanceId}/unlock':
     $ref: 'resources/Instance/lockUnlock.yaml'
+  '/ecloud/v2/instances/{instanceId}/console-session':
+    $ref: 'resources/Instance/console.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
@@ -261,30 +255,30 @@ paths:
     $ref: 'resources/RouterThroughput/collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
-  '/ecloud/v2/network-policies':
-    $ref: 'resources/NetworkPolicy/collection.yaml'
-  '/ecloud/v2/network-policies/{networkPolicyId}':
-    $ref: 'resources/NetworkPolicy/item.yaml'
-  '/ecloud/v2/network-rule-ports':
-    $ref: 'resources/NetworkRulePort/collection.yaml'
-  '/ecloud/v2/network-rule-ports/{networkRulePortId}':
-    $ref: 'resources/NetworkRulePort/item.yaml'
-  '/ecloud/v2/network-rules':
-    $ref: 'resources/NetworkRule/collection.yaml'
-  '/ecloud/v2/network-rules/{networkRuleId}':
-    $ref: 'resources/NetworkRule/item.yaml'
-  '/ecloud/v2/hosts' :
-    $ref : 'resources/Host/collection.yaml'
-  '/ecloud/v2/hosts/{id}' :
-    $ref : 'resources/Host/item.yaml'
-  '/ecloud/v2/host-specs':
-    $ref: 'resources/HostSpec/collection.yaml'
-  '/ecloud/v2/host-specs/{hostSpecId}':
-    $ref: 'resources/HostSpec/item.yaml'
-  '/ecloud/v2/host-groups' :
-    $ref : 'resources/HostGroup/collection.yaml'
-  '/ecloud/v2/host-groups/{id}' :
-    $ref : 'resources/HostGroup/item.yaml'
+#  '/ecloud/v2/network-policies':
+#    $ref: 'resources/NetworkPolicy/collection.yaml'
+#  '/ecloud/v2/network-policies/{networkPolicyId}':
+#    $ref: 'resources/NetworkPolicy/item.yaml'
+#  '/ecloud/v2/network-rule-ports':
+#    $ref: 'resources/NetworkRulePort/collection.yaml'
+#  '/ecloud/v2/network-rule-ports/{networkRulePortId}':
+#    $ref: 'resources/NetworkRulePort/item.yaml'
+#  '/ecloud/v2/network-rules':
+#    $ref: 'resources/NetworkRule/collection.yaml'
+#  '/ecloud/v2/network-rules/{networkRuleId}':
+#    $ref: 'resources/NetworkRule/item.yaml'
+#  '/ecloud/v2/hosts' :
+#    $ref : 'resources/Host/collection.yaml'
+#  '/ecloud/v2/hosts/{id}' :
+#    $ref : 'resources/Host/item.yaml'
+#  '/ecloud/v2/host-specs':
+#    $ref: 'resources/HostSpec/collection.yaml'
+#  '/ecloud/v2/host-specs/{hostSpecId}':
+#    $ref: 'resources/HostSpec/item.yaml'
+#  '/ecloud/v2/host-groups' :
+#    $ref : 'resources/HostGroup/collection.yaml'
+#  '/ecloud/v2/host-groups/{id}' :
+#    $ref : 'resources/HostGroup/item.yaml'
   '/ecloud/v2/images':
     $ref: 'resources/Image/collection.yaml'
   '/ecloud/v2/images/{id}':

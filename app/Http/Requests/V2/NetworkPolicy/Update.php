@@ -27,14 +27,6 @@ class Update extends FormRequest
     public function rules()
     {
         return [
-            'network_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.networks,id,deleted_at,NULL',
-                new ExistsForUser(Network::class),
-                new NetworkHasNoPolicy(),
-            ],
             'name' => 'nullable|string',
         ];
     }

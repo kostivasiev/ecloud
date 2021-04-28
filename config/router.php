@@ -3,7 +3,7 @@
 return [
     'throughput' => [
         'default' => [
-            'bandwidth' => env('ROUTER_THROUGHPUT_DEFAULT', 20)
+            'bandwidth' => env('ROUTER_THROUGHPUT_DEFAULT', 25)
         ]
     ]
 ];

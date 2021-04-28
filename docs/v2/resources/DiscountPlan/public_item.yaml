@@ -9,7 +9,7 @@ get:
           schema:
             type: object
             allOf:
-              - $ref: '../../components/schemas/admin/discountPlan.yaml'
+              - $ref: '../../components/schemas/discountPlan.yaml'
               - type: object
                 properties:
                   region_id:

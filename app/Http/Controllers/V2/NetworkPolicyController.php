@@ -35,7 +35,7 @@ class NetworkPolicyController extends BaseController
             'network_id',
         ]));
         $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->id, 201);
+        return $this->responseIdMeta($request, $networkPolicy->id, 202);
     }
 
     public function update(Update $request, string $networkPolicyId)
@@ -43,10 +43,9 @@ class NetworkPolicyController extends BaseController
         $networkPolicy = NetworkPolicy::forUser(Auth::user())->findOrFail($networkPolicyId);
         $networkPolicy->fill($request->only([
             'name',
-            'network_id',
         ]));
         $networkPolicy->save();
-        return $this->responseIdMeta($request, $networkPolicy->id, 200);
+        return $this->responseIdMeta($request, $networkPolicy->id, 202);
     }
 
     public function destroy(Request $request, string $networkPolicyId)
@@ -55,6 +54,6 @@ class NetworkPolicyController extends BaseController
         if (!$networkPolicy->delete()) {
             return $networkPolicy->getSyncError();
         }
-        return response('', 204);
+        return response('', 202);
     }
 }

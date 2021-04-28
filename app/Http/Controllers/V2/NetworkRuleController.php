@@ -42,14 +42,13 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
         $networkRule->save();
-        return $this->responseIdMeta($request, $networkRule->id, 201);
+        return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
     public function update(Update $request, string $networkRuleId)
     {
         $networkRule = NetworkRule::forUser(Auth::user())->findOrFail($networkRuleId);
         $networkRule->fill($request->only([
-            'network_policy_id',
             'name',
             'sequence',
             'source',
@@ -58,13 +57,13 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
         $networkRule->save();
-        return $this->responseIdMeta($request, $networkRule->id, 200);
+        return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
     public function destroy(Request $request, string $networkRuleId)
     {
         NetworkRule::forUser($request->user())->findOrFail($networkRuleId)
             ->delete();
-        return response('', 204);
+        return response('', 202);
     }
 }

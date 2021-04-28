@@ -33,7 +33,8 @@ patch:
                 router_id:
                   required: false
   responses:
-    200:
+    202:
+      description: Accepted
       $ref: '../../resources/FirewallPolicy/responses/idResponse.yaml'
   tags:
     - Firewall Policies
@@ -41,8 +42,8 @@ delete:
   parameters:
     - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Firewall Policies
 

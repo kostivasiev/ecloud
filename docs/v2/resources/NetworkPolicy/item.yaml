@@ -31,10 +31,11 @@ patch:
               properties:
                 name:
                   required: false
-                router_id:
-                  required: false
+                network_id:
+                  readOnly: true
   responses:
-    200:
+    202:
+      description: Accepted
       $ref: '../../resources/NetworkPolicy/responses/idResponse.yaml'
   tags:
     - Network Policies
@@ -43,7 +44,7 @@ delete:
   parameters:
     - $ref: '../../resources/NetworkPolicy/parameters/networkPolicyId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Network Policies
