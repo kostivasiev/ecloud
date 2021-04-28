@@ -37,4 +37,4 @@ class IsMaxInstanceForCustomer
         }
         return Instance::forUser(Auth::user())->count() < config('instance.max_limit.total');
     }
-} 
+}

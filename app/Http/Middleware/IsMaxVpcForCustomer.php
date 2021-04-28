@@ -36,4 +36,4 @@ class IsMaxVpcForCustomer
         }
         return (Vpc::forUser(Auth::user())->get()->count() < config('defaults.vpc.max_count'));
     }
-} 
+}
