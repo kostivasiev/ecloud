@@ -51,7 +51,10 @@ class HostGroupController extends BaseController
         $model->fill($request->only([
             'name',
         ]));
-        $model->save();
+
+        $model->withSyncLock(function ($model) {
+            $model->save();
+        });
         return $this->responseIdMeta($request, $model->id, 202);
     }
 
@@ -67,7 +70,9 @@ class HostGroupController extends BaseController
             ], 422);
         }
 
-        $model->delete();
+        $model->withSyncLock(function ($model) {
+            $model->delete();
+        });
         return response('', 204);
     }
 }
