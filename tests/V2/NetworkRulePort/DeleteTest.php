@@ -2,12 +2,13 @@
 
 namespace Tests\V2\NetworkRulePort;
 
-use App\Models\V2\Network;
+use App\Events\V2\NetworkPolicy\Saved;
+use App\Events\V2\NetworkPolicy\Saving;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -46,11 +47,12 @@ class DeleteTest extends TestCase
 
     public function testDelete()
     {
+        Event::fake();
+
         $this->delete('/v2/network-rule-ports/nrp-test')
             ->assertResponseStatus(202);
 
-
-
-        $this->assertNotFalse(NetworkRulePort::find('nrp-test'));
+        Event::assertDispatched(Saving::class);
+        Event::assertDispatched(Saved::class);
     }
 }

@@ -51,6 +51,7 @@ class CreateTest extends TestCase
 
     public function testCreateResourceNetworkAlreadyAssigned()
     {
+        Event::fake();
         $data = [
             'name' => 'Test Policy',
             'network_id' => $this->network()->id,
