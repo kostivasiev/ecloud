@@ -4,11 +4,6 @@ namespace App\Jobs\Sync\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Jobs\NetworkPolicy\DeleteChildResources;
-use App\Jobs\Nsx\FirewallPolicy\Undeploy;
-use App\Jobs\Nsx\FirewallPolicy\UndeployCheck;
-use App\Jobs\Sync\Completed;
-use App\Jobs\Sync\Delete as SyncDelete;
-use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;

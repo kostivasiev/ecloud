@@ -26,7 +26,7 @@ class DeleteTest extends TestCase
             $this->sync = new Sync([
                 'id' => 'sync-1',
             ]);
-            $this->sync->resource()->associate($this->firewallPolicy());
+            $this->sync->resource()->associate($this->networkPolicy());
         });
 
         Bus::fake();
