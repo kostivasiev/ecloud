@@ -51,7 +51,7 @@ class PrepareOsDisk extends Job
 
             // Send created Volume ID's to Kinpin
             $this->instance->availabilityZone->kingpinService()->put(
-                '/api/v1/vpc/' . $this->instance->vpc->id . '/volume/' . $volume->vmware_uuid . '/resourceid',
+                '/api/v2/vpc/' . $this->instance->vpc->id . '/volume/' . $volume->vmware_uuid . '/resourceid',
                 [
                     'json' => [
                         'volumeId' => $volume->id

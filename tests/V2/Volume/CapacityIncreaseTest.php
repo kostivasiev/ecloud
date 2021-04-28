@@ -21,7 +21,7 @@ class CapacityIncreaseTest extends TestCase
         // Initial create
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
+                '/api/v2/vpc/vpc-test/volume',
                 [
                     'json' => [
                         'volumeId' => 'vol-test',
