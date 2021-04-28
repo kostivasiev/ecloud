@@ -8,7 +8,6 @@ use App\Events\V2\NetworkPolicy\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
-use App\Traits\V2\SyncableOverrides;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -20,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class NetworkPolicy extends Model implements Filterable, Sortable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable, SyncableOverrides;
+    use CustomKey, DefaultName, SoftDeletes, Syncable;
 
     public string $keyPrefix = 'np';
 

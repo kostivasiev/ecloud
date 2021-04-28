@@ -1,16 +1,12 @@
 <?php
 
-namespace Tests\unit\Jobs\FirewallPolicy;
+namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 
 use App\Events\V2\FirewallRule\Deleted;
-use App\Jobs\FirewallPolicy\Deploy;
-use App\Jobs\FirewallPolicy\Undeploy;
+use App\Jobs\Nsx\FirewallPolicy\Undeploy;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Router;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;

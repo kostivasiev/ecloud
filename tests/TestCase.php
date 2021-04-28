@@ -13,6 +13,7 @@ use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
@@ -68,6 +69,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var FirewallPolicy */
     private $firewallPolicy;
+
+    /** @var NetworkPolicy */
+    private $networkPolicy;
 
     /** @var RouterThroughput */
     private $routerThroughput;
@@ -134,6 +138,19 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->firewallPolicy;
+    }
+
+    public function networkPolicy($id = 'np-test'): NetworkPolicy
+    {
+        if (!$this->networkPolicy) {
+            Model::withoutEvents(function() use ($id) {
+                $this->networkPolicy = factory(NetworkPolicy::class)->create([
+                    'id' => $id,
+                    'network_id' => $this->network()->id,
+                ]);
+            });
+        }
+        return $this->networkPolicy;
     }
 
     public function routerThroughput()

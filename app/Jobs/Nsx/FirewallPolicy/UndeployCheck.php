@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\FirewallPolicy;
+namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;

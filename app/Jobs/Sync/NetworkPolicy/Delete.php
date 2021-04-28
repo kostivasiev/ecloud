@@ -4,23 +4,37 @@ namespace App\Jobs\Sync\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Jobs\NetworkPolicy\DeleteChildResources;
+use App\Jobs\Nsx\FirewallPolicy\Undeploy;
+use App\Jobs\Nsx\FirewallPolicy\UndeployCheck;
 use App\Jobs\Sync\Completed;
 use App\Jobs\Sync\Delete as SyncDelete;
 use App\Models\V2\NetworkPolicy;
+use App\Models\V2\Sync;
+use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    private $model;
+    use SyncableBatch;
 
-    public function __construct(NetworkPolicy $model)
+    private $sync;
+
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
+        $this->sync = $sync;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+
+        $this->deleteSyncBatch([
+            [
+                new Undeploy($this->sync->resource),
+                new UndeployCheck($this->sync->resource),
+            ]
+        ])->dispatch();
+
 
         $jobs = [
             new DeleteChildResources($this->model),
@@ -33,6 +47,6 @@ class Delete extends Job
         ];
         dispatch(array_shift($jobs)->chain($jobs));
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

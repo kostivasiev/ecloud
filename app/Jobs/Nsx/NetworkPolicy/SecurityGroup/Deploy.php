@@ -8,18 +8,18 @@ use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    private $model;
+    private NetworkPolicy $networkPolicy;
 
-    public function __construct(NetworkPolicy $model)
+    public function __construct(NetworkPolicy $networkPolicy)
     {
-        $this->model = $model;
+        $this->networkPolicy = $networkPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->networkPolicy->id]);
 
-        $network = $this->model->network;
+        $network = $this->networkPolicy->network;
         $router = $network->router;
         $availabilityZone = $router->availabilityZone;
 
@@ -27,11 +27,11 @@ class Deploy extends Job
          * Create a security group for the network policy
          */
         $availabilityZone->nsxService()->patch(
-            '/policy/api/v1/infra/domains/default/groups/' . $this->model->id,
+            '/policy/api/v1/infra/domains/default/groups/' . $this->networkPolicy->id,
             [
                 'json' => [
-                    'id' => $this->model->id,
-                    'display_name' => $this->model->id,
+                    'id' => $this->networkPolicy->id,
+                    'display_name' => $this->networkPolicy->id,
                     'resource_type' => 'Group',
                     'expression' => [
                         [
@@ -45,12 +45,6 @@ class Deploy extends Job
             ]
         );
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->networkPolicy->id]);
     }
 }

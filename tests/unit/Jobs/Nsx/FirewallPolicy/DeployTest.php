@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\unit\Jobs\FirewallPolicy;
+namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 
-use App\Jobs\FirewallPolicy\Deploy;
+use App\Jobs\Nsx\FirewallPolicy\Deploy;
 use App\Models\V2\FirewallPolicy;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
