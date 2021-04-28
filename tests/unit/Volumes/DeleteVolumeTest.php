@@ -33,7 +33,7 @@ class DeleteVolumeTest extends TestCase
     public function testDeleteVolumeThatExistsInKingpin()
     {
         $this->kingpinServiceMock()->shouldReceive('delete')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume/d7a86079-6b02-4373-b2ca-6ec24fef2f1c')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/volume/d7a86079-6b02-4373-b2ca-6ec24fef2f1c')
             ->andReturnUsing(function () {
                 return new Response(200);
             });
@@ -44,7 +44,7 @@ class DeleteVolumeTest extends TestCase
     public function testDeleteVolumeThatDoesNotExistInKingpin()
     {
         $this->kingpinServiceMock()->shouldReceive('delete')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume/d7a86079-6b02-4373-b2ca-6ec24fef2f1c')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/volume/d7a86079-6b02-4373-b2ca-6ec24fef2f1c')
             ->andReturnUsing(function () {
                 return new Response(404);
             });

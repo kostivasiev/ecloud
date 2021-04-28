@@ -41,7 +41,7 @@ class UndeployTest extends TestCase
         });
 
         $this->kingpinServiceMock()->expects('delete')
-            ->withArgs(['/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test'])
+            ->withArgs(['/api/v2/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test'])
             ->andReturnUsing(function () {
                 return new Response(200);
             });

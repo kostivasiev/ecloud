@@ -34,7 +34,7 @@ class Undeploy extends Job
 
         try {
             $this->model->availabilityZone->kingpinService()->delete(
-                '/api/v1/vpc/' . $this->model->vpc->id . '/volume/' . $this->model->vmware_uuid
+                '/api/v2/vpc/' . $this->model->vpc->id . '/volume/' . $this->model->vmware_uuid
             );
         } catch (RequestException $exception) {
             if ($exception->getCode() != 404) {
