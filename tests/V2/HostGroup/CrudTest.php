@@ -225,7 +225,7 @@ class CrudTest extends TestCase
                     'deleted_at' => null,
                 ],
                 'ecloud'
-            )->assertResponseStatus(202);
+            )->assertResponseStatus(204);
     }
 
     public function testDestroyCantDeleteHostGroupWhenItHasHost()
