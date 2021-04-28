@@ -4,10 +4,13 @@ namespace App\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class UndeployCheck extends Job
 {
+    use Batchable;
+
     const RETRY_DELAY = 5;
 
     public $tries = 500;

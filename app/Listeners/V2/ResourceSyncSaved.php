@@ -3,7 +3,6 @@
 namespace App\Listeners\V2;
 
 use App\Models\V2\Sync;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSyncSaved

@@ -9,6 +9,7 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\Instance;
 use App\Models\V2\Nat;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
 use App\Models\V2\Router;
 use App\Models\V2\Sync;
@@ -29,6 +30,7 @@ class SyncCreated
             Nic::class,
             FloatingIp::class,
             FirewallPolicy::class,
+            NetworkPolicy::class,
             Vpc::class,
             Dhcp::class,
             Router::class,

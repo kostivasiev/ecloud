@@ -4,10 +4,13 @@ namespace App\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
+    use Batchable;
+
     private NetworkPolicy $networkPolicy;
 
     public function __construct(NetworkPolicy $networkPolicy)
