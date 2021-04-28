@@ -102,6 +102,6 @@ class CrudTest extends TestCase
                     'deleted_at' => null,
                 ],
                 'ecloud'
-            )->assertResponseStatus(202);
+            )->assertResponseStatus(204);
     }
 }
