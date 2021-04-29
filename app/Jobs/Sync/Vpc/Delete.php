@@ -5,7 +5,7 @@ namespace App\Jobs\Sync\Vpc;
 use App\Jobs\Job;
 use App\Jobs\Vpc\AwaitDhcpRemoval;
 use App\Jobs\Vpc\DeleteDhcps;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use App\Models\V2\Task;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;

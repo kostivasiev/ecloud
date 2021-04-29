@@ -4,7 +4,7 @@ namespace App\Listeners\V2\Host;
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -19,23 +19,23 @@ class ToggleHostGroupBilling
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
-        $sync = $event->model;
+        $task = $event->model;
 
-        if (!$sync->completed || !($sync->resource instanceof Host)) {
+        if (!$task->completed || !($task->resource instanceof Host)) {
             return;
         }
 
-        $host = $sync->resource;
+        $host = $task->resource;
 
-        switch ($sync->type) {
-            case Sync::TYPE_UPDATE:
+        switch ($task->name) {
+            case Sync::TASK_NAME_UPDATE:
                 $billingMetric = BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup');
                 if ($billingMetric) {
                     Log::debug(get_class($this) . ': Billing ended for non empty host group ' . $host->hostGroup->id);
                     $billingMetric->setEndDate();
                 }
                 break;
-            case Sync::TYPE_DELETE:
+            case Sync::TASK_NAME_DELETE:
                 // <= 1 because the host hasn't been trashed yet
                 if ($host->hostGroup->hosts->count() <= 1 && (!BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup'))) {
                     $billingMetric = app()->make(BillingMetric::class);
@@ -67,7 +67,7 @@ class ToggleHostGroupBilling
                 }
                 break;
             default:
-                Log::error(get_class($this) . ': Unrecognised sync type ' . $sync->type);
+                Log::error(get_class($this) . ': Unrecognised sync type ' . $task->type);
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);

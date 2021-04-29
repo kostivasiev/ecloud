@@ -3,7 +3,7 @@ namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Models\V2\Instance;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;

@@ -6,7 +6,7 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\NetworkPolicy;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Log;
 
 trait SyncableOverrides

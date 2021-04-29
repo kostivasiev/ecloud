@@ -11,7 +11,7 @@ use App\Models\V2\Nat;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Router;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Log;

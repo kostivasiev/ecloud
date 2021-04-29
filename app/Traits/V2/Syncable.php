@@ -4,7 +4,7 @@ namespace App\Traits\V2;
 
 use App\Exceptions\TaskException;
 use App\Listeners\V2\ResourceSyncSaving;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,14 +34,14 @@ trait Syncable
             $latest = $this->tasks()
                 ->where(function ($query) {
                     return $query
-                        ->where('name', '=', 'sync_update')
-                        ->orWhere('name', '=', 'sync_delete');
+                        ->where('name', '=', Sync::TASK_NAME_UPDATE)
+                        ->orWhere('name', '=', Sync::TASK_NAME_DELETE);
                 })
                 ->latest()
                 ->first();
 
             $status = $latest->status;
-            $type   = ltrim($latest->name, 'sync_');
+            $type   = Sync::transformTaskNameToType($latest->name);
         }
 
         return (object) [

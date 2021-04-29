@@ -279,10 +279,15 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Sync
-        \App\Events\V2\Sync\Created::class => [
-            \App\Listeners\V2\SyncCreated::class
-        ],
+
         \App\Events\V2\Sync\Updated::class => [
+        ],
+
+        // Task
+        \App\Events\V2\Task\Created::class => [
+            \App\Listeners\V2\TaskCreated::class
+        ],
+        \App\Events\V2\Task\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
@@ -293,10 +298,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Host\UpdateBilling::class,
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,
-        ],
-
-        \App\Events\V2\Task\Created::class => [
-            \App\Listeners\V2\TaskCreated::class
         ],
     ];
 }

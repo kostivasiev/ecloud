@@ -8,7 +8,7 @@ use App\Jobs\Nat\AwaitIPAddressAllocation;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;

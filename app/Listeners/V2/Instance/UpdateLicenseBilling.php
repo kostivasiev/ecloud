@@ -6,6 +6,7 @@ use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Resource;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -18,6 +19,10 @@ class UpdateLicenseBilling
      */
     public function handle(Updated $event)
     {
+        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+            return;
+        }
+
         if (!$event->model->completed) {
             return;
         }

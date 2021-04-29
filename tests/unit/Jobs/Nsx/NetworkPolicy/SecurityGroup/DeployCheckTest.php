@@ -3,7 +3,7 @@
 namespace Tests\unit\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 
 use App\Jobs\Nsx\DeployCheck;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;

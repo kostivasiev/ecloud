@@ -3,7 +3,7 @@
 namespace App\Listeners\V2;
 
 use App\Jobs\Sync\Router\Update;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSyncSaved

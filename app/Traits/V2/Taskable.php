@@ -34,7 +34,10 @@ trait Taskable
 
     public function canCreateTask()
     {
-        if ($this->sync->status === Task::STATUS_INPROGRESS) {
+        if ($this->tasks->filter(function ($task) {
+                return $task->status == Task::STATUS_INPROGRESS;
+        })->count())
+        {
             Log::warning(get_class($this) . ' : Cannot create task, resource has task in progress', ['resource_id' => $this->id]);
             return false;
         }
