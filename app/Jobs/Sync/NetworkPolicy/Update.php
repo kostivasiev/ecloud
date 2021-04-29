@@ -7,41 +7,43 @@ use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
 use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
 use App\Jobs\Nsx\DeployCheck;
 use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use App\Traits\V2\SyncableBatch;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
 
-        $this->updateSyncBatch([
+        $this->updateTaskBatch([
             [
-                new DeploySecurityGroup($this->sync->resource),
+                new DeploySecurityGroup($this->task->resource),
                 new DeployCheck(
-                    $this->sync->resource,
-                    $this->sync->resource->network->router->availabilityZone,
+                    $this->task->resource,
+                    $this->task->resource->network->router->availabilityZone,
                     '/infra/domains/default/groups/'
                 ),
-                new DeployNetworkPolicy($this->sync->resource),
+                new DeployNetworkPolicy($this->task->resource),
                 new DeployCheck(
-                    $this->sync->resource,
-                    $this->sync->resource->network->router->availabilityZone,
+                    $this->task->resource,
+                    $this->task->resource->network->router->availabilityZone,
                     '/infra/domains/default/security-policies/'
                 )
             ]
         ])->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Jobs\Sync\Network;
 
 use App\Jobs\Job;
-use App\Jobs\Network\AwaitRouterTask;
+use App\Jobs\Network\AwaitRouterSync;
 use App\Jobs\Network\DeployDiscoveryProfile;
 use App\Jobs\Network\DeploySecurityProfile;
 use App\Jobs\Network\Deploy;
@@ -28,7 +28,7 @@ class Update extends Job
 
         $this->updateTaskBatch([
             [
-                new AwaitRouterTask($this->task->resource),
+                new AwaitRouterSync($this->task->resource),
                 new Deploy($this->task->resource),
                 new DeploySecurityProfile($this->task->resource),
                 new DeployDiscoveryProfile($this->task->resource),
