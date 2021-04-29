@@ -13,7 +13,7 @@ trait DeletionRules
                 ->findOrFail($this->id)
                 ->getRelations()
         )->sum(function ($relation) {
-            return $relation->count();
+            return (!empty($relation)) ? $relation->count() : 0;
         });
         return $relationships === 0;
     }
