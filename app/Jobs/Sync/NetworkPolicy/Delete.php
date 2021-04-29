@@ -4,9 +4,7 @@ namespace App\Jobs\Sync\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Jobs\NetworkPolicy\DeleteChildResources;
-use App\Models\V2\Sync;
 use App\Models\V2\Task;
-use App\Traits\V2\SyncableBatch;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 

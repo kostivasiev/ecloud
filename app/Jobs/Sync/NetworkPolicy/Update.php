@@ -6,9 +6,7 @@ use App\Jobs\Job;
 use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
 use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
 use App\Jobs\Nsx\DeployCheck;
-use App\Models\V2\Sync;
 use App\Models\V2\Task;
-use App\Traits\V2\SyncableBatch;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 

@@ -8,9 +8,7 @@ use App\Jobs\Router\DeleteFirewallPolicies;
 use App\Jobs\Router\UndeployRouterLocale;
 use App\Jobs\Router\Undeploy;
 use App\Jobs\Router\UndeployCheck;
-use App\Models\V2\Sync;
 use App\Models\V2\Task;
-use App\Traits\V2\SyncableBatch;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 
