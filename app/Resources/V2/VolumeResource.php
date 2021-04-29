@@ -15,7 +15,7 @@ use UKFast\Responses\UKFastResource;
  * @property string capacity
  * @property string iops
  * @property string vmware_uuid
- * @property boolean os_volume
+ * @property boolean os_type
  * @property string created_at
  * @property string updated_at
  */
@@ -36,7 +36,7 @@ class VolumeResource extends UKFastResource
             'iops' => $this->iops,
             'attached' => $this->attached,
             'sync' => $this->sync,
-            'os_type' => $this->os_volume ? 'os' : 'data',
+            'os_type' => $this->os_type ? 'os' : 'data',
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
