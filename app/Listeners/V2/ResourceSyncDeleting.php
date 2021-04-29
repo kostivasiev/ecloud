@@ -4,8 +4,6 @@ namespace App\Listeners\V2;
 
 use App\Exceptions\TaskException;
 use App\Models\V2\Sync;
-use Illuminate\Contracts\Cache\LockTimeoutException;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSyncDeleting

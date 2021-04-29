@@ -46,7 +46,7 @@ class FirewallPolicyController extends BaseController
 
     public function store(CreateFirewallPolicyRequest $request)
     {
-        $model = new FirewallPolicy();
+        $model = app()->make(FirewallPolicy::class);
         $model->fill($request->only(['name', 'sequence', 'router_id']));
 
         $model->withTaskLock(function ($policy) {

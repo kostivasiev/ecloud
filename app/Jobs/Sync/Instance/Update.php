@@ -7,6 +7,7 @@ use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\AttachOsDisk;
 use App\Jobs\Instance\Deploy\AwaitNicTask;
+use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\DeployCompleted;
@@ -43,6 +44,7 @@ class Update extends Job
         if (!$this->task->resource->deployed) {
             $this->updateTaskBatch([
                 [
+                    new CheckNetworkAvailable($this->task->resource),
                     new Deploy($this->task->resource),
                     new PrepareOsDisk($this->task->resource),
                     new AttachOsDisk($this->task->resource),
