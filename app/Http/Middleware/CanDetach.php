@@ -17,7 +17,7 @@ class CanDetach
     {
         $volume = Volume::forUser($request->user())->findOrFail($request->route('volumeId'));
 
-        if ($volume->os_volume) {
+        if ($volume->type) {
             throw new DetachException();
         }
 

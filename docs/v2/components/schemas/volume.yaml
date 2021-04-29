@@ -40,7 +40,7 @@ properties:
       type:
         description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
         example: update
-  os_volume:
+  type:
     type: string
     readOnly: true
     description: Is the volume an OS volume

@@ -26,7 +26,7 @@ class CreateRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
+        return [
             'name' => ['nullable', 'string'],
             'vpc_id' => [
                 'required',
@@ -53,16 +53,6 @@ class CreateRequest extends FormRequest
                 'in:300,600,1200,2500',
             ],
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $rules['os_type'] = [
-                'sometimes',
-                'required',
-                'boolean',
-            ];
-        }
-
-        return $rules;
     }
 
     /**

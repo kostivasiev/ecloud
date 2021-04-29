@@ -93,7 +93,6 @@ class VolumeController extends BaseController
             'availability_zone_id',
             'capacity',
             'iops',
-            'os_type',
         ]));
 
         $model->save();

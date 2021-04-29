@@ -40,17 +40,7 @@ post:
     content:
       application/json:
         schema:
-          type: object
-          allOf:
-            - $ref: '../../admin-openapi.yaml#/components/schemas/Volume'
-            - type: object
-              properties:
-                os_type:
-                  type: boolean
-                  description: Is the volume an OS volume
-                  example: true
-                  required: false
-                  readOnly: false
+          $ref: '../../admin-openapi.yaml#/components/schemas/Volume'
   responses:
     202:
       description: Accepted
