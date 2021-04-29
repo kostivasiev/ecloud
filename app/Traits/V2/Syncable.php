@@ -40,8 +40,10 @@ trait Syncable
                 ->latest()
                 ->first();
 
-            $status = $latest->status;
-            $type   = Sync::transformTaskNameToType($latest->name);
+            if ($latest) {
+                $status = $latest->status;
+                $type   = Sync::transformTaskNameToType($latest->name);
+            }
         }
 
         return (object) [
