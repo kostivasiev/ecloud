@@ -13,6 +13,7 @@ use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
+use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
@@ -80,7 +81,7 @@ class InstanceController extends BaseController
         // Use the default network if there is only one and no network_id was passed in
         $defaultNetworkId = null;
         if (!$request->has('network_id')) {
-            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1) {
+            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1 && $vpc->routers->first()->getStatus() !== Sync::STATUS_FAILED) {
                 $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
             }
             if (!$defaultNetworkId) {

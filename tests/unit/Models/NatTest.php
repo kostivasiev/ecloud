@@ -26,10 +26,6 @@ class NatTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->instance = factory(Instance::class)->create([
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'vpc_id' => $this->vpc()->id,
-        ]);
         $this->floating_ip = FloatingIp::withoutEvents(function () {
             return factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
@@ -44,7 +40,7 @@ class NatTest extends TestCase
             });
         $this->nic = factory(Nic::class)->create([
             'id' => 'nic-a1ae98ce',
-            'instance_id' => $this->instance->id,
+            'instance_id' => $this->instance()->id,
             'network_id' => $this->network()->id,
             'ip_address' => $this->faker->ipv4,
         ]);
