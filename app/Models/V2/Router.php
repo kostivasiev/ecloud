@@ -65,7 +65,6 @@ class Router extends Model implements Filterable, Sortable
     public $children = [
         'vpns',
         'networks',
-        'routerThroughput',
     ];
 
     public function availabilityZone()
