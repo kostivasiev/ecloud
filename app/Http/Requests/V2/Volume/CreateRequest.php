@@ -55,7 +55,7 @@ class CreateRequest extends FormRequest
         ];
 
         if (Auth::user()->isAdmin()) {
-            $rules['os_volume'] = [
+            $rules['os_type'] = [
                 'sometimes',
                 'required',
                 'boolean',
