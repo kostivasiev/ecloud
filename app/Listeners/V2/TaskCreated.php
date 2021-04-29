@@ -20,28 +20,15 @@ class TaskCreated
 {
     public function handle($event)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
+        Log::debug(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
-        // TODO: Remove following once all syncable resources are using update/delete functionality
-        if (!in_array(get_class($event->model->resource), [
-            Volume::class,
-            Instance::class,
-            Nic::class,
-            FloatingIp::class,
-            FirewallPolicy::class,
-            Vpc::class,
-            Dhcp::class,
-            Router::class,
-            Network::class,
-            Host::class,
-            Nat::class,
-        ])) {
-            return true;
+        if ($event->model->job) {
+            Log::debug(get_class($this) . " : Dispatching job", ["job" => $event->model->job]);
+            dispatch(new $event->model->job($event->model));
+        } else {
+            Log::debug(get_class($this) . " : Skipping job dispatch, no job defined for task", ["job" => $event->model->job]);
         }
 
-        Log::debug(get_class($this) . " : Dispatching job", ["job" => $event->model->job]);
-        dispatch(new $event->model->job($event->model));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+        Log::debug(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }

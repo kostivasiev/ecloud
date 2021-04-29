@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\Sync\Vpc;
 
 use App\Jobs\Sync\Vpc\Delete;
 use App\Models\V2\Sync;
+use BeyondCode\ErdGenerator\Model;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -22,7 +23,7 @@ class DeleteTest extends TestCase
 
     public function testJobsBatched()
     {
-        Sync::withoutEvents(function() {
+        Model::withoutEvents(function() {
             $this->sync = new Sync([
                 'id' => 'sync-1',
             ]);

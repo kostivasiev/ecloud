@@ -33,6 +33,7 @@ class Task extends Model
 
     protected $casts = [
         'completed' => 'boolean',
+        'data'      => 'array',
     ];
 
     protected $dispatchesEvents = [
