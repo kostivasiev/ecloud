@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddOsVolumeColumnToVolumesTable extends Migration
+class AddOsTypeColumnToVolumesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddOsVolumeColumnToVolumesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('volumes', function (Blueprint $table) {
-            $table->boolean('os_volume')->default(true)->after('vmware_uuid');
+            $table->boolean('os_type')->default(true)->after('vmware_uuid');
         });
     }
 
@@ -26,7 +26,7 @@ class AddOsVolumeColumnToVolumesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('volumes', function (Blueprint $table) {
-            $table->dropColumn(['os_volume']);
+            $table->dropColumn(['os_type']);
         });
     }
 }

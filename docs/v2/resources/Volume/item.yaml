@@ -35,7 +35,7 @@ patch:
                   readOnly: true
                 capacity:
                   required: false
-                os_volume:
+                os_type:
                   readOnly: true
   responses:
     202:
