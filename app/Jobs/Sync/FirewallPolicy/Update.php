@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\FirewallPolicy;
+namespace App\Jobs\Sync\FirewallPolicy;
 
 use App\Jobs\Job;
 use App\Jobs\FirewallPolicy\Deploy;

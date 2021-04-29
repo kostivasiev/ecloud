@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Nic;
+namespace App\Jobs\Sync\Nic;
 
 use App\Jobs\Job;
 use App\Jobs\Nsx\Nic\CreateDHCPLease;

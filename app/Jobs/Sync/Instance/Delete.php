@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Instance;
+namespace App\Jobs\Sync\Instance;
 
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\Undeploy\AwaitNicRemoval;

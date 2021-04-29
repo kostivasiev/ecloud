@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Jobs\Task\Instance;
+namespace App\Jobs\Sync\Instance;
 
 use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
 use App\Jobs\Instance\Deploy\AttachOsDisk;
-use App\Jobs\Instance\Deploy\AwaitNicTask;
+use App\Jobs\Instance\Deploy\AwaitNicSync;
 use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
@@ -49,7 +49,7 @@ class Update extends Job
                     new PrepareOsDisk($this->task->resource),
                     new AttachOsDisk($this->task->resource),
                     new ConfigureNics($this->task->resource),
-                    new AwaitNicTask($this->task->resource),
+                    new AwaitNicSync($this->task->resource),
                     new AssignFloatingIp($this->task->resource),
                     new UpdateNetworkAdapter($this->task->resource),
                     new OsCustomisation($this->task->resource),

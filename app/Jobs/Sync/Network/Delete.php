@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Network;
+namespace App\Jobs\Sync\Network;
 
 use App\Jobs\Job;
 use App\Jobs\Network\AwaitPortRemoval;

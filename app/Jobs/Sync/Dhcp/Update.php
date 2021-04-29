@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Dhcp;
+namespace App\Jobs\Sync\Dhcp;
 
 use App\Jobs\Job;
 use App\Jobs\Nsx\Dhcp\Create;

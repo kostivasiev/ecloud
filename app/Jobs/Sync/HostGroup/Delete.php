@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\HostGroup;
+namespace App\Jobs\Sync\HostGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
@@ -21,8 +21,8 @@ class Delete extends Job
 
         $jobs = [
             // TODO :- Undeploy
-            new \App\Jobs\Task\Completed($this->model),
-            new \App\Jobs\Task\Delete($this->model),
+            new \App\Jobs\Sync\Completed($this->model),
+            new \App\Jobs\Sync\Delete($this->model),
         ];
         dispatch(array_shift($jobs)->chain($jobs));
 

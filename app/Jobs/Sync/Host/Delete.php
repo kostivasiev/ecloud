@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Host;
+namespace App\Jobs\Sync\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Task;

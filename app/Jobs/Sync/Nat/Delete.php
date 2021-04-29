@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Nat;
+namespace App\Jobs\Sync\Nat;
 
 use App\Jobs\Job;
 use App\Jobs\Nat\Undeploy;

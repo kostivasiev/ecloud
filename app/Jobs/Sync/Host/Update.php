@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Host;
+namespace App\Jobs\Sync\Host;
 
 use App\Jobs\Artisan\Host\Deploy;
 use App\Jobs\Conjurer\Host\CheckAvailableCompute;

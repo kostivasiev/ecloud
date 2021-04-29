@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\FloatingIp;
+namespace App\Jobs\Sync\FloatingIp;
 
 use App\Jobs\FloatingIp\AwaitNatRemoval;
 use App\Jobs\FloatingIp\DeleteNats;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Task\Volume;
+namespace App\Jobs\Sync\Volume;
 
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Volume\Undeploy;
