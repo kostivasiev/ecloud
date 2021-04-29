@@ -1,33 +1,33 @@
 <?php
 
-namespace App\Jobs\Sync\Volume;
+namespace App\Jobs\Task\Volume;
 
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
-use App\Models\V2\Sync;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch;
 
-    private $sync;
+    private $task;
     private $originalValues;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
-        $this->originalValues = $sync->resource->getOriginal();
+        $this->task = $task;
+        $this->originalValues = $task->resource->getOriginal();
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
 
-        $volume = $this->sync->resource;
+        $volume = $this->task->resource;
 
         $jobs = [
             new Deploy($volume),
@@ -43,10 +43,10 @@ class Update extends Job
             $jobs[] = new CapacityChange($volume);
         }
 
-        $this->updateSyncBatch([
+        $this->updateTaskBatch([
             $jobs
         ])->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
     }
 }

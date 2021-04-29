@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\TaskException;
 use App\Http\Requests\V2\Volume\AttachRequest;
 use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
@@ -109,7 +109,7 @@ class VolumeController extends BaseController
         }
         $volume->fill($request->only($only));
 
-        $volume->withSyncLock(function ($volume) {
+        $volume->withTaskLock(function ($volume) {
             $volume->save();
         });
 
@@ -120,7 +120,7 @@ class VolumeController extends BaseController
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
 
-        $volume->withSyncLock(function ($volume) {
+        $volume->withTaskLock(function ($volume) {
             $volume->delete();
         });
 
@@ -132,7 +132,7 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
-        $volume->withSyncLock(function ($volume) use ($instance) {
+        $volume->withTaskLock(function ($volume) use ($instance) {
             $instance->volumes()->attach($volume);
         });
 
@@ -144,7 +144,7 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
-        $volume->withSyncLock(function ($volume) use ($instance) {
+        $volume->withTaskLock(function ($volume) use ($instance) {
             $instance->volumes()->detach($volume);
         });
 

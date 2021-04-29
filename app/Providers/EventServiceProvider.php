@@ -312,5 +312,9 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,
         ],
+
+        \App\Events\V2\Task\Created::class => [
+            \App\Listeners\V2\TaskCreated::class
+        ],
     ];
 }

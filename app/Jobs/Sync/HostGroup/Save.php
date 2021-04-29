@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Sync\HostGroup;
+namespace App\Jobs\Task\HostGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
@@ -23,7 +23,7 @@ class Save extends Job
             new \App\Jobs\Kingpin\HostGroup\CreateCluster($this->model),
             new \App\Jobs\Nsx\HostGroup\CreateTransportNode($this->model),
             new \App\Jobs\Nsx\HostGroup\PrepareCluster($this->model),
-            new \App\Jobs\Sync\Completed($this->model),
+            new \App\Jobs\Task\Completed($this->model),
         ];
         dispatch(array_shift($jobs)->chain($jobs));
 
@@ -32,6 +32,6 @@ class Save extends Job
 
     public function failed($exception)
     {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $this->model->setTaskFailureReason($exception->getMessage());
     }
 }

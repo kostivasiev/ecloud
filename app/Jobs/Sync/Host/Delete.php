@@ -1,37 +1,37 @@
 <?php
 
-namespace App\Jobs\Sync\Host;
+namespace App\Jobs\Task\Host;
 
 use App\Jobs\Job;
-use App\Models\V2\Sync;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
 
-        $host = $this->sync->resource;
+        $host = $this->task->resource;
 
         // TODO
-//        $this->deleteSyncBatch([
+//        $this->deleteTaskBatch([
 //        ])->dispatch();
 
-        // TODO delete this when we implement deleteSyncBatch
-        $this->sync->completed = true;
-        $this->sync->save();
-        $this->sync->resource->delete();
+        // TODO delete this when we implement deleteTaskBatch
+        $this->task->completed = true;
+        $this->task->save();
+        $this->task->resource->delete();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $host->id]);
     }

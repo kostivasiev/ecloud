@@ -1,40 +1,40 @@
 <?php
 
-namespace App\Jobs\Sync\Network;
+namespace App\Jobs\Task\Network;
 
 use App\Jobs\Job;
-use App\Jobs\Network\AwaitRouterSync;
+use App\Jobs\Network\AwaitRouterTask;
 use App\Jobs\Network\DeployDiscoveryProfile;
 use App\Jobs\Network\DeploySecurityProfile;
 use App\Jobs\Network\Deploy;
-use App\Models\V2\Sync;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
 
-        $this->updateSyncBatch([
+        $this->updateTaskBatch([
             [
-                new AwaitRouterSync($this->sync->resource),
-                new Deploy($this->sync->resource),
-                new DeploySecurityProfile($this->sync->resource),
-                new DeployDiscoveryProfile($this->sync->resource),
+                new AwaitRouterTask($this->task->resource),
+                new Deploy($this->task->resource),
+                new DeploySecurityProfile($this->task->resource),
+                new DeployDiscoveryProfile($this->task->resource),
             ],
         ])->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\FirewallRulePort;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\TaskException;
 use App\Models\V2\Sync;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
@@ -15,7 +15,7 @@ class CheckFirewallPolicy
         Log::info(get_class($this) . ' : Started', ['event' => $event]);
 
         if (!$event->model->firewallRule->firewallPolicy->canSync()) {
-            throw new SyncException();
+            throw new TaskException();
         }
 
         Log::info(get_class($this) . ' : Finished', ['event' => $event]);

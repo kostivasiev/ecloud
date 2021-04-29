@@ -9,34 +9,36 @@ use App\Jobs\Router\UndeployRouterLocale;
 use App\Jobs\Router\Undeploy;
 use App\Jobs\Router\UndeployCheck;
 use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use App\Traits\V2\SyncableBatch;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
 
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new DeleteFirewallPolicies($this->sync->resource),
-                new AwaitFirewallPolicyRemoval($this->sync->resource),
-                new UndeployRouterLocale($this->sync->resource),
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new DeleteFirewallPolicies($this->task->resource),
+                new AwaitFirewallPolicyRemoval($this->task->resource),
+                new UndeployRouterLocale($this->task->resource),
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
             ]
         ])->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
     }
 }

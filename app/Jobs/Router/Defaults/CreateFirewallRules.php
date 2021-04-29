@@ -31,7 +31,7 @@ class CreateFirewallRules extends Job
 
         $policy = $this->policy;
 
-        $this->firewallPolicy->withSyncLock(function ($firewallPolicy) use ($policy) {
+        $this->firewallPolicy->withTaskLock(function ($firewallPolicy) use ($policy) {
             foreach ($policy['rules'] as $rule) {
                 Log::debug('FirewallRule', $rule);
                 $firewallRule = app()->make(FirewallRule::class);

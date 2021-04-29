@@ -2,6 +2,7 @@
 
 namespace App\Listeners\V2;
 
+use App\Jobs\Sync\Router\Update;
 use App\Models\V2\Sync;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,7 @@ class ResourceSyncSaved
     {
         Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
 
-        $event->model->createSync(Sync::TYPE_UPDATE);
+        $event->model->createTask('sync_update', $event->model->getUpdateSyncJob());
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
     }

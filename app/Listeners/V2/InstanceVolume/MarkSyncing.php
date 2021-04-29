@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\InstanceVolume;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\TaskException;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +30,7 @@ class MarkSyncing
 
         if (!$volume->createSync()) {
             Log::error(get_class($this) . ' : Failed to create sync for volume');
-            throw new SyncException();
+            throw new TaskException();
         }
 
         Log::info(get_class($this) . ' : Finished', [

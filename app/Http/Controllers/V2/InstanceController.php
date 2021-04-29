@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -145,7 +145,7 @@ class InstanceController extends BaseController
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             $instance->save();
         });
 
@@ -161,7 +161,7 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             $instance->delete();
         });
 
@@ -228,9 +228,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             if (!$instance->canSync()) {
-                throw new SyncException();
+                throw new TaskException();
             }
             $this->dispatch(new PowerOn($instance));
         });
@@ -243,9 +243,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             if (!$instance->canSync()) {
-                throw new SyncException();
+                throw new TaskException();
             }
             $this->dispatch(new PowerOff($instance));
         });
@@ -258,9 +258,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             if (!$instance->canSync()) {
-                throw new SyncException();
+                throw new TaskException();
             }
             $this->dispatch(new GuestRestart($instance));
         });
@@ -273,9 +273,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             if (!$instance->canSync()) {
-                throw new SyncException();
+                throw new TaskException();
             }
             $this->dispatch(new GuestShutdown($instance));
         });
@@ -288,9 +288,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             if (!$instance->canSync()) {
-                throw new SyncException();
+                throw new TaskException();
             }
             $this->dispatch(new PowerReset($instance));
         });

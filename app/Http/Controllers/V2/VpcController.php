@@ -85,7 +85,7 @@ class VpcController extends BaseController
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
 
-        $vpc->withSyncLock(function ($vpc) {
+        $vpc->withTaskLock(function ($vpc) {
             $vpc->save();
         });
 
@@ -99,7 +99,7 @@ class VpcController extends BaseController
             return $vpc->getDeletionError();
         }
 
-        $vpc->withSyncLock(function ($vpc) {
+        $vpc->withTaskLock(function ($vpc) {
             $vpc->delete();
         });
 
