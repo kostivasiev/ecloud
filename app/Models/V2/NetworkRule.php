@@ -3,13 +3,10 @@
 namespace App\Models\V2;
 
 use App\Events\V2\NetworkRule\Deleted;
-use App\Events\V2\NetworkRule\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
-use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -43,7 +40,6 @@ class NetworkRule extends Model implements Filterable, Sortable
             'enabled' => 'boolean',
         ];
         $this->dispatchesEvents = [
-            'saved' => Saved::class,
             'deleted' => Deleted::class,
         ];
         parent::__construct($attributes);

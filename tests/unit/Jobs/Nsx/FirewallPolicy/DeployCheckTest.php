@@ -1,13 +1,9 @@
 <?php
 
-namespace Tests\unit\Jobs\FirewallPolicy;
+namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 
-use App\Jobs\FirewallPolicy\DeployCheck;
-use App\Jobs\Router\Deploy;
+use App\Jobs\Nsx\FirewallPolicy\DeployCheck;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Router;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;

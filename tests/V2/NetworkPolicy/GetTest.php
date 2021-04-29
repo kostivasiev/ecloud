@@ -3,7 +3,6 @@ namespace Tests\V2\NetworkPolicy;
 
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
-use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,38 +16,7 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->availabilityZone();
-
-        $this->network = factory(Network::class)->create([
-            'id' => 'net-test',
-            'router_id' => $this->router()->id,
-        ]);
-
-        $this->nsxServiceMock()->expects('patch')
-            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/security-policies/np-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-        $this->nsxServiceMock()->expects('get')
-            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/groups/np-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
-        $this->nsxServiceMock()->expects('patch')
-            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/groups/np-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-        $this->nsxServiceMock()->expects('get')
-            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
-
-        $this->networkPolicy = factory(NetworkPolicy::class)->create([
-            'id' => 'np-test',
-            'network_id' => $this->network->id,
-        ]);
+        $this->networkPolicy();
     }
 
     public function testGetCollection()
@@ -61,7 +29,7 @@ class GetTest extends TestCase
             ]
         )->seeJson([
             'id' => 'np-test',
-            'network_id' => 'net-test',
+            'network_id' => $this->network()->id,
             'name' => 'np-test',
         ])->assertResponseStatus(200);
     }
@@ -76,7 +44,7 @@ class GetTest extends TestCase
             ]
         )->seeJson([
             'id' => 'np-test',
-            'network_id' => 'net-test',
+            'network_id' => $this->network()->id,
             'name' => 'np-test',
         ])->assertResponseStatus(200);
     }

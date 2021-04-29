@@ -4,10 +4,13 @@ namespace App\Jobs\Nsx;
 
 use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeployCheck extends Job
 {
+    use Batchable;
+
     const RETRY_DELAY = 5;
 
     public $tries = 500;
@@ -53,11 +56,5 @@ class DeployCheck extends Job
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
     }
 }

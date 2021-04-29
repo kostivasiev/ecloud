@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Events\V2\NetworkRulePort;
+namespace App\Events\V2\NetworkPolicy;
 
+use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Queue\SerializesModels;
 
-class Deleted
+class Saving extends Event
 {
-    use SerializesModels;
-
     public $model;
 
+    /**
+     * @param Model $model
+     * @return void
+     */
     public function __construct(Model $model)
     {
         $this->model = $model;

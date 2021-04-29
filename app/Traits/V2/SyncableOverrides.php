@@ -41,8 +41,6 @@ trait SyncableOverrides
     public function save(array $options = [])
     {
         if (!in_array(__CLASS__, [
-            FirewallPolicy::class,
-            NetworkPolicy::class,
             HostGroup::class,
             Host::class
         ])) {

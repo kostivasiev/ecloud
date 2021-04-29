@@ -1,21 +1,19 @@
 <?php
 
-namespace App\Events\V2\FirewallRulePort;
+namespace App\Events\V2\NetworkPolicy;
 
+use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Queue\SerializesModels;
 
-class Deleting
+class Saved extends Event
 {
-    use SerializesModels;
-
     public $model;
 
     /**
      * @param Model $model
      * @return void
      */
-    public function __construct($model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
