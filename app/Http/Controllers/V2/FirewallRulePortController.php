@@ -42,7 +42,7 @@ class FirewallRulePortController extends BaseController
         ]));
 
         $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
@@ -68,7 +68,7 @@ class FirewallRulePortController extends BaseController
         }
 
         $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
@@ -84,7 +84,7 @@ class FirewallRulePortController extends BaseController
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
 
         $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canSync()) {
+            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 

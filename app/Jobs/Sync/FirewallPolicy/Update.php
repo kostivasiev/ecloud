@@ -3,8 +3,8 @@
 namespace App\Jobs\Sync\FirewallPolicy;
 
 use App\Jobs\Job;
-use App\Jobs\FirewallPolicy\Deploy;
-use App\Jobs\FirewallPolicy\DeployCheck;
+use App\Jobs\Nsx\FirewallPolicy\Deploy;
+use App\Jobs\Nsx\FirewallPolicy\DeployCheck;
 use App\Models\V2\Task;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;

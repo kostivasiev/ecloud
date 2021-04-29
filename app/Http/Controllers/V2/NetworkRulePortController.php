@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\TaskException;
 use App\Http\Requests\V2\NetworkRulePort\Create;
 use App\Http\Requests\V2\NetworkRulePort\Update;
 use App\Models\V2\NetworkRulePort;
@@ -40,9 +40,9 @@ class NetworkRulePortController extends BaseController
             'destination',
         ]));
 
-        $resource->networkRule->networkPolicy->withSyncLock(function () use ($resource) {
-            if (!$resource->networkRule->networkPolicy->canSync()) {
-                throw new SyncException();
+        $resource->networkRule->networkPolicy->withTaskLock(function () use ($resource) {
+            if (!$resource->networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $resource->save();
@@ -62,9 +62,9 @@ class NetworkRulePortController extends BaseController
             'destination',
         ]));
 
-        $resource->networkRule->networkPolicy->withSyncLock(function () use ($resource) {
-            if (!$resource->networkRule->networkPolicy->canSync()) {
-                throw new SyncException();
+        $resource->networkRule->networkPolicy->withTaskLock(function () use ($resource) {
+            if (!$resource->networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $resource->save();
@@ -78,9 +78,9 @@ class NetworkRulePortController extends BaseController
     {
         $resource = NetworkRulePort::forUser($request->user())->findOrFail($networkRulePortId);
 
-        $resource->networkRule->networkPolicy->withSyncLock(function () use ($resource) {
-            if (!$resource->networkRule->networkPolicy->canSync()) {
-                throw new SyncException();
+        $resource->networkRule->networkPolicy->withTaskLock(function () use ($resource) {
+            if (!$resource->networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $resource->delete();

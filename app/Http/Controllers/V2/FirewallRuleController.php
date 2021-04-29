@@ -80,7 +80,7 @@ class FirewallRuleController extends BaseController
         ]));
 
         $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
-            if (!$firewallRule->firewallPolicy->canSync()) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
@@ -120,7 +120,7 @@ class FirewallRuleController extends BaseController
         ]));
 
         $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
-            if (!$firewallRule->firewallPolicy->canSync()) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
@@ -148,7 +148,7 @@ class FirewallRuleController extends BaseController
         $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
 
         $firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRule) {
-            if (!$firewallRule->firewallPolicy->canSync()) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
