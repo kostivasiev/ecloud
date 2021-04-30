@@ -92,7 +92,8 @@ $app->routeMiddleware([
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'is-locked' => \App\Http\Middleware\IsLocked::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
-    'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class
+    'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class,
+    'can-detach' => \App\Http\Middleware\CanDetach::class,
 ]);
 
 /*
