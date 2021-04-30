@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\Sync\Nat;
 
 use App\Jobs\Sync\Nat\Delete;
 use App\Models\V2\Nat;
-use App\Models\V2\Sync;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;

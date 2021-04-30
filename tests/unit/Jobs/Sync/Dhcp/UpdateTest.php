@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\Sync\Dhcp;
 
 use App\Jobs\Sync\Dhcp\Update;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Sync;
 use App\Models\V2\Task;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;

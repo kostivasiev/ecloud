@@ -287,11 +287,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
-        // Sync
-
-        \App\Events\V2\Sync\Updated::class => [
-        ],
-
         // Task
         \App\Events\V2\Task\Created::class => [
             \App\Listeners\V2\TaskCreated::class

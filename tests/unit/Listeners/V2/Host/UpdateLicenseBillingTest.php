@@ -6,7 +6,9 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,7 +16,7 @@ class UpdateLicenseBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Sync $sync;
+    protected Task $task;
 
     protected Product $product;
 
@@ -51,19 +53,19 @@ class UpdateLicenseBillingTest extends TestCase
         $this->hostSpec()->cpu_sockets = 2;
         $this->hostSpec()->cpu_cores = 6;
 
-        $sync = Sync::withoutEvents(function() use ($host) {
-            $sync = new Sync([
-                'id' => 'sync-1',
+        $task = Model::withoutEvents(function() use ($host) {
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $sync->resource()->associate($host);
-            return $sync;
+            $task->resource()->associate($host);
+            return $task;
         });
 
         // Check that the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateLicenseBilling();
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
         $metric = BillingMetric::getActiveByKey($host, 'host.license.windows');
         $this->assertNotNull($metric);
@@ -85,14 +87,14 @@ class UpdateLicenseBillingTest extends TestCase
         $this->hostSpec()->cpu_sockets = 2;
         $this->hostSpec()->cpu_cores = 6;
 
-        $sync = Sync::withoutEvents(function() use ($host) {
-            $sync = new Sync([
-                'id' => 'sync-1',
+        $task = Model::withoutEvents(function() use ($host) {
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $sync->resource()->associate($host);
-            return $sync;
+            $task->resource()->associate($host);
+            return $task;
         });
 
         // Billing is for at least config('host.billing.windows.min_cores') cores / 2
@@ -100,7 +102,7 @@ class UpdateLicenseBillingTest extends TestCase
 
         // Check that the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateLicenseBilling();
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
         $metric = BillingMetric::getActiveByKey($host, 'host.license.windows');
         $this->assertNotNull($metric);
@@ -129,19 +131,19 @@ class UpdateLicenseBillingTest extends TestCase
             'host_group_id' => $hostGroup->id,
         ]);
 
-        $sync = Sync::withoutEvents(function() use ($host) {
-            $sync = new Sync([
-                'id' => 'sync-1',
+        $task = Model::withoutEvents(function() use ($host) {
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $sync->resource()->associate($host);
-            return $sync;
+            $task->resource()->associate($host);
+            return $task;
         });
 
         // Check that no the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateLicenseBilling();
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
         $metric = BillingMetric::getActiveByKey($host, 'host.license.windows');
         $this->assertNull($metric);

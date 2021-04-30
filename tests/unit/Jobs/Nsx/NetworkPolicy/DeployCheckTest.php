@@ -3,7 +3,8 @@
 namespace Tests\unit\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Nsx\DeployCheck;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -16,17 +17,17 @@ class DeployCheckTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Sync $sync;
+    protected Task $task;
 
     public function testFirewallPolicyRealizedNotReleasedAndSucceeds()
     {
         Model::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->sync->resource()->associate($this->networkPolicy());
+            $this->task->resource()->associate($this->networkPolicy());
         });
 
         $this->nsxServiceMock()->expects('get')
@@ -42,8 +43,8 @@ class DeployCheckTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class]);
 
         dispatch(new DeployCheck(
-            $this->sync->resource,
-            $this->sync->resource->network->router->availabilityZone,
+            $this->task->resource,
+            $this->task->resource->network->router->availabilityZone,
             '/infra/domains/default/security-policies/'
         ));
 

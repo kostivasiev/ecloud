@@ -12,6 +12,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
+use App\Support\Sync;
 use App\Traits\V2\Syncable;
 use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
@@ -48,12 +49,12 @@ class TaskTest extends TestCase
             ]);
 
             $this->task = new Task([
-                'id' => 'sync-test',
+                'id' => 'task-test',
             ]);
             $this->task->resource()->associate($this->model);
             $this->task->completed = false;
             $this->task->failure_reason = 'some failure';
-            $this->task->type = 'test';
+            $this->task->name = 'test';
             $this->task->save();
         });
 
@@ -69,16 +70,16 @@ class TaskTest extends TestCase
                 'id' => 'test-testing'
             ]);
 
-            $this->sync = new Sync([
-                'id' => 'sync-test',
+            $this->task = new Task([
+                'id' => 'task-test',
             ]);
-            $this->sync->resource()->associate($this->model);
-            $this->sync->completed = true;
-            $this->sync->type = Sync::TYPE_UPDATE;
-            $this->sync->save();
+            $this->task->resource()->associate($this->model);
+            $this->task->completed = true;
+            $this->task->name = 'test';
+            $this->task->save();
         });
 
-        $status = $this->sync->status;
+        $status = $this->task->status;
 
         $this->assertEquals("complete", $status);
     }
@@ -90,16 +91,16 @@ class TaskTest extends TestCase
                 'id' => 'test-testing'
             ]);
 
-            $this->sync = new Sync([
-                'id' => 'sync-test',
+            $this->task = new Sync([
+                'id' => 'task-test',
             ]);
-            $this->sync->resource()->associate($this->model);
-            $this->sync->completed = false;
-            $this->sync->type = Sync::TYPE_UPDATE;
-            $this->sync->save();
+            $this->task->resource()->associate($this->model);
+            $this->task->completed = false;
+            $this->task->name = 'test';
+            $this->task->save();
         });
 
-        $status = $this->sync->status;
+        $status = $this->task->status;
 
         $this->assertEquals("in-progress", $status);
     }

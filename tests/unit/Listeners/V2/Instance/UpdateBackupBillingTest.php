@@ -2,8 +2,9 @@
 namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -13,7 +14,7 @@ class UpdateBackupBillingTest extends TestCase
     use DatabaseMigrations;
 
     private $volume;
-    private $sync;
+    private $task;
 
     public function setUp(): void
     {
@@ -38,18 +39,18 @@ class UpdateBackupBillingTest extends TestCase
         // Update the instance compute values
         $this->instance()->backup_enabled = true;
 
-        Sync::withoutEvents(function () {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instance());
         });
 
         // Check that the vcpu billing metric is added
         $updateBackupBillingListener = new \App\Listeners\V2\Instance\UpdateBackupBilling();
-        $updateBackupBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateBackupBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
 
@@ -72,18 +73,18 @@ class UpdateBackupBillingTest extends TestCase
         // Update the instance compute values
         $this->instance()->backup_enabled = false;
 
-        Sync::withoutEvents(function () {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instance());
         });
 
         // Check that the vcpu billing metric is added
         $updateBackupBillingListener = new \App\Listeners\V2\Instance\UpdateBackupBilling();
-        $updateBackupBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateBackupBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $billingMetric->refresh();
         $this->assertNotNull($billingMetric->end);
@@ -101,17 +102,17 @@ class UpdateBackupBillingTest extends TestCase
             $this->volume->capacity = 15;
             $this->volume->save();
 
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->volume);
+            $this->task->resource()->associate($this->volume);
         });
 
         // Check that the backup billing metric is added
         $updateBackupBillingListener = new \App\Listeners\V2\Instance\UpdateBackupBilling();
-        $updateBackupBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateBackupBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
 
@@ -138,16 +139,16 @@ class UpdateBackupBillingTest extends TestCase
             $this->volume->iops = 600;
             $this->volume->save();
 
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->volume);
+            $this->task->resource()->associate($this->volume);
         });
 
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $this->assertEquals(2, BillingMetric::where('resource_id', $this->volume->id)->count());
 

@@ -2,7 +2,9 @@
 namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -10,19 +12,19 @@ class UpdateLicenseBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    private Sync $sync;
+    private Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+        Model::withoutEvents(function() {
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instance());
         });
     }
 
@@ -32,7 +34,7 @@ class UpdateLicenseBillingTest extends TestCase
         $this->instance()->platform = 'Windows';
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
-        $updateLicenseBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
         $this->assertNotNull($vcpuMetric);
@@ -54,7 +56,7 @@ class UpdateLicenseBillingTest extends TestCase
         $this->instance()->platform = 'Windows';
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
-        $updateLicenseBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
         $this->assertNotNull($vcpuMetric);

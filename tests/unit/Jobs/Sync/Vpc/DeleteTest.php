@@ -3,9 +3,10 @@
 namespace Tests\unit\Jobs\Sync\Vpc;
 
 use App\Jobs\Sync\Vpc\Delete;
-use App\Models\V2\Sync;
-use BeyondCode\ErdGenerator\Model;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -14,7 +15,7 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    private $sync;
+    private $task;
 
     public function setUp(): void
     {
@@ -24,14 +25,15 @@ class DeleteTest extends TestCase
     public function testJobsBatched()
     {
         Model::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+            $this->task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $this->sync->resource()->associate($this->vpc());
+            $this->task->resource()->associate($this->vpc());
         });
 
         Bus::fake();
-        $job = new Delete($this->sync);
+        $job = new Delete($this->task);
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {

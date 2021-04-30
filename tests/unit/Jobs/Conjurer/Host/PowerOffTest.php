@@ -3,7 +3,6 @@ namespace Tests\unit\Jobs\Conjurer\Host;
 
 use App\Jobs\Conjurer\Host\PowerOff;
 use App\Models\V2\Host;
-use App\Models\V2\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;

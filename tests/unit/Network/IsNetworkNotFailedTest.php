@@ -2,8 +2,8 @@
 namespace Tests\unit\Network;
 
 use App\Models\V2\Network;
-use App\Models\V2\Sync;
 use App\Rules\V2\IsNetworkAvailable;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -24,7 +24,7 @@ class IsNetworkNotFailedTest extends TestCase
     public function testFailedNetwork()
     {
         // Force failure
-        Sync::withoutEvents(function () {
+        Model::withoutEvents(function () {
             $model = new Sync([
                 'id' => 'sync-test',
                 'failure_reason' => 'Unit Test Failure',

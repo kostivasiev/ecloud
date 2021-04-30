@@ -57,7 +57,7 @@ class UpdateBillingTest extends TestCase
 
         // Check that the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\HostGroup\UpdateBilling;
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($this->task));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNotNull($metric);

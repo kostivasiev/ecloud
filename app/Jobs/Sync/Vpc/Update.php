@@ -24,7 +24,7 @@ class Update extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
 
-        $this->updateSyncBatch([
+        $this->updateTaskBatch([
             [
                 new CreateDhcps($this->task->resource),
                 new AwaitDhcpSync($this->task->resource),

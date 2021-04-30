@@ -15,7 +15,7 @@ use Illuminate\Database\QueryException;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class TestModel extends Model
+class TestTaskModel extends Model
 {
     use Syncable;
 
@@ -24,7 +24,7 @@ class TestModel extends Model
     ];
 }
 
-class SyncableTest extends TestCase
+class TaskableTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -33,39 +33,39 @@ class SyncableTest extends TestCase
         parent::setUp();
     }
 
-    public function testGetSyncAttributeReturnsLatestSyncData()
+    public function testGetTaskAttributeReturnsLatestTaskData()
     {
         Model::withoutEvents(function() {
-            $this->model = new TestModel([
+            $this->model = new TestTaskModel([
                 'id' => 'test-testing'
             ]);
 
             $this->task = new Task([
                 'id' => 'task-test',
-                'name' => Sync::TASK_NAME_UPDATE,
+                'name' => 'test',
                 'completed' => true,
             ]);
             $this->task->resource()->associate($this->model);
             $this->task->save();
         });
 
-        $attribute = $this->model->sync;
+        $attribute = $this->model->task;
 
-        $this->assertEquals(Sync::STATUS_COMPLETE, $attribute->status);
-        $this->assertEquals(Sync::TASK_NAME_UPDATE, $attribute->type);
+        $this->assertEquals(Task::STATUS_COMPLETE, $attribute->status);
+        $this->assertEquals('test', $attribute->name);
     }
 
-    public function testGetSyncAttributeReturnsUnknownWithNoSync()
+    public function testGetTaskAttributeReturnsUnknownWithNoTask()
     {
         Model::withoutEvents(function() {
-            $this->model = new TestModel([
+            $this->model = new TestTaskModel([
                 'id' => 'test-testing'
             ]);
         });
 
-        $attribute = $this->model->sync;
+        $attribute = $this->model->task;
 
         $this->assertEquals('unknown', $attribute->status);
-        $this->assertEquals('unknown', $attribute->type);
+        $this->assertEquals('unknown', $attribute->name);
     }
 }

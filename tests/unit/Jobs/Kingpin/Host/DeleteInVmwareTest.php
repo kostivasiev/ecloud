@@ -3,7 +3,6 @@ namespace Tests\unit\Jobs\Kingpin\Host;
 
 use App\Jobs\Kingpin\Host\DeleteInVmware;
 use App\Models\V2\Host;
-use App\Models\V2\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;

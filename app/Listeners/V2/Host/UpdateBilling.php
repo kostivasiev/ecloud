@@ -1,7 +1,7 @@
 <?php
 namespace App\Listeners\V2\Host;
 
-use App\Events\V2\Sync\Updated;
+use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
 use App\Support\Sync;

@@ -3,8 +3,8 @@
 namespace Tests\unit\Jobs\Sync\Router;
 
 use App\Jobs\Sync\Router\Delete;
-use App\Models\V2\Sync;
 use Illuminate\Bus\PendingBatch;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -22,7 +22,7 @@ class DeleteTest extends TestCase
 
     public function testJobsBatched()
     {
-        Sync::withoutEvents(function() {
+        Model::withoutEvents(function() {
             $this->sync = new Sync([
                 'id' => 'sync-1',
             ]);
