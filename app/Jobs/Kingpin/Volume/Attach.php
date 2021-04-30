@@ -35,8 +35,8 @@ class Attach extends Job
         }
 
         $response = $this->instance->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
-            );
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
+        );
 
         $json = json_decode($response->getBody()->getContents());
         if (!$json) {
@@ -59,7 +59,7 @@ class Attach extends Job
                         'volumeUUID' => $this->volume->vmware_uuid
                     ]
                 ]
-        );
+            );
 
         $this->instance->volumes()->attach($this->volume);
 

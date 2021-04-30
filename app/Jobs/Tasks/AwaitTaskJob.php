@@ -19,7 +19,7 @@ class AwaitTaskJob extends Job
 
     private Task $task;
 
-    public function __construct(Task $task, $tries=60, $backoff=5)
+    public function __construct(Task $task, $tries = 60, $backoff = 5)
     {
         $this->task = $task;
         $this->tries = $tries;
@@ -36,8 +36,7 @@ class AwaitTaskJob extends Job
         }
 
         if ($this->task->status == Task::STATUS_INPROGRESS) {
-            Log::warning($this->task->id . ' in-progress, retrying in ' . $this->backoff . ' seconds',
-                ['id' => $this->task->id]);
+            Log::warning($this->task->id . ' in-progress, retrying in ' . $this->backoff . ' seconds', ['id' => $this->task->id]);
             return $this->release($this->backoff);
         }
 
