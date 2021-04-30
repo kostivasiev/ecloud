@@ -3,8 +3,8 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Host\Deleted;
-use App\Events\V2\Host\Saved;
 use App\Events\V2\Host\Deleting;
+use App\Events\V2\Host\Saved;
 use App\Events\V2\Host\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
@@ -27,6 +27,13 @@ class Host extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public string $keyPrefix = 'h';
+
+    protected $dispatchesEvents = [
+        'deleted' => Deleted::class,
+        'deleting' => Deleting::class,
+        'saved' => Saved::class,
+        'saving' => Saving::class,
+    ];
 
     public function __construct(array $attributes = [])
     {
