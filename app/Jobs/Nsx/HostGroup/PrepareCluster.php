@@ -6,10 +6,13 @@ use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PrepareCluster extends Job
 {
+    use Batchable;
+
     private $model;
 
     public function __construct(HostGroup $model)

@@ -6,6 +6,7 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Host;
 use App\Models\V2\Dhcp;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\Nat;
 use App\Models\V2\Network;
@@ -37,6 +38,7 @@ class SyncCreated
             Network::class,
             Host::class,
             Nat::class,
+            HostGroup::class,
         ])) {
             return true;
         }

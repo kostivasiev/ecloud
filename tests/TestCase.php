@@ -462,6 +462,47 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
     }
 
+    public function hostGroupDestroyMocks()
+    {
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs('/api/v1/transport-node-collections?compute_collection_id=TEST-COMPUTE-COLLECTION-ID')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => '92cba9bd-759c-465c-9e84-f6a1a19c4f11'
+                        ]
+                    ]
+                ]));
+            });
+        $this->nsxServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-collections/92cba9bd-759c-465c-9e84-f6a1a19c4f11')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->nsxServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-profiles/92cba9bd-759c-465c-9e84-f6a1a19c4f11')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->kingpinServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup()->vpc->id . '/hostgroup/' . $this->hostGroup()->id)
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'external_id' => 'TEST-COMPUTE-COLLECTION-ID',
+                        ],
+                    ],
+                ]));
+            });
+    }
+
     public function kingpinServiceMock()
     {
         if (!$this->kingpinServiceMock) {
