@@ -15,7 +15,6 @@ trait Mocks
     public function host()
     {
         if (!$this->host) {
-            //this->createHostMocks();
             $this->host = Model::withoutEvents(function() {
                return factory(\App\Models\V2\Host::class)->create([
                    'id' => 'h-test',
