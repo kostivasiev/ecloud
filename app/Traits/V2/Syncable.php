@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
+    use Taskable;
+
     // TODO: Make this abstract - we should force objects implementing Syncable to return job class
     public function getUpdateSyncJob()
     {

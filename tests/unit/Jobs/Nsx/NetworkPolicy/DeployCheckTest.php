@@ -5,6 +5,7 @@ namespace Tests\unit\Jobs\Nsx\NetworkPolicy;
 use App\Jobs\Nsx\DeployCheck;
 use App\Models\V2\Sync;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -19,7 +20,7 @@ class DeployCheckTest extends TestCase
 
     public function testFirewallPolicyRealizedNotReleasedAndSucceeds()
     {
-        Sync::withoutEvents(function() {
+        Model::withoutEvents(function() {
             $this->sync = new Sync([
                 'id' => 'sync-1',
                 'completed' => true,

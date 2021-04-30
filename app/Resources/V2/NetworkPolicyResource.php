@@ -16,6 +16,7 @@ class NetworkPolicyResource extends UKFastResource
             'vpc_id' => $this->network->router->vpc_id,
             'name' => $this->name,
             'sync' => $this->sync,
+            'task' => $this->task,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))

@@ -65,4 +65,22 @@ trait Taskable
 
         return $task;
     }
+
+    public function getTaskAttribute()
+    {
+        $status = 'unknown';
+        $name = 'unknown';
+
+        if ($this->tasks()->count()) {
+            $latest = $this->tasks()->latest()->first();
+
+            $status = $latest->status;
+            $name   = $latest->name;
+        }
+
+        return (object) [
+            'status' => $status,
+            'name' => $name,
+        ];
+    }
 }
