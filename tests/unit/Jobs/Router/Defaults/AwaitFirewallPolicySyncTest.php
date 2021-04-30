@@ -8,6 +8,7 @@ use App\Models\V2\Nat;
 use App\Models\V2\Nic;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -40,6 +41,7 @@ class AwaitFirewallPolicySyncTest extends TestCase
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $task->resource()->associate($this->firewallPolicy);
             $task->save();
@@ -62,6 +64,7 @@ class AwaitFirewallPolicySyncTest extends TestCase
                 'id' => 'task-1',
                 'completed' => false,
                 'failure_reason' => 'test',
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $task->resource()->associate($this->firewallPolicy);
             $task->save();
@@ -80,6 +83,7 @@ class AwaitFirewallPolicySyncTest extends TestCase
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => false,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $task->resource()->associate($this->firewallPolicy);
             $task->save();
