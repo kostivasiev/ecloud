@@ -1,0 +1,74 @@
+### Create instance to test with
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Test",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": true,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600,
+    "host_group_id": "{{dev_host_group_id}}"
+}
+
+> {%
+client.global.set("instance_id", response.body.data.id);
+%}
+
+### Create hostgroup to test with
+#POST https://{{host}}/{{version}}/host-groups
+#Accept: */*
+#Cache-Control: no-cache
+#X-consumer-custom-id: 0-0
+#X-consumer-groups: ecloud.read, ecloud.write
+#Content-Type: application/json
+#X-Reseller-Id: 1
+#
+#{
+#    "name": "test host group",
+#    "vpc_id": "{{dev_vpc_id}}",
+#    "availability_zone_id" : "{{dev_availability_zone_id}}",
+#    "host_spec_id" : "{{dev_host_spec_id}}"
+#}
+#
+#> {%
+#client.global.set('host_group_id', response.body.data.id);
+#%}
+
+### Move to {{host_group_id}}
+PATCH https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "host_group_id": "1001"
+}
+
+### Move back to {{dev_host_group_id}}
+PATCH https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "host_group_id": "{{dev_host_group_id}}"
+}
+
+### Cleanup instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+#### Cleanup host group
+#DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+#X-consumer-custom-id:  0-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json
