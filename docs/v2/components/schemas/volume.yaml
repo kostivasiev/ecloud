@@ -40,6 +40,11 @@ properties:
       type:
         description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
         example: update
+  type:
+    type: string
+    readOnly: true
+    description: Is the volume an OS volume
+    example: os
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
