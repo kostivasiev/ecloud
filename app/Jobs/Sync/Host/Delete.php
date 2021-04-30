@@ -3,12 +3,9 @@
 namespace App\Jobs\Sync\Host;
 
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Host\CheckExists;
-use App\Models\V2\Sync;
-use App\Traits\V2\SyncableBatch;
-use Illuminate\Bus\Batch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class Delete extends Job
 {
@@ -27,7 +24,7 @@ class Delete extends Job
 
         $host = $this->task->resource;
 
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             new \App\Jobs\Kingpin\Host\MaintenanceMode($host),
             new \App\Jobs\Kingpin\Host\DeleteInVmware($host),
             new \App\Jobs\Conjurer\Host\PowerOff($host),

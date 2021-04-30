@@ -67,7 +67,7 @@ class ToggleHostGroupBilling
                 }
                 break;
             default:
-                Log::error(get_class($this) . ': Unrecognised sync type ' . $task->type);
+                Log::error(get_class($this) . ': Unrecognised sync type ' . $task->name);
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
