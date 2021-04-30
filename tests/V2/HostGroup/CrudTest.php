@@ -180,7 +180,7 @@ class CrudTest extends TestCase
                 'name' => 'new name',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testUpdateCantChangeHostSpecId()
@@ -199,7 +199,7 @@ class CrudTest extends TestCase
                 'host_spec_id' => 'hs-test',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testDestroy()
@@ -209,6 +209,8 @@ class CrudTest extends TestCase
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
         $this->hostGroup();
+        $this->hostGroupDestroyMocks();
+
         $this->delete('/v2/host-groups/hg-test')
             ->seeInDatabase(
                 'host_groups',

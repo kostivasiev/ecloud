@@ -3,34 +3,46 @@
 namespace App\Jobs\Sync\HostGroup;
 
 use App\Jobs\Job;
-use App\Models\V2\HostGroup;
+use App\Jobs\Kingpin\HostGroup\DeleteCluster;
+use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
+use App\Models\V2\Sync;
+use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    private $model;
+    use SyncableBatch;
 
-    public function __construct(HostGroup $model)
+    private $sync;
+
+    public function __construct(Sync $sync)
     {
-        $this->model = $model;
+        $this->sync = $sync;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        Log::info(
+            get_class($this) . ' : Started',
+            [
+                'id' => $this->sync->id,
+                'resource_id' => $this->sync->resource->id
+            ]
+        );
 
-        $jobs = [
-            // TODO :- Undeploy
-            new \App\Jobs\Sync\Completed($this->model),
-            new \App\Jobs\Sync\Delete($this->model),
-        ];
-        dispatch(array_shift($jobs)->chain($jobs));
+        $hostGroup = $this->sync->resource;
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
+        $this->deleteSyncBatch([
+                new DeleteTransportNodeProfile($hostGroup),
+                new DeleteCluster($hostGroup),
+        ])->dispatch();
 
-    public function failed($exception)
-    {
-        $this->model->setTaskFailureReason($exception->getMessage());
+        Log::info(
+            get_class($this) . ' : Finished',
+            [
+                'id' => $this->sync->id,
+                'resource_id' => $this->sync->resource->id
+            ]
+        );
     }
 }
