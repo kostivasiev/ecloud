@@ -3,6 +3,7 @@ namespace Tests\unit\Jobs\Artisan\Host;
 
 use App\Jobs\Artisan\Host\RemoveFrom3Par;
 use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
@@ -29,10 +30,17 @@ class RemoveFrom3ParTest extends TestCase
             ]);
         });
         $this->host = Host::withoutEvents(function () {
+            $hostGroup = factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+            ]);
             return factory(Host::class)->create([
                 'id' => 'h-test',
                 'name' => 'h-test',
-                'host_group_id' => $this->hostGroup()->id,
+                'host_group_id' => $hostGroup->id,
             ]);
         });
         $this->job = \Mockery::mock(RemoveFrom3Par::class, [$this->host])->makePartial();
