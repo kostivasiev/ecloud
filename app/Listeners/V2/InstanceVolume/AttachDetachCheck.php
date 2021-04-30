@@ -7,7 +7,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
-class MarkSyncing
+class AttachDetachCheck
 {
     public function handle($event)
     {
@@ -16,20 +16,10 @@ class MarkSyncing
             'volume_id' => $event->model->volume_id,
         ]);
 
-        $instance = Instance::find($event->model->instance_id);
-        if (!$instance) {
-            Log::error(get_class($this) . ' : Failed to find instance');
-            throw new \Exception('Failed to find instance');
-        }
+        $instance = Instance::findOrFail($event->model->instance_id);
+        $volume = Volume::findOrFail($event->model->volume_id);
 
-        $volume = Volume::find($event->model->volume_id);
-        if (!$volume) {
-            Log::error(get_class($this) . ' : Failed to find volume');
-            throw new \Exception('Failed to find instance');
-        }
-
-        if (!$volume->createSync()) {
-            Log::error(get_class($this) . ' : Failed to create sync for volume');
+        if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
             throw new TaskException();
         }
 

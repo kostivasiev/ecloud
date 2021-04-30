@@ -10,7 +10,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;
 
-class Attach
+class VolumeAttach
 {
     public function handle(Created $event)
     {
@@ -19,25 +19,11 @@ class Attach
             'volume_id' => $event->model->volume_id,
         ]);
 
-        $instance = Instance::find($event->model->instance_id);
-        if (!$instance) {
-            Log::error(get_class($this) . ' : Failed to find instance');
-            throw new \Exception('Failed to find instance');
-        }
+        $volume = Volume::findOrFail($event->model->volume_id);
+        $instance = Instance::findOrFail($event->model->instance_id);
 
-        $volume = Volume::find($event->model->volume_id);
-        if (!$volume) {
-            Log::error(get_class($this) . ' : Failed to find volume');
-            throw new \Exception('Failed to find volume');
-        }
-
-        $jobs = [
-            new AttachJob($volume, $instance),
-            new IopsChange($volume),
-            new Completed($volume),
-        ];
-
-        dispatch(array_shift($jobs)->chain($jobs));
+        $task = $volume->createTask('volume_attach', \App\Jobs\Tasks\Volume\VolumeAttach::class, ['instance_id' => $event->model->instance_id]);
+        $instance->createTask('volume_attach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
 
         Log::info(get_class($this) . ' : Finished', [
             'instance_id' => $event->model->instance_id,

@@ -133,7 +133,14 @@ class VolumeController extends BaseController
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
         $volume->withTaskLock(function ($volume) use ($instance) {
-            $instance->volumes()->attach($volume);
+            $instance->withTaskLock(function ($instance) use ($volume) {
+                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
+                    throw new TaskException();
+                }
+
+                $task = $volume->createTask('volume_attach', \App\Jobs\Tasks\Volume\VolumeAttach::class, ['instance_id' => $instance->id]);
+                $instance->createTask('volume_attach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
+            });
         });
 
         return response('', 202);
@@ -145,7 +152,14 @@ class VolumeController extends BaseController
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
         $volume->withTaskLock(function ($volume) use ($instance) {
-            $instance->volumes()->detach($volume);
+            $instance->withTaskLock(function ($instance) use ($volume) {
+                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
+                    throw new TaskException();
+                }
+
+                $task = $volume->createTask('volume_detach', \App\Jobs\Tasks\Volume\VolumeDetach::class, ['instance_id' => $instance->id]);
+                $instance->createTask('volume_detach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
+            });
         });
 
         return response('', 202);

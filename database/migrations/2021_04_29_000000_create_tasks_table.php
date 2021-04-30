@@ -15,7 +15,7 @@ class CreateTasksTable extends Migration
             $table->string('name');
             $table->string('job')->nullable();
             $table->string('data')->nullable();
-            $table->boolean('completed');
+            $table->boolean('completed')->default(false);
             $table->text('failure_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
