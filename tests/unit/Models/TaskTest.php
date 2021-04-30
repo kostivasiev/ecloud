@@ -91,7 +91,7 @@ class TaskTest extends TestCase
                 'id' => 'test-testing'
             ]);
 
-            $this->task = new Sync([
+            $this->task = new Task([
                 'id' => 'task-test',
             ]);
             $this->task->resource()->associate($this->model);

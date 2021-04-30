@@ -5,6 +5,7 @@ namespace Tests\unit\Jobs\Instance\Undeploy;
 use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
+use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -55,10 +56,11 @@ class AwaitNicRemovalTest extends TestCase
                 'network_id' => 'net-test',
             ]);
 
-            $task = new Sync([
+            $task = new Task([
                 'id' => 'task-1',
                 'completed' => false,
                 'failure_reason' => 'test',
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
             $task->resource()->associate($this->nic);
             $task->save();
@@ -83,9 +85,10 @@ class AwaitNicRemovalTest extends TestCase
                 'network_id' => 'net-test',
             ]);
 
-            $task = new Sync([
+            $task = new Task([
                 'id' => 'task-1',
                 'completed' => false,
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
             $task->resource()->associate($this->nic);
             $task->save();

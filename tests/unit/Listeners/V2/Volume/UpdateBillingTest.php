@@ -3,7 +3,9 @@ namespace Tests\unit\Listeners\V2\Volume;
 
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -14,7 +16,7 @@ class UpdateBillingTest extends TestCase
     use DatabaseMigrations;
 
     protected Volume $volume;
-    protected Sync $sync;
+    protected Task $task;
     protected Instance $instance;
 
     public function setUp(): void
@@ -36,17 +38,17 @@ class UpdateBillingTest extends TestCase
     public function testResizingVolumeAddsBillingMetric()
     {
         Model::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->volume);
+            $this->task->resource()->associate($this->volume);
         });
 
         // Check that the volume billing metric is added
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->sync));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $metric = BillingMetric::where('resource_id', $this->volume->id)->first();
 

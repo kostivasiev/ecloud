@@ -59,7 +59,7 @@ class ToggleHostGroupBillingTest extends TestCase
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
-                'name' => Sync::TASK_NAME_DELETE,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $task->resource()->associate($this->host());
             return $task;

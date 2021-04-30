@@ -3,6 +3,8 @@
 namespace Tests\unit\Jobs\Sync\Network;
 
 use App\Jobs\Sync\Network\Delete;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
@@ -23,8 +25,9 @@ class DeleteTest extends TestCase
     public function testJobsBatched()
     {
         Model::withoutEvents(function() {
-            $this->sync = new Sync([
+            $this->sync = new Task([
                 'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
             $this->sync->resource()->associate($this->network());
         });

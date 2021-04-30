@@ -2,6 +2,8 @@
 namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Models\V2\BillingMetric;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -33,10 +35,10 @@ class UpdateVcpuBillingTest extends TestCase
         $this->instance()->vcpu_cores = 2;
 
         Model::withoutEvents(function() {
-            $this->sync = new Sync([
+            $this->sync = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $this->sync->resource()->associate($this->instance());
         });

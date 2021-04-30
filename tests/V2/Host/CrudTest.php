@@ -65,7 +65,6 @@ class CrudTest extends TestCase
     public function testUpdate()
     {
         $this->host();
-        $this->syncSaveIdempotent();
 
         $this->patch('/v2/hosts/h-test', [
             'name' => 'new name',

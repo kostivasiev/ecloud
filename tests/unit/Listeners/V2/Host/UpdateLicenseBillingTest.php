@@ -43,12 +43,13 @@ class UpdateLicenseBillingTest extends TestCase
 
     public function testCreatingHostInWindowsEnabledHostGroupAddsBilling()
     {
-        $this->syncSaveIdempotent('h-test-2');
-        $host = factory(\App\Models\V2\Host::class)->create([
-            'id' => 'h-test-2',
-            'name' => 'h-test-2',
-            'host_group_id' => $this->hostGroup()->id,
-        ]);
+        $host = Model::withoutEvents(function() {
+            return factory(\App\Models\V2\Host::class)->create([
+                'id' => 'h-test-2',
+                'name' => 'h-test-2',
+                'host_group_id' => $this->hostGroup()->id,
+            ]);
+        });
 
         $this->hostSpec()->cpu_sockets = 2;
         $this->hostSpec()->cpu_cores = 6;
@@ -77,12 +78,13 @@ class UpdateLicenseBillingTest extends TestCase
 
     public function testCreatingHostInWindowsEnabledHostGroupAddsBillingMinCores()
     {
-        $this->syncSaveIdempotent('h-test-2');
-        $host = factory(\App\Models\V2\Host::class)->create([
-            'id' => 'h-test-2',
-            'name' => 'h-test-2',
-            'host_group_id' => $this->hostGroup()->id,
-        ]);
+        $host = Model::withoutEvents(function() {
+            return factory(\App\Models\V2\Host::class)->create([
+                'id' => 'h-test-2',
+                'name' => 'h-test-2',
+                'host_group_id' => $this->hostGroup()->id,
+            ]);
+        });
 
         $this->hostSpec()->cpu_sockets = 2;
         $this->hostSpec()->cpu_cores = 6;
@@ -114,22 +116,24 @@ class UpdateLicenseBillingTest extends TestCase
 
     public function testCreatingHostInWindowsNotEnabledHostGroupDoesNotAddBilling()
     {
-        $this->hostGroupJobMocks('hg-test-2');
-        $hostGroup = factory(HostGroup::class)->create([
-            'id' => 'hg-test-2',
-            'name' => 'hg-test-2',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'host_spec_id' => $this->hostSpec()->id,
-            'windows_enabled' => false,
-        ]);
+        $hostGroup = Model::withoutEvents(function() {
+            return factory(HostGroup::class)->create([
+                'id' => 'hg-test-2',
+                'name' => 'hg-test-2',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => false,
+            ]);
+        });
 
-        $this->syncSaveIdempotent('h-test-2');
-        $host = factory(\App\Models\V2\Host::class)->create([
-            'id' => 'h-test-2',
-            'name' => 'h-test-2',
-            'host_group_id' => $hostGroup->id,
-        ]);
+        $host = Model::withoutEvents(function() use ($hostGroup) {
+            return factory(\App\Models\V2\Host::class)->create([
+                'id' => 'h-test-2',
+                'name' => 'h-test-2',
+                'host_group_id' => $hostGroup->id,
+            ]);
+        });
 
         $task = Model::withoutEvents(function() use ($host) {
             $task = new Task([
@@ -138,6 +142,8 @@ class UpdateLicenseBillingTest extends TestCase
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $task->resource()->associate($host);
+            $task->save();
+
             return $task;
         });
 
