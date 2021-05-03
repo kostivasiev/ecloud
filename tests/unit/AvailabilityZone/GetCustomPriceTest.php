@@ -8,13 +8,10 @@ use App\Models\V2\ProductPrice;
 use App\Models\V2\ProductPriceCustom;
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetCustomPriceTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $availabilityZone;
 

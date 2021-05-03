@@ -23,6 +23,8 @@ elif [ "$ROLE" = "scheduler" ]; then
       php /var/www/html/artisan schedule:run --verbose &
       sleep 60
     done
+elif [ "$ROLE" = "migrations" ]; then
+    php artisan migrate --database=ecloud
 else
     echo "invalid role '${ROLE}'"
     exit 1

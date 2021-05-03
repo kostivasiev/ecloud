@@ -3,13 +3,10 @@
 namespace Tests\V1\ActiveDirectory;
 
 use App\Models\V1\ActiveDirectoryDomain;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class GetDomainsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();
