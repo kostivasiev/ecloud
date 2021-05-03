@@ -3,6 +3,7 @@ namespace Tests\unit\Jobs\Conjurer\Host;
 
 use App\Jobs\Conjurer\Host\DeleteServiceProfile;
 use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
