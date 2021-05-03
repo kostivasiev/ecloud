@@ -42,4 +42,26 @@ class DeleteTest extends TestCase
         $this->routerThroughput->refresh();
         $this->assertNotNull($this->routerThroughput->deleted_at);
     }
+
+    public function testFailDeleteIfRouterAttached()
+    {
+        Router::withoutEvents(function () {
+            factory(Router::class)->create(
+                [
+                    'id' => 'rtr-test',
+                    'router_throughput_id' => $this->routerThroughput->id,
+                ]
+            );
+        });
+
+        $this->delete('/v2/router-throughputs/' . $this->routerThroughput->id, [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeJson(
+            [
+                'title' => 'Precondition Failed',
+                'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+            ]
+        )->assertResponseStatus(412);
+    }
 }
