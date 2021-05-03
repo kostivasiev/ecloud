@@ -21,15 +21,15 @@ properties:
     type: string
     example: 'nic-abc123'
     readOnly: true
-  sync:
+  task:
     type: object
     readOnly: true
     properties:
       status:
-        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        description: "The status of the most recent task performed on the resource. Possible values: in-progress, failed, complete."
         example: complete
-      type:
-        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+      name:
+        description: "The name of the most recent task performed on the resource."
         example: update
   created_at:
     type: string
