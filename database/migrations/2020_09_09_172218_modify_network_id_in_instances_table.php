@@ -14,7 +14,7 @@ class ModifyNetworkIdInInstancesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->string('network_id', 36)->nullable(true)->change();
+            $table->uuid('network_id', 36)->nullable(true)->change();
         });
     }
 
@@ -26,7 +26,7 @@ class ModifyNetworkIdInInstancesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->string('network_id', 36)->nullable()->change();
+            $table->uuid('network_id', 36)->nullable()->change();
         });
     }
 }
