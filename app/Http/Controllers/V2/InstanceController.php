@@ -81,7 +81,7 @@ class InstanceController extends BaseController
         // Use the default network if there is only one and no network_id was passed in
         $defaultNetworkId = null;
         if (!$request->has('network_id')) {
-            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1 && $vpc->routers->first()->getStatus() !== Sync::STATUS_FAILED) {
+            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1 && $vpc->routers->first()->sync->status !== Sync::STATUS_FAILED) {
                 $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
             }
             if (!$defaultNetworkId) {
