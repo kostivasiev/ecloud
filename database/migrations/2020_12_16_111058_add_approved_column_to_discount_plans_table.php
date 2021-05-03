@@ -15,7 +15,7 @@ class AddApprovedColumnToDiscountPlansTable extends Migration
     {
         Schema::connection('ecloud')->table('discount_plans', function (Blueprint $table) {
             $table->string('status')->default('pending')->after('term_end_date');
-            $table->timestamp('response_date')->nullable()->after('response_date');
+            $table->timestamp('response_date')->nullable()->after('status');
         });
     }
 
