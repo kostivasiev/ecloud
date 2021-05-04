@@ -90,6 +90,8 @@ class HiddenCredentialsTest extends TestCase
 
     public function testUserCannotSeeHiddenFlag()
     {
+        $this->instance()->deployed = true;
+        $this->instance()->saveQuietly();
         $this->get(
             '/v2/instances/' . $this->instance()->id . '/credentials',
             [
