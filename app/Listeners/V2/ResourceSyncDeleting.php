@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2;
 
-use App\Exceptions\TaskException;
+use App\Exceptions\V2\TaskException;
 use App\Support\Sync;
 use Illuminate\Support\Facades\Log;
 

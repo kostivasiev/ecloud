@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\TaskException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\NetworkRulePort\Create;
 use App\Http\Requests\V2\NetworkRulePort\Update;
 use App\Models\V2\NetworkRulePort;

@@ -2,7 +2,7 @@
 
 namespace App\Traits\V2;
 
-use App\Exceptions\TaskException;
+use App\Exceptions\V2\TaskException;
 use App\Listeners\V2\ResourceSyncSaving;
 use App\Support\Sync;
 use Illuminate\Support\Facades\Cache;

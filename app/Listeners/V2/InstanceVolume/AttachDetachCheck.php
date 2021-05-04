@@ -2,7 +2,7 @@
 
 namespace App\Listeners\V2\InstanceVolume;
 
-use App\Exceptions\TaskException;
+use App\Exceptions\V2\TaskException;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use Illuminate\Support\Facades\Log;

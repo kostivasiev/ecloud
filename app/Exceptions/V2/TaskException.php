@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exceptions\V2;
 
 use Symfony\Component\HttpFoundation\Response;
 use UKFast\Api\Exceptions\ApiException;
