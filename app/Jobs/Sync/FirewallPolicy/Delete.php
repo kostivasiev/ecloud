@@ -3,8 +3,8 @@
 namespace App\Jobs\Sync\FirewallPolicy;
 
 use App\Jobs\Job;
-use App\Jobs\FirewallPolicy\Undeploy;
-use App\Jobs\FirewallPolicy\UndeployCheck;
+use App\Jobs\Nsx\FirewallPolicy\Undeploy;
+use App\Jobs\Nsx\FirewallPolicy\UndeployCheck;
 use App\Models\V2\Sync;
 use App\Traits\V2\SyncableBatch;
 use Illuminate\Support\Facades\Log;

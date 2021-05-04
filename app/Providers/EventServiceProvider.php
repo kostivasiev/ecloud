@@ -86,19 +86,10 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FirewallPolicy\Deleting::class => [
             \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
-        \App\Events\V2\FirewallPolicy\Deleted::class => [
-            \App\Listeners\V2\BillingMetric\End::class,
-        ],
 
         // FirewallRule
         \App\Events\V2\FirewallRule\Deleted::class => [
             \App\Listeners\V2\FirewallRule\Undeploy::class,
-            \App\Listeners\V2\BillingMetric\End::class,
-        ],
-
-        // FirewallRulePort
-        \App\Events\V2\FirewallRulePort\Deleted::class => [
-            \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // FloatingIp
@@ -117,6 +108,9 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Host
+        \App\Events\V2\Host\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
         \App\Events\V2\Host\Saving::class => [
             \App\Listeners\V2\ResourceSyncSaving::class,
         ],
@@ -131,8 +125,14 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // HostGroup
+        \App\Events\V2\HostGroup\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
         \App\Events\V2\HostGroup\Saved::class => [
-//            \App\Listeners\V2\ResourceSync::class,
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\HostGroup\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
         \App\Events\V2\HostGroup\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
@@ -191,28 +191,19 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // NetworkPolicy
-        \App\Events\V2\NetworkPolicy\Deleted::class => [
-            \App\Listeners\V2\BillingMetric\End::class,
+        \App\Events\V2\NetworkPolicy\Saving::class => [
+            \App\Listeners\V2\ResourceSyncSaving::class,
+        ],
+        \App\Events\V2\NetworkPolicy\Saved::class => [
+            \App\Listeners\V2\ResourceSyncSaved::class,
+        ],
+        \App\Events\V2\NetworkPolicy\Deleting::class => [
+            \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
 
         // NetworkRule
         \App\Events\V2\NetworkRule\Deleted::class => [
             \App\Listeners\V2\NetworkRule\Undeploy::class,
-            \App\Listeners\V2\BillingMetric\End::class,
-            // TODO: not convinced we need to re-deploy the policy here. Undeploy will delete the rule, this just pointlessly redeploys the policy.
-            \App\Listeners\V2\NetworkRule\UpdateNetworkPolicy::class,
-        ],
-        \App\Events\V2\NetworkRule\Saved::class => [
-            \App\Listeners\V2\NetworkRule\UpdateNetworkPolicy::class,
-        ],
-
-        // NetworkRulePort
-        \App\Events\V2\NetworkRulePort\Deleted::class => [
-            \App\Listeners\V2\BillingMetric\End::class,
-            \App\Listeners\V2\NetworkRulePort\UpdateNetworkPolicy::class,
-        ],
-        \App\Events\V2\NetworkRulePort\Saved::class => [
-            \App\Listeners\V2\NetworkRulePort\UpdateNetworkPolicy::class,
         ],
 
         // Nat

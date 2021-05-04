@@ -41,12 +41,6 @@ class FirewallRulePort extends Model implements Filterable, Sortable
         'source',
         'destination'
     ];
-    protected $dispatchesEvents = [
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'deleting' => Deleting::class,
-        'deleted' => Deleted::class
-    ];
 
     public function firewallRule()
     {

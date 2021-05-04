@@ -76,7 +76,7 @@ class CrudTest extends TestCase
                 'name' => 'new name',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testDestroy()
@@ -86,6 +86,7 @@ class CrudTest extends TestCase
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
         $this->host();
+        $this->deleteHostMocks();
 
         $this->delete('/v2/hosts/h-test')
             ->seeInDatabase(

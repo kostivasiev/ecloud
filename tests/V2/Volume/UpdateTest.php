@@ -36,7 +36,7 @@ class UpdateTest extends TestCase
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
-                '/api/v1/vpc/vpc-test/volume',
+                '/api/v2/vpc/vpc-test/volume',
                 [
                     'json' => [
                         'volumeId' => 'vol-abc123xyz',
@@ -130,7 +130,7 @@ class UpdateTest extends TestCase
         $this->kingpinServiceMock()
             ->shouldReceive('put')
             ->withSomeOfArgs(
-                '/api/v1/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
+                '/api/v2/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
                 [
                     'json' => [
                         'sizeGiB' => '1999'

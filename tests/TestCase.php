@@ -13,11 +13,11 @@ use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
-use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
@@ -68,6 +68,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var FirewallPolicy */
     private $firewallPolicy;
+
+    /** @var NetworkPolicy */
+    private $networkPolicy;
 
     /** @var RouterThroughput */
     private $routerThroughput;
@@ -134,6 +137,19 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->firewallPolicy;
+    }
+
+    public function networkPolicy($id = 'np-test'): NetworkPolicy
+    {
+        if (!$this->networkPolicy) {
+            Model::withoutEvents(function() use ($id) {
+                $this->networkPolicy = factory(NetworkPolicy::class)->create([
+                    'id' => $id,
+                    'network_id' => $this->network()->id,
+                ]);
+            });
+        }
+        return $this->networkPolicy;
     }
 
     public function routerThroughput()
@@ -446,6 +462,47 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
     }
 
+    public function hostGroupDestroyMocks()
+    {
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs('/api/v1/transport-node-collections?compute_collection_id=TEST-COMPUTE-COLLECTION-ID')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => '92cba9bd-759c-465c-9e84-f6a1a19c4f11'
+                        ]
+                    ]
+                ]));
+            });
+        $this->nsxServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-collections/92cba9bd-759c-465c-9e84-f6a1a19c4f11')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->nsxServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-profiles/92cba9bd-759c-465c-9e84-f6a1a19c4f11')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->kingpinServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup()->vpc->id . '/hostgroup/' . $this->hostGroup()->id)
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->nsxServiceMock()->expects('get')
+            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'external_id' => 'TEST-COMPUTE-COLLECTION-ID',
+                        ],
+                    ],
+                ]));
+            });
+    }
+
     public function kingpinServiceMock()
     {
         if (!$this->kingpinServiceMock) {
@@ -569,7 +626,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Network\Created::class,
             \App\Events\V2\Router\Created::class,
-            \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
 
             // Deleting

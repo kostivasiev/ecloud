@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,9 +21,13 @@ use UKFast\DB\Ditto\Sortable;
  */
 class RouterThroughput extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
     public string $keyPrefix = 'rtp';
+
+    public $children = [
+        'routers',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -52,6 +57,11 @@ class RouterThroughput extends Model implements Filterable, Sortable
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    public function routers()
+    {
+        return $this->hasMany(Router::class);
     }
 
     /**
