@@ -5,7 +5,8 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Faker\Factory as Faker;
 use Faker\Generator;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,7 @@ class UpdateBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Sync $sync;
+    protected Task $task;
 
     protected FloatingIp $floatingIp;
 
@@ -34,13 +35,13 @@ class UpdateBillingTest extends TestCase
             ]);
         });
 
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
+        Model::withoutEvents(function() {
+            $this->task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->floatingIp);
+            $this->task->resource()->associate($this->floatingIp);
         });
 
         factory(Product::class)->create([
@@ -56,7 +57,7 @@ class UpdateBillingTest extends TestCase
     public function testCreatingFloatingIpAddsBillingMetric()
     {
         $listener = new \App\Listeners\V2\FloatingIp\UpdateBilling();
-        $listener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $listener->handle(new \App\Events\V2\Sync\Updated($this->task));
 
         $metric = BillingMetric::getActiveByKey($this->floatingIp, 'floating-ip.count');
         $this->assertNotNull($metric);

@@ -5,7 +5,8 @@ namespace App\Listeners\V2\FloatingIp;
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +21,7 @@ class UpdateBilling
     {
         Log::info(get_class($this) . ' : Started', ['model' => $event->model]);
 
-        if (!($event->model instanceof Sync)) {
+        if (!($event->model instanceof Task)) {
             return;
         }
 
@@ -28,7 +29,7 @@ class UpdateBilling
             return;
         }
 
-        if ($event->model->type != Sync::TYPE_UPDATE) {
+        if ($event->model->name != Sync::TASK_NAME_UPDATE) {
             return;
         }
 
