@@ -78,7 +78,8 @@ class AppServiceProvider extends ServiceProvider
         Queue::after(function (JobProcessed $event) {
             if (strpos($event->job->payload()['displayName'], 'App\\Listeners\\') !== 0) {
                 $command = unserialize($event->job->payload()['data']['command']);
-                Log::debug($event->job->resolveName() . ': Finished', ['id' => $command->getModel()->id]);
+                $parameter = (!empty($command->getModel())) ? $command->getModel()->id : null;
+                Log::debug($event->job->resolveName() . ': Finished', ['id' => $parameter]);
             }
         });
     }
