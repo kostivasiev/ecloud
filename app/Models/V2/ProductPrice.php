@@ -16,6 +16,12 @@ class ProductPrice extends V1ModelWrapper
         $this->casts = [
             'product_price_sale_price' => 'float'
         ];
+
+        $this->fillable([
+            'product_price_product_id',
+            'product_price_type',
+            'product_price_sale_price',
+        ]);
     }
 
     public function product()
