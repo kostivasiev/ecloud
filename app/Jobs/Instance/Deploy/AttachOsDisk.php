@@ -4,9 +4,10 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use App\Models\V2\Volume;
 use Illuminate\Bus\Batchable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class AttachOsDisk extends Job
@@ -51,7 +52,9 @@ class AttachOsDisk extends Job
             }
 
             // Now the save from PrepareOsDisk has completed, attach it to the instance
-            $volume->instances()->attach($this->instance);
+            Model::withoutEvents(function () use ($volume) {
+                $volume->instances()->attach($this->instance);
+            });
 
             Log::info(get_class($this) . ' : Volume ' . $volume->id . ' successfully attached');
         }

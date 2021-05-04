@@ -2,8 +2,8 @@
 
 namespace App\Listeners\V2;
 
-use App\Exceptions\SyncException;
-use App\Models\V2\Sync;
+use App\Exceptions\V2\TaskException;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSyncDeleting
@@ -17,11 +17,11 @@ class ResourceSyncDeleting
             return true;
         }
 
-        if (!$event->model->canSync()) {
-            throw new SyncException();
+        if (!$event->model->canCreateTask()) {
+            throw new TaskException();
         }
 
-        $event->model->createSync(Sync::TYPE_DELETE);
+        $event->model->createTask('sync_delete', $event->model->getDeleteSyncJob());
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
         return false;

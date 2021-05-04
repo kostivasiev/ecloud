@@ -92,7 +92,7 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
         $floatingIp->fill($request->only(['name']));
 
-        $floatingIp->withSyncLock(function ($floatingIp) {
+        $floatingIp->withTaskLock(function ($floatingIp) {
             $floatingIp->save();
         });
 
@@ -103,7 +103,7 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->withSyncLock(function ($floatingIp) {
+        $floatingIp->withTaskLock(function ($floatingIp) {
             $floatingIp->delete();
         });
 
@@ -115,7 +115,7 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
         $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        $floatingIp->withSyncLock(function ($floatingIp) use ($resource) {
+        $floatingIp->withTaskLock(function ($floatingIp) use ($resource) {
             if (!$floatingIp->destinationNat()->exists()) {
                 $nat = app()->make(Nat::class);
                 $nat->destination()->associate($floatingIp);
@@ -142,7 +142,7 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->withSyncLock(function ($floatingIp) {
+        $floatingIp->withTaskLock(function ($floatingIp) {
 
             if ($floatingIp->sourceNat()->exists()) {
                 $floatingIp->sourceNat->delete();

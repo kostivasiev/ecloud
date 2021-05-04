@@ -2,15 +2,11 @@
 
 namespace Tests\unit\Jobs\Instance\Undeploy;
 
-use App\Jobs\FloatingIp\AwaitNatRemoval;
-use App\Jobs\FloatingIp\AwaitNatSync;
 use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
-use App\Jobs\Nat\AwaitIPAddressAllocation;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
-use App\Models\V2\Nat;
 use App\Models\V2\Nic;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -60,13 +56,14 @@ class AwaitNicRemovalTest extends TestCase
                 'network_id' => 'net-test',
             ]);
 
-            $sync = new Sync([
-                'id' => 'sync-1',
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => false,
                 'failure_reason' => 'test',
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $sync->resource()->associate($this->nic);
-            $sync->save();
+            $task->resource()->associate($this->nic);
+            $task->save();
         });
 
         Event::fake([JobFailed::class]);
@@ -88,12 +85,13 @@ class AwaitNicRemovalTest extends TestCase
                 'network_id' => 'net-test',
             ]);
 
-            $sync = new Sync([
-                'id' => 'sync-1',
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => false,
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $sync->resource()->associate($this->nic);
-            $sync->save();
+            $task->resource()->associate($this->nic);
+            $task->save();
         });
 
         Event::fake([JobFailed::class, JobProcessed::class]);

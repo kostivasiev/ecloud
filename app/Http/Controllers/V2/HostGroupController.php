@@ -52,7 +52,7 @@ class HostGroupController extends BaseController
             'name',
         ]));
 
-        $model->withSyncLock(function ($model) {
+        $model->withTaskLock(function ($model) {
             $model->save();
         });
         return $this->responseIdMeta($request, $model->id, 202);
@@ -70,7 +70,7 @@ class HostGroupController extends BaseController
             ], 422);
         }
 
-        $model->withSyncLock(function ($model) {
+        $model->withTaskLock(function ($model) {
             $model->delete();
         });
         return response('', 204);
