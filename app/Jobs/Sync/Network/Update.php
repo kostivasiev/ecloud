@@ -7,29 +7,29 @@ use App\Jobs\Network\AwaitRouterSync;
 use App\Jobs\Network\Deploy;
 use App\Jobs\Network\DeployDiscoveryProfile;
 use App\Jobs\Network\DeploySecurityProfile;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $this->updateSyncBatch([
+        $this->updateTaskBatch([
             [
-                new AwaitRouterSync($this->sync->resource),
-                new Deploy($this->sync->resource),
-                new DeploySecurityProfile($this->sync->resource),
-                new DeployDiscoveryProfile($this->sync->resource),
+                new AwaitRouterSync($this->task->resource),
+                new Deploy($this->task->resource),
+                new DeploySecurityProfile($this->task->resource),
+                new DeployDiscoveryProfile($this->task->resource),
             ],
         ])->dispatch();
     }

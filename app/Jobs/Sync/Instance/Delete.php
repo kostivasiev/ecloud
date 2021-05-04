@@ -8,30 +8,30 @@ use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
 use App\Jobs\Instance\Undeploy\Undeploy;
 use App\Jobs\Job;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new PowerOff($this->sync->resource),
-                new Undeploy($this->sync->resource),
-                new DeleteVolumes($this->sync->resource),
-                new DeleteNics($this->sync->resource),
-                new AwaitNicRemoval($this->sync->resource),
+                new PowerOff($this->task->resource),
+                new Undeploy($this->task->resource),
+                new DeleteVolumes($this->task->resource),
+                new DeleteNics($this->task->resource),
+                new AwaitNicRemoval($this->task->resource),
             ],
         ])->dispatch();
     }

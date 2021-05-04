@@ -5,27 +5,27 @@ namespace App\Jobs\Sync\FirewallPolicy;
 use App\Jobs\Job;
 use App\Jobs\Nsx\FirewallPolicy\Undeploy;
 use App\Jobs\Nsx\FirewallPolicy\UndeployCheck;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
             ]
         ])->dispatch();
     }

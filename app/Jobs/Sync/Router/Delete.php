@@ -8,30 +8,30 @@ use App\Jobs\Router\DeleteFirewallPolicies;
 use App\Jobs\Router\Undeploy;
 use App\Jobs\Router\UndeployCheck;
 use App\Jobs\Router\UndeployRouterLocale;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new DeleteFirewallPolicies($this->sync->resource),
-                new AwaitFirewallPolicyRemoval($this->sync->resource),
-                new UndeployRouterLocale($this->sync->resource),
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new DeleteFirewallPolicies($this->task->resource),
+                new AwaitFirewallPolicyRemoval($this->task->resource),
+                new UndeployRouterLocale($this->task->resource),
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
             ]
         ])->dispatch();
     }

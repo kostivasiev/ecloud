@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -13,13 +13,13 @@ use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
-use App\Models\V2\Sync;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\VolumeResource;
+use App\Support\Sync;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -146,7 +146,7 @@ class InstanceController extends BaseController
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             $instance->save();
         });
 
@@ -162,7 +162,7 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
+        $instance->withTaskLock(function ($instance) {
             $instance->delete();
         });
 
@@ -229,9 +229,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
-            if (!$instance->canSync()) {
-                throw new SyncException();
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
             }
             $this->dispatch(new PowerOn($instance));
         });
@@ -244,9 +244,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
-            if (!$instance->canSync()) {
-                throw new SyncException();
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
             }
             $this->dispatch(new PowerOff($instance));
         });
@@ -259,9 +259,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
-            if (!$instance->canSync()) {
-                throw new SyncException();
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
             }
             $this->dispatch(new GuestRestart($instance));
         });
@@ -274,9 +274,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
-            if (!$instance->canSync()) {
-                throw new SyncException();
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
             }
             $this->dispatch(new GuestShutdown($instance));
         });
@@ -289,9 +289,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withSyncLock(function ($instance) {
-            if (!$instance->canSync()) {
-                throw new SyncException();
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
             }
             $this->dispatch(new PowerReset($instance));
         });

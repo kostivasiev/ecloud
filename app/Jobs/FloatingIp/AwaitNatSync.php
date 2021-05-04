@@ -4,11 +4,7 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Instance;
-use App\Models\V2\Nat;
-use App\Models\V2\Network;
-use App\Models\V2\Router;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;

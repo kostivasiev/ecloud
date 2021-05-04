@@ -3,27 +3,25 @@
 namespace App\Jobs\Sync\Host;
 
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Host\CheckExists;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $host = $this->sync->resource;
-
-        $this->deleteSyncBatch([
+        $host = $this->task->resource;
+        $this->deleteTaskBatch([
             new \App\Jobs\Kingpin\Host\MaintenanceMode($host),
             new \App\Jobs\Kingpin\Host\DeleteInVmware($host),
             new \App\Jobs\Conjurer\Host\PowerOff($host),

@@ -4,7 +4,9 @@ namespace Tests\unit\Listeners\V2\Instance;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,7 +16,7 @@ class UpdateRamBillingTest extends TestCase
 
     protected int $standardTier;
 
-    protected Sync $sync;
+    protected Task $task;
 
     public function setUp(): void
     {
@@ -22,14 +24,14 @@ class UpdateRamBillingTest extends TestCase
 
         $this->standardTier = config('billing.ram_tiers.standard');
 
-        $this->sync = Sync::withoutEvents(function() {
-            $sync = new Sync([
-                'id' => 'sync-1',
+        $this->task = Model::withoutEvents(function() {
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $sync->resource()->associate($this->instance());
-            return $sync;
+            $task->resource()->associate($this->instance());
+            return $task;
         });
 
         factory(Product::class)->create([
@@ -56,7 +58,7 @@ class UpdateRamBillingTest extends TestCase
         $this->instance()->ram_capacity = 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
-        $updateRamBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
 
@@ -70,7 +72,7 @@ class UpdateRamBillingTest extends TestCase
         $this->instance()->ram_capacity = (config('billing.ram_tiers.standard') * 1024) + 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
-        $updateRamBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $standardRamMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
         $this->assertNotNull($standardRamMetric);
@@ -96,18 +98,18 @@ class UpdateRamBillingTest extends TestCase
 
         $this->instance()->ram_capacity = 2048;
 
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
+        Model::withoutEvents(function() {
+            $this->task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->sync->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instance());
         });
 
         // Check that the ram billing metric is added
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
-        $updateRamBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         // Check existing metric was ended
         $originalRamMetric->refresh();
@@ -132,7 +134,7 @@ class UpdateRamBillingTest extends TestCase
         $this->instance()->ram_capacity = (config('billing.ram_tiers.standard') * 1024) + 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
-        $updateRamBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         // Check existing metric was ended
         $originalRamMetric->refresh();
@@ -173,7 +175,7 @@ class UpdateRamBillingTest extends TestCase
         $this->instance()->ram_capacity = 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
-        $updateRamBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         // Check existing metrics were ended
         $originalStandardMetric->refresh();

@@ -5,27 +5,27 @@ namespace App\Jobs\Sync\Vpc;
 use App\Jobs\Job;
 use App\Jobs\Vpc\AwaitDhcpRemoval;
 use App\Jobs\Vpc\DeleteDhcps;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new DeleteDhcps($this->sync->resource),
-                new AwaitDhcpRemoval($this->sync->resource),
+                new DeleteDhcps($this->task->resource),
+                new AwaitDhcpRemoval($this->task->resource),
             ]
         ])->dispatch();
     }

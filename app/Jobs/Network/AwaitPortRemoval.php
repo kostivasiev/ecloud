@@ -3,10 +3,7 @@
 namespace App\Jobs\Network;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
 use App\Models\V2\Network;
-use App\Models\V2\Router;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;

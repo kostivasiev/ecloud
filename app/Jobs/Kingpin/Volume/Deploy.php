@@ -70,9 +70,4 @@ class Deploy extends Job
 
         $volume->saveQuietly();
     }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
-    }
 }

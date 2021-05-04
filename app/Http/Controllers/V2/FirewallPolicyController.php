@@ -49,7 +49,7 @@ class FirewallPolicyController extends BaseController
         $model = app()->make(FirewallPolicy::class);
         $model->fill($request->only(['name', 'sequence', 'router_id']));
 
-        $model->withSyncLock(function ($policy) {
+        $model->withTaskLock(function ($policy) {
             $policy->save();
         });
 
@@ -61,7 +61,7 @@ class FirewallPolicyController extends BaseController
         $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $model->fill($request->only(['name', 'sequence']));
 
-        $model->withSyncLock(function ($policy) {
+        $model->withTaskLock(function ($policy) {
             $policy->save();
         });
 
@@ -72,7 +72,7 @@ class FirewallPolicyController extends BaseController
     {
         $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
 
-        $model->withSyncLock(function ($model) {
+        $model->withTaskLock(function ($model) {
             $model->delete();
         });
 

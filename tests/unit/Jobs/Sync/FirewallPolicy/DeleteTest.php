@@ -3,8 +3,10 @@
 namespace Tests\unit\Jobs\Sync\FirewallPolicy;
 
 use App\Jobs\Sync\FirewallPolicy\Delete;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -13,7 +15,7 @@ class DeleteTest extends TestCase
 {
     use DatabaseMigrations;
 
-    private $sync;
+    private $task;
 
     public function setUp(): void
     {
@@ -22,15 +24,16 @@ class DeleteTest extends TestCase
 
     public function testJobsBatched()
     {
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+        Model::withoutEvents(function() {
+            $this->task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->firewallPolicy());
+            $this->task->resource()->associate($this->firewallPolicy());
         });
 
         Bus::fake();
-        $job = new Delete($this->sync);
+        $job = new Delete($this->task);
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {

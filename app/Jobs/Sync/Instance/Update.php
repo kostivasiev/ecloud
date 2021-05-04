@@ -22,50 +22,50 @@ use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        if (!$this->sync->resource->deployed) {
-            $this->updateSyncBatch([
+        if (!$this->task->resource->deployed) {
+            $this->updateTaskBatch([
                 [
-                    new CheckNetworkAvailable($this->sync->resource),
-                    new Deploy($this->sync->resource),
-                    new PrepareOsDisk($this->sync->resource),
-                    new AttachOsDisk($this->sync->resource),
-                    new ConfigureNics($this->sync->resource),
-                    new AwaitNicSync($this->sync->resource),
-                    new AssignFloatingIp($this->sync->resource),
-                    new UpdateNetworkAdapter($this->sync->resource),
-                    new OsCustomisation($this->sync->resource),
-                    new PowerOn($this->sync->resource),
-                    new WaitOsCustomisation($this->sync->resource),
-                    new PrepareOsUsers($this->sync->resource),
-                    new ExpandOsDisk($this->sync->resource),
-                    new ConfigureWinRm($this->sync->resource),
-                    new ActivateWindows($this->sync->resource),
-                    new RunApplianceBootstrap($this->sync->resource),
-                    new RunBootstrapScript($this->sync->resource),
-                    new DeployCompleted($this->sync->resource),
+                    new CheckNetworkAvailable($this->task->resource),
+                    new Deploy($this->task->resource),
+                    new PrepareOsDisk($this->task->resource),
+                    new AttachOsDisk($this->task->resource),
+                    new ConfigureNics($this->task->resource),
+                    new AwaitNicSync($this->task->resource),
+                    new AssignFloatingIp($this->task->resource),
+                    new UpdateNetworkAdapter($this->task->resource),
+                    new OsCustomisation($this->task->resource),
+                    new PowerOn($this->task->resource),
+                    new WaitOsCustomisation($this->task->resource),
+                    new PrepareOsUsers($this->task->resource),
+                    new ExpandOsDisk($this->task->resource),
+                    new ConfigureWinRm($this->task->resource),
+                    new ActivateWindows($this->task->resource),
+                    new RunApplianceBootstrap($this->task->resource),
+                    new RunBootstrapScript($this->task->resource),
+                    new DeployCompleted($this->task->resource),
                 ],
             ])->dispatch();
         } else {
-            $this->updateSyncBatch([
+            $this->updateTaskBatch([
                 [
-                    new ComputeUpdate($this->sync->resource),
+                    new ComputeUpdate($this->task->resource),
                 ]
             ])->dispatch();
         }

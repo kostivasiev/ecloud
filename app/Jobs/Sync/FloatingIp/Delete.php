@@ -5,27 +5,26 @@ namespace App\Jobs\Sync\FloatingIp;
 use App\Jobs\FloatingIp\AwaitNatRemoval;
 use App\Jobs\FloatingIp\DeleteNats;
 use App\Jobs\Job;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Bus\Batch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private Sync $sync;
+    private Task $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $floatingIp = $this->sync->resource;
-
-        $this->deleteSyncBatch(
+        $floatingIp = $this->task->resource;
+        $this->deleteTaskBatch(
             [
                 new DeleteNats($floatingIp),
                 new AwaitNatRemoval($floatingIp),

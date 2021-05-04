@@ -3,9 +3,7 @@
 namespace App\Jobs\Nat;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
 use App\Models\V2\Nat;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;

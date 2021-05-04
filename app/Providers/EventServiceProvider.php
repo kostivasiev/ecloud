@@ -155,20 +155,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
-        // InstanceVolume
-        \App\Events\V2\InstanceVolume\Creating::class => [
-            \App\Listeners\V2\InstanceVolume\MarkSyncing::class,
-        ],
-        \App\Events\V2\InstanceVolume\Created::class => [
-            \App\Listeners\V2\InstanceVolume\Attach::class,
-        ],
-        \App\Events\V2\InstanceVolume\Deleting::class => [
-            \App\Listeners\V2\InstanceVolume\MarkSyncing::class,
-        ],
-        \App\Events\V2\InstanceVolume\Deleted::class => [
-            \App\Listeners\V2\InstanceVolume\Detach::class,
-        ],
-
         // LoadBalancerCluster
         \App\Events\V2\LoadBalancerCluster\Creating::class => [
         ],
@@ -287,11 +273,11 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpn\Creating::class => [
         ],
 
-        // Sync
-        \App\Events\V2\Sync\Created::class => [
-            \App\Listeners\V2\SyncCreated::class
+        // Task
+        \App\Events\V2\Task\Created::class => [
+            \App\Listeners\V2\TaskCreated::class
         ],
-        \App\Events\V2\Sync\Updated::class => [
+        \App\Events\V2\Task\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
@@ -302,6 +288,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Host\UpdateBilling::class,
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,
+            \App\Listeners\V2\FloatingIp\UpdateBilling::class,
         ],
     ];
 }

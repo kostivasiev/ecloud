@@ -65,7 +65,7 @@ class DhcpController extends BaseController
         $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->fill($request->only(['name']));
 
-        $dhcp->withSyncLock(function ($dhcp) {
+        $dhcp->withTaskLock(function ($dhcp) {
             $dhcp->save();
         });
 
@@ -76,7 +76,7 @@ class DhcpController extends BaseController
     {
         $dhcp = Dhcp::findOrFail($dhcpId);
 
-        $dhcp->withSyncLock(function ($dhcp) {
+        $dhcp->withTaskLock(function ($dhcp) {
             $dhcp->delete();
         });
 

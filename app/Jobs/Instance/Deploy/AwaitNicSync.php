@@ -4,7 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -31,6 +31,7 @@ class AwaitNicSync extends Job
                 $this->fail(new \Exception("NIC '" . $nic->id . "' in failed sync state"));
                 return;
             }
+
             if ($nic->sync->status != Sync::STATUS_COMPLETE) {
                 Log::warning('NIC not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id, 'nic' => $nic->id]);
                 return $this->release($this->backoff);

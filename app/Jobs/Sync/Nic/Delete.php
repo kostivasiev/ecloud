@@ -5,27 +5,27 @@ namespace App\Jobs\Sync\Nic;
 use App\Jobs\Job;
 use App\Jobs\Nic\UnassignFloatingIP;
 use App\Jobs\Nsx\Nic\RemoveDHCPLease;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new RemoveDHCPLease($this->sync->resource),
-                new UnassignFloatingIP($this->sync->resource),
+                new RemoveDHCPLease($this->task->resource),
+                new UnassignFloatingIP($this->task->resource),
             ]
         ])->dispatch();
     }

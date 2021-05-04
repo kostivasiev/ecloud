@@ -4,27 +4,27 @@ namespace App\Jobs\Sync\Volume;
 
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Volume\Undeploy;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    /** @var Sync */
-    private $sync;
+    /** @var Task */
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new Undeploy($this->sync->resource),
+                new Undeploy($this->task->resource),
             ]
         ])->dispatch();
     }

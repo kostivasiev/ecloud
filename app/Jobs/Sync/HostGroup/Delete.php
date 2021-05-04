@@ -5,26 +5,25 @@ namespace App\Jobs\Sync\HostGroup;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\HostGroup\DeleteCluster;
 use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
-use App\Models\V2\Sync;
 use App\Traits\V2\JobModel;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch, JobModel;
+    use TaskableBatch, JobModel;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        $hostGroup = $this->sync->resource;
-
-        $this->deleteSyncBatch([
+        $hostGroup = $this->task->resource;
+        $this->deleteTaskBatch([
                 new DeleteTransportNodeProfile($hostGroup),
                 new DeleteCluster($hostGroup),
         ])->dispatch();

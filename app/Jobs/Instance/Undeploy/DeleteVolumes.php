@@ -29,9 +29,8 @@ class DeleteVolumes extends Job
         $instance->volumes()->each(function ($volume) use ($instance) {
             if ($volume->instances()->count() == 1) {
                 Log::info('Detaching volume ' . $volume->id);
-                Model::withoutEvents(function () use ($instance, $volume) {
-                    $instance->volumes()->detach($volume->id);
-                });
+                $instance->volumes()->detach($volume->id);
+
                 Log::info('Deleting volume ' . $volume->id);
                 $volume->delete();
             }
