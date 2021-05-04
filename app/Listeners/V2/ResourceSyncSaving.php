@@ -2,7 +2,10 @@
 
 namespace App\Listeners\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
+use App\Support\Sync;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSyncSaving
@@ -16,8 +19,8 @@ class ResourceSyncSaving
             return true;
         }
 
-        if (!$event->model->canSync()) {
-            throw new SyncException();
+        if (!$event->model->canCreateTask()) {
+            throw new TaskException();
         }
 
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);

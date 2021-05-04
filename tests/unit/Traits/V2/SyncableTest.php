@@ -2,15 +2,10 @@
 
 namespace Tests\unit\Rules\V2;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Nic;
-use App\Models\V2\Sync;
-use App\Rules\V2\IpAvailable;
-use App\Traits\V2\DefaultAvailabilityZone;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use App\Traits\V2\Syncable;
-use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -37,13 +32,13 @@ class SyncableTest extends TestCase
                 'id' => 'test-testing'
             ]);
 
-            $this->sync = new Sync([
-                'id' => 'sync-test',
+            $this->task = new Task([
+                'id' => 'task-test',
+                'name' => Sync::TASK_NAME_UPDATE,
+                'completed' => true,
             ]);
-            $this->sync->resource()->associate($this->model);
-            $this->sync->completed = true;
-            $this->sync->type = Sync::TYPE_UPDATE;
-            $this->sync->save();
+            $this->task->resource()->associate($this->model);
+            $this->task->save();
         });
 
         $attribute = $this->model->sync;

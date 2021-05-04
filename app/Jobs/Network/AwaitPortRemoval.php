@@ -6,7 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;

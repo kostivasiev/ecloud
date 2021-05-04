@@ -6,10 +6,13 @@ use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Detach extends Job
 {
+    use Batchable;
+
     private Volume $volume;
     private Instance $instance;
 
@@ -23,22 +26,10 @@ class Detach extends Job
     {
         Log::info(get_class($this) . ' : Started');
 
-        try {
-            $response = $this->instance->availabilityZone->kingpinService()
+        $this->instance->availabilityZone->kingpinService()
                 ->post('/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/' . $this->volume->vmware_uuid . '/detach');
-        } catch (ServerException $exception) {
-            $response = $exception->getResponse();
-        }
 
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->volume->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed detachment'));
-            return false;
-        }
+        $this->instance->volumes()->detach($this->volume);
 
         Log::debug('Volume ' . $this->volume->id . ' has been detached from instance ' . $this->instance->id);
 

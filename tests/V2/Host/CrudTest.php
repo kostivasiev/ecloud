@@ -3,6 +3,7 @@
 namespace Tests\V2\Host;
 
 use App\Models\V2\Host;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -49,7 +50,7 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
-        $this->createHostMocks();
+        Event::fake();
 
         $data = [
             'name' => 'h-test',
@@ -63,7 +64,7 @@ class CrudTest extends TestCase
     public function testUpdate()
     {
         $this->host();
-        $this->syncSaveIdempotent();
+        Event::fake();
 
         $this->patch('/v2/hosts/h-test', [
             'name' => 'new name',
@@ -84,7 +85,7 @@ class CrudTest extends TestCase
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
         $this->host();
-        $this->deleteHostMocks();
+        Event::fake();
 
         $this->delete('/v2/hosts/h-test')
             ->seeInDatabase(

@@ -2,9 +2,15 @@
 namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
+use App\Jobs\Instance\GuestShutdown;
+use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\UndeployCheck;
 use App\Models\V2\Instance;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -16,7 +22,6 @@ class CheckNetworkAvailableTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->job = \Mockery::mock(CheckNetworkAvailable::class, [$this->instance()])->makePartial();
     }
 
     public function testNetworkDoesNotExists()
@@ -39,51 +44,58 @@ class CheckNetworkAvailableTest extends TestCase
                 ]
             ]);
         });
-        $this->job = new CheckNetworkAvailable($instance);
 
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [App\Models\V2\Network] net-notexists');
 
-        $this->job->handle();
+        dispatch(new CheckNetworkAvailable($instance));
     }
 
     public function testNetworkSyncFail()
     {
-        $sync = new Sync([
-            'type' => 'update',
+        $task = new Task([
             'completed' => true,
             'failure_reason' => 'Test Failure',
+            'name' => Sync::TASK_NAME_UPDATE,
         ]);
-        $this->network()->syncs()->save($sync);
+        $this->network()->tasks()->save($task);
 
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('info')->withSomeOfArgs("Network 'net-abcdef12' in failed sync state");
-        $this->assertNull($this->job->handle());
+        Event::fake([JobFailed::class]);
+
+        dispatch(new CheckNetworkAvailable($this->instance()));
+
+        Event::assertDispatched(JobFailed::class);
     }
 
     public function testNetworkSyncInProgress()
     {
-        $sync = new Sync([
-            'type' => 'update',
+        $task = new Task([
+            'name' => Sync::TASK_NAME_UPDATE,
             'completed' => false,
         ]);
-        $this->network()->syncs()->save($sync);
+        $this->network()->tasks()->save($task);
 
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('warning')
-            ->withSomeOfArgs('Network not in sync, retrying in ' . $this->job->backoff . ' seconds');
-        $this->assertNull($this->job->handle());
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        dispatch(new CheckNetworkAvailable($this->instance()));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
     }
 
     public function testSuccessful()
     {
-        $sync = new Sync([
-            'type' => 'update',
+        $task = new Task([
+            'name' => Sync::TASK_NAME_UPDATE,
             'completed' => true,
         ]);
-        $this->network()->syncs()->save($sync);
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Finished');
-        $this->assertNull($this->job->handle());
+        $this->network()->tasks()->save($task);
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new CheckNetworkAvailable($this->instance()));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 }

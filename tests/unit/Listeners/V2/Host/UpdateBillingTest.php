@@ -5,7 +5,9 @@ namespace Tests\unit\Listeners\V2\Host;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
 class UpdateBillingTest extends TestCase
@@ -41,11 +43,11 @@ class UpdateBillingTest extends TestCase
         //$sync = $this->host()->syncs()->latest()->first();
         // Even though $this->>host() will mock the sync and we can use above, use this instead
         // as we're going to refactor host deployment sync soon so we only have to test this small unit.
-        $sync = Sync::withoutEvents(function() {
-            $sync = new Sync([
+        $sync = Model::withoutEvents(function() {
+            $sync = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $sync->resource()->associate($this->host());
             return $sync;
@@ -53,7 +55,7 @@ class UpdateBillingTest extends TestCase
 
         // Check that the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\Host\UpdateBilling;
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($sync));
 
         $metric = BillingMetric::getActiveByKey($this->host(), 'host.hs-test');
         $this->assertNotNull($metric);

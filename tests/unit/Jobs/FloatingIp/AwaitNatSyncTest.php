@@ -8,7 +8,8 @@ use App\Jobs\Nat\AwaitIPAddressAllocation;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -71,13 +72,14 @@ class AwaitNatSyncTest extends TestCase
             $nat->action = NAT::ACTION_SNAT;
             $nat->save();
 
-            $sync = new Sync([
-                'id' => 'sync-1',
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => false,
                 'failure_reason' => 'test',
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $sync->resource()->associate($nat);
-            $sync->save();
+            $task->resource()->associate($nat);
+            $task->save();
         });
 
         Event::fake([JobFailed::class]);
@@ -107,13 +109,14 @@ class AwaitNatSyncTest extends TestCase
             $nat->action = NAT::ACTION_DNAT;
             $nat->save();
 
-            $sync = new Sync([
-                'id' => 'sync-1',
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => false,
                 'failure_reason' => 'test',
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $sync->resource()->associate($nat);
-            $sync->save();
+            $task->resource()->associate($nat);
+            $task->save();
         });
 
         Event::fake([JobFailed::class]);
@@ -142,12 +145,13 @@ class AwaitNatSyncTest extends TestCase
             $nat->action = NAT::ACTION_SNAT;
             $nat->save();
 
-            $sync = new Sync([
-                'id' => 'sync-1',
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => false,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $sync->resource()->associate($nat);
-            $sync->save();
+            $task->resource()->associate($nat);
+            $task->save();
         });
 
         Event::fake([JobFailed::class, JobProcessed::class]);
@@ -179,12 +183,13 @@ class AwaitNatSyncTest extends TestCase
             $nat->action = NAT::ACTION_SNAT;
             $nat->save();
 
-            $sync = new Sync([
-                'id' => 'sync-1',
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => false,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $sync->resource()->associate($nat);
-            $sync->save();
+            $task->resource()->associate($nat);
+            $task->save();
         });
 
         Event::fake([JobFailed::class, JobProcessed::class]);

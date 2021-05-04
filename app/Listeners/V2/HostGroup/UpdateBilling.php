@@ -2,10 +2,10 @@
 
 namespace App\Listeners\V2\HostGroup;
 
-use App\Events\V2\Sync\Updated;
+use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -20,13 +20,21 @@ class UpdateBilling
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
-        $sync = $event->model;
+        $task = $event->model;
 
-        if (!$sync->completed || $sync->type != Sync::TYPE_UPDATE || !($sync->resource instanceof HostGroup)) {
+        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
             return;
         }
 
-        $hostGroup = $sync->resource;
+        if (!$event->model->completed) {
+            return;
+        }
+
+        if (!($task->resource instanceof HostGroup)) {
+            return;
+        }
+
+        $hostGroup = $task->resource;
 
         if (!BillingMetric::getActiveByKey($hostGroup, 'hostgroup')) {
             $billingMetric = app()->make(BillingMetric::class);

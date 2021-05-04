@@ -3,8 +3,9 @@ namespace Tests\unit\Listeners\V2\Volume;
 
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 class UpdateBillingTest extends TestCase
 {
     protected Volume $volume;
-    protected Sync $sync;
+    protected Task $task;
     protected Instance $instance;
 
     public function setUp(): void
@@ -34,18 +35,18 @@ class UpdateBillingTest extends TestCase
 
     public function testResizingVolumeAddsBillingMetric()
     {
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+        Model::withoutEvents(function() {
+            $this->task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->volume);
+            $this->task->resource()->associate($this->volume);
         });
 
         // Check that the volume billing metric is added
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $metric = BillingMetric::where('resource_id', $this->volume->id)->first();
 
@@ -64,7 +65,7 @@ class UpdateBillingTest extends TestCase
         });
 
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Sync\Updated($this->volume));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->volume));
 
         $metric = BillingMetric::where('resource_id', $this->volume->id)->first();
 
@@ -85,7 +86,7 @@ class UpdateBillingTest extends TestCase
         });
 
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Sync\Updated($this->volume));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->volume));
 
         $metric = BillingMetric::where('resource_id', $this->volume->id)->first();
 
@@ -113,7 +114,7 @@ class UpdateBillingTest extends TestCase
         });
 
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Sync\Updated($this->volume));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->volume));
 
         $metric = BillingMetric::where('resource_id', $this->volume->id)->first();
 
@@ -143,7 +144,7 @@ class UpdateBillingTest extends TestCase
         });
 
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Sync\Updated($this->volume));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->volume));
 
         $metric = BillingMetric::where('resource_id', $this->volume->id)->first();
 
@@ -187,7 +188,7 @@ class UpdateBillingTest extends TestCase
         });
 
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
-        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Sync\Updated($this->volume));
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->volume));
 
         // Update the origin billingMetric now it's been ended
         $originalBilling->refresh();

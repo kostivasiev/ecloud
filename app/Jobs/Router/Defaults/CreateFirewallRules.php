@@ -6,7 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -31,7 +31,7 @@ class CreateFirewallRules extends Job
 
         $policy = $this->policy;
 
-        $this->firewallPolicy->withSyncLock(function ($firewallPolicy) use ($policy) {
+        $this->firewallPolicy->withTaskLock(function ($firewallPolicy) use ($policy) {
             foreach ($policy['rules'] as $rule) {
                 Log::debug('FirewallRule', $rule);
                 $firewallRule = app()->make(FirewallRule::class);

@@ -5,14 +5,16 @@ namespace Tests\unit\Listeners\V2\Host;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class ToggleHostGroupBillingTest extends TestCase
 {
-    protected Sync $sync;
+    protected Task $task;
 
     protected Product $product;
 
@@ -51,19 +53,19 @@ class ToggleHostGroupBillingTest extends TestCase
 
         $this->host();
 
-        $sync = Sync::withoutEvents(function() {
-            $sync = new Sync([
-                'id' => 'sync-1',
+        $task = Model::withoutEvents(function() {
+            $task = new Task([
+                'id' => 'task-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $sync->resource()->associate($this->host());
-            return $sync;
+            $task->resource()->associate($this->host());
+            return $task;
         });
 
         // Check that the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\Host\ToggleHostGroupBilling();
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
         $this->assertNotNull($hostGroupBillingMetric->refresh()->end);
     }
@@ -76,20 +78,20 @@ class ToggleHostGroupBillingTest extends TestCase
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNull($metric);
 
-        $sync = Sync::withoutEvents(function() {
-            $sync = new Sync([
-                'id' => 'sync-1',
+        $task = Model::withoutEvents(function() {
+            $task = new Task([
+                'id' => 'task-1',
                 'resource_id' => $this->host()->id,
                 'completed' => true,
-                'type' => Sync::TYPE_DELETE
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $sync->resource()->associate($this->host());
-            return $sync;
+            $task->resource()->associate($this->host());
+            return $task;
         });
 
         // Check that the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\Host\ToggleHostGroupBilling();
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNotNull($metric);
@@ -118,19 +120,19 @@ class ToggleHostGroupBillingTest extends TestCase
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNull($metric);
 
-        $sync = Sync::withoutEvents(function() {
-            $sync = new Sync([
-                'id' => 'sync-1',
+        $task = Model::withoutEvents(function() {
+            $task = new Task([
+                'id' => 'task-1',
                 'resource_id' => $this->host()->id,
                 'completed' => true,
-                'type' => Sync::TYPE_DELETE
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $sync->resource()->associate($this->host());
-            return $sync;
+            $task->resource()->associate($this->host());
+            return $task;
         });
 
         $UpdateBillingListener = new \App\Listeners\V2\Host\ToggleHostGroupBilling();
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
         // Check that no host group billing was added
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');

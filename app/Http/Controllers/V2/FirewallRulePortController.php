@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\FirewallRulePort\Create;
 use App\Http\Requests\V2\FirewallRulePort\Update;
 use App\Models\V2\FirewallRulePort;
@@ -41,9 +41,9 @@ class FirewallRulePortController extends BaseController
             'destination'
         ]));
 
-        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canSync()) {
-                throw new SyncException();
+        $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $resource->save();
@@ -67,9 +67,9 @@ class FirewallRulePortController extends BaseController
             $resource->destination = null;
         }
 
-        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canSync()) {
-                throw new SyncException();
+        $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $resource->save();
@@ -83,9 +83,9 @@ class FirewallRulePortController extends BaseController
     {
         $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
 
-        $resource->firewallRule->firewallPolicy->withSyncLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canSync()) {
-                throw new SyncException();
+        $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
+            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $resource->delete();

@@ -2,6 +2,7 @@
 
 namespace Tests\V2\HostGroup;
 
+use App\Events\Event;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -55,7 +56,7 @@ class CrudTest extends TestCase
             ]);
         });
 
-        $this->hostGroupJobMocks();
+        \Illuminate\Support\Facades\Event::fake();
 
         $data = [
             'name' => 'hg-test',
@@ -67,30 +68,6 @@ class CrudTest extends TestCase
         $this->post('/v2/host-groups', $data)
             ->seeInDatabase('host_groups', $data, 'ecloud')
             ->assertResponseStatus(202);
-    }
-
-    public function testCreateWithoutAz()
-    {
-        app()->bind(HostGroup::class, function () {
-            return new HostGroup([
-                'id' => 'hg-test',
-            ]);
-        });
-
-        $this->hostGroupJobMocks();
-
-        $data = [
-            'name' => 'hg-test',
-            'vpc_id' => $this->vpc()->id,
-            'host_spec_id' => $this->hostSpec()->id,
-        ];
-        $this->post('/v2/host-groups', $data)
-            ->seeInDatabase('host_groups', $data, 'ecloud')
-            ->assertResponseStatus(202);
-
-        $hostGroupId = (json_decode($this->response->getContent()))->data->id;
-        $hostGroup = HostGroup::findOrFail($hostGroupId);
-        $this->assertEquals($this->availabilityZone()->id, $hostGroup->availability_zone_id);
     }
 
     public function testStoreValidationWithEmptyHostSpecId()
@@ -123,7 +100,7 @@ class CrudTest extends TestCase
             ]);
         });
 
-        $this->hostGroupJobMocks();
+        \Illuminate\Support\Facades\Event::fake();
 
         $data = [
             'name' => 'hg-test',
@@ -146,7 +123,7 @@ class CrudTest extends TestCase
             ]);
         });
 
-        $this->hostGroupJobMocks();
+        \Illuminate\Support\Facades\Event::fake();
 
         $data = [
             'name' => 'hg-test',
@@ -166,8 +143,7 @@ class CrudTest extends TestCase
     {
         $this->hostGroup();
 
-        // The request fires the jobs a second time
-        $this->hostGroupJobMocks();
+        \Illuminate\Support\Facades\Event::fake();
 
         $this->patch('/v2/host-groups/hg-test', [
             'name' => 'new name',
@@ -185,8 +161,7 @@ class CrudTest extends TestCase
     {
         $this->hostGroup();
 
-        // The request fires the jobs a second time
-        $this->hostGroupJobMocks();
+        \Illuminate\Support\Facades\Event::fake();
 
         $this->patch('/v2/host-groups/hg-test', [
             'host_spec_id' => 'hs-new',
@@ -207,7 +182,8 @@ class CrudTest extends TestCase
          * @see https://laravel.com/docs/5.8/database-testing#available-assertions
          */
         $this->hostGroup();
-        $this->hostGroupDestroyMocks();
+
+        \Illuminate\Support\Facades\Event::fake();
 
         $this->delete('/v2/host-groups/hg-test')
             ->seeInDatabase(

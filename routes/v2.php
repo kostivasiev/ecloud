@@ -58,6 +58,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
         $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
+        $router->get('vpcs/{vpcId}/tasks', 'VpcController@tasks');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->get('vpcs/{vpcId}/lbcs', 'VpcController@lbcs');
         });

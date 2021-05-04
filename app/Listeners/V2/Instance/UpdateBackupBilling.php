@@ -2,11 +2,11 @@
 
 namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Sync\Updated;
+use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Models\V2\Sync;
 use App\Models\V2\Volume;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -19,7 +19,7 @@ class UpdateBackupBilling
      */
     public function handle(Updated $event)
     {
-        if ($event->model->type !== Sync::TYPE_UPDATE) {
+        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
             return;
         }
 

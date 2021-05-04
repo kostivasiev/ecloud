@@ -3,15 +3,17 @@
 namespace Tests\unit\Jobs\Sync\Router;
 
 use App\Jobs\Sync\Router\Update;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    private $sync;
+    private $task;
 
     public function setUp(): void
     {
@@ -20,15 +22,16 @@ class UpdateTest extends TestCase
 
     public function testJobsBatched()
     {
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
+        Model::withoutEvents(function() {
+            $this->task = new Task([
                 'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->router());
+            $this->task->resource()->associate($this->router());
         });
 
         Bus::fake();
-        $job = new Update($this->sync);
+        $job = new Update($this->task);
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {

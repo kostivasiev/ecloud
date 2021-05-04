@@ -7,32 +7,32 @@ use App\Jobs\Nic\UnassignFloatingIP;
 use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Jobs\Nsx\Dhcp\UndeployCheck;
 use App\Jobs\Nsx\Nic\RemoveDHCPLease;
-use App\Models\V2\Sync;
-use App\Traits\V2\SyncableBatch;
+use App\Models\V2\Task;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
 
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
             ]
         ])->dispatch();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
     }
 }
