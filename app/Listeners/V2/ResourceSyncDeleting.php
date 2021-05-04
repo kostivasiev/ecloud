@@ -12,7 +12,7 @@ class ResourceSyncDeleting
     {
         Log::info(get_class($this) . ' : Started', ['resource_id' => $event->model->id]);
 
-        if (($event->model->sync->status === Sync::STATUS_COMPLETE) && $event->model->sync->type == Sync::TASK_NAME_DELETE) {
+        if (($event->model->sync->status === Sync::STATUS_COMPLETE) && $event->model->sync->type == Sync::TYPE_DELETE) {
             Log::info(get_class($this) . ' : Delete sync complete, not blocking deletion', ['resource_id' => $event->model->id]);
             return true;
         }

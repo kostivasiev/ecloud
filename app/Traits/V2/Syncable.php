@@ -44,7 +44,7 @@ trait Syncable
 
             if ($latest) {
                 $status = $latest->status;
-                $type   = $latest->name;
+                $type   = Sync::transformTaskNameToType($latest->name);
             }
         }
 
