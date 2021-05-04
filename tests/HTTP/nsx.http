@@ -244,3 +244,8 @@ Content-Type:  application/json
 GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-hg-9fd79532
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/Reference_for_catchall_rule
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

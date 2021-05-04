@@ -34,7 +34,11 @@ class Create extends FormRequest
                 'exists:ecloud.network_policies,id,deleted_at,NULL',
                 new ExistsForUser(NetworkPolicy::class),
             ],
-            'sequence' => 'required|integer',
+            'sequence' => [
+                'required',
+                'integer',
+                'max:5000'
+            ],
             'source' => [
                 'required',
                 'string',

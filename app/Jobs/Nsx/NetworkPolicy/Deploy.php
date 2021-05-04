@@ -37,7 +37,6 @@ class Deploy extends Job
                     'resource_type' => 'SecurityPolicy',
                     'id' => $this->networkPolicy->id,
                     'display_name' => $this->networkPolicy->id,
-                    //'sequence_number' => $this->networkPolicy->sequence,
                     'category' => 'Application',
                     'stateful' => true,
                     'tcp_strict' => true,
@@ -84,7 +83,7 @@ class Deploy extends Job
                             ],
                             'logged' => false,
                             'scope' => [
-                                'ANY'
+                                '/infra/domains/default/groups/' . $this->networkPolicy->id,
                             ],
                             'ip_protocol' => 'IPV4_IPV6',
                         ];
