@@ -51,8 +51,11 @@ class HostGroupController extends BaseController
         $model->fill($request->only([
             'name',
         ]));
-        $model->save();
-        return $this->responseIdMeta($request, $model->id, 200);
+
+        $model->withTaskLock(function ($model) {
+            $model->save();
+        });
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $id)
@@ -67,7 +70,9 @@ class HostGroupController extends BaseController
             ], 422);
         }
 
-        $model->delete();
+        $model->withTaskLock(function ($model) {
+            $model->delete();
+        });
         return response('', 204);
     }
 }

@@ -5,6 +5,7 @@ namespace Tests\Mocks\Host;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 
 trait Mocks
 {
@@ -14,12 +15,13 @@ trait Mocks
     public function host()
     {
         if (!$this->host) {
-            $this->createHostMocks();
-            $this->host = factory(\App\Models\V2\Host::class)->create([
-                'id' => 'h-test',
-                'name' => 'h-test',
-                'host_group_id' => $this->hostGroup()->id,
-            ]);
+            $this->host = Model::withoutEvents(function() {
+               return factory(\App\Models\V2\Host::class)->create([
+                   'id' => 'h-test',
+                   'name' => 'h-test',
+                   'host_group_id' => $this->hostGroup()->id,
+               ]);
+            });
         }
         return $this->host;
     }
@@ -189,20 +191,7 @@ trait Mocks
                     'macAddress' => '00:25:B5:C0:A0:1B',
                 ]));
             });
-
-    }
-
-    /**
-     * Mock that the host already exists on Update, so that we don't run the create jobs
-     * @param string $id
-     */
-    protected function syncSaveIdempotent($id = 'h-test')
-    {
-        $this->conjurerServiceMock()->expects('get')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/' . $id])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        return $this;
     }
 
     private function getHostResponse()
@@ -238,5 +227,116 @@ trait Mocks
                 ]
             ]
         ]);
+    }
+
+    public function deleteHostMocks()
+    {
+        $this->maintenanceModeOn();
+        $this->deleteInVmWare();
+        $this->powerOff();
+        $this->removeFrom3Par();
+        $this->deleteServiceProfile();
+    }
+
+    public function maintenanceModeOn()
+    {
+        $this->conjurerServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs(
+                '/api/v2/compute/' . $this->availabilityZone()->ucs_compute_name .
+                '/vpc/' . $this->vpc()->id . '/host/h-test'
+            )->andReturnUsing(function () {
+                return new Response('200', [], json_encode([
+                    'specification' => 'DUAL-4208--32GB',
+                    'name' => 'DUAL-4208--32GB',
+                    'interfaces' => [
+                        [
+                            'name' => 'eth0',
+                            'address' => '00:25:B5:C0:A0:1B',
+                            'type' => 'vNIC'
+                        ]
+                    ]
+                ]));
+            });
+        $this->kingpinServiceMock()
+            ->expects('post')
+            ->withSomeOfArgs(
+                '/api/v2/vpc/' . $this->vpc()->id . '/hostgroup/' . $this->hostGroup()->id . '/host/00:25:B5:C0:A0:1B/maintenance'
+            )->andReturnUsing(function () {
+                return new Response(200);
+            });
+    }
+
+    public function deleteInVmWare()
+    {
+        $this->conjurerServiceMock()->expects('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response('200', [], json_encode([
+                    'specification' => 'DUAL-4208--32GB',
+                    'name' => 'DUAL-4208--32GB',
+                    'interfaces' => [
+                        [
+                            'name' => 'eth0',
+                            'address' => '00:25:B5:C0:A0:1B',
+                            'type' => 'vNIC'
+                        ]
+                    ]
+                ]));
+            });
+        $this->kingpinServiceMock()
+            ->expects('delete')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+    }
+
+    public function powerOff()
+    {
+        $this->conjurerServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->conjurerServiceMock()
+            ->expects('delete')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test/power')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+    }
+
+    public function removeFrom3Par()
+    {
+        $this->artisanServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/san/MCS-E-G0-3PAR-01/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->artisanServiceMock()
+            ->expects('delete')
+            ->withSomeOfArgs('/api/v2/san/MCS-E-G0-3PAR-01/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+    }
+
+    public function deleteServiceProfile()
+    {
+        $this->conjurerServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+        $this->conjurerServiceMock()
+            ->expects('delete')
+            ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
+            ->andReturnUsing(function () {
+                return new Response(204);
+            });
     }
 }

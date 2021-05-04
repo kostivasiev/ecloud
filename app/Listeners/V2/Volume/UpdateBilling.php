@@ -2,10 +2,11 @@
 
 namespace App\Listeners\V2\Volume;
 
-use App\Events\V2\Sync\Updated;
+use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -24,8 +25,8 @@ class UpdateBilling
             $volume = $event->model;
         }
 
-        if ($event->model instanceof Sync) {
-            if ($event->model->type !== Sync::TYPE_UPDATE) {
+        if ($event->model instanceof Task) {
+            if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
                 return;
             }
 

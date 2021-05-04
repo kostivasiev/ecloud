@@ -4,8 +4,7 @@ namespace App\Http\Requests\V2\Volume;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\ExistsForVpc;
-use App\Rules\V2\IsValidAvailabilityZoneId;
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -52,7 +51,7 @@ class CreateRequest extends FormRequest
                 'required',
                 'integer',
                 'in:300,600,1200,2500',
-            ]
+            ],
         ];
     }
 

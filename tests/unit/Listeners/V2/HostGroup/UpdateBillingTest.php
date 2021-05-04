@@ -6,7 +6,8 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,7 +15,7 @@ class UpdateBillingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected Sync $sync;
+    protected Task $task;
     protected HostGroup $hostGroup;
 
     protected Product $product;
@@ -45,18 +46,18 @@ class UpdateBillingTest extends TestCase
     {
         $this->hostGroup();
 
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
+        Task::withoutEvents(function() {
+            $this->task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->sync->resource()->associate($this->hostGroup());
+            $this->task->resource()->associate($this->hostGroup());
         });
 
         // Check that the billing metric is added
         $UpdateBillingListener = new \App\Listeners\V2\HostGroup\UpdateBilling;
-        $UpdateBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $UpdateBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNotNull($metric);

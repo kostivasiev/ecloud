@@ -56,8 +56,12 @@ class RouterThroughputController extends BaseController
 
     public function destroy(Request $request, string $routerThroughputId)
     {
-        RouterThroughput::findOrFail($routerThroughputId)
-            ->delete();
+        $routerThroughput = RouterThroughput::findOrFail($routerThroughputId);
+
+        if (!$routerThroughput->canDelete()) {
+            return $routerThroughput->getDeletionError();
+        }
+        $routerThroughput->delete();
         return response('', 204);
     }
 }

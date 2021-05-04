@@ -10,5 +10,7 @@ post:
   responses:
     202:
       description: Accepted
+    422:
+      description: "Precondition Failed"
   tags:
     - Volumes

@@ -52,7 +52,7 @@ class RouterController extends BaseController
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'router_throughput_id']));
 
-        $router->withSyncLock(function ($router) {
+        $router->withTaskLock(function ($router) {
             $router->save();
         });
 
@@ -67,7 +67,7 @@ class RouterController extends BaseController
             return $router->getDeletionError();
         }
 
-        $router->withSyncLock(function ($router) {
+        $router->withTaskLock(function ($router) {
             $router->delete();
         });
 

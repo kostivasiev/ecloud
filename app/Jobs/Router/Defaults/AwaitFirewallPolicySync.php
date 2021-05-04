@@ -4,7 +4,7 @@ namespace App\Jobs\Router\Defaults;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 

@@ -35,7 +35,7 @@ class NetworkPolicyController extends BaseController
             'network_id',
         ]));
 
-        $model->withSyncLock(function ($policy) {
+        $model->withTaskLock(function ($policy) {
             $policy->save();
         });
 
@@ -47,7 +47,7 @@ class NetworkPolicyController extends BaseController
         $model = NetworkPolicy::forUser(Auth::user())->findOrFail($networkPolicyId);
         $model->fill($request->only(['name']));
 
-        $model->withSyncLock(function ($policy) {
+        $model->withTaskLock(function ($policy) {
             $policy->save();
         });
 
@@ -58,7 +58,7 @@ class NetworkPolicyController extends BaseController
     {
         $model = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
 
-        $model->withSyncLock(function ($model) {
+        $model->withTaskLock(function ($model) {
             $model->delete();
         });
 

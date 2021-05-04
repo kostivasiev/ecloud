@@ -58,6 +58,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
         $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
         $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
+        $router->get('vpcs/{vpcId}/tasks', 'VpcController@tasks');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->get('vpcs/{vpcId}/lbcs', 'VpcController@lbcs');
         });
@@ -221,6 +222,9 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Volumes */
     $router->group([], function () use ($router) {
+        $router->group(['middleware' => 'can-detach'], function () use ($router) {
+            $router->post('volumes/{volumeId}/detach', 'VolumeController@detach');
+        });
         $router->get('volumes', 'VolumeController@index');
         $router->get('volumes/{volumeId}', 'VolumeController@show');
         $router->get('volumes/{volumeId}/instances', 'VolumeController@instances');
@@ -228,7 +232,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
         $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
-        $router->post('volumes/{volumeId}/detach', 'VolumeController@detach');
     });
 
     /** Nics */

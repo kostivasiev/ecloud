@@ -14,7 +14,7 @@ class AddPolicyIdColumnToFirewallRulesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('firewall_rules', function (Blueprint $table) {
-            $table->string('firewall_policy_id')->after('name')->nullable();
+            $table->uuid('firewall_policy_id')->after('name')->nullable();
         });
     }
 

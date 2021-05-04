@@ -155,7 +155,7 @@ class NetworkController extends BaseController
             'name',
         ]));
 
-        $network->withSyncLock(function ($network) {
+        $network->withTaskLock(function ($network) {
             $network->save();
         });
 
@@ -170,7 +170,7 @@ class NetworkController extends BaseController
             return $network->getDeletionError();
         }
 
-        $network->withSyncLock(function ($network) {
+        $network->withTaskLock(function ($network) {
             $network->delete();
         });
 
