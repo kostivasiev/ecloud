@@ -9,7 +9,7 @@ class UpdateFailedJobsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('failed_jobs', function (Blueprint $table) {
-            $table->string('uuid')->after('id')->nullable()->unique();
+            $table->uuid('uuid')->after('id')->nullable()->unique();
         });
     }
 

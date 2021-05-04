@@ -9,7 +9,7 @@ class VirtualPrivateCloudsAddRegionId extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('vpcs', function (Blueprint $table) {
-            $table->string('region_id')->default('');
+            $table->uuid('region_id')->default('');
         });
     }
 

@@ -30,6 +30,10 @@ class Volume extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     public $incrementing = false;
 
+    protected $casts = [
+        'os_volume' => 'boolean',
+    ];
+
     protected $fillable = [
         'id',
         'name',
@@ -37,6 +41,7 @@ class Volume extends Model implements Filterable, Sortable
         'availability_zone_id',
         'capacity',
         'vmware_uuid',
+        'os_volume',
         'iops',
     ];
 
@@ -47,6 +52,10 @@ class Volume extends Model implements Filterable, Sortable
         'saved' => Saved::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class,
+    ];
+
+    protected $attributes = [
+        'os_volume' => false,
     ];
 
     public function vpc()
@@ -91,6 +100,11 @@ class Volume extends Model implements Filterable, Sortable
         return false;
     }
 
+    public function getTypeAttribute()
+    {
+        return $this->attributes['os_volume'] ? 'os' : 'data';
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -104,6 +118,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('capacity', Filter::$stringDefaults),
             $factory->create('vmware_uuid', Filter::$stringDefaults),
+            $factory->create('os_volume', Filter::$numericDefaults),
             $factory->create('iops', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -124,6 +139,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('capacity'),
             $factory->create('vmware_uuid'),
+            $factory->create('os_volume'),
             $factory->create('iops'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -151,6 +167,7 @@ class Volume extends Model implements Filterable, Sortable
             'availability_zone_id' => 'availability_zone_id',
             'capacity' => 'capacity',
             'vmware_uuid' => 'vmware_uuid',
+            'os_volume' => 'os_volume',
             'iops' => 'iops',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

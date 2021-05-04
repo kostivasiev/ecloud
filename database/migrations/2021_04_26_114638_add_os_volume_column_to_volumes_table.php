@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ModifyNetworkIdInInstancesTable extends Migration
+class AddOsVolumeColumnToVolumesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class ModifyNetworkIdInInstancesTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->uuid('network_id', 36)->nullable(true)->change();
+        Schema::connection('ecloud')->table('volumes', function (Blueprint $table) {
+            $table->boolean('os_volume')->default(true)->after('vmware_uuid');
         });
     }
 
@@ -25,8 +25,8 @@ class ModifyNetworkIdInInstancesTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->uuid('network_id', 36)->nullable()->change();
+        Schema::connection('ecloud')->table('volumes', function (Blueprint $table) {
+            $table->dropColumn(['os_volume']);
         });
     }
 }
