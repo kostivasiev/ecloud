@@ -32,7 +32,6 @@ class InstanceResource extends UKFastResource
             'host_group_id' => $this->host_group_id ?? null,
             'volume_capacity' => $this->volume_capacity,
             'sync' => $this->sync,
-            'task' => $this->task,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))

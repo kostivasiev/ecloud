@@ -31,7 +31,6 @@ class VpcResource extends UKFastResource
             'name' => $this->name,
             'region_id' => $this->region_id,
             'sync' => $this->sync,
-            'task' => $this->task,
             'support_enabled' => $this->support_enabled,
             'console_enabled' => $this->console_enabled,
             'advanced_networking' => $this->advanced_networking,
