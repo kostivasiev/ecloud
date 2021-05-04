@@ -4,13 +4,14 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteServiceProfile extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private $model;
 
@@ -21,8 +22,6 @@ class DeleteServiceProfile extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
@@ -51,7 +50,5 @@ class DeleteServiceProfile extends Job
             Log::warning(get_class($this) . ' : Service Profile for Host ' . $host->id . ' was not found.');
             return;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

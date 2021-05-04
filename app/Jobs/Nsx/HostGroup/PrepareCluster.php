@@ -5,13 +5,14 @@ namespace App\Jobs\Nsx\HostGroup;
 use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PrepareCluster extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private $model;
 
@@ -22,10 +23,7 @@ class PrepareCluster extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $hostGroup = $this->model;
-
         $transportNodeCollections = $this->getTransportNodeCollections($hostGroup->availabilityZone);
         if (!$transportNodeCollections || !count($transportNodeCollections->results)) {
             $this->fail(new \Exception('Failed to get TransportNodeCollections'));
@@ -71,8 +69,6 @@ class PrepareCluster extends Job
                 ]
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     private function getTransportNodeCollections(AvailabilityZone $availabilityZone): ?\stdClass

@@ -4,35 +4,34 @@ namespace App\Jobs\Kingpin\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteInVmware extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $tries = 60;
     public $backoff = 60;
 
-    private Host $host;
+    private Host $model;
 
     public function __construct(Host $host)
     {
-        $this->host = $host;
+        $this->model = $host;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->host->id]);
-
-        $availabilityZone = $this->host->hostGroup->availabilityZone;
-        $hostGroup = $this->host->hostGroup;
+        $availabilityZone = $this->model->hostGroup->availabilityZone;
+        $hostGroup = $this->model->hostGroup;
 
         // Get the host spec from Conjurer
         try {
             $response = $availabilityZone->conjurerService()->get(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $this->host->id
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $this->model->id
             );
             $response = json_decode($response->getBody()->getContents());
         } catch (RequestException $exception) {
@@ -45,7 +44,7 @@ class DeleteInVmware extends Job
 
         $macAddress = collect($response->interfaces)->firstWhere('name', '=', 'eth0')->address;
         if (empty($macAddress)) {
-            $message = 'Failed to load eth0 address for host ' . $this->host->id;
+            $message = 'Failed to load eth0 address for host ' . $this->model->id;
             Log::error($message);
             $this->fail(new \Exception($message));
             return false;
@@ -64,7 +63,5 @@ class DeleteInVmware extends Job
             Log::warning(get_class($this) . ' : Host could not be deleted, skipping.');
             return false;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);
     }
 }

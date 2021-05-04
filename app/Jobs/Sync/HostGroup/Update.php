@@ -7,12 +7,12 @@ use App\Jobs\Kingpin\HostGroup\CreateCluster;
 use App\Jobs\Nsx\HostGroup\CreateTransportNode;
 use App\Jobs\Nsx\HostGroup\PrepareCluster;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use App\Traits\V2\SyncableBatch;
-use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use SyncableBatch;
+    use SyncableBatch, JobModel;
 
     private $sync;
 
@@ -23,8 +23,6 @@ class Update extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-
         $hostGroup = $this->sync->resource;
 
         $this->updateSyncBatch([
@@ -34,7 +32,5 @@ class Update extends Job
                 new PrepareCluster($hostGroup)
             ],
         ])->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

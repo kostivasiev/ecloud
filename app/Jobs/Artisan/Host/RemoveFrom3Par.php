@@ -4,13 +4,14 @@ namespace App\Jobs\Artisan\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class RemoveFrom3Par extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private $model;
 
@@ -21,8 +22,6 @@ class RemoveFrom3Par extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
@@ -51,7 +50,5 @@ class RemoveFrom3Par extends Job
             Log::warning(get_class($this) . ' : Host ' . $host->id . ' was not removed from 3Par.');
             return;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

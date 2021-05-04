@@ -4,13 +4,14 @@ namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $model;
 
@@ -21,8 +22,6 @@ class Undeploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         if (empty($this->model->vmware_uuid)) {
             Log::warning(get_class($this) . ' : No VMware UUID disk set for volume, skipping', ['id' => $this->model->id]);
             return;
@@ -42,7 +41,5 @@ class Undeploy extends Job
             }
             Log::debug(get_class($this) . ' : Volume was not found, nothing to do.');
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

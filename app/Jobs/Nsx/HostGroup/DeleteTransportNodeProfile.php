@@ -4,13 +4,14 @@ namespace App\Jobs\Nsx\HostGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteTransportNodeProfile extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $model;
 
@@ -21,10 +22,7 @@ class DeleteTransportNodeProfile extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $hostGroup = $this->model;
-
         // Compute Collection Item
         try {
             $response = $hostGroup->availabilityZone->nsxService()
@@ -93,7 +91,5 @@ class DeleteTransportNodeProfile extends Job
             );
             return false;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

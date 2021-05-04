@@ -6,13 +6,14 @@ use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 
 class UnassignFloatingIP extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
     
     private $nic;
 
@@ -23,8 +24,6 @@ class UnassignFloatingIP extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->nic->id]);
-
         $nic = $this->nic;
         $logMessage = 'UnassignFloatingIp for NIC ' . $nic->id . ': ';
         Log::info($logMessage . 'Started');
@@ -37,7 +36,5 @@ class UnassignFloatingIP extends Job
             Log::info($logMessage . 'Floating IP ' . $this->nic->sourceNat->translated_id . ' unassigned');
             $this->nic->destinationNat->delete();
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->nic->id]);
     }
 }

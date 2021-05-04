@@ -5,27 +5,28 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Log;
 
 class Attach extends Job
 {
-    private Volume $volume;
+    use JobModel;
+
+    private Volume $model;
     private Instance $instance;
 
     public function __construct(Volume $volume, Instance $instance)
     {
-        $this->volume = $volume;
+        $this->model = $volume;
         $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started');
-
         if ($this->instance->volumes()->get()->count() > config('volume.instance.limit', 15)) {
             $this->fail(new \Exception(
-                'Volume ' . $this->volume->id . ' failed to attach to instance ' .
+                'Volume ' . $this->model->id . ' failed to attach to instance ' .
                 $this->instance->id . ', volume limit exceeded'
             ));
             return false;
@@ -41,22 +42,22 @@ class Attach extends Job
 
         if (!$response || $response->getStatusCode() !== 200) {
             Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->volume->id,
+                'id' => $this->model->id,
                 'status_code' => $response->getStatusCode(),
                 'content' => $response->getBody()->getContents()
             ]);
-            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed attachment'));
+            $this->fail(new \Exception('Volume ' . $this->model->id . ' failed attachment'));
             return false;
         }
 
         $json = json_decode($response->getBody()->getContents());
         if (!$json) {
-            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed attachment, invalid JSON'));
+            $this->fail(new \Exception('Volume ' . $this->model->id . ' failed attachment, invalid JSON'));
             return false;
         }
 
         foreach ($json->volumes as $volume) {
-            if ($this->volume->vmware_uuid == $volume->uuid) {
+            if ($this->model->vmware_uuid == $volume->uuid) {
                 Log::info('Volume is already attached to instance, nothing to do');
                 return true;
             }
@@ -68,7 +69,7 @@ class Attach extends Job
                     '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
                     [
                         'json' => [
-                            'volumeUUID' => $this->volume->vmware_uuid
+                            'volumeUUID' => $this->model->vmware_uuid
                         ]
                     ]
                 );
@@ -78,24 +79,22 @@ class Attach extends Job
 
         if (!$response || $response->getStatusCode() !== 200) {
             Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->volume->id,
+                'id' => $this->model->id,
                 'status_code' => $response->getStatusCode(),
                 'content' => $response->getBody()->getContents()
             ]);
-            $this->fail(new \Exception('Volume ' . $this->volume->id . ' failed attachment'));
+            $this->fail(new \Exception('Volume ' . $this->model->id . ' failed attachment'));
             return false;
         }
 
-        Log::debug('Volume ' . $this->volume->id . ' has been attached to instance ' . $this->instance->id);
-
-        Log::info(get_class($this) . ' : Finished');
+        Log::debug('Volume ' . $this->model->id . ' has been attached to instance ' . $this->instance->id);
     }
 
     public function failed($exception)
     {
-        $this->volume->setSyncFailureReason($exception->getMessage());
+        $this->model->setSyncFailureReason($exception->getMessage());
 
         // Detach
-        $this->instance->volumes()->detach($this->volume);
+        $this->instance->volumes()->detach($this->model);
     }
 }

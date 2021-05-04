@@ -4,12 +4,13 @@ namespace App\Jobs\Network;
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeployDiscoveryProfile extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private Network $network;
 
@@ -20,8 +21,6 @@ class DeployDiscoveryProfile extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->network->id]);
-
         $response = $this->network->router->availabilityZone->nsxService()->get(
             'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id . '/segment-discovery-profile-binding-maps',
         );
@@ -37,7 +36,5 @@ class DeployDiscoveryProfile extends Job
             'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id . '/segment-discovery-profile-binding-maps/' . $response['results'][0]['id'],
             ['json' => $response['results'][0]]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->network->id]);
     }
 }

@@ -4,26 +4,25 @@ namespace App\Jobs\Instance\Undeploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class DeleteVolumes extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        $instance = $this->instance;
+        $instance = $this->model;
 
         // TODO: Check whether volumes are configured for removal on instance deletion. For now, we'll assume
         //       volume is to be deleted if connected to just this instance
@@ -37,7 +36,5 @@ class DeleteVolumes extends Job
                 $volume->delete();
             }
         });
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

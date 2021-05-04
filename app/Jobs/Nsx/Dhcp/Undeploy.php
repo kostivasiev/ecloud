@@ -4,28 +4,25 @@ namespace App\Jobs\Nsx\Dhcp;
 
 use App\Jobs\Job;
 use App\Models\V2\Dhcp;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    private Dhcp $dhcp;
+    private Dhcp $model;
 
     public function __construct(Dhcp $dhcp)
     {
-        $this->dhcp = $dhcp;
+        $this->model = $dhcp;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->dhcp->id]);
-
-        $this->dhcp->availabilityZone->nsxService()->delete(
-            '/policy/api/v1/infra/dhcp-server-configs/' . $this->dhcp->id
+        $this->model->availabilityZone->nsxService()->delete(
+            '/policy/api/v1/infra/dhcp-server-configs/' . $this->model->id
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->dhcp->id]);
     }
 }

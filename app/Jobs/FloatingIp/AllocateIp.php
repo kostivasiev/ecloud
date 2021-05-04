@@ -5,6 +5,7 @@ namespace App\Jobs\FloatingIp;
 use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -13,13 +14,13 @@ use UKFast\Admin\Networking\AdminClient;
 
 class AllocateIp extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    public FloatingIp $floatingIp;
+    public FloatingIp $model;
 
     public function __construct(FloatingIp $floatingIp)
     {
-        $this->floatingIp = $floatingIp;
+        $this->model = $floatingIp;
     }
 
     /**
@@ -27,15 +28,12 @@ class AllocateIp extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->floatingIp->id]);
-
-        if (!empty($this->floatingIp->ip_address)) {
+        if (!empty($this->model->ip_address)) {
             log::info("IP address already allocated for floating IP address");
             return;
         }
 
-
-        $datacentreSiteIds = $this->floatingIp->vpc->region->availabilityZones->pluck('datacentre_site_id')->unique();
+        $datacentreSiteIds = $this->model->vpc->region->availabilityZones->pluck('datacentre_site_id')->unique();
         $networkingAdminClient = app()->make(AdminClient::class);
 
         $ipRanges = collect();
@@ -51,11 +49,11 @@ class AllocateIp extends Job
         } while ($currentPage < $page->totalPages());
 
         foreach ($ipRanges as $ipRange) {
-            Log::debug('Checking for available IP addresses in range ' . $ipRange->id, ['id' => $this->floatingIp->id]);
+            Log::debug('Checking for available IP addresses in range ' . $ipRange->id, ['id' => $this->model->id]);
 
             $subnet = Subnet::fromString(long2ip($ipRange->networkAddress) . '/' . $ipRange->cidr);
             if (empty($subnet)) {
-                Log::error('Failed to load subnet details from IP range ' . $ipRange->id, ['id' => $this->floatingIp->id, 'networkAddress' => $ipRange->networkAddress, 'cidr' => $ipRange->cidr]);
+                Log::error('Failed to load subnet details from IP range ' . $ipRange->id, ['id' => $this->model->id, 'networkAddress' => $ipRange->networkAddress, 'cidr' => $ipRange->cidr]);
                 continue;
             }
 
@@ -67,7 +65,7 @@ class AllocateIp extends Job
 
                 while ($ip = $ip->getNextAddress()) {
                     if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                        Log::warning('Insufficient available IPs in range ' . $ipRange->id, ['id' => $this->floatingIp->id]);
+                        Log::warning('Insufficient available IPs in range ' . $ipRange->id, ['id' => $this->model->id]);
                         continue 2;
                     }
 
@@ -80,12 +78,12 @@ class AllocateIp extends Job
                         continue;
                     }
 
-                    $this->floatingIp->ip_address = $checkIp;
-                    $this->floatingIp->saveQuietly();
+                    $this->model->ip_address = $checkIp;
+                    $this->model->saveQuietly();
 
-                    Log::info('Success. IP ' . $this->floatingIp->ip_address . ' was assigned.', ['id' => $this->floatingIp->id]);
+                    Log::info('Success. IP ' . $this->model->ip_address . ' was assigned.', ['id' => $this->model->id]);
 
-                    $this->floatingIp->vpc->region->availabilityZones->each(function ($availabilityZone) {
+                    $this->model->vpc->region->availabilityZones->each(function ($availabilityZone) {
                         dispatch(new UpdateFloatingIpCapacity($availabilityZone));
                     });
                     break 2;
@@ -95,11 +93,9 @@ class AllocateIp extends Job
             }
         }
 
-        if (empty($this->floatingIp->ip_address)) {
-            $this->fail(new \Exception('Insufficient available external IPs to assign to floating IP resource ' . $this->floatingIp->id));
+        if (empty($this->model->ip_address)) {
+            $this->fail(new \Exception('Insufficient available external IPs to assign to floating IP resource ' . $this->model->id));
             return;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->floatingIp->id]);
     }
 }

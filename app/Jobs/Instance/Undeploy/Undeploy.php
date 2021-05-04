@@ -4,28 +4,27 @@ namespace App\Jobs\Instance\Undeploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
         try {
-            $this->instance->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
+            $this->model->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
             );
         } catch (RequestException $exception) {
             if ($exception->getCode() != 404) {
@@ -35,10 +34,8 @@ class Undeploy extends Job
             return;
         }
 
-        $this->instance->availabilityZone
+        $this->model->availabilityZone
             ->kingpinService()
-            ->delete('/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id);
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
+            ->delete('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
     }
 }

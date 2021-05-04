@@ -15,6 +15,8 @@ use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
@@ -64,6 +66,20 @@ class AppServiceProvider extends ServiceProvider
 
         Queue::failing(function (JobFailed $event) {
             Log::error($event->job->getName() . " : Job failed", ['exception' => $event->exception]);
+        });
+
+        Queue::before(function (JobProcessing $event) {
+            if (strpos($event->job->payload()['displayName'], 'App\\Listeners\\') !== 0) {
+                $command = unserialize($event->job->payload()['data']['command']);
+                Log::debug($event->job->resolveName() . ': Started', ['id' => $command->getModel()->id]);
+            }
+        });
+
+        Queue::after(function (JobProcessed $event) {
+            if (strpos($event->job->payload()['displayName'], 'App\\Listeners\\') !== 0) {
+                $command = unserialize($event->job->payload()['data']['command']);
+                Log::debug($event->job->resolveName() . ': Finished', ['id' => $command->getModel()->id]);
+            }
         });
     }
 }

@@ -4,12 +4,13 @@ namespace App\Jobs\Kingpin\HostGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteCluster extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $model;
 
@@ -20,13 +21,9 @@ class DeleteCluster extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $hostGroup = $this->model;
         $hostGroup->availabilityZone->kingpinService()->delete(
             '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

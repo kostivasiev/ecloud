@@ -5,53 +5,52 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PrepareOsDisk extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        $getInstanceResponse = $this->instance->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
+        $getInstanceResponse = $this->model->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
         );
 
         $instanceData = json_decode($getInstanceResponse->getBody()->getContents());
         if (!$instanceData) {
-            throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
+            throw new \Exception('Deploy failed for ' . $this->model->id . ', could not decode response');
         }
 
         if (count($instanceData->volumes) > 1) {
-            throw new \Exception('Deploy failed for ' . $this->instance->id . ', Multi volume instance deploy detected. Multiple volumes are not currently supported.');
+            throw new \Exception('Deploy failed for ' . $this->model->id . ', Multi volume instance deploy detected. Multiple volumes are not currently supported.');
         }
 
         // Create Volumes from kingpin
         foreach ($instanceData->volumes as $volumeData) {
             $volume = app()->make(Volume::class);
-            $volume->vpc()->associate($this->instance->vpc);
-            $volume->name = $this->instance->id . ' - ' . $this->instance->image->name;
-            $volume->availability_zone_id = $this->instance->availability_zone_id;
-            $volume->capacity = $this->instance->deploy_data['volume_capacity'];
-            $volume->iops = $this->instance->deploy_data['volume_iops'];
+            $volume->vpc()->associate($this->model->vpc);
+            $volume->name = $this->model->id . ' - ' . $this->model->image->name;
+            $volume->availability_zone_id = $this->model->availability_zone_id;
+            $volume->capacity = $this->model->deploy_data['volume_capacity'];
+            $volume->iops = $this->model->deploy_data['volume_iops'];
             $volume->vmware_uuid = $volumeData->uuid;
             $volume->save();
 
             Log::info(get_class($this) . ' : Created volume resource ' . $volume->id . ' for volume ' . $volume->vmware_uuid);
 
             // Send created Volume ID's to Kinpin
-            $this->instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $this->instance->vpc->id . '/volume/' . $volume->vmware_uuid . '/resourceid',
+            $this->model->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $this->model->vpc->id . '/volume/' . $volume->vmware_uuid . '/resourceid',
                 [
                     'json' => [
                         'volumeId' => $volume->id
@@ -61,7 +60,7 @@ class PrepareOsDisk extends Job
 
             // Update the volume iops
             $volume->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/volume/' . $volume->vmware_uuid . '/iops',
+                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/volume/' . $volume->vmware_uuid . '/iops',
                 [
                     'json' => [
                         'limit' => $volume->iops
@@ -71,7 +70,5 @@ class PrepareOsDisk extends Job
 
             Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->id);
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

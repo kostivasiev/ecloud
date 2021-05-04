@@ -7,31 +7,29 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateFirewallRules extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $tries = 1;
 
-    private $firewallPolicy;
+    private $model;
     private $policy;
 
     public function __construct(FirewallPolicy $firewallPolicy, $policy)
     {
-        $this->firewallPolicy = $firewallPolicy;
+        $this->model = $firewallPolicy;
         $this->policy = $policy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->firewallPolicy->id]);
-
         $policy = $this->policy;
-
-        $this->firewallPolicy->withSyncLock(function ($firewallPolicy) use ($policy) {
+        $this->model->withSyncLock(function ($firewallPolicy) use ($policy) {
             foreach ($policy['rules'] as $rule) {
                 Log::debug('FirewallRule', $rule);
                 $firewallRule = app()->make(FirewallRule::class);
@@ -47,10 +45,7 @@ class CreateFirewallRules extends Job
                     $firewallRulePort->save();
                 }
             }
-
-            $this->firewallPolicy->save();
+            $this->model->save();
         });
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->firewallPolicy->id]);
     }
 }

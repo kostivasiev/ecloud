@@ -5,16 +5,16 @@ namespace App\Jobs\Sync\Router;
 use App\Jobs\Job;
 use App\Jobs\Router\AwaitFirewallPolicyRemoval;
 use App\Jobs\Router\DeleteFirewallPolicies;
-use App\Jobs\Router\UndeployRouterLocale;
 use App\Jobs\Router\Undeploy;
 use App\Jobs\Router\UndeployCheck;
+use App\Jobs\Router\UndeployRouterLocale;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use App\Traits\V2\SyncableBatch;
-use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    use SyncableBatch;
+    use SyncableBatch, JobModel;
 
     private $sync;
 
@@ -25,8 +25,6 @@ class Delete extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-
         $this->deleteSyncBatch([
             [
                 new DeleteFirewallPolicies($this->sync->resource),
@@ -36,7 +34,5 @@ class Delete extends Job
                 new UndeployCheck($this->sync->resource),
             ]
         ])->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

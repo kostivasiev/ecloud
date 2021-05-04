@@ -4,19 +4,20 @@ namespace App\Jobs\Router;
 
 use App\Jobs\Job;
 use App\Models\V2\Router;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
     
-    private Router $router;
+    private Router $model;
 
     public function __construct(Router $router)
     {
-        $this->router = $router;
+        $this->model = $router;
     }
 
     /**
@@ -24,22 +25,20 @@ class Deploy extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
-
-        if (empty($this->router->routerThroughput)) {
-            $this->fail(new \Exception('Failed determine router throughput settings for router ' . $this->router->id));
+        if (empty($this->model->routerThroughput)) {
+            $this->fail(new \Exception('Failed determine router throughput settings for router ' . $this->model->id));
             return;
         }
 
-        $gatewayQosProfileSearchResponse = $this->router->availabilityZone->nsxService()->get(
+        $gatewayQosProfileSearchResponse = $this->model->availabilityZone->nsxService()->get(
             'policy/api/v1/search/query?query=resource_type:GatewayQosProfile'
-            . '%20AND%20committed_bandwitdth:' . $this->router->routerThroughput->committed_bandwidth
+            . '%20AND%20committed_bandwitdth:' . $this->model->routerThroughput->committed_bandwidth
         );
 
         $gatewayQosProfileSearchResponse = json_decode($gatewayQosProfileSearchResponse->getBody()->getContents());
 
         if ($gatewayQosProfileSearchResponse->result_count != 1) {
-            $message = 'Failed to determine gateway QoS profile for router ' . $this->router->id . ', with router_throughput_id ' . $this->router->routerThroughput->id;
+            $message = 'Failed to determine gateway QoS profile for router ' . $this->model->id . ', with router_throughput_id ' . $this->model->routerThroughput->id;
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
@@ -49,7 +48,7 @@ class Deploy extends Job
             'tags' => [
                 [
                     'scope' => config('defaults.tag.scope'),
-                    'tag' => $this->router->vpc_id,
+                    'tag' => $this->model->vpc_id,
                 ],
             ],
             'route_advertisement_types' => [
@@ -65,7 +64,7 @@ class Deploy extends Job
 
         $exists = true;
         try {
-            $this->router->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $this->router->id);
+            $this->model->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $this->model->id);
         } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
                 $exists = false;
@@ -76,7 +75,7 @@ class Deploy extends Job
 
         if (!$exists) {
             // Load default T0 for the AZ
-            $tier0SearchResponse = $this->router->availabilityZone->nsxService()->get(
+            $tier0SearchResponse = $this->model->availabilityZone->nsxService()->get(
                 '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default'
             );
             $tier0SearchResponse = json_decode($tier0SearchResponse->getBody()->getContents());
@@ -90,10 +89,8 @@ class Deploy extends Job
         }
 
         // Deploy/update the router
-        $this->router->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->router->id, [
+        $this->model->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->model->id, [
             'json' => $payload,
         ]);
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->router->id]);
     }
 }

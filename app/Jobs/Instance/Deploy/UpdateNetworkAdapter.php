@@ -4,18 +4,19 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class UpdateNetworkAdapter extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     /**
@@ -23,16 +24,14 @@ class UpdateNetworkAdapter extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        if (empty($this->instance->image->vm_template_name)) {
-            Log::info('Skipped UpdateNetworkAdapter for instance ' . $this->instance->id . ': no vm template found');
+        if (empty($this->model->image->vm_template_name)) {
+            Log::info('Skipped UpdateNetworkAdapter for instance ' . $this->model->id . ': no vm template found');
             return;
         }
 
-        foreach ($this->instance->nics as $nic) {
-            $this->instance->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/nic/' . $nic->mac_address . '/connect',
+        foreach ($this->model->nics as $nic) {
+            $this->model->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/nic/' . $nic->mac_address . '/connect',
                 [
                     'json' => [
                         'networkId' => $nic->network_id,
@@ -40,7 +39,5 @@ class UpdateNetworkAdapter extends Job
                 ]
             );
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

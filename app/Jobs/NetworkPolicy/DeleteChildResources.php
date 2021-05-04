@@ -4,32 +4,29 @@ namespace App\Jobs\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteChildResources extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    private NetworkPolicy $networkPolicy;
+    private NetworkPolicy $model;
 
     public function __construct(NetworkPolicy $networkPolicy)
     {
-        $this->networkPolicy = $networkPolicy;
+        $this->model = $networkPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->networkPolicy->id]);
-
         // TODO: do we want to do this without events?
-        $this->networkPolicy->networkRules->each(function ($networkRule) {
+        $this->model->networkRules->each(function ($networkRule) {
             $networkRule->networkRulePorts->each(function ($networkRulePort) {
                 $networkRulePort->delete();
             });
             $networkRule->delete();
         });
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->networkPolicy->id]);
     }
 }

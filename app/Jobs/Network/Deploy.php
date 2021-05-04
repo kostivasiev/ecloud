@@ -4,6 +4,7 @@ namespace App\Jobs\Network;
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
+use App\Traits\V2\JobModel;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -11,7 +12,7 @@ use IPLib\Range\Subnet;
 
 class Deploy extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private Network $network;
 
@@ -22,8 +23,6 @@ class Deploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->network->id]);
-
         $dhcp = $this->network->router->vpc->dhcps()->where('availability_zone_id', $this->network->router->availability_zone_id)->first();
         if (empty($dhcp)) {
             $this->fail(new Exception('Unable to locate VPC DHCP server for router availability zone'));
@@ -70,7 +69,5 @@ class Deploy extends Job
                 ]
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->network->id]);
     }
 }

@@ -4,18 +4,19 @@ namespace App\Jobs\Router;
 
 use App\Jobs\Job;
 use App\Models\V2\Router;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeployRouterLocale extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
     
-    private Router $router;
+    private Router $model;
 
     public function __construct(Router $router)
     {
-        $this->router = $router;
+        $this->model = $router;
     }
 
     /**
@@ -23,21 +24,17 @@ class DeployRouterLocale extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
-
         // Deploy the router locale
-        $this->router->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->router->id . '/locale-services/' . $this->router->id, [
+        $this->model->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->model->id . '/locale-services/' . $this->model->id, [
             'json' => [
-                'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $this->router->availabilityZone->nsxService()->getEdgeClusterId(),
+                'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $this->model->availabilityZone->nsxService()->getEdgeClusterId(),
                 'tags' => [
                     [
                         'scope' => config('defaults.tag.scope'),
-                        'tag' => $this->router->vpc_id,
+                        'tag' => $this->model->vpc_id,
                     ],
                 ],
             ],
         ]);
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->router->id]);
     }
 }

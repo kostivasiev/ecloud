@@ -7,12 +7,12 @@ use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use App\Traits\V2\SyncableBatch;
-use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use SyncableBatch;
+    use SyncableBatch, JobModel;
 
     private $sync;
     private $originalValues;
@@ -25,8 +25,6 @@ class Update extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-
         $volume = $this->sync->resource;
 
         $jobs = [
@@ -46,7 +44,5 @@ class Update extends Job
         $this->updateSyncBatch([
             $jobs
         ])->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

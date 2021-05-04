@@ -4,13 +4,14 @@ namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CapacityChange extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private $model;
 
@@ -21,8 +22,6 @@ class CapacityChange extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $volume = $this->model;
 
         // Volume has no instances so can be resized freely
@@ -59,7 +58,5 @@ class CapacityChange extends Job
         }
 
         Log::debug('Volume ' . $volume->id . ' capacity increased to ' . $volume->capacity);
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

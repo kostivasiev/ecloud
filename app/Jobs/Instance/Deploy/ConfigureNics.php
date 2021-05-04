@@ -6,6 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -13,28 +14,25 @@ use IPLib\Range\Subnet;
 
 class ConfigureNics extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        $network = Network::findOrFail($this->instance->deploy_data['network_id']);
-
-        $getInstanceResponse = $this->instance->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
+        $network = Network::findOrFail($this->model->deploy_data['network_id']);
+        $getInstanceResponse = $this->model->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
         );
 
         $instanceData = json_decode($getInstanceResponse->getBody()->getContents());
         if (!$instanceData) {
-            throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
+            throw new \Exception('Deploy failed for ' . $this->model->id . ', could not decode response');
         }
 
         Log::info(get_class($this) . ' : ' . count($instanceData->nics) . ' NIC\'s found');
@@ -42,12 +40,12 @@ class ConfigureNics extends Job
         foreach ($instanceData->nics as $nicData) {
             $nic = app()->make(Nic::class);
             $nic->mac_address = $nicData->macAddress;
-            $nic->instance_id = $this->instance->id;
+            $nic->instance_id = $this->model->id;
             $nic->network_id = $network->id;
 
             $router = $network->router;
             $subnet = Subnet::fromString($network->subnet);
-            $nsxService = $this->instance->availabilityZone->nsxService();
+            $nsxService = $this->model->availabilityZone->nsxService();
 
             /**
              * Get DHCP static bindings to determine used IP addresses on the network
@@ -117,7 +115,5 @@ class ConfigureNics extends Job
                 $lock->release();
             }
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

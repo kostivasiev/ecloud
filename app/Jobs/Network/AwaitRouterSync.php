@@ -7,38 +7,35 @@ use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AwaitRouterSync extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $tries = 60;
     public $backoff = 10;
 
-    private $network;
+    private $model;
 
     public function __construct(Network $network)
     {
-        $this->network = $network;
+        $this->model = $network;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->network->id]);
-
-        if ($this->network->router->sync->status == Sync::STATUS_FAILED) {
-            Log::error('Router in failed sync state, abort', ['id' => $this->network->id]);
-            $this->fail(new \Exception("Router '" . $this->network->router->id . "' in failed sync state"));
+        if ($this->model->router->sync->status == Sync::STATUS_FAILED) {
+            Log::error('Router in failed sync state, abort', ['id' => $this->model->id]);
+            $this->fail(new \Exception("Router '" . $this->model->router->id . "' in failed sync state"));
             return;
         }
 
-        if ($this->network->router->sync->status != Sync::STATUS_COMPLETE) {
-            Log::warning('Router not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->network->id]);
+        if ($this->model->router->sync->status != Sync::STATUS_COMPLETE) {
+            Log::warning('Router not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
             return $this->release($this->backoff);
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->network->id]);
     }
 }

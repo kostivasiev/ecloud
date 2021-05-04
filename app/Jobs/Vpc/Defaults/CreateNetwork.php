@@ -5,29 +5,27 @@ namespace App\Jobs\Vpc\Defaults;
 use App\Jobs\Job;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use Illuminate\Support\Facades\Log;
+use App\Traits\V2\JobModel;
 
 class CreateNetwork extends Job
 {
+    use JobModel;
+
     public $tries = 60;
     public $backoff = 10;
 
-    private $router;
+    private $model;
 
     public function __construct(Router $router)
     {
-        $this->router = $router;
+        $this->model = $router;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
-
         // Create a new network
         $network = app()->make(Network::class);
-        $network->router()->associate($this->router);
+        $network->router()->associate($this->model);
         $network->save();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->router->id]);
     }
 }

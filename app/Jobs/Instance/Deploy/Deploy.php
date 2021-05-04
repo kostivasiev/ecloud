@@ -4,19 +4,20 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
     
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     /**
@@ -24,35 +25,31 @@ class Deploy extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        if (empty($this->instance->image)) {
+        if (empty($this->model->image)) {
             $this->fail(new \Exception(
-                'Deploy failed for ' . $this->instance->id . ', Failed to load image'
+                'Deploy failed for ' . $this->model->id . ', Failed to load image'
             ));
             return;
         }
 
         /** @var Response $deployResponse */
-        $deployResponse = $this->instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/fromtemplate',
+        $deployResponse = $this->model->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/fromtemplate',
             [
                 'json' => [
-                    'templateName' => $this->instance->image->vm_template_name,
-                    'instanceId' => $this->instance->getKey(),
-                    'numCPU' => $this->instance->vcpu_cores,
-                    'ramMib' => $this->instance->ram_capacity,
+                    'templateName' => $this->model->image->vm_template_name,
+                    'instanceId' => $this->model->getKey(),
+                    'numCPU' => $this->model->vcpu_cores,
+                    'ramMib' => $this->model->ram_capacity,
                     'resourceTierTags' => config('instance.resource_tier_tags'),
-                    'backupEnabled' => $this->instance->backup_enabled,
+                    'backupEnabled' => $this->model->backup_enabled,
                 ]
             ]
         );
 
         $deployResponse = json_decode($deployResponse->getBody()->getContents());
         if (!$deployResponse) {
-            throw new \Exception('Deploy failed for ' . $this->instance->id . ', could not decode response');
+            throw new \Exception('Deploy failed for ' . $this->model->id . ', could not decode response');
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

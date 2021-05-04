@@ -7,32 +7,31 @@ use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AwaitPortRemoval extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $tries = 120;
     public $backoff = 5;
 
-    private $network;
+    private $model;
 
     public function __construct(Network $network)
     {
-        $this->network = $network;
+        $this->model = $network;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->network->id]);
-
         $segmentUniqueID = null;
         try {
-            $response = $this->network->router->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->network->router->id . '/segments/' . $this->network->id
+            $response = $this->model->router->availabilityZone->nsxService()->get(
+                'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/' . $this->model->id
             );
             $response = json_decode($response->getBody()->getContents());
             $segmentUniqueID = $response->unique_id;
@@ -45,7 +44,7 @@ class AwaitPortRemoval extends Job
             throw $e;
         }
 
-        $response = $this->network->router->availabilityZone->nsxService()->get(
+        $response = $this->model->router->availabilityZone->nsxService()->get(
             '/api/v1/logical-ports?logical_switch_id=' . $segmentUniqueID
         );
         $response = json_decode($response->getBody()->getContents());
@@ -57,7 +56,5 @@ class AwaitPortRemoval extends Job
                 return $this->release($this->backoff);
             }
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->network->id]);
     }
 }

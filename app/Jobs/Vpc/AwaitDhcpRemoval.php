@@ -3,43 +3,39 @@
 namespace App\Jobs\Vpc;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
 use App\Models\V2\Sync;
 use App\Models\V2\Vpc;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AwaitDhcpRemoval extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     public $tries = 30;
     public $backoff = 5;
 
-    private $vpc;
+    private $model;
 
     public function __construct(Vpc $vpc)
     {
-        $this->vpc = $vpc;
+        $this->model = $vpc;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
-
-        if ($this->vpc->dhcps()->count() > 0) {
-            $this->vpc->dhcps()->each(function ($dhcp) {
+        if ($this->model->dhcps()->count() > 0) {
+            $this->model->dhcps()->each(function ($dhcp) {
                 if ($dhcp->sync->status == Sync::STATUS_FAILED) {
-                    Log::error('DHCP in failed sync state, abort', ['id' => $this->vpc->id, 'dhcp' => $dhcp->id]);
+                    Log::error('DHCP in failed sync state, abort', ['id' => $this->model->id, 'dhcp' => $dhcp->id]);
                     $this->fail(new \Exception("DHCP '" . $dhcp->id . "' in failed sync state"));
                     return;
                 }
             });
 
-            Log::warning($this->vpc->dhcps()->count() . ' DHCP(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->vpc->id]);
+            Log::warning($this->model->dhcps()->count() . ' DHCP(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
             return $this->release($this->backoff);
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
     }
 }

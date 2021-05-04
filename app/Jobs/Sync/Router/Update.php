@@ -7,12 +7,12 @@ use App\Jobs\Router\Deploy;
 use App\Jobs\Router\DeployRouterDefaultRule;
 use App\Jobs\Router\DeployRouterLocale;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use App\Traits\V2\SyncableBatch;
-use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use SyncableBatch;
+    use SyncableBatch, JobModel;
 
     private $sync;
 
@@ -23,8 +23,6 @@ class Update extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-
         $this->updateSyncBatch([
             [
                 new Deploy($this->sync->resource),
@@ -32,7 +30,5 @@ class Update extends Job
                 new DeployRouterDefaultRule($this->sync->resource),
             ],
         ])->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

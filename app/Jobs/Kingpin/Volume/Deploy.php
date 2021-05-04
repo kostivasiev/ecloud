@@ -4,13 +4,14 @@ namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private $model;
 
@@ -21,10 +22,7 @@ class Deploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $volume = $this->model;
-
         if (!empty($volume->vmware_uuid)) {
             Log::info('Volume already deployed. Nothing to do.');
             return true;
@@ -71,8 +69,6 @@ class Deploy extends Job
         ]);
 
         $volume->saveQuietly();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     public function failed($exception)

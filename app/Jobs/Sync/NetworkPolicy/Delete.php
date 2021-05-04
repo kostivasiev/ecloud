@@ -5,12 +5,12 @@ namespace App\Jobs\Sync\NetworkPolicy;
 use App\Jobs\Job;
 use App\Jobs\NetworkPolicy\DeleteChildResources;
 use App\Models\V2\Sync;
+use App\Traits\V2\JobModel;
 use App\Traits\V2\SyncableBatch;
-use Illuminate\Support\Facades\Log;
 
 class Delete extends Job
 {
-    use SyncableBatch;
+    use SyncableBatch, JobModel;
 
     private $sync;
 
@@ -21,8 +21,6 @@ class Delete extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-
         $this->deleteSyncBatch([
             [
                 new DeleteChildResources($this->sync->resource),
@@ -32,7 +30,5 @@ class Delete extends Job
                 new \App\Jobs\Nsx\NetworkPolicy\SecurityGroup\UndeployCheck($this->sync->resource),
             ]
         ])->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }
