@@ -52,7 +52,7 @@ class SyncableTest extends TestCase
         $attribute = $this->model->sync;
 
         $this->assertEquals(Sync::STATUS_COMPLETE, $attribute->status);
-        $this->assertEquals(Sync::TASK_NAME_UPDATE, $attribute->type);
+        $this->assertEquals(Sync::TYPE_UPDATE, $attribute->type);
     }
 
     public function testGetSyncAttributeReturnsUnknownWithNoSync()
