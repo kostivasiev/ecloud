@@ -7,6 +7,9 @@ use App\Events\V2\Task\Updated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\DB\Ditto\Factories\FilterFactory;
+use UKFast\DB\Ditto\Factories\SortFactory;
+use UKFast\DB\Ditto\Filter;
 
 class Task extends Model
 {
@@ -55,5 +58,62 @@ class Task extends Model
             return static::STATUS_COMPLETE;
         }
         return static::STATUS_INPROGRESS;
+    }
+
+    /**
+     * @param FilterFactory $factory
+     * @return array|Filter[]
+     */
+    public function filterableColumns(FilterFactory $factory)
+    {
+        return [
+            $factory->create('id', Filter::$stringDefaults),
+            $factory->boolean()->create('completed', '1', '0'),
+            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('created_at', Filter::$dateDefaults),
+            $factory->create('updated_at', Filter::$dateDefaults),
+        ];
+    }
+
+    /**
+     * @param SortFactory $factory
+     * @return array|\UKFast\DB\Ditto\Sort[]
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     */
+    public function sortableColumns(SortFactory $factory)
+    {
+        return [
+            $factory->create('id'),
+            $factory->create('completed'),
+            $factory->create('name'),
+            $factory->create('created_at'),
+            $factory->create('updated_at'),
+        ];
+    }
+
+    /**
+     * @param SortFactory $factory
+     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
+     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     */
+    public function defaultSort(SortFactory $factory)
+    {
+        return [
+            $factory->create('created_at', 'desc'),
+        ];
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public function databaseNames()
+    {
+        return [
+            'id' => 'id',
+            'completed' => 'completed',
+            'name' => 'name',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+        ];
     }
 }
