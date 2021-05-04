@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class MaintenanceModeTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $job;
     protected Host $host;
 

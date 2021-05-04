@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class DeletionRulesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $faker;
     protected $availabilityZone;
     protected $region;

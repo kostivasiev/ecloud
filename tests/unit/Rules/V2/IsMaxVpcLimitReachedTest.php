@@ -15,8 +15,6 @@ use UKFast\Api\Auth\Consumer;
 
 class IsMaxVpcLimitReachedTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testMaxLimitReachedReturnsFails()
     {
         $vpc = null;

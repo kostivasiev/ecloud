@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $availabilityZone;
     protected $instance;

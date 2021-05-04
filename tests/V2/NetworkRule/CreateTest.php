@@ -10,8 +10,6 @@ use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testCreateResource()
     {
         Event::fake([Saving::class, Saved::class]);

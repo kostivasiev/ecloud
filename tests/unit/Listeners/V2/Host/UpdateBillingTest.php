@@ -6,13 +6,10 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Sync;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Sync $sync;
 
     protected Product $product;

@@ -16,8 +16,6 @@ use Tests\TestCase;
 
 class UndeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallPolicy $firewallPolicy;
     protected FirewallRule $firewallRule;
     protected FirewallRulePort $firewallRulePort;

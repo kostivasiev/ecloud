@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testPolicyNoRulesDeploys()
     {
         $this->networkPolicy();

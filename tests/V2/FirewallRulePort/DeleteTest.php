@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallRule $firewallRule;
     protected FirewallRulePort $firewallRulePort;
 

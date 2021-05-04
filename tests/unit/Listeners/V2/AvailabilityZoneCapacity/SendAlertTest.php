@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class SendAlertTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $floatingIp;
     protected $availabilityZoneCapacity;

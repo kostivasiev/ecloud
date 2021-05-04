@@ -20,8 +20,6 @@ use Tests\TestCase;
 
 class AwaitNicRemovalTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Instance $instance;
     protected Nic $nic;
 

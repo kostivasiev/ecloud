@@ -3,13 +3,10 @@ namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Sync;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateLicenseBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private Sync $sync;
 
     public function setUp(): void

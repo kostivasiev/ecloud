@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class DeleteInVmwareTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Host $host;
     protected $job;
 

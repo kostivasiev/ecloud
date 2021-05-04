@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class PowerOnTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testPowerOnJob()
     {
         $this->kingpinServiceMock()->expects('post')

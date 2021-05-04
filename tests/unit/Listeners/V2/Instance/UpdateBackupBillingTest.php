@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class UpdateBackupBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $volume;
     private $sync;
 

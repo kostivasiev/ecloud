@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class UpdateVcpuBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $sync;
 
     public function setUp(): void

@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class DeleteServiceProfileTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Host $host;
     protected $job;
 

@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class AttachVolumeTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testAttachingVolume()
     {
         $this->kingpinServiceMock()->expects('post')

@@ -18,8 +18,6 @@ use Tests\TestCase;
 
 class AwaitNatSyncTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Nat $nat;
     protected FloatingIp $floatingIp;
     protected Nic $nic;

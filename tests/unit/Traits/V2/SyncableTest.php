@@ -25,8 +25,6 @@ class TestModel extends Model
 
 class SyncableTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

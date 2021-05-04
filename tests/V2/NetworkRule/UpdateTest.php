@@ -14,8 +14,6 @@ use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkPolicy $networkPolicy;
     protected NetworkRule $networkRule;
 

@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class UpdateRamBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected int $standardTier;
 
     protected Sync $sync;

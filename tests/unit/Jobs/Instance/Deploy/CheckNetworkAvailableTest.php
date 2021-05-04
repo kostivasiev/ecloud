@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class CheckNetworkAvailableTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $job;
 
     public function setUp(): void

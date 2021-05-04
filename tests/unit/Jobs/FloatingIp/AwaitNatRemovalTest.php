@@ -17,8 +17,6 @@ use Tests\TestCase;
 
 class AwaitNatRemovalTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Nat $nat;
     protected FloatingIp $floatingIp;
     protected Nic $nic;

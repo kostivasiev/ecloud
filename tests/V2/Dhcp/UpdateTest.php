@@ -9,13 +9,10 @@ use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Dhcp $dhcp;
 
     public function setUp(): void

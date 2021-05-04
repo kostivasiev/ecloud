@@ -16,8 +16,6 @@ use Tests\TestCase;
 
 class RemoveFrom3ParTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $job;
     protected Host $host;
 

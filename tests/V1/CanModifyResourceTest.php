@@ -11,8 +11,6 @@ use UKFast\Api\Auth\Consumer;
 
 class CanModifyResourceTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function invalidStatuses()
     {
         return [

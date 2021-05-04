@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class InstanceTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testGetInstances()
     {
         $this->kingpinServiceMock()->expects('post')

@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private Sync $sync;
 
     public function setUp(): void

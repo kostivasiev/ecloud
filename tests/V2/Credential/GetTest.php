@@ -3,13 +3,10 @@
 namespace Tests\V2\Credential;
 
 use App\Models\V2\Credential;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /**
      * @var Credential
      */

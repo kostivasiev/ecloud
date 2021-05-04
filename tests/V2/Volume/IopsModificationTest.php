@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class IopsModificationTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Volume $volume;
 
     public function setUp(): void

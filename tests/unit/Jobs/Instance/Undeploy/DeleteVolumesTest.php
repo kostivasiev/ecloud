@@ -22,8 +22,6 @@ use Tests\TestCase;
 
 class DeleteVolumesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Instance $instance;
     protected Volume $volume;
 

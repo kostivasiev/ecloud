@@ -10,8 +10,6 @@ use UKFast\Api\Auth\Consumer;
 
 class NetworkHasNoPolicyTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkHasNoPolicy $rule;
 
     public function setUp(): void

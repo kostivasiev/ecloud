@@ -11,8 +11,6 @@ use Tests\V1\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /**
      * Test for creating a hostset with no SAN mapped to the solution
      * @return void

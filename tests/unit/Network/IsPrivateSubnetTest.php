@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class IsPrivateSubnetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected IsPrivateSubnet $validator;
 
     public function setUp(): void

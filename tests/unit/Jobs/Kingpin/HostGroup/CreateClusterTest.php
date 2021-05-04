@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class CreateClusterTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $job;
     protected $hostGroup;
 

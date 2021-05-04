@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class DeployCheckTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Sync $sync;
 
     public function testFirewallPolicyRealizedNotReleasedAndSucceeds()

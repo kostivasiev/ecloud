@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class DeletionRulesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testFailedDeletion()
     {
         $this->instance();

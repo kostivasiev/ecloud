@@ -16,8 +16,6 @@ use Tests\TestCase;
 
 class UndeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Router $router;
 
     public function setUp(): void

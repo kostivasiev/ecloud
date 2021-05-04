@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class CapacityIncreaseTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $volume;
 
     public function setUp(): void

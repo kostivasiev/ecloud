@@ -10,13 +10,10 @@ use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class HiddenCredentialsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Appliance $appliance;
     protected ApplianceVersion $appliance_version;
     protected AvailabilityZone $availabilityZone;

@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class UpdateBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Volume $volume;
     protected Sync $sync;
     protected Instance $instance;

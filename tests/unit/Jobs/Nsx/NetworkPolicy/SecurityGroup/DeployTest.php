@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testDeploys()
     {
         $this->nsxServiceMock()->shouldReceive('patch')

@@ -17,8 +17,6 @@ use Tests\TestCase;
 
 class AwaitFirewallPolicySyncTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $firewallPolicy;
 
     public function setUp(): void

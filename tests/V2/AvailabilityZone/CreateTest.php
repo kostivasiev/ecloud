@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $faker;
 
     public function setUp(): void

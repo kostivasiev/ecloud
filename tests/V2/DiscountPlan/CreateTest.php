@@ -9,8 +9,6 @@ use Tests\TestCase;
 class CreateTest extends TestCase
 {
 
-    use DatabaseMigrations;
-
     public function testCreateItem()
     {
         $data = [

@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $sync;
 
     public function setUp(): void

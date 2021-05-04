@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class UpdateLicenseBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Sync $sync;
 
     protected Product $product;

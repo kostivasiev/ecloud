@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class CredentialsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $faker;
 
     protected $vpc;

@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected DiscountPlan $discountPlan;
 
     public function setUp(): void
