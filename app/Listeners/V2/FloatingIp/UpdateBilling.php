@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners\V2\Vpc;
+namespace App\Listeners\V2\FloatingIp;
 
 use App\Events\V2\Sync\Updated;
 use App\Models\V2\BillingMetric;
@@ -9,7 +9,7 @@ use App\Models\V2\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class UpdateFloatingIpBilling
+class UpdateBilling
 {
     /**
      * @param Updated $event
@@ -28,31 +28,28 @@ class UpdateFloatingIpBilling
             return;
         }
 
+        if ($event->model->type != Sync::TYPE_UPDATE) {
+            return;
+        }
+
         $floatingIp = $event->model->resource;
 
         if (get_class($floatingIp) != FloatingIp::class) {
             return;
         }
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($floatingIp->vpc, 'floating-ip.count');
-
-        // If the sync type is delete, the resource hasn't actually been soft deleted yet.
-        $value = ($event->model->type == Sync::TYPE_DELETE) ? $floatingIp->vpc->floatingIps()->count()-1 : $floatingIp->vpc->floatingIps()->count();
+        $currentActiveMetric = BillingMetric::getActiveByKey($floatingIp, 'floating-ip.count');
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == $value) {
-                Log::info(get_class($this) . ' : No Change in number of fips, nothing to do', ['model' => $event->model]);
-                return;
-            }
-            $currentActiveMetric->setEndDate();
+            return;
         }
 
         $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $floatingIp->vpc->id;
+        $billingMetric->resource_id = $floatingIp->id;
         $billingMetric->vpc_id = $floatingIp->vpc->id;
         $billingMetric->reseller_id = $floatingIp->vpc->reseller_id;
         $billingMetric->key = 'floating-ip.count';
-        $billingMetric->value = $value;
+        $billingMetric->value = 1;
         $billingMetric->start = Carbon::now();
 
         // Bit of a hack to get the az product, as technically a fip isn't associated with an az
