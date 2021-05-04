@@ -57,7 +57,7 @@ class UpdateBillingTest extends TestCase
     public function testCreatingFloatingIpAddsBillingMetric()
     {
         $listener = new \App\Listeners\V2\FloatingIp\UpdateBilling();
-        $listener->handle(new \App\Events\V2\Sync\Updated($this->task));
+        $listener->handle(new \App\Events\V2\Task\Updated($this->task));
 
         $metric = BillingMetric::getActiveByKey($this->floatingIp, 'floating-ip.count');
         $this->assertNotNull($metric);
