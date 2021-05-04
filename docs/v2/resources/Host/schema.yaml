@@ -14,16 +14,10 @@ properties:
     description : The host group to use with this host
     example: hg-4c63cf58
     readOnly: false
-  task:
-    type: object
+  sync:
+    type: string
+    example: 'completed'
     readOnly: true
-    properties:
-      status:
-        description: "The status of the most recent task performed on the resource. Possible values: in-progress, failed, complete."
-        example: complete
-      name:
-        description: "The name of the most recent task performed on the resource."
-        example: update
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

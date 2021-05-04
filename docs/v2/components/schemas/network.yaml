@@ -20,15 +20,15 @@ properties:
     description: CIDR format subnet with mask. Minimum network prefix is /29.
     required: true
     example: 10.0.0.0/24
-  task:
+  sync:
     type: object
     readOnly: true
     properties:
       status:
-        description: "The status of the most recent task performed on the resource. Possible values: in-progress, failed, complete."
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
         example: complete
-      name:
-        description: "The name of the most recent task performed on the resource."
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
         example: update
   created_at:
     type: string

@@ -29,16 +29,10 @@ properties:
     description : Determines whether the host group contains windows-enabled hosts, defaults to false.
     example: true
     readOnly: false
-  task:
-    type: object
+  sync:
+    type: string
+    example: 'completed'
     readOnly: true
-    properties:
-      status:
-        description: "The status of the most recent task performed on the resource. Possible values: in-progress, failed, complete."
-        example: complete
-      name:
-        description: "The name of the most recent task performed on the resource."
-        example: update
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'
