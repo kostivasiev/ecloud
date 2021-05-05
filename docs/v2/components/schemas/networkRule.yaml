@@ -28,6 +28,18 @@ properties:
     required: true
     example: '2.2.2.2'
     readOnly: false
+  action:
+    description: 'One of ALLOW, DROP, REJECT'
+    type: string
+    required: true
+    example: 'ALLOW'
+    readOnly: false
+  direction:
+    description: 'One of IN, OUT, IN_OUT'
+    type: string
+    required: true
+    example: 'IN_OUT'
+    readOnly: false
   enabled:
     type: boolean
     required: true

@@ -20,6 +20,11 @@ class NetworkRule extends Model implements Filterable, Sortable
 
     public string $keyPrefix = 'nr';
 
+    const LOCKED_RULE_TYPES = [
+        'DHCP_Ingress',
+        'DHCP_Egress'
+    ];
+
     public function __construct(array $attributes = [])
     {
         $this->incrementing = false;
@@ -33,6 +38,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             'source',
             'destination',
             'action',
+            'direction',
             'enabled',
             'type'
         ];
@@ -84,6 +90,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             $factory->create('source', Filter::$stringDefaults),
             $factory->create('destination', Filter::$stringDefaults),
             $factory->create('action', Filter::$stringDefaults),
+            $factory->create('direction', Filter::$stringDefaults),
             $factory->create('enabled', Filter::$numericDefaults),
             $factory->create('type', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -101,6 +108,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             $factory->create('source'),
             $factory->create('destination'),
             $factory->create('action'),
+            $factory->create('direction'),
             $factory->create('enabled'),
             $factory->create('type'),
             $factory->create('created_at'),
@@ -125,6 +133,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             'source' => 'source',
             'destination' => 'destination',
             'action' => 'action',
+            'direction' => 'direction',
             'enabled' => 'enabled',
             'type' => 'type',
             'created_at' => 'created_at',

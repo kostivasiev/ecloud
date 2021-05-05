@@ -34,6 +34,7 @@ class Update extends FormRequest
                 'string',
                 new ValidFirewallRuleSourceDestination()
             ],
+            'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',
             'action' => 'sometimes|required|string|in:ALLOW,DROP,REJECT',
             'enabled' => 'sometimes|required|boolean',
         ];

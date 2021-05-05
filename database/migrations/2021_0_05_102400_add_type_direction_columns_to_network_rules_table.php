@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddTypeColumnToNetworkRulesTable extends Migration
+class AddTypeDirectionColumnsToNetworkRulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,6 +15,7 @@ class AddTypeColumnToNetworkRulesTable extends Migration
     {
         Schema::connection('ecloud')->table('network_rules', function (Blueprint $table) {
             $table->string('type')->nullable()->after('enabled');
+            $table->string('direction')->nullable()->after('action');
         });
     }
 
@@ -26,7 +27,7 @@ class AddTypeColumnToNetworkRulesTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('network_rules', function (Blueprint $table) {
-            $table->dropColumn(['type']);
+            $table->dropColumn(['type', 'direction']);
         });
     }
 }

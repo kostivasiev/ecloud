@@ -53,9 +53,10 @@ class Deploy extends Job
                             'sequence_number' => $rule->sequence,
                             'source_groups' => explode(',', $rule->source),
                             'destination_groups' => explode(',', $rule->destination),
-                            'services' => [
-                                'ANY'
-                            ],
+                            'services' => in_array($rule->type, ['DHCP_Ingress', 'DHCP_Egress']) ? [
+                                '/infra/services/DHCP-Client',
+                                '/infra/services/DHCP-Server'
+                            ] : ['ANY'],
                             'service_entries' => $rule->networkRulePorts->map(function ($port) {
                                 if ($port->protocol == 'ICMPv4') {
                                     return [
@@ -82,6 +83,7 @@ class Deploy extends Job
                             'profiles' => [
                                 'ANY'
                             ],
+                            'direction' => $rule->direction ?? 'IN_OUT',
                             'logged' => false,
                             'scope' => [
                                 '/infra/domains/default/groups/' . $this->networkPolicy->id,

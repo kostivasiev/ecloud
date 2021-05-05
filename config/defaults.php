@@ -29,6 +29,30 @@ return [
         'egress' => '',
         'ingress' => '',
     ],
+    'network_policy' => [
+        'rules' => [
+            'DHCP_Ingress' => [
+                'name' => 'DHCP_Ingress',
+                'sequence' => 5001,
+                'source' =>  '10.0.0.2',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true,
+                'type' => 'DHCP_Ingress',
+            ],
+            'DHCP_Egress' => [
+                'name' => 'DHCP_Egress',
+                'sequence' => 5002,
+                'source' =>  'ANY',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'OUT',
+                'enabled' => true,
+                'type' => 'DHCP_Egress',
+            ]
+        ]
+    ],
     'region' => [],
     'router' => [
         'policy' => '20/20',

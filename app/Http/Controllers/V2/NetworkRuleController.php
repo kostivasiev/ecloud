@@ -40,6 +40,7 @@ class NetworkRuleController extends BaseController
             'source',
             'destination',
             'action',
+            'direction',
             'enabled',
         ]));
 
@@ -65,6 +66,7 @@ class NetworkRuleController extends BaseController
             'source',
             'destination',
             'action',
+            'direction',
             'enabled',
         ]));
 
@@ -98,7 +100,6 @@ class NetworkRuleController extends BaseController
 
             $networkRule->networkPolicy->save();
         });
-
 
         return response('', 202);
     }
