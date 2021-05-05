@@ -7,6 +7,7 @@ use App\Jobs\Kingpin\Volume\Attach;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
+use App\Traits\V2\JobModel;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Bus;
@@ -15,7 +16,7 @@ use Throwable;
 
 class VolumeAttach extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private Task $task;
 
@@ -26,8 +27,6 @@ class VolumeAttach extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->task->resource->id]);
-
         $task = $this->task;
         $volume = $task->resource;
         $instance = Instance::findOrFail($task->data['instance_id']);
@@ -46,7 +45,5 @@ class VolumeAttach extends Job
             $task->failure_reason = $e->getMessage();
             $task->save();
         })->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->resource->id]);
     }
 }

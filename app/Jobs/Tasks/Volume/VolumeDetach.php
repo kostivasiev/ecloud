@@ -11,6 +11,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
+use App\Traits\V2\JobModel;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
@@ -20,7 +21,7 @@ use Throwable;
 
 class VolumeDetach extends Job
 {
-    use Batchable;
+    use Batchable, JobModel;
 
     private Task $task;
 
@@ -31,8 +32,6 @@ class VolumeDetach extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->task->resource->id]);
-
         $task = $this->task;
         $volume = $task->resource;
         $instance = Instance::findOrFail($task->data['instance_id']);
@@ -50,7 +49,5 @@ class VolumeDetach extends Job
             $task->failure_reason = $e->getMessage();
             $task->save();
         })->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->resource->id]);
     }
 }
