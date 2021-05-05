@@ -4,7 +4,7 @@ namespace App\Jobs\Tasks;
 
 use App\Jobs\Job;
 use App\Models\V2\Task;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableTaskJob;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +12,7 @@ use Throwable;
 
 class AwaitTask extends Job
 {
-    use JobModel;
+    use LoggableTaskJob;
 
     private Task $task;
 

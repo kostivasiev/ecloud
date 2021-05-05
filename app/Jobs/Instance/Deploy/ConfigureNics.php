@@ -6,7 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +14,7 @@ use IPLib\Range\Subnet;
 
 class ConfigureNics extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private $model;
 

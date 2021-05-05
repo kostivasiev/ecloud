@@ -4,13 +4,13 @@ namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeployCheck extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     public $tries = 60;
     public $backoff = 5;

@@ -5,13 +5,13 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Support\Sync;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class ExpandOsDisk extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     const RETRY_DELAY = 5;
     public $tries = 60;

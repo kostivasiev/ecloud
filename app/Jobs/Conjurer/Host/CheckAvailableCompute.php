@@ -4,13 +4,13 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CheckAvailableCompute extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private Host $model;
 

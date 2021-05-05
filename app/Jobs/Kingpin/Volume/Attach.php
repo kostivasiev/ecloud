@@ -5,14 +5,13 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
-use App\Traits\V2\JobModel;
-use GuzzleHttp\Exception\ServerException;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Attach extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private Volume $model;
     private Instance $instance;

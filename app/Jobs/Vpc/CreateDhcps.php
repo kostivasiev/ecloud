@@ -5,13 +5,13 @@ namespace App\Jobs\Vpc;
 use App\Jobs\Job;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Vpc;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateDhcps extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private Vpc $model;
 

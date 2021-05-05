@@ -5,12 +5,12 @@ namespace App\Jobs\Router\Defaults;
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Router;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Support\Facades\Log;
 
 class ConfigureRouterDefaults extends Job
 {
-    use JobModel;
+    use LoggableModelJob;
 
     private $model;
 

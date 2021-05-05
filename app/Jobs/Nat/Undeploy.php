@@ -5,14 +5,14 @@ namespace App\Jobs\Nat;
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
     
     private Nat $model;
 

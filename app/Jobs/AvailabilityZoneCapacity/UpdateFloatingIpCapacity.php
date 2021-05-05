@@ -6,14 +6,14 @@ use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\FloatingIp;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 use UKFast\Admin\Networking\AdminClient;
 
 class UpdateFloatingIpCapacity extends Job
 {
-    use JobModel;
+    use LoggableModelJob;
 
     private AvailabilityZone $model;
 

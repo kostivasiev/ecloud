@@ -4,16 +4,16 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Support\Sync;
 use App\Models\V2\Volume;
-use App\Traits\V2\JobModel;
+use App\Support\Sync;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class AttachOsDisk extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     const RETRY_DELAY = 1;
 

@@ -4,14 +4,14 @@ namespace App\Jobs\Network;
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AwaitPortRemoval extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     public $tries = 120;
     public $backoff = 5;

@@ -4,12 +4,11 @@ namespace App\Jobs\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Traits\V2\JobModel;
-use Illuminate\Support\Facades\Log;
+use App\Traits\V2\LoggableModelJob;
 
 class PowerReset extends Job
 {
-    use JobModel;
+    use LoggableModelJob;
 
     private $model;
 

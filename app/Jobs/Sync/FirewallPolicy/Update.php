@@ -5,13 +5,13 @@ namespace App\Jobs\Sync\FirewallPolicy;
 use App\Jobs\Job;
 use App\Jobs\Nsx\FirewallPolicy\Deploy;
 use App\Jobs\Nsx\FirewallPolicy\DeployCheck;
-use App\Traits\V2\JobModel;
 use App\Models\V2\Task;
+use App\Traits\V2\LoggableModelJob;
 use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use TaskableBatch, JobModel;
+    use TaskableBatch, LoggableModelJob;
 
     private $task;
 

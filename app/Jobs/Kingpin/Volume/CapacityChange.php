@@ -4,14 +4,14 @@ namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CapacityChange extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private $model;
 

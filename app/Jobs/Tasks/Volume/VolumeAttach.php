@@ -7,7 +7,7 @@ use App\Jobs\Kingpin\Volume\Attach;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableTaskJob;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Bus;
@@ -16,7 +16,7 @@ use Throwable;
 
 class VolumeAttach extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableTaskJob;
 
     private Task $task;
 

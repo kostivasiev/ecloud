@@ -5,11 +5,11 @@ namespace App\Jobs\Vpc\Defaults;
 use App\Jobs\Job;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 
 class CreateNetwork extends Job
 {
-    use JobModel;
+    use LoggableModelJob;
 
     public $tries = 60;
     public $backoff = 10;

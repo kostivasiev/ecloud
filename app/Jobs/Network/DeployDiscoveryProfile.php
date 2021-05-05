@@ -4,13 +4,12 @@ namespace App\Jobs\Network;
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class DeployDiscoveryProfile extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private Network $model;
 

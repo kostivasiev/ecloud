@@ -4,13 +4,12 @@ namespace App\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private NetworkPolicy $model;
 

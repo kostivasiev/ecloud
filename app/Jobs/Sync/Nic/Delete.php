@@ -5,13 +5,13 @@ namespace App\Jobs\Sync\Nic;
 use App\Jobs\Job;
 use App\Jobs\Nic\UnassignFloatingIP;
 use App\Jobs\Nsx\Nic\RemoveDHCPLease;
-use App\Traits\V2\JobModel;
 use App\Models\V2\Task;
+use App\Traits\V2\LoggableModelJob;
 use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use TaskableBatch, JobModel;
+    use TaskableBatch, LoggableModelJob;
 
     private $task;
 

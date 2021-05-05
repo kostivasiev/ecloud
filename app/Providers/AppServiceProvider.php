@@ -65,22 +65,27 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Queue::failing(function (JobFailed $event) {
-            Log::error($event->job->getName() . " : Job failed", ['exception' => $event->exception]);
+            Log::error(
+                $event->job->getName() . " : Job failed",
+                array_merge(
+                    ['exception' => $event->exception],
+                    $this->getLoggingData($event)
+                )
+            );
         });
 
         Queue::before(function (JobProcessing $event) {
-            if (strpos($event->job->payload()['displayName'], 'App\\Listeners\\') !== 0) {
-                $command = unserialize($event->job->payload()['data']['command']);
-                Log::debug($event->job->resolveName() . ': Started', ['id' => $command->getModel()->id]);
-            }
+            Log::debug($event->job->resolveName() .': Started', $this->getLoggingData($event));
         });
 
         Queue::after(function (JobProcessed $event) {
-            if (strpos($event->job->payload()['displayName'], 'App\\Listeners\\') !== 0) {
-                $command = unserialize($event->job->payload()['data']['command']);
-                $parameter = (!empty($command->getModel())) ? $command->getModel()->id : null;
-                Log::debug($event->job->resolveName() . ': Finished', ['id' => $parameter]);
-            }
+            Log::debug($event->job->resolveName() . ': Finished', $this->getLoggingData($event));
         });
+    }
+
+    public function getLoggingData($event)
+    {
+        $command = unserialize($event->job->payload()['data']['command']);
+        return method_exists($command, 'getLoggingData') ? $command->getLoggingData() : [];
     }
 }

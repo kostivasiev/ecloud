@@ -5,14 +5,14 @@ namespace App\Jobs\Nsx\HostGroup;
 use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PrepareCluster extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private $model;
 

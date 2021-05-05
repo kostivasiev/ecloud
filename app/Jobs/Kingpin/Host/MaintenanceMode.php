@@ -4,16 +4,14 @@ namespace App\Jobs\Kingpin\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
-use App\Traits\V2\JobModel;
-use GuzzleHttp\Exception\ClientException;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class MaintenanceMode extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private $model;
 

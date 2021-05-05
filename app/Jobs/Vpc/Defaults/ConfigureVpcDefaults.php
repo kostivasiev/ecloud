@@ -4,21 +4,13 @@ namespace App\Jobs\Vpc\Defaults;
 
 use App\Jobs\Job;
 use App\Jobs\Router\Defaults\ConfigureRouterDefaults;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Router;
-use App\Support\Sync;
 use App\Models\V2\Vpc;
-use App\Traits\V2\JobModel;
-use Illuminate\Bus\Batch;
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Log;
-use Throwable;
+use App\Traits\V2\LoggableModelJob;
 
 class ConfigureVpcDefaults extends Job
 {
-    use JobModel;
+    use LoggableModelJob;
 
     private $model;
 

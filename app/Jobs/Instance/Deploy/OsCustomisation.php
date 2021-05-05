@@ -6,13 +6,12 @@ use App\Jobs\Job;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Services\V2\PasswordService;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class OsCustomisation extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private $model;
 

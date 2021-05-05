@@ -4,7 +4,7 @@ namespace App\Jobs\Network;
 
 use App\Jobs\Job;
 use App\Models\V2\Network;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +12,7 @@ use IPLib\Range\Subnet;
 
 class Deploy extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private Network $model;
 

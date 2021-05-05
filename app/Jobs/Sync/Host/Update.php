@@ -10,14 +10,14 @@ use App\Jobs\Conjurer\Host\CreateProfile;
 use App\Jobs\Conjurer\Host\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Host\CheckOnline;
-use App\Traits\V2\JobModel;
 use App\Models\V2\Task;
+use App\Traits\V2\LoggableModelJob;
 use App\Traits\V2\TaskableBatch;
 use GuzzleHttp\Exception\RequestException;
 
 class Update extends Job
 {
-    use TaskableBatch, JobModel;
+    use TaskableBatch, LoggableModelJob;
 
     private $task;
 

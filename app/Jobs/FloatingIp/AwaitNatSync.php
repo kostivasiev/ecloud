@@ -5,14 +5,14 @@ namespace App\Jobs\FloatingIp;
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Support\Sync;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 // TODO: NAT state should be exposed seperately, rather than this being part of floating IP update sync
 class AwaitNatSync extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     public $tries = 60;
     public $backoff = 10;

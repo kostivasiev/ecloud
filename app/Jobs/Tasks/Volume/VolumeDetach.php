@@ -3,16 +3,11 @@
 namespace App\Jobs\Tasks\Volume;
 
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Volume\Attach;
 use App\Jobs\Kingpin\Volume\Detach;
-use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Jobs\Sync\Completed;
 use App\Models\V2\Instance;
-use App\Models\V2\Router;
 use App\Models\V2\Task;
-use App\Models\V2\Volume;
-use App\Traits\V2\JobModel;
-use GuzzleHttp\Exception\ClientException;
+use App\Traits\V2\LoggableTaskJob;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Bus;
@@ -21,7 +16,7 @@ use Throwable;
 
 class VolumeDetach extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableTaskJob;
 
     private Task $task;
 

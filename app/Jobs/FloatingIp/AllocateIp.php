@@ -5,7 +5,7 @@ namespace App\Jobs\FloatingIp;
 use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +14,7 @@ use UKFast\Admin\Networking\AdminClient;
 
 class AllocateIp extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     public FloatingIp $model;
 

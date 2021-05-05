@@ -6,13 +6,13 @@ use App\Jobs\Job;
 use App\Jobs\Kingpin\HostGroup\CreateCluster;
 use App\Jobs\Nsx\HostGroup\CreateTransportNode;
 use App\Jobs\Nsx\HostGroup\PrepareCluster;
-use App\Traits\V2\JobModel;
 use App\Models\V2\Task;
+use App\Traits\V2\LoggableModelJob;
 use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use TaskableBatch, JobModel;
+    use TaskableBatch, LoggableModelJob;
 
     private $task;
 

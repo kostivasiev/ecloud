@@ -5,12 +5,12 @@ namespace App\Jobs\Vpc\Defaults;
 use App\Jobs\Job;
 use App\Models\V2\Router;
 use App\Support\Sync;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Support\Facades\Log;
 
 class AwaitRouterSync extends Job
 {
-    use JobModel;
+    use LoggableModelJob;
 
     public $tries = 60;
     public $backoff = 10;

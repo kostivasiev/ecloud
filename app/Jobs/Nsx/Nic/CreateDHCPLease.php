@@ -4,13 +4,13 @@ namespace App\Jobs\Nsx\Nic;
 
 use App\Jobs\Job;
 use App\Models\V2\Nic;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateDHCPLease extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     private $model;
 

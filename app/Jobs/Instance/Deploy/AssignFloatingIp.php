@@ -7,14 +7,14 @@ use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Nat;
-use App\Traits\V2\JobModel;
+use App\Traits\V2\LoggableModelJob;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AssignFloatingIp extends Job
 {
-    use Batchable, JobModel;
+    use Batchable, LoggableModelJob;
 
     public $tries = 1;
 
