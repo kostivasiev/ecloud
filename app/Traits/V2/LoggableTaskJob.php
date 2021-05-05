@@ -7,7 +7,7 @@ trait LoggableTaskJob
 
     public function resolveModelId()
     {
-        return $this->task->resource->id;
+        return $this->task->resource ? $this->task->resource->id : null;
     }
 
 }

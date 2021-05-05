@@ -7,7 +7,7 @@ trait LoggableModelJob
 
     public function resolveModelId()
     {
-        return $this->model->id;
+        return $this->model ? $this->model->id : null;
     }
 
     public function getLoggingData()
