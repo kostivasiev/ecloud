@@ -30,16 +30,20 @@ class CredentialsTest extends TestCase
         $availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $region->id,
         ]);
-        $this->instance = factory(Instance::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $availabilityZone->id,
-            'deploy_data' => [
-                'network_id' => $this->network()->id,
-                'volume_capacity' => 20,
-                'volume_iops' => 300,
-                'requires_floating_ip' => false,
-            ],
-        ]);
+        $this->instance = Instance::withoutEvents(function () use ($availabilityZone) {
+            return factory(Instance::class)->create([
+                'id' => 'i-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $availabilityZone->id,
+                'deploy_data' => [
+                    'network_id' => $this->network()->id,
+                    'volume_capacity' => 20,
+                    'volume_iops' => 300,
+                    'requires_floating_ip' => false,
+                ],
+                'deployed' => true,
+            ]);
+        });
 
         $this->credential = factory(Credential::class)->create([
             'resource_id' => $this->instance->id
@@ -52,6 +56,43 @@ class CredentialsTest extends TestCase
             '/v2/instances/' . $this->instance->id . '/credentials',
             [
                 'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson(
+                collect($this->credential)
+                    ->except(['created_at', 'updated_at'])
+                    ->toArray()
+            )
+            ->assertResponseStatus(200);
+    }
+
+    public function testGetCredentialsWhenNotDeployed()
+    {
+        $this->instance->deployed = false;
+        $this->instance->saveQuietly();
+        $this->get(
+            '/v2/instances/' . $this->instance->id . '/credentials',
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Not Found',
+                'detail' => 'Credentials will be available when instance deployment is complete'
+            ]
+        )->assertResponseStatus(404);
+    }
+
+    public function testGetCredentialsWhenNotDeployedAsAdmin()
+    {
+        $this->instance->deployed = false;
+        $this->instance->saveQuietly();
+        $this->get(
+            '/v2/instances/' . $this->instance->id . '/credentials',
+            [
+                'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
