@@ -35,7 +35,8 @@ class ProductCreate extends Command
                 'Storage',
                 'Networking',
                 'License',
-                'Support'
+                'Support',
+                'Dedicated Hosts'
             ],
             0
         );
