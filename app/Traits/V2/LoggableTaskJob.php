@@ -9,5 +9,4 @@ trait LoggableTaskJob
     {
         return $this->task->resource ? $this->task->resource->id : null;
     }
-
 }
