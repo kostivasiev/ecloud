@@ -80,8 +80,27 @@ class CredentialsTest extends TestCase
         )->seeJson(
             [
                 'title' => 'Not Found',
-                'detail' => 'Credentials are not available until instance deployment is complete'
+                'detail' => 'Credentials will be available when instance deployment is complete'
             ]
         )->assertResponseStatus(404);
+    }
+
+    public function testGetCredentialsWhenAdmin()
+    {
+        $this->instance->deployed = false;
+        $this->instance->saveQuietly();
+        $this->get(
+            '/v2/instances/' . $this->instance->id . '/credentials',
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson(
+                collect($this->credential)
+                    ->except(['created_at', 'updated_at'])
+                    ->toArray()
+            )
+            ->assertResponseStatus(200);
     }
 }
