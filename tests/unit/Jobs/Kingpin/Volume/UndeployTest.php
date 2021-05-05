@@ -67,7 +67,7 @@ class UndeployTest extends TestCase
         Event::fake();
 
         dispatch(new Undeploy($this->volume));
-        
+
         Event::assertDispatched(JobFailed::class);
     }
 
