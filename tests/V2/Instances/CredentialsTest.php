@@ -85,7 +85,7 @@ class CredentialsTest extends TestCase
         )->assertResponseStatus(404);
     }
 
-    public function testGetCredentialsWhenAdmin()
+    public function testGetCredentialsWhenNotDeployedAsAdmin()
     {
         $this->instance->deployed = false;
         $this->instance->saveQuietly();
