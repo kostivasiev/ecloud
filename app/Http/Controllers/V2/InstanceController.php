@@ -179,7 +179,7 @@ class InstanceController extends BaseController
     public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
-        if (!$instance->deployed) {
+        if (!$instance->deployed && !$request->user()->isAdmin()) {
             return response()->json([
                 'errors' => [
                     [
