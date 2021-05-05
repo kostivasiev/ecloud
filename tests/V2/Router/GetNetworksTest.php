@@ -7,8 +7,6 @@ use Tests\TestCase;
 
 class GetNetworksTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testGetCollection()
     {
         $this->network();

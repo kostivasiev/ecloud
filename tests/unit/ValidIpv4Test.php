@@ -3,13 +3,10 @@
 namespace Tests\unit;
 
 use App\Rules\V2\ValidIpv4;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class ValidIpv4Test extends TestCase
 {
-    use DatabaseMigrations;
-
     private $validator;
 
     public function setUp(): void

@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $lbcs;
 
     public function setUp(): void

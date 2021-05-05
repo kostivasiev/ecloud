@@ -2,13 +2,10 @@
 
 namespace Tests\V2\Credential;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testValidDataSucceeds()
     {
         $this->post(

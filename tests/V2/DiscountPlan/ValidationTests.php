@@ -10,8 +10,6 @@ use Tests\TestCase;
 class ValidationTests extends TestCase
 {
 
-    use DatabaseMigrations;
-
     protected array $data;
     protected DiscountPlan $discountPlan;
 

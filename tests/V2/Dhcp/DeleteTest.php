@@ -11,13 +11,10 @@ use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var AvailabilityZone */
     protected $availabilityZone;
     /** @var Region */

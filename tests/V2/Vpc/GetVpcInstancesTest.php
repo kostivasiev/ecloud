@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class GetVpcInstancesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testInstancesCollection()
     {
         $instance = $this->instance();

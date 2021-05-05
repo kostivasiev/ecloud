@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class IpAvailableTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $faker;
     protected $validator;
 

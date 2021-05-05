@@ -13,8 +13,6 @@ use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Region */
     private $region;
 

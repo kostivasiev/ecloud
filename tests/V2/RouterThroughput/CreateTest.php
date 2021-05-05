@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private Router $router;
 
     private AvailabilityZone $availabilityZone;

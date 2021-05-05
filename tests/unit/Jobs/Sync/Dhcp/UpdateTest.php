@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $task;
 
     public function setUp(): void

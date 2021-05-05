@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class DeleteNicsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Instance $instance;
     protected Nic $nic;
 

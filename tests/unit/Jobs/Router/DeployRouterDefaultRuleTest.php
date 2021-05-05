@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class DeployRouterDefaultRuleTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Router $router;
 
     public function setUp(): void

@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class GetCredentialsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected AvailabilityZone $availabilityZone;
     protected Credential $credential;

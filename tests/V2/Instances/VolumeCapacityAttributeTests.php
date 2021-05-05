@@ -18,8 +18,6 @@ use Tests\TestCase;
 
 class VolumeCapacityAttributeTests extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $vpc;
     protected $instance;

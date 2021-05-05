@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallRule $firewallRule;
 
     public function setUp(): void

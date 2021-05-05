@@ -14,8 +14,6 @@ use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkRule $networkRule;
     protected NetworkPolicy $networkPolicy;
 

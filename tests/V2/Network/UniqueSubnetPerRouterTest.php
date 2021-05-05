@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class UniqueSubnetPerRouterTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected AvailabilityZone $availabilityZone;
     protected Network $network;
     protected Network $network2;

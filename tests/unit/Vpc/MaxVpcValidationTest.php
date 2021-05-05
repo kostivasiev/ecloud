@@ -10,8 +10,6 @@ use UKFast\Api\Auth\Consumer;
 
 class MaxVpcValidationTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected IsMaxVpcLimitReached $rule;
 
     public function setUp(): void

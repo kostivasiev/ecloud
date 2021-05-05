@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class DeployCheckTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallPolicy $firewallPolicy;
 
     public function setUp(): void

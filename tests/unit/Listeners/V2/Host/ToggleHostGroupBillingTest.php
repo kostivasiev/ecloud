@@ -14,9 +14,7 @@ use Tests\TestCase;
 
 class ToggleHostGroupBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
-    protected Sync $task;
+    protected Task $task;
 
     protected Product $product;
 

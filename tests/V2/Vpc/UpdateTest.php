@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testNoPermsIsDenied()
     {
         $this->patch('/v2/vpcs/' . $this->vpc()->id, [

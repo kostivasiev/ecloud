@@ -5,13 +5,10 @@ namespace Tests\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $faker;
 
     protected $availabilityZone;

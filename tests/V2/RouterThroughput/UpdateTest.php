@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private Region $region;
 
     private RouterThroughput $routerThroughput;

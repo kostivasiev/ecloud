@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class InstanceTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testGetInstances()
     {
         $volume = Model::withoutEvents(function() {

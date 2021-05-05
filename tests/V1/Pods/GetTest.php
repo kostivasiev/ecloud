@@ -3,12 +3,12 @@
 namespace Tests\V1\Pods;
 
 use App\Models\V1\Pod;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Traits\ResellerDatabaseMigrations;
 use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
+    use ResellerDatabaseMigrations;
 
     public function setUp(): void
     {

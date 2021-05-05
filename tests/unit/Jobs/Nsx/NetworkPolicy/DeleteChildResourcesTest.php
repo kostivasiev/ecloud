@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class DeleteChildResourcesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkRule $networkRule;
     protected NetworkRulePort $networkRulePort;
 

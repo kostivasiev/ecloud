@@ -32,10 +32,8 @@ class TestModel extends Model
 
 class TaskTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $task;
-
+    
     public function setUp(): void
     {
         parent::setUp();

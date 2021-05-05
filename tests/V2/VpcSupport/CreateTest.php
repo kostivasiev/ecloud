@@ -13,8 +13,6 @@ use UKFast\Admin\Account\AdminCustomerClient;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $region;
     protected $vpc;

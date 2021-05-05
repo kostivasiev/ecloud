@@ -8,13 +8,10 @@ use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Sync $sync;
 
     protected Product $product;
