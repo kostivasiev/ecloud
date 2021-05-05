@@ -7,12 +7,12 @@ use App\Jobs\Nsx\DeployCheck;
 use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
 use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
 use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use TaskableBatch, LoggableModelJob;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
 

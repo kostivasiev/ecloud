@@ -5,12 +5,12 @@ namespace App\Jobs\Sync\NetworkPolicy;
 use App\Jobs\Job;
 use App\Jobs\NetworkPolicy\DeleteChildResources;
 use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use TaskableBatch, LoggableModelJob;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
 

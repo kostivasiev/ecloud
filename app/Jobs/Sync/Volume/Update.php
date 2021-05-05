@@ -7,12 +7,12 @@ use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use TaskableBatch, LoggableModelJob;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
     private $originalValues;

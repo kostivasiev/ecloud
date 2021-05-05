@@ -11,13 +11,13 @@ use App\Jobs\Conjurer\Host\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Host\CheckOnline;
 use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 use GuzzleHttp\Exception\RequestException;
 
 class Update extends Job
 {
-    use TaskableBatch, LoggableModelJob;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
 

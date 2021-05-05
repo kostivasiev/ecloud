@@ -10,12 +10,12 @@ use App\Jobs\Network\UndeployDiscoveryProfiles;
 use App\Jobs\Network\UndeployQoSProfiles;
 use App\Jobs\Network\UndeploySecurityProfiles;
 use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use TaskableBatch, LoggableModelJob;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
 

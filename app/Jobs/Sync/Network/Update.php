@@ -8,12 +8,12 @@ use App\Jobs\Network\Deploy;
 use App\Jobs\Network\DeployDiscoveryProfile;
 use App\Jobs\Network\DeploySecurityProfile;
 use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use TaskableBatch, LoggableModelJob;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
 
