@@ -178,7 +178,19 @@ class InstanceController extends BaseController
      */
     public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->credentials();
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+        if (!$instance->deployed && !$request->user()->isAdmin()) {
+            return response()->json([
+                'errors' => [
+                    [
+                        'title' => 'Not Found',
+                        'detail' => 'Credentials will be available when instance deployment is complete',
+                        'status' => 404,
+                    ]
+                ]
+            ], 404);
+        }
+        $collection = $instance->credentials();
         if (!$request->user()->isAdmin()) {
             $collection->where('credentials.is_hidden', 0);
         }

@@ -17,8 +17,6 @@ use Tests\TestCase;
 
 class UndeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Nat $nat;
     protected FloatingIp $floatingIp;
     protected Nic $nic;

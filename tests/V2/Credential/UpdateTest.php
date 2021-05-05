@@ -4,13 +4,10 @@ namespace Tests\V2\Credential;
 
 use App\Models\V2\Credential;
 use App\Providers\EncryptionServiceProvider;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testValidDataSucceeds()
     {
         $credential = factory(Credential::class)->create();

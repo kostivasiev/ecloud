@@ -3,12 +3,9 @@
 namespace Tests\V1;
 
 use App\Models\V1\Solution;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class GetDrsRuleTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /**
      * Test for valid collection
      * @return void

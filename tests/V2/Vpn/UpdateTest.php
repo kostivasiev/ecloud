@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $vpn;
 
     public function setUp(): void

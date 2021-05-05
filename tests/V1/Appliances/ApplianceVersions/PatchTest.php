@@ -7,8 +7,6 @@ use Tests\V1\ApplianceTestCase;
 
 class PatchTest extends ApplianceTestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $task;
 
     public function setUp(): void

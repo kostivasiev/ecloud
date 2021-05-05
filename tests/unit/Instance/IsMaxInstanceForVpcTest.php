@@ -9,8 +9,6 @@ use UKFast\Api\Auth\Consumer;
 
 class IsMaxInstanceForVpcTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected IsMaxInstanceForVpc $validationRule;
 
     public function setUp(): void

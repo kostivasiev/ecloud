@@ -10,8 +10,6 @@ use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkPolicy $networkPolicy;
     protected NetworkRule $networkRule;
 

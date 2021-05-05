@@ -9,8 +9,6 @@ use Tests\V1\TestCase;
 
 class TriggerTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testPublicContractTriggerLoading()
     {
         $serverId = 123;

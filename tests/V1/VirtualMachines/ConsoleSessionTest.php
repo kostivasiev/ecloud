@@ -9,8 +9,6 @@ use Tests\V1\TestCase;
 
 class ConsoleSessionTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testValidRequest()
     {
         return $this->markTestSkipped('WIP');

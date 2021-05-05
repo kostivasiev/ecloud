@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallPolicy $policy;
     protected array $oldData;
 

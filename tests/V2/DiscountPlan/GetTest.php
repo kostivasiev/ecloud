@@ -14,9 +14,6 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected DiscountPlan $discountPlan;
 

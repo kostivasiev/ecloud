@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $mac_address;
     protected $ip_address;

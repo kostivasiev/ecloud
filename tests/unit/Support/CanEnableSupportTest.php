@@ -14,8 +14,6 @@ use UKFast\Api\Auth\Consumer;
 
 class CanEnableSupportTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected CanEnableSupport $canEnableSupport;
 
     public function setUp(): void

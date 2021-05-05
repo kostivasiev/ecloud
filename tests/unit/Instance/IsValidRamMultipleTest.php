@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class IsValidRamMultipleTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected IsValidRamMultiple $validator;
 
     public function setUp(): void

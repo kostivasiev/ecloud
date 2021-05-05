@@ -7,13 +7,10 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Dhcp */
     private $dhcp;
 

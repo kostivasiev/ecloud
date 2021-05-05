@@ -12,8 +12,6 @@ use UKFast\Api\Auth\Consumer;
 
 class IsNetworkNotFailedTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected IsNetworkAvailable $rule;
 
     public function setUp(): void

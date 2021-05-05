@@ -15,8 +15,6 @@ use UKFast\Admin\Devices\AdminClient;
 
 class DefaultPlatformTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $availability_zone;
     protected $network;

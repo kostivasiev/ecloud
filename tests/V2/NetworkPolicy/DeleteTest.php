@@ -9,8 +9,6 @@ use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

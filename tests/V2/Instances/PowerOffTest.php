@@ -9,8 +9,6 @@ use UKFast\Api\Auth\Consumer;
 
 class PowerOffTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testPowerOff()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));

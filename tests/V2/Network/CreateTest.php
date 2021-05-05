@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $region;
     protected $vpc;
     protected $router;

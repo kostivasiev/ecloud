@@ -3,9 +3,12 @@
 namespace Tests\V1;
 
 use Illuminate\Support\Facades\Event;
+use Tests\Traits\ResellerDatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
+    use ResellerDatabaseMigrations;
+
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
         'X-consumer-groups' => 'ecloud.read',

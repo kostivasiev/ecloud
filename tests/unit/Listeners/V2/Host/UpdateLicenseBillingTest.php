@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class UpdateLicenseBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Task $task;
 
     protected Product $product;

@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class RuntimePropertyTests extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $availability_zone;
     protected $instance;
     protected $region;

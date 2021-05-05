@@ -23,8 +23,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $dhcp;
 
     public function setUp(): void

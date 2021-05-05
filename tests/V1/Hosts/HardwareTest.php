@@ -12,8 +12,6 @@ use Tests\V1\TestCase;
 
 class HardwareTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function hostWithCredentialsDataProvider()
     {
         return [

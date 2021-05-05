@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class DefaultNameTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

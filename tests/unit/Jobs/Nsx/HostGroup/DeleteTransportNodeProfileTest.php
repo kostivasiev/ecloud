@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class DeleteTransportNodeProfileTest extends TestCase
 {
-    use DatabaseMigrations, TransportNodeProfile;
+    use TransportNodeProfile;
 
     protected $job;
     protected $hostGroup;

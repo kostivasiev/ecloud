@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Network;
 
-use App\Events\V2\Sync\Created;
+use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Network\Deploy;
 use App\Jobs\Network\DeployDiscoveryProfile;
@@ -18,8 +18,6 @@ use Tests\TestCase;
 
 class PrepareOSDiskTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

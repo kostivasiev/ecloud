@@ -19,8 +19,6 @@ use Tests\TestCase;
 
 class DeleteNatsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Nat $nat;
     protected FloatingIp $floatingIp;
     protected Nic $nic;

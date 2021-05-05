@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class UndeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testUndeployJob()
     {
         $this->kingpinServiceMock()->expects('get')
