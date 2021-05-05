@@ -44,12 +44,14 @@ class UndeployTest extends TestCase
                 return new Response(200);
             });
 
+        Event::fake();
+
         dispatch(new Undeploy($this->volume));
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testInstanceAttachedFails()
+    public function testDataVolumeWithInstanceAttachedFails()
     {
         Volume::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -62,8 +64,35 @@ class UndeployTest extends TestCase
             $this->instance()->volumes()->attach($this->volume);
         });
 
-        $this->expectException(\Exception::class);
+        Event::fake();
 
         dispatch(new Undeploy($this->volume));
+        
+        Event::assertDispatched(JobFailed::class);
+    }
+
+    public function testOSVolumeWithInstanceAttachedSucceeds()
+    {
+        Volume::withoutEvents(function() {
+            $this->volume = factory(Volume::class)->create([
+                'id' => 'vol-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'vmware_uuid' => 'uuid-test-uuid-test-uuid-test',
+                'os_volume' => true,
+            ]);
+        });
+
+        $this->kingpinServiceMock()->expects('delete')
+            ->withArgs(['/api/v2/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test'])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        Event::fake();
+
+        dispatch(new Undeploy($this->volume));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 }

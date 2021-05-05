@@ -47,7 +47,7 @@ class DeleteVolumesTest extends TestCase
         });
     }
 
-    public function testDeletesVolumeWithOnlyOneAttachment()
+    public function testDeletesOSVolume()
     {
         Model::withoutEvents(function() {
             $this->instance = factory(Instance::class)->create([
@@ -57,6 +57,7 @@ class DeleteVolumesTest extends TestCase
                 'id' => 'vol-test',
                 'vpc_id' => 'vpc-test',
                 'capacity' => 10,
+                'os_volume' => true,
             ]);
             $this->instance->volumes()->attach($this->volume);
         });
@@ -74,22 +75,19 @@ class DeleteVolumesTest extends TestCase
         $this->assertNotNull($this->volume->deleted_at);
     }
 
-    public function testDoesntDeleteVolumeWithMoreThanOneAttachment()
+    public function testDetachesDataVolume()
     {
         Model::withoutEvents(function() {
             $this->instance = factory(Instance::class)->create([
                 'id' => 'i-test1',
             ]);
-            $instance2 = factory(Instance::class)->create([
-                'id' => 'i-test2',
-            ]);
             $this->volume = factory(Volume::class)->create([
                 'id' => 'vol-test',
                 'vpc_id' => 'vpc-test',
                 'capacity' => 10,
+                'os_volume' => false,
             ]);
             $this->instance->volumes()->attach($this->volume);
-            $instance2->volumes()->attach($this->volume);
         });
 
         Event::fake();
