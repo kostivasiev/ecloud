@@ -35,7 +35,7 @@ class AwaitVolumeRemoval extends Job
                 }
             });
 
-            Log::warning($this->instance->volumes()->count() . ' Volumes(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->instance->id]);
+            Log::warning($this->instance->volumes()->count() . ' Volume(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->instance->id]);
             $this->release($this->backoff);
             return;
         }
