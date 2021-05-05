@@ -184,7 +184,7 @@ class InstanceController extends BaseController
                 'errors' => [
                     [
                         'title' => 'Not Found',
-                        'detail' => 'Credentials are not available until instance deployment is complete',
+                        'detail' => 'Credentials will be available when instance deployment is complete',
                         'status' => 404,
                     ]
                 ]
