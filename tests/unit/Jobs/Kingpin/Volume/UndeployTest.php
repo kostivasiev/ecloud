@@ -13,6 +13,7 @@ use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\QueryException;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -64,11 +65,9 @@ class UndeployTest extends TestCase
             $this->instance()->volumes()->attach($this->volume);
         });
 
-        Event::fake();
+        $this->expectException(\Exception::class);
 
         dispatch(new Undeploy($this->volume));
-
-        Event::assertDispatched(JobFailed::class);
     }
 
     public function testOSVolumeWithInstanceAttachedSucceeds()
