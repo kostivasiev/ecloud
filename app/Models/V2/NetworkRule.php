@@ -34,6 +34,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             'destination',
             'action',
             'enabled',
+            'type'
         ];
         $this->casts = [
             'sequence' => 'integer',
@@ -84,6 +85,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             $factory->create('destination', Filter::$stringDefaults),
             $factory->create('action', Filter::$stringDefaults),
             $factory->create('enabled', Filter::$numericDefaults),
+            $factory->create('type', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -100,6 +102,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             $factory->create('destination'),
             $factory->create('action'),
             $factory->create('enabled'),
+            $factory->create('type'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -123,6 +126,7 @@ class NetworkRule extends Model implements Filterable, Sortable
             'destination' => 'destination',
             'action' => 'action',
             'enabled' => 'enabled',
+            'type' => 'type',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

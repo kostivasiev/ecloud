@@ -29,6 +29,7 @@ class Deploy extends Job
 
         /**
          * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/d9f0d8ce-b56e-45fa-9d32-ad9b95baa071/bd4b6353-6bbf-45ca-b7ef-3fa6c4905e94/api_includes/method_UpdateSecurityPolicyForDomain.html
+         * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/d9f0d8ce-b56e-45fa-9d32-ad9b95baa071/bd4b6353-6bbf-45ca-b7ef-3fa6c4905e94/api_includes/types_Rule.html
          */
         $availabilityZone->nsxService()->patch(
             '/policy/api/v1/infra/domains/default/security-policies/' . $this->networkPolicy->id,
@@ -86,6 +87,7 @@ class Deploy extends Job
                                 '/infra/domains/default/groups/' . $this->networkPolicy->id,
                             ],
                             'ip_protocol' => 'IPV4_IPV6',
+                            'disabled' => !$rule->enabled,
                         ];
                     })->toArray()
                 ]
