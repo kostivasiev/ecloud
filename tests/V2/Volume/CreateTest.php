@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $volume;
 
     public function setUp(): void

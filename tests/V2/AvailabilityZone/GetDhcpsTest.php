@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetDhcpsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Dhcp $dhcp;
 
     public function setUp(): void

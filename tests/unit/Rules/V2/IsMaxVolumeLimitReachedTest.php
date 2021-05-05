@@ -13,8 +13,6 @@ use UKFast\Api\Auth\Consumer;
 
 class IsMaxVolumeLimitReachedTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testLimits()
     {
         $volume = null;

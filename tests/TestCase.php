@@ -29,11 +29,11 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Traits\ResellerDatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
-    use DatabaseMigrations,
+    use ResellerDatabaseMigrations,
         Mocks\Host\Mocks;
 
     /**

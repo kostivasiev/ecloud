@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class ScopingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public RouterThroughput $routerThroughput;
 
     public function setUp(): void

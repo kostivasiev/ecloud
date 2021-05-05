@@ -18,8 +18,6 @@ use Tests\TestCase;
 
 class UndeployCheckTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $dhcp;
 
     public function setUp(): void

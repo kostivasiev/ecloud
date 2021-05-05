@@ -2,13 +2,10 @@
 
 namespace Tests\V1\Appliances\Pods;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\ApplianceTestCase;
 
 class GetTest extends ApplianceTestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

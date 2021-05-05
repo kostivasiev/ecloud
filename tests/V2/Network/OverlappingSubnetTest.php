@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class OverlappingSubnetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected AvailabilityZone $availabilityZone;
     protected Network $network;
     protected Region $region;

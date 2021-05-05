@@ -6,13 +6,10 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetRoutersTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected AvailabilityZone $availabilityZone;
     protected Router $router;

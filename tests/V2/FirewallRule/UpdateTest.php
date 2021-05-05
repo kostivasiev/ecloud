@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallRule $firewall_rule;
 
     public function setUp(): void

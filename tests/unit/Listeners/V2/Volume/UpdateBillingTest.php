@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class UpdateBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Volume $volume;
     protected Task $task;
     protected Instance $instance;

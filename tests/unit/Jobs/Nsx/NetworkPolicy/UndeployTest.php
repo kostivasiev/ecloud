@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class UndeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkRule $networkRule;
     protected NetworkRulePort $networkRulePort;
 

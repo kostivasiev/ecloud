@@ -17,8 +17,6 @@ use Tests\TestCase;
 
 class DeletionRulesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected AvailabilityZone $availability_zone;
     protected Region $region;
 

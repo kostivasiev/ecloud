@@ -11,8 +11,6 @@ use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkRule $networkRule;
     protected NetworkRulePort $networkRulePort;
 

@@ -10,8 +10,6 @@ use UKFast\Api\Auth\Consumer;
 
 class CrudTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

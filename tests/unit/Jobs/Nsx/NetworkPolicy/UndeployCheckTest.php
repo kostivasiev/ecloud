@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class UndeployCheckTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

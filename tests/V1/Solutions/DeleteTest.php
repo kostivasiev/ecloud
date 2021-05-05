@@ -9,8 +9,6 @@ use Tests\V1\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

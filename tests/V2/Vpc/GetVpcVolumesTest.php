@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetVpcVolumesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public $volumes;
 
     public function setUp(): void

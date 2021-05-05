@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class DeployCheckTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Task $task;
 
     public function testFirewallPolicyRealizedNotReleasedAndSucceeds()

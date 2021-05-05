@@ -4,13 +4,10 @@ namespace Tests\V1\Datastores;
 
 use App\Models\V1\Datastore;
 use App\Models\V1\Pod;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

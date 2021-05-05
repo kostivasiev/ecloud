@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class VpcHasResourcesValidationTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Vpc */
     private $vpc;
     private $validator;

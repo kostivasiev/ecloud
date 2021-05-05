@@ -3,13 +3,10 @@
 namespace Tests\V1\HostSets;
 
 use App\Models\V1\HostSet;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

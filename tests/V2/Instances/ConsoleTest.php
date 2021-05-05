@@ -14,8 +14,6 @@ use UKFast\Api\Auth\Consumer;
 
 class ConsoleTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testFailedSessionResponse()
     {
         $this->kingpinServiceMock()

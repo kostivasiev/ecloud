@@ -3,13 +3,10 @@
 namespace Tests\unit\FirewallRule;
 
 use App\Rules\V2\ValidIpFormatCsvString;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class ValidIpFormatCsvStringTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $validator;
 
     public function setUp(): void
