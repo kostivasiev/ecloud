@@ -25,7 +25,7 @@ class CreateDefaultNetworkRules extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->networkPolicy->id]);
 
         if ($this->networkPolicy->networkRules()->where('type', 'DHCP_Ingress')->orWhere('type', 'DHCP_Egress')->count() > 0) {
-            Log::info('Default DHCP rules already exists, nothing to do');
+            Log::info('Default network rules already exists, nothing to do');
             return true;
         }
 

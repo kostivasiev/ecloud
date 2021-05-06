@@ -89,6 +89,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('network-policies', 'NetworkPolicyController@index');
         $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
         $router->post('network-policies', 'NetworkPolicyController@store');
         $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
         $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
