@@ -10,6 +10,7 @@ use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
