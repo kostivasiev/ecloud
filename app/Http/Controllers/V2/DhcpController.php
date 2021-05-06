@@ -5,10 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Task;
-use App\Models\V2\Vpc;
 use App\Resources\V2\DhcpResource;
-use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -25,7 +22,7 @@ class DhcpController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Dhcp::forUser($request->user());
+        $collection = Dhcp::query();
 
         $queryTransformer->config(Dhcp::class)
             ->transform($collection);
@@ -39,10 +36,10 @@ class DhcpController extends BaseController
      * @param string $dhcpId
      * @return DhcpResource
      */
-    public function show(Request $request, string $dhcpId)
+    public function show(string $dhcpId)
     {
         return new DhcpResource(
-            Dhcp::forUser($request->user())->findOrFail($dhcpId)
+            Dhcp::findOrFail($dhcpId)
         );
     }
 
@@ -65,7 +62,7 @@ class DhcpController extends BaseController
      */
     public function update(UpdateDhcpRequest $request, string $dhcpId)
     {
-        $dhcp = Dhcp::forUser($request->user())->findOrFail($dhcpId);
+        $dhcp = Dhcp::findOrFail($dhcpId);
         $dhcp->fill($request->only(['name']));
 
         $dhcp->withTaskLock(function ($dhcp) {
@@ -75,9 +72,9 @@ class DhcpController extends BaseController
         return $this->responseIdMeta($request, $dhcp->id, 202);
     }
 
-    public function destroy(Request $request, string $dhcpId)
+    public function destroy(string $dhcpId)
     {
-        $dhcp = Dhcp::forUser($request->user())->findOrFail($dhcpId);
+        $dhcp = Dhcp::findOrFail($dhcpId);
 
         $dhcp->withTaskLock(function ($dhcp) {
             $dhcp->delete();

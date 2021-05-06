@@ -10,7 +10,6 @@ use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
-use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
@@ -85,15 +84,5 @@ class UpdateTest extends TestCase
 
         $dhcp = Dhcp::findOrFail($this->dhcp->id);
         $this->assertEquals($data['name'], $dhcp->name);
-    }
-
-    public function testDoesntUpdateNonOwnedDhcp()
-    {
-        $this->be(new Consumer(2, [config('app.name') . '.read']));
-
-        $response = $this->patch('/v2/dhcps/' .$this->dhcp->id, [
-            'name' => 'Updated Name',
-        ]);
-        $response->assertResponseStatus(404);
     }
 }
