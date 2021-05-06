@@ -26,8 +26,9 @@ class MaxVpcValidationTest extends TestCase
 
     public function testRuleFails()
     {
+        config(['defaults.vpc.max_count' => 10]);
         $counter = 1;
-        factory(Vpc::class, config('defaults.vpc.max_count', 20))
+        factory(Vpc::class, config('defaults.vpc.max_count'))
             ->make([
                 'reseller_id' => 1,
                 'region_id' => $this->region()->id,
