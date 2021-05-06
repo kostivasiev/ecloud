@@ -4,6 +4,7 @@ namespace App\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
+use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -29,6 +30,7 @@ class Deploy extends Job
 
         /**
          * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/d9f0d8ce-b56e-45fa-9d32-ad9b95baa071/bd4b6353-6bbf-45ca-b7ef-3fa6c4905e94/api_includes/method_UpdateSecurityPolicyForDomain.html
+         * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/d9f0d8ce-b56e-45fa-9d32-ad9b95baa071/bd4b6353-6bbf-45ca-b7ef-3fa6c4905e94/api_includes/types_Rule.html
          */
         $availabilityZone->nsxService()->patch(
             '/policy/api/v1/infra/domains/default/security-policies/' . $this->networkPolicy->id,
@@ -37,7 +39,6 @@ class Deploy extends Job
                     'resource_type' => 'SecurityPolicy',
                     'id' => $this->networkPolicy->id,
                     'display_name' => $this->networkPolicy->id,
-                    //'sequence_number' => $this->networkPolicy->sequence,
                     'category' => 'Application',
                     'stateful' => true,
                     'tcp_strict' => true,
@@ -53,9 +54,10 @@ class Deploy extends Job
                             'sequence_number' => $rule->sequence,
                             'source_groups' => explode(',', $rule->source),
                             'destination_groups' => explode(',', $rule->destination),
-                            'services' => [
-                                'ANY'
-                            ],
+                            'services' => in_array($rule->type, [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS]) ? [
+                                '/infra/services/DHCP-Client',
+                                '/infra/services/DHCP-Server'
+                            ] : ['ANY'],
                             'service_entries' => $rule->networkRulePorts->map(function ($port) {
                                 if ($port->protocol == 'ICMPv4') {
                                     return [
@@ -82,11 +84,13 @@ class Deploy extends Job
                             'profiles' => [
                                 'ANY'
                             ],
+                            'direction' => $rule->direction ?? 'IN_OUT',
                             'logged' => false,
                             'scope' => [
-                                'ANY'
+                                '/infra/domains/default/groups/' . $this->networkPolicy->id,
                             ],
                             'ip_protocol' => 'IPV4_IPV6',
+                            'disabled' => !$rule->enabled,
                         ];
                     })->toArray()
                 ]

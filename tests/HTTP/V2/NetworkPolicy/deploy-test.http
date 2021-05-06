@@ -67,6 +67,36 @@ client.test('Create a Network Policy', function () {
 %}
 
 ###
+GET https://{{host}}/{{version}}/network-policies/{{network_policy_id}}/network-rules
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+###
+# Create a Network Policy
+PATCH https://{{host}}/{{version}}/network-policies/{{network_policy_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test Policy - PM RENAMED"
+}
+
+> {%
+client.test('Create a Network Policy', function () {
+    client.assert(response.status === 202, '202 response not received');
+    client.global.set('network_policy_id', response.body.data.id);
+    client.log('Policy ID: ' + response.body.data.id);
+});
+%}
+
+###
 # Create a Rule
 POST https://{{host}}/{{version}}/network-rules
 Accept: */*
@@ -178,7 +208,7 @@ client.test('CLEANUP - Delete Network', function () {
 
 ###
 # CLEANUP - DELETE Router
-DELETE https://{{host}}/{{version}}/routers/{{router_id}}
+DELETE https://{{host}}/{{version}}/routers/rtr-211ad4f3
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

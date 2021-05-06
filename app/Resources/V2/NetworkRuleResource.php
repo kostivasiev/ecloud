@@ -19,6 +19,7 @@ class NetworkRuleResource extends UKFastResource
             'destination' => $this->destination,
             'action' => $this->action,
             'enabled' => $this->enabled,
+            'type' => $this->type,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))
