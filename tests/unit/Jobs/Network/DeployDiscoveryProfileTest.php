@@ -16,8 +16,6 @@ use Tests\TestCase;
 
 class DeployDiscoveryProfileTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

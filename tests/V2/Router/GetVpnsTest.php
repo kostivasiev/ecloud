@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class GetVpnsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected Region $region;
     protected Router $router;

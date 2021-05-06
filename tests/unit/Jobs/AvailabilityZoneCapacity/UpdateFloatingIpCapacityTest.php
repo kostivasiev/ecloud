@@ -17,8 +17,6 @@ use Tests\TestCase;
 
 class UpdateFloatingIpCapacityTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FloatingIp $floatingIp;
     protected $mockNetworkAdminClient;
     protected $mockAdminIpRangeClient;

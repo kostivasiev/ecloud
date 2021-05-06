@@ -4,17 +4,16 @@ namespace Tests\unit\Jobs\Sync\Dhcp;
 
 use App\Jobs\Sync\Dhcp\Update;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use Illuminate\Bus\PendingBatch;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
-    private $sync;
+    private $task;
 
     public function setUp(): void
     {
@@ -23,19 +22,19 @@ class UpdateTest extends TestCase
 
     public function testJobsBatched()
     {
-        Sync::withoutEvents(function() {
+        Model::withoutEvents(function() {
             $dhcp = factory(Dhcp::class)->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => 'vpc-test',
             ]);
-            $this->sync = new Sync([
-                'id' => 'sync-1',
+            $this->task = new Task([
+                'id' => 'task-1',
             ]);
-            $this->sync->resource()->associate($dhcp);
+            $this->task->resource()->associate($dhcp);
         });
 
         Bus::fake();
-        $job = new Update($this->sync);
+        $job = new Update($this->task);
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {

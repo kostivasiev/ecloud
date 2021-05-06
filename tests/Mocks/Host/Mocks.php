@@ -5,6 +5,7 @@ namespace Tests\Mocks\Host;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 
 trait Mocks
 {
@@ -14,12 +15,13 @@ trait Mocks
     public function host()
     {
         if (!$this->host) {
-            $this->createHostMocks();
-            $this->host = factory(\App\Models\V2\Host::class)->create([
-                'id' => 'h-test',
-                'name' => 'h-test',
-                'host_group_id' => $this->hostGroup()->id,
-            ]);
+            $this->host = Model::withoutEvents(function() {
+               return factory(\App\Models\V2\Host::class)->create([
+                   'id' => 'h-test',
+                   'name' => 'h-test',
+                   'host_group_id' => $this->hostGroup()->id,
+               ]);
+            });
         }
         return $this->host;
     }
@@ -190,19 +192,6 @@ trait Mocks
                 ]));
             });
         return $this;
-    }
-
-    /**
-     * Mock that the host already exists on Update, so that we don't run the create jobs
-     * @param string $id
-     */
-    protected function syncSaveIdempotent($id = 'h-test')
-    {
-        $this->conjurerServiceMock()->expects('get')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/' . $id])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
     }
 
     private function getHostResponse()

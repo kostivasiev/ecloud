@@ -3,7 +3,7 @@
 namespace App\Jobs\Vpc;
 
 use App\Jobs\Job;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use App\Models\V2\Vpc;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;

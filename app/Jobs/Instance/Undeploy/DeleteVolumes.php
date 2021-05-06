@@ -25,16 +25,13 @@ class DeleteVolumes extends Job
 
         $instance = $this->instance;
 
-        // TODO: Check whether volumes are configured for removal on instance deletion. For now, we'll assume
-        //       volume is to be deleted if connected to just this instance
         $instance->volumes()->each(function ($volume) use ($instance) {
-            if ($volume->instances()->count() == 1) {
-                Log::info('Detaching volume ' . $volume->id);
-                Model::withoutEvents(function () use ($instance, $volume) {
-                    $instance->volumes()->detach($volume->id);
-                });
-                Log::info('Deleting volume ' . $volume->id);
+            if ($volume->os_volume) {
+                Log::info('Deleting OS volume ' . $volume->id);
                 $volume->delete();
+            } else {
+                Log::info('Detaching data volume ' . $volume->id);
+                $instance->volumes()->detach($volume->id);
             }
         });
 

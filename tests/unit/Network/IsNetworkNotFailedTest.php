@@ -2,16 +2,16 @@
 namespace Tests\unit\Network;
 
 use App\Models\V2\Network;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
 use App\Rules\V2\IsNetworkAvailable;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class IsNetworkNotFailedTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected IsNetworkAvailable $rule;
 
     public function setUp(): void
@@ -24,11 +24,12 @@ class IsNetworkNotFailedTest extends TestCase
     public function testFailedNetwork()
     {
         // Force failure
-        Sync::withoutEvents(function () {
-            $model = new Sync([
+        Model::withoutEvents(function () {
+            $model = new Task([
                 'id' => 'sync-test',
                 'failure_reason' => 'Unit Test Failure',
                 'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $model->resource()->associate($this->network());
             $model->save();

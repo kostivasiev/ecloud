@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class CreateTransportNodeTest extends TestCase
 {
-    use DatabaseMigrations, TransportNodeProfile;
+    use TransportNodeProfile;
 
     protected $job;
     protected $hostGroup;

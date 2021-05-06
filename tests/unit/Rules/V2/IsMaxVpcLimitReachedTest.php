@@ -6,14 +6,11 @@ use App\Http\Middleware\IsMaxVpcForCustomer;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class IsMaxVpcLimitReachedTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testMaxLimitReachedReturnsFails()
     {
         $vpc = null;

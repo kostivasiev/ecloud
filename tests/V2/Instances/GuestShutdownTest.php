@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class GuestShutdownTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

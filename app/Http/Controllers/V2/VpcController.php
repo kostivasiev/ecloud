@@ -9,10 +9,12 @@ use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
@@ -85,7 +87,7 @@ class VpcController extends BaseController
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
 
-        $vpc->withSyncLock(function ($vpc) {
+        $vpc->withTaskLock(function ($vpc) {
             $vpc->save();
         });
 
@@ -99,7 +101,7 @@ class VpcController extends BaseController
             return $vpc->getDeletionError();
         }
 
-        $vpc->withSyncLock(function ($vpc) {
+        $vpc->withTaskLock(function ($vpc) {
             $vpc->delete();
         });
 
@@ -124,6 +126,17 @@ class VpcController extends BaseController
             ->transform($collection);
 
         return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    {
+        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

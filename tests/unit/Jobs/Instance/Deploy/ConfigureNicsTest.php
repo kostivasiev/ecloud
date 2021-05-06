@@ -18,8 +18,6 @@ use Tests\TestCase;
 
 class ConfigureNicsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

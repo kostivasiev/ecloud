@@ -3,14 +3,11 @@ namespace Tests\unit\Instance;
 
 use App\Http\Middleware\IsMaxInstanceForCustomer;
 use Illuminate\Support\Facades\Config;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class IsMaxInstanceForCustomerTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $validationRule;
 
     public function setUp(): void

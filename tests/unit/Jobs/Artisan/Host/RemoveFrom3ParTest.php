@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\Artisan\Host;
 use App\Jobs\Artisan\Host\RemoveFrom3Par;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
@@ -16,8 +15,6 @@ use Tests\TestCase;
 
 class RemoveFrom3ParTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $job;
     protected Host $host;
 

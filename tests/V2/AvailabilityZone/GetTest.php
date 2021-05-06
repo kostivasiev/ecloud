@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testGetCollectionAsAdmin()
     {
         // Availability Zone only visible to admins

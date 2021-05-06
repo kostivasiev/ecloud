@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class NatTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $instance;
     protected $floating_ip;

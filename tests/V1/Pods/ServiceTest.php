@@ -8,8 +8,6 @@ use Tests\V1\TestCase;
 
 class ServiceTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /**
      * Test service enabled
      * @return void

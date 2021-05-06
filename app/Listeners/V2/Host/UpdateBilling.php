@@ -1,10 +1,10 @@
 <?php
 namespace App\Listeners\V2\Host;
 
-use App\Events\V2\Sync\Updated;
+use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -21,10 +21,15 @@ class UpdateBilling
 
         $sync = $event->model;
 
-        if (!$sync->completed
-            || $sync->type != Sync::TYPE_UPDATE
-            || !($sync->resource instanceof Host)
-        ) {
+        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+            return;
+        }
+
+        if (!$event->model->completed) {
+            return;
+        }
+
+        if (!($sync->resource instanceof Host)) {
             return;
         }
 

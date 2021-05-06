@@ -56,7 +56,7 @@ class NicController extends BaseController
         ]));
         $this->validate($request, ['ip_address' => [new IpAvailable($nic->network_id)]]);
 
-        $nic->withSyncLock(function ($nic) {
+        $nic->withTaskLock(function ($nic) {
             $nic->save();
         });
 
@@ -67,7 +67,7 @@ class NicController extends BaseController
     {
         $nic = Nic::forUser($request->user())->findOrFail($nicId);
 
-        $nic->withSyncLock(function ($nic) {
+        $nic->withTaskLock(function ($nic) {
             $nic->delete();
         });
 

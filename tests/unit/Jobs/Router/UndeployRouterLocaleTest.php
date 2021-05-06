@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class UndeployRouterLocaleTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Router $router;
 
     public function setUp(): void

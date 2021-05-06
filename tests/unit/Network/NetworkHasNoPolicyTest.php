@@ -4,14 +4,13 @@ namespace Tests\unit\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Rules\V2\NetworkHasNoPolicy;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class NetworkHasNoPolicyTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected NetworkHasNoPolicy $rule;
 
     public function setUp(): void
@@ -55,10 +54,12 @@ class NetworkHasNoPolicyTest extends TestCase
     public function testRuleFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        factory(NetworkPolicy::class)->create([
-            'id' => 'np-test',
-            'network_id' => $this->network()->id,
-        ]);
+        Model::withoutEvents(function () {
+            factory(NetworkPolicy::class)->create([
+                'id' => 'np-test',
+                'network_id' => $this->network()->id,
+            ]);
+        });
         $this->assertFalse($this->rule->passes('', $this->network()->id));
     }
 }

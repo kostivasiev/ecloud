@@ -4,7 +4,8 @@ namespace Tests\unit\Jobs\Conjurer\Host;
 use App\Jobs\Conjurer\Host\DeleteServiceProfile;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
@@ -15,17 +16,16 @@ use Tests\TestCase;
 
 class DeleteServiceProfileTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Host $host;
     protected $job;
 
     public function setUp(): void
     {
         parent::setUp();
-        app()->bind(Sync::class, function () {
-            return new Sync([
+        app()->bind(Task::class, function () {
+            return new Task([
                 'id' => 'sync-test',
+                'name' => Sync::TASK_NAME_DELETE,
             ]);
         });
         $this->host = Host::withoutEvents(function () {
@@ -42,7 +42,7 @@ class DeleteServiceProfileTest extends TestCase
                 'host_group_id' => $hostGroup->id,
             ]);
         });
-        $this->job = \Mockery::mock(DeleteServiceProfile::class, [$this->host])->makePartial();
+        $this->job = new DeleteServiceProfile($this->host);
     }
 
     public function testDeleteHostDoesNotExist()
@@ -51,10 +51,7 @@ class DeleteServiceProfileTest extends TestCase
             ->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
             ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(404)));
-        Log::shouldReceive('info')
-            ->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('warning')
-            ->withSomeOfArgs(get_class($this->job) . ' : Service Profile for Host h-test not found, skipping.');
+
         $this->assertFalse($this->job->handle());
     }
 

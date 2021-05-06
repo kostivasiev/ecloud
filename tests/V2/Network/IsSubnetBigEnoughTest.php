@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class IsSubnetBigEnoughTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected IsSubnetBigEnough $validator;
 
     public function setUp(): void

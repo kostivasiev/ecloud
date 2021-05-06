@@ -11,8 +11,6 @@ use Tests\V1\TestCase;
 
 class PostTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

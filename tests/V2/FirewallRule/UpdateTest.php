@@ -4,13 +4,12 @@ namespace Tests\V2\FirewallRule;
 
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallRule $firewall_rule;
 
     public function setUp(): void
@@ -34,27 +33,6 @@ class UpdateTest extends TestCase
         $this->firewall_rule = factory(FirewallRule::class)->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
-    }
-
-    public function testValidDataSucceeds()
-    {
-        $this->patch(
-            '/v2/firewall-rules/' . $this->firewall_rule->id,
-            [
-                'name' => 'Changed',
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeInDatabase('firewall_rules',
-                [
-                    'id' => $this->firewall_rule->id,
-                    'name' => 'Changed'
-                ],
-                'ecloud')
-            ->assertResponseStatus(202);
     }
 
     public function testEmptySourceFails()

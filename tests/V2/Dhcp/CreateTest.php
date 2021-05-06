@@ -7,13 +7,10 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Region */
     private $region;
 
@@ -61,27 +58,6 @@ class CreateTest extends TestCase
         ])->seeJson([
             'title' => 'Validation Error',
             'detail' => 'The vpc id field is required',
-            'status' => 422,
-            'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
-    }
-
-    public function testNotOwnedVpcIsFailed()
-    {
-        Model::withoutEvents(function() {
-            $this->vpc()->reseller_id = 3;
-            $this->vpc()->save();
-
-        });
-
-        $this->post('/v2/dhcps', [
-            'vpc_id' => $this->vpc()->id,
-        ], [
-            'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
         ])->assertResponseStatus(422);

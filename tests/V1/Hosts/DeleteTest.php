@@ -5,13 +5,10 @@ namespace Tests\V1\Hosts;
 use App\Models\V1\Host;
 use App\Models\V1\Pod;
 use App\Models\V1\Solution;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /**
      * Test for deleting a host with no SAN mapped to the solution
      * @return void

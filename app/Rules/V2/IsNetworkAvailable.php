@@ -2,7 +2,7 @@
 namespace App\Rules\V2;
 
 use App\Models\V2\Network;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 

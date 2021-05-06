@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\NetworkRule\Create;
 use App\Http\Requests\V2\NetworkRule\Update;
 use App\Models\V2\NetworkRule;
@@ -43,9 +43,9 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
 
-        $networkRule->networkPolicy->withSyncLock(function () use ($request, $networkRule) {
-            if (!$networkRule->networkPolicy->canSync()) {
-                throw new SyncException();
+        $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
+            if (!$networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $networkRule->save();
@@ -68,9 +68,9 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
 
-        $networkRule->networkPolicy->withSyncLock(function () use ($request, $networkRule) {
-            if (!$networkRule->networkPolicy->canSync()) {
-                throw new SyncException();
+        $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
+            if (!$networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $networkRule->save();
@@ -85,9 +85,9 @@ class NetworkRuleController extends BaseController
     {
         $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
             
-        $networkRule->networkPolicy->withSyncLock(function () use ($networkRule) {
-            if (!$networkRule->networkPolicy->canSync()) {
-                throw new SyncException();
+        $networkRule->networkPolicy->withTaskLock(function () use ($networkRule) {
+            if (!$networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $networkRule->networkRulePorts->each(function ($port) {

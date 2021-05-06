@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Queue\PopulateFailedJobsUuids::class,
         \App\Console\Commands\Artisan\TestAuth::class,
         \App\Console\Commands\Host\Delete::class,
+        \App\Console\Commands\Billing\ProductCreate::class,
     ];
 
     /**

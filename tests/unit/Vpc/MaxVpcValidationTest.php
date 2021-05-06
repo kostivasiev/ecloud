@@ -4,13 +4,11 @@ namespace Tests\unit\Vpc;
 
 use App\Http\Middleware\IsMaxVpcForCustomer;
 use App\Models\V2\Vpc;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class MaxVpcValidationTest extends TestCase
 {
-    use DatabaseMigrations;
 
     protected $rule;
 

@@ -26,6 +26,6 @@ class GpuProfileTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('gpu_profile');
+        Schema::connection('ecloud')->dropIfExists('gpu_profile');
     }
 }

@@ -3,13 +3,10 @@
 namespace Tests\V2\Credential;
 
 use App\Models\V2\Credential;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Credential */
     private $credential;
 

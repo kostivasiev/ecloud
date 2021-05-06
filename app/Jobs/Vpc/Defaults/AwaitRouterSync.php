@@ -4,7 +4,7 @@ namespace App\Jobs\Vpc\Defaults;
 
 use App\Jobs\Job;
 use App\Models\V2\Router;
-use App\Models\V2\Sync;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Log;
 
 class AwaitRouterSync extends Job

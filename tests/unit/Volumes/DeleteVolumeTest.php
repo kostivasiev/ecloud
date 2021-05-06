@@ -5,12 +5,10 @@ namespace Tests\unit\Volumes;
 use App\Jobs\Kingpin\Volume\Undeploy;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteVolumeTest extends TestCase
 {
-    use DatabaseMigrations;
     protected $job;
     protected Volume $volume;
 
