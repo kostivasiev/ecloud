@@ -4,6 +4,8 @@
  * v2 Routes
  */
 
+use Laravel\Lumen\Routing\Router;
+
 $middleware = [
     'auth',
     'paginator-limit:' . env('PAGINATION_LIMIT')
@@ -15,7 +17,7 @@ $baseRouteParameters = [
     'middleware' => $middleware
 ];
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+/** @var Router $router */
 $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
     $router->get('availability-zones', 'AvailabilityZoneController@index');
@@ -91,6 +93,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('network-policies', 'NetworkPolicyController@index');
         $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
         $router->post('network-policies', 'NetworkPolicyController@store');
         $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
         $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
@@ -101,7 +104,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('network-rules', 'NetworkRuleController@index');
         $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
         $router->post('network-rules', 'NetworkRuleController@store');
-        $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        $router->group(['middleware' => 'can-edit-rule'], function () use ($router) {
+            $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        });
         $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
     });
 

@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeployTest extends TestCase
@@ -48,23 +47,6 @@ class DeployTest extends TestCase
 
     public function testPolicyWithRulesDeploys()
     {
-        Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
-                'id' => 'nr-test-1',
-                'name' => 'nr-test-1',
-            ]);
-
-            $networkRule->networkRulePorts()->create([
-                'id' => 'nrp-test',
-                'name' => 'nrp-test',
-                'protocol' => 'TCP',
-                'source' => '443',
-                'destination' => '555',
-            ]);
-
-            $this->networkPolicy()->networkRules()->save($networkRule);
-        });
-
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
                 '/policy/api/v1/infra/domains/default/security-policies/np-test',
@@ -77,7 +59,7 @@ class DeployTest extends TestCase
                         'stateful' => true,
                         'tcp_strict' => true,
                         'scope' => [
-                            '/infra/domains/default/groups/np-test',
+                            '/infra/domains/default/groups/np-test'
                         ],
                         'rules' => [
                             [
@@ -112,11 +94,13 @@ class DeployTest extends TestCase
                                 'profiles' => [
                                     'ANY'
                                 ],
+                                'direction' => 'IN_OUT',
                                 'logged' => false,
                                 'scope' => [
-                                    'ANY'
+                                    '/infra/domains/default/groups/np-test'
                                 ],
                                 'ip_protocol' => 'IPV4_IPV6',
+                                'disabled' => false
                             ]
                         ]
                     ]
@@ -125,6 +109,24 @@ class DeployTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
+
+
+        Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-test-1',
+                'name' => 'nr-test-1',
+            ]);
+
+            $networkRule->networkRulePorts()->create([
+                'id' => 'nrp-test',
+                'name' => 'nrp-test',
+                'protocol' => 'TCP',
+                'source' => '443',
+                'destination' => '555',
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+        });
 
         Event::fake([JobFailed::class]);
 

@@ -96,6 +96,7 @@ $app->routeMiddleware([
     'customer-max-vpc' => \App\Http\Middleware\IsMaxVpcForCustomer::class,
     'customer-max-instance' => \App\Http\Middleware\IsMaxInstanceForCustomer::class,
     'can-detach' => \App\Http\Middleware\CanDetach::class,
+    'can-edit-rule' => \App\Http\Middleware\NetworkRule\CanEdit::class,
 ]);
 
 /*

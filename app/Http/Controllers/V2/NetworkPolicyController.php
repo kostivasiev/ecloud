@@ -5,6 +5,7 @@ use App\Http\Requests\V2\NetworkPolicy\Create;
 use App\Http\Requests\V2\NetworkPolicy\Update;
 use App\Models\V2\NetworkPolicy;
 use App\Resources\V2\NetworkPolicyResource;
+use App\Resources\V2\NetworkRuleResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -63,5 +64,16 @@ class NetworkPolicyController extends BaseController
         });
 
         return response('', 202);
+    }
+
+    public function networkRules(Request $request, QueryTransformer $queryTransformer, string $networkPolicyId)
+    {
+        $collection = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId)->networkRules();
+        $queryTransformer->config(NetworkPolicy::class)
+            ->transform($collection);
+
+        return NetworkRuleResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
