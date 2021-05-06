@@ -60,28 +60,28 @@ class UpdateTest extends TestCase
         Model::withoutEvents(function () {
             $this->dhcpIngressNetworkRule = factory(NetworkRule::class)->make([
                 'id' => 'nr-' . uniqid(),
-                'name' => 'DHCP_Ingress',
+                'name' => NetworkRule::TYPE_DHCP_INGRESS,
                 'sequence' => 5001,
                 'source' =>  '10.0.0.2',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
                 'direction' => 'IN',
                 'enabled' => true,
-                'type' => 'DHCP_Ingress',
+                'type' => NetworkRule::TYPE_DHCP_INGRESS,
             ]);
 
             $this->networkPolicy()->networkRules()->save($this->dhcpIngressNetworkRule);
 
             $this->dhcpEgressNetworkRule = factory(NetworkRule::class)->make([
                 'id' => 'nr-' . uniqid(),
-                'name' => 'DHCP_Egress',
+                'name' => NetworkRule::TYPE_DHCP_EGRESS,
                 'sequence' => 5002,
                 'source' =>  'ANY',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
                 'direction' => 'OUT',
                 'enabled' => true,
-                'type' => 'DHCP_Egress',
+                'type' => NetworkRule::TYPE_DHCP_EGRESS,
             ]);
 
             $this->networkPolicy()->networkRules()->save($this->dhcpEgressNetworkRule);

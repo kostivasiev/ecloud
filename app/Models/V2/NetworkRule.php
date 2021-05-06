@@ -20,10 +20,8 @@ class NetworkRule extends Model implements Filterable, Sortable
 
     public string $keyPrefix = 'nr';
 
-    const LOCKED_RULE_TYPES = [
-        'DHCP_Ingress',
-        'DHCP_Egress'
-    ];
+    const TYPE_DHCP_INGRESS = 'dhcp_ingress';
+    const TYPE_DHCP_EGRESS = 'dhcp_egress';
 
     public function __construct(array $attributes = [])
     {

@@ -4,6 +4,7 @@ namespace App\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
+use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -53,7 +54,7 @@ class Deploy extends Job
                             'sequence_number' => $rule->sequence,
                             'source_groups' => explode(',', $rule->source),
                             'destination_groups' => explode(',', $rule->destination),
-                            'services' => in_array($rule->type, ['DHCP_Ingress', 'DHCP_Egress']) ? [
+                            'services' => in_array($rule->type, [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS]) ? [
                                 '/infra/services/DHCP-Client',
                                 '/infra/services/DHCP-Server'
                             ] : ['ANY'],
