@@ -8,6 +8,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
@@ -55,5 +56,22 @@ class GetTest extends TestCase
             'id' => $this->dhcp->id,
             'vpc_id' => $this->dhcp->vpc_id,
         ])->assertResponseStatus(200);
+    }
+
+    public function testDoesntShowNonOwnedDhcps()
+    {
+        $this->be(new Consumer(2, [config('app.name') . '.read']));
+
+        $response = $this->get('/v2/dhcps');
+        $response->assertResponseStatus(200);
+        $this->assertEquals(0, count($response->response->json()['data']));
+    }
+
+    public function testDoesntShowNonOwnedDhcp()
+    {
+        $this->be(new Consumer(2, [config('app.name') . '.read']));
+
+        $response = $this->get('/v2/dhcps/' . $this->dhcp->id);
+        $response->assertResponseStatus(404);
     }
 }

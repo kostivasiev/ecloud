@@ -12,6 +12,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
@@ -90,5 +91,13 @@ class DeleteTest extends TestCase
         Event::assertDispatched(Deleted::class, function ($job) {
             return $job->model->id === $this->dhcp->id;
         });
+    }
+
+    public function testDoesntDeleteNonOwnedDhcp()
+    {
+        $this->be(new Consumer(2, [config('app.name') . '.read']));
+
+        $response = $this->delete('/v2/dhcps/' .$this->dhcp->id);
+        $response->assertResponseStatus(404);
     }
 }
