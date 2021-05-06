@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Vpc\Deleted;
 use App\Events\V2\Vpc\Deleting;
 use App\Events\V2\Vpc\Saved;
 use App\Events\V2\Vpc\Saving;
@@ -41,6 +42,7 @@ class Vpc extends Model implements Filterable, Sortable
         'saving' => Saving::class,
         'saved' => Saved::class,
         'deleting' => Deleting::class,
+        'deleted' => Deleted::class,
     ];
 
     public $children = [

@@ -265,6 +265,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Vpc\Deleting::class => [
             \App\Listeners\V2\ResourceSyncDeleting::class,
         ],
+        \App\Events\V2\Vpc\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
 
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
@@ -286,6 +289,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,
             \App\Listeners\V2\FloatingIp\UpdateBilling::class,
+            \App\Listeners\V2\Vpc\UpdateBilling::class,
         ],
     ];
 }

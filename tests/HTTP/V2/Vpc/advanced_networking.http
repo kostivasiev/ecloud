@@ -1,0 +1,24 @@
+### Create VPC
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "TEST VPC",
+    "region_id": "{{dev_region_id}}",
+    "advanced_networking": true
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC Id : ' + response.body.data.id);
+%}
+
+### Delete VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

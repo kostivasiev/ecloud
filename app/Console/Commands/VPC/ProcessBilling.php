@@ -59,6 +59,7 @@ class ProcessBilling extends Command
         // License
         'license.windows',
         'host.license.windows',
+        'advanced.networking',
     ];
 
     public function __construct()
@@ -111,6 +112,15 @@ class ProcessBilling extends Command
 
                     $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                 });
+
+                // Advanced networking
+                if ($key === 'advanced.networking') {
+                    $totalRamGb = $vpc->instances->sum(function ($instance) {
+                            return $instance->ram_capacity / 1024;
+                    });
+                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] =
+                        $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] * $totalRamGb;
+                }
             });
 
             // VPC Support
