@@ -65,12 +65,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Dhcps */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+    $router->group([], function () use ($router) {
         $router->get('dhcps', 'DhcpController@index');
         $router->get('dhcps/{dhcpId}', 'DhcpController@show');
-        $router->post('dhcps', 'DhcpController@create');
-        $router->patch('dhcps/{dhcpId}', 'DhcpController@update');
-        $router->delete('dhcps/{dhcpId}', 'DhcpController@destroy');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('dhcps', 'DhcpController@create');
+            $router->patch('dhcps/{dhcpId}', 'DhcpController@update');
+            $router->delete('dhcps/{dhcpId}', 'DhcpController@destroy');
+        });
     });
 
     /** Networks */

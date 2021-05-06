@@ -12,6 +12,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {

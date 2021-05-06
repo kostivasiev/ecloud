@@ -1,0 +1,48 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/Dhcp'
+              meta:
+                type: object
+  tags:
+    - Dhcps
+patch:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../public-openapi.yaml#/components/schemas/Dhcp"
+            - type: object
+              properties:
+                vpc_id:
+                  readOnly: true
+                availability_zone_id:
+                  readOnly : true
+  responses :
+    202 :
+      description: Accepted
+      $ref : '../../resources/Dhcp/responses/idResponse.yaml'
+  tags :
+    - Dhcps
+delete:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/DhcpId'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Dhcps
