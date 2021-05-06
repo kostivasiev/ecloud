@@ -62,25 +62,4 @@ class CreateTest extends TestCase
             'source' => 'vpc_id'
         ])->assertResponseStatus(422);
     }
-
-    public function testNotOwnedVpcIsFailed()
-    {
-        Model::withoutEvents(function() {
-            $this->vpc()->reseller_id = 3;
-            $this->vpc()->save();
-
-        });
-
-        $this->post('/v2/dhcps', [
-            'vpc_id' => $this->vpc()->id,
-        ], [
-            'X-consumer-custom-id' => '1-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'The specified vpc id was not found',
-            'status' => 422,
-            'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
-    }
 }

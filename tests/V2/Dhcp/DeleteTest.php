@@ -92,12 +92,4 @@ class DeleteTest extends TestCase
             return $job->model->id === $this->dhcp->id;
         });
     }
-
-    public function testDoesntDeleteNonOwnedDhcp()
-    {
-        $this->be(new Consumer(2, [config('app.name') . '.read']));
-
-        $response = $this->delete('/v2/dhcps/' .$this->dhcp->id);
-        $response->assertResponseStatus(404);
-    }
 }
