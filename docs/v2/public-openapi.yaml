@@ -239,6 +239,8 @@ paths:
     $ref : 'resources/Volume/detach.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
+  '/ecloud/v2/volumes/{volumeId}/tasks' :
+    $ref : 'resources/Volume/tasks-collection.yaml'
   '/ecloud/v2/support':
     $ref: 'resources/VpcSupport/collection.yaml'
   '/ecloud/v2/support/{supportId}':
