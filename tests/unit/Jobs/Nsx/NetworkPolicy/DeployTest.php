@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeployTest extends TestCase
@@ -95,6 +94,7 @@ class DeployTest extends TestCase
                                 'profiles' => [
                                     'ANY'
                                 ],
+                                'direction' => 'IN_OUT',
                                 'logged' => false,
                                 'scope' => [
                                     '/infra/domains/default/groups/np-test'
