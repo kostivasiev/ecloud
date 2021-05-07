@@ -47,6 +47,8 @@ components:
               example: '03747ccf-d56b-45a9-b589-177f3cb9936e'
     Nics:
       $ref: 'components/schemas/nic.yaml'
+    Dhcps :
+      $ref : 'components/schemas/dhcp.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
     Credentials:
@@ -139,6 +141,10 @@ paths:
     $ref: 'resources/DiscountPlan/admin-collection.yaml'
   '/ecloud/v2/discount-plans/{discountPlanId}':
     $ref: 'resources/DiscountPlan/admin-item.yaml'
+  '/ecloud/v2/dhcps' :
+    $ref : 'resources/Dhcp/admin-collection.yaml'
+  '/ecloud/v2/dhcps/{dhcpId}' :
+    $ref : 'resources/Dhcp/admin-item.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/capacities':
     $ref: 'resources/AvailabilityZone/capacity-collection.yaml'
   '/ecloud/v2/routers':

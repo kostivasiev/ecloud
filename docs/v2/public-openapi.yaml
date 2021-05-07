@@ -259,6 +259,8 @@ paths:
 #    $ref: 'resources/NetworkPolicy/collection.yaml'
 #  '/ecloud/v2/network-policies/{networkPolicyId}':
 #    $ref: 'resources/NetworkPolicy/item.yaml'
+#  '/ecloud/v2/network-policies/{networkPolicyId}/network-rules':
+#    $ref: 'resources/NetworkPolicy/network-rules-collection.yaml'
 #  '/ecloud/v2/network-rule-ports':
 #    $ref: 'resources/NetworkRulePort/collection.yaml'
 #  '/ecloud/v2/network-rule-ports/{networkRulePortId}':

@@ -45,6 +45,7 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
         'Storage',
         'License',
         'Support',
+        'Dedicated Hosts'
     ];
 
     protected $appends = [

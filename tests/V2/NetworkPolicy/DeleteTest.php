@@ -3,7 +3,6 @@ namespace Tests\V2\NetworkPolicy;
 
 use App\Events\V2\NetworkPolicy\Deleting;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 

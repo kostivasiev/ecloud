@@ -2,16 +2,13 @@
 
 namespace Tests\unit\Jobs\Instance\Undeploy;
 
-use App\Jobs\FloatingIp\AwaitNatRemoval;
-use App\Jobs\FloatingIp\AwaitNatSync;
-use App\Jobs\FloatingIp\DeleteNats;
-use App\Jobs\Instance\Undeploy\DeleteVolumes;
-use App\Jobs\Nat\AwaitIPAddressAllocation;
-use App\Models\V2\FloatingIp;
+use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
+use App\Jobs\Instance\Undeploy\AwaitVolumeRemoval;
 use App\Models\V2\Instance;
-use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -19,7 +16,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class DeleteVolumesTest extends TestCase
+class AwaitVolumeRemovalTest extends TestCase
 {
     protected Instance $instance;
     protected Volume $volume;
@@ -39,7 +36,7 @@ class DeleteVolumesTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new DeleteVolumes($this->instance));
+        dispatch(new AwaitVolumeRemoval($this->instance));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -47,59 +44,65 @@ class DeleteVolumesTest extends TestCase
         });
     }
 
-    public function testDeletesOSVolume()
+    public function testJobFailedWhenVolumeSyncFailed()
     {
         Model::withoutEvents(function() {
             $this->instance = factory(Instance::class)->create([
                 'id' => 'i-test',
             ]);
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = $this->instance->volumes()->create([
                 'id' => 'vol-test',
                 'vpc_id' => 'vpc-test',
                 'capacity' => 10,
                 'os_volume' => true,
             ]);
-            $this->instance->volumes()->attach($this->volume);
+
+            $task = new Task([
+                'id' => 'task-1',
+                'completed' => false,
+                'failure_reason' => 'test',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $task->resource()->associate($this->volume);
+            $task->save();
         });
 
-        Event::fake();
+        Event::fake([JobFailed::class]);
 
-        dispatch(new DeleteVolumes($this->instance));
+        dispatch(new AwaitVolumeRemoval($this->instance));
 
-        Event::assertNotDispatched(JobFailed::class);
-        Event::assertDispatched(JobProcessed::class, function ($event) {
-            return !$event->job->isReleased();
-        });
-
-        $this->volume->refresh();
-        $this->assertNotNull($this->volume->deleted_at);
+        Event::assertDispatched(JobFailed::class);
     }
 
-    public function testDetachesDataVolume()
+    public function testJobReleasedWhenNicSyncInProgress()
     {
         Model::withoutEvents(function() {
             $this->instance = factory(Instance::class)->create([
-                'id' => 'i-test1',
+                'id' => 'i-test',
             ]);
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = $this->instance->volumes()->create([
                 'id' => 'vol-test',
                 'vpc_id' => 'vpc-test',
                 'capacity' => 10,
-                'os_volume' => false,
+                'os_volume' => true,
             ]);
-            $this->instance->volumes()->attach($this->volume);
+
+            $task = new Task([
+                'id' => 'task-1',
+                'completed' => false,
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $task->resource()->associate($this->volume);
+            $task->save();
         });
 
-        Event::fake();
+        Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new DeleteVolumes($this->instance));
+        dispatch(new AwaitVolumeRemoval($this->instance));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
-            return !$event->job->isReleased();
+            return $event->job->isReleased();
         });
-
-        $this->volume->refresh();
-        $this->assertNull($this->volume->deleted_at);
     }
 }

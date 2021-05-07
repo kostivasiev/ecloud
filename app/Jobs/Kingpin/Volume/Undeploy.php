@@ -27,8 +27,8 @@ class Undeploy extends Job
             return;
         }
 
-        if ($this->model->instances()->count() !== 0) {
-            throw new \Exception('Volume ' . $this->model->id . ' had instances when trying to delete');
+        if (!$this->model->os_volume && $this->model->instances()->count() > 0) {
+            throw new \Exception('Non-OS volume ' . $this->model->id . ' had instances when trying to delete');
         }
 
         try {

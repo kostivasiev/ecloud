@@ -102,8 +102,9 @@ class CreateTest extends TestCase
 
     public function testExceedMaxVpcLimit()
     {
+        config(['defaults.vpc.max_count' => 10]);
         $counter = 1;
-        factory(Vpc::class, config('defaults.vpc.max_count'))
+        factory(Vpc::class, (int) config('defaults.vpc.max_count'))
             ->make([
                 'reseller_id' => 1,
                 'region_id' => $this->region()->id,
@@ -115,11 +116,11 @@ class CreateTest extends TestCase
                 $vpc->saveQuietly();
                 $counter++;
             });
+
         $data = [
             'name' => 'CreateTest Name',
             'reseller_id' => 1,
-            'region_id' => $this->region()->id,
-            'console_enabled' => true,
+            'region_id' => $this->region()->id
         ];
         $this->post(
             '/v2/vpcs',
