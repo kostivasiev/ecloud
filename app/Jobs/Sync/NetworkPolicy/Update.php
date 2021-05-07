@@ -4,8 +4,6 @@ namespace App\Jobs\Sync\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Jobs\NetworkPolicy\CreateDefaultNetworkRules;
-use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
-use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
 use App\Jobs\Nsx\DeployCheck;
 use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
 use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
