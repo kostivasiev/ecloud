@@ -72,6 +72,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('dhcps', 'DhcpController@index');
         $router->get('dhcps/{dhcpId}', 'DhcpController@show');
+        $router->get('dhcps/{dhcpId}/tasks', 'DhcpController@tasks');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('dhcps', 'DhcpController@create');
             $router->patch('dhcps/{dhcpId}', 'DhcpController@update');
