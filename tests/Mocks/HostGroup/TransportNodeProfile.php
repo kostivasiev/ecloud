@@ -2,7 +2,9 @@
 
 namespace Tests\Mocks\HostGroup;
 
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
@@ -154,19 +156,33 @@ trait TransportNodeProfile
         $this->logFinished();
     }
 
-    public function noComputeCollectionItem()
+    protected function getThrownException(int $code, string $message, string $method = 'get')
     {
-        $this->logStarted();
+        $thrownException = new RequestException($message, new Request($method, '', []), new Response($code));
+        if ($code === 500) {
+            $thrownException = new ServerException($message, new Request($method, '', []), new Response($code));
+        }
+        return $thrownException;
+    }
+
+    public function noComputeCollectionItem(int $code, string $message)
+    {
+        $thrownException = $this->getThrownException($code, $message);
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $this->hostGroup->id)
-            ->andThrow(new RequestException('Not Found', new Request('get', '', []), new Response(404)));
-        Log::shouldReceive('warning')
-            ->withSomeOfArgs(get_class($this->job) . ' : Compute Collection for HostGroup hg-test could not be retrieved, skipping.');
+            ->andThrow($thrownException);
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
+            return stripos($arg, 'Compute Collection for HostGroup') !== false;
+        }));
+        if ($code == 404) {
+            // The job should not fail
+            $this->job->shouldNotReceive('fail');
+        }
     }
 
     public function validComputeCollection()
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $this->hostGroup->id)
             ->andReturnUsing(function () {
@@ -180,23 +196,18 @@ trait TransportNodeProfile
             });
     }
 
-    public function noTransportNodeCollectionItem()
+    public function noTransportNodeCollectionItem(int $code, string $message)
     {
+        $thrownException = $this->getThrownException($code, $message);
         $this->validComputeCollection();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs(
                 '/api/v1/transport-node-collections?compute_collection_id=d54d92a4-0d03-49c9-b621-fbbdd7f3e422'
-            )->andThrow(
-                new RequestException(
-                    'Not Found',
-                    new Request('get', '', []),
-                    new Response(404)
-                )
-            );
-        Log::shouldReceive('warning')
-            ->withSomeOfArgs(
-                get_class($this->job) . ' : TransportNode Collection for HostGroup hg-test could not be retrieved, skipping.'
-            );
+            )->andThrow($thrownException);
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
+            return stripos($arg, 'TransportNode Collection for HostGroup') !== false;
+        }));
     }
 
     public function validTransportNodeCollection()
@@ -216,16 +227,17 @@ trait TransportNodeProfile
             });
     }
 
-    public function detachNodeFail()
+    public function detachNodeFail(int $code, string $message)
     {
+        $thrownException = $this->getThrownException($code, $message, 'delete');
         $this->validTransportNodeCollection();
         $this->nsxServiceMock()->expects('delete')
             ->withSomeOfArgs('/api/v1/transport-node-collections/1')
-            ->andThrow(new RequestException('Not Found', new Request('delete', '', []), new Response(404)));
-        Log::shouldReceive('warning')
-            ->withSomeOfArgs(
-                get_class($this->job) . ' : Failed to detach transport node profile for Host Group hg-test, skipping'
-            );
+            ->andThrow($thrownException);
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
+            return stripos($arg, 'Failed to detach transport node profile for Host Group') !== false;
+        }));
     }
 
     public function detachNodeSuccess()
@@ -238,16 +250,17 @@ trait TransportNodeProfile
             });
     }
 
-    public function deleteNodeFail()
+    public function deleteNodeFail(int $code, string $message)
     {
+        $thrownException = $this->getThrownException($code, $message, 'delete');
         $this->detachNodeSuccess();
         $this->nsxServiceMock()->expects('delete')
             ->withSomeOfArgs('/api/v1/transport-node-profiles/1')
-            ->andThrow(new RequestException('Not Found', new Request('delete', '', []), new Response(404)));
-        Log::shouldReceive('warning')
-            ->withSomeOfArgs(
-                get_class($this->job) . ' : Failed to delete transport node profile for Host Group hg-test, skipping.'
-            );
+            ->andThrow($thrownException);
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
+            return stripos($arg, 'Failed to delete transport node profile for Host Group') !== false;
+        }));
     }
 
     public function deleteNodeSuccessful()
@@ -258,6 +271,5 @@ trait TransportNodeProfile
             ->andReturnUsing(function () {
                 return new Response(200);
             });
-        $this->logFinished();
     }
 }

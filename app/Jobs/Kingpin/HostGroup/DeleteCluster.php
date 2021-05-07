@@ -23,9 +23,20 @@ class DeleteCluster extends Job
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
         $hostGroup = $this->model;
-        $hostGroup->availabilityZone->kingpinService()->delete(
-            '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id
-        );
+        try {
+            $hostGroup->availabilityZone->kingpinService()->delete(
+                '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id
+            );
+        } catch (\Exception $exception) {
+            Log::info('Exception Code: ' . $exception->getCode());
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
+            }
+            Log::warning(
+                get_class($this) . ' : Failed to delete Host Group ' . $hostGroup->id . ', skipping'
+            );
+            return;
+        }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
