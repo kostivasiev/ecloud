@@ -49,7 +49,11 @@ class Create extends FormRequest
                 'string',
                 new ValidFirewallRuleSourceDestination()
             ],
-            'action' => 'required|string|in:ALLOW,DROP,REJECT',
+            'action' => [
+                'required',
+                'string',
+                'in:ALLOW,DROP,REJECT'
+            ],
             'direction' => 'required|string|in:IN,OUT,IN_OUT',
             'enabled' => 'required|boolean',
         ];

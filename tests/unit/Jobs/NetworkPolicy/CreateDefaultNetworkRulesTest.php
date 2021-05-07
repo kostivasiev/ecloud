@@ -25,11 +25,11 @@ class CreateDefaultNetworkRulesTest extends TestCase
 
         dispatch(new CreateDefaultNetworkRules($this->networkPolicy()));
 
-        $this->assertEquals($this->networkPolicy()->networkRules()->count(), 2);
+        $this->assertEquals($this->networkPolicy()->networkRules()->count(), 3);
 
         $this->seeInDatabase('network_rules', [
             'name' => NetworkRule::TYPE_DHCP_INGRESS,
-            'sequence' => 5001,
+            'sequence' => 10000,
             'network_policy_id' => $this->networkPolicy()->id,
             'source' => '10.0.0.2',
             'destination' => 'ANY',
@@ -41,7 +41,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
 
         $this->seeInDatabase('network_rules', [
             'name' => NetworkRule::TYPE_DHCP_EGRESS,
-            'sequence' => 5002,
+            'sequence' => 10001,
             'network_policy_id' => $this->networkPolicy()->id,
             'source' => 'ANY',
             'destination' => 'ANY',
@@ -49,6 +49,18 @@ class CreateDefaultNetworkRulesTest extends TestCase
             'direction' => 'OUT',
             'enabled' => true,
             'type' => NetworkRule::TYPE_DHCP_EGRESS
+        ], 'ecloud');
+
+        $this->seeInDatabase('network_rules', [
+            'name' => NetworkRule::TYPE_CATCHALL,
+            'sequence' => 20000,
+            'network_policy_id' => $this->networkPolicy()->id,
+            'source' => 'ANY',
+            'destination' => 'ANY',
+            'action' => 'DROP',
+            'direction' => 'IN_OUT',
+            'enabled' => true,
+            'type' => NetworkRule::TYPE_CATCHALL
         ], 'ecloud');
 
         Event::assertNotDispatched(JobFailed::class);
