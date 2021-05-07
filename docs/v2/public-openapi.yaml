@@ -23,9 +23,9 @@ components:
 #    NetworkPolicy:
 #      $ref: 'components/schemas/networkPolicy.yaml'
 #    NetworkRule:
-#      $ref : 'components/schemas/networkRule.yaml'
-#    NetworkRulePort :
-#      $ref : 'components/schemas/networkRulePort.yaml'
+#      $ref: 'components/schemas/networkRule.yaml'
+#    NetworkRulePort:
+#      $ref: 'components/schemas/networkRulePort.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
@@ -62,7 +62,7 @@ components:
       $ref: 'resources/HostSpec/schema.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
-    HostGroup :
+    HostGroup:
       $ref: 'resources/HostGroup/schema.yaml'
     Image:
       $ref: 'resources/Image/schema.yaml'
@@ -70,6 +70,8 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     ImageMetadata:
       $ref: 'resources/ImageMetadata/schema.yaml'
+    Task:
+      $ref: 'components/schemas/task.yaml'
   parameters:
     # Query Parameters
     PerPage:
@@ -131,6 +133,8 @@ paths:
     $ref: 'resources/Vpc/volumes-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/instances':
     $ref: 'resources/Vpc/instances-collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/tasks':
+    $ref: 'resources/Vpc/tasks-collection.yaml'
 #  '/ecloud/v2/availability-zones':
 #    $ref: 'resources/AvailabilityZone/collection.yaml'
 #  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
@@ -143,10 +147,14 @@ paths:
     $ref: 'resources/Network/item.yaml'
   '/ecloud/v2/networks/{networkId}/nics':
     $ref: 'resources/Network/nic-collection.yaml'
+  '/ecloud/v2/networks/{networkId}/tasks':
+    $ref: 'resources/Network/tasks-collection.yaml'
   '/ecloud/v2/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
   '/ecloud/v2/dhcps/{dhcpId}':
     $ref: 'resources/Dhcp/item.yaml'
+  '/ecloud/v2/dhcps/{dhcpId}/tasks':
+    $ref: 'resources/Dhcp/tasks-collection.yaml'
 #  '/ecloud/v2/vpns':
 #    $ref: 'resources/Vpn/collection.yaml'
 #  '/ecloud/v2/vpns/{vpnId}':
@@ -177,6 +185,8 @@ paths:
     $ref: 'resources/Instance/lockUnlock.yaml'
   '/ecloud/v2/instances/{instanceId}/console-session':
     $ref: 'resources/Instance/console.yaml'
+  '/ecloud/v2/instances/{instanceId}/tasks':
+    $ref: 'resources/Instance/tasks-collection.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
@@ -185,6 +195,8 @@ paths:
     $ref: 'resources/FloatingIp/assign.yaml'
   '/ecloud/v2/floating-ips/{fipId}/unassign':
     $ref: 'resources/FloatingIp/unassign.yaml'
+  '/ecloud/v2/floating-ips/{fipId}/tasks':
+    $ref: 'resources/FloatingIp/tasks-collection.yaml'
   '/ecloud/v2/firewall-rules':
     $ref: 'resources/FirewallRule/collection.yaml'
   '/ecloud/v2/firewall-rules/{firewallRuleId}':
@@ -197,6 +209,8 @@ paths:
     $ref: 'resources/FirewallPolicy/item.yaml'
   '/ecloud/v2/firewall-policies/{firewallPolicyId}/firewall-rules':
     $ref: 'resources/FirewallPolicy/firewall-rules-collection.yaml'
+  '/ecloud/v2/firewall-policies/{firewallPolicyId}/tasks':
+    $ref: 'resources/FirewallPolicy/tasks-collection.yaml'
   '/ecloud/v2/firewall-rule-ports':
     $ref: 'resources/FirewallRulePort/collection.yaml'
   '/ecloud/v2/firewall-rule-ports/{firewallRulePortId}':
@@ -217,6 +231,8 @@ paths:
     $ref: 'resources/Router/vpns-collection.yaml'
   '/ecloud/v2/routers/{routerId}/configure-default-policies':
     $ref: 'resources/Router/configureDefaults.yaml'
+  '/ecloud/v2/routers/{routerId}/tasks':
+    $ref: 'resources/Router/tasks-collection.yaml'
 #  '/ecloud/v2/lbcs':
 #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
 #  '/ecloud/v2/lbcs/{lbcId}':
@@ -225,16 +241,20 @@ paths:
     $ref: 'resources/Nic/public_collection.yaml'
   '/ecloud/v2/nics/{nicId}':
     $ref: 'resources/Nic/public_item.yaml'
+  '/ecloud/v2/nics/{nicId}/tasks':
+    $ref: 'resources/Nic/tasks-collection.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
-  '/ecloud/v2/volumes/{volumeId}/attach' :
-    $ref : 'resources/Volume/attach.yaml'
-  '/ecloud/v2/volumes/{volumeId}/detach' :
-    $ref : 'resources/Volume/detach.yaml'
+  '/ecloud/v2/volumes/{volumeId}/attach':
+    $ref: 'resources/Volume/attach.yaml'
+  '/ecloud/v2/volumes/{volumeId}/detach':
+    $ref: 'resources/Volume/detach.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
+  '/ecloud/v2/volumes/{volumeId}/tasks':
+    $ref: 'resources/Volume/tasks-collection.yaml'
   '/ecloud/v2/support':
     $ref: 'resources/VpcSupport/collection.yaml'
   '/ecloud/v2/support/{supportId}':
@@ -261,6 +281,8 @@ paths:
 #    $ref: 'resources/NetworkPolicy/item.yaml'
 #  '/ecloud/v2/network-policies/{networkPolicyId}/network-rules':
 #    $ref: 'resources/NetworkPolicy/network-rules-collection.yaml'
+#  '/ecloud/v2/network-policies/{networkPolicyId}/tasks':
+#    $ref: 'resources/NetworkPolicy/tasks-collection.yaml'
 #  '/ecloud/v2/network-rule-ports':
 #    $ref: 'resources/NetworkRulePort/collection.yaml'
 #  '/ecloud/v2/network-rule-ports/{networkRulePortId}':
@@ -269,18 +291,22 @@ paths:
 #    $ref: 'resources/NetworkRule/collection.yaml'
 #  '/ecloud/v2/network-rules/{networkRuleId}':
 #    $ref: 'resources/NetworkRule/item.yaml'
-#  '/ecloud/v2/hosts' :
-#    $ref : 'resources/Host/collection.yaml'
-#  '/ecloud/v2/hosts/{id}' :
-#    $ref : 'resources/Host/item.yaml'
+#  '/ecloud/v2/hosts':
+#    $ref: 'resources/Host/collection.yaml'
+#  '/ecloud/v2/hosts/{id}':
+#    $ref: 'resources/Host/item.yaml'
+#  '/ecloud/v2/hosts/{id}/tasks':
+#    $ref: 'resources/Host/tasks-collection.yaml'
 #  '/ecloud/v2/host-specs':
 #    $ref: 'resources/HostSpec/collection.yaml'
 #  '/ecloud/v2/host-specs/{hostSpecId}':
 #    $ref: 'resources/HostSpec/item.yaml'
-#  '/ecloud/v2/host-groups' :
-#    $ref : 'resources/HostGroup/collection.yaml'
-#  '/ecloud/v2/host-groups/{id}' :
-#    $ref : 'resources/HostGroup/item.yaml'
+#  '/ecloud/v2/host-groups':
+#    $ref: 'resources/HostGroup/collection.yaml'
+#  '/ecloud/v2/host-groups/{id}':
+#    $ref: 'resources/HostGroup/item.yaml'
+#  '/ecloud/v2/host-groups/{id}/tasks':
+#    $ref: 'resources/HostGroup/tasks-collection.yaml'
   '/ecloud/v2/images':
     $ref: 'resources/Image/collection.yaml'
   '/ecloud/v2/images/{id}':

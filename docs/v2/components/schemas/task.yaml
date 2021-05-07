@@ -1,0 +1,22 @@
+properties:
+  id:
+    type: string
+    example: 'task-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    example: 'some_task'
+    readOnly : true
+  status:
+    type: string
+    example: 'complete'
+    readOnly : true
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Tasks'

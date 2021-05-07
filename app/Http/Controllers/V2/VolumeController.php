@@ -8,9 +8,11 @@ use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -172,6 +174,17 @@ class VolumeController extends BaseController
             ->transform($collection);
 
         return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $volumeId)
+    {
+        $collection = Volume::forUser($request->user())->findOrFail($volumeId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
