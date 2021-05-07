@@ -4,6 +4,8 @@
  * v2 Routes
  */
 
+use Laravel\Lumen\Routing\Router;
+
 $middleware = [
     'auth',
     'paginator-limit:' . env('PAGINATION_LIMIT')
@@ -15,7 +17,7 @@ $baseRouteParameters = [
     'middleware' => $middleware
 ];
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+/** @var Router $router */
 $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
     $router->get('availability-zones', 'AvailabilityZoneController@index');
@@ -48,7 +50,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     /** Virtual Private Clouds */
     $router->group([], function () use ($router) {
         $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
-            $router->post('vpcs', 'VpcController@create');
+            $router->group(['middleware' => 'customer-max-vpc'], function () use ($router) {
+                $router->post('vpcs', 'VpcController@create');
+            });
             $router->post('vpcs/{vpcId}/deploy-defaults', 'VpcController@deployDefaults');
         });
         $router->patch('vpcs/{vpcId}', 'VpcController@update');
@@ -90,6 +94,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('network-policies', 'NetworkPolicyController@index');
         $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
         $router->get('network-policies/{networkPolicyId}/tasks', 'NetworkPolicyController@tasks');
         $router->post('network-policies', 'NetworkPolicyController@store');
         $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
@@ -101,7 +106,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('network-rules', 'NetworkRuleController@index');
         $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
         $router->post('network-rules', 'NetworkRuleController@store');
-        $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        $router->group(['middleware' => 'can-edit-rule'], function () use ($router) {
+            $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        });
         $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
     });
 
@@ -139,6 +146,9 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Instances */
     $router->group([], function () use ($router) {
+        $router->group(['middleware' => 'customer-max-instance'], function () use ($router) {
+            $router->post('instances', 'InstanceController@store');
+        });
         $router->get('instances', 'InstanceController@index');
         $router->get('instances/{instanceId}', 'InstanceController@show');
         $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');

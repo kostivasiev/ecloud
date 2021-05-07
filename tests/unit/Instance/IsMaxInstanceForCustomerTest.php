@@ -1,19 +1,19 @@
 <?php
 namespace Tests\unit\Instance;
 
-use App\Rules\V2\IsMaxInstanceForCustomer;
+use App\Http\Middleware\IsMaxInstanceForCustomer;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class IsMaxInstanceForCustomerTest extends TestCase
 {
-    protected IsMaxInstanceForCustomer $validationRule;
+    protected $validationRule;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->validationRule = new IsMaxInstanceForCustomer();
+        $this->validationRule = \Mockery::mock(IsMaxInstanceForCustomer::class)->makePartial();
         Config::set('instance.max_limit.total', 1);
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
@@ -26,13 +26,13 @@ class IsMaxInstanceForCustomerTest extends TestCase
     public function testValidationFails()
     {
         // Use the instance
-        $instance = $this->instance();
-        $this->assertFalse($this->validationRule->passes('vpc_id', $instance->vpc->id));
+        $this->instance();
+        $this->assertFalse($this->validationRule->isWithinLimit());
     }
 
     public function testValidationSucceeds()
     {
-        $this->assertTrue($this->validationRule->passes('vpc_id', $this->vpc()->id));
+        $this->assertTrue($this->validationRule->isWithinLimit());
     }
 
 }

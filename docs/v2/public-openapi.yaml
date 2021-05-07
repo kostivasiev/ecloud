@@ -147,8 +147,8 @@ paths:
     $ref: 'resources/Network/item.yaml'
   '/ecloud/v2/networks/{networkId}/nics':
     $ref: 'resources/Network/nic-collection.yaml'
-  '/ecloud/v2/networks/{networkId}/tasks' :
-    $ref : 'resources/Network/tasks-collection.yaml'
+  '/ecloud/v2/networks/{networkId}/tasks':
+    $ref: 'resources/Network/tasks-collection.yaml'
   '/ecloud/v2/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
   '/ecloud/v2/dhcps/{dhcpId}':
@@ -231,8 +231,8 @@ paths:
     $ref: 'resources/Router/vpns-collection.yaml'
   '/ecloud/v2/routers/{routerId}/configure-default-policies':
     $ref: 'resources/Router/configureDefaults.yaml'
-  '/ecloud/v2/routers/{routerId}/tasks' :
-    $ref : 'resources/Router/tasks-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/tasks':
+    $ref: 'resources/Router/tasks-collection.yaml'
 #  '/ecloud/v2/lbcs':
 #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
 #  '/ecloud/v2/lbcs/{lbcId}':
@@ -241,8 +241,8 @@ paths:
     $ref: 'resources/Nic/public_collection.yaml'
   '/ecloud/v2/nics/{nicId}':
     $ref: 'resources/Nic/public_item.yaml'
-  '/ecloud/v2/nics/{nicId}/tasks' :
-    $ref : 'resources/Nic/tasks-collection.yaml'
+  '/ecloud/v2/nics/{nicId}/tasks':
+    $ref: 'resources/Nic/tasks-collection.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
@@ -279,8 +279,10 @@ paths:
 #    $ref: 'resources/NetworkPolicy/collection.yaml'
 #  '/ecloud/v2/network-policies/{networkPolicyId}':
 #    $ref: 'resources/NetworkPolicy/item.yaml'
-#  '/ecloud/v2/network-policies/{networkPolicyId}/tasks' :
-#    $ref : 'resources/NetworkPolicy/tasks-collection.yaml'
+#  '/ecloud/v2/network-policies/{networkPolicyId}/network-rules':
+#    $ref: 'resources/NetworkPolicy/network-rules-collection.yaml'
+#  '/ecloud/v2/network-policies/{networkPolicyId}/tasks':
+#    $ref: 'resources/NetworkPolicy/tasks-collection.yaml'
 #  '/ecloud/v2/network-rule-ports':
 #    $ref: 'resources/NetworkRulePort/collection.yaml'
 #  '/ecloud/v2/network-rule-ports/{networkRulePortId}':

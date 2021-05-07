@@ -259,3 +259,7 @@ Content-Type:  application/json
 GET https://185.197.63.88/api/v1/transport-node-collections?compute_collection_id=e8040fd9-c4d2-4435-a1c8-0d8ee6b2fc84:domain-c23210
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+###
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/Reference_for_catchall_rule
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

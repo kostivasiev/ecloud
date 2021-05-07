@@ -7,6 +7,7 @@ use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Task;
 use App\Resources\V2\NetworkPolicyResource;
 use App\Resources\V2\TaskResource;
+use App\Resources\V2\NetworkRuleResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -74,6 +75,17 @@ class NetworkPolicyController extends BaseController
             ->transform($collection);
 
         return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+    
+    public function networkRules(Request $request, QueryTransformer $queryTransformer, string $networkPolicyId)
+    {
+        $collection = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId)->networkRules();
+        $queryTransformer->config(NetworkPolicy::class)
+            ->transform($collection);
+
+        return NetworkRuleResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

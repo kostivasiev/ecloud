@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\NetworkPolicy;
 
 use App\Jobs\Job;
+use App\Jobs\NetworkPolicy\CreateDefaultNetworkRules;
 use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy as DeploySecurityGroup;
 use App\Jobs\Nsx\NetworkPolicy\Deploy as DeployNetworkPolicy;
 use App\Jobs\Nsx\DeployCheck;
@@ -33,6 +34,7 @@ class Update extends Job
                     $this->task->resource->network->router->availabilityZone,
                     '/infra/domains/default/groups/'
                 ),
+                new CreateDefaultNetworkRules($this->task->resource),
                 new DeployNetworkPolicy($this->task->resource),
                 new DeployCheck(
                     $this->task->resource,
