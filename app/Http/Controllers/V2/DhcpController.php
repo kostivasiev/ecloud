@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Models\V2\Dhcp;
+use App\Models\V2\Network;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Resources\V2\DhcpResource;
@@ -84,5 +85,16 @@ class DhcpController extends BaseController
         });
 
         return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $dhcpId)
+    {
+        $collection = Dhcp::forUser($request->user())->findOrFail($dhcpId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

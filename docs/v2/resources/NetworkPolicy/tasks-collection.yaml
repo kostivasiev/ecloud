@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/vpcId.yaml'
+    - $ref: 'parameters/networkPolicyId.yaml'
   responses:
     200:
       description: Success
@@ -24,12 +24,12 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/tasks?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies/{networkPolicyId}/tasks?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/tasks?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies/{networkPolicyId}/tasks?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/tasks?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies/{networkPolicyId}/tasks?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/tasks?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies/{networkPolicyId}/tasks?page=2'
   tags:
     - Virtual Private Clouds

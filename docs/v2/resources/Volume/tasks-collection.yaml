@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref : 'parameters/volumeId.yaml'
+    - $ref: 'parameters/volumeId.yaml'
   responses:
     200:
       description: Success
@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref : '../Task/schema.yaml'
+                  $ref: '../../components/schemas/task.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
