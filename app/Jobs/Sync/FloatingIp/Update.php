@@ -6,12 +6,12 @@ use App\Jobs\FloatingIp\AllocateIp;
 use App\Jobs\FloatingIp\AwaitNatSync;
 use App\Jobs\Job;
 use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
-use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use TaskableBatch;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
 
@@ -22,8 +22,6 @@ class Update extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
-
         // Here we chain AllocateIp and AllocateIpCheck
         $this->updateTaskBatch([
             [
@@ -31,8 +29,5 @@ class Update extends Job
                 new AwaitNatSync($this->task->resource),
             ]
         ])->dispatch();
-
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
     }
 }

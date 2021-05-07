@@ -10,6 +10,7 @@ use App\Jobs\Instance\Deploy\AwaitNicSync;
 use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
+use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\DeployCompleted;
 use App\Jobs\Instance\Deploy\ExpandOsDisk;
 use App\Jobs\Instance\Deploy\OsCustomisation;
@@ -21,14 +22,13 @@ use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
-use App\Jobs\Instance\Deploy\Deploy;
 use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
-use Illuminate\Support\Facades\Log;
 
 class Update extends Job
 {
-    use TaskableBatch;
+    use TaskableBatch, LoggableTaskJob;
 
     private $task;
 
@@ -39,8 +39,6 @@ class Update extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
-
         if (!$this->task->resource->deployed) {
             $this->updateTaskBatch([
                 [
@@ -71,7 +69,5 @@ class Update extends Job
                 ]
             ])->dispatch();
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->id, 'resource_id' => $this->task->resource->id]);
     }
 }

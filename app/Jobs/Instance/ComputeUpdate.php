@@ -4,25 +4,24 @@ namespace App\Jobs\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class ComputeUpdate extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        $instanceResponse = $this->instance->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id);
+        $instanceResponse = $this->model->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
         $instanceResponseData = json_decode($instanceResponse->getBody()->getContents());
 
         $currentVCPUCores = $instanceResponseData->numCPU;
@@ -33,47 +32,45 @@ class ComputeUpdate extends Job
         }
 
 
-        if ($currentVCPUCores == $this->instance->vcpu_cores && $currentRAMMiB == $this->instance->ram_capacity) {
-            Log::info(get_class($this) . ' : Finished: No changes required', ['id' => $this->instance->id]);
+        if ($currentVCPUCores == $this->model->vcpu_cores && $currentRAMMiB == $this->model->ram_capacity) {
+            Log::info(get_class($this) . ' : Finished: No changes required', ['id' => $this->model->id]);
             return;
         }
 
         $reboot = false;
 
-        $ram_limit = (($this->instance->platform == 'Windows') ? 16 : 3) * 1024;
+        $ram_limit = (($this->model->platform == 'Windows') ? 16 : 3) * 1024;
 
-        if ($this->instance->ram_capacity < $currentRAMMiB) {
+        if ($this->model->ram_capacity < $currentRAMMiB) {
             $reboot = true;
         }
 
-        if ($this->instance->ram_capacity > $ram_limit && $currentRAMMiB <= $ram_limit) {
+        if ($this->model->ram_capacity > $ram_limit && $currentRAMMiB <= $ram_limit) {
             $reboot = true;
         }
 
-        if ($this->instance->vcpu_cores < $currentVCPUCores) {
+        if ($this->model->vcpu_cores < $currentVCPUCores) {
             $reboot = true;
         }
 
         Log::info(
-            'Resizing compute resources on instance ' . $this->instance->id,
+            'Resizing compute resources on instance ' . $this->model->id,
             [
-                'ramMiB' => $this->instance->ram_capacity,
-                'numCPU' => $this->instance->vcpu_cores,
+                'ramMiB' => $this->model->ram_capacity,
+                'numCPU' => $this->model->vcpu_cores,
                 'guestShutdown' => $reboot
             ]
         );
 
-        $this->instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/resize',
+        $this->model->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/resize',
             [
                 'json' => [
-                    'ramMiB' => $this->instance->ram_capacity,
-                    'numCPU' => $this->instance->vcpu_cores,
+                    'ramMiB' => $this->model->ram_capacity,
+                    'numCPU' => $this->model->vcpu_cores,
                     'guestShutdown' => $reboot
                 ],
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

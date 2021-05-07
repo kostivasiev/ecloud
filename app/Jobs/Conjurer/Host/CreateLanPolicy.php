@@ -4,19 +4,20 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateLanPolicy extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private Host $host;
+    private Host $model;
 
     public function __construct(Host $host)
     {
-        $this->host = $host;
+        $this->model = $host;
     }
 
     /**
@@ -24,10 +25,8 @@ class CreateLanPolicy extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->host->id]);
-
-        $vpc = $this->host->hostGroup->vpc;
-        $availabilityZone = $this->host->hostGroup->availabilityZone;
+        $vpc = $this->model->hostGroup->vpc;
+        $availabilityZone = $this->model->hostGroup->availabilityZone;
 
         if (empty($availabilityZone->ucs_compute_name)) {
             $message = 'Failed to load UCS compute name for availability zone ' . $availabilityZone->id;
@@ -52,9 +51,7 @@ class CreateLanPolicy extends Job
                     ],
                 ]
             );
-            Log::info(get_class($this) . ' : LAN policy created on UCS for VPC', ['id' => $this->host->id]);
+            Log::info(get_class($this) . ' : LAN policy created on UCS for VPC', ['id' => $this->model->id]);
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);
     }
 }

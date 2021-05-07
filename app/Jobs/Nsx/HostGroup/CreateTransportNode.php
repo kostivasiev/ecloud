@@ -6,13 +6,14 @@ use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Vpc;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateTransportNode extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     private $model;
 
@@ -23,10 +24,7 @@ class CreateTransportNode extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $hostGroup = $this->model;
-
         $transportNodeProfiles = $this->getTransportNodeProfiles($hostGroup->availabilityZone);
         if (!$transportNodeProfiles) {
             $this->fail(new \Exception('Failed to get TransportNodeProfiles'));
@@ -112,8 +110,6 @@ class CreateTransportNode extends Job
                 ]
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     private function getTransportNodeProfiles(AvailabilityZone $availabilityZone): ?\stdClass

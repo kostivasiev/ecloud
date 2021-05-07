@@ -4,26 +4,24 @@ namespace App\Jobs\Instance\Undeploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class DeleteVolumes extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        $instance = $this->instance;
+        $instance = $this->model;
 
         $instance->volumes()->each(function ($volume) use ($instance) {
             if ($volume->os_volume) {
@@ -34,7 +32,5 @@ class DeleteVolumes extends Job
                 $instance->volumes()->detach($volume->id);
             }
         });
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

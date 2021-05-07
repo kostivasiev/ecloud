@@ -4,13 +4,14 @@ namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class IopsChange extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     private $model;
 
@@ -21,10 +22,7 @@ class IopsChange extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $volume = $this->model;
-
         if (!$volume->instances()->count()) {
             Log::info('No instances using this volume. Nothing to do.');
             return true;
@@ -62,8 +60,6 @@ class IopsChange extends Job
             $this->fail(new \Exception('Volume ' . $volume->id . ' failed to change iops to ' . $volume->iops));
             return false;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
 
         return true;
     }

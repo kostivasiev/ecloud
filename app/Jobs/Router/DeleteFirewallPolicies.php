@@ -4,29 +4,24 @@ namespace App\Jobs\Router;
 
 use App\Jobs\Job;
 use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class DeleteFirewallPolicies extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private Router $router;
+    private Router $model;
 
     public function __construct(Router $router)
     {
-        $this->router = $router;
+        $this->model = $router;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
-
-        $this->router->firewallPolicies()->each(function ($fwp) {
+        $this->model->firewallPolicies()->each(function ($fwp) {
             $fwp->delete();
         });
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->router->id]);
     }
 }

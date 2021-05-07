@@ -4,28 +4,24 @@ namespace App\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private NetworkPolicy $networkPolicy;
+    private NetworkPolicy $model;
 
     public function __construct(NetworkPolicy $networkPolicy)
     {
-        $this->networkPolicy = $networkPolicy;
+        $this->model = $networkPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->networkPolicy->id]);
-
-        $this->networkPolicy->network->router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/domains/default/security-policies/' . $this->networkPolicy->id
+        $this->model->network->router->availabilityZone->nsxService()->delete(
+            'policy/api/v1/infra/domains/default/security-policies/' . $this->model->id
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->networkPolicy->id]);
     }
 }

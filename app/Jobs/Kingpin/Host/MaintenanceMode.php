@@ -4,15 +4,14 @@ namespace App\Jobs\Kingpin\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
-use GuzzleHttp\Exception\ClientException;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class MaintenanceMode extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     private $model;
 
@@ -23,8 +22,6 @@ class MaintenanceMode extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $host = $this->model;
         $hostGroup = $this->model->hostGroup;
         $availabilityZone = $hostGroup->availabilityZone;
@@ -77,7 +74,5 @@ class MaintenanceMode extends Job
             $this->fail(new \Exception('Host ' . $host->id . ' could not be put into maintenance mode.'));
             return false;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }
