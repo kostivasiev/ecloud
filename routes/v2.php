@@ -155,10 +155,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
         $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
         $router->get('instances/{instanceId}/tasks', 'InstanceController@tasks');
-        $router->post('instances', 'InstanceController@store');
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
-
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
 
         $router->group(['middleware' => 'is-locked'], function () use ($router) {
