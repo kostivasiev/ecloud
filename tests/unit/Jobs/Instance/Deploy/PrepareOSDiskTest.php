@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Jobs\Network;
+namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;

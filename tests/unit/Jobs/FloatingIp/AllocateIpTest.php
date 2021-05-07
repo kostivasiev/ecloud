@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Jobs\Nat;
+namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Jobs\FloatingIp\AllocateIp;
 use App\Jobs\Nat\AwaitIPAddressAllocation;
