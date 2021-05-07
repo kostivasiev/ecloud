@@ -32,4 +32,4 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/firewall-policies/{firewallPolicyId}/tasks?page=2'
   tags:
-    - Virtual Private Clouds
+    - Firewall Policies

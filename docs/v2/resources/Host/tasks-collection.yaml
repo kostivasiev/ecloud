@@ -32,4 +32,4 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/hosts/{id}/tasks?page=2'
   tags:
-    - Virtual Private Clouds
+    - Hosts
