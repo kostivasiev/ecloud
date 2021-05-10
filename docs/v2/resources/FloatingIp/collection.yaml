@@ -13,10 +13,10 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/FloatingIP'
+                  $ref: '../../components/schemas/floatingIp.yaml'
               meta:
                 allOf:
-                  - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
+                  - $ref: '../../components/schemas/meta.yaml'
                   - type: object
                     properties:
                       pagination:
@@ -40,9 +40,10 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../public-openapi.yaml#/components/schemas/FloatingIP'
+          $ref: '../../components/schemas/floatingIp.yaml'
   responses:
-    201:
-      $ref: '../../public-openapi.yaml#/components/responses/FipIdResponse'
+    202:
+      description: Accepted
+      $ref: '../../resources/FloatingIp/responses/idResponse.yaml'
   tags:
     - Floating IPs

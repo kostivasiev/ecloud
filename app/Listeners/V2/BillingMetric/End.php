@@ -3,7 +3,6 @@
 namespace App\Listeners\V2\BillingMetric;
 
 use App\Models\V2\BillingMetric;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class End
@@ -26,9 +25,7 @@ class End
 
         $billingMetric->each(function ($metric) use ($event) {
             $metric->setEndDate();
-            Log::info(get_class($this) . ' : Updated end on billing metric ' . $metric->id . ' for resource', [
-                'event' => $event
-            ]);
+            Log::info(get_class($this) . ' : Updated end on billing metric ' . $metric->id . ' for resource', ['id' => $event->model->id]);
         });
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);

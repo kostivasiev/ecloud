@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Queue\PopulateFailedJobsUuids::class,
         \App\Console\Commands\Artisan\TestAuth::class,
         \App\Console\Commands\Host\Delete::class,
+        \App\Console\Commands\Billing\ProductCreate::class,
     ];
 
     /**
@@ -40,6 +41,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('vpc:process-billing')->monthlyOn(1, '01:00')->emailOutputTo(config('alerts.billing.to'));
+        if ($this->app->environment() == 'production') {
+            $schedule->command('vpc:process-billing')
+                ->monthlyOn(1, '01:00')
+                ->emailOutputTo(config('alerts.billing.to'));
+        }
     }
 }

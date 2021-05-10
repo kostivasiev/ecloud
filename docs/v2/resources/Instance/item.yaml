@@ -34,12 +34,14 @@ patch:
               required: false
               example: 1
             ram_capacity:
+              description: RAM capacity MiB
               type: integer
               required: false
               example: 1024
           description: 'Instances'
   responses:
-    200:
+    202:
+      description: Accepted
       $ref: '../../resources/Instance/responses/idResponse.yaml'
   tags:
     - Instances
@@ -47,7 +49,7 @@ delete:
   parameters:
     - $ref: '../../resources/Instance/parameters/instanceId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Instances

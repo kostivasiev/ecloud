@@ -9,8 +9,6 @@ use Tests\TestCase;
 class DeleteTest extends TestCase
 {
 
-    use DatabaseMigrations;
-
     protected DiscountPlan $discountPlan;
 
     public function setUp(): void

@@ -2,46 +2,38 @@
 
 namespace App\Jobs\Sync\FloatingIp;
 
+use App\Jobs\FloatingIp\AwaitNatRemoval;
+use App\Jobs\FloatingIp\DeleteNats;
 use App\Jobs\Job;
-use App\Jobs\Nsx\FloatingIp\UndeployCheck;
-use App\Jobs\Nsx\Nat\Undeploy as NatUndeploy;
-use App\Jobs\Nsx\Nat\UndeployCheck as NatUndeployCheck;
-use App\Models\V2\FloatingIp;
-use App\Models\V2\Nat;
-use Illuminate\Support\Facades\Log;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
+use App\Traits\V2\TaskableBatch;
+use Illuminate\Bus\Batch;
 
 class Delete extends Job
 {
-    /** @var FloatingIp */
-    private $model;
+    use TaskableBatch, LoggableTaskJob;
 
-    public function __construct(FloatingIp $model)
+    private Task $task;
+
+    public function __construct(Task $task)
     {
-        $this->model = $model;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        $jobs = [];
-        $nats = Nat::where('source_id', $this->model->id)
-            ->orWhere('destination_id', $this->model->id)
-            ->orWhere('translated_id', $this->model->id)
-            ->get()
-            ->filter(function ($model) {
-                return $model instanceof Nat;
-            });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeploy($nat);
-        });
-        $nats->each(function ($nat) use (&$jobs) {
-            $jobs[] = new NatUndeployCheck($nat);
-        });
-        $jobs[] = new UndeployCheck($this->model);
-
-        dispatch(array_shift($jobs)->chain($jobs));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        $floatingIp = $this->task->resource;
+        $this->deleteTaskBatch(
+            [
+                new DeleteNats($floatingIp),
+                new AwaitNatRemoval($floatingIp),
+            ]
+        )
+            // TODO: Remove this once atomic db constraint removed
+        ->then(function (Batch $batch) use ($floatingIp) {
+            $floatingIp->deleted = time();
+            $floatingIp->saveQuietly();
+        })->dispatch();
     }
 }

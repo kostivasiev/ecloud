@@ -49,7 +49,6 @@ class FirewallRule extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'saved' => Saved::class,
         'deleted' => Deleted::class,
     ];
 

@@ -3,30 +3,38 @@
 namespace App\Jobs\Sync\Network;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\Network\Undeploy;
-use App\Jobs\Nsx\Network\UndeployCheck;
-use App\Models\V2\Network;
-use Illuminate\Support\Facades\Log;
+use App\Jobs\Network\AwaitPortRemoval;
+use App\Jobs\Network\Undeploy;
+use App\Jobs\Network\UndeployCheck;
+use App\Jobs\Network\UndeployDiscoveryProfiles;
+use App\Jobs\Network\UndeployQoSProfiles;
+use App\Jobs\Network\UndeploySecurityProfiles;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    private $model;
+    use TaskableBatch, LoggableTaskJob;
 
-    public function __construct(Network $model)
+    private $task;
+
+    public function __construct(Task $task)
     {
-        $this->model = $model;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        $jobs = [
-            new Undeploy($this->model),
-            new UndeployCheck($this->model)
-        ];
-        dispatch(array_shift($jobs)->chain($jobs));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        $this->deleteTaskBatch([
+            [
+                new AwaitPortRemoval($this->task->resource),
+                new UndeploySecurityProfiles($this->task->resource),
+                new UndeployDiscoveryProfiles($this->task->resource),
+                new UndeployQoSProfiles($this->task->resource),
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
+            ],
+        ])->dispatch();
     }
 }

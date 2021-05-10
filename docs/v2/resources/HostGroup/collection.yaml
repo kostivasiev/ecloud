@@ -42,7 +42,8 @@ post:
         schema:
           $ref: '../../resources/HostGroup/schema.yaml'
   responses:
-    201:
+    202:
+      description: Accepted
       $ref: '../../resources/HostGroup/responses/idResponse.yaml'
   tags:
     - Host Groups

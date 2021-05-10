@@ -1,7 +1,7 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/PerPage'
-    - $ref: '../../public-openapi.yaml#/components/parameters/Page'
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
   responses:
     200:
       description: Success
@@ -13,10 +13,10 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/Volume'
+                  $ref: '../../components/schemas/volume.yaml'
               meta:
                 allOf:
-                  - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
+                  - $ref: '../../components/schemas/meta.yaml'
                   - type: object
                     properties:
                       pagination:
@@ -34,15 +34,16 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/volumes?page=2'
   tags:
     - Volumes
-#post:
-#  requestBody:
-#    required: true
-#    content:
-#      application/json:
-#        schema:
-#          $ref: '../../public-openapi.yaml#/components/schemas/Volume'
-#  responses:
-#    201:
-#      $ref: '../../public-openapi.yaml#/components/responses/VolumeIdResponse'
-#  tags:
-#    - Volumes
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/volume.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Volume/responses/idResponse.yaml'
+  tags:
+    - Volumes

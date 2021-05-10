@@ -14,7 +14,7 @@ Content-Type: application/json
 
 > {%
 client.test('Create a Network Policy', function () {
-    client.assert(response.status === 201, '201 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.global.set('network_policy_id', response.body.data.id);
     client.log('Policy ID: ' + response.body.data.id);
 });
@@ -40,7 +40,7 @@ Content-Type: application/json
 
 > {%
 client.test('Create a Network Rule', function () {
-    client.assert(response.status === 201, '201 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.global.set('network_rule_id', response.body.data.id);
     client.log('Network Rule ID: ' + response.body.data.id);
 });
@@ -64,7 +64,7 @@ Content-Type: application/json
 
 > {%
 client.test('Create a Network Rule Port', function () {
-    client.assert(response.status === 201, '201 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.global.set('network_rule_port_id', response.body.data.id);
     client.log('Network Rule Port ID: ' + response.body.data.id);
 });
@@ -103,7 +103,7 @@ Content-Type: application/json
 
 > {%
 client.test('Update Network Rule Ports', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
     client.assert(response.body.data.id, client.global.get('network_rule_port_id'));
 });
 %}
@@ -135,7 +135,7 @@ Content-Type: application/json
 
 > {%
 client.test('Delete Network Rule Ports', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -150,7 +150,7 @@ Content-Type: application/json
 
 > {%
 client.test('Delete Network Rule', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 

@@ -2,9 +2,12 @@
 
 namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Sync\Updated;
+use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
+use App\Models\V2\Router;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -17,6 +20,10 @@ class UpdateRamBilling
      */
     public function handle(Updated $event)
     {
+        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+            return;
+        }
+
         if (!$event->model->completed) {
             return;
         }
@@ -27,29 +34,55 @@ class UpdateRamBilling
             return;
         }
 
-        $time = Carbon::now();
+        $currentActiveMetrics = BillingMetric::where('resource_id', $instance->id)
+            ->whereNull('end')
+            ->whereIn('key', ['ram.capacity', 'ram.capacity.high'])
+            ->get();
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'ram.capacity');
-
-        if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == $instance->ram_capacity) {
+        if (!empty($currentActiveMetrics)) {
+            if ($currentActiveMetrics->sum('value') == $instance->ram_capacity) {
                 return;
             }
-            $currentActiveMetric->setEndDate($time);
+            $currentActiveMetrics->each(function ($metric) {
+                $metric->setEndDate();
+            });
         }
 
+        $standardTierLimitMiB = config('billing.ram_tiers.standard') * 1024;
+
+        // Standard tier billing
+        $this->addBilling(
+            $instance,
+            'ram.capacity',
+            ($instance->ram_capacity > $standardTierLimitMiB) ? $standardTierLimitMiB : $instance->ram_capacity,
+            $instance->availabilityZone->id . ': ram-1mb'
+        );
+
+        // High RAM tier billing
+        if ($instance->ram_capacity > $standardTierLimitMiB) {
+            $this->addBilling(
+                $instance,
+                'ram.capacity.high',
+                ($instance->ram_capacity - $standardTierLimitMiB),
+                $instance->availabilityZone->id . ': ram:high-1mb'
+            );
+        }
+    }
+
+    private function addBilling($instance, $key, $value, $billingProduct)
+    {
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->key = 'ram.capacity';
-        $billingMetric->value = $instance->ram_capacity;
-        $billingMetric->start = $time;
+        $billingMetric->key = $key;
+        $billingMetric->value = $value;
+        $billingMetric->start = Carbon::now();
 
-        $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'ram');
+        $product = $instance->availabilityZone->products()->where('product_name', $billingProduct)->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'ram\' billing product for availability zone ' . $instance->availabilityZone->id
+                'Failed to load billing product ' . $billingProduct .' for availability zone ' . $instance->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;

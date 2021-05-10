@@ -2,17 +2,13 @@
 
 namespace Tests\V2\FirewallRulePort;
 
-use App\Events\V2\FirewallPolicy\Saved;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $firewallRule;
 
     public function setUp(): void
@@ -57,7 +53,7 @@ class CreateTest extends TestCase
                 'destination' => '555'
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testValidICMPDataSucceeds()
@@ -75,7 +71,7 @@ class CreateTest extends TestCase
                 'protocol' => 'ICMPv4',
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testSourceANYSucceeds()
@@ -97,7 +93,7 @@ class CreateTest extends TestCase
                 'destination' => '555'
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testDestinationANYSucceeds()
@@ -119,7 +115,7 @@ class CreateTest extends TestCase
                 'destination' => 'ANY'
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        )->assertResponseStatus(202);
     }
 
     public function testMissingSourceFails()

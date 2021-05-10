@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
-use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Models\V2\Dhcp;
+use App\Models\V2\Task;
 use App\Resources\V2\DhcpResource;
+use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -25,7 +24,7 @@ class DhcpController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Dhcp::query();
+        $collection = Dhcp::forUser($request->user());
 
         $queryTransformer->config(Dhcp::class)
             ->transform($collection);
@@ -39,10 +38,10 @@ class DhcpController extends BaseController
      * @param string $dhcpId
      * @return DhcpResource
      */
-    public function show(string $dhcpId)
+    public function show(Request $request, string $dhcpId)
     {
         return new DhcpResource(
-            Dhcp::findOrFail($dhcpId)
+            Dhcp::forUser($request->user())->findOrFail($dhcpId)
         );
     }
 
@@ -53,14 +52,9 @@ class DhcpController extends BaseController
     public function create(CreateDhcpRequest $request)
     {
         $dhcp = new Dhcp($request->only(['name', 'vpc_id', 'availability_zone_id']));
-        try {
-            if (!$dhcp->save()) {
-                return $dhcp->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $dhcp->getSyncError();
-        }
-        return $this->responseIdMeta($request, $dhcp->id, 201);
+        $dhcp->save();
+
+        return $this->responseIdMeta($request, $dhcp->id, 202);
     }
 
     /**
@@ -70,26 +64,35 @@ class DhcpController extends BaseController
      */
     public function update(UpdateDhcpRequest $request, string $dhcpId)
     {
-        $dhcp = Dhcp::findOrFail($dhcpId);
+        $dhcp = Dhcp::forUser($request->user())->findOrFail($dhcpId);
         $dhcp->fill($request->only(['name']));
-        try {
-            if (!$dhcp->save()) {
-                return $dhcp->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $dhcp->getSyncError();
-        }
-        return $this->responseIdMeta($request, $dhcp->id, 200);
+
+        $dhcp->withTaskLock(function ($dhcp) {
+            $dhcp->save();
+        });
+
+        return $this->responseIdMeta($request, $dhcp->id, 202);
     }
 
-    public function destroy(string $dhcpId)
+    public function destroy(Request $request, string $dhcpId)
     {
-        $model = Dhcp::findOrFail($dhcpId);
-        try {
-            $model->delete();
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
-        return response()->json([], 204);
+        $dhcp = Dhcp::forUser($request->user())->findOrFail($dhcpId);
+
+        $dhcp->withTaskLock(function ($dhcp) {
+            $dhcp->delete();
+        });
+
+        return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $dhcpId)
+    {
+        $collection = Dhcp::forUser($request->user())->findOrFail($dhcpId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

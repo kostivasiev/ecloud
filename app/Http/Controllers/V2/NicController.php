@@ -5,13 +5,12 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateNicRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
 use App\Models\V2\Nic;
+use App\Models\V2\Task;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\TaskResource;
 use App\Rules\V2\IpAvailable;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class NicController extends BaseController
@@ -42,8 +41,10 @@ class NicController extends BaseController
             'network_id',
             'ip_address',
         ]));
+
         $nic->save();
-        return $this->responseIdMeta($request, $nic->id, 201);
+
+        return $this->responseIdMeta($request, $nic->id, 202);
     }
 
     public function update(UpdateNicRequest $request, string $nicId)
@@ -56,18 +57,33 @@ class NicController extends BaseController
             'ip_address'
         ]));
         $this->validate($request, ['ip_address' => [new IpAvailable($nic->network_id)]]);
-        if (!$nic->save()) {
-            return $nic->getSyncError();
-        }
-        return $this->responseIdMeta($request, $nic->id, 200);
+
+        $nic->withTaskLock(function ($nic) {
+            $nic->save();
+        });
+
+        return $this->responseIdMeta($request, $nic->id, 202);
     }
 
     public function destroy(Request $request, string $nicId)
     {
         $nic = Nic::forUser($request->user())->findOrFail($nicId);
-        if (!$nic->delete()) {
-            return $nic->getSyncError();
-        }
-        return response(null, 204);
+
+        $nic->withTaskLock(function ($nic) {
+            $nic->delete();
+        });
+
+        return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $nicId)
+    {
+        $collection = Nic::forUser($request->user())->findOrFail($nicId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $macAddress;
     protected $nic;
@@ -119,6 +117,6 @@ class UpdateTest extends TestCase
                 ],
                 'ecloud'
             )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
     }
 }

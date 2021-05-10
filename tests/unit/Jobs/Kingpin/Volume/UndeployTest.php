@@ -13,6 +13,7 @@ use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\QueryException;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -20,8 +21,6 @@ use Tests\TestCase;
 
 class UndeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $volume;
 
     public function setUp(): void
@@ -41,17 +40,19 @@ class UndeployTest extends TestCase
         });
 
         $this->kingpinServiceMock()->expects('delete')
-            ->withArgs(['/api/v1/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test'])
+            ->withArgs(['/api/v2/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test'])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
+        Event::fake();
+
         dispatch(new Undeploy($this->volume));
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testInstanceAttachedFails()
+    public function testDataVolumeWithInstanceAttachedFails()
     {
         Volume::withoutEvents(function() {
             $this->volume = factory(Volume::class)->create([
@@ -67,5 +68,30 @@ class UndeployTest extends TestCase
         $this->expectException(\Exception::class);
 
         dispatch(new Undeploy($this->volume));
+    }
+
+    public function testOSVolumeWithInstanceAttachedSucceeds()
+    {
+        Volume::withoutEvents(function() {
+            $this->volume = factory(Volume::class)->create([
+                'id' => 'vol-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'vmware_uuid' => 'uuid-test-uuid-test-uuid-test',
+                'os_volume' => true,
+            ]);
+        });
+
+        $this->kingpinServiceMock()->expects('delete')
+            ->withArgs(['/api/v2/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test'])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        Event::fake();
+
+        dispatch(new Undeploy($this->volume));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 }

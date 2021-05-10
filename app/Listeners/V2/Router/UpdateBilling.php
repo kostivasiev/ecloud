@@ -5,7 +5,8 @@ namespace App\Listeners\V2\Router;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\Router;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -16,11 +17,20 @@ class UpdateBilling
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         $model = $event->model;
-        if ($model instanceof Sync) {
+        if ($model instanceof Task) {
+            if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+                return;
+            }
+
             if (!$model->completed) {
                 return;
             }
-            $model = Router::find($event->model->resource_id);
+
+            if (get_class($event->model->resource) != Router::class) {
+                return;
+            }
+
+            $model = $event->model->resource;
         }
 
         if (!($model instanceof Router)) {

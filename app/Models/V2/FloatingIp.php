@@ -2,12 +2,14 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
+use App\Events\V2\FloatingIp\Deleting;
+use App\Events\V2\FloatingIp\Saved;
+use App\Events\V2\FloatingIp\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
-use App\Traits\V2\SyncableOverrides;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -19,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class FloatingIp extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public $keyPrefix = 'fip';
     public $incrementing = false;
@@ -34,34 +36,18 @@ class FloatingIp extends Model implements Filterable, Sortable
     ];
 
     protected $dispatchesEvents = [
-        'created' => Created::class,
+        'saving' => Saving::class,
+        'saved' => Saved::class,
+        'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($model) {
-            $model->attributes['deleted'] = time();
-            $model->save();
-        });
-    }
-
-    /**
-     * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
-     */
-    public function nat()
-    {
-        return $this->morphOne(Nat::class, 'destinationable', null, 'destination_id');
-    }
 
     /**
      * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
      */
     public function getResourceIdAttribute()
     {
-        return ($this->nat) ? $this->nat->translated_id : null;
+        return ($this->destinationNat()->exists()) ? $this->destinationNat->translated_id : null;
     }
 
     public function vpc()
@@ -94,52 +80,6 @@ class FloatingIp extends Model implements Filterable, Sortable
         return $query->whereHas('vpc.region', function ($query) use ($regionId) {
             $query->where('id', '=', $regionId);
         });
-    }
-
-    public function getStatus()
-    {
-        if (empty($this->ip_address)) {
-            return Sync::STATUS_FAILED;
-        }
-
-        if ($this->syncs()->count() && !$this->syncs()->latest()->first()->completed) {
-            return Sync::STATUS_INPROGRESS;
-        }
-
-        if (!$this->sourceNat && !$this->destinationNat) {
-            return Sync::STATUS_COMPLETE;
-        }
-
-        if (!$this->sourceNat || !$this->destinationNat) {
-            return Sync::STATUS_INPROGRESS;
-        }
-
-        if ($this->sourceNat->getStatus() !== 'complete') {
-            return $this->sourceNat->getStatus();
-        }
-
-        if ($this->destinationNat->getStatus() !== 'complete') {
-            return $this->destinationNat->getStatus();
-        }
-
-        return Sync::STATUS_COMPLETE;
-    }
-
-    public function getSyncFailureReason()
-    {
-        if (empty($this->ip_address)) {
-            return 'Awaiting IP Allocation';
-        }
-
-        if ($this->sourceNat->getSyncFailureReason() !== null) {
-            return $this->sourceNat->getSyncFailureReason();
-        }
-
-        if ($this->destinationNat->getSyncFailureReason() !== null) {
-            return $this->destinationNat->getSyncFailureReason();
-        }
-
-        return null;
     }
 
     /**

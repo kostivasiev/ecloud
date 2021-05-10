@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class GetVpcsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $regions;
     protected $vpc;

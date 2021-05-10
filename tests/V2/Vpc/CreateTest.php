@@ -12,9 +12,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-
-    use DatabaseMigrations;
-
     public function testNoPermsIsDenied()
     {
         $data = [
@@ -101,5 +98,42 @@ class CreateTest extends TestCase
                 'status' => 403
             ]
         )->assertResponseStatus(403);
+    }
+
+    public function testExceedMaxVpcLimit()
+    {
+        config(['defaults.vpc.max_count' => 10]);
+        $counter = 1;
+        factory(Vpc::class, (int) config('defaults.vpc.max_count'))
+            ->make([
+                'reseller_id' => 1,
+                'region_id' => $this->region()->id,
+                'console_enabled' => true,
+            ])
+            ->each(function ($vpc) use (&$counter) {
+                $vpc->id = 'vpc-test' . $counter;
+                $vpc->name = 'TestVPC-' . $counter;
+                $vpc->saveQuietly();
+                $counter++;
+            });
+
+        $data = [
+            'name' => 'CreateTest Name',
+            'reseller_id' => 1,
+            'region_id' => $this->region()->id
+        ];
+        $this->post(
+            '/v2/vpcs',
+            $data,
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The maximum number of ' . config('defaults.vpc.max_count') . ' VPCs has been reached',
+            ]
+        )->assertResponseStatus(422);
     }
 }

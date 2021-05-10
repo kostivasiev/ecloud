@@ -24,6 +24,19 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
     {
         parent::__construct($attributes);
         $this->timestamps = false;
+
+        $this->fillable([
+            'product_sales_product_id',
+            'product_name',
+            'product_category',
+            'product_subcategory',
+            'product_supplier',
+            'product_active',
+            'product_duration_type',
+            'product_duration_length',
+            'product_cost_currency',
+            'product_cost_price',
+        ]);
     }
 
     const PRODUCT_CATEGORIES = [
@@ -32,6 +45,7 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
         'Storage',
         'License',
         'Support',
+        'Dedicated Hosts'
     ];
 
     protected $appends = [
@@ -97,8 +111,8 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
      */
     public function getNameAttribute()
     {
-        preg_match("/(az-\w+[^:])(:\s)(\S[^-]+)/", $this->attributes['product_name'], $matches);
-        return str_replace(' ', '_', $matches[3] ?? null);
+        preg_match("/az-\w+[^:]:\s?(?(?=hs-)(hs-\S[^-]+)|(\S[^-]+))/", $this->attributes['product_name'], $matches);
+        return str_replace(' ', '_', array_pop($matches) ?? null);
     }
 
     /**
@@ -106,8 +120,8 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
      */
     public function getAvailabilityZoneIdAttribute()
     {
-        preg_match("/(az-\w+[^:])(:\s)(\S[^-]+)/", $this->attributes['product_name'], $matches);
-        return $matches[1] ?? null;
+        preg_match("/^az-\w+[^:]/", $this->attributes['product_name'], $matches);
+        return $matches[0] ?? null;
     }
 
     public function getCategoryAttribute()

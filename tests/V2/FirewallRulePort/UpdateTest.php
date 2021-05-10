@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $firewallRule;
     protected $firewallRulePort;
 
@@ -69,7 +67,7 @@ class UpdateTest extends TestCase
                 'destination' => '80'
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testUpdateWithICMPValues()
@@ -94,7 +92,7 @@ class UpdateTest extends TestCase
                 'destination' => null
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
     }
 
     public function testEmptySourceFails()

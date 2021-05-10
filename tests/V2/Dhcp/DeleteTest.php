@@ -11,13 +11,11 @@ use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var AvailabilityZone */
     protected $availabilityZone;
     /** @var Region */
@@ -87,7 +85,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/dhcps/' . $this->dhcp->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
+        ])->assertResponseStatus(202);
         $this->assertNotNull(Dhcp::withTrashed()->findOrFail($this->dhcp->id)->deleted_at);
 
         Event::assertDispatched(Deleted::class, function ($job) {

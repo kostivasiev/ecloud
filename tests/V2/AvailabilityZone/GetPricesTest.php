@@ -16,8 +16,6 @@ use Tests\TestCase;
 
 class GetPricesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected LoadBalancerCluster $lbc;
     protected Router $router;

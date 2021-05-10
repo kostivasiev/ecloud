@@ -4,11 +4,12 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Network\CreateRequest;
 use App\Http\Requests\V2\Network\UpdateRequest;
-use App\Jobs\Nsx\Network\Undeploy;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\Task;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -138,9 +139,10 @@ class NetworkController extends BaseController
             'name',
             'subnet',
         ]));
+
         $network->save();
-        $network->refresh();
-        return $this->responseIdMeta($request, $network->id, 201);
+
+        return $this->responseIdMeta($request, $network->id, 202);
     }
 
     /**
@@ -154,23 +156,27 @@ class NetworkController extends BaseController
         $network->fill($request->only([
             'name',
         ]));
-        if (!$network->save()) {
-            return $network->getSyncError();
-        }
-        return $this->responseIdMeta($request, $network->id, 200);
+
+        $network->withTaskLock(function ($network) {
+            $network->save();
+        });
+
+        return $this->responseIdMeta($request, $network->id, 202);
     }
 
     public function destroy(Request $request, string $networkId)
     {
-        $model = Network::forUser($request->user())->findOrFail($networkId);
+        $network = Network::forUser($request->user())->findOrFail($networkId);
 
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
+        if (!$network->canDelete()) {
+            return $network->getDeletionError();
         }
-        if (!$model->delete()) {
-            return $model->getSyncError();
-        }
-        return response()->json([], 204);
+
+        $network->withTaskLock(function ($network) {
+            $network->delete();
+        });
+
+        return response('', 202);
     }
 
     /**
@@ -186,6 +192,17 @@ class NetworkController extends BaseController
             ->transform($collection);
 
         return NicResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $networkId)
+    {
+        $collection = Network::forUser($request->user())->findOrFail($networkId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

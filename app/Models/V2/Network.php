@@ -12,7 +12,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
-use App\Traits\V2\SyncableOverrides;
+use App\Traits\V2\Taskable;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,7 +28,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Network extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, SyncableOverrides;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'net';
     public $incrementing = false;
@@ -73,7 +73,7 @@ class Network extends Model implements Filterable, Sortable
      * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/9e1c6bcc-85db-46b6-bc38-d6d2431e7c17/30af91b5-3a91-4d5d-8ed5-a7d806764a16/api_includes/method_GetSegmentState.html
      * When the configuration is actually in effect, the state will change to "success".
      */
-    public function getAvailableAttribute()
+/*    public function getAvailableAttribute()
     {
         try {
             $response = $this->router->availabilityZone->nsxService()->get(
@@ -88,7 +88,7 @@ class Network extends Model implements Filterable, Sortable
             ]);
             return false;
         }
-    }
+    }*/
 
     /**
      * @param $query

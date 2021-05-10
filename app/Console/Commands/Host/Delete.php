@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 /**
  * Class Delete
- * Delete an instance from vmware
+ * Delete a Host and free up physical infrastructure
  * @param string instanceId
  * @package App\Console\Commands\Kingpin\Instance
  */
@@ -35,14 +35,25 @@ class Delete extends Command
             );
             $response = json_decode($response->getBody()->getContents());
 
-
             $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
 
             if (empty($macAddress)) {
                 $this->alert('Failed to load eth0 address for host ' . $host->id);
                 //return Command::FAILURE;
             }
+
             $this->line('Found host on UCS MAC address ' . $macAddress);
+
+            try {
+                // Put host into maintenance mode
+                $availabilityZone->kingpinService()->post(
+                    '/api/v2/vpc/' . $host->hostGroup->vpc->id . '/hostgroup/' . $host->hostGroup->id . '/host/' . $macAddress . '/maintenance'
+                );
+                $this->line('Successfully put host into maintenance mode on VMWare');
+            } catch (\Exception $exception) {
+                $this->alert('Failed to put host into maintenance mode on VMWare ' . $exception->getMessage());
+                //return Command::FAILURE;
+            }
 
             try {
                 $availabilityZone->conjurerService()->delete(
@@ -54,16 +65,14 @@ class Delete extends Command
                 //return Command::FAILURE;
             }
 
-            if (!empty($macAddress)) {
-                try {
-                    $availabilityZone->kingpinService()->delete(
-                        '/api/v2/vpc/' . $host->hostGroup->vpc->id . '/hostgroup/' . $host->hostGroup->id . '/host/' . $macAddress
-                    );
-                    $this->line('Deleted host from VMWare');
-                } catch (\Exception $exception) {
-                    $this->alert('Failed to delete Kingpin host profile for host ' . $host->id);
-                    //return Command::FAILURE;
-                }
+            try {
+                $availabilityZone->kingpinService()->delete(
+                    '/api/v2/vpc/' . $host->hostGroup->vpc->id . '/hostgroup/' . $host->hostGroup->id . '/host/' . $macAddress
+                );
+                $this->line('Deleted host from VMWare');
+            } catch (\Exception $exception) {
+                $this->alert('Failed to delete Kingpin host profile for host ' . $exception->getMessage());
+                //return Command::FAILURE;
             }
         } catch (RequestException $exception) {
             if ($exception->getCode() == 404) {
@@ -77,11 +86,11 @@ class Delete extends Command
             );
             $this->line('Deleted host from SAN');
         } catch (\Exception $exception) {
-            $this->alert('Failed to delete host from Artisan ' . $exception->getMessage());
-            return Command::FAILURE;
+            $this->alert('Failed to delete host from SAN ' . $exception->getMessage());
+            //return Command::FAILURE;
         }
 
-        $host->syncDelete();
+        $host->delete();
 
         return Command::SUCCESS;
     }

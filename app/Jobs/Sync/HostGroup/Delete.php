@@ -3,34 +3,29 @@
 namespace App\Jobs\Sync\HostGroup;
 
 use App\Jobs\Job;
-use App\Models\V2\HostGroup;
-use Illuminate\Support\Facades\Log;
+use App\Jobs\Kingpin\HostGroup\DeleteCluster;
+use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    private $model;
+    use TaskableBatch, LoggableTaskJob;
 
-    public function __construct(HostGroup $model)
+    private $task;
+
+    public function __construct(Task $task)
     {
-        $this->model = $model;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        $jobs = [
-            // TODO :- Undeploy
-            new \App\Jobs\Sync\Completed($this->model),
-            new \App\Jobs\Sync\Delete($this->model),
-        ];
-        dispatch(array_shift($jobs)->chain($jobs));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $hostGroup = $this->task->resource;
+        $this->deleteTaskBatch([
+                new DeleteTransportNodeProfile($hostGroup),
+                new DeleteCluster($hostGroup),
+        ])->dispatch();
     }
 }

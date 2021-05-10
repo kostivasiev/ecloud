@@ -9,6 +9,6 @@ post:
           $ref: '../../components/schemas/volume/attach.yaml'
   responses:
     202:
-      description: Success
+      description: Accepted
   tags:
     - Volumes

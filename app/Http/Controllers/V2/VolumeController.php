@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Volume\AttachRequest;
 use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,24 +23,24 @@ class VolumeController extends BaseController
     public function index(Request $request)
     {
         if ($request->hasAny([
-            'mounted',
-            'mounted:eq',
-            'mounted:neq',
+            'attached',
+            'attached:eq',
+            'attached:neq',
         ])) {
-            if ($request->has('mounted') || $request->has('mounted:eq')) {
-                if ($request->has('mounted')) {
-                    $mounted = filter_var($request->get('mounted'), FILTER_VALIDATE_BOOLEAN);
-                    $request->query->remove('mounted');
+            if ($request->has('attached') || $request->has('attached:eq')) {
+                if ($request->has('attached')) {
+                    $attached = filter_var($request->get('attached'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached');
                 } else {
-                    $mounted = filter_var($request->get('mounted:eq'), FILTER_VALIDATE_BOOLEAN);
-                    $request->query->remove('mounted:eq');
+                    $attached = filter_var($request->get('attached:eq'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached:eq');
                 }
-            } elseif ($request->has('mounted:neq')) {
-                $mounted = !filter_var($request->get('mounted:neq'), FILTER_VALIDATE_BOOLEAN);
-                $request->query->remove('mounted:neq');
+            } elseif ($request->has('attached:neq')) {
+                $attached = !filter_var($request->get('attached:neq'), FILTER_VALIDATE_BOOLEAN);
+                $request->query->remove('attached:neq');
             }
 
-            if ($mounted) {
+            if ($attached) {
                 $collection = Volume::forUser($request->user())->has('instances', '>', 0);
             } else {
                 $collection = Volume::forUser($request->user())->has('instances', '=', 0);
@@ -94,10 +96,10 @@ class VolumeController extends BaseController
             'capacity',
             'iops',
         ]));
-        if (!$model->save()) {
-            return $model->getSyncError();
-        }
-        return $this->responseIdMeta($request, $model->id, 201);
+
+        $model->save();
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
@@ -108,49 +110,60 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
-        try {
-            if (!$volume->save()) {
-                return $volume->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $volume->getSyncError();
-        }
 
-        return $this->responseIdMeta($request, $volume->id, 200);
+        $volume->withTaskLock(function ($volume) {
+            $volume->save();
+        });
+
+        return $this->responseIdMeta($request, $volume->id, 202);
     }
 
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
-        try {
+
+        $volume->withTaskLock(function ($volume) {
             $volume->delete();
-        } catch (SyncException $exception) {
-            return $volume->getSyncError();
-        }
-        return response('', 204);
+        });
+
+        return response('', 202);
     }
 
     public function attach(AttachRequest $request, string $volumeId)
     {
-        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
-        try {
-            $instance->volumes()->attach($model);
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $volume->withTaskLock(function ($volume) use ($instance) {
+            $instance->withTaskLock(function ($instance) use ($volume) {
+                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
+                    throw new TaskException();
+                }
+
+                $task = $volume->createTask('volume_attach', \App\Jobs\Tasks\Volume\VolumeAttach::class, ['instance_id' => $instance->id]);
+                $instance->createTask('volume_attach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
+            });
+        });
+
         return response('', 202);
     }
 
     public function detach(DetachRequest $request, string $volumeId)
     {
-        $model = Volume::forUser(Auth::user())->findOrFail($volumeId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
-        try {
-            $instance->volumes()->detach($model);
-        } catch (SyncException $exception) {
-            return $model->getSyncError();
-        }
+
+        $volume->withTaskLock(function ($volume) use ($instance) {
+            $instance->withTaskLock(function ($instance) use ($volume) {
+                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
+                    throw new TaskException();
+                }
+
+                $task = $volume->createTask('volume_detach', \App\Jobs\Tasks\Volume\VolumeDetach::class, ['instance_id' => $instance->id]);
+                $instance->createTask('volume_detach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
+            });
+        });
+
         return response('', 202);
     }
 
@@ -161,6 +174,17 @@ class VolumeController extends BaseController
             ->transform($collection);
 
         return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $volumeId)
+    {
+        $collection = Volume::forUser($request->user())->findOrFail($volumeId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

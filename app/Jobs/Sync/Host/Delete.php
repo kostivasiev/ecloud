@@ -3,34 +3,30 @@
 namespace App\Jobs\Sync\Host;
 
 use App\Jobs\Job;
-use App\Models\V2\Host;
-use Illuminate\Support\Facades\Log;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    private $model;
+    use TaskableBatch, LoggableTaskJob;
 
-    public function __construct(Host $model)
+    private $task;
+
+    public function __construct(Task $task)
     {
-        $this->model = $model;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        $jobs = [
-            // TODO :- Undeploy
-            new \App\Jobs\Sync\Completed($this->model),
-            new \App\Jobs\Sync\Delete($this->model),
-        ];
-        dispatch(array_shift($jobs)->chain($jobs));
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
+        $host = $this->task->resource;
+        $this->deleteTaskBatch([
+            new \App\Jobs\Kingpin\Host\MaintenanceMode($host),
+            new \App\Jobs\Kingpin\Host\DeleteInVmware($host),
+            new \App\Jobs\Conjurer\Host\PowerOff($host),
+            new \App\Jobs\Artisan\Host\RemoveFrom3Par($host),
+            new \App\Jobs\Conjurer\Host\DeleteServiceProfile($host),
+        ])->dispatch();
     }
 }

@@ -43,6 +43,7 @@ post:
           $ref: '../../resources/Host/schema.yaml'
   responses:
     202:
+      description: Accepted
       $ref: '../../resources/Host/responses/idResponse.yaml'
   tags:
     - Hosts

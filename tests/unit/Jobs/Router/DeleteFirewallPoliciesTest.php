@@ -16,8 +16,6 @@ use Tests\TestCase;
 
 class DeleteFirewallPoliciesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Router $router;
     protected FirewallPolicy $fwp1;
     protected FirewallPolicy $fwp2;

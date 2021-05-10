@@ -61,7 +61,7 @@ Content-Type:  application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 

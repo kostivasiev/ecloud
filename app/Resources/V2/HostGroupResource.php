@@ -15,7 +15,8 @@ class HostGroupResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
             'host_spec_id' => $this->host_spec_id,
-            'sync' => $this->getStatus(),
+            'windows_enabled' => $this->windows_enabled,
+            'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

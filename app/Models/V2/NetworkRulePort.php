@@ -2,8 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NetworkRulePort\Deleted;
-use App\Events\V2\NetworkRulePort\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -35,10 +33,6 @@ class NetworkRulePort extends Model implements Filterable, Sortable
             'protocol',
             'source',
             'destination',
-        ];
-        $this->dispatchesEvents = [
-            'saved' => Saved::class,
-            'deleted' => Deleted::class,
         ];
         parent::__construct($attributes);
     }

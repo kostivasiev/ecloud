@@ -43,7 +43,8 @@ post:
         schema:
           $ref: '../../components/schemas/networkRule.yaml'
   responses:
-    201:
+    202:
+      description: Accepted
       $ref: '../../resources/NetworkRule/responses/idResponse.yaml'
   tags:
     - Network Rule

@@ -6,18 +6,19 @@ use App\Jobs\Job;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Services\V2\PasswordService;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PrepareOsUsers extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     /**
@@ -26,10 +27,7 @@ class PrepareOsUsers extends Job
      */
     public function handle(PasswordService $passwordService)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        $instance = $this->instance;
-
+        $instance = $this->model;
         $guestAdminCredential = $instance->credentials()
             ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
@@ -65,6 +63,7 @@ class PrepareOsUsers extends Job
                     'name' => $username,
                     'resource_id' => $instance->id,
                     'username' => $username,
+                    'port' => $instance->platform == 'Linux' ? '2020' : '3389',
                 ]);
                 $credential->password = $password;
                 $credential->save();
@@ -130,7 +129,5 @@ class PrepareOsUsers extends Job
                 Log::info('PrepareOsUsers for instance ' . $instance->id . ' : Pushed Linux account "' . $username . '"');
             });
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

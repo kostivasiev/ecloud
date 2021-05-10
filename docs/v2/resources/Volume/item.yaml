@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: '../../resources/Volume/parameters/volumeId.yaml'
   responses:
     200:
       description: success
@@ -17,7 +17,7 @@ get:
     - Volumes
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: '../../resources/Volume/parameters/volumeId.yaml'
   requestBody:
     required: true
     content:
@@ -35,16 +35,19 @@ patch:
                   readOnly: true
                 capacity:
                   required: false
+                type:
+                  readOnly: true
   responses:
-    200:
-      $ref: '../../public-openapi.yaml#/components/responses/VolumeIdResponse'
+    202:
+      description: Accepted
+      $ref: '../../resources/Volume/responses/idResponse.yaml'
   tags:
     - Volumes
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VolumeId'
+    - $ref: '../../resources/Volume/parameters/volumeId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Volumes

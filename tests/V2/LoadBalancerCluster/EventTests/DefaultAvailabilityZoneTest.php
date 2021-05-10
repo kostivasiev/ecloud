@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class DefaultAvailabilityZoneTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Generator $faker;
     protected AvailabilityZone $availability_zone;
     protected Region $region;

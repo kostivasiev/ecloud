@@ -11,12 +11,13 @@ X-Reseller-Id: 1
     "name": "test host group",
     "vpc_id": "{{dev_vpc_id}}",
     "availability_zone_id" : "{{dev_availability_zone_id}}",
-    "host_spec_id" : "{{dev_host_spec_id}}"
+    "host_spec_id" : "{{dev_host_spec_id}}",
+    "windows_enabled": true
 }
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 
 client.global.set('host_group_id', response.body.data.id);
@@ -53,6 +54,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.vpc_id === "vpc-aaaaaaaa");
   client.assert(response.body.data.availability_zone_id === "az-aaaaaaaa");
   client.assert(response.body.data.host_spec_id === "hs-aaaaaaaa");
+  client.assert(response.body.data.windows_enabled === true);
 });
 %}
 
@@ -70,7 +72,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 ###
@@ -98,7 +100,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 

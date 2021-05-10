@@ -7,12 +7,9 @@ use App\Models\V1\ApplianceParameter;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\ApplianceVersion;
 use App\Models\V1\Pod;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class ApplianceTestCase extends TestCase
 {
-    use DatabaseMigrations;
-
     public $appliances;
 
     /**

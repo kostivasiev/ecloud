@@ -3,42 +3,35 @@
 namespace App\Jobs\Nic;
 
 use App\Jobs\Job;
-use App\Models\V2\FloatingIp;
-use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 
 class UnassignFloatingIP extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
     
-    private $nic;
+    private $model;
 
     public function __construct(Nic $nic)
     {
-        $this->nic = $nic;
+        $this->model = $nic;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->nic->id]);
-
-        $nic = $this->nic;
+        $nic = $this->model;
         $logMessage = 'UnassignFloatingIp for NIC ' . $nic->id . ': ';
         Log::info($logMessage . 'Started');
-        Nat::whereHasMorph('translated', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
-            $query->where('translated_id', $nic->id)->withTrashed();
-        })
-            ->orWhereHasMorph('source', [Nic::class, FloatingIp::class], function (Builder $query) use ($nic) {
-                $query->where('source_id', $nic->id)->withTrashed();
-            })
-            ->each(function ($nat) use ($logMessage) {
-                Log::info($logMessage . 'Floating IP ' . $nat->destination_id . ' unassigned');
-                $nat->delete();
-            });
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->nic->id]);
+        if ($this->model->sourceNat()->exists()) {
+            Log::info($logMessage . 'Floating IP ' . $this->model->sourceNat->translated_id . ' unassigned');
+            $this->model->sourceNat->delete();
+        }
+        if ($this->model->destinationNat()->exists()) {
+            Log::info($logMessage . 'Floating IP ' . $this->model->sourceNat->translated_id . ' unassigned');
+            $this->model->destinationNat->delete();
+        }
     }
 }

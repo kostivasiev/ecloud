@@ -6,8 +6,10 @@ use App\Http\Requests\V2\CreateFirewallPolicyRequest;
 use App\Http\Requests\V2\UpdateFirewallPolicyRequest;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
+use App\Models\V2\Task;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
+use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -46,31 +48,47 @@ class FirewallPolicyController extends BaseController
 
     public function store(CreateFirewallPolicyRequest $request)
     {
-        $model = new FirewallPolicy();
+        $model = app()->make(FirewallPolicy::class);
         $model->fill($request->only(['name', 'sequence', 'router_id']));
-        if (!$model->save()) {
-            return $model->getSyncError();
-        }
-        $model->refresh();
-        return $this->responseIdMeta($request, $model->id, 201);
+
+        $model->withTaskLock(function ($policy) {
+            $policy->save();
+        });
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
     {
         $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $model->fill($request->only(['name', 'sequence']));
-        if (!$model->save()) {
-            return $model->getSyncError();
-        }
-        return $this->responseIdMeta($request, $model->id, 200);
+
+        $model->withTaskLock(function ($policy) {
+            $policy->save();
+        });
+
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)
     {
         $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
-        if (!$model->delete()) {
-            return $model->getSyncError();
-        }
-        return response()->json([], 204);
+
+        $model->withTaskLock(function ($model) {
+            $model->delete();
+        });
+
+        return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
+    {
+        $collection = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

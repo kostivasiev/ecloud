@@ -2,10 +2,11 @@
 
 namespace App\Listeners\V2\Instance;
 
-use App\Events\V2\Sync\Updated;
+use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Resource;
+use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -18,15 +19,19 @@ class UpdateLicenseBilling
      */
     public function handle(Updated $event)
     {
+        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+            return;
+        }
+
         if (!$event->model->completed) {
             return;
         }
 
-        if (Resource::classFromId($event->model->resource_id) != Instance::class) {
+        if (get_class($event->model->resource) != Instance::class) {
             return;
         }
 
-        $instance = Instance::find($event->model->resource_id);
+        $instance = $event->model->resource;
 
         if (empty($instance)) {
             return;
@@ -36,11 +41,12 @@ class UpdateLicenseBilling
             return;
         }
 
-        $time = Carbon::now();
-
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.windows');
         if (!empty($currentActiveMetric)) {
-            return;
+            if ($currentActiveMetric->value == $instance->vcpu_cores) {
+                return;
+            }
+            $currentActiveMetric->setEndDate();
         }
 
         $billingMetric = app()->make(BillingMetric::class);
@@ -48,10 +54,12 @@ class UpdateLicenseBilling
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->key = 'license.windows';
-        $billingMetric->value = 1;
-        $billingMetric->start = $time;
+        $billingMetric->value = $instance->vcpu_cores;
+        $billingMetric->start = Carbon::now();
 
-        $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'windows');
+        $product = $instance->availabilityZone->products()
+            ->where('product_name', $instance->availabilityZone->id . ': windows-os-license')
+            ->first();
         if (empty($product)) {
             Log::error(
                 'Failed to load \'windows\' billing product for availability zone ' . $instance->availabilityZone->id

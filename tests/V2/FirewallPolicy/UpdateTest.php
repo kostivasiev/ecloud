@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FirewallPolicy $policy;
     protected array $oldData;
 
@@ -55,7 +53,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
 
         $firewallPolicy = FirewallPolicy::findOrFail((json_decode($this->response->getContent()))->data->id);
         $this->assertEquals($data['name'], $firewallPolicy->name);

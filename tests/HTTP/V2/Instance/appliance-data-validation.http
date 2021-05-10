@@ -23,7 +23,7 @@ Content-Type:  application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 201");
+  client.assert(response.status === 202, "Response status is not 202");
   client.global.set('instance_id', response.body.data.id);
 });
 %}
@@ -53,7 +53,7 @@ Content-Type:  application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 201");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 

@@ -1,89 +1,3 @@
-## Setup Dependancies
-POST https://{{host}}/{{version}}/regions
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-  "name": "Test Region - LbcCrud"
-}
-
-> {%
-client.global.set('region_id', response.body.data.id);
-client.log('Region ID: ' + response.body.data.id);
-%}
-
-###
-POST https://{{host}}/{{version}}/availability-zones
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-  "code": "MAN1",
-  "name": "Test availability zone (v)",
-  "datacentre_site_id": 8,
-  "nsx_manager_endpoint": "https://185.197.63.88/",
-  "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
-  "region_id": "{{region_id}}"
-}
-
-> {%
-client.global.set('availability_zone_id', response.body.data.id);
-client.log('Availability Zone ID: ' + response.body.data.id);
-%}
-
-###
-
-POST https://{{host}}/{{version}}/credentials
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-  "name": "NSX",
-  "resource_id": "{{availability_zone_id}}",
-  "host": "https://185.197.63.88",
-  "username": "ecloud.api@ecloudgov.dev",
-  "password": "a5hfysIVpUND"
-}
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 200");
-});
-
-client.global.set('nsx_credential_id', response.body.data.id);
-client.log('NSX Credential ID: ' + response.body.data.id);
-%}
-
-###
-
-
-POST https://{{host}}/{{version}}/vpcs
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-X-Reseller-Id: 1
-
-{
-  "region_id": "{{region_id}}"
-}
-
-> {%
-client.global.set('vpc_id', response.body.data.id);
-client.log('VPC UUID: ' + response.body.data.id);
-%}
-
-###
-
-
-## Test Resource CRUD
-
 POST https://{{host}}/{{version}}/floating-ips
 Accept: */*
 Cache-Control: no-cache
@@ -92,12 +6,12 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "vpc_id": "{{vpc_id}}"
+  "vpc_id": "{{dev_vpc_id}}"
 }
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 
 client.global.set('fip_id', response.body.data.id);
@@ -105,12 +19,6 @@ client.log('Floating IP ID: ' + response.body.data.id);
 %}
 
 ###
-
-
-
-###
-
-
 GET https://{{host}}/{{version}}/floating-ips
 Accept: */*
 Cache-Control: no-cache
@@ -125,7 +33,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
 GET https://ecloud-apio.paul.rnd.ukfast/v2/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -143,7 +50,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
 PATCH https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -157,13 +63,12 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
   client.assert(response.body.data.id === client.global.get('fip_id'), "Incorrect resource ID returned");
 });
 %}
 
 ###
-
 GET https://ecloud-apio.paul.rnd.ukfast/v2/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -180,9 +85,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-
-
-
 DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -192,7 +94,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
@@ -210,31 +112,3 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 404, "Response status is not 404");
 });
 %}
-
-
-
-
-### Tear down dependancies
-#DELETE https://{{host}}/{{version}}/regions/{{region_id}}
-#Accept: */*
-#Cache-Control: no-cache
-#X-consumer-custom-id: 0-0
-#X-consumer-groups: ecloud.read, ecloud.write
-#Content-Type: application/json
-#
-####
-#DELETE https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
-#Accept: */*
-#Cache-Control: no-cache
-#X-consumer-custom-id: 0-0
-#X-consumer-groups: ecloud.read, ecloud.write
-#Content-Type: application/json
-#
-####
-#DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
-#Accept: */*
-#Cache-Control: no-cache
-#X-consumer-custom-id: 0-0
-#X-consumer-groups: ecloud.read, ecloud.write
-#Content-Type: application/json
-

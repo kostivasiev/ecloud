@@ -4,37 +4,25 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
-use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\Log;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
 
 class PowerOn extends Job
 {
-    private $model;
+    use Batchable, LoggableModelJob;
 
-    public function __construct(Host $model)
+    private Host $model;
+
+    public function __construct(Host $host)
     {
-        $this->model = $model;
+        $this->model = $host;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        $host = $this->model;
-        $availabilityZone = $host->hostGroup->availabilityZone;
-
+        $availabilityZone = $this->model->hostGroup->availabilityZone;
         $availabilityZone->conjurerService()->post(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id .'/host/' . $host->id . '/power'
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $this->model->hostGroup->vpc->id .'/host/' . $this->model->id . '/power'
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
-            $exception->getResponse()->getBody()->getContents() :
-            $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
     }
 }

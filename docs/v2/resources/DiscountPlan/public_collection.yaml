@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../components/schemas/admin/discountPlan.yaml'
+                  $ref: '../../components/schemas/discountPlan.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

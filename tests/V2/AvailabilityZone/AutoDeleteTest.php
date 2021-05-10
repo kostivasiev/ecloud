@@ -16,8 +16,6 @@ use Tests\TestCase;
 
 class AutoDeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Dhcp $dhcp;
     protected Credential $credential;
 

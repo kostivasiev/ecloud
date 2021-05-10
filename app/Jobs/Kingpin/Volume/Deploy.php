@@ -4,13 +4,14 @@ namespace App\Jobs\Kingpin\Volume;
 
 use App\Jobs\Job;
 use App\Models\V2\Volume;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     private $model;
 
@@ -21,10 +22,7 @@ class Deploy extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $volume = $this->model;
-
         if (!empty($volume->vmware_uuid)) {
             Log::info('Volume already deployed. Nothing to do.');
             return true;
@@ -32,7 +30,7 @@ class Deploy extends Job
 
         try {
             $response = $volume->availabilityZone->kingpinService()->post(
-                '/api/v1/vpc/' . $volume->vpc_id . '/volume',
+                '/api/v2/vpc/' . $volume->vpc_id . '/volume',
                 [
                     'json' => [
                         'volumeId' => $volume->id,
@@ -71,12 +69,5 @@ class Deploy extends Job
         ]);
 
         $volume->saveQuietly();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }

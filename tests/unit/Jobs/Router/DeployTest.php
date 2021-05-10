@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Router $router;
 
     public function setUp(): void
@@ -68,6 +66,11 @@ class DeployTest extends TestCase
                             'tag' => $this->router()->vpc_id,
                         ],
                     ],
+                    'route_advertisement_types' => [
+                        'TIER1_IPSEC_LOCAL_ENDPOINT',
+                        'TIER1_STATIC_ROUTES',
+                        'TIER1_NAT'
+                    ],
                     'qos_profile' => [
                         'egress_qos_profile_path' => '/some/qos/path',
                         'ingress_qos_profile_path' => '/some/qos/path'
@@ -114,6 +117,11 @@ class DeployTest extends TestCase
                             'scope' => config('defaults.tag.scope'),
                             'tag' => $this->router()->vpc_id,
                         ],
+                    ],
+                    'route_advertisement_types' => [
+                        'TIER1_IPSEC_LOCAL_ENDPOINT',
+                        'TIER1_STATIC_ROUTES',
+                        'TIER1_NAT'
                     ],
                     'qos_profile' => [
                         'egress_qos_profile_path' => '/some/qos/path',

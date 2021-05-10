@@ -19,9 +19,15 @@ properties:
     example: 'rtr-4c63cf58'
     readOnly: true
   sync:
-    type: string
-    example: 'completed'
+    type: object
     readOnly: true
+    properties:
+      status:
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example: complete
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example: update
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

@@ -10,6 +10,7 @@ use App\Events\V2\Nic\Saved;
 use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -23,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Nic extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, Syncable;
+    use CustomKey, SoftDeletes, Syncable, Taskable;
 
     public $keyPrefix = 'nic';
     public $incrementing = false;
@@ -54,6 +55,16 @@ class Nic extends Model implements Filterable, Sortable
     public function network()
     {
         return $this->belongsTo(Network::class);
+    }
+
+    public function sourceNat()
+    {
+        return $this->morphOne(Nat::class, 'sourceable', null, 'source_id');
+    }
+
+    public function destinationNat()
+    {
+        return $this->morphOne(Nat::class, 'translatedable', null, 'translated_id');
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Jobs\Instance\GuestRestart;
@@ -13,12 +13,15 @@ use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
+use App\Support\Sync;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -80,7 +83,7 @@ class InstanceController extends BaseController
         // Use the default network if there is only one and no network_id was passed in
         $defaultNetworkId = null;
         if (!$request->has('network_id')) {
-            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1) {
+            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1 && $vpc->routers->first()->sync->status !== Sync::STATUS_FAILED) {
                 $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
             }
             if (!$defaultNetworkId) {
@@ -119,17 +122,9 @@ class InstanceController extends BaseController
             'user_script' => $request->input('user_script'),
         ];
 
-        try {
-            if (!$instance->save()) {
-                return $instance->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $instance->getSyncError();
-        }
+        $instance->save();
 
-        $instance->refresh();
-
-        return $this->responseIdMeta($request, $instance->id, 201);
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -144,21 +139,20 @@ class InstanceController extends BaseController
         $instance->fill($request->only([
             'name',
             'locked',
-            'backup_enabled',
             'vcpu_cores',
             'ram_capacity',
             'host_group_id',
         ]));
 
-        try {
-            if (!$instance->save()) {
-                return $instance->getSyncError();
-            }
-        } catch (SyncException $exception) {
-            return $instance->getSyncError();
+        if ($request->has('backup_enabled') && $this->isAdmin) {
+            $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
 
-        return $this->responseIdMeta($request, $instance->id, 200);
+        $instance->withTaskLock(function ($instance) {
+            $instance->save();
+        });
+
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -170,13 +164,11 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        try {
+        $instance->withTaskLock(function ($instance) {
             $instance->delete();
-        } catch (SyncException $exception) {
-            return $instance->getSyncError();
-        }
+        });
 
-        return response('', 204);
+        return response('', 202);
     }
 
     /**
@@ -188,7 +180,19 @@ class InstanceController extends BaseController
      */
     public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->credentials();
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+        if (!$instance->deployed && !$request->user()->isAdmin()) {
+            return response()->json([
+                'errors' => [
+                    [
+                        'title' => 'Not Found',
+                        'detail' => 'Credentials will be available when instance deployment is complete',
+                        'status' => 404,
+                    ]
+                ]
+            ], 404);
+        }
+        $collection = $instance->credentials();
         if (!$request->user()->isAdmin()) {
             $collection->where('credentials.is_hidden', 0);
         }
@@ -239,7 +243,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOn($instance));
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
+            }
+            $this->dispatch(new PowerOn($instance));
+        });
 
         return response('', 202);
     }
@@ -249,8 +258,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerOff($instance));
-
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
+            }
+            $this->dispatch(new PowerOff($instance));
+        });
 
         return response('', 202);
     }
@@ -260,10 +273,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new GuestRestart([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
+            }
+            $this->dispatch(new GuestRestart($instance));
+        });
 
         return response('', 202);
     }
@@ -273,10 +288,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new GuestShutdown([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
+            }
+            $this->dispatch(new GuestShutdown($instance));
+        });
 
         return response('', 202);
     }
@@ -286,10 +303,12 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $this->dispatch(new PowerReset([
-            'instance_id' => $instance->id,
-            'vpc_id' => $instance->vpc->id
-        ]));
+        $instance->withTaskLock(function ($instance) {
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
+            }
+            $this->dispatch(new PowerReset($instance));
+        });
 
         return response('', 202);
     }
@@ -315,6 +334,18 @@ class InstanceController extends BaseController
     public function consoleSession(Request $request, $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+
+        if (!$instance->vpc->console_enabled) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access has been disabled for this resource',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+        }
 
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $instance->availabilityZone
@@ -360,6 +391,7 @@ class InstanceController extends BaseController
             ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
+        $message = $e = null;
         try {
             $client = app()->make(Client::class, [
                 'config' => [
@@ -378,14 +410,17 @@ class InstanceController extends BaseController
             ]);
         } catch (\Exception $e) {
             $response = response('', Response::HTTP_SERVICE_UNAVAILABLE);
+            $message = $e->getMessage();
         }
         if (!$response || $response->getStatusCode() !== 201) {
+            $message = $message ?? __CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session from host';
             Log::info(
-                __CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session from host',
+                $message,
                 [
                     'data' => [
                         'instance' => $instance,
                         'host' => $consoleResource->host,
+                        'exception' => $e ?? '',
                     ]
                 ]
             );
@@ -412,9 +447,20 @@ class InstanceController extends BaseController
         // respond to the Customer call with the URL containing the session UUID that allows them to connect to the console
         return response()->json([
             'data' => [
-                'url' => $consoleResource->host . '/console/?title=id' . $instance->id . '&session=' . $uuid,
+                'url' => $consoleResource->host . '/console/?title=' . $instance->id . '&session=' . $uuid,
             ],
             'meta' => (object)[]
         ]);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    {
+        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

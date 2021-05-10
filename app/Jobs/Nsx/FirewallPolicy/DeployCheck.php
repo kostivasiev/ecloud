@@ -4,29 +4,29 @@ namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeployCheck extends Job
 {
-    const RETRY_DELAY = 5;
+    use Batchable, LoggableModelJob;
 
-    public $tries = 500;
+    public $tries = 60;
+    public $backoff = 5;
 
     private $model;
 
-    public function __construct(FirewallPolicy $model)
+    public function __construct(FirewallPolicy $firewallPolicy)
     {
-        $this->model = $model;
+        $this->model = $firewallPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         // NSX doesn't try to "realise" a FirewallPolicy until it has rules
         if (!count($this->model->firewallRules)) {
-            Log::info('No rules on the policy. Ignoring deploy check and marking policy as in sync');
-            $this->model->setSyncCompleted();
+            Log::info('No rules on the policy. Ignoring deploy check');
             return;
         }
 
@@ -35,15 +35,11 @@ class DeployCheck extends Job
         );
         $response = json_decode($response->getBody()->getContents());
         if ($response->publish_status !== 'REALIZED') {
-            $this->release(static::RETRY_DELAY);
             Log::info(
-                'Waiting for ' . $this->model->id . ' being deployed, retrying in ' . static::RETRY_DELAY . ' seconds'
+                'Waiting for ' . $this->model->id . ' being deployed, retrying in ' . $this->backoff . ' seconds'
             );
+            $this->release($this->backoff);
             return;
         }
-
-        $this->model->setSyncCompleted();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetVpcVolumesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public $volumes;
 
     public function setUp(): void
@@ -19,7 +17,7 @@ class GetVpcVolumesTest extends TestCase
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v1/vpc/vpc-test/volume',
+                '/api/v2/vpc/vpc-test/volume',
                 [
                     'json' => [
                         'volumeId' => 'vol-test',

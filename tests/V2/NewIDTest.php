@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class NewIDTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Region */
     private $region;
 
@@ -67,7 +65,7 @@ class NewIDTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(201);
+        ])->assertResponseStatus(202);
 
         $this->assertMatchesRegularExpression(
             $this->generateRegExp(Router::class),

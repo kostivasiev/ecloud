@@ -5,28 +5,29 @@ namespace App\Jobs\Nsx\FirewallPolicy;
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRulePort;
-use Illuminate\Support\Facades\Log;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
 
 class Deploy extends Job
 {
+    use Batchable, LoggableModelJob;
+
     private $model;
 
-    public function __construct(FirewallPolicy $model)
+    public function __construct(FirewallPolicy $firewallPolicy)
     {
-        $this->model = $model;
+        $this->model = $firewallPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $router = $this->model->router;
         $availabilityZone = $router->availabilityZone;
 
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
-        $response = $availabilityZone->nsxService()->patch(
+        $availabilityZone->nsxService()->patch(
             'policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id,
             [
                 'json' => [
@@ -86,17 +87,5 @@ class Deploy extends Job
                 ]
             ]
         );
-
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $this->model->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents()
-            ]);
-            $this->fail(new \Exception('Failed to create "' . $this->model->id . '"'));
-            return false;
-        }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

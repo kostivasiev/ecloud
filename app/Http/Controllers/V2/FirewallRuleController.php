@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\FirewallRule\Create;
 use App\Http\Requests\V2\FirewallRule\Update;
 use App\Models\V2\FirewallRule;
@@ -65,7 +66,7 @@ class FirewallRuleController extends BaseController
      */
     public function store(Create $request)
     {
-        $firewallRule = new FirewallRule();
+        $firewallRule = app()->make(FirewallRule::class);
         $firewallRule->fill($request->only([
             'name',
             'sequence',
@@ -77,17 +78,26 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
-        $firewallRule->save();
 
-        if ($request->has('ports')) {
-            foreach ($request->input('ports') as $port) {
-                $port['firewall_rule_id'] = $firewallRule->id;
-                $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->save();
+        $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
-        }
 
-        return $this->responseIdMeta($request, $firewallRule->id, 201);
+            $firewallRule->save();
+
+            if ($request->has('ports')) {
+                foreach ($request->input('ports') as $port) {
+                    $port['firewall_rule_id'] = $firewallRule->id;
+                    $firewallRulePort = new FirewallRulePort($port);
+                    $firewallRulePort->save();
+                }
+            }
+
+            $firewallRule->firewallPolicy->save();
+        });
+
+        return $this->responseIdMeta($request, $firewallRule->id, 202);
     }
 
     /**
@@ -108,26 +118,49 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
-        $firewallRule->save();
 
-        if ($request->has('ports')) {
-            $firewallRule->firewallRulePorts->each(function ($rule) {
-                $rule->delete();
-            });
-            foreach ($request->input('ports') as $port) {
-                $port['firewall_rule_id'] = $firewallRule->id;
-                $firewallRulePort = new FirewallRulePort($port);
-                $firewallRulePort->save();
+        $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
-        }
 
-        return $this->responseIdMeta($request, $firewallRule->id, 200);
+            $firewallRule->save();
+
+            if ($request->filled('ports')) {
+                $firewallRule->firewallRulePorts->each(function ($port) {
+                    $port->delete();
+                });
+                foreach ($request->input('ports') as $port) {
+                    $port['firewall_rule_id'] = $firewallRule->id;
+                    $firewallRulePort = new FirewallRulePort($port);
+                    $firewallRulePort->save();
+                }
+            }
+
+            $firewallRule->firewallPolicy->save();
+        });
+
+        return $this->responseIdMeta($request, $firewallRule->id, 202);
     }
 
     public function destroy(Request $request, string $firewallRuleId)
     {
-        FirewallRule::foruser($request->user())->findOrFail($firewallRuleId)
-            ->delete();
-        return response()->json([], 204);
+        $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
+
+        $firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRule) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
+            }
+
+            $firewallRule->firewallRulePorts->each(function ($port) {
+                $port->delete();
+            });
+
+            $firewallRule->delete();
+
+            $firewallRule->firewallPolicy->save();
+        });
+
+        return response('', 202);
     }
 }

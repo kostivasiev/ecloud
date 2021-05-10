@@ -34,15 +34,3 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/dhcps?page=2'
   tags:
     - Dhcps
-post:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          $ref: '../../public-openapi.yaml#/components/schemas/Dhcp'
-  responses:
-    201:
-      $ref: '../../public-openapi.yaml#/components/responses/DhcpIdResponse'
-  tags:
-    - Dhcps

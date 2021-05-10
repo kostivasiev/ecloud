@@ -3,33 +3,29 @@
 namespace App\Jobs\NetworkPolicy;
 
 use App\Jobs\Job;
-use Illuminate\Support\Facades\Log;
+use App\Models\V2\NetworkPolicy;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
 
 class DeleteChildResources extends Job
 {
-    protected $model;
+    use Batchable, LoggableModelJob;
 
-    public function __construct($model)
+    private NetworkPolicy $model;
+
+    public function __construct(NetworkPolicy $networkPolicy)
     {
-        $this->model = $model;
+        $this->model = $networkPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
+        // TODO: do we want to do this without events?
         $this->model->networkRules->each(function ($networkRule) {
             $networkRule->networkRulePorts->each(function ($networkRulePort) {
                 $networkRulePort->delete();
             });
             $networkRule->delete();
         });
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }

@@ -34,14 +34,18 @@ class ProcessBilling extends Command
      * @var array|string[]
      */
     protected array $billableMetrics = [
+        // Compute
         'vcpu.count',
         'ram.capacity',
+        'hostgroup',
+        'host.hs-aaaaaaaa', // DEV
+        // Storage
         'disk.capacity',
-        'license.windows',
         'disk.capacity.300',
         'disk.capacity.600',
         'disk.capacity.1200',
         'disk.capacity.2500',
+        // Networking
         'throughput.20Mb',
         'throughput.50Mb',
         'throughput.100Mb',
@@ -51,6 +55,10 @@ class ProcessBilling extends Command
         'throughput.2.5Gb',
         'throughput.5Gb',
         'throughput.10Gb',
+        'floating-ip.count',
+        // License
+        'license.windows',
+        'host.license.windows',
     ];
 
     public function __construct()

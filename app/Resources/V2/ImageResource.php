@@ -27,21 +27,17 @@ class ImageResource extends UKFastResource
             'logo_uri' => $this->logo_uri,
             'documentation_uri' => $this->documentation_uri,
             'description' => $this->description,
-            'created_at' => $this->created_at === null ? null : Carbon::parse(
-                $this->created_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
-            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
-                $this->updated_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
         ];
-
 
         if ($request->user()->isAdmin()) {
             $data['is_public'] = $this->is_public;
+            $data['public'] = $this->is_public;
             $data['active'] = $this->active;
             $data['license_id'] = $this->license_id;
+
+            $tz = new \DateTimeZone(config('app.timezone'));
+            $data['created_at'] = $this->created_at === null ? null : Carbon::parse($this->created_at, $tz)->toIso8601String();
+            $data['updated_at'] = $this->updated_at === null ? null : Carbon::parse($this->updated_at, $tz)->toIso8601String();
         }
 
         return $data;

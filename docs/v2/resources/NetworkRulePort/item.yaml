@@ -34,7 +34,8 @@ patch:
                   example : nr-4c63cf58
                   readOnly : true
   responses:
-    200:
+    202:
+      description: Accepted
       $ref: '../../resources/NetworkRulePort/responses/idResponse.yaml'
   tags:
     - Network Rule Ports
@@ -42,8 +43,8 @@ delete:
   parameters:
     - $ref: '../../resources/NetworkRulePort/parameters/networkRulePortId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Network Rule Ports
 

@@ -14,8 +14,6 @@ use Tests\TestCase;
 
 class DefaultAvailabilityZoneTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Generator $faker;
     protected AvailabilityZone $availabilityZone;
     protected Region $region;
@@ -47,7 +45,7 @@ class DefaultAvailabilityZoneTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
         $id = json_decode($this->response->getContent())->data->id;
         $router = Router::findOrFail($id);
         // verify that the availability_zone_id equals the one in the data array

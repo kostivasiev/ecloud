@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $faker;
     protected $region;
     protected $vpc;

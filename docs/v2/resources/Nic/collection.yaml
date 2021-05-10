@@ -42,7 +42,8 @@ get:
 #        schema:
 #          $ref: '../../components/schemas/nic.yaml'
 #  responses:
-#    201:
+#    202:
+#      description: Accepted
 #      $ref: '../../resources/Nic/responses/idResponse.yaml'
 #  tags:
 #    - Nics

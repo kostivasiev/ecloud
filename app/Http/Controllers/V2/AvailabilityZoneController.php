@@ -240,7 +240,7 @@ class AvailabilityZoneController extends BaseController
             return $model->getDeletionError();
         }
         $model->delete();
-        return response()->json([], 204);
+        return response('', 204);
     }
 
     /**

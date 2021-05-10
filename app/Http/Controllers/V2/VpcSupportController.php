@@ -64,6 +64,6 @@ class VpcSupportController extends BaseController
     public function destroy(Request $request, string $vpcSupportId)
     {
         VpcSupport::forUser($request->user())->findOrFail($vpcSupportId)->delete();
-        return response(null, 204);
+        return response('', 204);
     }
 }

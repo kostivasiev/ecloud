@@ -17,7 +17,7 @@ Content-Type: application/json
 client.global.set('router1_id', response.body.data.id);
 client.log('Router 1 ID: ' + response.body.data.id);
 client.test('Test Create of 1st Router', function () {
-    client.assert(response.status === 201, '201 Status not received');
+    client.assert(response.status === 202, '202 Status not received');
 });
 %}
 
@@ -39,7 +39,7 @@ Content-Type: application/json
 client.global.set('network1_id', response.body.data.id);
 client.log('Network 1 ID: ' + response.body.data.id);
 client.test('Test Create of 1st Network', function () {
-    client.assert(response.status === 201, '201 Status not received');
+    client.assert(response.status === 202, '202 Status not received');
 });
 %}
 
@@ -62,7 +62,7 @@ Content-Type: application/json
 client.global.set('router2_id', response.body.data.id);
 client.log('Router 2 ID: ' + response.body.data.id);
 client.test('Test Create of 2nd Router', function () {
-    client.assert(response.status === 201, '201 Status not received');
+    client.assert(response.status === 202, '202 Status not received');
 });
 %}
 
@@ -84,7 +84,7 @@ Content-Type: application/json
 client.global.set('network2_id', response.body.data.id);
 client.log('Network 2 ID: ' + response.body.data.id);
 client.test('Test Create of 2nd Network', function () {
-    client.assert(response.status === 201, '201 Status not received');
+    client.assert(response.status === 202, '202 Status not received');
 });
 %}
 
@@ -103,7 +103,7 @@ Content-Type: application/json
 
 > {%
 client.test('Test update of 2nd Network', function () {
-    client.assert(response.status === 200, '200 Status not received');
+    client.assert(response.status === 202, '202 Status not received');
 });
 %}
 

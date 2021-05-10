@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class ResourceTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $region;
     protected $availability_zone;
     protected $vpc;

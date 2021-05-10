@@ -1,8 +1,12 @@
 <?php
 
+use App\Models\V2\NetworkRule;
+
 return [
     'availability_zones' => [],
-    'vpc' => [],
+    'vpc' => [
+        'max_count' => env('VPC_MAX_COUNT', 10),
+    ],
     'network' => [
         'subnets' => [
             'range' => '10.0.0.0/24',
@@ -26,6 +30,30 @@ return [
         /** The defaults for these need review as unsure of what they're supposed to be */
         'egress' => '',
         'ingress' => '',
+    ],
+    'network_policy' => [
+        'rules' => [
+            'DHCP_Ingress' => [
+                'name' => NetworkRule::TYPE_DHCP_INGRESS,
+                'sequence' => 5001,
+                'source' =>  '10.0.0.2',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true,
+                'type' => NetworkRule::TYPE_DHCP_INGRESS,
+            ],
+            'DHCP_Egress' => [
+                'name' => NetworkRule::TYPE_DHCP_EGRESS,
+                'sequence' => 5002,
+                'source' =>  'ANY',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'OUT',
+                'enabled' => true,
+                'type' => NetworkRule::TYPE_DHCP_EGRESS,
+            ]
+        ]
     ],
     'region' => [],
     'router' => [

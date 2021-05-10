@@ -12,6 +12,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -23,12 +24,16 @@ use UKFast\DB\Ditto\Sortable;
 
 class Volume extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
 
     public $keyPrefix = 'vol';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
+
+    protected $casts = [
+        'os_volume' => 'boolean',
+    ];
 
     protected $fillable = [
         'id',
@@ -37,6 +42,7 @@ class Volume extends Model implements Filterable, Sortable
         'availability_zone_id',
         'capacity',
         'vmware_uuid',
+        'os_volume',
         'iops',
     ];
 
@@ -47,6 +53,10 @@ class Volume extends Model implements Filterable, Sortable
         'saved' => Saved::class,
         'deleting' => Deleting::class,
         'deleted' => Deleted::class,
+    ];
+
+    protected $attributes = [
+        'os_volume' => false,
     ];
 
     public function vpc()
@@ -82,13 +92,18 @@ class Volume extends Model implements Filterable, Sortable
     /**
      * @return bool
      */
-    public function getMountedAttribute()
+    public function getAttachedAttribute()
     {
         if ($this->instances()->count() > 0) {
             return true;
         }
 
         return false;
+    }
+
+    public function getTypeAttribute()
+    {
+        return $this->attributes['os_volume'] ? 'os' : 'data';
     }
 
     /**
@@ -104,6 +119,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('capacity', Filter::$stringDefaults),
             $factory->create('vmware_uuid', Filter::$stringDefaults),
+            $factory->create('os_volume', Filter::$numericDefaults),
             $factory->create('iops', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -124,6 +140,7 @@ class Volume extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('capacity'),
             $factory->create('vmware_uuid'),
+            $factory->create('os_volume'),
             $factory->create('iops'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -151,6 +168,7 @@ class Volume extends Model implements Filterable, Sortable
             'availability_zone_id' => 'availability_zone_id',
             'capacity' => 'capacity',
             'vmware_uuid' => 'vmware_uuid',
+            'os_volume' => 'os_volume',
             'iops' => 'iops',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

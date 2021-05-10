@@ -77,6 +77,6 @@ class HostSpecController extends BaseController
         // Delete from pivot table
         $model->availabilityZones()->sync([]);
         $model->delete();
-        return response(null, 204);
+        return response('', 204);
     }
 }

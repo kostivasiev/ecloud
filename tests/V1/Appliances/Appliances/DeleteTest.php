@@ -2,13 +2,10 @@
 
 namespace Tests\V1\Appliances\Appliances;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\ApplianceTestCase;
 
 class DeleteTest extends ApplianceTestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

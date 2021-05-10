@@ -9,13 +9,11 @@ use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Dhcp $dhcp;
 
     public function setUp(): void
@@ -83,7 +81,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
 
         $dhcp = Dhcp::findOrFail($this->dhcp->id);
         $this->assertEquals($data['name'], $dhcp->name);

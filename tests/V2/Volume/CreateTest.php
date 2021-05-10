@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $volume;
 
     public function setUp(): void
@@ -47,6 +45,7 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $availabilityZone->id,
             'capacity' => '1',
+            'os_volume' => true,
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -61,7 +60,7 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/vpc/vpc-test/volume')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/volume')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
             });
@@ -70,10 +69,11 @@ class CreateTest extends TestCase
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => '1',
+            'os_volume' => true,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(201);
+        ])->assertResponseStatus(202);
 
         $volumeId = (json_decode($this->response->getContent()))->data->id;
         $volume = Volume::find($volumeId);

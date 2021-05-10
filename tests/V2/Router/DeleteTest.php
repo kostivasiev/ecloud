@@ -8,13 +8,12 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $availability_zone;
     protected $region;
     protected $router;
@@ -49,6 +48,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
+        Event::fake();
         $this->assertNull($this->router->deleted_at);
         $this->delete('/v2/routers/' . $this->router->id, [], [
             'X-consumer-custom-id' => '0-0',

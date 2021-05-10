@@ -13,8 +13,6 @@ use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Region */
     private $region;
 
@@ -36,7 +34,7 @@ class UpdateTest extends TestCase
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
-                '/api/v1/vpc/vpc-test/volume',
+                '/api/v2/vpc/vpc-test/volume',
                 [
                     'json' => [
                         'volumeId' => 'vol-abc123xyz',
@@ -130,10 +128,10 @@ class UpdateTest extends TestCase
         $this->kingpinServiceMock()
             ->shouldReceive('put')
             ->withSomeOfArgs(
-                '/api/v1/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
+                '/api/v2/vpc/vpc-test/volume/7b9d062f-2048-42e8-82f9-f67d3e9e3dfe/size',
                 [
                     'json' => [
-                        'sizeGiB' => '999'
+                        'sizeGiB' => '1999'
                     ]
                 ]
             )->andReturnUsing(function () {
@@ -152,7 +150,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
 
         $volumeId = (json_decode($this->response->getContent()))->data->id;
         $volume = Volume::find($volumeId);

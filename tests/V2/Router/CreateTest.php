@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private Region $region;
 
     private AvailabilityZone $availabilityZone;
@@ -71,6 +69,6 @@ class CreateTest extends TestCase
             ]
         )
            ->seeInDatabase('routers', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
     }
 }

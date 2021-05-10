@@ -5,12 +5,13 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
-use App\Jobs\FloatingIp\Assign;
-use App\Jobs\FloatingIp\Unassign;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Nat;
+use App\Models\V2\Task;
 use App\Resources\V2\FloatingIpResource;
+use App\Resources\V2\TaskResource;
+use App\Support\Resource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -78,47 +79,93 @@ class FloatingIpController extends BaseController
 
     public function store(CreateRequest $request)
     {
-        $resource = new FloatingIp(
+        $floatingIp = new FloatingIp(
             $request->only(['vpc_id', 'name'])
         );
-        $resource->save();
-        return $this->responseIdMeta($request, $resource->id, 201);
+
+        $floatingIp->save();
+
+        return $this->responseIdMeta($request, $floatingIp->id, 202);
     }
 
     public function update(UpdateRequest $request, string $fipId)
     {
-        $resource = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
-        $resource->fill($request->only(['name']));
-        $resource->save();
-        return $this->responseIdMeta($request, $resource->id, 200);
+        $floatingIp = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
+        $floatingIp->fill($request->only(['name']));
+
+        $floatingIp->withTaskLock(function ($floatingIp) {
+            $floatingIp->save();
+        });
+
+        return $this->responseIdMeta($request, $floatingIp->id, 202);
     }
 
     public function destroy(Request $request, string $fipId)
     {
-        $model = FloatingIp::forUser($request->user())->findOrFail($fipId);
+        $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        if (!$model->delete()) {
-            return $model->getSyncError();
-        }
-        return response()->json([], 204);
+        $floatingIp->withTaskLock(function ($floatingIp) {
+            $floatingIp->delete();
+        });
+
+        return response('', 202);
     }
 
     public function assign(AssignRequest $request, string $fipId)
     {
-        $this->dispatch(new Assign([
-            'floating_ip_id' => $fipId,
-            'resource_id' => $request->resource_id
-        ]));
+        $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
+        $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        return response(null, 202);
+        $floatingIp->withTaskLock(function ($floatingIp) use ($resource) {
+            if (!$floatingIp->destinationNat()->exists()) {
+                $nat = app()->make(Nat::class);
+                $nat->destination()->associate($floatingIp);
+                $nat->translated()->associate($resource);
+                $nat->action = Nat::ACTION_DNAT;
+                $nat->save();
+            }
+
+            if (!$floatingIp->sourceNat()->exists()) {
+                $nat = app()->make(Nat::class);
+                $nat->source()->associate($resource);
+                $nat->translated()->associate($floatingIp);
+                $nat->action = NAT::ACTION_SNAT;
+                $nat->save();
+            }
+
+            $floatingIp->save();
+        });
+
+        return response('', 202);
     }
 
     public function unassign(Request $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $this->dispatch(new Unassign($floatingIp));
+        $floatingIp->withTaskLock(function ($floatingIp) {
 
-        return new Response(null, 202);
+            if ($floatingIp->sourceNat()->exists()) {
+                $floatingIp->sourceNat->delete();
+            }
+            if ($floatingIp->destinationNat()->exists()) {
+                $floatingIp->destinationNat->delete();
+            }
+
+            $floatingIp->save();
+        });
+
+        return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $fipId)
+    {
+        $collection = FloatingIp::forUser($request->user())->findOrFail($fipId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

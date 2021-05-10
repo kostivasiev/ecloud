@@ -9,12 +9,12 @@ X-Reseller-Id: 1
 
 {
     "name": "test host",
-    "host_group_id" : "{{dev_host_group_id}}"
+    "host_group_id" : "hg-2d3280ab"
 }
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 
 client.global.set('host_id', response.body.data.id);
@@ -66,13 +66,12 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
 ### destroy
 DELETE https://{{host}}/{{version}}/hosts/{{host_id}}
-Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write
@@ -80,6 +79,6 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}

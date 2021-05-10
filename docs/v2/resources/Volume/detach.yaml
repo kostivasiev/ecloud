@@ -9,6 +9,8 @@ post:
           $ref: '../../components/schemas/volume/detach.yaml'
   responses:
     202:
-      description: Success
+      description: Accepted
+    422:
+      description: "Precondition Failed"
   tags:
     - Volumes
