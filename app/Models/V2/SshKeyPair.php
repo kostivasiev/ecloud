@@ -9,6 +9,7 @@ use App\Events\V2\Nic\Deleting;
 use App\Events\V2\Nic\Saved;
 use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class SshKeyPair extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, DefaultName, SoftDeletes;
 
     public $keyPrefix = 'ssh';
     public $incrementing = false;
