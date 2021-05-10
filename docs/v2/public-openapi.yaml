@@ -20,12 +20,12 @@ components:
       in: header
       name: Authorization
   schemas:
-    NetworkPolicy:
-      $ref: 'components/schemas/networkPolicy.yaml'
-    NetworkRule:
-      $ref : 'components/schemas/networkRule.yaml'
-    NetworkRulePort :
-      $ref : 'components/schemas/networkRulePort.yaml'
+#    NetworkPolicy:
+#      $ref: 'components/schemas/networkPolicy.yaml'
+#    NetworkRule:
+#      $ref : 'components/schemas/networkRule.yaml'
+#    NetworkRulePort :
+#      $ref : 'components/schemas/networkRulePort.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
