@@ -92,7 +92,7 @@ class GetTest extends TestCase
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])->seeJson([
             'title' => 'Not found',
-            'detail' => 'No SshKeyPair with that ID was found',
+            'detail' => 'No Ssh Key Pair with that ID was found',
             'status' => 404,
         ])->assertResponseStatus(404);
     }
