@@ -5,31 +5,30 @@ namespace App\Jobs\Nat;
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class UndeployCheck extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     // Wait up to 30 minutes
     public $tries = 360;
     public $backoff = 5;
     
-    private Nat $nat;
+    private Nat $model;
 
     public function __construct(Nat $nat)
     {
-        $this->nat = $nat;
+        $this->model = $nat;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->nat->id]);
-
         // Load NIC from destination or translated
         $nic = collect(
-            $this->nat->load([
+            $this->model->load([
                 'destination' => function ($query) {
                     $query->withTrashed();
                 },
@@ -53,15 +52,13 @@ class UndeployCheck extends Job
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
-            if ($this->nat->id === $result->id) {
+            if ($this->model->id === $result->id) {
                 Log::info(
-                    'Waiting for ' . $this->nat->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
+                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
                 $this->release($this->backoff);
                 return;
             }
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->nat->id]);
     }
 }

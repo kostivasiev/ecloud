@@ -4,6 +4,7 @@ namespace App\Jobs\Tasks;
 
 use App\Jobs\Job;
 use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
@@ -11,6 +12,8 @@ use Throwable;
 
 class AwaitTask extends Job
 {
+    use LoggableTaskJob;
+
     private Task $task;
 
     public function __construct(Task $task)
@@ -20,8 +23,6 @@ class AwaitTask extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->task->resource->id]);
-
         $task = $this->task;
 
         if (empty($task->data['task_id'])) {
@@ -43,7 +44,5 @@ class AwaitTask extends Job
             $task->failure_reason = $e->getMessage();
             $task->save();
         })->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->task->resource->id]);
     }
 }

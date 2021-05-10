@@ -6,18 +6,18 @@ use App\Jobs\Job;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Services\V2\PasswordService;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class OsCustomisation extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     /**
@@ -26,29 +26,25 @@ class OsCustomisation extends Job
      */
     public function handle(PasswordService $passwordService)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        $username = ($this->instance->platform == 'Linux') ? 'root' : 'graphite.rack';
+        $username = ($this->model->platform == 'Linux') ? 'root' : 'graphite.rack';
         $credential = Credential::create([
             'name' => $username,
-            'resource_id' => $this->instance->id,
+            'resource_id' => $this->model->id,
             'username' => $username,
-            'port' => $this->instance->platform == 'Linux' ? '2020' : '3389',
+            'port' => $this->model->platform == 'Linux' ? '2020' : '3389',
         ]);
         $credential->password = $passwordService->generate();
         $credential->save();
 
-        $this->instance->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/oscustomization',
+        $this->model->availabilityZone->kingpinService()->put(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/oscustomization',
             [
                 'json' => [
-                    'platform' => $this->instance->platform,
+                    'platform' => $this->model->platform,
                     'password' => $credential->password,
-                    'hostname' => $this->instance->id,
+                    'hostname' => $this->model->id,
                 ],
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

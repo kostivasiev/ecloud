@@ -4,7 +4,9 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\NetworkPolicy\Create;
 use App\Http\Requests\V2\NetworkPolicy\Update;
 use App\Models\V2\NetworkPolicy;
+use App\Models\V2\Task;
 use App\Resources\V2\NetworkPolicyResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\NetworkRuleResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,6 +63,17 @@ class NetworkPolicyController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $networkPolicyId)
+    {
+        $collection = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+    
     public function networkRules(Request $request, QueryTransformer $queryTransformer, string $networkPolicyId)
     {
         $collection = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId)->networkRules();

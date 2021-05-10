@@ -4,20 +4,18 @@ namespace App\Jobs\Nsx\Dhcp;
 
 use App\Jobs\Job;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Instance;
-use GuzzleHttp\Psr7\Response;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class Create extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
     
-    private Dhcp $dhcp;
+    private Dhcp $model;
 
     public function __construct(Dhcp $dhcp)
     {
-        $this->dhcp = $dhcp;
+        $this->model = $dhcp;
     }
 
     /**
@@ -25,23 +23,19 @@ class Create extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->dhcp->id]);
-
-        $this->dhcp->availabilityZone->nsxService()->put('/policy/api/v1/infra/dhcp-server-configs/' . $this->dhcp->id, [
+        $this->model->availabilityZone->nsxService()->put('/policy/api/v1/infra/dhcp-server-configs/' . $this->model->id, [
             'json' => [
                 'lease_time' => config('defaults.dhcp.lease_time'),
                 'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/'
-                    . $this->dhcp->availabilityZone->nsxService()->getEdgeClusterId(),
+                    . $this->model->availabilityZone->nsxService()->getEdgeClusterId(),
                 'resource_type' => 'DhcpServerConfig',
                 'tags' => [
                     [
                         'scope' => config('defaults.tag.scope'),
-                        'tag' => $this->dhcp->vpc->id
+                        'tag' => $this->model->vpc->id
                     ]
                 ]
             ]
         ]);
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->dhcp->id]);
     }
 }

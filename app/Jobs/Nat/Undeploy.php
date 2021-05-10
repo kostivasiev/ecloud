@@ -5,28 +5,27 @@ namespace App\Jobs\Nat;
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
     
-    private Nat $nat;
+    private Nat $model;
 
     public function __construct(Nat $nat)
     {
-        $this->nat = $nat;
+        $this->model = $nat;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->nat->id]);
-
         // Load NIC from destination or translated
         $nic = collect(
-            $this->nat->load([
+            $this->model->load([
                 'destination' => function ($query) {
                     $query->withTrashed();
                 },
@@ -49,7 +48,7 @@ class Undeploy extends Job
 
         try {
             $router->availabilityZone->nsxService()->get(
-                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->nat->id
+                '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->model->id
             );
         } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
@@ -61,9 +60,7 @@ class Undeploy extends Job
         }
 
         $router->availabilityZone->nsxService()->delete(
-            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->nat->id
+            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->model->id
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->nat->id]);
     }
 }

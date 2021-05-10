@@ -13,11 +13,13 @@ use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Support\Sync;
 use GuzzleHttp\Client;
@@ -449,5 +451,16 @@ class InstanceController extends BaseController
             ],
             'meta' => (object)[]
         ]);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    {
+        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

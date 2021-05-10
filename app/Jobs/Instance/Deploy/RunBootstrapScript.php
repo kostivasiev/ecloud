@@ -4,18 +4,19 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class RunBootstrapScript extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     /**
@@ -23,36 +24,31 @@ class RunBootstrapScript extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-
-        if (empty($this->instance->deploy_data['user_script'])) {
-            Log::info('RunBootstrapScript for ' . $this->instance->id . ', no data passed so nothing to do');
+        if (empty($this->model->deploy_data['user_script'])) {
+            Log::info('RunBootstrapScript for ' . $this->model->id . ', no data passed so nothing to do');
             return;
         }
 
-        $guestAdminCredential = $this->instance->credentials()
-            ->where('username', ($this->instance->platform == 'Linux') ? 'root' : 'graphite.rack')
+        $guestAdminCredential = $this->model->credentials()
+            ->where('username', ($this->model->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
-            $message = 'RunBootstrapScript failed for ' . $this->instance->id . ', no admin credentials found';
+            $message = 'RunBootstrapScript failed for ' . $this->model->id . ', no admin credentials found';
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
         }
 
-        $endpoint = ($this->instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
-        $this->instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/guest/' . $endpoint,
+        $endpoint = ($this->model->platform == 'Linux') ? 'linux/script' : 'windows/script';
+        $this->model->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
             [
                 'json' => [
-                    'encodedScript' => base64_encode($this->instance->deploy_data['user_script']),
+                    'encodedScript' => base64_encode($this->model->deploy_data['user_script']),
                     'username' => $guestAdminCredential->username,
                     'password' => $guestAdminCredential->password,
                 ],
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

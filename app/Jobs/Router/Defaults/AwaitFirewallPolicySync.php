@@ -5,38 +5,35 @@ namespace App\Jobs\Router\Defaults;
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Support\Sync;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AwaitFirewallPolicySync extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     public $tries = 30;
     public $backoff = 5;
 
-    private $firewallPolicy;
+    private $model;
 
     public function __construct(FirewallPolicy $firewallPolicy)
     {
-        $this->firewallPolicy = $firewallPolicy;
+        $this->model = $firewallPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->firewallPolicy->id]);
-
-        if ($this->firewallPolicy->sync->status == Sync::STATUS_FAILED) {
-            Log::error('Firewall policy in failed sync state, abort', ['id' => $this->firewallPolicy->id]);
-            $this->fail(new \Exception("Firewall policy '" . $this->firewallPolicy->id . "' in failed sync state"));
+        if ($this->model->sync->status == Sync::STATUS_FAILED) {
+            Log::error('Firewall policy in failed sync state, abort', ['id' => $this->model->id]);
+            $this->fail(new \Exception("Firewall policy '" . $this->model->id . "' in failed sync state"));
             return;
         }
 
-        if ($this->firewallPolicy->sync->status != Sync::STATUS_COMPLETE) {
-            Log::warning('Firewall policy not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->firewallPolicy->id]);
+        if ($this->model->sync->status != Sync::STATUS_COMPLETE) {
+            Log::warning('Firewall policy not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
             return $this->release($this->backoff);
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->firewallPolicy->id]);
     }
 }

@@ -5,25 +5,24 @@ namespace App\Jobs\Nat;
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
     
-    private Nat $nat;
+    private Nat $model;
 
     public function __construct(Nat $nat)
     {
-        $this->nat = $nat;
+        $this->model = $nat;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->nat->id]);
-
-        $nic = collect((clone $this->nat)->load([
+        $nic = collect((clone $this->model)->load([
             'destination',
             'translated',
             'source'
@@ -39,31 +38,29 @@ class Deploy extends Job
             return;
         }
 
-        Log::info('Nat Deploy ' . $this->nat->id . ' : Adding NAT (' . $this->nat->action . ') Rule');
+        Log::info('Nat Deploy ' . $this->model->id . ' : Adding NAT (' . $this->model->action . ') Rule');
 
         $json = [
-            'display_name' => $this->nat->id,
-            'description' => $this->nat->id,
-            'action' => $this->nat->action,
-            'translated_network' => $this->nat->translated->ip_address,
+            'display_name' => $this->model->id,
+            'description' => $this->model->id,
+            'action' => $this->model->action,
+            'translated_network' => $this->model->translated->ip_address,
             'enabled' => true,
             'logging' => false,
             'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',
         ];
 
-        if (!empty($this->nat->destination)) {
-            $json['destination_network'] = $this->nat->destination->ip_address;
+        if (!empty($this->model->destination)) {
+            $json['destination_network'] = $this->model->destination->ip_address;
         }
 
-        if (!empty($this->nat->source)) {
-            $json['source_network'] = $this->nat->source->ip_address;
+        if (!empty($this->model->source)) {
+            $json['source_network'] = $this->model->source->ip_address;
         }
 
         $router->availabilityZone->nsxService()->patch(
-            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->nat->id,
+            '/policy/api/v1/infra/tier-1s/' . $router->id . '/nat/USER/nat-rules/' . $this->model->id,
             ['json' => $json]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->nat->id]);
     }
 }

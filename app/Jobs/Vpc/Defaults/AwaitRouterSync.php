@@ -5,35 +5,34 @@ namespace App\Jobs\Vpc\Defaults;
 use App\Jobs\Job;
 use App\Models\V2\Router;
 use App\Support\Sync;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Support\Facades\Log;
 
 class AwaitRouterSync extends Job
 {
+    use LoggableModelJob;
+
     public $tries = 60;
     public $backoff = 10;
 
-    private $router;
+    private $model;
 
     public function __construct(Router $router)
     {
-        $this->router = $router;
+        $this->model = $router;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->router->id]);
-
-        if ($this->router->sync->status == Sync::STATUS_FAILED) {
-            Log::error('Router in failed sync state, abort', ['id' => $this->router->id]);
-            $this->fail(new \Exception("Router '" . $this->router->id . "' in failed sync state"));
+        if ($this->model->sync->status == Sync::STATUS_FAILED) {
+            Log::error('Router in failed sync state, abort', ['id' => $this->model->id]);
+            $this->fail(new \Exception("Router '" . $this->model->id . "' in failed sync state"));
             return;
         }
 
-        if ($this->router->sync->status != Sync::STATUS_COMPLETE) {
-            Log::warning('Router not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->router->id]);
+        if ($this->model->sync->status != Sync::STATUS_COMPLETE) {
+            Log::warning('Router not in sync, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
             return $this->release($this->backoff);
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->router->id]);
     }
 }

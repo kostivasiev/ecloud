@@ -4,41 +4,40 @@ namespace App\Jobs\Kingpin\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CheckOnline extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     public $tries = 60;
     public $backoff = 60;
 
-    private Host $host;
+    private Host $model;
 
     public function __construct(Host $host)
     {
-        $this->host = $host;
+        $this->model = $host;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->host->id]);
-
-        $availabilityZone = $this->host->hostGroup->availabilityZone;
-        $hostGroup = $this->host->hostGroup;
+        $availabilityZone = $this->model->hostGroup->availabilityZone;
+        $hostGroup = $this->model->hostGroup;
 
         // Get the host spec from Conjurer
         $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host/' . $this->host->id
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host/' . $this->model->id
         );
         $response = json_decode($response->getBody()->getContents());
 
         $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
 
         if (empty($macAddress)) {
-            $message = 'Failed to load eth0 address for host ' . $this->host->id;
+            $message = 'Failed to load eth0 address for host ' . $this->model->id;
             Log::error($message);
             $this->fail(new \Exception($message));
             return false;
@@ -53,14 +52,12 @@ class CheckOnline extends Job
             $response = json_decode($response->getBody()->getContents());
         } catch (RequestException $exception) {
             if ($exception->getCode() == 404) {
-                throw new \Exception('Host ' . $this->host->id . ' was not found. Waiting for Host to come online...');
+                throw new \Exception('Host ' . $this->model->id . ' was not found. Waiting for Host to come online...');
             }
         }
 
         if ($response->powerState !== 'poweredOn') {
-            throw new \Exception('Host ' . $this->host->id . ' was found. Waiting for Host to power on...');
+            throw new \Exception('Host ' . $this->model->id . ' was found. Waiting for Host to power on...');
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->host->id]);
     }
 }
