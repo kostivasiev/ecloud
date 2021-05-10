@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $volume;
 
     public function setUp(): void

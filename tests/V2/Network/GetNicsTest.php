@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetNicsTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
 
     public function setUp(): void

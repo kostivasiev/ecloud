@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class PowerOffTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testPowerOffJob()
     {
         $this->kingpinServiceMock()->expects('get')

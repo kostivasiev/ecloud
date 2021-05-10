@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Region */
     private $region;
 

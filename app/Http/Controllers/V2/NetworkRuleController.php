@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\NetworkRule\Create;
 use App\Http\Requests\V2\NetworkRule\Update;
 use App\Models\V2\NetworkRule;
@@ -39,9 +40,20 @@ class NetworkRuleController extends BaseController
             'source',
             'destination',
             'action',
+            'direction',
             'enabled',
         ]));
-        $networkRule->save();
+
+        $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
+            if (!$networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
+            }
+
+            $networkRule->save();
+
+            $networkRule->networkPolicy->save();
+        });
+
         return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
@@ -54,16 +66,41 @@ class NetworkRuleController extends BaseController
             'source',
             'destination',
             'action',
+            'direction',
             'enabled',
         ]));
-        $networkRule->save();
+
+        $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
+            if (!$networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
+            }
+
+            $networkRule->save();
+
+            $networkRule->networkPolicy->save();
+        });
+
         return $this->responseIdMeta($request, $networkRule->id, 202);
     }
 
     public function destroy(Request $request, string $networkRuleId)
     {
-        NetworkRule::forUser($request->user())->findOrFail($networkRuleId)
-            ->delete();
+        $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
+            
+        $networkRule->networkPolicy->withTaskLock(function () use ($networkRule) {
+            if (!$networkRule->networkPolicy->canCreateTask()) {
+                throw new TaskException();
+            }
+
+            $networkRule->networkRulePorts->each(function ($port) {
+                $port->delete();
+            });
+
+            $networkRule->delete();
+
+            $networkRule->networkPolicy->save();
+        });
+
         return response('', 202);
     }
 }

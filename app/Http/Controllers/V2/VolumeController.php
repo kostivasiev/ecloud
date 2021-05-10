@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Volume\AttachRequest;
 use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -109,7 +111,7 @@ class VolumeController extends BaseController
         }
         $volume->fill($request->only($only));
 
-        $volume->withSyncLock(function ($volume) {
+        $volume->withTaskLock(function ($volume) {
             $volume->save();
         });
 
@@ -120,7 +122,7 @@ class VolumeController extends BaseController
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
 
-        $volume->withSyncLock(function ($volume) {
+        $volume->withTaskLock(function ($volume) {
             $volume->delete();
         });
 
@@ -132,8 +134,15 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
-        $volume->withSyncLock(function ($volume) use ($instance) {
-            $instance->volumes()->attach($volume);
+        $volume->withTaskLock(function ($volume) use ($instance) {
+            $instance->withTaskLock(function ($instance) use ($volume) {
+                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
+                    throw new TaskException();
+                }
+
+                $task = $volume->createTask('volume_attach', \App\Jobs\Tasks\Volume\VolumeAttach::class, ['instance_id' => $instance->id]);
+                $instance->createTask('volume_attach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
+            });
         });
 
         return response('', 202);
@@ -144,8 +153,15 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
-        $volume->withSyncLock(function ($volume) use ($instance) {
-            $instance->volumes()->detach($volume);
+        $volume->withTaskLock(function ($volume) use ($instance) {
+            $instance->withTaskLock(function ($instance) use ($volume) {
+                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
+                    throw new TaskException();
+                }
+
+                $task = $volume->createTask('volume_detach', \App\Jobs\Tasks\Volume\VolumeDetach::class, ['instance_id' => $instance->id]);
+                $instance->createTask('volume_detach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
+            });
         });
 
         return response('', 202);
@@ -158,6 +174,17 @@ class VolumeController extends BaseController
             ->transform($collection);
 
         return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $volumeId)
+    {
+        $collection = Volume::forUser($request->user())->findOrFail($volumeId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

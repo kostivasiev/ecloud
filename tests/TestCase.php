@@ -13,11 +13,11 @@ use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
-use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
@@ -29,11 +29,11 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Application;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Traits\ResellerDatabaseMigrations;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
-    use DatabaseMigrations,
+    use ResellerDatabaseMigrations,
         Mocks\Host\Mocks;
 
     /**
@@ -68,6 +68,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var FirewallPolicy */
     private $firewallPolicy;
+
+    /** @var NetworkPolicy */
+    private $networkPolicy;
 
     /** @var RouterThroughput */
     private $routerThroughput;
@@ -134,6 +137,19 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->firewallPolicy;
+    }
+
+    public function networkPolicy($id = 'np-test'): NetworkPolicy
+    {
+        if (!$this->networkPolicy) {
+            Model::withoutEvents(function() use ($id) {
+                $this->networkPolicy = factory(NetworkPolicy::class)->create([
+                    'id' => $id,
+                    'network_id' => $this->network()->id,
+                ]);
+            });
+        }
+        return $this->networkPolicy;
     }
 
     public function routerThroughput()
@@ -305,120 +321,178 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function hostGroup()
     {
         if (!$this->hostGroup) {
-            $this->hostGroupJobMocks();
-            $this->hostGroup = factory(HostGroup::class)->create([
-                'id' => 'hg-test',
-                'name' => 'hg-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'host_spec_id' => $this->hostSpec()->id,
-                'windows_enabled' => true,
-            ]);
+            $this->hostGroup = Model::withoutEvents(function() {
+                return factory(HostGroup::class)->create([
+                    'id' => 'hg-test',
+                    'name' => 'hg-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'host_spec_id' => $this->hostSpec()->id,
+                    'windows_enabled' => true,
+                ]);
+            });
         }
         return $this->hostGroup;
     }
 
-    public function hostGroupJobMocks($id = 'hg-test')
+//    public function hostGroupJobMocks($id = 'hg-test')
+//    {
+//        // CreateCluster Job
+//        $this->kingpinServiceMock()->expects('get')
+//            ->with('/api/v2/vpc/vpc-test/hostgroup/' . $id)
+//            ->andReturnUsing(function () {
+//                return new Response(404);
+//            });
+//        $this->kingpinServiceMock()->expects('post')
+//            ->withSomeOfArgs(
+//                '/api/v2/vpc/vpc-test/hostgroup',
+//                [
+//                    'json' => [
+//                        'hostGroupId' => $id,
+//                        'shared' => false,
+//                    ]
+//                ]
+//            )
+//            ->andReturnUsing(function () {
+//                return new Response(200);
+//            });
+//
+//        // CreateTransportNode Job
+//        $this->kingpinServiceMock()->expects('get')
+//            ->with('/api/v2/vpc/vpc-test/network/switch')
+//            ->andReturnUsing(function () {
+//                return new Response(200, [], json_encode([
+//                    'name' => 'test-network-switch-name',
+//                    'uuid' => 'test-network-switch-uuid',
+//                ]));
+//            });
+//        $this->nsxServiceMock()->expects('get')
+//            ->with('/api/v1/transport-node-profiles')
+//            ->andReturnUsing(function () {
+//                return new Response(200, [], json_encode([
+//                    'results' => [
+//                        [
+//                            'id' => 'TEST-TRANSPORT-NODE-PROFILE-ID',
+//                            'display_name' => 'TEST-TRANSPORT-NODE-PROFILE-DISPLAY-NAME',
+//                        ],
+//                    ],
+//                ]));
+//            });
+//        $this->nsxServiceMock()->expects('get')
+//            ->with('/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz')
+//            ->andReturnUsing(function () {
+//                return new Response(200, [], json_encode([
+//                    'results' => [
+//                        [
+//                            'id' => 'TEST-TRANSPORT-ZONE-ID',
+//                            'transport_zone_profile_ids' => [
+//                                'profile_id' => 'TEST-TRANSPORT-NODE-PROFILE-ID',
+//                                'resource_type' => 'BfdHealthMonitoringProfile',
+//                            ],
+//                        ],
+//                    ],
+//                ]));
+//            });
+//        $this->nsxServiceMock()->expects('get')
+//            ->with('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile')
+//            ->andReturnUsing(function () {
+//                return new Response(200, [], json_encode([
+//                    'results' => [
+//                        [
+//                            'id' => 'TEST-UPLINK-HOST-SWITCH-ID',
+//                        ],
+//                    ],
+//                ]));
+//            });
+//        $this->nsxServiceMock()->expects('post')
+//            ->withSomeOfArgs('/api/v1/transport-node-profiles')
+//            ->andReturnUsing(function () {
+//                return new Response(200);
+//            });
+//
+//        // PrepareCluster Job
+//        $this->nsxServiceMock()->expects('get')
+//            ->with('/api/v1/transport-node-collections')
+//            ->andReturnUsing(function () {
+//                return new Response(200, [], json_encode([
+//                    'results' => [
+//                        [
+//                            'id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
+//                            'display_name' => 'TEST-TRANSPORT-NODE-COLLECTION-DISPLAY-NAME',
+//                        ],
+//                    ],
+//                ]));
+//            });
+//        $this->nsxServiceMock()->expects('get')
+//            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $id)
+//            ->andReturnUsing(function () {
+//                return new Response(200, [], json_encode([
+//                    'results' => [
+//                        [
+//                            'id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
+//                        ],
+//                    ],
+//                ]));
+//            });
+//        $this->nsxServiceMock()->expects('get')
+//            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $id)
+//            ->andReturnUsing(function () {
+//                return new Response(200, [], json_encode([
+//                    'results' => [
+//                        [
+//                            'external_id' => 'TEST-COMPUTE-COLLECTION-ID',
+//                        ],
+//                    ],
+//                ]));
+//            });
+//        $this->nsxServiceMock()->expects('post')
+//            ->withSomeOfArgs(
+//                '/api/v1/transport-node-collections',
+//                [
+//                    'json' => [
+//                        'resource_type' => 'TransportNodeCollection',
+//                        'display_name' => 'tnc-' . $id,
+//                        'description' => 'API created Transport Node Collection',
+//                        'compute_collection_id' => 'TEST-COMPUTE-COLLECTION-ID',
+//                        'transport_node_profile_id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
+//                    ]
+//                ]
+//            )
+//            ->andReturnUsing(function () {
+//                return new Response(200);
+//            });
+//    }
+
+    public function hostGroupDestroyMocks()
     {
-        // CreateCluster Job
-        $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/hostgroup/' . $id)
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs('/api/v1/transport-node-collections?compute_collection_id=TEST-COMPUTE-COLLECTION-ID')
             ->andReturnUsing(function () {
-                return new Response(404);
-            });
-        $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs(
-                '/api/v2/vpc/vpc-test/hostgroup',
-                [
-                    'json' => [
-                        'hostGroupId' => $id,
-                        'shared' => false,
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => '92cba9bd-759c-465c-9e84-f6a1a19c4f11'
+                        ]
                     ]
-                ]
-            )
+                ]));
+            });
+        $this->nsxServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-collections/92cba9bd-759c-465c-9e84-f6a1a19c4f11')
             ->andReturnUsing(function () {
                 return new Response(200);
             });
-
-        // CreateTransportNode Job
-        $this->kingpinServiceMock()->expects('get')
-            ->with('/api/v2/vpc/vpc-test/network/switch')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'name' => 'test-network-switch-name',
-                    'uuid' => 'test-network-switch-uuid',
-                ]));
-            });
-        $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/transport-node-profiles')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'results' => [
-                        [
-                            'id' => 'TEST-TRANSPORT-NODE-PROFILE-ID',
-                            'display_name' => 'TEST-TRANSPORT-NODE-PROFILE-DISPLAY-NAME',
-                        ],
-                    ],
-                ]));
-            });
-        $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'results' => [
-                        [
-                            'id' => 'TEST-TRANSPORT-ZONE-ID',
-                            'transport_zone_profile_ids' => [
-                                'profile_id' => 'TEST-TRANSPORT-NODE-PROFILE-ID',
-                                'resource_type' => 'BfdHealthMonitoringProfile',
-                            ],
-                        ],
-                    ],
-                ]));
-            });
-        $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'results' => [
-                        [
-                            'id' => 'TEST-UPLINK-HOST-SWITCH-ID',
-                        ],
-                    ],
-                ]));
-            });
-        $this->nsxServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v1/transport-node-profiles')
+        $this->nsxServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v1/transport-node-profiles/92cba9bd-759c-465c-9e84-f6a1a19c4f11')
             ->andReturnUsing(function () {
                 return new Response(200);
             });
-
-        // PrepareCluster Job
-        $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/transport-node-collections')
+        $this->kingpinServiceMock()->expects('delete')
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->hostGroup()->vpc->id . '/hostgroup/' . $this->hostGroup()->id)
             ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'results' => [
-                        [
-                            'id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
-                            'display_name' => 'TEST-TRANSPORT-NODE-COLLECTION-DISPLAY-NAME',
-                        ],
-                    ],
-                ]));
+                return new Response(200);
             });
         $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $id)
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'results' => [
-                        [
-                            'id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
-                        ],
-                    ],
-                ]));
-            });
-        $this->nsxServiceMock()->expects('get')
-            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $id)
+            ->with('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-test')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
@@ -427,22 +501,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                         ],
                     ],
                 ]));
-            });
-        $this->nsxServiceMock()->expects('post')
-            ->withSomeOfArgs(
-                '/api/v1/transport-node-collections',
-                [
-                    'json' => [
-                        'resource_type' => 'TransportNodeCollection',
-                        'display_name' => 'tnc-' . $id,
-                        'description' => 'API created Transport Node Collection',
-                        'compute_collection_id' => 'TEST-COMPUTE-COLLECTION-ID',
-                        'transport_node_profile_id' => 'TEST-TRANSPORT-NODE-COLLECTION-ID',
-                    ]
-                ]
-            )
-            ->andReturnUsing(function () {
-                return new Response(200);
             });
     }
 
@@ -569,7 +627,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Network\Created::class,
             \App\Events\V2\Router\Created::class,
-            \App\Events\V2\FloatingIp\Created::class,
             \App\Events\V2\Nat\Created::class,
 
             // Deleting
@@ -587,9 +644,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Network\Saved::class,
             \App\Events\V2\Nat\Saved::class,
             \App\Events\V2\AvailabilityZoneCapacity\Saved::class,
-
-            // Updated
-            \App\Events\V2\Sync\Updated::class,
 
             // Saving
             \App\Events\V2\Router\Saving::class,

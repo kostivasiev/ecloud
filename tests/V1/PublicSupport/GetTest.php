@@ -8,8 +8,6 @@ use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

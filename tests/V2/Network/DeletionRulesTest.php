@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class DeletionRulesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected Nic $nics;
 

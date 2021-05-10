@@ -5,7 +5,9 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\HostGroup\StoreRequest;
 use App\Http\Requests\V2\HostGroup\UpdateRequest;
 use App\Models\V2\HostGroup;
+use App\Models\V2\Task;
 use App\Resources\V2\HostGroupResource;
+use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -51,8 +53,11 @@ class HostGroupController extends BaseController
         $model->fill($request->only([
             'name',
         ]));
-        $model->save();
-        return $this->responseIdMeta($request, $model->id, 200);
+
+        $model->withTaskLock(function ($model) {
+            $model->save();
+        });
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $id)
@@ -67,7 +72,20 @@ class HostGroupController extends BaseController
             ], 422);
         }
 
-        $model->delete();
+        $model->withTaskLock(function ($model) {
+            $model->delete();
+        });
         return response('', 204);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $id)
+    {
+        $collection = HostGroup::forUser($request->user())->findOrFail($id)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

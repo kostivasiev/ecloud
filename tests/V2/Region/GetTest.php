@@ -8,8 +8,6 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testGetCollectionAsAdmin()
     {
         // Region only visible to admins

@@ -4,14 +4,11 @@ namespace Tests\unit\DiscountPlan;
 
 use App\Models\V2\DiscountPlan;
 use App\Rules\V2\CommitmentIsGreater;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class CommitmentIsGreaterTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testCommitmentIsGreaterRule()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));

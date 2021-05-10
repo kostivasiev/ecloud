@@ -5,32 +5,28 @@ namespace App\Jobs\Sync\Nat;
 use App\Jobs\Job;
 use App\Jobs\Nat\Undeploy;
 use App\Jobs\Nat\UndeployCheck;
-use App\Models\V2\Sync;
-use App\Traits\V2\SyncableBatch;
-use Illuminate\Support\Facades\Log;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
+use App\Traits\V2\TaskableBatch;
 
 class Delete extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch, LoggableTaskJob;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-
-        $this->deleteSyncBatch([
+        $this->deleteTaskBatch([
             [
-                new Undeploy($this->sync->resource),
-                new UndeployCheck($this->sync->resource),
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
             ]
         ])->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

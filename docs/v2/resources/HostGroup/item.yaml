@@ -37,7 +37,7 @@ patch:
                 windows_enabled:
                   readOnly: true
   responses:
-    200:
+    202:
       $ref: '../../resources/HostGroup/responses/idResponse.yaml'
   tags:
     - Host Groups
@@ -45,8 +45,8 @@ delete:
   parameters:
     - $ref: '../../resources/HostGroup/parameters/id.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Host Groups
 

@@ -3,48 +3,43 @@
 namespace App\Jobs\Nat;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
 use App\Models\V2\Nat;
-use App\Models\V2\Sync;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class AwaitIPAddressAllocation extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     public $tries = 30;
     public $backoff = 5;
 
-    private Nat $nat;
+    private Nat $model;
 
     public function __construct(Nat $nat)
     {
-        $this->nat = $nat;
+        $this->model = $nat;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->nat->id]);
-
-        if (!empty($this->nat->source) && empty($this->nat->source->ip_address)) {
-            Log::warning('Awaiting source NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->nat->id, 'source_id' => $this->nat->source->id]);
+        if (!empty($this->model->source) && empty($this->model->source->ip_address)) {
+            Log::warning('Awaiting source NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id, 'source_id' => $this->model->source->id]);
             $this->release($this->backoff);
             return;
         }
 
-        if (!empty($this->nat->destination) && empty($this->nat->destination->ip_address)) {
-            Log::warning('Awaiting destination NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->nat->id, 'destination_id' => $this->nat->destination->id]);
+        if (!empty($this->model->destination) && empty($this->model->destination->ip_address)) {
+            Log::warning('Awaiting destination NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id, 'destination_id' => $this->model->destination->id]);
             $this->release($this->backoff);
             return;
         }
 
-        if (!empty($this->nat->translated) && empty($this->nat->translated->ip_address)) {
-            Log::warning('Awaiting translated NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->nat->id, 'translated_id' => $this->nat->translated->id]);
+        if (!empty($this->model->translated) && empty($this->model->translated->ip_address)) {
+            Log::warning('Awaiting translated NAT resource IP allocation, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id, 'translated_id' => $this->model->translated->id]);
             $this->release($this->backoff);
             return;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->nat->id]);
     }
 }

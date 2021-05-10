@@ -4,31 +4,27 @@ namespace App\Jobs\Sync\Nic;
 
 use App\Jobs\Job;
 use App\Jobs\Nsx\Nic\CreateDHCPLease;
-use App\Models\V2\Sync;
-use App\Traits\V2\SyncableBatch;
-use Illuminate\Support\Facades\Log;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
+use App\Traits\V2\TaskableBatch;
 
 class Update extends Job
 {
-    use SyncableBatch;
+    use TaskableBatch, LoggableTaskJob;
 
-    private $sync;
+    private $task;
 
-    public function __construct(Sync $sync)
+    public function __construct(Task $task)
     {
-        $this->sync = $sync;
+        $this->task = $task;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
-
-        $this->updateSyncBatch([
+        $this->updateTaskBatch([
             [
-                new CreateDHCPLease($this->sync->resource),
+                new CreateDHCPLease($this->task->resource),
             ]
         ])->dispatch();
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->sync->id, 'resource_id' => $this->sync->resource->id]);
     }
 }

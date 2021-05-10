@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class NewIDTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @var Region */
     private $region;
 

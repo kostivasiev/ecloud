@@ -4,13 +4,15 @@ namespace App\Jobs\Kingpin\HostGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
-use GuzzleHttp\Exception\ClientException;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateCluster extends Job
 {
+    use Batchable, LoggableModelJob;
+
     private $model;
 
     public function __construct(HostGroup $model)
@@ -20,8 +22,6 @@ class CreateCluster extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $hostGroup = $this->model;
 
         // Check if it already exists and if do skip creating it
@@ -47,8 +47,6 @@ class CreateCluster extends Job
                 ],
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 
     public function failed($exception)

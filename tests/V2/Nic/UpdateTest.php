@@ -10,8 +10,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected $macAddress;
     protected $nic;

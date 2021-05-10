@@ -12,8 +12,6 @@ use Tests\V1\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /**
      * Test for counting SAN's mapped to a solution
      * @return void

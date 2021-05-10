@@ -3,15 +3,16 @@
 namespace App\Models\V2;
 
 use App\Events\V2\HostGroup\Deleted;
+use App\Events\V2\HostGroup\Deleting;
 use App\Events\V2\HostGroup\Saved;
+use App\Events\V2\HostGroup\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
-use App\Traits\V2\SyncableOverrides;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -25,14 +26,9 @@ use UKFast\DB\Ditto\Sortable;
  */
 class HostGroup extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, SyncableOverrides, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, DefaultAvailabilityZone;
 
     public string $keyPrefix = 'hg';
-
-    protected $dispatchesEvents = [
-        'saved' => Saved::class,
-        'deleted' => Deleted::class,
-    ];
 
     public function __construct(array $attributes = [])
     {
@@ -54,7 +50,10 @@ class HostGroup extends Model implements Filterable, Sortable
         ];
 
         $this->dispatchesEvents = [
-            'deleted' => Deleted::class
+            'saving' => Saving::class,
+            'saved' => Saved::class,
+            'deleting' => Deleting::class,
+            'deleted' => Deleted::class,
         ];
 
         parent::__construct($attributes);

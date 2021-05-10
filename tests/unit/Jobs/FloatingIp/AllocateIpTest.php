@@ -21,8 +21,6 @@ use UKFast\Admin\Networking\IpRangeClient;
 
 class AllocateIpTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected FloatingIp $floatingIp;
     protected $mockNetworkAdminClient;
     protected $mockAdminIpRangeClient;

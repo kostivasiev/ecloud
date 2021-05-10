@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class PowerResetTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testPowerResetJob()
     {
         $this->kingpinServiceMock()->expects('put')

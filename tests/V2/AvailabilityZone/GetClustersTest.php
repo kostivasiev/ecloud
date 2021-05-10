@@ -9,8 +9,6 @@ use Tests\TestCase;
 
 class GetClustersTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected \Faker\Generator $faker;
     protected LoadBalancerCluster $lbc;
 

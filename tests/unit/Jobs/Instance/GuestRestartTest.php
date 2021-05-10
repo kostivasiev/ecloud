@@ -13,8 +13,6 @@ use Tests\TestCase;
 
 class GuestRestartTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testGuestRestartJob()
     {
         $this->kingpinServiceMock()->expects('put')

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateNicRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
 use App\Models\V2\Nic;
+use App\Models\V2\Task;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\TaskResource;
 use App\Rules\V2\IpAvailable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +58,7 @@ class NicController extends BaseController
         ]));
         $this->validate($request, ['ip_address' => [new IpAvailable($nic->network_id)]]);
 
-        $nic->withSyncLock(function ($nic) {
+        $nic->withTaskLock(function ($nic) {
             $nic->save();
         });
 
@@ -67,10 +69,21 @@ class NicController extends BaseController
     {
         $nic = Nic::forUser($request->user())->findOrFail($nicId);
 
-        $nic->withSyncLock(function ($nic) {
+        $nic->withTaskLock(function ($nic) {
             $nic->delete();
         });
 
         return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $nicId)
+    {
+        $collection = Nic::forUser($request->user())->findOrFail($nicId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallPolicy\Deleted;
 use App\Events\V2\FirewallPolicy\Deleting;
 use App\Events\V2\FirewallPolicy\Saved;
 use App\Events\V2\FirewallPolicy\Saving;
@@ -10,7 +9,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
-use App\Traits\V2\SyncableOverrides;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -28,30 +27,32 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallPolicy extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'fwp';
-    public $incrementing = false;
-    public $timestamps = true;
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    protected $fillable = [
-        'id',
-        'name',
-        'sequence',
-        'router_id',
-    ];
 
-    protected $dispatchesEvents = [
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'deleting' => Deleting::class,
-        'deleted' => Deleted::class
-    ];
-
-    protected $casts = [
-        'sequence' => 'integer'
-    ];
+    public function __construct(array $attributes = [])
+    {
+        $this->timestamps = true;
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+        $this->fillable = [
+            'id',
+            'name',
+            'sequence',
+            'router_id',
+        ];
+        $this->dispatchesEvents = [
+            'saving' => Saving::class,
+            'saved' => Saved::class,
+            'deleting' => Deleting::class,
+        ];
+        $this->casts = [
+            'sequence' => 'integer'
+        ];
+        parent::__construct($attributes);
+    }
 
     public function firewallRules()
     {

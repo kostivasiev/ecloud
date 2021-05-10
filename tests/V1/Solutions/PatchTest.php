@@ -6,13 +6,10 @@ use App\Events\V1\EncryptionEnabledOnSolutionEvent;
 use App\Models\V1\Solution;
 use App\Models\V1\Tag;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class PatchTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

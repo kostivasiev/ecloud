@@ -8,10 +8,12 @@ use App\Jobs\Router\Defaults\ConfigureRouterDefaults;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
 use App\Models\V2\Vpn;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
+use App\Resources\V2\TaskResource;
 use App\Resources\V2\VpnResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,7 +54,7 @@ class RouterController extends BaseController
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'vpc_id', 'router_throughput_id']));
 
-        $router->withSyncLock(function ($router) {
+        $router->withTaskLock(function ($router) {
             $router->save();
         });
 
@@ -67,7 +69,7 @@ class RouterController extends BaseController
             return $router->getDeletionError();
         }
 
-        $router->withSyncLock(function ($router) {
+        $router->withTaskLock(function ($router) {
             $router->delete();
         });
 
@@ -112,6 +114,17 @@ class RouterController extends BaseController
             ->transform($collection);
 
         return FirewallPolicyResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    {
+        $collection = Router::forUser($request->user())->findOrFail($routerId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

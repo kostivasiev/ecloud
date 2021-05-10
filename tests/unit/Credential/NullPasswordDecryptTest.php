@@ -3,13 +3,10 @@
 namespace Tests\unit\Credential;
 
 use App\Models\V2\Credential;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class NullPasswordDecryptTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

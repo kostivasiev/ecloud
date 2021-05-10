@@ -9,8 +9,6 @@ use UKFast\Api\Auth\Consumer;
 
 class AdvancedNetworkingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

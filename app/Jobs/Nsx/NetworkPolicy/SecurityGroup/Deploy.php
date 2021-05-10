@@ -4,21 +4,22 @@ namespace App\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
-use Illuminate\Support\Facades\Log;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
 
 class Deploy extends Job
 {
-    private $model;
+    use Batchable, LoggableModelJob;
 
-    public function __construct(NetworkPolicy $model)
+    private NetworkPolicy $model;
+
+    public function __construct(NetworkPolicy $networkPolicy)
     {
-        $this->model = $model;
+        $this->model = $networkPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $network = $this->model->network;
         $router = $network->router;
         $availabilityZone = $router->availabilityZone;
@@ -44,13 +45,5 @@ class Deploy extends Job
                 ]
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
-    }
-
-    public function failed($exception)
-    {
-        $message = $exception->hasResponse() ? json_decode($exception->getResponse()->getBody()->getContents()) : $exception->getMessage();
-        $this->model->setSyncFailureReason($message);
     }
 }

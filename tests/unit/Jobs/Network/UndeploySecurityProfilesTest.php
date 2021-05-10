@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class UndeploySecurityProfilesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

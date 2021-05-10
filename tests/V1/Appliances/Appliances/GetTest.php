@@ -7,15 +7,12 @@ use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\ApplianceVersion;
 use App\Models\V1\Pod;
 use Illuminate\Http\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Ramsey\Uuid\Uuid;
 use Tests\V1\ApplianceTestCase;
 use Tests\V1\Appliance\Version\DataTest;
 
 class GetTest extends ApplianceTestCase
 {
-    use DatabaseMigrations;
-
     public function setUp(): void
     {
         parent::setUp();

@@ -2,17 +2,13 @@
 
 namespace Tests\V2\FirewallRulePort;
 
-use App\Events\V2\FirewallPolicy\Saved;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected $firewallRule;
 
     public function setUp(): void

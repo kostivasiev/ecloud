@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class DefaultRouterThroughputTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private Router $router;
 
     public function setUp(): void

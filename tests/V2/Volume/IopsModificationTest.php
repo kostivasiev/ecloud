@@ -4,13 +4,12 @@ namespace Tests\V2\Volume;
 
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class IopsModificationTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Volume $volume;
 
     public function setUp(): void
@@ -41,56 +40,9 @@ class IopsModificationTest extends TestCase
 
     public function testSetValidIopsValue()
     {
-        $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'volumes' => []
-                ]));
-            });
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
-                [
-                    'json' => [
-                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
-        // Initial attachment with 300 limit
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
-                [
-                    'json' => [
-                        'limit' => '300',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        Event::fake();
 
         $this->instance()->volumes()->attach($this->volume);
-
-        // Patch to the IOPS to 600
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
-                [
-                    'json' => [
-                        'limit' => '600',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
 
         $this->patch('/v2/volumes/' . $this->volume->id, [
             'iops' => 600,
@@ -109,40 +61,6 @@ class IopsModificationTest extends TestCase
 
     public function testSetInvalidIopsValue()
     {
-        $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'volumes' => []
-                ]));
-            });
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
-                [
-                    'json' => [
-                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
-                [
-                    'json' => [
-                        'limit' => '300',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
         $this->instance()->volumes()->attach($this->volume);
 
         $this->patch('/v2/volumes/' . $this->volume->id, [

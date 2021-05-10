@@ -8,14 +8,11 @@ use App\Models\V1\Solution;
 use App\Models\V1\Storage;
 use App\Models\V1\VolumeSet;
 use App\Services\Artisan\V1\ArtisanService;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Mockery;
 use Tests\V1\TestCase;
 
 class VolumesTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testValidVolumeSet()
     {
         (factory(Solution::class, 1)->create());

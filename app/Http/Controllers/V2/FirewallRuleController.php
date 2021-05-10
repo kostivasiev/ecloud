@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\SyncException;
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\FirewallRule\Create;
 use App\Http\Requests\V2\FirewallRule\Update;
 use App\Models\V2\FirewallRule;
@@ -66,7 +66,7 @@ class FirewallRuleController extends BaseController
      */
     public function store(Create $request)
     {
-        $firewallRule = new FirewallRule();
+        $firewallRule = app()->make(FirewallRule::class);
         $firewallRule->fill($request->only([
             'name',
             'sequence',
@@ -79,9 +79,9 @@ class FirewallRuleController extends BaseController
             'enabled'
         ]));
 
-        $firewallRule->firewallPolicy->withSyncLock(function () use ($request, $firewallRule) {
-            if (!$firewallRule->firewallPolicy->canSync()) {
-                throw new SyncException();
+        $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $firewallRule->save();
@@ -119,9 +119,9 @@ class FirewallRuleController extends BaseController
             'enabled'
         ]));
 
-        $firewallRule->firewallPolicy->withSyncLock(function () use ($request, $firewallRule) {
-            if (!$firewallRule->firewallPolicy->canSync()) {
-                throw new SyncException();
+        $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $firewallRule->save();
@@ -147,9 +147,9 @@ class FirewallRuleController extends BaseController
     {
         $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
 
-        $firewallRule->firewallPolicy->withSyncLock(function () use ($firewallRule) {
-            if (!$firewallRule->firewallPolicy->canSync()) {
-                throw new SyncException();
+        $firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRule) {
+            if (!$firewallRule->firewallPolicy->canCreateTask()) {
+                throw new TaskException();
             }
 
             $firewallRule->firewallRulePorts->each(function ($port) {

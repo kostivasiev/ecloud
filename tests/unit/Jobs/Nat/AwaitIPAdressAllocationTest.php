@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class AwaitIPAdressAllocationTest extends TestCase
 {
-    use DatabaseMigrations;
-
     protected Nat $nat;
     protected FloatingIp $floatingIp;
     protected Nic $nic;

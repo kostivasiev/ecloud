@@ -2,14 +2,14 @@
 namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Sync;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateVcpuBillingTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $sync;
 
     public function setUp(): void
@@ -32,18 +32,18 @@ class UpdateVcpuBillingTest extends TestCase
         // Update the instance compute values
         $this->instance()->vcpu_cores = 2;
 
-        Sync::withoutEvents(function() {
-            $this->sync = new Sync([
+        Model::withoutEvents(function() {
+            $this->sync = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'type' => Sync::TYPE_UPDATE
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $this->sync->resource()->associate($this->instance());
         });
 
         // Check that the vcpu billing metric is added
         $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
-        $updateVcpuBillingListener->handle(new \App\Events\V2\Sync\Updated($this->sync));
+        $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->sync));
 
         $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'vcpu.count');
         $this->assertNotNull($vcpuMetric);

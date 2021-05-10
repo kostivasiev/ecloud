@@ -7,10 +7,11 @@ use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
+use App\Models\V2\Task;
 use App\Resources\V2\FloatingIpResource;
+use App\Resources\V2\TaskResource;
 use App\Support\Resource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -92,7 +93,7 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
         $floatingIp->fill($request->only(['name']));
 
-        $floatingIp->withSyncLock(function ($floatingIp) {
+        $floatingIp->withTaskLock(function ($floatingIp) {
             $floatingIp->save();
         });
 
@@ -103,7 +104,7 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->withSyncLock(function ($floatingIp) {
+        $floatingIp->withTaskLock(function ($floatingIp) {
             $floatingIp->delete();
         });
 
@@ -115,7 +116,7 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
         $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        $floatingIp->withSyncLock(function ($floatingIp) use ($resource) {
+        $floatingIp->withTaskLock(function ($floatingIp) use ($resource) {
             if (!$floatingIp->destinationNat()->exists()) {
                 $nat = app()->make(Nat::class);
                 $nat->destination()->associate($floatingIp);
@@ -142,7 +143,7 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->withSyncLock(function ($floatingIp) {
+        $floatingIp->withTaskLock(function ($floatingIp) {
 
             if ($floatingIp->sourceNat()->exists()) {
                 $floatingIp->sourceNat->delete();
@@ -155,5 +156,16 @@ class FloatingIpController extends BaseController
         });
 
         return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $fipId)
+    {
+        $collection = FloatingIp::forUser($request->user())->findOrFail($fipId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

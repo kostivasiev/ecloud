@@ -11,7 +11,7 @@ use Tests\V1\TestCase;
 
 class GetTest extends TestCase
 {
-    use DatabaseMigrations, DatabaseTransactions;
+    use DatabaseTransactions;
 
     public function setUp(): void
     {

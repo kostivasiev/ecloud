@@ -92,7 +92,11 @@ $app->routeMiddleware([
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'is-locked' => \App\Http\Middleware\IsLocked::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
-    'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class
+    'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class,
+    'customer-max-vpc' => \App\Http\Middleware\IsMaxVpcForCustomer::class,
+    'customer-max-instance' => \App\Http\Middleware\IsMaxInstanceForCustomer::class,
+    'can-detach' => \App\Http\Middleware\CanDetach::class,
+    'can-edit-rule' => \App\Http\Middleware\NetworkRule\CanEdit::class,
 ]);
 
 /*
