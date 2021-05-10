@@ -36,11 +36,9 @@ class NetworkPolicyController extends BaseController
             'network_id',
         ]));
 
-        $model->withTaskLock(function ($policy) {
-            $policy->save();
-        });
+        $task = $model->syncSave(['catchall_rule_action' => $request->input('catchall_rule_action', 'REJECT')]);
 
-        return $this->responseIdMeta($request, $model->id, 202);
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function update(Update $request, string $networkPolicyId)
@@ -48,22 +46,19 @@ class NetworkPolicyController extends BaseController
         $model = NetworkPolicy::forUser(Auth::user())->findOrFail($networkPolicyId);
         $model->fill($request->only(['name']));
 
-        $model->withTaskLock(function ($policy) {
-            $policy->save();
-        });
+        // TODO: we don't really need to trigger a sync here.
+        $task = $model->syncSave();
 
-        return $this->responseIdMeta($request, $model->id, 202);
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $networkPolicyId)
     {
         $model = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
 
-        $model->withTaskLock(function ($model) {
-            $model->delete();
-        });
+        $task = $model->syncDelete();
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function networkRules(Request $request, QueryTransformer $queryTransformer, string $networkPolicyId)

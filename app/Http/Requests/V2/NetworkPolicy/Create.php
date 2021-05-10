@@ -2,7 +2,6 @@
 namespace App\Http\Requests\V2\NetworkPolicy;
 
 use App\Models\V2\Network;
-use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\NetworkHasNoPolicy;
 use UKFast\FormRequests\FormRequest;
@@ -34,6 +33,12 @@ class Create extends FormRequest
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),
                 new NetworkHasNoPolicy(),
+            ],
+            'catchall_rule_action' => [
+                'sometimes',
+                'required',
+                'string',
+                'in:ALLOW,DROP,REJECT'
             ],
         ];
     }

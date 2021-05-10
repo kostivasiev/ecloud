@@ -44,17 +44,11 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
 
-        $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
-            if (!$networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
+        $networkRule->save();
 
-            $networkRule->save();
+        $task = $networkRule->networkPolicy->syncSave();
 
-            $networkRule->networkPolicy->save();
-        });
-
-        return $this->responseIdMeta($request, $networkRule->id, 202);
+        return $this->responseIdMeta($request, $networkRule->id, 202, $task->id);
     }
 
     public function update(Update $request, string $networkRuleId)
@@ -70,37 +64,27 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
 
-        $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
-            if (!$networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
+        $networkRule->save();
 
-            $networkRule->save();
+        $task = $networkRule->networkPolicy->syncSave();
 
-            $networkRule->networkPolicy->save();
-        });
-
-        return $this->responseIdMeta($request, $networkRule->id, 202);
+        return $this->responseIdMeta($request, $networkRule->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $networkRuleId)
     {
         $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
-            
-        $networkRule->networkPolicy->withTaskLock(function () use ($networkRule) {
-            if (!$networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
 
-            $networkRule->networkRulePorts->each(function ($port) {
-                $port->delete();
-            });
-
-            $networkRule->delete();
-
-            $networkRule->networkPolicy->save();
+        $networkRule->networkRulePorts->each(function ($port) {
+            $port->delete();
         });
 
-        return response('', 202);
+        $networkRule->delete();
+
+        // We don't actually need to do this due to the delete listener deleting the rule,
+        // but that logic needs to be moved into the resource sync jobs so lets keep this for now.
+        $task = $networkRule->networkPolicy->syncSave();
+
+        return $this->responseTaskId($task->id);
     }
 }

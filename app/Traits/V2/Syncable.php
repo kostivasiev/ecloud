@@ -3,11 +3,7 @@
 namespace App\Traits\V2;
 
 use App\Exceptions\V2\TaskException;
-use App\Listeners\V2\ResourceSyncSaving;
 use App\Support\Sync;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Response;
 
 trait Syncable
 {
@@ -52,5 +48,37 @@ trait Syncable
             'status' => $status,
             'type' => $type,
         ];
+    }
+
+    public function createSync($type, $data = null)
+    {
+        switch ($type) {
+            case Sync::TYPE_UPDATE:
+                return $this->createTask(Sync::TASK_NAME_UPDATE, $this->getUpdateSyncJob(), $data);
+            case Sync::TYPE_DELETE:
+                return $this->createTask(Sync::TASK_NAME_DELETE, $this->getDeleteSyncJob(), $data);
+        }
+        return false;
+    }
+
+    public function syncSave($data = null)
+    {
+        return $this->withTaskLock(function ($model) use ($data) {
+            if (!$model->canCreateTask()) {
+                throw new TaskException();
+            }
+            $model->save();
+            return $this->createSync(Sync::TYPE_UPDATE, $data);
+        });
+    }
+
+    public function syncDelete($data = null)
+    {
+        return $this->withTaskLock(function ($model) use ($data) {
+            if (!$model->canCreateTask()) {
+                throw new TaskException();
+            }
+            return $this->createSync(Sync::TYPE_DELETE, $data);
+        });
     }
 }

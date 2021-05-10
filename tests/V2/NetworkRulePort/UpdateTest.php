@@ -7,7 +7,6 @@ use App\Events\V2\NetworkPolicy\Saving;
 use App\Models\V2\NetworkRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -39,7 +38,7 @@ class UpdateTest extends TestCase
 
     public function testUpdate()
     {
-        Event::fake();
+        Event::fake(\App\Events\V2\Task\Created::class);
 
         $this->patch('v2/network-rule-ports/nrp-test', [
             'source' => '3306',
@@ -54,7 +53,6 @@ class UpdateTest extends TestCase
             'ecloud'
         )->assertResponseStatus(202);
 
-        Event::assertDispatched(Saving::class);
-        Event::assertDispatched(Saved::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 }

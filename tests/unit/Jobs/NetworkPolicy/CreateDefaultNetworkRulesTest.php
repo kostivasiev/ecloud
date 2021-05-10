@@ -57,7 +57,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
             'network_policy_id' => $this->networkPolicy()->id,
             'source' => 'ANY',
             'destination' => 'ANY',
-            'action' => 'DROP',
+            'action' => 'REJECT',
             'direction' => 'IN_OUT',
             'enabled' => true,
             'type' => NetworkRule::TYPE_CATCHALL
