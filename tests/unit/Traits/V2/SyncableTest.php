@@ -4,27 +4,15 @@ namespace Tests\unit\Traits\V2;
 
 use App\Models\V2\Task;
 use App\Support\Sync;
-use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class TestModel extends Model
-{
-    use Syncable;
-
-    protected $fillable = [
-        'id',
-    ];
-
-    public function save(array $options = [])
-    {
-        return true;
-    }
-}
-
 class SyncableTest extends TestCase
 {
+    public $model;
+    public $task;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -32,7 +20,7 @@ class SyncableTest extends TestCase
 
     public function testGetSyncAttributeReturnsLatestSyncData()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->model = new TestModel([
                 'id' => 'test-testing'
             ]);
@@ -54,7 +42,7 @@ class SyncableTest extends TestCase
 
     public function testGetSyncAttributeReturnsUnknownWithNoSync()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->model = new TestModel([
                 'id' => 'test-testing'
             ]);
