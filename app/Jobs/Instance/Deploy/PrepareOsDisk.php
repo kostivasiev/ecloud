@@ -69,6 +69,16 @@ class PrepareOsDisk extends Job
                 ]
             );
 
+            // Update the volume capacity
+            $volume->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/volume/' . $volume->vmware_uuid . '/size',
+                [
+                    'json' => [
+                        'sizeGiB' => $volume->capacity,
+                    ],
+                ]
+            );
+
             Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->id);
         }
     }
