@@ -110,7 +110,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'can-edit-rule'], function () use ($router) {
             $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
         });
-        $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+        $router->group(['middleware' => 'can-delete-rule'], function () use ($router) {
+            $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+        });
     });
 
     /** Network Rule Ports */

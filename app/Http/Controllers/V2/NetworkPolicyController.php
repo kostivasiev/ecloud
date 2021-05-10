@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\NetworkPolicy\Create;
 use App\Http\Requests\V2\NetworkPolicy\Update;
 use App\Models\V2\NetworkPolicy;
+use App\Models\V2\NetworkRule;
 use App\Models\V2\Task;
 use App\Resources\V2\NetworkPolicyResource;
 use App\Resources\V2\TaskResource;
@@ -77,7 +78,7 @@ class NetworkPolicyController extends BaseController
     public function networkRules(Request $request, QueryTransformer $queryTransformer, string $networkPolicyId)
     {
         $collection = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId)->networkRules();
-        $queryTransformer->config(NetworkPolicy::class)
+        $queryTransformer->config(NetworkRule::class)
             ->transform($collection);
 
         return NetworkRuleResource::collection($collection->paginate(

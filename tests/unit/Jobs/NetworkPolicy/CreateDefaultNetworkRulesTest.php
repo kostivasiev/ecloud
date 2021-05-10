@@ -65,4 +65,20 @@ class CreateDefaultNetworkRulesTest extends TestCase
 
         Event::assertNotDispatched(JobFailed::class);
     }
+
+    public function testCatchallRuleActionIsImplemented()
+    {
+        $this->networkPolicy();
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new CreateDefaultNetworkRules($this->networkPolicy(), ['catchall_rule_action' => 'ALLOW']));
+
+        $this->seeInDatabase('network_rules', [
+            'action' => 'ALLOW',
+            'type' => NetworkRule::TYPE_CATCHALL
+        ], 'ecloud');
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
 }

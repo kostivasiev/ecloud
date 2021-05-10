@@ -54,7 +54,8 @@ class NetworkRuleController extends BaseController
     public function update(Update $request, string $networkRuleId)
     {
         $networkRule = NetworkRule::forUser(Auth::user())->findOrFail($networkRuleId);
-        $networkRule->fill($request->only([
+
+        $fillable = [
             'name',
             'sequence',
             'source',
@@ -62,7 +63,13 @@ class NetworkRuleController extends BaseController
             'action',
             'direction',
             'enabled',
-        ]));
+        ];
+
+        if ($networkRule->type == NetworkRule::TYPE_CATCHALL && !Auth::user()->isAdmin()) {
+            $fillable = 'action';
+        }
+
+        $networkRule->fill($request->only($fillable));
 
         $networkRule->save();
 

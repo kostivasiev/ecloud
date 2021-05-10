@@ -40,16 +40,61 @@ class DeleteTest extends TestCase
     {
         Event::fake([\App\Events\V2\Task\Created::class, \App\Events\V2\NetworkRule\Deleted::class]);
 
-        $this->delete(
-            '/v2/network-rules/' . $this->networkRule->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertResponseStatus(202);
+        $this->delete('/v2/network-rules/' . $this->networkRule->id)
+            ->assertResponseStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
         Event::assertDispatched(\App\Events\V2\NetworkRule\Deleted::class);
+    }
+
+    public function testCanNotDeleteDhcpEgress()
+    {
+        $networkRule = Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-' . NetworkRule::TYPE_DHCP_EGRESS,
+                'name' => 'nr-test-1',
+                'type' => NetworkRule::TYPE_DHCP_EGRESS
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+
+            return $networkRule;
+        });
+
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
+    }
+
+    public function testCanNotDeleteDhcpIngress()
+    {
+        $networkRule = Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-' . NetworkRule::TYPE_DHCP_INGRESS,
+                'name' => 'nr-test-1',
+                'type' => NetworkRule::TYPE_DHCP_INGRESS
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+
+            return $networkRule;
+        });
+
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
+    }
+
+    public function testCanNotDeleteCatchall()
+    {
+        $networkRule = Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-' . NetworkRule::TYPE_CATCHALL,
+                'name' => 'nr-test-1',
+                'type' => NetworkRule::TYPE_CATCHALL
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+
+            return $networkRule;
+        });
+
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
     }
 }

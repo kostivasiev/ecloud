@@ -35,11 +35,6 @@ class NetworkPolicy extends Model implements Filterable, Sortable
             'network_id',
             'name',
         ];
-//        $this->dispatchesEvents = [
-//            'saving' => Saving::class,
-//            'saved' => Saved::class,
-//            'deleting' => Deleting::class,
-//        ];
         parent::__construct($attributes);
     }
 
