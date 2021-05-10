@@ -89,7 +89,7 @@ class NetworkRuleController extends BaseController
         $networkRule->delete();
 
         // We don't actually need to do this due to the delete listener deleting the rule,
-        // but that logic needs to be moved into the resource sync jobs so lets keep this for now.
+        // but that logic needs to be moved into the resource non-sync job (task) so lets keep this for now.
         $task = $networkRule->networkPolicy->syncSave();
 
         return $this->responseTaskId($task->id);
