@@ -3,17 +3,12 @@
 namespace Tests\unit\Jobs\Network;
 
 use App\Jobs\Network\AwaitPortRemoval;
-use App\Jobs\Network\Deploy;
-use App\Jobs\Network\Undeploy;
-use App\Models\V2\Router;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AwaitPortRemovalTest extends TestCase
