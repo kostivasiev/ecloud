@@ -66,11 +66,13 @@ trait Taskable
         return $task;
     }
 
-    public function newTask($name, $job, $data = null)
+    public function createTaskWithLock($name, $job, $data = null)
     {
-        if (!$this->canCreateTask()) {
-            throw new TaskException();
-        }
-        return $this->createTask($name, $job, $data);
+        return $this->withTaskLock(function ($model) use ($name, $job, $data) {
+            if (!$model->canCreateTask()) {
+                throw new TaskException();
+            }
+            return $this->createTask($name, $job, $data);
+        });
     }
 }
