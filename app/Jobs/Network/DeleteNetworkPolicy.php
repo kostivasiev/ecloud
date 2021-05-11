@@ -20,6 +20,8 @@ class DeleteNetworkPolicy extends Job
 
     public function handle()
     {
-        $this->model->networkPolicy->syncDelete();
+        if ($this->model->networkPolicy()->exists()) {
+            $this->model->networkPolicy->syncDelete();
+        }
     }
 }

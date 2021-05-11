@@ -25,7 +25,7 @@ class AwaitNetworkPolicyRemoval extends Job
 
     public function handle()
     {
-        if ($this->model->networkPolicy()->count() > 0) {
+        if ($this->model->networkPolicy()->exists()) {
             if ($this->model->networkPolicy->sync->status == Sync::STATUS_FAILED) {
                 $this->fail(new \Exception("Network policy '" . $this->model->networkPolicy->id . "' in failed sync state"));
                 return;
