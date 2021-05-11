@@ -97,6 +97,7 @@ $app->routeMiddleware([
     'customer-max-instance' => \App\Http\Middleware\IsMaxInstanceForCustomer::class,
     'can-detach' => \App\Http\Middleware\CanDetach::class,
     'can-edit-rule' => \App\Http\Middleware\NetworkRule\CanEdit::class,
+    'can-delete-rule' => \App\Http\Middleware\NetworkRule\CanDelete::class,
 ]);
 
 /*

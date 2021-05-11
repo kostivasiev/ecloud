@@ -9,7 +9,6 @@ use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -36,12 +35,18 @@ class CreateTest extends TestCase
 
     public function testCreate()
     {
-        Event::fake([Saving::class, Saved::class]);
+        Event::fake(\App\Events\V2\Task\Created::class);
+
         $this->post('/v2/network-rule-ports', [
             'network_rule_id' => 'nr-test',
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555',
+        ])->seeJsonStructure([
+            'data' => [
+                'id',
+                'task_id'
+            ]
         ])->seeInDatabase(
             'network_rule_ports',
             [
@@ -53,7 +58,6 @@ class CreateTest extends TestCase
             'ecloud'
         )->assertResponseStatus(202);
 
-        Event::assertDispatched(Saving::class);
-        Event::assertDispatched(Saved::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 }

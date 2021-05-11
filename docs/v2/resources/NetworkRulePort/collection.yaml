@@ -44,6 +44,6 @@ post:
   responses:
     202:
       description: Accepted
-      $ref: '../../resources/NetworkRulePort/responses/idResponse.yaml'
+      $ref : 'responses/idResponse.yaml'
   tags:
     - Network Rule Ports

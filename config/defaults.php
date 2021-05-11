@@ -33,9 +33,9 @@ return [
     ],
     'network_policy' => [
         'rules' => [
-            'DHCP_Ingress' => [
+            'dhcp_ingress' => [
                 'name' => NetworkRule::TYPE_DHCP_INGRESS,
-                'sequence' => 5001,
+                'sequence' => 10000,
                 'source' =>  '10.0.0.2',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
@@ -43,15 +43,25 @@ return [
                 'enabled' => true,
                 'type' => NetworkRule::TYPE_DHCP_INGRESS,
             ],
-            'DHCP_Egress' => [
+            'dhcp_egress' => [
                 'name' => NetworkRule::TYPE_DHCP_EGRESS,
-                'sequence' => 5002,
+                'sequence' => 10001,
                 'source' =>  'ANY',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
                 'direction' => 'OUT',
                 'enabled' => true,
                 'type' => NetworkRule::TYPE_DHCP_EGRESS,
+            ],
+            'catchall' => [
+                'name' => NetworkRule::TYPE_CATCHALL,
+                'sequence' => 20000,
+                'source' =>  'ANY',
+                'destination' => 'ANY',
+                'action' => 'REJECT',
+                'direction' => 'IN_OUT',
+                'enabled' => true,
+                'type' => NetworkRule::TYPE_CATCHALL,
             ]
         ]
     ],

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Jobs\Network;
+namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
@@ -56,16 +56,16 @@ class PrepareOSDiskTest extends TestCase
                         'limit' => 300,
                     ],
                 ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'volumes' => [
-                        [
-                            'uuid' => 'd64169c6-4c40-4008-916c-8be822d8cc2d',
-                        ],
-                    ]
-                ]));
-            });
+            ]);
+
+        $this->kingpinServiceMock()->expects('put')
+            ->withArgs(['/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/volume/d64169c6-4c40-4008-916c-8be822d8cc2d/size',
+                [
+                    'json' => [
+                        'sizeGiB' => 20,
+                    ],
+                ]
+            ]);
 
         Event::fake([Created::class]);
 

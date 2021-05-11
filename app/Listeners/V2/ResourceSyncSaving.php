@@ -3,9 +3,6 @@
 namespace App\Listeners\V2;
 
 use App\Exceptions\V2\TaskException;
-use App\Support\Sync;
-use Illuminate\Contracts\Cache\LockTimeoutException;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ResourceSyncSaving

@@ -177,17 +177,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
-        // NetworkPolicy
-        \App\Events\V2\NetworkPolicy\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\NetworkPolicy\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\NetworkPolicy\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
-
         // NetworkRule
         \App\Events\V2\NetworkRule\Deleted::class => [
             \App\Listeners\V2\NetworkRule\Undeploy::class,

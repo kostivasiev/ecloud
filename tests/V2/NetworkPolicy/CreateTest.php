@@ -1,11 +1,8 @@
 <?php
 namespace Tests\V2\NetworkPolicy;
 
-use App\Events\V2\NetworkPolicy\Saved;
-use App\Events\V2\NetworkPolicy\Saving;
 use App\Models\V2\NetworkPolicy;
-use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use App\Models\V2\Task;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -15,9 +12,21 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        // Bind data so we can use actual NSX mocks
         app()->bind(NetworkPolicy::class, function () {
-            return $this->networkPolicy();
+            $networkPolicy = \Mockery::mock($this->networkPolicy())->makePartial();
+            $networkPolicy->expects('syncSave')
+                ->andReturnUsing(function () use ($networkPolicy) {
+                    $networkPolicy->save();
+                    $task = app()->make(Task::class);
+                    $task->id = 'test-task';
+                    $task->name = $task->id;
+                    $task->resource()->associate($networkPolicy);
+                    $task->completed = false;
+                    $task->save();
+                    return $task;
+                });
+
+            return $networkPolicy;
         });
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
@@ -25,8 +34,6 @@ class CreateTest extends TestCase
 
     public function testCreateResource()
     {
-        Event::fake();
-
         $data = [
             'name' => 'Test Policy',
             'network_id' => $this->network()->id,
@@ -34,7 +41,10 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/network-policies',
             $data
-        )->seeInDatabase(
+        )->seeJson([
+            'id' => 'np-test',
+            'task_id' => 'test-task',
+        ])->seeInDatabase(
             'network_policies',
             [
                 'name' => 'Test Policy',
@@ -42,14 +52,10 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
-
-        Event::assertDispatched(Saving::class);
-        Event::assertDispatched(Saved::class);
     }
 
     public function testCreateResourceNetworkAlreadyAssigned()
     {
-        Event::fake();
         $data = [
             'name' => 'Test Policy',
             'network_id' => $this->network()->id,

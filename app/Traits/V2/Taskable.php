@@ -2,6 +2,7 @@
 
 namespace App\Traits\V2;
 
+use App\Exceptions\V2\TaskException;
 use App\Models\V2\Task;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +22,7 @@ trait Taskable
             Log::debug(get_class($this) . ' : Attempting to obtain task lock for 60s', ['resource_id' => $this->id]);
             $lock->block(60);
 
-            $callback($this);
+            return $callback($this);
         } finally {
             $lock->release();
         }
@@ -63,5 +64,15 @@ trait Taskable
         ]);
 
         return $task;
+    }
+
+    public function createTaskWithLock($name, $job, $data = null)
+    {
+        return $this->withTaskLock(function ($model) use ($name, $job, $data) {
+            if (!$model->canCreateTask()) {
+                throw new TaskException();
+            }
+            return $this->createTask($name, $job, $data);
+        });
     }
 }

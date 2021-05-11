@@ -43,17 +43,35 @@ class BaseController extends Controller
      * @param $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseIdMeta($request, $id, $statusCode)
+    public function responseIdMeta($request, $id, $statusCode, $taskId = null)
     {
         $location = $request->fullUrlIs("*/$id") ? URL::current() : sprintf('%s/%s', URL::current(), $id);
+
+        $data = ['id' => $id];
+
+        if ($taskId) {
+            $data['task_id'] = $taskId;
+        }
+
         return response()->json(
             [
-                'data' => [
-                    'id' => $id,
-                ],
+                'data' => $data,
                 'meta' => [
                     'location' => $location,
                 ],
+            ],
+            $statusCode
+        );
+    }
+
+    public function responseTaskId($taskId, $statusCode = 202)
+    {
+        return response()->json(
+            [
+                'data' => [
+                    'task_id' => $taskId
+                ],
+                'meta' => [],
             ],
             $statusCode
         );
