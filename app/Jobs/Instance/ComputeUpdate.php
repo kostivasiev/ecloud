@@ -5,6 +5,7 @@ namespace App\Jobs\Instance;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -21,7 +22,16 @@ class ComputeUpdate extends Job
 
     public function handle()
     {
-        $instanceResponse = $this->model->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
+        try {
+            $instanceResponse = $this->model->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
+        } catch (RequestException $exception) {
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
+            }
+            $message = 'Unable to retrieve instance ' . $this->model->id . ' on Vpc ' . $this->model->vpc_id . ', skipping.';
+            Log::warning(get_class($this) . ' : ' . $message);
+            return;
+        }
         $instanceResponseData = json_decode($instanceResponse->getBody()->getContents());
 
         $currentVCPUCores = $instanceResponseData->numCPU;

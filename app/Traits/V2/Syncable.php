@@ -72,6 +72,17 @@ trait Syncable
         });
     }
 
+    public function syncSaveQuietly($data = null)
+    {
+        return $this->withTaskLock(function ($model) use ($data) {
+            if (!$model->canCreateTask()) {
+                throw new TaskException();
+            }
+            $model->saveQuietly();
+            return $this->createSync(Sync::TYPE_UPDATE, $data);
+        });
+    }
+
     public function syncDelete($data = null)
     {
         return $this->withTaskLock(function ($model) use ($data) {

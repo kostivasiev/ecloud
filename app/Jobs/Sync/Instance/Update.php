@@ -20,6 +20,7 @@ use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
+use App\Jobs\Instance\HostGroupUpdate;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
 use App\Models\V2\Task;
@@ -66,6 +67,7 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new ComputeUpdate($this->task->resource),
+                    new HostGroupUpdate($this->task->resource, $this->task->data),
                 ]
             ])->dispatch();
         }

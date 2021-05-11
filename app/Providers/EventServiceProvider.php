@@ -140,8 +140,8 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
         \App\Events\V2\Instance\Updated::class => [
-            \App\Listeners\V2\Instance\HostGroupChange::class,
-            \App\Listeners\V2\Instance\ComputeChange::class,
+//            \App\Listeners\V2\Instance\HostGroupChange::class,
+//            \App\Listeners\V2\Instance\ComputeChange::class,
         ],
         \App\Events\V2\Instance\Saving::class => [
             \App\Listeners\V2\ResourceSyncSaving::class,
