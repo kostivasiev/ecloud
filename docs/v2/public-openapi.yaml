@@ -20,12 +20,12 @@ components:
       in: header
       name: Authorization
   schemas:
-#    NetworkPolicy:
-#      $ref: 'components/schemas/networkPolicy.yaml'
-#    NetworkRule:
-#      $ref: 'components/schemas/networkRule.yaml'
-#    NetworkRulePort:
-#      $ref: 'components/schemas/networkRulePort.yaml'
+    NetworkPolicy:
+      $ref: 'components/schemas/networkPolicy.yaml'
+    NetworkRule:
+      $ref : 'components/schemas/networkRule.yaml'
+    NetworkRulePort :
+      $ref : 'components/schemas/networkRulePort.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     VirtualPrivateCloud:
@@ -275,22 +275,22 @@ paths:
     $ref: 'resources/RouterThroughput/collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
-#  '/ecloud/v2/network-policies':
-#    $ref: 'resources/NetworkPolicy/collection.yaml'
-#  '/ecloud/v2/network-policies/{networkPolicyId}':
-#    $ref: 'resources/NetworkPolicy/item.yaml'
-#  '/ecloud/v2/network-policies/{networkPolicyId}/network-rules':
-#    $ref: 'resources/NetworkPolicy/network-rules-collection.yaml'
-#  '/ecloud/v2/network-policies/{networkPolicyId}/tasks':
-#    $ref: 'resources/NetworkPolicy/tasks-collection.yaml'
-#  '/ecloud/v2/network-rule-ports':
-#    $ref: 'resources/NetworkRulePort/collection.yaml'
-#  '/ecloud/v2/network-rule-ports/{networkRulePortId}':
-#    $ref: 'resources/NetworkRulePort/item.yaml'
-#  '/ecloud/v2/network-rules':
-#    $ref: 'resources/NetworkRule/collection.yaml'
-#  '/ecloud/v2/network-rules/{networkRuleId}':
-#    $ref: 'resources/NetworkRule/item.yaml'
+  '/ecloud/v2/network-policies':
+    $ref: 'resources/NetworkPolicy/collection.yaml'
+  '/ecloud/v2/network-policies/{networkPolicyId}':
+    $ref: 'resources/NetworkPolicy/item.yaml'
+  '/ecloud/v2/network-policies/{networkPolicyId}/network-rules':
+    $ref: 'resources/NetworkPolicy/network-rules-collection.yaml'
+  '/ecloud/v2/network-policies/{networkPolicyId}/tasks':
+    $ref: 'resources/NetworkPolicy/tasks-collection.yaml'
+  '/ecloud/v2/network-rule-ports':
+    $ref: 'resources/NetworkRulePort/collection.yaml'
+  '/ecloud/v2/network-rule-ports/{networkRulePortId}':
+    $ref: 'resources/NetworkRulePort/item.yaml'
+  '/ecloud/v2/network-rules':
+    $ref: 'resources/NetworkRule/collection.yaml'
+  '/ecloud/v2/network-rules/{networkRuleId}':
+    $ref: 'resources/NetworkRule/item.yaml'
 #  '/ecloud/v2/hosts':
 #    $ref: 'resources/Host/collection.yaml'
 #  '/ecloud/v2/hosts/{id}':

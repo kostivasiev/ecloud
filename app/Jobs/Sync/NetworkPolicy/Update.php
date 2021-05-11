@@ -32,7 +32,7 @@ class Update extends Job
                     $this->task->resource->network->router->availabilityZone,
                     '/infra/domains/default/groups/'
                 ),
-                new CreateDefaultNetworkRules($this->task->resource),
+                new CreateDefaultNetworkRules($this->task->resource, $this->task->data),
                 new DeployNetworkPolicy($this->task->resource),
                 new DeployCheck(
                     $this->task->resource,

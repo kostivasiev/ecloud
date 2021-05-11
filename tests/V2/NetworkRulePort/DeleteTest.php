@@ -9,7 +9,6 @@ use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -45,12 +44,11 @@ class DeleteTest extends TestCase
 
     public function testDelete()
     {
-        Event::fake();
+        Event::fake([\App\Events\V2\Task\Created::class]);
 
         $this->delete('/v2/network-rule-ports/nrp-test')
             ->assertResponseStatus(202);
 
-        Event::assertDispatched(Saving::class);
-        Event::assertDispatched(Saved::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 }

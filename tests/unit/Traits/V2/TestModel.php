@@ -12,4 +12,9 @@ class TestModel extends Model
     protected $fillable = [
         'id',
     ];
+
+    public function save(array $options = [])
+    {
+        return true;
+    }
 }

@@ -5,6 +5,7 @@ namespace Tests\unit\Traits\V2;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class SyncableTest extends TestCase
@@ -51,5 +52,43 @@ class SyncableTest extends TestCase
 
         $this->assertEquals('unknown', $attribute->status);
         $this->assertEquals('unknown', $attribute->type);
+    }
+
+    public function testSyncSave()
+    {
+        Event::fake(\App\Events\V2\Task\Created::class);
+
+        $model = Model::withoutEvents(function() {
+            return new TestModel([
+                'id' => 'test-testing'
+            ]);
+        });
+
+        $task = $model->syncSave(['testKey' => 'testVal']);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
+
+        $this->assertEquals('sync_update', $task->name);
+        $this->assertEquals('App\Jobs\Sync\TestModel\Update', $task->job);
+        $this->assertEquals(['testKey' => 'testVal'], $task->data);
+    }
+
+    public function testSyncDelete()
+    {
+        Event::fake(\App\Events\V2\Task\Created::class);
+
+        $model = Model::withoutEvents(function() {
+            return new TestModel([
+                'id' => 'test-testing'
+            ]);
+        });
+
+        $task = $model->syncDelete(['testKey' => 'testVal']);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
+
+        $this->assertEquals('sync_delete', $task->name);
+        $this->assertEquals('App\Jobs\Sync\TestModel\Delete', $task->job);
+        $this->assertEquals(['testKey' => 'testVal'], $task->data);
     }
 }
