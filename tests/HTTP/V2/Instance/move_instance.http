@@ -21,34 +21,14 @@ Content-Type:  application/json
 client.global.set("instance_id", response.body.data.id);
 %}
 
-### Create hostgroup to test with
-POST https://{{host}}/{{version}}/host-groups
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-X-Reseller-Id: 1
-
-{
-    "name": "test host group",
-    "vpc_id": "{{dev_vpc_id}}",
-    "availability_zone_id" : "{{dev_availability_zone_id}}",
-    "host_spec_id" : "{{dev_host_spec_id}}"
-}
-
-> {%
-client.global.set('host_group_id', response.body.data.id);
-%}
-
-### Move to {{host_group_id}}
+### Move to hg-aaaabbbb
 PATCH https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "host_group_id": "{{host_group_id}}"
+    "host_group_id": "hg-aaaabbbb"
 }
 
 ### Move back to {{dev_host_group_id}}
@@ -63,12 +43,6 @@ Content-Type:  application/json
 
 ### Cleanup instance
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-### Cleanup host group
-DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
