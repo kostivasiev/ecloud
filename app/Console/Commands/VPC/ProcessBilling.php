@@ -29,6 +29,9 @@ class ProcessBilling extends Command
 
     protected array $billing;
 
+    protected int $ramCapacity;
+    protected int $ramCapacityHigh;
+
     /**
      * Billable metrics - Add any metrics to this array that we want to bill for.
      * @var array|string[]
@@ -57,10 +60,10 @@ class ProcessBilling extends Command
         'throughput.5Gb',
         'throughput.10Gb',
         'floating-ip.count',
+        'networking.advanced',
         // License
         'license.windows',
         'host.license.windows',
-        'advanced.networking',
     ];
 
     public function __construct()
@@ -70,6 +73,8 @@ class ProcessBilling extends Command
         $this->timeZone = new \DateTimeZone(config('app.timezone'));
         $this->startDate = Carbon::createFromTimeString("First day of last month 00:00:00", $this->timeZone);
         $this->endDate = Carbon::createFromTimeString("last day of last month 23:59:59", $this->timeZone);
+        $this->ramCapacity = 0;
+        $this->ramCapacityHigh = 0;
     }
 
     public function handle()
@@ -111,17 +116,16 @@ class ProcessBilling extends Command
 
                     $cost = ($hours * $metric->price) * $metric->value;
 
+                    $this->ramCapacity += ($key === 'ram.capacity') ? $metric->value : 0;
+                    $this->ramCapacityHigh += ($key === 'ram.capacity.high') ? $metric->value : 0;
+
+                    if ($key === 'networking.advanced') {
+                        $cost = ($hours * $metric->price) * ($this->ramCapacity / 1024);
+                        $cost+= ($hours * $metric->price) * ($this->ramCapacityHigh / 1024);
+                    }
+
                     $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                 });
-
-                // Advanced networking
-                if ($key === 'advanced.networking') {
-                    $totalRamGb = $vpc->instances->sum(function ($instance) {
-                            return $instance->ram_capacity / 1024;
-                    });
-                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] =
-                        $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] * $totalRamGb;
-                }
             });
 
             // VPC Support
