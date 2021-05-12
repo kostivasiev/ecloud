@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateImageRequest;
 use App\Http\Requests\V2\Image\StoreRequest;
-use App\Http\Requests\V2\UpdateImageRequest;
-use App\Jobs\Nsx\Image\Undeploy;
 use App\Models\V2\Image;
 use App\Resources\V2\ImageMetadataResource;
 use App\Resources\V2\ImageParameterResource;
