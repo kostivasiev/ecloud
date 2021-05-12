@@ -37,6 +37,7 @@ class ProcessBilling extends Command
         // Compute
         'vcpu.count',
         'ram.capacity',
+        'ram.capacity.high',
         'hostgroup',
         'host.hs-aaaaaaaa', // DEV
         // Storage
