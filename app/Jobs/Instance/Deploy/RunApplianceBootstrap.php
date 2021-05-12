@@ -4,18 +4,19 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class RunApplianceBootstrap extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private $instance;
+    private $model;
 
     public function __construct(Instance $instance)
     {
-        $this->instance = $instance;
+        $this->model = $instance;
     }
 
     /**
@@ -23,42 +24,38 @@ class RunApplianceBootstrap extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->instance->id]);
-
-        if ($this->instance->platform !== 'Linux') {
-            Log::info('RunApplianceBootstrap for ' . $this->instance->id . ', nothing to do for non-Linux platforms, skipping');
+        if ($this->model->platform !== 'Linux') {
+            Log::info('RunApplianceBootstrap for ' . $this->model->id . ', nothing to do for non-Linux platforms, skipping');
             return;
         }
 
-        if (empty($this->instance->image->script_template)) {
-            Log::info('RunApplianceBootstrap for ' . $this->instance->id . ', no script template defined, skipping');
+        if (empty($this->model->image->script_template)) {
+            Log::info('RunApplianceBootstrap for ' . $this->model->id . ', no script template defined, skipping');
             return;
         }
 
-        $guestAdminCredential = $this->instance->credentials()
-            ->where('username', ($this->instance->platform == 'Linux') ? 'root' : 'graphite.rack')
+        $guestAdminCredential = $this->model->credentials()
+            ->where('username', ($this->model->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
-            $message = 'RunApplianceBootstrap failed for ' . $this->instance->id . ', no admin credentials found';
+            $message = 'RunApplianceBootstrap failed for ' . $this->model->id . ', no admin credentials found';
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
         }
 
-        $this->instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id . '/guest/linux/script',
+        $this->model->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/linux/script',
             [
                 'json' => [
                     'encodedScript' => base64_encode(
-                        (new \Mustache_Engine())->loadTemplate($this->instance->image->script_template)
-                            ->render($this->instance->deploy_data['image_data'])
+                        (new \Mustache_Engine())->loadTemplate($this->model->image->script_template)
+                            ->render($this->model->deploy_data['image_data'])
                     ),
                     'username' => $guestAdminCredential->username,
                     'password' => $guestAdminCredential->password,
                 ],
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->instance->id]);
     }
 }

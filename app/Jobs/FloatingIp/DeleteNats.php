@@ -4,32 +4,27 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class DeleteNats extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private $floatingIp;
+    private $model;
 
     public function __construct(FloatingIp $floatingIp)
     {
-        $this->floatingIp = $floatingIp;
+        $this->model = $floatingIp;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->floatingIp->id]);
-
-        if ($this->floatingIp->sourceNat()->exists()) {
-            $this->floatingIp->sourceNat->delete();
+        if ($this->model->sourceNat()->exists()) {
+            $this->model->sourceNat->delete();
         }
-
-        if ($this->floatingIp->destinationNat()->exists()) {
-            $this->floatingIp->destinationNat->delete();
+        if ($this->model->destinationNat()->exists()) {
+            $this->model->destinationNat->delete();
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->floatingIp->id]);
     }
 }

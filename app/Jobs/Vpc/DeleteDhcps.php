@@ -4,28 +4,24 @@ namespace App\Jobs\Vpc;
 
 use App\Jobs\Job;
 use App\Models\V2\Vpc;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class DeleteDhcps extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private Vpc $vpc;
+    private Vpc $model;
 
     public function __construct(Vpc $vpc)
     {
-        $this->vpc = $vpc;
+        $this->model = $vpc;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
-
-        $this->vpc->dhcps()->each(function ($dhcp) {
+        $this->model->dhcps()->each(function ($dhcp) {
             $dhcp->delete();
         });
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
     }
 }

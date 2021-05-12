@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Rules\V2;
+namespace Tests\unit\Traits\V2;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Nic;

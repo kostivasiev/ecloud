@@ -1,9 +1,7 @@
 <?php
 namespace Tests\V2\NetworkPolicy;
 
-use App\Events\V2\NetworkPolicy\Deleting;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -17,13 +15,13 @@ class DeleteTest extends TestCase
 
     public function testDeleteResource()
     {
-        Event::fake();
+        Event::fake(\App\Events\V2\Task\Created::class);
 
         $this->delete(
             '/v2/network-policies/' . $this->networkPolicy()->id,
             []
         )->assertResponseStatus(202);
 
-        Event::assertDispatched(Deleting::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 }

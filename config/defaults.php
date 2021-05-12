@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\V2\NetworkRule;
+
 return [
     'availability_zones' => [],
     'vpc' => [
@@ -28,6 +30,40 @@ return [
         /** The defaults for these need review as unsure of what they're supposed to be */
         'egress' => '',
         'ingress' => '',
+    ],
+    'network_policy' => [
+        'rules' => [
+            'dhcp_ingress' => [
+                'name' => NetworkRule::TYPE_DHCP_INGRESS,
+                'sequence' => 10000,
+                'source' =>  '10.0.0.2',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true,
+                'type' => NetworkRule::TYPE_DHCP_INGRESS,
+            ],
+            'dhcp_egress' => [
+                'name' => NetworkRule::TYPE_DHCP_EGRESS,
+                'sequence' => 10001,
+                'source' =>  'ANY',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'OUT',
+                'enabled' => true,
+                'type' => NetworkRule::TYPE_DHCP_EGRESS,
+            ],
+            'catchall' => [
+                'name' => NetworkRule::TYPE_CATCHALL,
+                'sequence' => 20000,
+                'source' =>  'ANY',
+                'destination' => 'ANY',
+                'action' => 'REJECT',
+                'direction' => 'IN_OUT',
+                'enabled' => true,
+                'type' => NetworkRule::TYPE_CATCHALL,
+            ]
+        ]
     ],
     'region' => [],
     'router' => [

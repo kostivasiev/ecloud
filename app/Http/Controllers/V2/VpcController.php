@@ -7,8 +7,6 @@ use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
-use App\Models\V2\Network;
-use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;

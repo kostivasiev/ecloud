@@ -2,32 +2,33 @@
 
 namespace Tests\unit\Vpc;
 
+use App\Http\Middleware\IsMaxVpcForCustomer;
 use App\Models\V2\Vpc;
-use App\Rules\V2\IsMaxVpcLimitReached;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class MaxVpcValidationTest extends TestCase
 {
-    protected IsMaxVpcLimitReached $rule;
+
+    protected $rule;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->rule = new IsMaxVpcLimitReached();
+        $this->rule = \Mockery::mock(IsMaxVpcForCustomer::class)->makePartial();
     }
 
     public function testRulePasses()
     {
-        $this->assertTrue($this->rule->passes('', ''));
+        $this->assertTrue($this->rule->isWithinLimit());
     }
 
     public function testRuleFails()
     {
+        config(['defaults.vpc.max_count' => 10]);
         $counter = 1;
-        factory(Vpc::class, config('defaults.vpc.max_count', 20))
+        factory(Vpc::class, config('defaults.vpc.max_count'))
             ->make([
                 'reseller_id' => 1,
                 'region_id' => $this->region()->id,
@@ -39,6 +40,6 @@ class MaxVpcValidationTest extends TestCase
                 $vpc->saveQuietly();
                 $counter++;
             });
-        $this->assertFalse($this->rule->passes('', ''));
+        $this->assertFalse($this->rule->isWithinLimit());
     }
 }

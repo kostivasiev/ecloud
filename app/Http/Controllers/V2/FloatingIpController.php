@@ -7,10 +7,11 @@ use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
+use App\Models\V2\Task;
 use App\Resources\V2\FloatingIpResource;
+use App\Resources\V2\TaskResource;
 use App\Support\Resource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -155,5 +156,16 @@ class FloatingIpController extends BaseController
         });
 
         return response('', 202);
+    }
+
+    public function tasks(Request $request, QueryTransformer $queryTransformer, string $fipId)
+    {
+        $collection = FloatingIp::forUser($request->user())->findOrFail($fipId)->tasks();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

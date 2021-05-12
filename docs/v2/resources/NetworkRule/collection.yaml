@@ -13,10 +13,10 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/NetworkRule'
+                  $ref: '../../components/schemas/networkRule.yaml'
               meta:
                 allOf:
-                  - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
+                  - $ref: '../../components/schemas/meta.yaml'
                   - type: object
                     properties:
                       pagination:
@@ -45,6 +45,6 @@ post:
   responses:
     202:
       description: Accepted
-      $ref: '../../resources/NetworkRule/responses/idResponse.yaml'
+      $ref: 'responses/idResponse.yaml'
   tags:
     - Network Rule

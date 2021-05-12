@@ -34,7 +34,11 @@ class Create extends FormRequest
                 'exists:ecloud.network_policies,id,deleted_at,NULL',
                 new ExistsForUser(NetworkPolicy::class),
             ],
-            'sequence' => 'required|integer',
+            'sequence' => [
+                'required',
+                'integer',
+                'max:5000'
+            ],
             'source' => [
                 'required',
                 'string',
@@ -45,7 +49,12 @@ class Create extends FormRequest
                 'string',
                 new ValidFirewallRuleSourceDestination()
             ],
-            'action' => 'required|string|in:ALLOW,DROP,REJECT',
+            'action' => [
+                'required',
+                'string',
+                'in:ALLOW,DROP,REJECT'
+            ],
+            'direction' => 'required|string|in:IN,OUT,IN_OUT',
             'enabled' => 'required|boolean',
         ];
     }

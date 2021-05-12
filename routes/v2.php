@@ -4,6 +4,8 @@
  * v2 Routes
  */
 
+use Laravel\Lumen\Routing\Router;
+
 $middleware = [
     'auth',
     'paginator-limit:' . env('PAGINATION_LIMIT')
@@ -15,7 +17,7 @@ $baseRouteParameters = [
     'middleware' => $middleware
 ];
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+/** @var Router $router */
 $router->group($baseRouteParameters, function () use ($router) {
     /** Availability Zones */
     $router->get('availability-zones', 'AvailabilityZoneController@index');
@@ -48,7 +50,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     /** Virtual Private Clouds */
     $router->group([], function () use ($router) {
         $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
-            $router->post('vpcs', 'VpcController@create');
+            $router->group(['middleware' => 'customer-max-vpc'], function () use ($router) {
+                $router->post('vpcs', 'VpcController@create');
+            });
             $router->post('vpcs/{vpcId}/deploy-defaults', 'VpcController@deployDefaults');
         });
         $router->patch('vpcs/{vpcId}', 'VpcController@update');
@@ -68,6 +72,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('dhcps', 'DhcpController@index');
         $router->get('dhcps/{dhcpId}', 'DhcpController@show');
+        $router->get('dhcps/{dhcpId}/tasks', 'DhcpController@tasks');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('dhcps', 'DhcpController@create');
             $router->patch('dhcps/{dhcpId}', 'DhcpController@update');
@@ -80,6 +85,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('networks', 'NetworkController@index');
         $router->get('networks/{networkId}', 'NetworkController@show');
         $router->get('networks/{networkId}/nics', 'NetworkController@nics');
+        $router->get('networks/{networkId}/tasks', 'NetworkController@tasks');
         $router->post('networks', 'NetworkController@create');
         $router->patch('networks/{networkId}', 'NetworkController@update');
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
@@ -89,6 +95,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('network-policies', 'NetworkPolicyController@index');
         $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        $router->get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
+        $router->get('network-policies/{networkPolicyId}/tasks', 'NetworkPolicyController@tasks');
         $router->post('network-policies', 'NetworkPolicyController@store');
         $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
         $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
@@ -99,8 +107,12 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('network-rules', 'NetworkRuleController@index');
         $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
         $router->post('network-rules', 'NetworkRuleController@store');
-        $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
-        $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+        $router->group(['middleware' => 'can-edit-rule'], function () use ($router) {
+            $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+        });
+        $router->group(['middleware' => 'can-delete-rule'], function () use ($router) {
+            $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+        });
     });
 
     /** Network Rule Ports */
@@ -128,6 +140,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('routers/{routerId}/networks', 'RouterController@networks');
         $router->get('routers/{routerId}/vpns', 'RouterController@vpns');
         $router->get('routers/{routerId}/firewall-policies', 'RouterController@firewallPolicies');
+        $router->get('routers/{routerId}/tasks', 'RouterController@tasks');
         $router->post('routers', 'RouterController@create');
         $router->patch('routers/{routerId}', 'RouterController@update');
         $router->delete('routers/{routerId}', 'RouterController@destroy');
@@ -136,15 +149,17 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Instances */
     $router->group([], function () use ($router) {
+        $router->group(['middleware' => 'customer-max-instance'], function () use ($router) {
+            $router->post('instances', 'InstanceController@store');
+        });
         $router->get('instances', 'InstanceController@index');
         $router->get('instances/{instanceId}', 'InstanceController@show');
         $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
         $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
         $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
-        $router->post('instances', 'InstanceController@store');
+        $router->get('instances/{instanceId}/tasks', 'InstanceController@tasks');
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
-
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
 
         $router->group(['middleware' => 'is-locked'], function () use ($router) {
@@ -162,6 +177,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('floating-ips', 'FloatingIpController@index');
         $router->get('floating-ips/{fipId}', 'FloatingIpController@show');
+        $router->get('floating-ips/{fipId}/tasks', 'FloatingIpController@tasks');
         $router->post('floating-ips', 'FloatingIpController@store');
         $router->post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
         $router->post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');
@@ -174,6 +190,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('firewall-policies', 'FirewallPolicyController@index');
         $router->get('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@show');
         $router->get('firewall-policies/{firewallPolicyId}/firewall-rules', 'FirewallPolicyController@firewallRules');
+        $router->get('firewall-policies/{firewallPolicyId}/tasks', 'FirewallPolicyController@tasks');
         $router->post('firewall-policies', 'FirewallPolicyController@store');
         $router->patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
         $router->delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
@@ -230,6 +247,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('volumes', 'VolumeController@index');
         $router->get('volumes/{volumeId}', 'VolumeController@show');
         $router->get('volumes/{volumeId}/instances', 'VolumeController@instances');
+        $router->get('volumes/{volumeId}/tasks', 'VolumeController@tasks');
         $router->post('volumes', 'VolumeController@store');
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
@@ -240,6 +258,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('nics', 'NicController@index');
         $router->get('nics/{nicId}', 'NicController@show');
+        $router->get('nics/{nicId}/tasks', 'NicController@tasks');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             //$router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');
@@ -311,6 +330,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('hosts', 'HostController@index');
         $router->get('hosts/{id}', 'HostController@show');
+        $router->get('hosts/{id}/tasks', 'HostController@tasks');
         $router->post('hosts', 'HostController@store');
         $router->patch('hosts/{id}', 'HostController@update');
         $router->delete('hosts/{id}', 'HostController@destroy');
@@ -332,6 +352,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('host-groups', 'HostGroupController@index');
         $router->get('host-groups/{id}', 'HostGroupController@show');
+        $router->get('host-groups/{id}/tasks', 'HostGroupController@tasks');
         $router->post('host-groups', 'HostGroupController@store');
         $router->patch('host-groups/{id}', 'HostGroupController@update');
         $router->delete('host-groups/{id}', 'HostGroupController@destroy');

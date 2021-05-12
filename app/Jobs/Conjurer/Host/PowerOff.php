@@ -4,13 +4,14 @@ namespace App\Jobs\Conjurer\Host;
 
 use App\Jobs\Job;
 use App\Models\V2\Host;
+use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class PowerOff extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     private $model;
 
@@ -21,8 +22,6 @@ class PowerOff extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         $host = $this->model;
         $hostGroup = $host->hostGroup;
         $availabilityZone = $host->hostGroup->availabilityZone;
@@ -52,7 +51,5 @@ class PowerOff extends Job
             }
             return;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

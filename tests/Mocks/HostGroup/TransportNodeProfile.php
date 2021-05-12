@@ -38,7 +38,6 @@ trait TransportNodeProfile
 
     public function transportNodeNoProfiles()
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () {
@@ -48,7 +47,6 @@ trait TransportNodeProfile
 
     public function transportNodeNameExists(string $name)
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () use ($name) {
@@ -65,7 +63,6 @@ trait TransportNodeProfile
 
     public function validTransportNodeProfile()
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () {
@@ -151,12 +148,10 @@ trait TransportNodeProfile
                     ]
                 ]));
             });
-        $this->logFinished();
     }
 
     public function noComputeCollectionItem()
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $this->hostGroup->id)
             ->andThrow(new RequestException('Not Found', new Request('get', '', []), new Response(404)));
@@ -166,7 +161,6 @@ trait TransportNodeProfile
 
     public function validComputeCollection()
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=' . $this->hostGroup->id)
             ->andReturnUsing(function () {
@@ -258,6 +252,5 @@ trait TransportNodeProfile
             ->andReturnUsing(function () {
                 return new Response(200);
             });
-        $this->logFinished();
     }
 }

@@ -4,25 +4,23 @@ namespace App\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private NetworkPolicy $networkPolicy;
+    private NetworkPolicy $model;
 
     public function __construct(NetworkPolicy $networkPolicy)
     {
-        $this->networkPolicy = $networkPolicy;
+        $this->model = $networkPolicy;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->networkPolicy->id]);
-
-        $network = $this->networkPolicy->network;
+        $network = $this->model->network;
         $router = $network->router;
         $availabilityZone = $router->availabilityZone;
 
@@ -30,11 +28,11 @@ class Deploy extends Job
          * Create a security group for the network policy
          */
         $availabilityZone->nsxService()->patch(
-            '/policy/api/v1/infra/domains/default/groups/' . $this->networkPolicy->id,
+            '/policy/api/v1/infra/domains/default/groups/' . $this->model->id,
             [
                 'json' => [
-                    'id' => $this->networkPolicy->id,
-                    'display_name' => $this->networkPolicy->id,
+                    'id' => $this->model->id,
+                    'display_name' => $this->model->id,
                     'resource_type' => 'Group',
                     'expression' => [
                         [
@@ -47,7 +45,5 @@ class Deploy extends Job
                 ]
             ]
         );
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->networkPolicy->id]);
     }
 }
