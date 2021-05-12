@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Queue;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class DeployTest extends TestCase
+class IopsChangeTest extends TestCase
 {
     protected $volume;
 
