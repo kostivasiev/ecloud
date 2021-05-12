@@ -55,9 +55,9 @@ class UpdateBillingTest extends TestCase
         $listener = new \App\Listeners\V2\Vpc\UpdateBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $metric = BillingMetric::getActiveByKey($this->vpc, 'advanced.networking');
+        $metric = BillingMetric::getActiveByKey($this->vpc, 'networking.advanced');
         $this->assertNotNull($metric);
-        $this->assertEquals('advanced.networking', $metric->key);
+        $this->assertEquals('networking.advanced', $metric->key);
         $this->assertEquals(1, $metric->value);
     }
 
