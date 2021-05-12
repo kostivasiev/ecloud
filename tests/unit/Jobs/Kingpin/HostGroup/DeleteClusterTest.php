@@ -49,7 +49,7 @@ class DeleteClusterTest extends TestCase
 
         Log::shouldReceive('info')->zeroOrMoreTimes();
         Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
-            return stripos($arg, 'Failed to delete Host Group hg-test, skipping') !== false;
+            return stripos($arg, 'Failed to delete Host Group hg-test. Host group was not found, skipping') !== false;
         }));
         $this->assertNull($this->job->handle());
     }
