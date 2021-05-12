@@ -24,8 +24,6 @@ class CapacityChange extends Job
     {
         $volume = $this->model;
 
-        // Volume has no instances so can be resized freely
-
         if ($volume->instances()->count() > 0) {
             // Volume has at least one instance so needs to be resized via an instance
             $instance = $volume->instances()->first();
@@ -33,7 +31,7 @@ class CapacityChange extends Job
             $getVolumeResponse = $volume->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid);
             $getVolumeResponseJson = json_decode($getVolumeResponse->getBody()->getContents());
             if ($getVolumeResponseJson->sizeGiB == $volume->capacity) {
-                Log::debug("Volume capacity already set to expected size on instance ' . $instance->id . ', skipping");
+                Log::debug('Volume capacity already set to expected size on instance ' . $instance->id . ', skipping');
                 return;
             }
 
@@ -50,7 +48,7 @@ class CapacityChange extends Job
             $getVolumeResponse = $volume->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid);
             $getVolumeResponseJson = json_decode($getVolumeResponse->getBody()->getContents());
             if ($getVolumeResponseJson->sizeGiB == $volume->capacity) {
-                Log::debug("Volume capacity already set to expected size, skipping");
+                Log::debug('Volume capacity already set to expected size, skipping');
                 return;
             }
 

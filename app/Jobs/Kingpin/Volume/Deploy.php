@@ -68,6 +68,6 @@ class Deploy extends Job
             'uuid' => $volume->vmware_uuid,
         ]);
 
-        $volume->saveQuietly();
+        $volume->save();
     }
 }

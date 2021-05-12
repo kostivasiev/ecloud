@@ -24,7 +24,7 @@ class IopsChange extends Job
     {
         $volume = $this->model;
         if (!$volume->instances()->count()) {
-            Log::info('No instances using this volume. Nothing to do.');
+            Log::info('Volume not attached to any instances, skipping');
             return;
         }
 
@@ -32,7 +32,7 @@ class IopsChange extends Job
             $getVolumeResponse = $volume->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid);
             $getVolumeResponseJson = json_decode($getVolumeResponse->getBody()->getContents());
             if ($getVolumeResponseJson->iops == $volume->iops) {
-                Log::debug("Volume IOPS already set on instance ' . $instance->id . ', skipping");
+                Log::debug('Volume IOPS already set to expected limit on instance ' . $instance->id . ', skipping');
                 continue;
             }
 
