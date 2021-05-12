@@ -31,18 +31,25 @@ class Deploy extends Job
             return;
         }
 
+        $deployData = [
+            'templateName' => $this->model->image->vm_template_name,
+            'instanceId' => $this->model->getKey(),
+            'numCPU' => $this->model->vcpu_cores,
+            'ramMib' => $this->model->ram_capacity,
+            'resourceTierTags' => config('instance.resource_tier_tags'),
+            'backupEnabled' => $this->model->backup_enabled,
+        ];
+
+        if (!empty($this->model->host_group_id)) {
+            unset($deployData['resourceTierTags']);
+            $deployData['hostGroupId'] = $this->model->host_group_id;
+        }
+
         /** @var Response $deployResponse */
         $deployResponse = $this->model->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/instance/fromtemplate',
             [
-                'json' => [
-                    'templateName' => $this->model->image->vm_template_name,
-                    'instanceId' => $this->model->getKey(),
-                    'numCPU' => $this->model->vcpu_cores,
-                    'ramMib' => $this->model->ram_capacity,
-                    'resourceTierTags' => config('instance.resource_tier_tags'),
-                    'backupEnabled' => $this->model->backup_enabled,
-                ]
+                'json' => $deployData
             ]
         );
 
