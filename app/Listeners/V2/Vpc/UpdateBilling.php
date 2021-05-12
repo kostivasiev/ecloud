@@ -33,7 +33,7 @@ class UpdateBilling
             return;
         }
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($vpc, 'advanced.networking');
+        $currentActiveMetric = BillingMetric::getActiveByKey($vpc, 'networking.advanced');
 
         if (!empty($currentActiveMetric)) {
             return;
@@ -43,7 +43,7 @@ class UpdateBilling
         $billingMetric->resource_id = $vpc->id;
         $billingMetric->vpc_id = $vpc->id;
         $billingMetric->reseller_id = $vpc->reseller_id;
-        $billingMetric->key = 'advanced.networking';
+        $billingMetric->key = 'networking.advanced';
         $billingMetric->value = 1;
         $billingMetric->start = Carbon::now();
 
