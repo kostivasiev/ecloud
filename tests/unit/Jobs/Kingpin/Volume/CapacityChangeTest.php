@@ -94,7 +94,9 @@ class CapacityChangeTest extends TestCase
                 '/api/v2/vpc/vpc-test/instance/i-test/volume/bbff7e7b-c22e-4827-8d2c-a918087deefd',
             ])
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'sizeGiB' => '30',
+                ]));
             });
 
         Event::fake();
@@ -163,7 +165,9 @@ class CapacityChangeTest extends TestCase
                 '/api/v2/vpc/vpc-test/volume/bbff7e7b-c22e-4827-8d2c-a918087deefd',
             ])
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'sizeGiB' => '30',
+                ]));
             });
 
         Event::fake();
