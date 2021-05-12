@@ -33,7 +33,7 @@ class DeleteCluster extends Job
                 $this->fail($exception);
             }
             Log::warning(
-                get_class($this) . ' : Failed to delete Host Group ' . $hostGroup->id . ', skipping'
+                get_class($this) . ' : Failed to delete Host Group ' . $hostGroup->id . '. Host group was not found, skipping'
             );
             return;
         }
