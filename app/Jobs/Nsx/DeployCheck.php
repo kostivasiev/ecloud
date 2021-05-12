@@ -4,12 +4,13 @@ namespace App\Jobs\Nsx;
 
 use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeployCheck extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
     const RETRY_DELAY = 5;
 
@@ -30,8 +31,6 @@ class DeployCheck extends Job
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
         if (empty($this->availabilityZone)) {
             $this->fail(new \Exception('Failed to check deploy status: Availability zone is undefined'));
             return;
@@ -54,7 +53,5 @@ class DeployCheck extends Job
             );
             return;
         }
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
     }
 }

@@ -10,6 +10,9 @@ content:
             id:
               type: string
               example: np-abc123xyz
+            task_id :
+              type : string
+              example : task-abc123xyz
         meta:
           type: object
           properties:

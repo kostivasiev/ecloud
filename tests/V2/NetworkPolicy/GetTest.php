@@ -3,7 +3,6 @@ namespace Tests\V2\NetworkPolicy;
 
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase

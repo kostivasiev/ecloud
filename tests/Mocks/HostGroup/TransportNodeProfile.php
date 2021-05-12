@@ -40,7 +40,6 @@ trait TransportNodeProfile
 
     public function transportNodeNoProfiles()
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () {
@@ -50,7 +49,6 @@ trait TransportNodeProfile
 
     public function transportNodeNameExists(string $name)
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () use ($name) {
@@ -67,7 +65,6 @@ trait TransportNodeProfile
 
     public function validTransportNodeProfile()
     {
-        $this->logStarted();
         $this->nsxServiceMock()->expects('get')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () {
@@ -153,7 +150,6 @@ trait TransportNodeProfile
                     ]
                 ]));
             });
-        $this->logFinished();
     }
 
     protected function getThrownException(int $code, string $message, string $method = 'get')

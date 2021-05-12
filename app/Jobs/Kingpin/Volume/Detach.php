@@ -5,39 +5,35 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
-use GuzzleHttp\Exception\ServerException;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class Detach extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private Volume $volume;
+    private Volume $model;
     private Instance $instance;
 
     public function __construct(Volume $volume, Instance $instance)
     {
-        $this->volume = $volume;
+        $this->model = $volume;
         $this->instance = $instance;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started');
-
         $this->instance->availabilityZone->kingpinService()
-                ->post('/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/' . $this->volume->vmware_uuid . '/detach');
+            ->post('/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/' . $this->model->vmware_uuid . '/detach');
 
-        $this->instance->volumes()->detach($this->volume);
+        $this->instance->volumes()->detach($this->model);
 
-        Log::debug('Volume ' . $this->volume->id . ' has been detached from instance ' . $this->instance->id);
-
-        Log::info(get_class($this) . ' : Finished');
+        Log::debug('Volume ' . $this->model->id . ' has been detached from instance ' . $this->instance->id);
     }
 
     public function failed($exception)
     {
-        $this->volume->setSyncFailureReason($exception->getMessage());
+        $this->model->setSyncFailureReason($exception->getMessage());
     }
 }

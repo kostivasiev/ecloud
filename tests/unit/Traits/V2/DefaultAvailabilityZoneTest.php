@@ -1,14 +1,9 @@
 <?php
 
-namespace Tests\unit\Rules\V2;
+namespace Tests\unit\Traits\V2;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Nic;
-use App\Rules\V2\IpAvailable;
 use App\Traits\V2\DefaultAvailabilityZone;
-use Faker\Factory as Faker;
-use Illuminate\Database\QueryException;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DefaultAvailabilityZoneTest extends TestCase

@@ -14,36 +14,36 @@ class CreateDefaultNetworkRules extends Job
     use Batchable;
 
     private NetworkPolicy $networkPolicy;
+    private $data;
 
-    public function __construct(NetworkPolicy $networkPolicy)
+    public function __construct(NetworkPolicy $networkPolicy, $data = null)
     {
         $this->networkPolicy = $networkPolicy;
+        $this->data = $data;
     }
 
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->networkPolicy->id]);
-
         if ($this->networkPolicy->networkRules()->whereIn('type', [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS])->count() > 0) {
             Log::info('Default network rules already exists, nothing to do');
             return true;
         }
 
-        $this->networkPolicy->withTaskLock(function () {
-            $subnet = Subnet::fromString($this->networkPolicy->network->subnet);
-            $dhcpServerAddress = $subnet->getStartAddress()->getNextAddress()->getNextAddress();
+        $subnet = Subnet::fromString($this->networkPolicy->network->subnet);
+        $dhcpServerAddress = $subnet->getStartAddress()->getNextAddress()->getNextAddress();
 
-            foreach (config('defaults.network_policy.rules') as $rule) {
-                $networkRule = app()->make(NetworkRule::class);
-                $networkRule->fill($rule);
-                if ($rule['type'] == NetworkRule::TYPE_DHCP_INGRESS) {
-                    $networkRule->source = $dhcpServerAddress;
-                }
-
-                $this->networkPolicy->networkRules()->save($networkRule);
+        foreach (config('defaults.network_policy.rules') as $rule) {
+            $networkRule = app()->make(NetworkRule::class);
+            $networkRule->fill($rule);
+            if ($rule['type'] == NetworkRule::TYPE_DHCP_INGRESS) {
+                $networkRule->source = $dhcpServerAddress;
             }
-        });
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->networkPolicy->id]);
+            if ($rule['type'] == NetworkRule::TYPE_CATCHALL && isset($this->data['catchall_rule_action'])) {
+                $networkRule->action = $this->data['catchall_rule_action'];
+            }
+
+            $this->networkPolicy->networkRules()->save($networkRule);
+        }
     }
 }

@@ -1,8 +1,6 @@
 <?php
 namespace Tests\V2\NetworkRule;
 
-use App\Events\V2\NetworkPolicy\Saved;
-use App\Events\V2\NetworkPolicy\Saving;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -11,7 +9,7 @@ class CreateTest extends TestCase
 {
     public function testCreateResource()
     {
-        Event::fake([Saving::class, Saved::class]);
+        Event::fake(\App\Events\V2\Task\Created::class);
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
@@ -28,13 +26,17 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/network-rules',
             $data
-        )->seeInDatabase(
+        )->seeJsonStructure([
+           'data' => [
+               'id',
+               'task_id'
+           ]
+        ])->seeInDatabase(
             'network_rules',
             $data,
             'ecloud'
         )->assertResponseStatus(202);
 
-        Event::assertDispatched(Saving::class);
-        Event::assertDispatched(Saved::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 }

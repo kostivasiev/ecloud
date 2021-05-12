@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Middleware\NetworkRule;
 
-use App\Exceptions\V2\DetachException;
 use App\Models\V2\NetworkRule;
 use Closure;
 
@@ -11,7 +10,6 @@ class CanEdit
      * @param $request
      * @param Closure $next
      * @return mixed
-     * @throws DetachException
      */
     public function handle($request, Closure $next)
     {
