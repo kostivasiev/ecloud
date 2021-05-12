@@ -31,6 +31,7 @@ class DeleteTransportNodeProfile extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() !== 404) {
                 $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : Compute Collection for HostGroup ' .
@@ -51,6 +52,7 @@ class DeleteTransportNodeProfile extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() !== 404) {
                 $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : TransportNode Collection for HostGroup ' .
@@ -68,6 +70,7 @@ class DeleteTransportNodeProfile extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() !== 404) {
                 $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : Failed to detach transport node profile for Host Group ' .
@@ -84,6 +87,7 @@ class DeleteTransportNodeProfile extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() !== 404) {
                 $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : Failed to delete transport node profile for Host Group ' .
