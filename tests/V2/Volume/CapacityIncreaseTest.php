@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Volume;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Models\V2\Volume;
 use App\Rules\V2\VolumeCapacityIsGreater;
@@ -33,7 +34,7 @@ class CapacityIncreaseTest extends TestCase
 
     public function testIncreaseSize()
     {
-        Event::fake();
+        Event::fake([Created::class]);
 
         $this->volume->instances()->attach($this->instance());
 
