@@ -3,6 +3,7 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\ApplianceVersionData;
+use App\Models\V2\Task;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -12,6 +13,9 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $task = app()->make(Task::class);
+        $task->id = 't-test';
+        app()->instance(Task::class, $task);
     }
 
     public function testValidDataIsSuccessful()
