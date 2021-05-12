@@ -20,13 +20,13 @@ class HostGroupUpdate extends Job
     public function __construct(Instance $instance, $data)
     {
         $this->model = $instance;
-        $this->host_group_id = (array_key_exists('host_group_id', $data)) ? $data['host_group_id'] : null;
+        $this->host_group_id = (isset($data['host_group_id'])) ? $data['host_group_id'] : null;
     }
 
     public function handle()
     {
-        if ($this->model->host_group_id == $this->host_group_id) {
-            Log::info(get_class($this) . ' : Finished: No changes required', ['id' => $event->model->id]);
+        if (($this->model->host_group_id == $this->host_group_id) || (empty($this->host_group_id))) {
+            Log::info(get_class($this) . ' : Finished: No changes required', ['id' => $this->model->id]);
             return;
         }
 
