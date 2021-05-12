@@ -147,8 +147,19 @@ class InstanceController extends BaseController
         if ($request->has('backup_enabled') && $this->isAdmin) {
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
-        $task = $instance->syncSaveQuietly(['host_group_id' => $instance->getOriginal()['host_group_id']]);
-        return $this->responseIdMeta($request, $instance->id, 202, $task->id);
+
+        $instance->withTaskLock(function ($instance) {
+            $data = [
+                'host_group_id' => $instance->getOriginal()['host_group_id']
+            ];
+            if (!$instance->canCreateTask()) {
+                throw new TaskException();
+            }
+            $instance->saveQuietly();
+            return $instance->createSync(Sync::TYPE_UPDATE, $data);
+        });
+
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
