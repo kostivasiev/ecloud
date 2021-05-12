@@ -98,6 +98,13 @@ class ChangeHostgroupTest extends TestCase
             ]);
         });
 
+        $this->kingpinServiceMock()
+            ->expects('post')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test/reschedule')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
         $this->patch(
             '/v2/instances/' . $this->instance()->id,
             [
@@ -107,6 +114,6 @@ class ChangeHostgroupTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        );
+        )->assertResponseStatus(202);
     }
 }
