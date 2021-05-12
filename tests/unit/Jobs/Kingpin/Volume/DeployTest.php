@@ -22,8 +22,6 @@ use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
-    protected $volume;
-
     public function setUp(): void
     {
         parent::setUp();
