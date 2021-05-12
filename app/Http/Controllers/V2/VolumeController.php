@@ -97,9 +97,9 @@ class VolumeController extends BaseController
             'iops',
         ]));
 
-        $model->save();
+        $task = $model->syncSave();
 
-        return $this->responseIdMeta($request, $model->id, 202);
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $volumeId)
@@ -110,23 +110,18 @@ class VolumeController extends BaseController
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
+        $task = $volume->syncSave();
 
-        $volume->withTaskLock(function ($volume) {
-            $volume->save();
-        });
-
-        return $this->responseIdMeta($request, $volume->id, 202);
+        return $this->responseIdMeta($request, $volume->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $volumeId)
     {
         $volume = Volume::forUser($request->user())->findOrFail($volumeId);
 
-        $volume->withTaskLock(function ($volume) {
-            $volume->delete();
-        });
+        $task = $volume->syncDelete();
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function attach(AttachRequest $request, string $volumeId)

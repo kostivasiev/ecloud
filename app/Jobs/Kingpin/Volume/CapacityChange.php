@@ -25,36 +25,43 @@ class CapacityChange extends Job
         $volume = $this->model;
 
         // Volume has no instances so can be resized freely
-        $endpoint = '/api/v2/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size';
 
         if ($volume->instances()->count() > 0) {
-            // Volume has at least one instance so needs to be resized via an instance, allowing it to expand the OS partitions AFAIK
-            // TODO :- Need to confirm this doesn't break other instances using this volume, Spotts was going to investigate this
+            // Volume has at least one instance so needs to be resized via an instance
             $instance = $volume->instances()->first();
-            $endpoint = '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size';
-        }
 
-        try {
-            $response = $volume->availabilityZone->kingpinService()->put(
-                $endpoint,
+            $getVolumeResponse = $volume->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid);
+            $getVolumeResponseJson = json_decode($getVolumeResponse->getBody()->getContents());
+            if ($getVolumeResponseJson->sizeGiB == $volume->capacity) {
+                Log::debug("Volume capacity already set to expected size on instance ' . $instance->id . ', skipping");
+                return;
+            }
+
+            $volume->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid . '/size',
                 [
                     'json' => [
                         'sizeGiB' => $volume->capacity,
                     ],
                 ]
             );
-        } catch (ServerException $exception) {
-            $response = $exception->getResponse();
-        }
+        } else {
+            // Volume has no instances, increase directly
+            $getVolumeResponse = $volume->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid);
+            $getVolumeResponseJson = json_decode($getVolumeResponse->getBody()->getContents());
+            if ($getVolumeResponseJson->sizeGiB == $volume->capacity) {
+                Log::debug("Volume capacity already set to expected size, skipping");
+                return;
+            }
 
-        if (!$response || $response->getStatusCode() !== 200) {
-            Log::error(get_class($this) . ' : Failed', [
-                'id' => $volume->id,
-                'status_code' => $response->getStatusCode(),
-                'content' => $response->getBody()->getContents(),
-            ]);
-            $this->fail(new \Exception('Volume ' . $volume->id . ' failed to increase capacity to ' . $volume->capacity));
-            return false;
+            $volume->availabilityZone->kingpinService()->put(
+                '/api/v2/vpc/' . $volume->vpc_id . '/volume/' . $volume->vmware_uuid . '/size',
+                [
+                    'json' => [
+                        'sizeGiB' => $volume->capacity,
+                    ],
+                ]
+            );
         }
 
         Log::debug('Volume ' . $volume->id . ' capacity increased to ' . $volume->capacity);
