@@ -74,7 +74,8 @@ class Deploy extends Job
         }
 
         if (!$exists) {
-            $tier0Tag = ($this->model->vpc->advanced_networking) ? 'az-advancedNetworking' : 'az-default';
+            $tier0Tag = ($this->model->vpc->advanced_networking) ?
+                config('defaults.tag.networking.advanced') : config('defaults.tag.networking.default');
 
             // Load default T0 for the AZ
             $tier0SearchResponse = $this->model->availabilityZone->nsxService()->get(
