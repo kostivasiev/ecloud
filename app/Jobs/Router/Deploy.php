@@ -74,9 +74,11 @@ class Deploy extends Job
         }
 
         if (!$exists) {
+            $tier0Tag = ($this->model->vpc->advanced_networking) ? 'az-advanced' : 'az-default';
+
             // Load default T0 for the AZ
             $tier0SearchResponse = $this->model->availabilityZone->nsxService()->get(
-                '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default'
+                '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:' . $tier0Tag
             );
             $tier0SearchResponse = json_decode($tier0SearchResponse->getBody()->getContents());
 
