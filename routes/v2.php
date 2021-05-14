@@ -370,6 +370,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
     });
 
+    /** SSH Key Pairs */
+    $router->group([], function () use ($router) {
+        $router->group(['middleware' => ['has-reseller-id', 'customer-max-ssh-key-pairs']], function () use ($router) {
+            $router->post('ssh-key-pairs', 'SshKeyPairController@create');
+        });
+        $router->patch('ssh-key-pairs/{keypairId}', 'SshKeyPairController@update');
+        $router->get('ssh-key-pairs', 'SshKeyPairController@index');
+        $router->get('ssh-key-pairs/{keypairId}', 'SshKeyPairController@show');
+        $router->delete('ssh-key-pairs/{keypairId}', 'SshKeyPairController@destroy');
+    });
+
     /** Task */
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('tasks', 'TaskController@index');
