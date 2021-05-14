@@ -319,5 +319,5 @@ paths:
     $ref: 'resources/Image/metadata-collection.yaml'
   '/ecloud/v2/ssh-key-pairs':
     $ref: 'resources/SSHKeyPair/collection.yaml'
-  '/ecloud/v2/ssh-key-pairs/{id}':
+  '/ecloud/v2/ssh-key-pairs/{keypairId}':
     $ref: 'resources/SSHKeyPair/item.yaml'

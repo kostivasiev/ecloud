@@ -14,7 +14,7 @@ get:
               meta:
                 type: object
   tags:
-    - SSHKeyPairs
+    - SSH Key Pairs
 patch:
   parameters:
     - $ref: 'parameters/keypairId.yaml'
@@ -29,7 +29,7 @@ patch:
               description: success
               $ref: 'responses/idResponse.yaml'
   tags:
-    - SSHKeyPairs
+    - SSH Key Pairs
 delete:
   parameters:
     - $ref: 'parameters/keypairId.yaml'
@@ -37,4 +37,4 @@ delete:
     200:
       description: success
   tags:
-    - SSHKeyPairs
+    - SSH Key Pairs

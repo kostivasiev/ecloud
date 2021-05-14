@@ -33,7 +33,7 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=2'
   tags:
-    - SSHKeyPairs
+    - SSH Key Pairs
 post:
   requestBody:
     required: true
@@ -46,4 +46,4 @@ post:
               description: success
               $ref: 'responses/idResponse.yaml'
   tags:
-    - SSHKeyPairs
+    - SSH Key Pairs
