@@ -23,6 +23,4 @@ class IsResourceAvailable implements Rule
     {
         return 'The specified :attribute resource is currently in a failed state and cannot be used';
     }
-
-
 }
