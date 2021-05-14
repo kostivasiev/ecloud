@@ -17,21 +17,21 @@ get:
                   meta:
                     allOf:
                       - $ref: '../../components/schemas/meta.yaml'
-                  - type: object
-                    properties:
-                      pagination:
+                      - type: object
                         properties:
-                          links:
-                            type: object
+                          pagination:
                             properties:
-                              first:
-                                example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=1'
-                              previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=1'
-                              next:
-                                example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=2'
-                              last:
-                                example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=2'
+                              links:
+                                type: object
+                                properties:
+                                  first:
+                                    example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=1'
+                                  previous:
+                                    example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=1'
+                                  next:
+                                    example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=2'
+                                  last:
+                                    example: 'https://api.ukfast.io/ecloud/v2/ssh-key-pairs?page=2'
   tags:
     - SSH Key Pairs
 post:
