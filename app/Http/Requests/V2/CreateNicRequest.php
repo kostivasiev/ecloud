@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Rules\V2\IpAvailable;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidMacAddress;
 use UKFast\FormRequests\FormRequest;
 
@@ -31,8 +34,18 @@ class CreateNicRequest extends FormRequest
                 'string',
                 new ValidMacAddress()
             ],
-            'instance_id' => 'required|string|exists:ecloud.instances,id',
-            'network_id' => 'required|string|exists:ecloud.networks,id',
+            'instance_id' => [
+                'required',
+                'string',
+                'exists:ecloud.instances,id',
+                new IsResourceAvailable(Instance::class),
+            ],
+            'network_id' => [
+                'required',
+                'string',
+                'exists:ecloud.networks,id',
+                new IsResourceAvailable(Network::class),
+            ],
             'ip_address' => ['sometimes', 'nullable', 'ip', new IpAvailable($this->request->get('network_id'))]
         ];
     }

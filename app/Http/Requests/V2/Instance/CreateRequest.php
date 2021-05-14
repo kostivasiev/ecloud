@@ -8,8 +8,7 @@ use App\Models\V2\Image;
 use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\IsNetworkAvailable;
-use App\Rules\V2\IsMaxInstanceForCustomer;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsValidRamMultiple;
 use UKFast\FormRequests\FormRequest;
@@ -49,6 +48,7 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class),
                 new IsMaxInstanceForVpc(),
+                new IsResourceAvailable(Vpc::class),
             ],
             'image_id' => [
                 'required',
@@ -75,13 +75,14 @@ class CreateRequest extends FormRequest
                 'string',
                 'exists:ecloud.host_groups,id,deleted_at,NULL',
                 new ExistsForUser(HostGroup::class),
+                new IsResourceAvailable(HostGroup::class),
             ],
             'network_id' => [
                 'sometimes',
                 'string',
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),
-                new IsNetworkAvailable(),
+                new IsResourceAvailable(Network::class),
             ],
             'floating_ip_id' => [
                 'sometimes',
@@ -89,6 +90,7 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.floating_ips,id,deleted_at,NULL',
                 'required_without:requires_floating_ip',
                 new ExistsForUser(FloatingIp::class),
+                new IsResourceAvailable(FloatingIp::class),
             ],
             'requires_floating_ip' => [
                 'sometimes',
