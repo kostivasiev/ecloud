@@ -2,9 +2,11 @@
 
 namespace Tests\V2\Volume;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -12,56 +14,7 @@ class AttachVolumeTest extends TestCase
 {
     public function testAttachingVolume()
     {
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/volume',
-                [
-                    'json' => [
-                        'volumeId' => 'vol-test',
-                        'sizeGiB' => '100',
-                        'shared' => false,
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'uuid' => 'uuid-test-uuid-test-uuid-test',
-                ]));
-            });
-
-        $this->kingpinServiceMock()->expects('put')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/uuid-test-uuid-test-uuid-test/iops',
-                [
-                    'json' => [
-                        'limit' => '300',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-
-        $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'volumes' => []
-                ]));
-            });
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
-                [
-                    'json' => [
-                        'volumeUUID' => 'uuid-test-uuid-test-uuid-test',
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        Event::fake([Created::class]);
 
         $volume = factory(Volume::class)->create([
             'id' => 'vol-test',
@@ -76,9 +29,19 @@ class AttachVolumeTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(202);
-        $this->assertNotEquals(0, $this->instance()->volumes()->get()->count());
+    }
+    public function testAttachingAttachedVolumeFails()
+    {
+        Event::fake([Created::class]);
 
-        // Try to attach it again and get an error
+        $volume = factory(Volume::class)->create([
+            'id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+        ]);
+
+        $this->instance()->volumes()->attach($volume);
+
         $this->post('/v2/volumes/' . $volume->id . '/attach', [
             'instance_id' => $this->instance()->id,
         ], [

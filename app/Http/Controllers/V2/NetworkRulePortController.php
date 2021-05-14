@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\NetworkRulePort\Create;
 use App\Http\Requests\V2\NetworkRulePort\Update;
 use App\Models\V2\NetworkRulePort;
@@ -39,17 +38,11 @@ class NetworkRulePortController extends BaseController
             'source',
             'destination',
         ]));
+        $resource->save();
 
-        $resource->networkRule->networkPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
+        $task = $resource->networkRule->networkPolicy->syncSave();
 
-            $resource->save();
-            $resource->networkRule->networkPolicy->save();
-        });
-
-        return $this->responseIdMeta($request, $resource->id, 202);
+        return $this->responseIdMeta($request, $resource->id, 202, $task->id);
     }
 
     public function update(Update $request, string $networkRulePortId)
@@ -61,32 +54,20 @@ class NetworkRulePortController extends BaseController
             'source',
             'destination',
         ]));
+        $resource->save();
 
-        $resource->networkRule->networkPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
+        $task = $resource->networkRule->networkPolicy->syncSave();
 
-            $resource->save();
-            $resource->networkRule->networkPolicy->save();
-        });
-
-        return $this->responseIdMeta($request, $resource->id, 202);
+        return $this->responseIdMeta($request, $resource->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $networkRulePortId)
     {
         $resource = NetworkRulePort::forUser($request->user())->findOrFail($networkRulePortId);
+        $resource->delete();
 
-        $resource->networkRule->networkPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
+        $task = $resource->networkRule->networkPolicy->syncSave();
 
-            $resource->delete();
-            $resource->networkRule->networkPolicy->save();
-        });
-
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 }

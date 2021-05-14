@@ -98,6 +98,7 @@ $app->routeMiddleware([
     'customer-max-ssh-key-pairs' => \App\Http\Middleware\IsMaxSshKeyPairForCustomer::class,
     'can-detach' => \App\Http\Middleware\CanDetach::class,
     'can-edit-rule' => \App\Http\Middleware\NetworkRule\CanEdit::class,
+    'can-delete-rule' => \App\Http\Middleware\NetworkRule\CanDelete::class,
 ]);
 
 /*

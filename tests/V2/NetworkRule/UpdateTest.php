@@ -1,8 +1,6 @@
 <?php
 namespace Tests\V2\NetworkRule;
 
-use App\Events\V2\NetworkPolicy\Saved;
-use App\Events\V2\NetworkPolicy\Saving;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +33,7 @@ class UpdateTest extends TestCase
 
     public function testUpdateResource()
     {
-        Event::fake();
+        Event::fake(\App\Events\V2\Task\Created::class);
 
         $this->patch(
             '/v2/network-rules/nr-test',
@@ -51,8 +49,7 @@ class UpdateTest extends TestCase
             'ecloud'
         )->assertResponseStatus(202);
 
-        Event::assertDispatched(Saving::class);
-        Event::assertDispatched(Saved::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testCanNotEditDhcpRules()

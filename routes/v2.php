@@ -110,7 +110,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'can-edit-rule'], function () use ($router) {
             $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
         });
-        $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+        $router->group(['middleware' => 'can-delete-rule'], function () use ($router) {
+            $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+        });
     });
 
     /** Network Rule Ports */
@@ -377,5 +379,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('ssh-key-pairs', 'SshKeyPairController@index');
         $router->get('ssh-key-pairs/{keypairId}', 'SshKeyPairController@show');
         $router->delete('ssh-key-pairs/{keypairId}', 'SshKeyPairController@destroy');
+    });
+
+    /** Task */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('tasks', 'TaskController@index');
+        $router->get('tasks/{taskId}', 'TaskController@show');
     });
 });

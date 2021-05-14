@@ -22,6 +22,7 @@ class NetworkRule extends Model implements Filterable, Sortable
 
     const TYPE_DHCP_INGRESS = 'dhcp_ingress';
     const TYPE_DHCP_EGRESS = 'dhcp_egress';
+    const TYPE_CATCHALL = 'catchall';
 
     public function __construct(array $attributes = [])
     {

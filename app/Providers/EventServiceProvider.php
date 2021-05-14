@@ -173,17 +173,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
-        // NetworkPolicy
-        \App\Events\V2\NetworkPolicy\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\NetworkPolicy\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\NetworkPolicy\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
-
         // NetworkRule
         \App\Events\V2\NetworkRule\Deleted::class => [
             \App\Listeners\V2\NetworkRule\Undeploy::class,
@@ -242,7 +231,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Creating::class => [
             \App\Listeners\V2\Volume\DefaultIops::class,
         ],
-        \App\Events\V2\Volume\Saving::class => [
+       /* \App\Events\V2\Volume\Saving::class => [
             \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Volume\Saved::class => [
@@ -250,7 +239,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Volume\Deleting::class => [
             \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
+        ],*/
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],

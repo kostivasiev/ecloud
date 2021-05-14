@@ -1,14 +1,10 @@
 <?php
 namespace Tests\V2\NetworkRule;
 
-use App\Events\V2\NetworkRule\Deleted;
 use App\Models\V2\NetworkPolicy;
-use App\Models\V2\Network;
 use App\Models\V2\NetworkRule;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -42,17 +38,63 @@ class DeleteTest extends TestCase
 
     public function testDeleteResource()
     {
-        Event::fake();
+        Event::fake([\App\Events\V2\Task\Created::class, \App\Events\V2\NetworkRule\Deleted::class]);
 
-        $this->delete(
-            '/v2/network-rules/' . $this->networkRule->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertResponseStatus(202);
+        $this->delete('/v2/network-rules/' . $this->networkRule->id)
+            ->assertResponseStatus(202);
 
-        Event::assertDispatched(Deleted::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertDispatched(\App\Events\V2\NetworkRule\Deleted::class);
+    }
+
+    public function testCanNotDeleteDhcpEgress()
+    {
+        $networkRule = Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-' . NetworkRule::TYPE_DHCP_EGRESS,
+                'name' => 'nr-test-1',
+                'type' => NetworkRule::TYPE_DHCP_EGRESS
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+
+            return $networkRule;
+        });
+
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
+    }
+
+    public function testCanNotDeleteDhcpIngress()
+    {
+        $networkRule = Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-' . NetworkRule::TYPE_DHCP_INGRESS,
+                'name' => 'nr-test-1',
+                'type' => NetworkRule::TYPE_DHCP_INGRESS
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+
+            return $networkRule;
+        });
+
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
+    }
+
+    public function testCanNotDeleteCatchall()
+    {
+        $networkRule = Model::withoutEvents(function () {
+            $networkRule = factory(NetworkRule::class)->make([
+                'id' => 'nr-' . NetworkRule::TYPE_CATCHALL,
+                'name' => 'nr-test-1',
+                'type' => NetworkRule::TYPE_CATCHALL
+            ]);
+
+            $this->networkPolicy()->networkRules()->save($networkRule);
+
+            return $networkRule;
+        });
+
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
     }
 }

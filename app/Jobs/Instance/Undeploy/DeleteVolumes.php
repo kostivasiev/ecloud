@@ -26,7 +26,7 @@ class DeleteVolumes extends Job
         $instance->volumes()->each(function ($volume) use ($instance) {
             if ($volume->os_volume) {
                 Log::info('Deleting OS volume ' . $volume->id);
-                $volume->delete();
+                $volume->syncDelete();
             } else {
                 Log::info('Detaching data volume ' . $volume->id);
                 $instance->volumes()->detach($volume->id);
