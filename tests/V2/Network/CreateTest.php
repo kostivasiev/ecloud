@@ -6,7 +6,10 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
 use App\Models\V2\Vpc;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -55,6 +58,39 @@ class CreateTest extends TestCase
             'ecloud'
         )
             ->assertResponseStatus(202);
+    }
+
+    public function testFailedRouterCausesFail()
+    {
+        // Force failure
+        Model::withoutEvents(function () {
+            $model = new Task([
+                'id' => 'sync-test',
+                'failure_reason' => 'Unit Test Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->router);
+            $model->save();
+        });
+
+        $this->post(
+            '/v2/networks',
+            [
+                'name' => 'Manchester Network',
+                'router_id' => $this->router->id,
+                'subnet' => '10.0.0.0/24'
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The specified router id resource is currently in a failed state and cannot be used',
+            ]
+        )->assertResponseStatus(422);
     }
 
     public function testCreateDispatchesEvent()

@@ -3,6 +3,8 @@ namespace Tests\V2\NetworkPolicy;
 
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -52,6 +54,35 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
+    }
+
+    public function testCreateResourceFailedNetwork()
+    {
+        // Force failure
+        Model::withoutEvents(function () {
+            $model = new Task([
+                'id' => 'sync-test',
+                'failure_reason' => 'Unit Test Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->network());
+            $model->save();
+        });
+
+        $data = [
+            'name' => 'Test Policy',
+            'network_id' => $this->network()->id,
+        ];
+        $this->post(
+            '/v2/network-policies',
+            $data
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The specified network id resource is currently in a failed state and cannot be used',
+            ]
+        )->assertResponseStatus(422);
     }
 
     public function testCreateResourceNetworkAlreadyAssigned()
