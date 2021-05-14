@@ -369,4 +369,10 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->delete('images/{imageId}', 'ImageController@destroy');
         });
     });
+
+    /** Task */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('tasks', 'TaskController@index');
+        $router->get('tasks/{taskId}', 'TaskController@show');
+    });
 });
