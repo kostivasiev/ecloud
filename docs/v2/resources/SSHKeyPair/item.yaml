@@ -1,0 +1,40 @@
+get:
+  parameters:
+    - $ref: 'parameters/keypairId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/sshkeypair.yaml'
+              meta:
+                type: object
+  tags:
+    - SSHKeyPairs
+patch:
+  parameters:
+    - $ref: 'parameters/keypairId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/sshkeypair.yaml'
+          responses:
+            200:
+              description: success
+              $ref: 'responses/idResponse.yaml'
+  tags:
+    - SSHKeyPairs
+delete:
+  parameters:
+    - $ref: 'parameters/keypairId.yaml'
+  responses:
+    200:
+      description: success
+  tags:
+    - SSHKeyPairs

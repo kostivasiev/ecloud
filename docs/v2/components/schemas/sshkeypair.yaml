@@ -1,0 +1,22 @@
+properties:
+  id:
+    type: string
+    example: 'ssh-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    example: 'some_task'
+    readOnly : true
+  public_key:
+    type: string
+    example: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDFnKEoztA5+jy3u/uQ9eLhFbMKuCMvZFkflRPtYu0zcq1pkjGZZ5BrOJgLu36eGvVIqZBgtaFefmCVVKZyqXfQ8v/uXb/Liv5HqmFquLq8F/80GJ7djYqL0ZzHxkAdGEWikeN3kbcZOHG2MvFpTlg7IVuh7lujRMYklJbG3P9azQ=='
+    readOnly : true
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'SSHKeyPair'
