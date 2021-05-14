@@ -5,7 +5,7 @@ properties:
     readOnly: true
   name:
     type: string
-    example: 'some_task'
+    example: 'mykey'
     readOnly : true
   public_key:
     type: string

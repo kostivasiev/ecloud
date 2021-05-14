@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../components/schemas/sshkeypair.yaml'
+                $ref: 'schema.yaml'
               meta:
                 type: object
   tags:
@@ -23,7 +23,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/sshkeypair.yaml'
+          $ref: 'schema.yaml'
           responses:
             200:
               description: success

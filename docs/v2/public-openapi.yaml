@@ -73,7 +73,7 @@ components:
     Task:
       $ref: 'components/schemas/task.yaml'
     SSHKeyPair:
-      $ref: 'components/schemas/sshkeypair.yaml'
+      $ref: 'resources/SSHKeyPair/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
