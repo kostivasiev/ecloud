@@ -107,4 +107,10 @@ properties:
     writeOnly: true
     type: string
     example: ''
+  ssh_key_pairs:
+    required: false
+    writeOnly: true
+    type: array
+    items:
+      type: string
 description: 'Instances'
