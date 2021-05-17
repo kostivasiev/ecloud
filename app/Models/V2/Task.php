@@ -10,8 +10,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
+use UKFast\DB\Ditto\Filterable;
+use UKFast\DB\Ditto\Sortable;
 
-class Task extends Model
+class Task extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
