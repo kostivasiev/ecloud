@@ -120,7 +120,7 @@ class InstanceController extends BaseController
             'requires_floating_ip' => $request->input('requires_floating_ip', false),
             'image_data' => $request->input('image_data'),
             'user_script' => $request->input('user_script'),
-            'ssh_key_pairs' => $request->input('ssh_key_pairs'),
+            'ssh_key_pair_ids' => $request->input('ssh_key_pair_ids'),
         ];
 
         $instance->save();
