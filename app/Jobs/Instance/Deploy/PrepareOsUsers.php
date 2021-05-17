@@ -132,10 +132,10 @@ class PrepareOsUsers extends Job
                 Log::debug('PrepareOsUsers for instance ' . $instance->id . ' : Pushed Linux account "' . $username . '"');
             });
 
-            if (isset($this->model->deploy_data['ssh_key_pairs'])) {
+            if (isset($this->model->deploy_data['ssh_key_pair_ids'])) {
                 $sshKeys = [];
 
-                foreach ($this->model->deploy_data['ssh_key_pairs'] as $sshKeyPairId) {
+                foreach ($this->model->deploy_data['ssh_key_pair_ids'] as $sshKeyPairId) {
                     $sshKeyPair = SshKeyPair::find($sshKeyPairId);
                     if (!$sshKeyPair) {
                         Log::warning('Cannot find SSH keypair with id "' . $sshKeyPairId . '"');

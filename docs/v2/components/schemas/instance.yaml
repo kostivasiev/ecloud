@@ -107,7 +107,7 @@ properties:
     writeOnly: true
     type: string
     example: ''
-  ssh_key_pairs:
+  ssh_key_pair_ids:
     required: false
     writeOnly: true
     type: array

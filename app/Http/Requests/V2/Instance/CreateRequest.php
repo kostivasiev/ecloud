@@ -114,7 +114,7 @@ class CreateRequest extends FormRequest
                 'numeric',
                 'in:300,600,1200,2500',
             ],
-            'ssh_key_pairs.*' => [
+            'ssh_key_pair_ids.*' => [
                 'sometimes',
                 'string',
                 new ExistsForUser(SshKeyPair::class),

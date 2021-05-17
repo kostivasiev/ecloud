@@ -43,7 +43,7 @@ class PrepareOSUsersTest extends TestCase
     public function testsSetsSSHKeysWhenSpecifiedInDeployData()
     {
         $this->instance()->deploy_data =[
-            'ssh_key_pairs' => [
+            'ssh_key_pair_ids' => [
                 $this->keypair
             ]
         ];
@@ -101,7 +101,7 @@ class PrepareOSUsersTest extends TestCase
     public function testDoesntFailWhenSSHKeyDoesntExist()
     {
         $this->instance()->deploy_data =[
-            'ssh_key_pairs' => [
+            'ssh_key_pair_ids' => [
                 'invalid'
             ]
         ];
