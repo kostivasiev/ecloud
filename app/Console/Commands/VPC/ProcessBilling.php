@@ -77,6 +77,7 @@ class ProcessBilling extends Command
 
         // Collect and sort VPC metrics by reseller
         Vpc::get()->each(function ($vpc) {
+            dump("Working on: " . $vpc->id);
             $metrics = $this->getVpcMetrics($vpc->id);
 
             if ($metrics->count() == 0) {
@@ -299,7 +300,7 @@ class ProcessBilling extends Command
             }
 
             // Min £1 surcharge
-            $total = ($total < 1) ? 1 : $total;
+            $total = ($total > 0 && $total < 1) ? 1 : $total;
 
             $bilingAdminClient = app()->make(BillingAdminClient::class);
             $payment = new Payment([
