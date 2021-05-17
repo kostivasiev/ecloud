@@ -37,13 +37,13 @@ class CreateNicRequest extends FormRequest
             'instance_id' => [
                 'required',
                 'string',
-                'exists:ecloud.instances,id',
+                'exists:ecloud.instances,id,deleted_at,NULL',
                 new IsResourceAvailable(Instance::class),
             ],
             'network_id' => [
                 'required',
                 'string',
-                'exists:ecloud.networks,id',
+                'exists:ecloud.networks,id,deleted_at,NULL',
                 new IsResourceAvailable(Network::class),
             ],
             'ip_address' => ['sometimes', 'nullable', 'ip', new IpAvailable($this->request->get('network_id'))]
