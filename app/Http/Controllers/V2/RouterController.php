@@ -52,7 +52,7 @@ class RouterController extends BaseController
     public function update(UpdateRequest $request, string $routerId)
     {
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
-        $router->fill($request->only(['name', 'vpc_id', 'router_throughput_id']));
+        $router->fill($request->only(['name', 'router_throughput_id']));
 
         $router->withTaskLock(function ($router) {
             $router->save();

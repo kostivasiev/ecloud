@@ -72,6 +72,8 @@ components:
       $ref: 'resources/ImageMetadata/schema.yaml'
     Task:
       $ref: 'components/schemas/task.yaml'
+    SSHKeyPair:
+      $ref: 'resources/SSHKeyPair/schema.yaml'
   parameters:
     # Query Parameters
     PerPage:
@@ -315,3 +317,7 @@ paths:
     $ref: 'resources/Image/parameters-collection.yaml'
   '/ecloud/v2/image/{id}/metadata':
     $ref: 'resources/Image/metadata-collection.yaml'
+  '/ecloud/v2/ssh-key-pairs':
+    $ref: 'resources/SSHKeyPair/collection.yaml'
+  '/ecloud/v2/ssh-key-pairs/{keypairId}':
+    $ref: 'resources/SSHKeyPair/item.yaml'

@@ -6,6 +6,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\Network;
+use App\Models\V2\SshKeyPair;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
@@ -114,6 +115,11 @@ class CreateRequest extends FormRequest
                 'required',
                 'numeric',
                 'in:300,600,1200,2500',
+            ],
+            'ssh_key_pair_ids.*' => [
+                'sometimes',
+                'string',
+                new ExistsForUser(SshKeyPair::class),
             ],
         ];
 
