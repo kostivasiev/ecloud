@@ -16,7 +16,11 @@ class IsResourceAvailable implements Rule
 
     public function passes($attribute, $value)
     {
-        return ($this->resource->findOrFail($value))->sync->status !== Task::STATUS_FAILED;
+        $instance = $this->resource->find($value);
+        if (!$instance) {
+            return false;
+        }
+        return $instance->sync->status !== Task::STATUS_FAILED;
     }
 
     public function message()
