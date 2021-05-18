@@ -49,12 +49,11 @@ class DetachVolume extends Job
         if ($attached) {
             $this->instance->availabilityZone->kingpinService()
                 ->post('/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/' . $this->volume->vmware_uuid . '/detach');
+            Log::debug('Volume ' . $this->volume->id . ' has been detached from instance ' . $this->instance->id);
         } else {
-            Log::debug('Volume isn\'t attached to instance, nothing to do');
+            Log::warning('Volume isn\'t attached to instance, nothing to do');
         }
 
         $this->instance->volumes()->detach($this->volume);
-
-        Log::debug('Volume ' . $this->volume->id . ' has been detached from instance ' . $this->instance->id);
     }
 }

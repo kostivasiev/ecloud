@@ -71,12 +71,11 @@ class AttachVolume extends Job
                         ]
                     ]
                 );
+            Log::debug('Volume ' . $this->volume->id . ' has been attached to instance ' . $this->instance->id);
         } else {
-            Log::info('Volume is already attached to instance, nothing to do');
+            Log::warning('Volume is already attached to instance, nothing to do');
         }
 
         $this->instance->volumes()->attach($this->volume);
-
-        Log::debug('Volume ' . $this->volume->id . ' has been attached to instance ' . $this->instance->id);
     }
 }
