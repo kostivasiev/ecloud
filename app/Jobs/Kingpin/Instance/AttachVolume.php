@@ -29,6 +29,13 @@ class AttachVolume extends Job
 
     public function handle()
     {
+        foreach ($this->instance->volumes as $volume) {
+            if ($volume->id == $this->volume->id) {
+                Log::warning('Attempted to attach volume, already attached. Skipping');
+                return;
+            }
+        }
+
         if ($this->instance->volumes()->get()->count() >= config('volume.instance.limit', 15)) {
             $this->fail(new \Exception(
                 'Failed to attach volume ' . $this->volume->id . '  to instance ' .

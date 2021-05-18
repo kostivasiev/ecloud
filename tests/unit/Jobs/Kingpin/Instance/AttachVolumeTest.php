@@ -73,8 +73,6 @@ class AttachVolumeTest extends TestCase
             'capacity' => 30
         ]);
 
-        $this->instance()->volumes()->attach($volume);
-
         $this->kingpinServiceMock()->expects('get')
             ->withArgs([
                 '/api/v2/vpc/vpc-test/instance/i-test',
@@ -107,8 +105,6 @@ class AttachVolumeTest extends TestCase
             'vmware_uuid' => 'bbff7e7b-c22e-4827-8d2c-a918087deefd',
             'capacity' => 30
         ]);
-
-        $this->instance()->volumes()->attach($volume);
 
         $this->kingpinServiceMock()->expects('get')
             ->withArgs([
