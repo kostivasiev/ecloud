@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Jobs\Tasks\Volume;
+namespace App\Jobs\Tasks\Instance;
 
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Volume\Attach;
-use App\Jobs\Kingpin\Volume\IopsChange;
-use App\Models\V2\Instance;
+use App\Jobs\Kingpin\Instance\DetachVolume;
 use App\Models\V2\Task;
+use App\Models\V2\Volume;
 use App\Traits\V2\LoggableTaskJob;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
@@ -14,7 +13,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class VolumeAttach extends Job
+class VolumeDetach extends Job
 {
     use Batchable, LoggableTaskJob;
 
@@ -28,13 +27,12 @@ class VolumeAttach extends Job
     public function handle()
     {
         $task = $this->task;
-        $volume = $task->resource;
-        $instance = Instance::findOrFail($task->data['instance_id']);
+        $instance = $task->resource;
+        $volume = Volume::findOrFail($task->data['volume_id']);
 
         Bus::batch([
             [
-                new Attach($volume, $instance),
-                new IopsChange($volume),
+                new DetachVolume($instance, $volume),
             ]
         ])->then(function (Batch $batch) use ($task) {
             Log::info("Setting task completed", ['id' => $task->id, 'resource_id' => $task->resource->id]);

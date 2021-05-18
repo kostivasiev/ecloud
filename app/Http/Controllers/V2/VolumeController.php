@@ -129,18 +129,7 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
-        $task = $volume->withTaskLock(function ($volume) use ($instance, &$task) {
-            return $instance->withTaskLock(function ($instance) use ($volume, &$task) {
-                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
-                    throw new TaskException();
-                }
-
-                $task = $volume->createTask('volume_attach', \App\Jobs\Tasks\Volume\VolumeAttach::class, ['instance_id' => $instance->id]);
-                $instance->createTask('volume_attach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
-
-                return $task;
-            });
-        });
+        $task = $instance->createTaskWithLock('volume_attach', \App\Jobs\Tasks\Instance\VolumeAttach::class, ['volume_id' => $volume->id]);
 
         return $this->responseTaskId($task->id);
     }
@@ -150,18 +139,7 @@ class VolumeController extends BaseController
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
         $instance = Instance::forUser(Auth::user())->findOrFail($request->get('instance_id'));
 
-        $task = $volume->withTaskLock(function ($volume) use ($instance, &$task) {
-            return $instance->withTaskLock(function ($instance) use ($volume, &$task) {
-                if (!$instance->canCreateTask() || !$volume->canCreateTask()) {
-                    throw new TaskException();
-                }
-
-                $task = $volume->createTask('volume_detach', \App\Jobs\Tasks\Volume\VolumeDetach::class, ['instance_id' => $instance->id]);
-                $instance->createTask('volume_detach_wait', \App\Jobs\Tasks\AwaitTask::class, ['task_id' => $task->id]);
-
-                return $task;
-            });
-        });
+        $task = $instance->createTaskWithLock('volume_detach', \App\Jobs\Tasks\Instance\VolumeDetach::class, ['volume_id' => $volume->id]);
 
         return $this->responseTaskId($task->id);
     }

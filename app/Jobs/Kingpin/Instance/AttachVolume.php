@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Kingpin\Volume;
+namespace App\Jobs\Kingpin\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
@@ -9,24 +9,29 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class Attach extends Job
+class AttachVolume extends Job
 {
     use Batchable, LoggableModelJob;
 
-    private Volume $model;
     private Instance $instance;
+    private Volume $volume;
 
-    public function __construct(Volume $volume, Instance $instance)
+    public function __construct(Instance $instance, Volume $volume)
     {
-        $this->model = $volume;
         $this->instance = $instance;
+        $this->volume = $volume;
+    }
+
+    public function resolveModelId()
+    {
+        return $this->instance->id;
     }
 
     public function handle()
     {
         if ($this->instance->volumes()->get()->count() > config('volume.instance.limit', 15)) {
             $this->fail(new \Exception(
-                'Volume ' . $this->model->id . ' failed to attach to instance ' .
+                'Failed to attach volume ' . $this->volume->id . '  to instance ' .
                 $this->instance->id . ', volume limit exceeded'
             ));
             return false;
@@ -38,12 +43,11 @@ class Attach extends Job
 
         $json = json_decode($response->getBody()->getContents());
         if (!$json) {
-            $this->fail(new \Exception('Volume ' . $this->model->id . ' failed attachment, invalid JSON'));
-            return false;
+            throw new \Exception('Failed to retrieve instance ' . $this->instance->id . ' from Kingpin, invalid JSON');
         }
 
         foreach ($json->volumes as $volume) {
-            if ($this->model->vmware_uuid == $volume->uuid) {
+            if ($this->volume->vmware_uuid == $volume->uuid) {
                 Log::info('Volume is already attached to instance, nothing to do');
                 return true;
             }
@@ -54,13 +58,13 @@ class Attach extends Job
                 '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
                 [
                     'json' => [
-                        'volumeUUID' => $this->model->vmware_uuid
+                        'volumeUUID' => $this->volume->vmware_uuid
                     ]
                 ]
             );
 
-        $this->instance->volumes()->attach($this->model);
+        $this->instance->volumes()->attach($this->volume);
 
-        Log::debug('Volume ' . $this->model->id . ' has been attached to instance ' . $this->instance->id);
+        Log::debug('Volume ' . $this->volume->id . ' has been attached to instance ' . $this->instance->id);
     }
 }
