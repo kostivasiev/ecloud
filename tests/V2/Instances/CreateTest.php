@@ -223,25 +223,9 @@ class CreateTest extends TestCase
         Config::set('instance.max_limit.per_vpc', 0);
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        Model::withoutEvents(function () {
-            $this->applianceVersion = factory(ApplianceVersion::class)->create([
-                'appliance_version_appliance_id' => 123,
-                'appliance_version_uuid' => 'e8321e4a-2306-4b9d-bd2d-9cd42f054197'
-            ]);
-            factory(ApplianceVersionData::class)->create([
-                'key' => 'ukfast.spec.cpu_cores.min',
-                'value' => 2,
-                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
-            ]);
-            $this->image = factory(Image::class)->create([
-                'id' => 'img-abcdef12aa',
-                'appliance_version_id' => $this->applianceVersion->id,
-            ]);
-        });
-
         $data = [
             'vpc_id' => $this->vpc()->id,
-            'image_id' => $this->image->id,
+            'image_id' => $this->image()->id,
             'network_id' => $this->network()->id,
             'vcpu_cores' => 2,
             'ram_capacity' => 1024,
@@ -269,25 +253,9 @@ class CreateTest extends TestCase
         Config::set('instance.max_limit.total', 0);
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        Model::withoutEvents(function () {
-            $this->applianceVersion = factory(ApplianceVersion::class)->create([
-                'appliance_version_appliance_id' => 123,
-                'appliance_version_uuid' => 'e8321e4a-2306-4b9d-bd2d-9cd42f054197'
-            ]);
-            factory(ApplianceVersionData::class)->create([
-                'key' => 'ukfast.spec.cpu_cores.min',
-                'value' => 2,
-                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
-            ]);
-            $this->image = factory(Image::class)->create([
-                'id' => 'img-abcdef12aa',
-                'appliance_version_id' => $this->applianceVersion->id,
-            ]);
-        });
-
         $data = [
             'vpc_id' => $this->vpc()->id,
-            'image_id' => $this->image->id,
+            'image_id' => $this->image()->id,
             'network_id' => $this->network()->id,
             'vcpu_cores' => 2,
             'ram_capacity' => 1024,

@@ -5,14 +5,6 @@ namespace App\Resources\V2;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
-/**
- * Class ImageParameterResource
- * @package App\Http\Resources\V2
- * @property string id
- * @property string name
- * @property string created_at
- * @property string updated_at
- */
 class ImageParameterResource extends UKFastResource
 {
     /**
@@ -22,11 +14,13 @@ class ImageParameterResource extends UKFastResource
     public function toArray($request)
     {
         $data = [
+            'id' => $this->id,
+            'image_id' => $this->image_id,
             'name' => $this->name,
             'key' => $this->key,
             'type' => $this->type,
             'description' => $this->description,
-            'required' => $this->required == 'Yes',
+            'required' => $this->required,
             'validation_rule' => $this->validation_rule,
         ];
 

@@ -368,7 +368,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('images/{imageId}/parameters', 'ImageController@parameters');
         $router->get('images/{imageId}/metadata', 'ImageController@metadata');
 
-
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('images', 'ImageController@store');
         });
@@ -378,6 +377,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'can-delete-image'], function () use ($router) {
             $router->delete('images/{imageId}', 'ImageController@destroy');
         });
+    });
+
+    /** Image Parameters */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('image-parameters', 'ImageParameterController@index');
+        $router->get('image-parameters/{imageParameterId}', 'ImageParameterController@show');
+        $router->post('image-parameters', 'ImageParameterController@store');
+        $router->patch('image-parameters/{imageParameterId}', 'ImageParameterController@update');
+        $router->delete('image-parameters/{imageParameterId}', 'ImageParameterController@destroy');
     });
 
     /** SSH Key Pairs */

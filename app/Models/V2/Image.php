@@ -74,15 +74,16 @@ class Image extends Model implements Filterable, Sortable
         return $this->hasMany(Instance::class);
     }
 
-//    public function parameters()
-//    {
-//        return $this->applianceVersion->applianceScriptParameters();
-//    }
-//
-//    public function metadata()
-//    {
-//        return $this->applianceVersion->applianceVersionData();
-//    }
+    public function imageParameters()
+    {
+        return $this->hasMany(ImageParameter::class);
+    }
+
+
+    public function imageMetadata()
+    {
+        return $this->hasMany(ImageMetadata::class);
+    }
 
     /**
      * @param $query

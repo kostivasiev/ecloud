@@ -59,7 +59,6 @@ class ImageController extends BaseController
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
-
     public function update(UpdateRequest $request, string $imageId)
     {
         $model = Image::forUser(Auth::user())->findOrFail($imageId);
@@ -98,7 +97,6 @@ class ImageController extends BaseController
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
-
     public function destroy(string $imageId)
     {
         $model = Image::forUser(Auth::user())->findOrFail($imageId);
@@ -110,21 +108,21 @@ class ImageController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-//    public function parameters(Request $request, string $imageId)
-//    {
-//        $collection = Image::forUser(Auth::user())->findOrFail($imageId)->parameters();
-//
-//        return ImageParameterResource::collection($collection->paginate(
-//            $request->input('per_page', env('PAGINATION_LIMIT'))
-//        ));
-//    }
-//
-//    public function metadata(Request $request, string $imageId)
-//    {
-//        $collection = Image::forUser(Auth::user())->findOrFail($imageId)->metadata();
-//
-//        return ImageMetadataResource::collection($collection->paginate(
-//            $request->input('per_page', env('PAGINATION_LIMIT'))
-//        ));
-//    }
+    public function parameters(Request $request, string $imageId)
+    {
+        $collection = Image::forUser(Auth::user())->findOrFail($imageId)->imageParameters();
+
+        return ImageParameterResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function metadata(Request $request, string $imageId)
+    {
+        $collection = Image::forUser(Auth::user())->findOrFail($imageId)->imageMetadata();
+
+        return ImageMetadataResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
 }

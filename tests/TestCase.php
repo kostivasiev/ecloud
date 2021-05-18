@@ -11,6 +11,7 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
+use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
@@ -114,6 +115,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Image */
     private $image;
+
+    /** @var ImageParameter */
+    private $imageParameter;
 
     /** @var Nic */
     private $nic;
@@ -280,6 +284,20 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         }
         return $this->image;
     }
+
+    public function imageParameter()
+    {
+        if (!$this->imageParameter) {
+            $this->imageParameter = factory(ImageParameter::class)->make([
+                'id' => 'iparam-test'
+            ]);
+            $this->image()->imageParameters()->save($this->imageParameter);
+        }
+        return $this->imageParameter;
+    }
+
+
+
 
 //    public function applianceVersion()
 //    {
