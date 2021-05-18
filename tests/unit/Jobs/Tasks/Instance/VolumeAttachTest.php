@@ -1,12 +1,10 @@
 <?php
 
-namespace Tests\unit\Jobs\Tasks\Volume;
+namespace Tests\unit\Jobs\Tasks\Instance;
 
-use App\Jobs\Sync\Router\Update;
-use App\Jobs\Tasks\Volume\VolumeAttach;
+use App\Jobs\Tasks\Instance\VolumeAttach;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
-use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
@@ -36,10 +34,10 @@ class VolumeAttachTest extends TestCase
                 'id' => 'sync-1',
                 'name' => 'test',
                 'data' => [
-                    'instance_id' => $this->instance()->id,
+                    'volume_id' => $volume->id,
                 ]
             ]);
-            $this->task->resource()->associate($volume);
+            $this->task->resource()->associate($this->instance());
         });
 
         Bus::fake();

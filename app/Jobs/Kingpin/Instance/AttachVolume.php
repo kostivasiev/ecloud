@@ -29,7 +29,7 @@ class AttachVolume extends Job
 
     public function handle()
     {
-        if ($this->instance->volumes()->get()->count() > config('volume.instance.limit', 15)) {
+        if ($this->instance->volumes()->get()->count() >= config('volume.instance.limit', 15)) {
             $this->fail(new \Exception(
                 'Failed to attach volume ' . $this->volume->id . '  to instance ' .
                 $this->instance->id . ', volume limit exceeded'
@@ -46,22 +46,27 @@ class AttachVolume extends Job
             throw new \Exception('Failed to retrieve instance ' . $this->instance->id . ' from Kingpin, invalid JSON');
         }
 
+        $attached = false;
         foreach ($json->volumes as $volume) {
             if ($this->volume->vmware_uuid == $volume->uuid) {
-                Log::info('Volume is already attached to instance, nothing to do');
-                return true;
+                $attached = true;
+                break;
             }
         }
 
-        $this->instance->availabilityZone->kingpinService()
-            ->post(
-                '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
-                [
-                    'json' => [
-                        'volumeUUID' => $this->volume->vmware_uuid
+        if (!$attached) {
+            $this->instance->availabilityZone->kingpinService()
+                ->post(
+                    '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
+                    [
+                        'json' => [
+                            'volumeUUID' => $this->volume->vmware_uuid
+                        ]
                     ]
-                ]
-            );
+                );
+        } else {
+            Log::info('Volume is already attached to instance, nothing to do');
+        }
 
         $this->instance->volumes()->attach($this->volume);
 

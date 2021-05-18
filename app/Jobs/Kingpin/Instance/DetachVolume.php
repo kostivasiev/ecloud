@@ -29,8 +29,29 @@ class DetachVolume extends Job
 
     public function handle()
     {
-        $this->instance->availabilityZone->kingpinService()
-            ->post('/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/' . $this->volume->vmware_uuid . '/detach');
+        $response = $this->instance->availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $this->instance->vpc->id . '/instance/' . $this->instance->id
+        );
+
+        $json = json_decode($response->getBody()->getContents());
+        if (!$json) {
+            throw new \Exception('Failed to retrieve instance ' . $this->instance->id . ' from Kingpin, invalid JSON');
+        }
+
+        $attached = false;
+        foreach ($json->volumes as $volume) {
+            if ($this->volume->vmware_uuid == $volume->uuid) {
+                $attached = true;
+                break;
+            }
+        }
+
+        if ($attached) {
+            $this->instance->availabilityZone->kingpinService()
+                ->post('/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/' . $this->volume->vmware_uuid . '/detach');
+        } else {
+            Log::debug('Volume isn\'t attached to instance, nothing to do');
+        }
 
         $this->instance->volumes()->detach($this->volume);
 
