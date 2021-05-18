@@ -15,34 +15,22 @@ class Update extends Job
     use TaskableBatch, LoggableTaskJob;
 
     private $task;
-    private $originalValues;
 
     public function __construct(Task $task)
     {
         $this->task = $task;
-        $this->originalValues = $task->resource->getOriginal();
     }
 
     public function handle()
     {
         $volume = $this->task->resource;
 
-        $jobs = [
-            new Deploy($volume),
-        ];
-
-        // DO NOT DO THIS! Original values will be removed in the future!
-        if (isset($this->originalValues['iops']) && $this->originalValues['iops'] != $volume->iops) {
-            $jobs[] = new IopsChange($volume);
-        }
-
-        // DO NOT DO THIS! Original values will be removed in the future!
-        if (isset($this->originalValues['capacity']) && $this->originalValues['capacity'] != $volume->capacity) {
-            $jobs[] = new CapacityChange($volume);
-        }
-
         $this->updateTaskBatch([
-            $jobs
+            [
+                new Deploy($volume),
+                new IopsChange($volume),
+                new CapacityChange($volume),
+            ]
         ])->dispatch();
     }
 }

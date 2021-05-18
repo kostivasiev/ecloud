@@ -18,7 +18,7 @@ class TaskResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'status' => $this->status,
@@ -31,5 +31,15 @@ class TaskResource extends UKFastResource
                 new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+
+        if ($request->user()->isAdmin()) {
+            $data['resource_id'] = $this->resource_id;
+            $data['data'] = $this->data;
+            $data['completed'] = $this->completed;
+            $data['failure_reason'] = $this->failure_reason;
+        }
+
+        return $data;
     }
 }
