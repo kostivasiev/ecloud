@@ -8,23 +8,44 @@ class UpdateImagesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('images', function ($table) {
-            $table->string('name');
-            $table->string('logo_uri');
-            $table->string('documentation_uri');
-            $table->text('description');
+            $table->string('name')->nullable();
+            $table->bigInteger('reseller_id')->nullable();
+            $table->string('logo_uri')->nullable();
+            $table->string('documentation_uri')->nullable();
+            $table->text('description')->nullable();
+            $table->text('script_template')->nullable();
+            $table->text('vm_template')->nullable();
+            $table->string('platform')->nullable();
             $table->boolean('active')->default(true);
-            $table->boolean('is_public')->default(false);
+            $table->boolean('public')->default(false);
+            $table->string('publisher')->nullable();
+        });
 
-            $table->string('template');
-
-
+        Schema::connection('ecloud')->table('images', function ($table) {
+            $table->dropColumn(['appliance_version_id']);
         });
     }
 
     public function down()
     {
-        Schema::connection('ecloud')->table('host_groups', function ($table) {
-            $table->dropColumn(['appliance_version_id']);
+        Schema::connection('ecloud')->table('images', function ($table) {
+            $table->dropColumn([
+                'name',
+                'reseller_id',
+                'logo_uri',
+                'documentation_uri',
+                'description',
+                'script_template',
+                'vm_template',
+                'platform',
+                'active',
+                'public',
+                'publisher'
+            ]);
+        });
+
+        Schema::connection('ecloud')->table('images', function ($table) {
+            $table->uuid('appliance_version_id')->nullable();
         });
     }
 }

@@ -72,6 +72,6 @@ class PrepareOSDiskTest extends TestCase
         dispatch(new PrepareOsDisk($this->instance()));
 
         $this->assertEquals(1, $this->vpc()->volumes()->count());
-        $this->assertEquals("i-test - Test Appliance", $this->vpc()->volumes[0]->name);
+        $this->assertEquals("i-test - Test Image", $this->vpc()->volumes[0]->name);
     }
 }

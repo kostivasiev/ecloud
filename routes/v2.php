@@ -161,6 +161,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
+        $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
 
         $router->group(['middleware' => 'is-locked'], function () use ($router) {
             $router->patch('instances/{instanceId}', 'InstanceController@update');
@@ -358,14 +359,22 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('host-groups/{id}', 'HostGroupController@destroy');
     });
 
-    /** Image */
+    /** Images */
     $router->group([], function () use ($router) {
         $router->get('images', 'ImageController@index');
         $router->get('images/{imageId}', 'ImageController@show');
         $router->get('images/{imageId}/parameters', 'ImageController@parameters');
         $router->get('images/{imageId}/metadata', 'ImageController@metadata');
+
+
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('images', 'ImageController@store');
+        });
+
+        $router->group(['middleware' => 'can-update-image'], function () use ($router) {
+            $router->patch('images', 'ImageController@update');
+        });
+        $router->group(['middleware' => 'can-delete-image'], function () use ($router) {
             $router->delete('images/{imageId}', 'ImageController@destroy');
         });
     });

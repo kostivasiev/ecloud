@@ -96,11 +96,11 @@ class CreateTest extends TestCase
             factory(ApplianceVersionData::class)->create([
                 'key' => 'ukfast.spec.ram.min',
                 'value' => 2048,
-                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+               // 'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
             ]);
             $this->image = factory(Image::class)->create([
                 'id' => 'img-abcdef12',
-                'appliance_version_id' => $this->applianceVersion->id,
+               // 'appliance_version_id' => $this->applianceVersion->id,
             ]);
         });
 

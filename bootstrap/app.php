@@ -98,6 +98,8 @@ $app->routeMiddleware([
     'can-detach' => \App\Http\Middleware\CanDetach::class,
     'can-edit-rule' => \App\Http\Middleware\NetworkRule\CanEdit::class,
     'can-delete-rule' => \App\Http\Middleware\NetworkRule\CanDelete::class,
+    'can-update-image' => \App\Http\Middleware\image\CanUpdate::class,
+    'can-delete-image' => \App\Http\Middleware\image\CanDelete::class,
 ]);
 
 /*

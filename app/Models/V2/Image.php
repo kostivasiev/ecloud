@@ -3,7 +3,10 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use App\Traits\V2\Syncable;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -16,13 +19,17 @@ use UKFast\DB\Ditto\Sortable;
 /**
  * Class Image
  * @package App\Models\V2
- * This model is a proxy to the underlying V1 Appliances. In future, the underlying appliances will be dropped in favour of images
  */
 class Image extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DeletionRules;
+    use CustomKey, SoftDeletes, DeletionRules, DefaultName, Syncable, Taskable;
 
     public string $keyPrefix = 'img';
+
+    protected $casts = [
+        'active' => 'boolean',
+        'public' => 'boolean',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -32,79 +39,33 @@ class Image extends Model implements Filterable, Sortable
 
         $this->fillable([
             'id',
-            'appliance_version_id',
+            'name',
+            'reseller_id',
+            'logo_uri',
+            'documentation_uri',
+            'description',
+            'script_template',
+            'vm_template',
+            'platform',
+            'active',
+            'public',
+            'publisher'
         ]);
-
         parent::__construct($attributes);
     }
 
-    public function getNameAttribute()
+    public function vpc()
     {
-        return $this->applianceVersion->appliance->name;
+        return $this->belongsTo(Vpc::class);
     }
 
-    public function getScriptTemplateAttribute()
+    /**
+     * Pivot table image_availability_zone
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function availabilityZones()
     {
-        return $this->applianceVersion->script_template;
-    }
-
-    public function getVMTemplateNameAttribute()
-    {
-        return $this->applianceVersion->appliance_version_vm_template;
-    }
-
-    public function getLogoURIAttribute()
-    {
-        return $this->applianceVersion->appliance->logo_uri;
-    }
-
-    public function getDocumentationURIAttribute()
-    {
-        return $this->applianceVersion->appliance->documentation_uri;
-    }
-
-    public function getDescriptionAttribute()
-    {
-        return $this->applianceVersion->appliance->description;
-    }
-
-    public function getActiveAttribute()
-    {
-        return $this->applianceVersion->appliance->active == "Yes";
-    }
-
-    public function getIsPublicAttribute()
-    {
-        return $this->applianceVersion->appliance->is_public == "Yes";
-    }
-
-    public function getPlatformAttribute()
-    {
-        return $this->applianceVersion->serverLicense()->category;
-    }
-
-    public function getLicenseIDAttribute()
-    {
-        return $this->applianceVersion->serverLicense()->id;
-    }
-
-    public function parameters()
-    {
-        return $this->applianceVersion->applianceScriptParameters();
-    }
-
-    public function metadata()
-    {
-        return $this->applianceVersion->applianceVersionData();
-    }
-
-    public function applianceVersion()
-    {
-        return $this->belongsTo(
-            ApplianceVersion::class,
-            'appliance_version_id',
-            'appliance_version_uuid'
-        );
+        return $this->belongsToMany(AvailabilityZone::class);
     }
 
     public function instances()
@@ -112,6 +73,15 @@ class Image extends Model implements Filterable, Sortable
         return $this->hasMany(Instance::class);
     }
 
+//    public function parameters()
+//    {
+//        return $this->applianceVersion->applianceScriptParameters();
+//    }
+//
+//    public function metadata()
+//    {
+//        return $this->applianceVersion->applianceVersionData();
+//    }
 
     /**
      * @param $query
@@ -120,14 +90,18 @@ class Image extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if (!$user->isAdmin()) {
-            return $query->whereHas('applianceVersion.appliance', function ($query) use ($user) {
-                $query->where('appliance_is_public', 'Yes')
-                      ->where('appliance_active', 'Yes');
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
 
-        return $query;
+        return $query->where(function ($query) use ($user) {
+            $query->where(function ($query) {
+                $query->where('public', true)->where('active', true);
+            })
+            ->orWhere(function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            });
+        });
     }
 
     /**
@@ -138,6 +112,18 @@ class Image extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('name', Filter::$stringDefaults),
+            $factory->create('reseller_id', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
+            $factory->create('logo_uri', Filter::$stringDefaults),
+            $factory->create('documentation_uri', Filter::$stringDefaults),
+            $factory->create('description', Filter::$stringDefaults),
+            $factory->create('script_template', Filter::$stringDefaults),
+            $factory->create('vm_template', Filter::$stringDefaults),
+            $factory->create('platform', Filter::$enumDefaults),
+            $factory->create('active', Filter::$enumDefaults),
+            $factory->create('public', Filter::$enumDefaults),
+            $factory->create('publisher', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -152,6 +138,17 @@ class Image extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('name'),
+            $factory->create('reseller_id'),
+            $factory->create('availability_zone_id'),
+            $factory->create('logo_uri'),
+            $factory->create('documentation_uri'),
+            $factory->create('description'),
+            $factory->create('script_template'),
+            $factory->create('vm_template'),
+            $factory->create('platform'),
+            $factory->create('active'),
+            $factory->create('publisher'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -173,6 +170,17 @@ class Image extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
+            'name' => 'name',
+            'reseller_id' => 'reseller_id',
+            'availability_zone_id' => 'availability_zone_id',
+            'logo_uri' => 'logo_uri',
+            'documentation_uri' => 'documentation_uri',
+            'description' => 'description',
+            'script_template' => 'script_template',
+            'vm_template' => 'vm_template',
+            'platform' => 'platform',
+            'active' => 'active',
+            'publisher' => 'publisher',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
