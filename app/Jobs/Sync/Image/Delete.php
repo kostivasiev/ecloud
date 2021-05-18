@@ -22,7 +22,6 @@ class Delete extends Job
     {
         // TODO
 
-
         $this->task->resource->delete();
         $this->task->completed = true;
         $this->task->save();

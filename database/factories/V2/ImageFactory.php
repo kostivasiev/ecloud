@@ -7,7 +7,7 @@ use App\Models\V2\Image;
 $factory->define(Image::class, function () {
     return [
         'name' => 'Test Image',
-        'vpc_id' => null,
+        'reseller_id' => null,
         'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
         'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
         'description' => 'CentOS (Community enterprise Operating System)',

@@ -9,6 +9,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -102,6 +103,11 @@ class Image extends Model implements Filterable, Sortable
                 $query->where('reseller_id', $user->resellerId());
             });
         });
+    }
+
+    public function isOwner(): bool
+    {
+        return $this->reseller_id == Auth::user()->resellerId();
     }
 
     /**

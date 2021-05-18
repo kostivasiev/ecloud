@@ -25,6 +25,8 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
     $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
     $router->get('availability-zones/{zoneId}/host-specs', 'AvailabilityZoneController@hostSpecs');
+    $router->get('availability-zones/{zoneId}/images', 'AvailabilityZoneController@images');
+
 
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
@@ -370,9 +372,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('images', 'ImageController@store');
         });
-
         $router->group(['middleware' => 'can-update-image'], function () use ($router) {
-            $router->patch('images', 'ImageController@update');
+            $router->patch('images/{imageId}', 'ImageController@update');
         });
         $router->group(['middleware' => 'can-delete-image'], function () use ($router) {
             $router->delete('images/{imageId}', 'ImageController@destroy');

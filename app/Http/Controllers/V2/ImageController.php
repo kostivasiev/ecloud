@@ -77,23 +77,23 @@ class ImageController extends BaseController
         ];
 
         // Private images
-        if (Auth::user()->isScoped() && !empty($model->vpc_id)) {
+        if (Auth::user()->isScoped() && !empty($model->reseller_id)) {
             $fillable = [
                 'name',
                 'logo_uri',
                 'documentation_uri',
                 'description',
-                'platform',
             ];
         }
 
         $model->fill($request->only($fillable));
-        $task = $model->syncSave();
 
-        if ($request->has('availability_zones')) {
-            // Sync the pivot table
-            $model->availabilityZones()->sync(collect($request->input('availability_zones'))->pluck('id')->toArray());
+        // Sync the pivot table
+        if ($request->has('availability_zone_ids') && !Auth::user()->isScoped()) {
+            $model->availabilityZones()->sync($request->input('availability_zone_ids'));
         }
+
+        $task = $model->syncSave();
 
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
@@ -101,8 +101,7 @@ class ImageController extends BaseController
 
     public function destroy(string $imageId)
     {
-        $model = Image::findOrFail($imageId);
-
+        $model = Image::forUser(Auth::user())->findOrFail($imageId);
 
         // Delete from pivot table
         $model->availabilityZones()->sync([]);
