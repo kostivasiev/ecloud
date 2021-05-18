@@ -139,7 +139,6 @@ class InstanceController extends BaseController
 
         $instance->fill($request->only([
             'name',
-            'locked',
             'vcpu_cores',
             'ram_capacity',
             'host_group_id',
