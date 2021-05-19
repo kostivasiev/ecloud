@@ -79,7 +79,6 @@ class Image extends Model implements Filterable, Sortable
         return $this->hasMany(ImageParameter::class);
     }
 
-
     public function imageMetadata()
     {
         return $this->hasMany(ImageMetadata::class);

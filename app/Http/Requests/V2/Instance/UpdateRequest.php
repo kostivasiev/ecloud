@@ -49,7 +49,7 @@ class UpdateRequest extends FormRequest
         $instance = Instance::forUser(Auth::user())
             ->findOrFail($this->instanceId);
 
-        $this->config = $instance->image->metadata->pluck('key', 'value')->flip();
+        $this->config = $instance->image->imageMetadata->pluck('key', 'value')->flip();
 
         $rules = [
             'name' => 'nullable|string',

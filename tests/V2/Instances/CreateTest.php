@@ -5,10 +5,9 @@ namespace Tests\V2\Instances;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\ApplianceVersionData;
 use App\Models\V2\Image;
-use GuzzleHttp\Psr7\Response;
+use App\Models\V2\ImageMetadata;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Devices\AdminClient;
 use UKFast\Api\Auth\Consumer;
@@ -22,32 +21,21 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        $mockAdminDevices = \Mockery::mock(AdminClient::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
-            $mockedResponse = new \stdClass();
-            $mockedResponse->category = "Linux";
-            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
-            return $mockAdminDevices;
-        });
+//        $mockAdminDevices = \Mockery::mock(AdminClient::class)
+//            ->shouldAllowMockingProtectedMethods();
+//        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
+//            $mockedResponse = new \stdClass();
+//            $mockedResponse->category = "Linux";
+//            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
+//            return $mockAdminDevices;
+//        });
     }
 
-    public function testApplianceSpecDefaultConfigFallbacks()
+    public function testSpecDefaultConfigFallbacks()
     {
-        Model::withoutEvents(function () {
-            $this->applianceVersion = factory(ApplianceVersion::class)->create([
-                'appliance_version_appliance_id' => 123,
-                'appliance_version_uuid' => 'e8321e4a-2306-4b9d-bd2d-9cd42f054197'
-            ]);
-            $this->image = factory(Image::class)->create([
-                'id' => 'img-abcdef12',
-                'appliance_version_id' => $this->applianceVersion->id,
-            ]);
-        });
-
         $data = [
             'vpc_id' => $this->vpc()->id,
-            'image_id' => $this->image->id,
+            'image_id' => $this->image()->id,
             'network_id' => $this->network()->id,
             'vcpu_cores' => 11,
             'ram_capacity' => 512,
@@ -86,27 +74,17 @@ class CreateTest extends TestCase
         //dd($this->response->getContent());
     }
 
-    public function testApplianceSpecRamMin()
+    public function testImageMetadataSpecRamMin()
     {
-        Model::withoutEvents(function () {
-            $this->applianceVersion = factory(ApplianceVersion::class)->create([
-                'appliance_version_appliance_id' => 123,
-                'appliance_version_uuid' => 'e8321e4a-2306-4b9d-bd2d-9cd42f054197'
-            ]);
-            factory(ApplianceVersionData::class)->create([
-                'key' => 'ukfast.spec.ram.min',
-                'value' => 2048,
-               // 'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
-            ]);
-            $this->image = factory(Image::class)->create([
-                'id' => 'img-abcdef12',
-               // 'appliance_version_id' => $this->applianceVersion->id,
-            ]);
-        });
+        factory(ImageMetadata::class)->create([
+            'key' => 'ukfast.spec.ram.min',
+            'value' => 2048,
+            'image_id' => $this->image()->id
+        ]);
 
         $data = [
             'vpc_id' => $this->vpc()->id,
-            'image_id' => $this->image->id,
+            'image_id' => $this->image()->id,
             'network_id' => $this->network()->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
@@ -130,27 +108,17 @@ class CreateTest extends TestCase
             ])->assertResponseStatus(422);
     }
 
-    public function testApplianceSpecVolumeMin()
+    public function testImageMetadataSpecVolumeMin()
     {
-        Model::withoutEvents(function () {
-            $this->applianceVersion = factory(ApplianceVersion::class)->create([
-                'appliance_version_appliance_id' => 123,
-                'appliance_version_uuid' => 'e8321e4a-2306-4b9d-bd2d-9cd42f054197'
-            ]);
-            factory(ApplianceVersionData::class)->create([
-                'key' => 'ukfast.spec.volume.min',
-                'value' => 50,
-                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
-            ]);
-            $this->image = factory(Image::class)->create([
-                'id' => 'img-abcdef12',
-                'appliance_version_id' => $this->applianceVersion->id,
-            ]);
-        });
+        factory(ImageMetadata::class)->create([
+            'key' => 'ukfast.spec.volume.min',
+            'value' => 50,
+            'image_id' => $this->image()->id
+        ]);
 
         $data = [
             'vpc_id' => $this->vpc()->id,
-            'image_id' => $this->image->id,
+            'image_id' => $this->image()->id,
             'network_id' => $this->network()->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
@@ -174,27 +142,17 @@ class CreateTest extends TestCase
             ])->assertResponseStatus(422);
     }
 
-    public function testApplianceSpecVcpuMin()
+    public function testImageMetadataSpecVcpuMin()
     {
-        Model::withoutEvents(function () {
-            $this->applianceVersion = factory(ApplianceVersion::class)->create([
-                'appliance_version_appliance_id' => 123,
-                'appliance_version_uuid' => 'e8321e4a-2306-4b9d-bd2d-9cd42f054197'
-            ]);
-            factory(ApplianceVersionData::class)->create([
-                'key' => 'ukfast.spec.cpu_cores.min',
-                'value' => 2,
-                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
-            ]);
-            $this->image = factory(Image::class)->create([
-                'id' => 'img-abcdef12',
-                'appliance_version_id' => $this->applianceVersion->id,
-            ]);
-        });
+        factory(ImageMetadata::class)->create([
+            'key' => 'ukfast.spec.cpu_cores.min',
+            'value' => 2,
+            'image_id' => $this->image()->id
+        ]);
 
         $data = [
             'vpc_id' => $this->vpc()->id,
-            'image_id' => $this->image->id,
+            'image_id' => $this->image()->id,
             'network_id' => $this->network()->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,

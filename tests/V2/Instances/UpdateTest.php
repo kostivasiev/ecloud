@@ -3,6 +3,7 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\ApplianceVersionData;
+use App\Models\V2\ImageMetadata;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -148,10 +149,10 @@ class UpdateTest extends TestCase
 
     public function testApplianceSpecRamMax()
     {
-        factory(ApplianceVersionData::class)->create([
+        factory(ImageMetadata::class)->create([
             'key' => 'ukfast.spec.ram.max',
             'value' => 2048,
-            'appliance_version_uuid' => $this->applianceVersion()->appliance_version_uuid,
+            'image_id' => $this->image()->id,
         ]);
 
         $data = [
@@ -176,10 +177,10 @@ class UpdateTest extends TestCase
 
     public function testApplianceSpecVcpuMax()
     {
-        factory(ApplianceVersionData::class)->create([
+        factory(ImageMetadata::class)->create([
             'key' => 'ukfast.spec.cpu_cores.max',
             'value' => 5,
-            'appliance_version_uuid' => $this->applianceVersion()->appliance_version_uuid,
+            'image_id' => $this->image()->id,
         ]);
 
         $data = [
