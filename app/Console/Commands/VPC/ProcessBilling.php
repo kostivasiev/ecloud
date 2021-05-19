@@ -77,7 +77,6 @@ class ProcessBilling extends Command
 
         // Collect and sort VPC metrics by reseller
         Vpc::get()->each(function ($vpc) {
-            dump("Working on: " . $vpc->id);
             $metrics = $this->getVpcMetrics($vpc->id);
 
             if ($metrics->count() == 0) {
