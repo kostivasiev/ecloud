@@ -299,6 +299,11 @@ class ProcessBilling extends Command
                 Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
             }
 
+            // Don't create accounts logs for zero cost vpcs
+            if ($total == 0) {
+                continue;
+            }
+
             // Min £1 surcharge
             $total = ($total > 0 && $total < 1) ? 1 : $total;
 
