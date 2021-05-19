@@ -24,7 +24,7 @@ class UpdateNetworkAdapter extends Job
      */
     public function handle()
     {
-        if (empty($this->model->image->vm_template_name)) {
+        if (empty($this->model->image->vm_template)) {
             Log::info('Skipped UpdateNetworkAdapter for instance ' . $this->model->id . ': no vm template found');
             return;
         }

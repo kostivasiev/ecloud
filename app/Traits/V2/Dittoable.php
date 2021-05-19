@@ -9,7 +9,8 @@ use UKFast\DB\Ditto\Filter;
 trait Dittoable
 {
     /**
-     * This is a work in progress to move the ditto functionality into a trait. It does not work at the moment, do not use.
+     * DO NOT USE
+     * This is a POC to move the Ditto model methods into a trait. Do not use yet.
      *
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -98,5 +99,4 @@ trait Dittoable
         });
         return $columns;
     }
-
 }
