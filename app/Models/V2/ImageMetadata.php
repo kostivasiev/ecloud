@@ -18,11 +18,11 @@ use UKFast\DB\Ditto\Sortable;
  * Class ImageParameter
  * @package App\Models\V2
  */
-class ImageParameter extends Model implements Filterable, Sortable
+class ImageMetadata extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DeletionRules, DefaultName;
+    use CustomKey, SoftDeletes, DeletionRules;
 
-    public string $keyPrefix = 'imgparam';
+    public string $keyPrefix = 'imgmeta';
 
     protected $casts = [
         'required' => 'boolean',
@@ -37,12 +37,8 @@ class ImageParameter extends Model implements Filterable, Sortable
         $this->fillable([
             'id',
             'image_id',
-            'name',
             'key',
-            'type',
-            'description',
-            'required',
-            'validation_rule',
+            'value',
         ]);
         parent::__construct($attributes);
     }
@@ -71,6 +67,7 @@ class ImageParameter extends Model implements Filterable, Sortable
             });
     }
 
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -78,14 +75,10 @@ class ImageParameter extends Model implements Filterable, Sortable
     public function filterableColumns(FilterFactory $factory): array
     {
         return [
-            $factory->create('id', Filter::$stringDefaults),
+            $factory->create('id', Filter::$enumDefaults),
             $factory->create('image_id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
             $factory->create('key', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
-            $factory->create('description', Filter::$stringDefaults),
-            $factory->create('required', Filter::$enumDefaults),
-            $factory->create('validation_rule', Filter::$stringDefaults),
+            $factory->create('value', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -101,12 +94,8 @@ class ImageParameter extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('image_id'),
-            $factory->create('name'),
             $factory->create('key'),
-            $factory->create('type'),
-            $factory->create('description'),
-            $factory->create('required'),
-            $factory->create('validation_rule'),
+            $factory->create('value'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -128,13 +117,8 @@ class ImageParameter extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
-            'name' => 'name',
             'image_id' => 'image_id',
-            'key' => 'key',
-            'type' => 'type',
-            'description' => 'description',
-            'required' => 'required',
-            'validation_rule' => 'validation_rule',
+            'value' => 'value',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

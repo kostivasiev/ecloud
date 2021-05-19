@@ -388,6 +388,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('image-parameters/{imageParameterId}', 'ImageParameterController@destroy');
     });
 
+    /** Image metadata */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('image-metadata', 'ImageMetadataController@index');
+        $router->get('image-metadata/{imageMetadataId}', 'ImageMetadataController@show');
+        $router->post('image-metadata', 'ImageMetadataController@store');
+        $router->patch('image-metadata/{imageMetadataId}', 'ImageMetadataController@update');
+        $router->delete('image-metadata/{imageMetadataId}', 'ImageMetadataController@destroy');
+    });
+
     /** SSH Key Pairs */
     $router->group([], function () use ($router) {
         $router->group(['middleware' => ['has-reseller-id', 'customer-max-ssh-key-pairs']], function () use ($router) {
