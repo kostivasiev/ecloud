@@ -389,9 +389,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Image metadata */
+    $router->get('image-metadata', 'ImageMetadataController@index');
+    $router->get('image-metadata/{imageMetadataId}', 'ImageMetadataController@show');
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('image-metadata', 'ImageMetadataController@index');
-        $router->get('image-metadata/{imageMetadataId}', 'ImageMetadataController@show');
         $router->post('image-metadata', 'ImageMetadataController@store');
         $router->patch('image-metadata/{imageMetadataId}', 'ImageMetadataController@update');
         $router->delete('image-metadata/{imageMetadataId}', 'ImageMetadataController@destroy');

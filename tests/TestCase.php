@@ -11,6 +11,7 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
@@ -118,6 +119,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var ImageParameter */
     private $imageParameter;
+
+    /** @var ImageMetadata */
+    private $imageMetadata;
 
     /** @var Nic */
     private $nic;
@@ -294,6 +298,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             $this->image()->imageParameters()->save($this->imageParameter);
         }
         return $this->imageParameter;
+    }
+
+    public function imageMetadata()
+    {
+        if (!$this->imageMetadata) {
+            $this->imageMetadata = factory(ImageMetadata::class)->make([
+                'id' => 'imgmeta-test'
+            ]);
+            $this->image()->imageMetadata()->save($this->imageMetadata);
+        }
+        return $this->imageMetadata;
     }
 
 
