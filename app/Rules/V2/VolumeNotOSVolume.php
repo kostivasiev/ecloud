@@ -18,6 +18,6 @@ class VolumeNotOSVolume implements Rule
 
     public function message()
     {
-        return 'The specified volume is already attached to this instance';
+        return 'The specified volume cannot be detached from this instance.';
     }
 }
