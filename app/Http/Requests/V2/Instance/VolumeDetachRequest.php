@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\V2\Instance;
 
-use App\Models\V2\Instance;
+use App\Models\V2\Volume;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\VolumeAttachedToInstance;
+use App\Rules\V2\VolumeNotOSVolume;
 use UKFast\FormRequests\FormRequest;
 
 class VolumeDetachRequest extends FormRequest
@@ -21,8 +22,9 @@ class VolumeDetachRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.instances,id,deleted_at,NULL',
-                new ExistsForUser(Instance::class),
-                new VolumeAttachedToInstance(),
+                new ExistsForUser(Volume::class),
+                new VolumeAttachedToInstance($this->route('instanceId')),
+                new VolumeNotOSVolume(),
             ]
         ];
     }
