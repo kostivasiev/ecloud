@@ -112,9 +112,3 @@ Cache-Control: no-cache
 X-consumer-custom-id: 1-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 404, "Response status is not 404");
-});
-%}

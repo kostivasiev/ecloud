@@ -5,31 +5,33 @@ namespace App\Jobs\NetworkPolicy;
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
+use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
 class CreateDefaultNetworkRules extends Job
 {
-    use Batchable;
+    use Batchable, LoggableModelJob;
 
-    private NetworkPolicy $networkPolicy;
+    private NetworkPolicy $model;
+
     private $data;
 
     public function __construct(NetworkPolicy $networkPolicy, $data = null)
     {
-        $this->networkPolicy = $networkPolicy;
+        $this->model = $networkPolicy;
         $this->data = $data;
     }
 
     public function handle()
     {
-        if ($this->networkPolicy->networkRules()->whereIn('type', [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS])->count() > 0) {
+        if ($this->model->networkRules()->whereIn('type', [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS])->count() > 0) {
             Log::info('Default network rules already exists, nothing to do');
             return true;
         }
 
-        $subnet = Subnet::fromString($this->networkPolicy->network->subnet);
+        $subnet = Subnet::fromString($this->model->network->subnet);
         $dhcpServerAddress = $subnet->getStartAddress()->getNextAddress()->getNextAddress();
 
         foreach (config('defaults.network_policy.rules') as $rule) {
@@ -43,7 +45,7 @@ class CreateDefaultNetworkRules extends Job
                 $networkRule->action = $this->data['catchall_rule_action'];
             }
 
-            $this->networkPolicy->networkRules()->save($networkRule);
+            $this->model->networkRules()->save($networkRule);
         }
     }
 }

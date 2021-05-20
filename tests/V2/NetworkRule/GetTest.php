@@ -4,7 +4,6 @@ namespace Tests\V2\NetworkRule;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
