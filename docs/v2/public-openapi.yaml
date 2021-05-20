@@ -249,10 +249,6 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
-  '/ecloud/v2/volumes/{volumeId}/attach':
-    $ref: 'resources/Volume/attach.yaml'
-  '/ecloud/v2/volumes/{volumeId}/detach':
-    $ref: 'resources/Volume/detach.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
   '/ecloud/v2/volumes/{volumeId}/tasks':

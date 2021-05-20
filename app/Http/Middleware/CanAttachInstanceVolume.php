@@ -7,7 +7,7 @@ use App\Models\V2\Instance;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class CanAttach
+class CanAttachInstanceVolume
 {
     /**
      * @param $request

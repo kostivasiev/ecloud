@@ -5,8 +5,8 @@ namespace App\Http\Controllers\V2;
 use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
-use App\Http\Requests\V2\Volume\AttachRequest;
-use App\Http\Requests\V2\Volume\VolumeDetachRequest;
+use App\Http\Requests\V2\Instance\VolumeDetachRequest;
+use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
@@ -455,7 +455,7 @@ class InstanceController extends BaseController
         ]);
     }
 
-    public function volumeAttach(AttachRequest $request, string $instanceId)
+    public function volumeAttach(VolumeAttachRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
         $volume = Volume::forUser(Auth::user())->findOrFail($request->get('volume_id'));
