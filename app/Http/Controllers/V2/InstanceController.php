@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V2;
 use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
+use App\Http\Requests\V2\Volume\AttachRequest;
+use App\Http\Requests\V2\Volume\VolumeDetachRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
@@ -451,6 +453,26 @@ class InstanceController extends BaseController
             ],
             'meta' => (object)[]
         ]);
+    }
+
+    public function volumeAttach(AttachRequest $request, string $instanceId)
+    {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($request->get('volume_id'));
+
+        $task = $instance->createTaskWithLock('volume_attach', \App\Jobs\Tasks\Instance\VolumeAttach::class, ['volume_id' => $volume->id]);
+
+        return $this->responseTaskId($task->id);
+    }
+
+    public function volumeDetach(VolumeDetachRequest $request, string $instanceId)
+    {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($request->get('volume_id'));
+
+        $task = $instance->createTaskWithLock('volume_detach', \App\Jobs\Tasks\Instance\VolumeDetach::class, ['volume_id' => $volume->id]);
+
+        return $this->responseTaskId($task->id);
     }
 
     public function tasks(Request $request, QueryTransformer $queryTransformer, string $instanceId)

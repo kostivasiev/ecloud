@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Requests\V2\Volume;
+namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\Instance;
+use App\Models\V2\Volume;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsMaxVolumeLimitReached;
-use App\Rules\V2\VolumeNotAttached;
+use App\Rules\V2\VolumeNotAttachedToInstance;
 use UKFast\FormRequests\FormRequest;
 
-class AttachRequest extends FormRequest
+class VolumeAttachRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -18,13 +19,12 @@ class AttachRequest extends FormRequest
     public function rules()
     {
         return [
-            'instance_id' => [
+            'volume_id' => [
                 'required',
                 'string',
                 'exists:ecloud.instances,id,deleted_at,NULL',
-                new ExistsForUser(Instance::class),
-                new VolumeNotAttached($this->route()[2]['volumeId']),
-                new IsMaxVolumeLimitReached()
+                new ExistsForUser(Volume::class),
+                new VolumeNotAttachedToInstance($this->route('instanceId')),
             ]
         ];
     }

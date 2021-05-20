@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\Volume;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\IsVolumeAttached;
+use App\Rules\V2\VolumeAttachedToInstance;
 use App\Rules\V2\ValidVolumeIops;
 use App\Rules\V2\VolumeCapacityIsGreater;
 use UKFast\FormRequests\FormRequest;
