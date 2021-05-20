@@ -1,41 +1,36 @@
-####
-#POST https://{{host}}/{{version}}/image-parameters
-#Accept: */*
-#Cache-Control: no-cache
-#X-consumer-custom-id: 0-0
-#X-consumer-groups: ecloud.read, ecloud.write
-#Content-Type: application/json
-#
-#{
-#    "name": "Test Image - PMC4",
-#    "logo_uri": "https://images.ukfast.co.uk/logos/centos/300x300_white.png",
-#    "documentation_uri": "https://docs.centos.org/en-US/docs/",
-#    "description": "CentOS (Community enterprise Operating System)",
-#    "script_template": null,
-#    "vm_template": "CentOS7 x86_64",
-#    "platform": "Linux",
-#    "active": true,
-#    "public": true,
-#    "availability_zone_ids": [
-#        "az-aaaaaaaa"
-#    ]
-#}
-#
-#> {%
-#
-#client.global.set("image_parameter_id", response.body.data.id);
-#client.log("Image Parameter ID: " + response.body.data.id);
-#
-#client.test("Request executed successfully", function() {
-#  client.assert(response.status === 202, "Response status is not 200");
-#});
-#%}
+###
+POST https://{{host}}/{{version}}/image-parameters
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test Image Parameter",
+    "image_id": "{{dev_image_id}}",
+    "key": "Username",
+    "type": "String",
+    "description": "Lorem ipsum",
+    "required": true,
+    "validation_rule": "/\\w+/"
+}
+
+> {%
+
+client.global.set("image_parameter_id", response.body.data.id);
+client.log("Image Parameter ID: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 201");
+});
+%}
 
 ###
 GET https://{{host}}/{{version}}/image-parameters
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -46,22 +41,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/image-parameters/{{image_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-
-###
-
-GET https://{{host}}/{{version}}/images/{{dev_image_id}}/parameters
+GET https://{{host}}/{{version}}/image-parameters/{{image_parameter_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -83,18 +63,13 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "Test Image - PMC5",
-    "logo_uri": "https://images.ukfast.co.uk/logos/centos/300x300_white.png",
-    "documentation_uri": "https://docs.centos.org/en-US/docs/",
-    "description": "CentOS (Community enterprise Operating System)",
-    "script_template": null,
-    "vm_template": "CentOS7 x86_64",
-    "platform": "Linux",
-    "active": true,
-    "public": true,
-    "availability_zone_ids": [
-        "az-aaaaaaaa"
-    ]
+    "name": "RENAMED",
+    "image_id": "{{dev_image_id}}",
+    "key": "RENAMED",
+    "type": "Boolean",
+    "description": "RENAMED",
+    "required": false,
+    "validation_rule": "RENAMED"
 }
 
 > {%
@@ -103,7 +78,28 @@ client.global.set("image_id", response.body.data.id);
 client.log("Image ID: " + response.body.data.id);
 
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 200");
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/image-parameters/{{image_parameter_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+
+  client.assert(response.body.data.name === "RENAMED");
+  client.assert(response.body.data.key === "RENAMED");
+  client.assert(response.body.data.type === "Boolean");
+  client.assert(response.body.data.description === "RENAMED");
+  client.assert(response.body.data.required === false);
+  client.assert(response.body.data.validation_rule === "RENAMED");
 });
 %}
 
@@ -117,7 +113,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 202");
+  client.assert(response.status === 204, "Response status is not 204");
 });
 %}
 
