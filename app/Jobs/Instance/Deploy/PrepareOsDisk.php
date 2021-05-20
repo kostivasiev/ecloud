@@ -46,6 +46,7 @@ class PrepareOsDisk extends Job
             $volume->vmware_uuid = $volumeData->uuid;
             $volume->os_volume = true;
             $volume->save();
+            $volume->instances()->attach($this->model);
 
             Log::info(get_class($this) . ' : Created volume resource ' . $volume->id . ' for volume ' . $volume->vmware_uuid);
 
@@ -59,25 +60,8 @@ class PrepareOsDisk extends Job
                 ]
             );
 
-            // Update the volume iops
-            $volume->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/volume/' . $volume->vmware_uuid . '/iops',
-                [
-                    'json' => [
-                        'limit' => $volume->iops
-                    ]
-                ]
-            );
-
-            // Update the volume capacity
-            $volume->availabilityZone->kingpinService()->put(
-                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/volume/' . $volume->vmware_uuid . '/size',
-                [
-                    'json' => [
-                        'sizeGiB' => $volume->capacity,
-                    ],
-                ]
-            );
+            // Trigger sync to set IOPS/Capacity
+            $volume->syncSave();
 
             Log::info(get_class($this) . ' : Volume ' . $volume->vmware_uuid . ' successfully updated with resource ID ' . $volume->id);
         }

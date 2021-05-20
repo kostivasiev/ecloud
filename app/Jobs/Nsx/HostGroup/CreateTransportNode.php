@@ -64,6 +64,13 @@ class CreateTransportNode extends Job
         }
         $uplinkHostSwitchProfile = collect($uplinkHostSwitchProfiles->results)->first();
 
+        $vtepIpPools = $this->getVtepIpPools($hostGroup->availabilityZone);
+        if (!$vtepIpPools || !isset($vtepIpPools->results) || !count($vtepIpPools->results)) {
+            $this->fail(new \Exception('Failed to get VtepIpPools'));
+            return false;
+        }
+        $vtepIpPool = collect($vtepIpPools->results)->first();
+
         $hostGroup->availabilityZone->nsxService()->post(
             '/api/v1/transport-node-profiles',
             [
@@ -102,7 +109,8 @@ class CreateTransportNode extends Job
                                     ]
                                 ],
                                 'ip_assignment_spec' => [
-                                    'resource_type' => 'AssignedByDhcp'
+                                    'resource_type' => 'StaticIpPoolSpec',
+                                    'ip_pool_id' => $vtepIpPool->id
                                 ]
                             ]
                         ]
@@ -147,6 +155,16 @@ class CreateTransportNode extends Job
         return json_decode(
             $availabilityZone->nsxService()
                 ->get('/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile')
+                ->getBody()
+                ->getContents()
+        );
+    }
+
+    private function getVtepIpPools(AvailabilityZone $availabilityZone): ?\stdClass
+    {
+        return json_decode(
+            $availabilityZone->nsxService()
+                ->get('/api/v1/search/query?query=resource_type:IpPool%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-vtep-ip-pool')
                 ->getBody()
                 ->getContents()
         );

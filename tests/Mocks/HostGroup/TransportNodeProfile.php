@@ -152,6 +152,32 @@ trait TransportNodeProfile
             });
     }
 
+    public function vtepIpPoolNoResults()
+    {
+        $this->validUplinkHost();
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs('/api/v1/search/query?query=resource_type:IpPool%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-vtep-ip-pool')
+            ->andReturnUsing(function () {
+                return new Response(200, [], '');
+            });
+    }
+
+    public function validVtepIpPool()
+    {
+        $this->validUplinkHost();
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs('/api/v1/search/query?query=resource_type:IpPool%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-vtep-ip-pool')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => 'da1c8d8d-67ce-4e62-815a-0e940265682c'
+                        ]
+                    ]
+                ]));
+            });
+    }
+
     protected function getThrownException(int $code, string $message, string $method = 'get')
     {
         $thrownException = new RequestException($message, new Request($method, '', []), new Response($code));
