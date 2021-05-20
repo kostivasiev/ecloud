@@ -20,7 +20,6 @@ class Populate extends Command
     {
         Image::all()->each(function ($image) {
             if (!empty($image->appliance_version_id)) {
-
                 $this->info("Updating Image $image->id \"$image->name\"");
 
                 $applianceVersion = ApplianceVersion::findOrFail($image->appliance_version_id);
@@ -83,7 +82,6 @@ class Populate extends Command
                 });
                 $this->info('Added ' . $applianceScriptParameters->count() . ' image parameters');
 
-
                 /**
                  * Update image metadata
                  */
@@ -108,13 +106,11 @@ class Populate extends Command
 
                 $this->info("Updated Image $image->id \"$image->name\"");
 
-
                 // Update availability zones
                 // WARNING: ADDS THE IMAGES TO ALL AVAILABILITY ZONES
                 $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id'));
 
                 $this->info("Image $image->id \"$image->name\" was added to all availability zones");
-
             }
         });
 
