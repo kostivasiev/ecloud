@@ -31,17 +31,18 @@ class DeleteTransportNodeProfile extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() !== 404) {
                 $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : Compute Collection for HostGroup ' .
                 $hostGroup->id . ' could not be retrieved, skipping.'
             );
-            return false;
+            return;
         }
         $computeItem = collect($response->results)->first();
         if (empty($computeItem)) {
             Log::warning('Compute Item for HostGroup ' . $hostGroup->id . ' not found, skipping');
-            return false;
+            return;
         }
 
         try {
@@ -51,12 +52,13 @@ class DeleteTransportNodeProfile extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() !== 404) {
                 $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : TransportNode Collection for HostGroup ' .
                 $hostGroup->id . ' could not be retrieved, skipping.'
             );
-            return false;
+            return;
         }
         $transportNodeItem = collect($response->results)->first();
 
@@ -68,28 +70,30 @@ class DeleteTransportNodeProfile extends Job
         } catch (RequestException $exception) {
             if ($exception->getCode() !== 404) {
                 $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : Failed to detach transport node profile for Host Group ' .
                 $hostGroup->id . ', skipping'
             );
-            return false;
+            return;
         }
 
         // Once the Profile is Detached it can be deleted
         try {
-            $response = $this->model->availabilityZone->nsxService()->delete(
+            $this->model->availabilityZone->nsxService()->delete(
                 '/api/v1/transport-node-profiles/' . $transportNodeItem->id
             );
         } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                throw $exception;
+            if ($exception->getCode() !== 404) {
+                $this->fail($exception);
+                return;
             }
             Log::warning(
                 get_class($this) . ' : Failed to delete transport node profile for Host Group ' .
                 $hostGroup->id . ', skipping.'
             );
-            return false;
+            return;
         }
     }
 }
