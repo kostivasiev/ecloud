@@ -84,6 +84,39 @@ class Image extends Model implements Filterable, Sortable
         return $this->hasMany(ImageMetadata::class);
     }
 
+
+    /**
+     * @return mixed
+     * @deprecated
+     */
+    public function parameters()
+    {
+        return $this->applianceVersion->applianceScriptParameters();
+    }
+
+    /**
+     * @return mixed
+     * @deprecated
+     */
+    public function metadata()
+    {
+        return $this->applianceVersion->applianceVersionData();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @deprecated
+     */
+    public function applianceVersion()
+    {
+        return $this->belongsTo(
+            ApplianceVersion::class,
+            'appliance_version_id',
+            'appliance_version_uuid'
+        );
+    }
+
+
     /**
      * @param $query
      * @param $user
