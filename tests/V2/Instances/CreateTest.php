@@ -42,6 +42,7 @@ class CreateTest extends TestCase
             $this->image = factory(Image::class)->create([
                 'id' => 'img-abcdef12',
                 'appliance_version_id' => $this->applianceVersion->id,
+                'platform' => 'Linux'
             ]);
         });
 
@@ -79,7 +80,7 @@ class CreateTest extends TestCase
                 'title' => 'Validation Error',
                 'detail' => 'Specified volume capacity is below the minimum of ' . config('volume.capacity.linux.min'),
                 'status' => 422,
-                'source' => 'ram_capacity'
+                'source' => 'volume_capacity'
             ])
             ->assertResponseStatus(422);
 
