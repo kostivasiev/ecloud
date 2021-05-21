@@ -6,15 +6,21 @@ properties:
   name:
     type: string
     example: 'Default Network Policy'
-  network_id :
-    required : true
+  network_id:
+    required: true
+    type: string
+    example: 'net-912345'
+  vpc_id:
+    type: string
+    required: true
+    example: vpc-2b66bb79
+    readOnly: true
+  catchall_rule_action:
+    description: 'Action to apply to the catchall rule, allowed options are ALLOW,DROP,REJECT. Default action is REJECT.'
     type : string
-    example : 'net-912345'
-  vpc_id :
-    type : string
-    required : true
-    example : vpc-2b66bb79
-    readOnly : true
+    required : false
+    example : 'ALLOW'
+    writeOnly : true
   sync:
     type: object
     readOnly: true

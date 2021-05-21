@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\V2\Host;
 
+use App\Models\V2\HostGroup;
+use App\Rules\V2\IsResourceAvailable;
 use UKFast\FormRequests\FormRequest;
 
 class StoreRequest extends FormRequest
@@ -14,6 +16,7 @@ class StoreRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.host_groups,id,deleted_at,NULL',
+                new IsResourceAvailable(HostGroup::class),
             ],
         ];
     }

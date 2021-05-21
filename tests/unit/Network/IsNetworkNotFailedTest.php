@@ -3,21 +3,20 @@ namespace Tests\unit\Network;
 
 use App\Models\V2\Network;
 use App\Models\V2\Task;
-use App\Rules\V2\IsNetworkAvailable;
+use App\Rules\V2\IsResourceAvailable;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class IsNetworkNotFailedTest extends TestCase
 {
-    protected IsNetworkAvailable $rule;
+    protected IsResourceAvailable $rule;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->rule = new IsNetworkAvailable();
+        $this->rule = new IsResourceAvailable(Network::class);
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
