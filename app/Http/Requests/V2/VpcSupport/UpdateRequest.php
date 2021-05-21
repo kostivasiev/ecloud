@@ -38,7 +38,6 @@ class UpdateRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 'unique:ecloud.vpc_support,vpc_id,NULL,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class),
-                new IsResourceAvailable(Vpc::class),
             ],
             'start_date' => 'sometimes|date_format:Y-m-d',
             'end_date' => 'sometimes|nullable|date_format:Y-m-d',
