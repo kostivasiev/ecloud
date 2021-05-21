@@ -17,27 +17,15 @@ class VolumeAttachRequest extends FormRequest
      */
     public function rules()
     {
+        dd($this->route());
         return [
             'volume_id' => [
                 'required',
                 'string',
-                'exists:ecloud.instances,id,deleted_at,NULL',
+                'exists:ecloud.volumes,id,deleted_at,NULL',
                 new ExistsForUser(Volume::class),
                 new VolumeNotAttachedToInstance($this->route('instanceId')),
             ]
-        ];
-    }
-
-    /**
-     * Get the validation messages that apply to the request.
-     *
-     * @return array|string[]
-     */
-    public function messages()
-    {
-        return [
-            'capacity.min' => 'specified :attribute is below the minimum of ' . config('volume.capacity.min'),
-            'capacity.max' => 'specified :attribute is above the maximum of ' . config('volume.capacity.max'),
         ];
     }
 }
