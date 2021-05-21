@@ -2,10 +2,12 @@
 
 namespace Tests\V2\Volume;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -59,11 +61,7 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/volume')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
+        Event::fake([Created::class]);
 
         $this->post('/v2/volumes', [
             'vpc_id' => $this->vpc()->id,

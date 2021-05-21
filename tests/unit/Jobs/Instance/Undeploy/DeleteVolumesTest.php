@@ -2,6 +2,7 @@
 
 namespace Tests\unit\Jobs\Instance\Undeploy;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\FloatingIp\AwaitNatRemoval;
 use App\Jobs\FloatingIp\AwaitNatSync;
 use App\Jobs\FloatingIp\DeleteNats;
@@ -62,7 +63,7 @@ class DeleteVolumesTest extends TestCase
             $this->instance->volumes()->attach($this->volume);
         });
 
-        Event::fake();
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         dispatch(new DeleteVolumes($this->instance));
 
@@ -70,9 +71,6 @@ class DeleteVolumesTest extends TestCase
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
-
-        $this->volume->refresh();
-        $this->assertNotNull($this->volume->deleted_at);
     }
 
     public function testDetachesDataVolume()
@@ -90,7 +88,7 @@ class DeleteVolumesTest extends TestCase
             $this->instance->volumes()->attach($this->volume);
         });
 
-        Event::fake();
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         dispatch(new DeleteVolumes($this->instance));
 
@@ -98,8 +96,5 @@ class DeleteVolumesTest extends TestCase
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
-
-        $this->volume->refresh();
-        $this->assertNull($this->volume->deleted_at);
     }
 }

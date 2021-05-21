@@ -15,21 +15,6 @@ class GetVpcVolumesTest extends TestCase
     {
         parent::setUp();
 
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/volume',
-                [
-                    'json' => [
-                        'volumeId' => 'vol-test',
-                        'sizeGiB' => '100',
-                        'shared' => false,
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
-
         $this->volume = factory(Volume::class)->create([
             'id' => 'vol-test',
             'name' => 'Volume',

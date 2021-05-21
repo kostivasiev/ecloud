@@ -62,9 +62,15 @@ class CreateTransportNodeTest extends TestCase
         $this->assertFalse($this->job->handle());
     }
 
+    public function testNoVtepIpPools()
+    {
+        $this->vtepIpPoolNoResults();
+        $this->assertFalse($this->job->handle());
+    }
+
     public function testCreateSuccessful()
     {
-        $this->validUplinkHost();
+        $this->validVtepIpPool();
         $this->nsxServiceMock()->expects('post')
             ->withSomeOfArgs('/api/v1/transport-node-profiles')
             ->andReturnUsing(function () {

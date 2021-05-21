@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Volume;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
@@ -16,21 +17,6 @@ class IopsModificationTest extends TestCase
     {
         parent::setUp();
 
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/volume',
-                [
-                    'json' => [
-                        'volumeId' => 'vol-test',
-                        'sizeGiB' => '100',
-                        'shared' => false,
-                    ]
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['uuid' => 'uuid-test-uuid-test-uuid-test']));
-            });
-
         $this->volume = factory(Volume::class)->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
@@ -40,7 +26,7 @@ class IopsModificationTest extends TestCase
 
     public function testSetValidIopsValue()
     {
-        Event::fake();
+        Event::fake([Created::class]);
 
         $this->instance()->volumes()->attach($this->volume);
 

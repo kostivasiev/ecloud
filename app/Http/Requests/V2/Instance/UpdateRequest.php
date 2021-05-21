@@ -68,7 +68,6 @@ class UpdateRequest extends FormRequest
                 'max:' . ($this->config->get('ukfast.spec.ram.max') ?? config('instance.ram_capacity.max')),
                 new IsValidRamMultiple()
             ],
-            'locked' => 'sometimes|required|boolean',
             'backup_enabled' => 'sometimes|required|boolean',
             'host_group_id' => [
                 'sometimes',

@@ -30,7 +30,6 @@ class ImageResource extends UKFastResource
         ];
 
         if ($request->user()->isAdmin()) {
-            $data['is_public'] = $this->is_public;
             $data['public'] = $this->is_public;
             $data['active'] = $this->active;
             $data['license_id'] = $this->license_id;

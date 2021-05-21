@@ -54,7 +54,7 @@ class Deploy extends Job
         }
 
         $json = json_decode($response->getBody()->getContents());
-        if (!isset($json->uuid)) {
+        if (!isset($json->uuid) || empty($json->uuid)) {
             Log::error(get_class($this) . ' : Failed', [
                 'id' => $volume->id,
                 'json' => $json,
@@ -68,6 +68,6 @@ class Deploy extends Job
             'uuid' => $volume->vmware_uuid,
         ]);
 
-        $volume->saveQuietly();
+        $volume->save();
     }
 }
