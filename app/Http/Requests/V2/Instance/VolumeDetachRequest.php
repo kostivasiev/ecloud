@@ -23,7 +23,7 @@ class VolumeDetachRequest extends FormRequest
                 'string',
                 'exists:ecloud.volumes,id,deleted_at,NULL',
                 new ExistsForUser(Volume::class),
-                new VolumeAttachedToInstance($this->route('instanceId')),
+                new VolumeAttachedToInstance($this->route()[2]['instanceId']),
                 new VolumeNotOSVolume(),
             ]
         ];

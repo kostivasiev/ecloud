@@ -17,14 +17,13 @@ class VolumeAttachRequest extends FormRequest
      */
     public function rules()
     {
-        dd($this->route());
         return [
             'volume_id' => [
                 'required',
                 'string',
                 'exists:ecloud.volumes,id,deleted_at,NULL',
                 new ExistsForUser(Volume::class),
-                new VolumeNotAttachedToInstance($this->route('instanceId')),
+                new VolumeNotAttachedToInstance($this->route()[2]['instanceId']),
             ]
         ];
     }
