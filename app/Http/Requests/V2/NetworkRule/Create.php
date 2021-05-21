@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\NetworkRule;
 
 use App\Models\V2\NetworkPolicy;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
 
@@ -33,6 +34,7 @@ class Create extends FormRequest
                 'string',
                 'exists:ecloud.network_policies,id,deleted_at,NULL',
                 new ExistsForUser(NetworkPolicy::class),
+                new IsResourceAvailable(NetworkPolicy::class),
             ],
             'sequence' => [
                 'required',

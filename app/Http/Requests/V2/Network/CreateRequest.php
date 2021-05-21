@@ -6,6 +6,7 @@ use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsNotOverlappingSubnet;
 use App\Rules\V2\IsPrivateSubnet;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsSubnetBigEnough;
 use App\Rules\V2\ValidCidrSubnet;
 use UKFast\FormRequests\FormRequest;
@@ -39,7 +40,8 @@ class CreateRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.routers,id,deleted_at,NULL',
-                new ExistsForUser(Router::class)
+                new ExistsForUser(Router::class),
+                new IsResourceAvailable(Router::class),
             ],
             'subnet' => [
                 'required',

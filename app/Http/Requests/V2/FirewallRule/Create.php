@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\FirewallRule;
 
 use App\Models\V2\FirewallPolicy;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
@@ -32,7 +33,8 @@ class Create extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.firewall_policies,id,deleted_at,NULL',
-                new ExistsForUser(FirewallPolicy::class)
+                new ExistsForUser(FirewallPolicy::class),
+                new IsResourceAvailable(FirewallPolicy::class),
             ],
             'source' => [
                 'required',

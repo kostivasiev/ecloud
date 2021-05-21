@@ -5,6 +5,7 @@ namespace App\Http\Requests\V2\Volume;
 use App\Models\V2\Instance;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsMaxVolumeLimitReached;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\VolumeNotAttached;
 use UKFast\FormRequests\FormRequest;
 
@@ -24,7 +25,8 @@ class AttachRequest extends FormRequest
                 'exists:ecloud.instances,id,deleted_at,NULL',
                 new ExistsForUser(Instance::class),
                 new VolumeNotAttached($this->route()[2]['volumeId']),
-                new IsMaxVolumeLimitReached()
+                new IsMaxVolumeLimitReached(),
+                new IsResourceAvailable(Instance::class),
             ]
         ];
     }

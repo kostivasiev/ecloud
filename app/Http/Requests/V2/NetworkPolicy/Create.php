@@ -3,6 +3,7 @@ namespace App\Http\Requests\V2\NetworkPolicy;
 
 use App\Models\V2\Network;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\NetworkHasNoPolicy;
 use UKFast\FormRequests\FormRequest;
 
@@ -33,6 +34,7 @@ class Create extends FormRequest
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),
                 new NetworkHasNoPolicy(),
+                new IsResourceAvailable(Network::class),
             ],
             'catchall_rule_action' => [
                 'sometimes',

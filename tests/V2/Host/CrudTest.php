@@ -3,6 +3,9 @@
 namespace Tests\V2\Host;
 
 use App\Models\V2\Host;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -59,6 +62,35 @@ class CrudTest extends TestCase
         $this->post('/v2/hosts', $data)
             ->seeInDatabase('hosts', $data, 'ecloud')
             ->assertResponseStatus(202);
+    }
+
+    public function testStoreWithFailedHostGroup()
+    {
+        Event::fake();
+
+        // Force failure
+        Model::withoutEvents(function () {
+            $model = new Task([
+                'id' => 'sync-test',
+                'failure_reason' => 'Unit Test Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->hostGroup());
+            $model->save();
+        });
+
+        $data = [
+            'name' => 'h-test',
+            'host_group_id' => $this->hostGroup()->id,
+        ];
+        $this->post('/v2/hosts', $data)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'The specified host group id resource is currently in a failed state and cannot be used',
+                ]
+            )->assertResponseStatus(422);
     }
 
     public function testUpdate()

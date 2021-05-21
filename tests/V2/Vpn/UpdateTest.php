@@ -2,7 +2,10 @@
 
 namespace Tests\V2\Vpn;
 
+use App\Models\V2\Task;
 use App\Models\V2\Vpn;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -41,6 +44,38 @@ class UpdateTest extends TestCase
                 'source' => 'router_id'
             ])
             ->assertResponseStatus(422);
+    }
+
+    public function testFailedRouterCausesFailure()
+    {
+        // Force failure
+        Model::withoutEvents(function () {
+            $model = new Task([
+                'id' => 'sync-test',
+                'failure_reason' => 'Unit Test Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->router());
+            $model->save();
+        });
+
+        $data = [
+            'router_id' => $this->router()->id,
+        ];
+        $this->patch(
+            '/v2/vpns/' . $this->vpn->id,
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The specified router id resource is currently in a failed state and cannot be used',
+            ]
+        )->assertResponseStatus(422);
     }
 
     public function testValidDataIsSuccessful()
