@@ -175,10 +175,14 @@ paths:
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-off':
     $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/volume-attach':
+    $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/volume-detach':
+    $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-reset':
-    $ref: 'resources/Instance/poweronoff.yaml'
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/power-shutdown':
-    $ref: 'resources/Instance/poweronoff.yaml'
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/power-restart':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/lock':
@@ -249,10 +253,6 @@ paths:
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/item.yaml'
-  '/ecloud/v2/volumes/{volumeId}/attach':
-    $ref: 'resources/Volume/attach.yaml'
-  '/ecloud/v2/volumes/{volumeId}/detach':
-    $ref: 'resources/Volume/detach.yaml'
   '/ecloud/v2/volumes/{volumeId}/instances':
     $ref: 'resources/Volume/instance.yaml'
   '/ecloud/v2/volumes/{volumeId}/tasks':

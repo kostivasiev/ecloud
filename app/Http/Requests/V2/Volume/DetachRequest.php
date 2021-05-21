@@ -8,6 +8,9 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsVolumeAttached;
 use UKFast\FormRequests\FormRequest;
 
+/**
+ * @deprecated use instance volume
+ */
 class DetachRequest extends FormRequest
 {
     /**

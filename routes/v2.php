@@ -170,6 +170,10 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->put('instances/{instanceId}/power-reset', 'InstanceController@powerReset');
             $router->put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
             $router->put('instances/{instanceId}/power-shutdown', 'InstanceController@guestShutdown');
+            $router->group(['middleware' => 'can-attach-instance-volume'], function () use ($router) {
+                $router->post('instances/{instanceId}/volume-attach', 'InstanceController@volumeAttach');
+            });
+            $router->post('instances/{instanceId}/volume-detach', 'InstanceController@volumeDetach');
         });
     });
 

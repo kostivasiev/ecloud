@@ -6,6 +6,9 @@ use App\Models\V2\Volume;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @deprecated use instance volume
+ */
 class VolumeNotAttached implements Rule
 {
     protected string $volumeId;

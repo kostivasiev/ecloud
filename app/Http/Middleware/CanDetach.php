@@ -5,6 +5,9 @@ use App\Exceptions\V2\DetachException;
 use App\Models\V2\Volume;
 use Closure;
 
+/**
+ * @deprecated use instance volume
+ */
 class CanDetach
 {
     /**

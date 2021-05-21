@@ -9,6 +9,9 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\VolumeNotAttached;
 use UKFast\FormRequests\FormRequest;
 
+/**
+ * @deprecated use instance volume
+ */
 class AttachRequest extends FormRequest
 {
     /**
