@@ -164,6 +164,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
         $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
+        $router->post('instances/{instanceId}/host-group', 'InstanceController@hostGroup');
 
         $router->group(['middleware' => 'is-locked'], function () use ($router) {
             $router->patch('instances/{instanceId}', 'InstanceController@update');

@@ -22,7 +22,7 @@ client.global.set("instance_id", response.body.data.id);
 %}
 
 ### Move to hg-aaaabbbb
-PATCH https://{{host}}/{{version}}/instances/{{instance_id}}
+POST https://{{host}}/{{version}}/instances/{{instance_id}}/host-group
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -32,7 +32,7 @@ Content-Type:  application/json
 }
 
 ### Move back to {{dev_host_group_id}}
-PATCH https://{{host}}/{{version}}/instances/{{instance_id}}
+POST https://{{host}}/{{version}}/instances/{{instance_id}}/host-group
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

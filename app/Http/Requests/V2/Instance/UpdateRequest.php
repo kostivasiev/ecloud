@@ -70,14 +70,6 @@ class UpdateRequest extends FormRequest
                 new IsValidRamMultiple()
             ],
             'backup_enabled' => 'sometimes|required|boolean',
-            'host_group_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.host_groups,id,deleted_at,NULL',
-                new ExistsForUser(HostGroup::class),
-                new IsResourceAvailable(HostGroup::class),
-            ],
         ];
 
         return $rules;
