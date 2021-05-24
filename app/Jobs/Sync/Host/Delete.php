@@ -22,11 +22,13 @@ class Delete extends Job
     {
         $host = $this->task->resource;
         $this->deleteTaskBatch([
-            new \App\Jobs\Kingpin\Host\MaintenanceMode($host),
-            new \App\Jobs\Kingpin\Host\DeleteInVmware($host),
-            new \App\Jobs\Conjurer\Host\PowerOff($host),
-            new \App\Jobs\Artisan\Host\RemoveFrom3Par($host),
-            new \App\Jobs\Conjurer\Host\DeleteServiceProfile($host),
+            [
+                new \App\Jobs\Kingpin\Host\MaintenanceMode($host),
+                new \App\Jobs\Kingpin\Host\DeleteInVmware($host),
+                new \App\Jobs\Conjurer\Host\PowerOff($host),
+                new \App\Jobs\Artisan\Host\RemoveFrom3Par($host),
+                new \App\Jobs\Conjurer\Host\DeleteServiceProfile($host),
+            ]
         ])->dispatch();
     }
 }

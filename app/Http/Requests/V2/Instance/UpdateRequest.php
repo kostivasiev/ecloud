@@ -5,6 +5,7 @@ namespace App\Http\Requests\V2\Instance;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
@@ -75,6 +76,7 @@ class UpdateRequest extends FormRequest
                 'string',
                 'exists:ecloud.host_groups,id,deleted_at,NULL',
                 new ExistsForUser(HostGroup::class),
+                new IsResourceAvailable(HostGroup::class),
             ],
         ];
 

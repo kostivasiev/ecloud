@@ -1,0 +1,20 @@
+post:
+  parameters:
+    - $ref: 'parameters/instanceId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            volume_id:
+              type: string
+              required: true
+              example: 'vol-abcdef12'
+          description: 'Instances'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Instances

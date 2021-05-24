@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsResourceAvailable;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -35,7 +36,8 @@ class UpdateVpnRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.routers,id,deleted_at,NULL',
-                new ExistsForUser(Router::class)
+                new ExistsForUser(Router::class),
+                new IsResourceAvailable(Router::class),
             ],
         ];
     }
@@ -49,7 +51,6 @@ class UpdateVpnRequest extends FormRequest
     {
         return [
             'router_id.required' => 'The :attribute field, when specified, cannot be null',
-            'availability_zone_id.required' => 'The :attribute field, when specified, cannot be null',
         ];
     }
 }

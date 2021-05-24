@@ -34,15 +34,6 @@ class Populate extends Command
                 $image->script_template = $applianceVersion->appliance_version_script_template;
                 $image->vm_template = $applianceVersion->appliance_version_vm_template;
 
-                $mockAdminDevices = \Mockery::mock(AdminClient::class)
-                    ->shouldAllowMockingProtectedMethods();
-                app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
-                    $mockedResponse = new \stdClass();
-                    $mockedResponse->category = "Linux";
-                    $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
-                    return $mockAdminDevices;
-                });
-
                 $devicesAdminClient = app()->make(AdminClient::class);
                 try {
                     $image->platform = $devicesAdminClient->licenses()->getById($applianceVersion->appliance_version_server_license_id)->category;

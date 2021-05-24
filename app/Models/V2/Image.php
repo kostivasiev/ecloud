@@ -88,6 +88,7 @@ class Image extends Model implements Filterable, Sortable
      * @param $query
      * @param $user
      * @return mixed
+     * @deprecated
      */
     public function scopeForUser($query, Consumer $user)
     {

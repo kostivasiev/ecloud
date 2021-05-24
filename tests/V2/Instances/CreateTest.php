@@ -6,30 +6,17 @@ use App\Models\V2\ApplianceVersion;
 use App\Models\V2\ApplianceVersionData;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
-use UKFast\Admin\Devices\AdminClient;
 use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
 {
     protected ApplianceVersion $applianceVersion;
     protected Image $image;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-//        $mockAdminDevices = \Mockery::mock(AdminClient::class)
-//            ->shouldAllowMockingProtectedMethods();
-//        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
-//            $mockedResponse = new \stdClass();
-//            $mockedResponse->category = "Linux";
-//            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
-//            return $mockAdminDevices;
-//        });
-    }
 
     public function testSpecDefaultConfigFallbacks()
     {
@@ -67,7 +54,7 @@ class CreateTest extends TestCase
                 'title' => 'Validation Error',
                 'detail' => 'Specified volume capacity is below the minimum of ' . config('volume.capacity.linux.min'),
                 'status' => 422,
-                'source' => 'ram_capacity'
+                'source' => 'volume_capacity'
             ])
             ->assertResponseStatus(422);
 
@@ -232,6 +219,74 @@ class CreateTest extends TestCase
             [
                 'title' => 'Validation Error',
                 'detail' => 'The maximum number of 0 Instances per Customer have been reached',
+            ]
+        )->assertResponseStatus(422);
+    }
+
+    public function testVpcOrNetworkFailCausesFail()
+    {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
+        Model::withoutEvents(function () {
+            $this->applianceVersion = factory(ApplianceVersion::class)->create([
+                'appliance_version_appliance_id' => 123,
+                'appliance_version_uuid' => 'e8321e4a-2306-4b9d-bd2d-9cd42f054197'
+            ]);
+            factory(ApplianceVersionData::class)->create([
+                'key' => 'ukfast.spec.cpu_cores.min',
+                'value' => 2,
+                'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
+            ]);
+            $this->image = factory(Image::class)->create([
+                'id' => 'img-abcdef12aa',
+                'appliance_version_id' => $this->applianceVersion->id,
+            ]);
+
+            $model = new Task([
+                'id' => 'sync-test',
+                'failure_reason' => 'Vpc Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->vpc());
+            $model->save();
+
+            $model = new Task([
+                'id' => 'sync-test-2',
+                'failure_reason' => 'Network Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->network());
+            $model->save();
+        });
+
+        $data = [
+            'vpc_id' => $this->vpc()->id,
+            'image_id' => $this->image->id,
+            'network_id' => $this->network()->id,
+            'vcpu_cores' => 2,
+            'ram_capacity' => 1024,
+            'volume_capacity' => 30,
+            'volume_iops' => 600,
+        ];
+
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The specified vpc id resource is currently in a failed state and cannot be used',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The specified network id resource is currently in a failed state and cannot be used',
             ]
         )->assertResponseStatus(422);
     }
