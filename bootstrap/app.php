@@ -95,6 +95,8 @@ $app->routeMiddleware([
     'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class,
     'customer-max-vpc' => \App\Http\Middleware\IsMaxVpcForCustomer::class,
     'customer-max-instance' => \App\Http\Middleware\IsMaxInstanceForCustomer::class,
+    'customer-max-ssh-key-pairs' => \App\Http\Middleware\IsMaxSshKeyPairForCustomer::class,
+    'can-attach-instance-volume' => \App\Http\Middleware\CanAttachInstanceVolume::class,
     'can-detach' => \App\Http\Middleware\CanDetach::class,
     'can-edit-rule' => \App\Http\Middleware\NetworkRule\CanEdit::class,
     'can-delete-rule' => \App\Http\Middleware\NetworkRule\CanDelete::class,

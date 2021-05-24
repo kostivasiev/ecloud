@@ -235,7 +235,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Volume\Creating::class => [
             \App\Listeners\V2\Volume\DefaultIops::class,
         ],
-        \App\Events\V2\Volume\Saving::class => [
+       /* \App\Events\V2\Volume\Saving::class => [
             \App\Listeners\V2\ResourceSyncSaving::class,
         ],
         \App\Events\V2\Volume\Saved::class => [
@@ -243,7 +243,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Volume\Deleting::class => [
             \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
+        ],*/
         \App\Events\V2\Volume\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],

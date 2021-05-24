@@ -26,13 +26,12 @@ class AwaitFirewallPolicyRemoval extends Job
     public function handle()
     {
         if ($this->model->firewallPolicies()->count() > 0) {
-            $this->model->firewallPolicies()->each(function ($fwp) {
-                if ($fwp->sync->status == Sync::STATUS_FAILED) {
-                    Log::error('Firewall policy in failed sync state, abort', ['id' => $this->model->id, 'fwp' => $fwp->id]);
-                    $this->fail(new \Exception("Firewall policy '" . $fwp->id . "' in failed sync state"));
+            foreach ($this->model->firewallPolicies as $firewallPolicy) {
+                if ($firewallPolicy->sync->status == Sync::STATUS_FAILED) {
+                    $this->fail(new \Exception("Firewall policy '" . $firewallPolicy->id . "' in failed sync state"));
                     return;
                 }
-            });
+            }
 
             Log::warning($this->model->firewallPolicies()->count() . ' firewall polic(y/ies) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
             return $this->release($this->backoff);

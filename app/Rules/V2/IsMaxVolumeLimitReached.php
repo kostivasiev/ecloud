@@ -6,6 +6,9 @@ use App\Models\V2\Instance;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @deprecated use instance volume
+ */
 class IsMaxVolumeLimitReached implements Rule
 {
     private int $volumeAttachLimit;

@@ -5,6 +5,9 @@ namespace Tests\V2\HostGroup;
 use App\Events\Event;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -68,6 +71,36 @@ class CrudTest extends TestCase
         $this->post('/v2/host-groups', $data)
             ->seeInDatabase('host_groups', $data, 'ecloud')
             ->assertResponseStatus(202);
+    }
+
+    public function testVpcFailedCausesFailure()
+    {
+        // Force failure
+        Model::withoutEvents(function () {
+            $model = new Task([
+                'id' => 'sync-test',
+                'failure_reason' => 'Unit Test Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->vpc());
+            $model->save();
+        });
+
+        $data = [
+            'name' => 'hg-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'host_spec_id' => $this->hostSpec()->id,
+            'windows_enabled' => true,
+        ];
+        $this->post('/v2/host-groups', $data)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'The specified vpc id resource is currently in a failed state and cannot be used',
+                ]
+            )->assertResponseStatus(422);
     }
 
     public function testStoreValidationWithEmptyHostSpecId()

@@ -170,6 +170,10 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->put('instances/{instanceId}/power-reset', 'InstanceController@powerReset');
             $router->put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
             $router->put('instances/{instanceId}/power-shutdown', 'InstanceController@guestShutdown');
+            $router->group(['middleware' => 'can-attach-instance-volume'], function () use ($router) {
+                $router->post('instances/{instanceId}/volume-attach', 'InstanceController@volumeAttach');
+            });
+            $router->post('instances/{instanceId}/volume-detach', 'InstanceController@volumeDetach');
         });
     });
 
@@ -368,5 +372,22 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->post('images', 'ImageController@store');
             $router->delete('images/{imageId}', 'ImageController@destroy');
         });
+    });
+
+    /** SSH Key Pairs */
+    $router->group([], function () use ($router) {
+        $router->group(['middleware' => ['has-reseller-id', 'customer-max-ssh-key-pairs']], function () use ($router) {
+            $router->post('ssh-key-pairs', 'SshKeyPairController@create');
+        });
+        $router->patch('ssh-key-pairs/{keypairId}', 'SshKeyPairController@update');
+        $router->get('ssh-key-pairs', 'SshKeyPairController@index');
+        $router->get('ssh-key-pairs/{keypairId}', 'SshKeyPairController@show');
+        $router->delete('ssh-key-pairs/{keypairId}', 'SshKeyPairController@destroy');
+    });
+
+    /** Task */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('tasks', 'TaskController@index');
+        $router->get('tasks/{taskId}', 'TaskController@show');
     });
 });

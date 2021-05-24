@@ -71,7 +71,7 @@ class BaseController extends Controller
                 'data' => [
                     'task_id' => $taskId
                 ],
-                'meta' => [],
+                'meta' => (object)[],
             ],
             $statusCode
         );

@@ -7,6 +7,9 @@ return [
     'vpc' => [
         'max_count' => env('VPC_MAX_COUNT', 10),
     ],
+    'ssh_key_pair' => [
+        'max_count' => env('SSH_KEY_PAIR_MAX_COUNT', 30),
+    ],
     'network' => [
         'subnets' => [
             'range' => '10.0.0.0/24',

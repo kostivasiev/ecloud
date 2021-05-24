@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V2;
 use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
+use App\Http\Requests\V2\Instance\VolumeDetachRequest;
+use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
@@ -120,6 +122,7 @@ class InstanceController extends BaseController
             'requires_floating_ip' => $request->input('requires_floating_ip', false),
             'image_data' => $request->input('image_data'),
             'user_script' => $request->input('user_script'),
+            'ssh_key_pair_ids' => $request->input('ssh_key_pair_ids'),
         ];
 
         $instance->save();
@@ -138,7 +141,6 @@ class InstanceController extends BaseController
 
         $instance->fill($request->only([
             'name',
-            'locked',
             'vcpu_cores',
             'ram_capacity',
             'host_group_id',
@@ -458,6 +460,26 @@ class InstanceController extends BaseController
             ],
             'meta' => (object)[]
         ]);
+    }
+
+    public function volumeAttach(VolumeAttachRequest $request, string $instanceId)
+    {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($request->get('volume_id'));
+
+        $task = $instance->createTaskWithLock('volume_attach', \App\Jobs\Tasks\Instance\VolumeAttach::class, ['volume_id' => $volume->id]);
+
+        return $this->responseTaskId($task->id);
+    }
+
+    public function volumeDetach(VolumeDetachRequest $request, string $instanceId)
+    {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
+        $volume = Volume::forUser(Auth::user())->findOrFail($request->get('volume_id'));
+
+        $task = $instance->createTaskWithLock('volume_detach', \App\Jobs\Tasks\Instance\VolumeDetach::class, ['volume_id' => $volume->id]);
+
+        return $this->responseTaskId($task->id);
     }
 
     public function tasks(Request $request, QueryTransformer $queryTransformer, string $instanceId)
