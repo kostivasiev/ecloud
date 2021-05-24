@@ -6,13 +6,15 @@ use App\Jobs\Job;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
-use App\Traits\V2\TaskableBatch;
+use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class HostGroupUpdate extends Job
 {
-    use Batchable, TaskableBatch, LoggableModelJob;
+    use Batchable, LoggableModelJob;
 
     public Task $task;
     private $model;
@@ -27,6 +29,7 @@ class HostGroupUpdate extends Job
 
     public function handle()
     {
+        $task = $this->task;
         if (($this->model->host_group_id == $this->host_group_id) || (empty($this->host_group_id))) {
             Log::info(get_class($this) . ' : Finished: No changes required', ['id' => $this->model->id]);
             return;
@@ -44,6 +47,16 @@ class HostGroupUpdate extends Job
             array_push($jobs, new PowerOn($this->model));
         }
 
-        $this->updateTaskBatch([$jobs])->dispatch();
+        Bus::batch([
+            $jobs
+        ])->then(function (Batch $batch) use ($task) {
+            Log::info("Setting task completed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
+            $task->completed = true;
+            $task->save();
+        })->catch(function (Batch $batch, Throwable $e) use ($task) {
+            Log::warning("Setting task failed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
+            $task->failure_reason = $e->getMessage();
+            $task->save();
+        })->dispatch();
     }
 }

@@ -150,18 +150,18 @@ class InstanceController extends BaseController
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
 
-        $instance->withTaskLock(function ($instance) {
+        $task = $instance->withTaskLock(function ($instance) {
             $data = [
                 'host_group_id' => $instance->getOriginal()['host_group_id']
             ];
             if (!$instance->canCreateTask()) {
                 throw new TaskException();
             }
-            $instance->saveQuietly();
+            $instance->save();
             return $instance->createSync(Sync::TYPE_UPDATE, $data);
         });
 
-        return $this->responseIdMeta($request, $instance->id, 202);
+        return $this->responseIdMeta($request, $instance->id, 202, $task->id);
     }
 
     /**
