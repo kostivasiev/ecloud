@@ -42,6 +42,7 @@ class DefaultPlatformTest extends TestCase
             $this->image = factory(Image::class)->create([
                 'id' => 'img-test',
                 'appliance_version_id' => $this->appliance_version->id,
+                'platform' => 'Linux'
             ]);
             $this->instance = factory(Instance::class)->create([
                 'id' => 'i-test',
