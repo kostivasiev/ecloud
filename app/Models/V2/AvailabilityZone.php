@@ -122,6 +122,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(AvailabilityZoneCapacity::class);
     }
 
+    public function images()
+    {
+        return $this->belongsToMany(Image::class);
+    }
+
     public function nsxService()
     {
         if (!$this->nsxService) {

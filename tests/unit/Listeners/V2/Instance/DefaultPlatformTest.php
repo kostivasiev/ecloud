@@ -31,18 +31,8 @@ class DefaultPlatformTest extends TestCase
         $this->faker = Faker::create();
 
         Model::withoutEvents(function() {
-            $this->appliance = factory(Appliance::class)->create([
-                'appliance_uuid' => 'aa085bfc-bbe9-4825-b636-1f221d6c3fa9',
-                'appliance_name' => 'Test Appliance',
-            ]);
-            $this->appliance_version = factory(ApplianceVersion::class)->create([
-                'appliance_version_uuid' => 'd7c4a253-0718-4ef7-adb2-ad348ae96371',
-                'appliance_version_appliance_id' => $this->appliance->id,
-            ]);
             $this->image = factory(Image::class)->create([
                 'id' => 'img-test',
-                'appliance_version_id' => $this->appliance_version->id,
-                'platform' => 'Linux'
             ]);
             $this->instance = factory(Instance::class)->create([
                 'id' => 'i-test',
@@ -50,14 +40,6 @@ class DefaultPlatformTest extends TestCase
             $this->instance->image()->associate($this->image);
         });
 
-        $mockAdminDevices = \Mockery::mock(AdminClient::class)
-            ->shouldAllowMockingProtectedMethods();
-        app()->bind(AdminClient::class, function () use ($mockAdminDevices) {
-            $mockedResponse = new \stdClass();
-            $mockedResponse->category = "Linux";
-            $mockAdminDevices->shouldReceive('licenses->getById')->andReturn($mockedResponse);
-            return $mockAdminDevices;
-        });
         $this->network = factory(Network::class)->create();
     }
 

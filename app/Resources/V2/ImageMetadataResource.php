@@ -22,6 +22,8 @@ class ImageMetadataResource extends UKFastResource
     public function toArray($request)
     {
         $data = [
+            'id' => $this->id,
+            'image_id' => $this->image_id,
             'key' => $this->key,
             'value' => $this->value,
         ];

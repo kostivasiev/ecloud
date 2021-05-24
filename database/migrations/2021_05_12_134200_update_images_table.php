@@ -21,9 +21,9 @@ class UpdateImagesTable extends Migration
             $table->string('publisher')->nullable();
         });
 
-//        Schema::connection('ecloud')->table('images', function ($table) {
-//            $table->dropColumn(['appliance_version_id']);
-//        });
+        Schema::connection('ecloud')->table('images', function ($table) {
+            $table->dropColumn(['appliance_version_id']);
+        });
     }
 
     public function down()
@@ -44,8 +44,8 @@ class UpdateImagesTable extends Migration
             ]);
         });
 
-//        Schema::connection('ecloud')->table('images', function ($table) {
-//            $table->uuid('appliance_version_id')->nullable();
-//        });
+        Schema::connection('ecloud')->table('images', function ($table) {
+            $table->uuid('appliance_version_id')->nullable();
+        });
     }
 }

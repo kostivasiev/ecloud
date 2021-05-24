@@ -1,5 +1,5 @@
 ###
-POST https://{{host}}/{{version}}/images
+POST https://{{host}}/{{version}}/image-metadata
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -7,18 +7,75 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "Test Image - PMC4",
-    "logo_uri": "https://images.ukfast.co.uk/logos/centos/300x300_white.png",
-    "documentation_uri": "https://docs.centos.org/en-US/docs/",
-    "description": "CentOS (Community enterprise Operating System)",
-    "script_template": null,
-    "vm_template": "CentOS7 x86_64",
-    "platform": "Linux",
-    "active": true,
-    "public": true,
-    "availability_zone_ids": [
-        "az-aaaaaaaa"
-    ]
+    "image_id": "{{dev_image_id}}",
+    "key": "test key",
+    "value": "tes  value"
+}
+
+> {%
+
+client.global.set("image_metadata_id", response.body.data.id);
+client.log("Image metadata ID: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/image-metadata
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/image-metadata/{{image_metadata_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/images/{{dev_image_id}}/metadata
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+PATCH https://{{host}}/{{version}}/image-metadata/{{image_metadata_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "image_id": "img-4a3ebaa8",
+    "key": "ddd",
+    "value": "ssse"
 }
 
 > {%
@@ -32,7 +89,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/images
+GET https://{{host}}/{{version}}/image-metadata/{{image_metadata_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -46,69 +103,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/images/{{image_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-
-###
-
-GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/images
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-
-###
-PATCH https://{{host}}/{{version}}/images/{{image_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-    "name": "Test Image - PMC5",
-    "logo_uri": "https://images.ukfast.co.uk/logos/centos/300x300_white.png",
-    "documentation_uri": "https://docs.centos.org/en-US/docs/",
-    "description": "CentOS (Community enterprise Operating System)",
-    "script_template": null,
-    "vm_template": "CentOS7 x86_64",
-    "platform": "Linux",
-    "active": true,
-    "public": true,
-    "availability_zone_ids": [
-        "az-aaaaaaaa"
-    ]
-}
-
-> {%
-
-client.global.set("image_id", response.body.data.id);
-client.log("Image ID: " + response.body.data.id);
-
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 200");
-});
-%}
-
-###
-DELETE https://{{host}}/{{version}}/images/{{image_id}}
+DELETE https://{{host}}/{{version}}/image-metadata/{{image_metadata_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -122,7 +117,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/images/{{image_id}}
+GET https://{{host}}/{{version}}/image-metadata/{{image_metadata_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

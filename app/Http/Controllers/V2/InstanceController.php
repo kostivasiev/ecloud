@@ -485,4 +485,11 @@ class InstanceController extends BaseController
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
+
+    public function createImage(Request $request, $instanceId)
+    {
+
+        // TODO - create an image from an instance
+        return response('', 202);
+    }
 }

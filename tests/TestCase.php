@@ -11,6 +11,8 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
+use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
@@ -114,6 +116,12 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Image */
     private $image;
+
+    /** @var ImageParameter */
+    private $imageParameter;
+
+    /** @var ImageMetadata */
+    private $imageMetadata;
 
     /** @var Nic */
     private $nic;
@@ -275,34 +283,36 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->image) {
             $this->image = factory(Image::class)->create([
-                'id' => 'img-abcdef12',
-                'appliance_version_id' => $this->applianceVersion()->id,
+                'id' => 'img-test',
             ]);
         }
         return $this->image;
     }
 
-    public function applianceVersion()
+    public function imageParameter()
     {
-        if (!$this->applianceVersion) {
-            $this->applianceVersion = factory(ApplianceVersion::class)->create([
-                'appliance_version_uuid' => 'd7c4a253-0718-4ef7-adb2-ad348ae96371',
-                'appliance_version_appliance_id' => $this->appliance()->id,
+        if (!$this->imageParameter) {
+            $this->imageParameter = factory(ImageParameter::class)->make([
+                'id' => 'iparam-test'
             ]);
+            $this->image()->imageParameters()->save($this->imageParameter);
         }
-        return $this->applianceVersion;
+        return $this->imageParameter;
     }
 
-    public function appliance()
+    public function imageMetadata()
     {
-        if (!$this->appliance) {
-            $this->appliance = factory(Appliance::class)->create([
-                'appliance_uuid' => 'aa085bfc-bbe9-4825-b636-1f221d6c3fa9',
-                'appliance_name' => 'Test Appliance',
-            ])->refresh();
+        if (!$this->imageMetadata) {
+            $this->imageMetadata = factory(ImageMetadata::class)->make([
+                'id' => 'imgmeta-test'
+            ]);
+            $this->image()->imageMetadata()->save($this->imageMetadata);
         }
-        return $this->appliance;
+        return $this->imageMetadata;
     }
+
+
+
 
     public function network()
     {

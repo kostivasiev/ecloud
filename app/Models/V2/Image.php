@@ -85,131 +85,6 @@ class Image extends Model implements Filterable, Sortable
     }
 
     /**
-     * DEPRECATED METHODS
-     */
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getNameAttribute()
-    {
-        return $this->applianceVersion->appliance->name;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getScriptTemplateAttribute()
-    {
-        return $this->applianceVersion->script_template;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getVMTemplateNameAttribute()
-    {
-        return $this->applianceVersion->appliance_version_vm_template;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getLogoURIAttribute()
-    {
-        return $this->applianceVersion->appliance->logo_uri;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getDocumentationURIAttribute()
-    {
-        return $this->applianceVersion->appliance->documentation_uri;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getDescriptionAttribute()
-    {
-        return $this->applianceVersion->appliance->description;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getActiveAttribute()
-    {
-        return $this->applianceVersion->appliance->active == "Yes";
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getIsPublicAttribute()
-    {
-        return $this->applianceVersion->appliance->is_public == "Yes";
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getPlatformAttribute()
-    {
-        return $this->applianceVersion->serverLicense()->category;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getLicenseIDAttribute()
-    {
-        return $this->applianceVersion->serverLicense()->id;
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function parameters()
-    {
-        return $this->applianceVersion->applianceScriptParameters();
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function metadata()
-    {
-        return $this->applianceVersion->applianceVersionData();
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     * @deprecated
-     */
-    public function applianceVersion()
-    {
-        return $this->belongsTo(
-            ApplianceVersion::class,
-            'appliance_version_id',
-            'appliance_version_uuid'
-        );
-    }
-
-    /**
      * @param $query
      * @param $user
      * @return mixed
@@ -217,41 +92,19 @@ class Image extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if (!$user->isAdmin()) {
-            return $query->whereHas('applianceVersion.appliance', function ($query) use ($user) {
-                $query->where('appliance_is_public', 'Yes')
-                    ->where('appliance_active', 'Yes');
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
 
-        return $query;
+        return $query->where(function ($query) use ($user) {
+            $query->where(function ($query) {
+                $query->where('public', true)->where('active', true);
+            })
+            ->orWhere(function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            });
+        });
     }
-
-    /**
-     * END DEPRECATED METHODS
-     */
-
-
-//    /**
-//     * @param $query
-//     * @param $user
-//     * @return mixed
-//     */
-//    public function scopeForUser($query, Consumer $user)
-//    {
-//        if (!$user->isScoped()) {
-//            return $query;
-//        }
-//
-//        return $query->where(function ($query) use ($user) {
-//            $query->where(function ($query) {
-//                $query->where('public', true)->where('active', true);
-//            })
-//            ->orWhere(function ($query) use ($user) {
-//                $query->where('reseller_id', $user->resellerId());
-//            });
-//        });
-//    }
 
     public function isOwner(): bool
     {
