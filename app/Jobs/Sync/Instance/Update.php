@@ -67,7 +67,7 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new ComputeUpdate($this->task->resource),
-                    new HostGroupUpdate($this->task->resource, $this->task->data),
+                    new HostGroupUpdate($this->task),
                 ]
             ])->dispatch();
         }

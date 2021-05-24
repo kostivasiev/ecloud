@@ -4,23 +4,25 @@ namespace App\Jobs\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\RequestException;
+use App\Traits\V2\TaskableBatch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class HostGroupUpdate extends Job
 {
-    use Batchable, LoggableModelJob;
+    use Batchable, TaskableBatch, LoggableModelJob;
 
+    public Task $task;
     private $model;
     private $host_group_id;
 
-    public function __construct(Instance $instance, $data)
+    public function __construct(Task $task)
     {
-        $this->model = $instance;
-        $this->host_group_id = (isset($data['host_group_id'])) ? $data['host_group_id'] : null;
+        $this->task = $task;
+        $this->model = $this->task->resource;
+        $this->host_group_id = (isset($this->task->data['host_group_id'])) ? $this->task->data['host_group_id'] : null;
     }
 
     public function handle()
@@ -34,48 +36,14 @@ class HostGroupUpdate extends Job
         $newHostGroup = HostGroup::findOrFail($this->model->host_group_id);
         $cyclePower = ($originalHostGroup->hostSpec->id != $newHostGroup->hostSpec->id);
 
+        $jobs = [
+            new MoveToHostGroup($this->model),
+        ];
         if ($cyclePower) {
-            try {// Power off
-                $this->model->availabilityZone->kingpinService()
-                    ->delete('/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/power');
-            } catch (RequestException $exception) {
-                if ($exception->getCode() !== 404) {
-                    $this->fail($exception);
-                }
-                $message = 'Unable to power off ' . $this->model->id . ' on Vpc ' . $this->model->vpc_id;
-                Log::warning(get_class($this) . ' : ' . $message);
-                return;
-            }
+            array_unshift($jobs, new PowerOff($this->model));
+            array_push($jobs, new PowerOn($this->model));
         }
 
-        try {
-            $this->model->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/reschedule',
-                [
-                    'json' => [
-                        'hostGroupId' => $this->model->host_group_id,
-                    ],
-                ]
-            );
-        } catch (RequestException $exception) {
-            if ($exception->getCode() !== 404) {
-                $this->fail($exception);
-            }
-            $message = 'Unable to move ' . $this->model->id . ' to host group ' . $this->model->host_group_id;
-            Log::warning(get_class($this) . ' : ' . $message);
-        }
-
-        if ($cyclePower) {
-            try {// Power on
-                $this->model->availabilityZone->kingpinService()
-                    ->post('/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/power');
-            } catch (RequestException $exception) {
-                if ($exception->getCode() !== 404) {
-                    $this->fail($exception);
-                }
-                $message = 'Unable to power on ' . $this->model->id . ' on Vpc' . $this->model->vpc_id . ', skipping.';
-                Log::warning(get_class($this) . ' : ' . $message);
-            }
-        }
+        $this->updateTaskBatch([$jobs])->dispatch();
     }
 }
