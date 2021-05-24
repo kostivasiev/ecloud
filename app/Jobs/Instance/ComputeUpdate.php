@@ -25,9 +25,6 @@ class ComputeUpdate extends Job
         try {
             $instanceResponse = $this->model->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
         } catch (RequestException $exception) {
-            if ($exception->getCode() !== 404) {
-                $this->fail($exception);
-            }
             $message = 'Unable to retrieve instance ' . $this->model->id . ' on Vpc ' . $this->model->vpc_id . ', skipping.';
             Log::warning(get_class($this) . ' : ' . $message);
             return;
