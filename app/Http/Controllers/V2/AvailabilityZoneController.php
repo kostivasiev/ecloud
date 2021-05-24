@@ -9,6 +9,7 @@ use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\HostSpec;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Product;
@@ -19,6 +20,7 @@ use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\DhcpResource;
 use App\Resources\V2\HostSpecResource;
+use App\Resources\V2\ImageResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\ProductResource;
@@ -272,6 +274,18 @@ class AvailabilityZoneController extends BaseController
             ->transform($collection);
 
         return HostSpecResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function images(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    {
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
+            ->images();
+        $queryTransformer->config(Image::class)
+            ->transform($collection);
+
+        return ImageResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -38,7 +38,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         $this->image = Image::findOrFail($this->request->get('image_id'));
-        $this->config = $this->image->metadata->pluck('key', 'value')->flip();
+        $this->config = $this->image->imageMetadata->pluck('key', 'value')->flip();
         $this->platform = strtolower($this->image->platform);
 
         $rules = [
@@ -133,7 +133,7 @@ class CreateRequest extends FormRequest
         $scriptRules = [];
 
         // So, we need to retrieve the validation rules
-        $parameters = $this->image->parameters;
+        $parameters = $this->image->imageParameters;
         foreach ($parameters as $parameterKey => $parameter) {
             $key = 'image_data.' . $parameter->appliance_script_parameters_key;
             $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
