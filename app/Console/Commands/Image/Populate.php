@@ -44,7 +44,7 @@ class Populate extends Command
                 }
 
                 $image->active = ($applianceVersion->appliance_version_active == 'Yes');
-                $image->public = true;
+                $image->public = ($appliance->appliance_is_public == 'Yes');
                 $image->save();
 
                 /**
