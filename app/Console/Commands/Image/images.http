@@ -1,8 +1,0 @@
-GET https://api.ukfast.io/ecloud/v2/images
-Accept: */*
-Cache-Control: no-cache
-Authorization: s2qjbSeqbAfhSmVIivSn7ytBLsBBd0lc
-Content-Type:  application/json
-
-
-###
