@@ -95,7 +95,7 @@ class Populate extends Command
                 });
 
                 $ct = $applianceVersionData->count();
-                // Set OS Name
+                // Add license id to metadata
                 if (!empty($license)) {
                     $imageMetadata = app()->make(ImageMetadata::class);
                     $imageMetadata->fill([
