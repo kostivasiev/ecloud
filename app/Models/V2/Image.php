@@ -101,15 +101,15 @@ class Image extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if (!$user->isAdmin()) {
+        if ($user->isAdmin()) {
             return $query;
         }
 
         $query->where('public', true)->where('active', true);
 
         $query->where(function ($query) use ($user) {
-            $query->orWhere('visibility', Image::VISIBILITY_PUBLIC);
             $query->where('reseller_id', $user->resellerId());
+            $query->orWhere('visibility', Image::VISIBILITY_PUBLIC);
         });
 
         return $query;
