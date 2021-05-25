@@ -74,6 +74,11 @@ client.test('Kingpin: Create Image', function () {
 });
 %}
 
+### Check image exists on Kingpin
+GET https://compute-20.ecloud-service.ukfast.co.uk:8443/api/v2/vpc/{{dev_vpc_id}}/template/{{image_id}}
+Authorization: Basic {{kingpin_auth}}
+Content-Type:  application/json
+
 ### Now that the image exists in Kingpin we can delete it
 DELETE https://{{host}}/{{version}}/images/{{image_id}}
 Accept: */*
