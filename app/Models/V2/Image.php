@@ -108,8 +108,8 @@ class Image extends Model implements Filterable, Sortable
         $query->where('public', true)->where('active', true);
 
         $query->where(function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
             $query->orWhere('visibility', Image::VISIBILITY_PUBLIC);
+            $query->where('reseller_id', $user->resellerId());
         });
 
         return $query;
