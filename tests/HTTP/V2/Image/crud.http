@@ -18,7 +18,8 @@ Content-Type: application/json
     "public": true,
     "availability_zone_ids": [
         "az-aaaaaaaa"
-    ]
+    ],
+    "visibility": "public"
 }
 
 > {%

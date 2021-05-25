@@ -43,8 +43,8 @@ class Populate extends Command
                     $this->error('Failed to set platform for appliance version ' . $applianceVersion->id);
                 }
 
-                $image->active = ($applianceVersion->appliance_version_active == 'Yes');
-                $image->public = true;
+                $image->active = ($appliance->appliance_active == 'Yes');
+                $image->public = ($appliance->appliance_is_public == 'Yes');
                 $image->save();
 
                 /**

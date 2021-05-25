@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateImagesTableAddVisibilityDropPublisher extends Migration
+class UpdateImagesTableAddVisibility extends Migration
 {
     public function up()
     {

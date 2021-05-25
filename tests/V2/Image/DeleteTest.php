@@ -27,7 +27,7 @@ class DeleteTest extends TestCase
 
     public function testNotAdminDeletePublicFails()
     {
-        $this->delete('/v2/images/' . $this->image()->id,)->assertResponseStatus(403);
+        $this->delete('/v2/images/' . $this->image()->id)->assertResponseStatus(403);
     }
 
     public function testAdminDeletePrivateSucceeds()
