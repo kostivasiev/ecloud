@@ -101,7 +101,7 @@ class Image extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if (!$user->isScoped()) {
+        if (!$user->isAdmin()) {
             return $query;
         }
 
