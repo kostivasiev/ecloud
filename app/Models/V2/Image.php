@@ -27,9 +27,13 @@ class Image extends Model implements Filterable, Sortable
 
     public string $keyPrefix = 'img';
 
+    const VISIBILITY_PUBLIC = 'public';
+    const VISIBILITY_PRIVATE = 'private';
+
     protected $casts = [
         'active' => 'boolean',
         'public' => 'boolean',
+        'license_id' => 'integer'
     ];
 
     public function __construct(array $attributes = [])
@@ -37,6 +41,10 @@ class Image extends Model implements Filterable, Sortable
         $this->incrementing = false;
         $this->keyType = 'string';
         $this->connection = 'ecloud';
+
+        $this->attributes = [
+            'visibility' => static::VISIBILITY_PRIVATE
+        ];
 
         $this->fillable([
             'id',
@@ -50,6 +58,7 @@ class Image extends Model implements Filterable, Sortable
             'platform',
             'active',
             'public',
+            'visibility',
             'publisher'
         ]);
         parent::__construct($attributes);
@@ -96,19 +105,29 @@ class Image extends Model implements Filterable, Sortable
             return $query;
         }
 
-        return $query->where(function ($query) use ($user) {
-            $query->where(function ($query) {
-                $query->where('public', true)->where('active', true);
-            })
-            ->orWhere(function ($query) use ($user) {
-                $query->where('reseller_id', $user->resellerId());
-            });
+        $query->where('public', true)->where('active', true);
+
+        $query->where(function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+            $query->orWhere('visibility', Image::VISIBILITY_PUBLIC);
         });
+
+        return $query;
     }
 
     public function isOwner(): bool
     {
         return $this->reseller_id == Auth::user()->resellerId();
+    }
+
+
+    public function getLicenseIDAttribute()
+    {
+        if ($this->imageMetadata()->where('key', 'ukfast.license.id')->exists()) {
+            return (int) $this->imageMetadata()->where('key', 'ukfast.license.id')->first()->value;
+        }
+
+        return null;
     }
 
     /**
@@ -129,6 +148,7 @@ class Image extends Model implements Filterable, Sortable
             $factory->create('platform', Filter::$enumDefaults),
             $factory->create('active', Filter::$enumDefaults),
             $factory->create('public', Filter::$enumDefaults),
+            $factory->create('visibility', Filter::$enumDefaults),
             $factory->create('publisher', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -153,7 +173,8 @@ class Image extends Model implements Filterable, Sortable
             $factory->create('vm_template'),
             $factory->create('platform'),
             $factory->create('active'),
-            $factory->create('publisher'),
+            $factory->create('public'),
+            $factory->create('visibility'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -184,7 +205,8 @@ class Image extends Model implements Filterable, Sortable
             'vm_template' => 'vm_template',
             'platform' => 'platform',
             'active' => 'active',
-            'publisher' => 'publisher',
+            'public' => 'public',
+            'visibility' => 'visibility',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

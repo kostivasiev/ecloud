@@ -37,7 +37,7 @@ class DeleteTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false
+            'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
         Event::fake(\App\Events\V2\Task\Created::class);
@@ -52,7 +52,7 @@ class DeleteTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false
+            'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
         Event::fake(\App\Events\V2\Task\Created::class);
@@ -69,7 +69,7 @@ class DeleteTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 2,
-            'public' => false
+            'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
         $this->delete('/v2/images/img-private-test')->assertResponseStatus(404);
