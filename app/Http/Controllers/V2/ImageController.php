@@ -49,6 +49,7 @@ class ImageController extends BaseController
             'platform',
             'active',
             'public',
+            'visibility',
         ]));
 
         $task = $model->syncSave();
@@ -72,7 +73,8 @@ class ImageController extends BaseController
             'vm_template',
             'platform',
             'active',
-            'public'
+            'public',
+            'visibility',
         ];
 
         // Private images

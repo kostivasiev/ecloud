@@ -50,8 +50,8 @@ class SyncableTest extends TestCase
 
         $attribute = $this->model->sync;
 
-        $this->assertEquals('unknown', $attribute->status);
-        $this->assertEquals('unknown', $attribute->type);
+        $this->assertEquals('complete', $attribute->status);
+        $this->assertEquals('n/a', $attribute->type);
     }
 
     public function testSyncSave()

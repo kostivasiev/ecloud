@@ -22,14 +22,13 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => 'img-test',
                 'name' => 'Test Image',
-                'reseller_id' => null,
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
                 'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
                 'description' => 'CentOS (Community enterprise Operating System)',
                 'platform' => 'Linux',
-                'public' => true,
             ])
             ->dontSeeJson([
+                'reseller_id' => null,
                 'script_template' => '',
                 'vm_template' => 'CentOS7 x86_64',
                 'active' => true,
@@ -82,7 +81,7 @@ class GetTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false,
+            'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
         $this->get('/v2/images')
@@ -115,17 +114,17 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => 'img-test',
                 'name' => 'Test Image',
-                'reseller_id' => null,
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
                 'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
                 'description' => 'CentOS (Community enterprise Operating System)',
                 'platform' => 'Linux',
-                'public' => true,
+                'visibility' => Image::VISIBILITY_PUBLIC,
             ])
             ->dontSeeJson([
                 'script_template' => '',
                 'vm_template' => 'CentOS7 x86_64',
                 'active' => true,
+                'public' => true,
             ])
             ->assertResponseStatus(200);
     }
@@ -171,7 +170,7 @@ class GetTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false,
+            'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
         $this->get('/v2/images/img-private-test')

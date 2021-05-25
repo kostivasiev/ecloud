@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\Image;
 
+use App\Models\V2\Image;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -57,6 +58,12 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'boolean'
+            ],
+            'visibility' => [
+                'sometimes',
+                'required',
+                'string',
+                'in:' . Image::VISIBILITY_PUBLIC . ','. Image::VISIBILITY_PRIVATE
             ],
         ];
     }

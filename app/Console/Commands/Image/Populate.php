@@ -33,18 +33,18 @@ class Populate extends Command
                 $image->description = $appliance->appliance_description;
                 $image->script_template = $applianceVersion->appliance_version_script_template;
                 $image->vm_template = $applianceVersion->appliance_version_vm_template;
+                $image->visibility = Image::VISIBILITY_PUBLIC;
 
                 $devicesAdminClient = app()->make(AdminClient::class);
                 try {
-                    $image->platform = $devicesAdminClient->licenses()->getById($applianceVersion->appliance_version_server_license_id)->category;
+                    $license = $devicesAdminClient->licenses()->getById($applianceVersion->appliance_version_server_license_id);
+                    $image->platform = $license->category;
                 } catch (\Exception $exception) {
                     $this->error('Failed to set platform for appliance version ' . $applianceVersion->id);
                 }
 
                 $image->active = ($applianceVersion->appliance_version_active == 'Yes');
                 $image->public = true;
-                $image->publisher = $appliance->appliance_publisher;
-
                 $image->save();
 
                 /**
@@ -93,15 +93,32 @@ class Populate extends Command
                     ]);
                     $imageMetadata->save();
                 });
-                $this->info('Added ' . $applianceVersionData->count() . ' image metadata records');
+
+                $ct = $applianceVersionData->count();
+                // Set OS Name
+                if (!empty($license)) {
+                    $imageMetadata = app()->make(ImageMetadata::class);
+                    $imageMetadata->fill([
+                        'image_id' => $image->id,
+                        'key' => 'ukfast.license.id',
+                        'value' => $license->id
+                    ]);
+                    $imageMetadata->save();
+                    $ct++;
+                }
+
+                $this->info('Added ' . $ct . ' image metadata records');
 
                 $this->info("Updated Image $image->id \"$image->name\"");
 
-                // Update availability zones
-                // WARNING: ADDS THE IMAGES TO ALL AVAILABILITY ZONES
+                // Add image to all availability zones
                 $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id'));
 
                 $this->info("Image $image->id \"$image->name\" was added to all availability zones");
+            } else {
+                $this->warn("Image $image->id \"$image->name\" MARKED PRIVATE");
+                $image->visibility = Image::VISIBILITY_PRIVATE;
+                $image->save();
             }
         });
 

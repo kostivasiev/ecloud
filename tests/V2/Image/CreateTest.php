@@ -48,6 +48,7 @@ class CreateTest extends TestCase
             'platform' => 'Linux',
             'active' => true,
             'public' => true,
+            'visibility' => Image::VISIBILITY_PUBLIC,
             'availability_zone_ids' => [
                 $this->availabilityZone()->id
             ]
