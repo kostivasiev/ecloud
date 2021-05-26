@@ -20,10 +20,10 @@ class Delete extends Job
 
     public function handle()
     {
-        // TODO
-
-        $this->task->resource->delete();
-        $this->task->completed = true;
-        $this->task->save();
+        $this->deleteTaskBatch([
+            [
+                new \App\Jobs\Tasks\Image\UpdateBilling($this->task->resource),
+            ],
+        ])->dispatch();
     }
 }
