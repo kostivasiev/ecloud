@@ -24,13 +24,14 @@ class MoveToHostGroup extends Job
 
     public function handle()
     {
-        $response = $this->model->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
-        );
-
-        $json = json_decode($response->getBody()->getContents());
-        if (!$json) {
-            throw new \Exception('Failed to retrieve instance ' . $this->model->id . ' from Kingpin, invalid JSON');
+        try {
+            $response = $this->model->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
+            );
+        } catch (RequestException $exception) {
+            $message = 'Failed to retrieve instance ' . $this->model->id . ' from Kingpin';
+            Log::warning(get_class($this) . ' : ' . $message);
+            throw new \Exception($message);
         }
 
         $this->model->availabilityZone->kingpinService()

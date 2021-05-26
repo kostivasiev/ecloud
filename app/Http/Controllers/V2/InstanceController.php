@@ -6,8 +6,8 @@ use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\HostGroupRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
-use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
+use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
@@ -151,7 +151,7 @@ class InstanceController extends BaseController
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
         $instance->save();
-        return $this->responseIdMeta($request, $instance->id, 202, $task->id);
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -495,14 +495,21 @@ class InstanceController extends BaseController
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
         $hostGroup = HostGroup::forUser(Auth::user())->findOrFail($request->get('host_group_id'));
 
-        $task = $instance->createTaskWithLock(
-            'instance_hostgroup',
-            \App\Jobs\Tasks\Instance\HostGroupUpdate::class,
-            ['host_group_id' => $hostGroup->id]
-        );
-        $instance->host_group_id = $hostGroup->id;
-        $instance->saveQuietly();
-
+        try {
+            $task = $instance->createTaskWithLock(
+                'instance_hostgroup',
+                \App\Jobs\Tasks\Instance\HostGroupUpdate::class,
+                ['host_group_id' => $hostGroup->id]
+            );
+            $instance->host_group_id = $hostGroup->id;
+            $instance->saveQuietly();
+        } catch (\Exception $e) {
+            return response()->json([
+                'title' => 'Request Error',
+                'detail' => 'Failed to make hostgroup modifications to instance ' . $instanceId,
+                'status' => 428,
+            ], 428);
+        }
         return $this->responseTaskId($task->id);
     }
 }
