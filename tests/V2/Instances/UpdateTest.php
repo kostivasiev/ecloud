@@ -19,37 +19,6 @@ class UpdateTest extends TestCase
         app()->instance(Task::class, $task);
     }
 
-    public function testFailedHostGroupCausesFail()
-    {
-        // Force failure
-        Model::withoutEvents(function () {
-            $model = new Task([
-                'id' => 'sync-test',
-                'failure_reason' => 'Unit Test Failure',
-                'completed' => true,
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $model->resource()->associate($this->hostGroup());
-            $model->save();
-        });
-
-        $this->patch(
-            '/v2/instances/' . $this->instance()->id,
-            [
-                'host_group_id' => $this->hostGroup()->id,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->seeJson(
-            [
-                'title' => 'Validation Error',
-                'detail' => 'The specified host group id resource is currently in a failed state and cannot be used',
-            ]
-        )->assertResponseStatus(422);
-    }
-
     public function testValidDataIsSuccessful()
     {
         Event::fake();
