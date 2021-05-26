@@ -32,6 +32,7 @@ class UpdateTest extends TestCase
                 'platform' => 'Windows',
                 'active' => false,
                 'public' => false,
+                'visibility' => Image::VISIBILITY_PRIVATE,
             ]
         )->seeInDatabase(
             'images',
@@ -45,6 +46,7 @@ class UpdateTest extends TestCase
                 'platform' => 'Windows',
                 'active' => false,
                 'public' => false,
+                'visibility' => Image::VISIBILITY_PRIVATE,
             ],
             'ecloud'
         )->assertResponseStatus(202);
@@ -62,7 +64,7 @@ class UpdateTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false
+            'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
@@ -81,6 +83,7 @@ class UpdateTest extends TestCase
                 'platform' => 'Windows',
                 'active' => false,
                 'public' => false,
+                'visibility' => Image::VISIBILITY_PUBLIC,
             ]
         )->seeInDatabase(
             'images',
@@ -94,6 +97,7 @@ class UpdateTest extends TestCase
                 'platform' => 'Windows',
                 'active' => false,
                 'public' => false,
+                'visibility' => Image::VISIBILITY_PUBLIC,
             ],
             'ecloud'
         )->assertResponseStatus(202);
@@ -108,7 +112,7 @@ class UpdateTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false
+            'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
         $this->patch(
@@ -140,7 +144,7 @@ class UpdateTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false
+            'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
         $this->patch(
@@ -156,6 +160,7 @@ class UpdateTest extends TestCase
                 'vm_template' => 'NEW VM TEMPLATE',
                 'active' => false,
                 'public' => false,
+                'visibility' => Image::VISIBILITY_PUBLIC
             ]
         )->notSeeInDatabase(
             'images',
@@ -165,6 +170,7 @@ class UpdateTest extends TestCase
                 'vm_template' => 'NEW VM TEMPLATE',
                 'active' => false,
                 'public' => false,
+                'visibility' => Image::VISIBILITY_PUBLIC
             ],
             'ecloud'
         )->assertResponseStatus(202);
@@ -180,7 +186,7 @@ class UpdateTest extends TestCase
         factory(Image::class)->create([
             'id' => 'img-private-test',
             'reseller_id' => 1,
-            'public' => false
+            'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
         $this->patch('/v2/images/img-private-test', [])->assertResponseStatus(404);

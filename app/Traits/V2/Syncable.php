@@ -25,8 +25,8 @@ trait Syncable
 
     public function getSyncAttribute()
     {
-        $status = 'unknown';
-        $type = 'unknown';
+        $status = Sync::STATUS_COMPLETE;
+        $type = 'n/a';
 
         if ($this->tasks()->count()) {
             $latest = $this->tasks()
