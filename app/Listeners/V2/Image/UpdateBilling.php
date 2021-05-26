@@ -45,7 +45,11 @@ class UpdateBilling
 
             $availabilityZone = $model->availabilityZones()->first();
             $vpc = $model->instances()->first()->vpc;
-            $volumeCapacity = $model->instances()->first()->volume_capacity;
+
+            $metaData = $model->imageMetadata()
+                ->where('key', '=', 'ukfast.spec.volume.min')
+                ->first();
+            $volumeCapacity = (int)$metaData->value;
 
             $currentActiveMetric = BillingMetric::where('resource_id', $model->id)
                 ->where('key', '=', 'private.image')

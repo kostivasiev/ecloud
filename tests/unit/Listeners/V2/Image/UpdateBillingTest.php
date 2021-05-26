@@ -5,6 +5,7 @@ use App\Events\V2\Task\Updated;
 use App\Listeners\V2\Image\UpdateBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
@@ -60,6 +61,16 @@ class UpdateBillingTest extends TestCase
         $this->instance()->image_id = $this->image->id;
         $this->instance()->saveQuietly();
         $this->image->saveQuietly();
+
+        $imageMetadata = factory(ImageMetadata::class)->make([
+            'id' => 'imgmeta-tgtest',
+            'key' => 'ukfast.spec.volume.min',
+            'value' => 30,
+        ]);
+        $this->image->imageMetadata()->save($imageMetadata);
+        $this->image->refresh();
+
+//        dd($this->image()->imageMetadata->toArray());
 
         // Setup the task
         $this->task = Model::withoutEvents(function () {
