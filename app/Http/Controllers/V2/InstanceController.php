@@ -20,7 +20,7 @@ use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\InstanceResource;
-use App\Resources\V2\BuilderConfigurationResource;
+use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Support\Sync;
@@ -235,7 +235,7 @@ class InstanceController extends BaseController
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 
-        return BuilderConfigurationResource::collection($collection->paginate(
+        return NicResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
