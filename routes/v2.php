@@ -417,4 +417,14 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('tasks', 'TaskController@index');
         $router->get('tasks/{taskId}', 'TaskController@show');
     });
+
+    /** Builder Configurations */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('builder-configurations', 'BuilderConfigurationController@index');
+        $router->get('builder-configurations/{configurationId}', 'BuilderConfigurationController@show');
+        $router->get('builder-configurations/{configurationId}/data', 'BuilderConfigurationController@data');
+        $router->post('builder-configurations', 'BuilderConfigurationController@store');
+        $router->patch('builder-configurations/{configurationId}', 'BuilderConfigurationController@update');
+        $router->delete('builder-configurations/{configurationId}', 'BuilderConfigurationController@destroy');
+    });
 });

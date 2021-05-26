@@ -6,7 +6,7 @@ use App\Http\Requests\V2\CreateNicRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
-use App\Resources\V2\NicResource;
+use App\Resources\V2\BuilderConfigurationResource;
 use App\Resources\V2\TaskResource;
 use App\Rules\V2\IpAvailable;
 use Illuminate\Http\Request;
@@ -21,14 +21,14 @@ class NicController extends BaseController
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 
-        return NicResource::collection($collection->paginate(
+        return BuilderConfigurationResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     public function show(Request $request, string $nicId)
     {
-        return new NicResource(
+        return new BuilderConfigurationResource(
             Nic::forUser($request->user())->findOrFail($nicId)
         );
     }

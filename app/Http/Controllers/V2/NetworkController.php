@@ -8,7 +8,7 @@ use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Resources\V2\NetworkResource;
-use App\Resources\V2\NicResource;
+use App\Resources\V2\BuilderConfigurationResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -191,7 +191,7 @@ class NetworkController extends BaseController
         $queryTransformer->config(Nic::class)
             ->transform($collection);
 
-        return NicResource::collection($collection->paginate(
+        return BuilderConfigurationResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
