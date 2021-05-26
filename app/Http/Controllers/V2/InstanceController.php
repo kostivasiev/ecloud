@@ -15,6 +15,7 @@ use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
 use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
@@ -492,6 +493,14 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
+        if (!$instance->volumes()->count()) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Cannot create an image of an Instance with no attached volumes',
+                'status' => 422,
+            ], 422);
+        }
+
         $image = new Image(array_merge(
             collect($instance->image->getAttributes())
                 ->only([
@@ -506,10 +515,36 @@ class InstanceController extends BaseController
                 ])->toArray(),
             [
                 'name' => $request->get('name'),
-                'public' => 0,
+                'visibility' => 'private',
             ]
         ));
         $image->save();
+
+        $volumeCapacity = $instance->volumes->where('os_volume', '=', true)->first()->capacity;
+        $instance->image->imageMetadata->each(function ($metadata) use ($image, $volumeCapacity) {
+            if ($metadata->key == 'ukfast.spec.volume.min') {
+                $metadata->value = $volumeCapacity;
+            }
+            (new ImageMetadata(array_merge(
+                collect($metadata->getAttributes())
+                ->only([
+                    'key' => $metadata->key,
+                    'value' => $metadata->value,
+                ])->toArray(),
+                [
+                    'image_id' => $image->id,
+                ]
+            )))->save();
+        });
+        $image->refresh();
+        if ($image->imageMetadata->where('key', '=', 'ukfast.spec.volume.min')->count() <= 0) {
+            (new ImageMetadata([
+                    'image_id' => $image->id,
+                    'key' => 'ukfast.spec.volume.min',
+                    'value' => $volumeCapacity,
+                ]))->save();
+        }
+        $image->refresh();
 
         $task = $instance->createTaskWithLock(
             'image_create',

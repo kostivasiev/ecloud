@@ -1,5 +1,5 @@
-### Get last instance created
-GET https://{{host}}/{{version}}/instances?per_page=1&sort=created_at:desc
+### Get an instance with no volumes
+GET https://{{host}}/{{version}}/instances/i-3b673f47
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -19,7 +19,33 @@ Content-Type:  application/json
 }
 
 > {%
-client.test('Image Created', function () {
+client.test('API: Image did not create', function () {
+    client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+### Get an Instance that has volumes
+GET https://{{host}}/{{version}}/instances/i-c9e30b96
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('instance_id', response.body.data.id);
+%}
+
+### Create an Image for it
+POST https://{{host}}/{{version}}/instances/{{instance_id}}/create-image
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Test Image"
+}
+
+> {%
+client.test('API: Image Created', function () {
     client.assert(response.status === 202, '202 response not received');
 });
 client.global.set('image_id', response.body.data.id);
@@ -31,7 +57,19 @@ Authorization: Basic a2luZ3BpbmFwaTp0S20/Yzc/T3Yhb2Y=
 Content-Type:  application/json
 
 > {%
-client.test('Image Verified', function () {
+client.test('Kingpin: Image Verified', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Verify the image can be retrieved
+GET https://{{host}}/{{version}}/images/{{image_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('API: Image Verified', function () {
     client.assert(response.status === 200, '200 response not received');
 });
 %}
@@ -42,7 +80,7 @@ Authorization: Basic a2luZ3BpbmFwaTp0S20/Yzc/T3Yhb2Y=
 Content-Type:  application/json
 
 > {%
-client.test('Image Deleted', function () {
+client.test('Kingpin: Image Deleted', function () {
     client.assert(response.status === 200, '200 response not received');
 });
 %}
@@ -54,7 +92,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 > {%
-client.test('Image Deleted', function () {
+client.test('API: Image Deleted', function () {
     client.assert(response.status === 202, '202 response not received');
 });
 %}

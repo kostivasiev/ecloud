@@ -2,17 +2,49 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Task;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientException;
+use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 
 class CreateImageTest extends TestCase
 {
+    protected Volume $volume;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->volume = factory(Volume::class)->create([
+            'id' => 'vol-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'os_volume' => true,
+        ]);
+    }
+
+    public function testCreateImageNoVolumes()
+    {
+        $this->post(
+            '/v2/instances/' . $this->instance()->id . '/create-image',
+            [
+                'name' => 'createImageTest',
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'Cannot create an image of an Instance with no attached volumes',
+            ]
+        )->assertResponseStatus(422);
+    }
+
     public function testCreateImageTest()
     {
-        $this->image()->name = 'createImageTest';
+        $this->instance()->volumes()->attach($this->volume);
+        $this->instance()->saveQuietly();
+
         $this->kingpinServiceMock()
             ->expects('post')
             ->withSomeOfArgs('/api/v2/vpc/' . $this->vpc()->id . '/template')
@@ -23,7 +55,7 @@ class CreateImageTest extends TestCase
         $this->post(
             '/v2/instances/' . $this->instance()->id . '/create-image',
             [
-                'name' => $this->image()->name,
+                'name' => 'createImageTest',
             ],
             [
                 'X-consumer-custom-id' => '0-0',
