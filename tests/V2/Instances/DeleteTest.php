@@ -2,10 +2,7 @@
 
 namespace Tests\V2\Instances;
 
-use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
