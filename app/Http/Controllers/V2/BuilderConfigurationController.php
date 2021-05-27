@@ -9,7 +9,6 @@ use App\Resources\V2\BuilderConfigurationResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
-use UKFast\Responses\UKFastResource;
 
 /**
  * Class BuilderConfigurationController
