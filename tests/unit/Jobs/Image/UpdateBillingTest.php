@@ -1,8 +1,8 @@
 <?php
-namespace Tests\unit\Listeners\V2\Image;
+namespace Tests\unit\Jobs\Image;
 
 use App\Events\V2\Task\Updated;
-use App\Listeners\V2\Image\UpdateBilling;
+use App\Jobs\Tasks\Image\UpdateBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
@@ -27,7 +27,6 @@ class UpdateBillingTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->listener = \Mockery::mock(UpdateBilling::class)->makePartial();
 
         // Setup the product
         $this->product = factory(Product::class)->create([
@@ -70,7 +69,7 @@ class UpdateBillingTest extends TestCase
         $this->image->imageMetadata()->save($imageMetadata);
         $this->image->refresh();
 
-//        dd($this->image()->imageMetadata->toArray());
+        $this->listener = \Mockery::mock(UpdateBilling::class, [$this->image, $this->instance()])->makePartial();
 
         // Setup the task
         $this->task = Model::withoutEvents(function () {
@@ -114,18 +113,5 @@ class UpdateBillingTest extends TestCase
 
         $billingMetric->refresh();
         $this->assertNotNull($billingMetric->end);
-    }
-
-    public function testBillingWhenThereAreNoInstances()
-    {
-        $image = factory(Image::class)->create();
-        $this->instance()->image_id = $image->id;
-        $this->instance()->saveQuietly();
-
-        $event = new Updated($this->task);
-        $this->listener->handle($event);
-
-        $billingMetric = BillingMetric::where('resource_id', '=', $this->task->resource->id)->first();
-        $this->assertTrue(empty($billingMetric));
     }
 }
