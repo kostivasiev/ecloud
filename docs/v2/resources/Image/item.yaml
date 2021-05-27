@@ -15,4 +15,11 @@ get:
                 type: object
   tags:
     - Images
-
+delete:
+  parameters:
+    - $ref: '../../resources/Image/parameters/id.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Images

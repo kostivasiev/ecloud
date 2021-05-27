@@ -34,4 +34,4 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/availability-zones/{AvailabilityZoneId}/capacities?page=2'
   tags:
-    - AvailabilityZones
+    - Availability Zones

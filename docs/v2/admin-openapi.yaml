@@ -133,6 +133,8 @@ paths:
     $ref: 'resources/AvailabilityZone/dhcp-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/credentials':
     $ref: 'resources/AvailabilityZone/credential-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/images':
+    $ref: 'resources/AvailabilityZone/image-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/instances':
     $ref: 'resources/AvailabilityZone/instance-collection.yaml'
 #  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/lbcs':
@@ -197,6 +199,14 @@ paths:
     $ref: 'resources/Image/parameters-collection.yaml'
   '/ecloud/v2/image/{id}/metadata':
     $ref: 'resources/Image/metadata-collection.yaml'
+  '/ecloud/v2/image-parameters':
+    $ref: 'resources/ImageParameter/admin-collection.yaml'
+  '/ecloud/v2/image-parameters/{imageParameterId}':
+    $ref: 'resources/ImageParameter/admin-item.yaml'
+  '/ecloud/v2/image-metadata':
+    $ref: 'resources/ImageMetadata/admin-collection.yaml'
+  '/ecloud/v2/image-metadata/{imageMetadataId}':
+    $ref: 'resources/ImageMetadata/admin-item.yaml'
   '/ecloud/v2/host-specs':
     $ref: 'resources/HostSpec/admin-collection.yaml'
   '/ecloud/v2/host-specs/{hostSpecId}':

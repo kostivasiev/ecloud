@@ -1,4 +1,12 @@
 properties:
+  id:
+    type: string
+    example: imgparam-abc123xyz
+    readOnly: true
+  image_id:
+    type: string
+    example: img-2b66bb79
+    readOnly: true
   key:
     type: string
     example: 'ukfast.spec.ram.min'
