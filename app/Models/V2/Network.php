@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Network extends Model implements Filterable, Sortable
+class Network extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -51,6 +51,11 @@ class Network extends Model implements Filterable, Sortable
         'deleted' => Deleted::class,
         'deleting' => Deleting::class,
     ];
+
+    public function getResellerId(): int
+    {
+        return $this->router->getResellerId();
+    }
 
     public function router()
     {

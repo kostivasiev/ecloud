@@ -21,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class Image
  * @package App\Models\V2
  */
-class Image extends Model implements Filterable, Sortable
+class Image extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DeletionRules, DefaultName, Syncable, Taskable;
 
@@ -62,6 +62,11 @@ class Image extends Model implements Filterable, Sortable
             'publisher'
         ]);
         parent::__construct($attributes);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->vpc !== null ? $this->vpc->getResellerId() : 0;
     }
 
     public function vpc()

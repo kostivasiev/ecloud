@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class Volume extends Model implements Filterable, Sortable
+class Volume extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
 
@@ -58,6 +58,11 @@ class Volume extends Model implements Filterable, Sortable
     protected $attributes = [
         'os_volume' => false,
     ];
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
+    }
 
     public function vpc()
     {

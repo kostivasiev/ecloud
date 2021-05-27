@@ -29,6 +29,7 @@ class Task extends Model implements Filterable, Sortable
 
     protected $fillable = [
         'id',
+        'reseller_id',
         'completed',
         'failure_reason',
         'name',

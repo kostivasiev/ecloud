@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Models\V2\Task;
 use App\Resources\V2\TaskResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -25,10 +26,16 @@ class TaskController extends BaseController
         ));
     }
 
-    public function show(string $taskId)
+    public function show(Request $request, string $taskId)
     {
+        $task = Task::findOrFail($taskId);
+        $taskResource = $task->resource()->withTrashed()->forUser($request->user())->first();
+        if (!$taskResource) {
+            throw (new ModelNotFoundException)->setModel(Task::class, $taskId);
+        }
+
         return new TaskResource(
-            Task::findOrFail($taskId)
+            $taskResource
         );
     }
 }

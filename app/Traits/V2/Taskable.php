@@ -3,9 +3,11 @@
 namespace App\Traits\V2;
 
 use App\Exceptions\V2\TaskException;
+use App\Models\V2\ResellerScopeable;
 use App\Models\V2\Task;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use UKFast\Api\Auth\Consumer;
 
 trait Taskable
 {
@@ -57,6 +59,9 @@ trait Taskable
         $task->name = $name;
         $task->job = $job;
         $task->data = $data;
+        if ($this instanceof ResellerScopeable) {
+            $task->reseller_id = $this->getResellerId();
+        }
         $task->save();
 
         Log::debug(get_class($this) . ' : Creating new task - Finished', [

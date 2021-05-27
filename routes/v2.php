@@ -413,8 +413,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Task */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('tasks', 'TaskController@index');
+    $router->group([], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->get('tasks', 'TaskController@index');
+        });
         $router->get('tasks/{taskId}', 'TaskController@show');
     });
 });

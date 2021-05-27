@@ -32,7 +32,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $routerUuid)
  * @method static forUser(string $user)
  */
-class Router extends Model implements Filterable, Sortable
+class Router extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules, Syncable, Taskable;
 
@@ -66,6 +66,11 @@ class Router extends Model implements Filterable, Sortable
         'vpns',
         'networks'
     ];
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
+    }
 
     public function availabilityZone()
     {
