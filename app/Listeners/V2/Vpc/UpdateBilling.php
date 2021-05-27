@@ -3,6 +3,7 @@ namespace App\Listeners\V2\Vpc;
 
 use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
+use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -14,29 +15,36 @@ class UpdateBilling
     public function handle(Updated $event)
     {
         Log::info(get_class($this) . ' : Started', ['model' => $event->model]);
-
         if (!($event->model instanceof Task)) {
             return;
         }
-
         if (!$event->model->completed) {
             return;
         }
 
-        if ($event->model->name != Sync::TASK_NAME_UPDATE) {
+        if (!in_array(get_class($event->model->resource), [Vpc::class, Instance::class])) {
             return;
         }
 
-        $vpc = $event->model->resource;
+        $vpc = ($event->model->resource instanceof Vpc) ? $event->model->resource : $event->model->resource->vpc;
 
-        if (get_class($vpc) != Vpc::class) {
-            return;
+        $time = Carbon::now();
+
+        $value = $vpc->instances->sum('ram_capacity');
+
+        if ($event->model->name == Sync::TASK_NAME_DELETE && $event->model->resource instanceof Instance) {
+            // The resource isnt actually marked as deleted until the delete batch completes
+            $value -= $event->model->resource->ram_capacity;
         }
 
         $currentActiveMetric = BillingMetric::getActiveByKey($vpc, 'networking.advanced');
 
         if (!empty($currentActiveMetric)) {
-            return;
+            if ($currentActiveMetric->value == $value) {
+                return;
+            }
+
+            $currentActiveMetric->setEndDate($time);
         }
 
         $billingMetric = app()->make(BillingMetric::class);
@@ -44,7 +52,7 @@ class UpdateBilling
         $billingMetric->vpc_id = $vpc->id;
         $billingMetric->reseller_id = $vpc->reseller_id;
         $billingMetric->key = 'networking.advanced';
-        $billingMetric->value = 1;
+        $billingMetric->value = $value;
         $billingMetric->start = Carbon::now();
 
         $availabilityZone = $vpc->region->availabilityZones()->first();

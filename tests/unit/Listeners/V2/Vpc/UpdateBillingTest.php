@@ -58,7 +58,6 @@ class UpdateBillingTest extends TestCase
         $metric = BillingMetric::getActiveByKey($this->vpc, 'networking.advanced');
         $this->assertNotNull($metric);
         $this->assertEquals('networking.advanced', $metric->key);
-        $this->assertEquals(1, $metric->value);
+        $this->assertEquals(0, $metric->value);
     }
-
 }

@@ -15,6 +15,75 @@ client.global.set('vpc_id', response.body.data.id);
 client.log('VPC Id : ' + response.body.data.id);
 %}
 
+###
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{vpc_id}}",
+    "name": "Test",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600,
+    "host_group_id": "{{dev_host_group_id}}"
+}
+
+> {%
+client.global.set("instance_id", response.body.data.id);
+%}
+
+###
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{vpc_id}}",
+    "name": "Test",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600,
+    "host_group_id": "{{dev_host_group_id}}"
+}
+
+> {%
+client.global.set("instance2_id", response.body.data.id);
+%}
+
+###
+PATCH https://{{host}}/{{version}}/instances/{{instance2_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "ram_capacity": 2048
+}
+
+###
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+DELETE https://{{host}}/{{version}}/instances/{{instance2_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+###
+
 ### Delete VPC
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
