@@ -17,14 +17,14 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        Event::fake();
+        Event::fake(\App\Events\V2\Task\Created::class);
 
         $this->delete('/v2/instances/' . $this->instance()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(202);
-        $this->instance()->refresh();
-        $this->assertNotNull($this->instance()->deleted_at);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testAdminInstanceLocking()
