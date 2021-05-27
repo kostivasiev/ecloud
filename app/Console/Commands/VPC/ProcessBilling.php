@@ -80,68 +80,68 @@ class ProcessBilling extends Command
             ->where('deleted_at', '>=', $this->startDate)
             ->orWhereNull('deleted_at')
             ->each(function ($vpc) {
-            $metrics = $this->getVpcMetrics($vpc->id);
+                $metrics = $this->getVpcMetrics($vpc->id);
 
-            if ($metrics->count() == 0) {
-                return true;
-            }
-
-            $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
-                if (!in_array($key, $this->billableMetrics)) {
-                    Log::info('Metric `'.$key.'` not found in billableMetrics');
+                if ($metrics->count() == 0) {
                     return true;
                 }
 
-                $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
-
-                $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
-                    $start = $this->startDate;
-                    $end = $this->endDate;
-
-                    if ($metric->start > $this->startDate) {
-                        $start = Carbon::parse($metric->start, $this->timeZone);
+                $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
+                    if (!in_array($key, $this->billableMetrics)) {
+                        Log::info('Metric `' . $key . '` not found in billableMetrics');
+                        return true;
                     }
 
-                    if (!empty($metric->end) && $metric->end < $this->endDate) {
-                        $end = Carbon::parse($metric->end, $this->timeZone);
-                    }
+                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
 
-                    $hours = $start->diffInHours($end);
+                    $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
+                        $start = $this->startDate;
+                        $end = $this->endDate;
 
-                    // Minimum period is 1 hour
-                    $hours = ($hours < 1) ? 1 : $hours;
+                        if ($metric->start > $this->startDate) {
+                            $start = Carbon::parse($metric->start, $this->timeZone);
+                        }
 
-                    $cost = ($hours * $metric->price) * $metric->value;
+                        if (!empty($metric->end) && $metric->end < $this->endDate) {
+                            $end = Carbon::parse($metric->end, $this->timeZone);
+                        }
 
-                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
+                        $hours = $start->diffInHours($end);
+
+                        // Minimum period is 1 hour
+                        $hours = ($hours < 1) ? 1 : $hours;
+
+                        $cost = ($hours * $metric->price) * $metric->value;
+
+                        $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
+                    });
                 });
-            });
 
-            // VPC Support
-            $this->billing[$vpc->reseller_id][$vpc->id]['support'] = [
-                'enabled' => false,
-                'pro-rata' => false
-            ];
+                // VPC Support
+                $this->billing[$vpc->reseller_id][$vpc->id]['support'] = [
+                    'enabled' => false,
+                    'pro-rata' => false
+                ];
 
-            $vpcSupport = $this->getVpcSupport($vpc->id);
+                $vpcSupport = $this->getVpcSupport($vpc->id);
 
-            if (!empty($vpcSupport)) {
-                $this->billing[$vpc->reseller_id][$vpc->id]['support']['enabled'] = true;
+                if (!empty($vpcSupport)) {
+                    $this->billing[$vpc->reseller_id][$vpc->id]['support']['enabled'] = true;
 
-                // Incomplete month
-                if ($vpcSupport->start_date > $this->startDate) {
-                    $this->billing[$vpc->reseller_id][$vpc->id]['support']['pro-rata'] = true;
+                    // Incomplete month
+                    if ($vpcSupport->start_date > $this->startDate) {
+                        $this->billing[$vpc->reseller_id][$vpc->id]['support']['pro-rata'] = true;
+                    }
                 }
-            }
 
-            if (!array_key_exists('metrics', $this->billing[$vpc->reseller_id][$vpc->id])) {
-                return true;
-            }
+                if (!array_key_exists('metrics', $this->billing[$vpc->reseller_id][$vpc->id])) {
+                    return true;
+                }
 
-            $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
+                $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
 
-            $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
-        });
+                $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
+            });
 
         // Calculate the total for all VPC's for each reseller
         foreach ($this->billing as $resellerId => $vpcs) {
@@ -237,10 +237,14 @@ class ProcessBilling extends Command
                         $this->info(
                             'Term start: 2020-12-20 13:12:10'
                             . PHP_EOL . round($percentHoursRemaining) . '% of Billing period remaining'
-                            . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
-                            . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
-                            . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
-                            . PHP_EOL . 'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount, 2)
+                            . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount,
+                                2)
+                            . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount,
+                                2)
+                            . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount,
+                                2)
+                            . PHP_EOL . 'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount,
+                                2)
                             . PHP_EOL . 'Original Discount Rate: ' . $discountPlan->discount_rate
                             . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
                         );
