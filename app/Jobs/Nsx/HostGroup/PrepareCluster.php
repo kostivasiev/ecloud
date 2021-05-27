@@ -102,17 +102,4 @@ class PrepareCluster extends Job
                 ->getContents()
         );
     }
-
-    public function failed($exception)
-    {
-        $message = $exception->getMessage();
-        if ($exception instanceof RequestException && $exception->hasResponse()) {
-            $json = json_decode($exception->getResponse()->getBody()->getContents());
-            Log::error('Request Exception', [
-                'response_json' => $json,
-                'exception' => $exception,
-            ]);
-        }
-        $this->model->setSyncFailureReason($message);
-    }
 }
