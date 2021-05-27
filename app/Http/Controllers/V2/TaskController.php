@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V2;
 
 use App\Models\V2\Task;
 use App\Resources\V2\TaskResource;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
