@@ -76,10 +76,7 @@ class ProcessBilling extends Command
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
         // Collect and sort VPC metrics by reseller
-        Vpc::withTrashed()
-            ->where('deleted_at', '>=', $this->startDate)
-            ->orWhereNull('deleted_at')
-            ->each(function ($vpc) {
+        Vpc::get()->each(function ($vpc) {
             $metrics = $this->getVpcMetrics($vpc->id);
 
             if ($metrics->count() == 0) {
@@ -297,7 +294,7 @@ class ProcessBilling extends Command
                 }
             } catch (\Exception $exception) {
                 $error = 'Failed to load customer details for for reseller ' . $resellerId;
-                $this->error($error . ' - ' . $exception->getMessage());
+                $this->error($error . $exception->getMessage());
                 Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
             }
 
