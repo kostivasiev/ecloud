@@ -73,11 +73,10 @@ class GetTest extends TestCase
         $this->get('/v2/tasks/' . $this->task2->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
-            'title' => 'Unauthorized',
-            'detail' => 'Unauthorized',
-            'status' => 401,
-        ])->assertResponseStatus(401);
+        ])->dontSeeJson([
+            'id' => $this->task2->id,
+            'name' => $this->task2->name,
+        ])->assertResponseStatus(404);
     }
 
     public function testGetOwnedTaskSucceeds()
