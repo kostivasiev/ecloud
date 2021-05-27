@@ -3,6 +3,7 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Instance;
+use App\Models\V2\Task;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -28,11 +29,11 @@ class DeleteTest extends TestCase
 
     public function testAdminInstanceLocking()
     {
-        Event::fake();
-
+        Event::fake(\App\Events\V2\Task\Created::class);
         // Lock the instance
         $this->instance()->locked = true;
-        $this->instance()->save();
+        $this->instance()->saveQuietly();
+
         $this->delete(
             '/v2/instances/' . $this->instance()->id,
             [],
@@ -42,17 +43,18 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(202);
-        $instance = Instance::withTrashed()->findOrFail($this->instance()->id);
-        $this->assertNotNull($instance->deleted_at);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testNonAdminInstanceLocking()
     {
-        Event::fake();
+        Event::fake(\App\Events\V2\Task\Created::class);
 
         // First lock the instance
         $this->instance()->locked = true;
-        $this->instance()->save();
+        $this->instance()->saveQuietly();
+
         $this->delete(
             '/v2/instances/' . $this->instance()->id,
             [],
@@ -69,7 +71,8 @@ class DeleteTest extends TestCase
             ->assertResponseStatus(403);
         // Now unlock the instance
         $this->instance()->locked = false;
-        $this->instance()->save();
+        $this->instance()->saveQuietly();
+
         $this->delete(
             '/v2/instances/' . $this->instance()->id,
             [],
@@ -79,7 +82,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(202);
-        $instance = Instance::withTrashed()->findOrFail($this->instance()->id);
-        $this->assertNotNull($instance->deleted_at);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 }
