@@ -297,7 +297,7 @@ class ProcessBilling extends Command
                 }
             } catch (\Exception $exception) {
                 $error = 'Failed to load customer details for for reseller ' . $resellerId;
-                $this->error($error . $exception->getMessage());
+                $this->error($error . ' - ' . $exception->getMessage());
                 Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
             }
 
