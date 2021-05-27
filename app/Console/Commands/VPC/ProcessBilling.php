@@ -76,7 +76,10 @@ class ProcessBilling extends Command
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
         // Collect and sort VPC metrics by reseller
-        Vpc::get()->each(function ($vpc) {
+        Vpc::withTrashed()
+            ->where('deleted_at', '>=', $this->startDate)
+            ->orWhereNull('deleted_at')
+            ->each(function ($vpc) {
             $metrics = $this->getVpcMetrics($vpc->id);
 
             if ($metrics->count() == 0) {
