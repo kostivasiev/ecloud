@@ -25,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $firewallPolicyId)
  * @method static forUser($request)
  */
-class FirewallPolicy extends Model implements Filterable, Sortable
+class FirewallPolicy extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -52,6 +52,11 @@ class FirewallPolicy extends Model implements Filterable, Sortable
             'sequence' => 'integer'
         ];
         parent::__construct($attributes);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->router->getResellerId();
     }
 
     public function firewallRules()

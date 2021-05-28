@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Network extends Model implements Filterable, Sortable
+class Network extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -52,6 +52,11 @@ class Network extends Model implements Filterable, Sortable
         'deleting' => Deleting::class,
     ];
 
+    public function getResellerId(): int
+    {
+        return $this->router->getResellerId();
+    }
+
     public function router()
     {
         return $this->belongsTo(Router::class);
@@ -66,29 +71,6 @@ class Network extends Model implements Filterable, Sortable
     {
         return $this->hasOne(NetworkPolicy::class);
     }
-
-    /**
-     * @return bool
-     * @throws \Exception
-     * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/9e1c6bcc-85db-46b6-bc38-d6d2431e7c17/30af91b5-3a91-4d5d-8ed5-a7d806764a16/api_includes/method_GetSegmentState.html
-     * When the configuration is actually in effect, the state will change to "success".
-     */
-/*    public function getAvailableAttribute()
-    {
-        try {
-            $response = $this->router->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->router->id . '/segments/' . $this->id . '/state'
-            );
-            $response = json_decode($response->getBody()->getContents());
-            return in_array($response->state, ['in_sync', 'success']);
-        } catch (GuzzleException $exception) {
-            Log::info('Segment state response', [
-                'id' => $this->id,
-                'response' => json_decode($exception->getResponse()->getBody()->getContents()),
-            ]);
-            return false;
-        }
-    }*/
 
     /**
      * @param $query
