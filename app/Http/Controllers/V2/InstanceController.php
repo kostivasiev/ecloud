@@ -501,8 +501,6 @@ class InstanceController extends BaseController
                 \App\Jobs\Tasks\Instance\HostGroupUpdate::class,
                 ['host_group_id' => $hostGroup->id]
             );
-            $instance->host_group_id = $hostGroup->id;
-            $instance->saveQuietly();
         } catch (\Exception $e) {
             return response()->json([
                 'title' => 'Request Error',
