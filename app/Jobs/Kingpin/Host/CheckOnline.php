@@ -59,5 +59,9 @@ class CheckOnline extends Job
         if ($response->powerState !== 'poweredOn') {
             throw new \Exception('Host ' . $this->model->id . ' was found. Waiting for Host to power on...');
         }
+
+        if (!$response->networkProfileApplied) {
+            throw new \Exception('Host ' . $this->model->id . ' found. Waiting for network profile to be applied...');
+        }
     }
 }
