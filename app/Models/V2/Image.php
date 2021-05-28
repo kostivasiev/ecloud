@@ -97,7 +97,6 @@ class Image extends Model implements Filterable, Sortable
      * @param $query
      * @param $user
      * @return mixed
-     * @deprecated
      */
     public function scopeForUser($query, Consumer $user)
     {
@@ -120,7 +119,9 @@ class Image extends Model implements Filterable, Sortable
         return $this->reseller_id == Auth::user()->resellerId();
     }
 
-
+    /**
+     * @return int|null
+     */
     public function getLicenseIDAttribute()
     {
         if ($this->imageMetadata()->where('key', 'ukfast.license.id')->exists()) {

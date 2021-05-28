@@ -1,0 +1,44 @@
+get:
+  parameters:
+    - $ref: 'parameters/builderSpecificationId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: 'schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Builder Specifications
+
+patch:
+  parameters:
+    - $ref: 'parameters/builderSpecificationId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: 'schema.yaml'
+  responses:
+    200:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Builder Specifications
+
+delete:
+  description: Delete a host spec
+  parameters:
+    - $ref: 'schema.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Builder Specifications
