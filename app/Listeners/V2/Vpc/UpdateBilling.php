@@ -8,6 +8,7 @@ use App\Models\V2\Vpc;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class UpdateBilling
@@ -28,45 +29,47 @@ class UpdateBilling
 
         $vpc = ($event->model->resource instanceof Vpc) ? $event->model->resource : $event->model->resource->vpc;
 
-        $time = Carbon::now();
+        Cache::lock('billing.networking.advanced.'  . $vpc->id, 60)->block(60, function () use ($vpc, $event) {
+            $time = Carbon::now();
 
-        $value = $vpc->instances->sum('ram_capacity');
+            $value = $vpc->instances->sum('ram_capacity');
 
-        if ($event->model->name == Sync::TASK_NAME_DELETE && $event->model->resource instanceof Instance) {
-            // The resource isnt actually marked as deleted until the delete batch completes
-            $value -= $event->model->resource->ram_capacity;
-        }
-
-        $currentActiveMetric = BillingMetric::getActiveByKey($vpc, 'networking.advanced');
-
-        if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == $value) {
-                return;
+            if ($event->model->name == Sync::TASK_NAME_DELETE && $event->model->resource instanceof Instance) {
+                // The resource isnt actually marked as deleted until the delete batch completes
+                $value -= $event->model->resource->ram_capacity;
             }
 
-            $currentActiveMetric->setEndDate($time);
-        }
+            $currentActiveMetric = BillingMetric::getActiveByKey($vpc, 'networking.advanced');
 
-        $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $vpc->id;
-        $billingMetric->vpc_id = $vpc->id;
-        $billingMetric->reseller_id = $vpc->reseller_id;
-        $billingMetric->key = 'networking.advanced';
-        $billingMetric->value = $value;
-        $billingMetric->start = Carbon::now();
+            if (!empty($currentActiveMetric)) {
+                if ($currentActiveMetric->value == $value) {
+                    return;
+                }
 
-        $availabilityZone = $vpc->region->availabilityZones()->first();
-        $product = $availabilityZone->products()->where('product_name', $availabilityZone->id . ': advanced networking')->first();
-        if (empty($product)) {
-            Log::error(
-                'Failed to load billing product ' . $availabilityZone->id . ': advanced networking'
-            );
-        } else {
-            $billingMetric->category = $product->category;
-            $billingMetric->price = $product->getPrice($vpc->reseller_id);
-        }
+                $currentActiveMetric->setEndDate($time);
+            }
 
-        $billingMetric->save();
+            $billingMetric = app()->make(BillingMetric::class);
+            $billingMetric->resource_id = $vpc->id;
+            $billingMetric->vpc_id = $vpc->id;
+            $billingMetric->reseller_id = $vpc->reseller_id;
+            $billingMetric->key = 'networking.advanced';
+            $billingMetric->value = $value;
+            $billingMetric->start = Carbon::now();
+
+            $availabilityZone = $vpc->region->availabilityZones()->first();
+            $product = $availabilityZone->products()->where('product_name', $availabilityZone->id . ': advanced networking')->first();
+            if (empty($product)) {
+                Log::error(
+                    'Failed to load billing product ' . $availabilityZone->id . ': advanced networking'
+                );
+            } else {
+                $billingMetric->category = $product->category;
+                $billingMetric->price = $product->getPrice($vpc->reseller_id);
+            }
+
+            $billingMetric->save();
+        });
 
         Log::info(get_class($this) . ' : Finished', ['model' => $event->model]);
     }
