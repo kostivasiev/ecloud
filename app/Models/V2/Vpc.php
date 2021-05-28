@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class Vpc extends Model implements Filterable, Sortable
+class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -55,6 +55,11 @@ class Vpc extends Model implements Filterable, Sortable
         'console_enabled' => 'bool',
         'advanced_networking' => 'bool',
     ];
+
+    public function getResellerId(): int
+    {
+        return $this->reseller_id;
+    }
 
     public function dhcps()
     {

@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  * @package App\Models\V2
  * @method static findOrFail(string $dhcpId)
  */
-class Dhcp extends Model implements Filterable, Sortable
+class Dhcp extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
 
@@ -48,6 +48,11 @@ class Dhcp extends Model implements Filterable, Sortable
         'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
+    }
 
     public function vpc()
     {

@@ -25,7 +25,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Instance extends Model implements Filterable, Sortable
+class Instance extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
 
@@ -75,6 +75,11 @@ class Instance extends Model implements Filterable, Sortable
         parent::__construct($attributes);
 
         $this->timestamps = true;
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
     }
 
     public function vpc()

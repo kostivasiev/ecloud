@@ -18,7 +18,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class NetworkPolicy extends Model implements Filterable, Sortable
+class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable;
 
@@ -36,6 +36,11 @@ class NetworkPolicy extends Model implements Filterable, Sortable
             'name',
         ];
         parent::__construct($attributes);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->network->getResellerId();
     }
 
     public function network()
