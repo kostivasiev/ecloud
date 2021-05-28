@@ -6,6 +6,7 @@ use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Instance\MoveToHostGroup;
+use App\Jobs\Tasks\HostGroup\UpdateInstance;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
@@ -28,7 +29,7 @@ class HostGroupUpdate extends Job
     {
         $this->task = $task;
         $this->model = $this->task->resource;
-        $this->host_group_id = $this->task->resource->host_group_id;
+        $this->host_group_id = $task->data['volume_id'];
     }
 
     public function handle()
@@ -40,6 +41,7 @@ class HostGroupUpdate extends Job
         // Setup the jobs
         $jobs = [
             new MoveToHostGroup($this->model, $newHostGroup->id),
+            new UpdateInstance($this->model, $this->host_group_id),
         ];
 
         // If hostSpec changes too, then we need to cyclePower on the instance
