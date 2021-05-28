@@ -4,37 +4,31 @@ namespace App\Listeners\V2\Vpc;
 use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Models\V2\Vpc;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class UpdateBilling
+class UpdateAdvancedNetworkingBilling
 {
     public function handle(Updated $event)
     {
         Log::info(get_class($this) . ' : Started', ['model' => $event->model]);
-        if (!($event->model instanceof Task)) {
+        if (!($event->model instanceof Task) || !($event->model->resource instanceof Instance)) {
             return;
         }
         if (!$event->model->completed) {
             return;
         }
 
-        if (!in_array(get_class($event->model->resource), [Vpc::class, Instance::class])) {
-            return;
-        }
-
-        $vpc = ($event->model->resource instanceof Vpc) ? $event->model->resource : $event->model->resource->vpc;
-
+        $vpc = $event->model->resource->vpc;
         Cache::lock('billing.networking.advanced.'  . $vpc->id, 60)->block(60, function () use ($vpc, $event) {
             $time = Carbon::now();
 
             $value = $vpc->instances->sum('ram_capacity');
 
-            if ($event->model->name == Sync::TASK_NAME_DELETE && $event->model->resource instanceof Instance) {
+            if ($event->model->name == Sync::TASK_NAME_DELETE) {
                 // The resource isnt actually marked as deleted until the delete batch completes
                 $value -= $event->model->resource->ram_capacity;
             }
@@ -47,6 +41,9 @@ class UpdateBilling
                 }
 
                 $currentActiveMetric->setEndDate($time);
+                if ($value == 0) {
+                    return;
+                }
             }
 
             $billingMetric = app()->make(BillingMetric::class);

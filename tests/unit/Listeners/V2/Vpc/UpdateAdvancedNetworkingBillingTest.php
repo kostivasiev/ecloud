@@ -10,7 +10,7 @@ use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
-class UpdateBillingTest extends TestCase
+class UpdateAdvancedNetworkingBillingTest extends TestCase
 {
     public function setUp(): void
     {
@@ -26,37 +26,9 @@ class UpdateBillingTest extends TestCase
         });
     }
 
-    public function testCreateVpcAdvancedNetworkingBillingMetric()
-    {
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'completed' => true,
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->vpc());
-            return $task;
-        });
-
-        $listener = new \App\Listeners\V2\Vpc\UpdateBilling();
-        $listener->handle(new \App\Events\V2\Task\Updated($task));
-
-        $metric = BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced');
-        $this->assertNotNull($metric);
-        $this->assertEquals('networking.advanced', $metric->key);
-        $this->assertEquals(0, $metric->value);
-    }
-
     public function testCreateInstanceUpdatesAdvancedNetworkingBillingMetric()
     {
-        $originalMetric = factory(BillingMetric::class)->create([
-            'id' => 'bm-test',
-            'resource_id' => $this->vpc()->id,
-            'vpc_id' => $this->vpc()->id,
-            'key' => 'networking.advanced',
-            'value' => 0,
-            'start' => '2020-07-07T10:30:00+01:00',
-        ]);
+        $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced'));
 
         $task = Model::withoutEvents(function() {
             $task = new Task([
@@ -68,11 +40,9 @@ class UpdateBillingTest extends TestCase
             return $task;
         });
 
-        $listener = new \App\Listeners\V2\Vpc\UpdateBilling();
+        $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));
 
-        $originalMetric->refresh();
-        $this->assertNotNull($originalMetric->end);
 
         $metric = BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced');
         $this->assertNotNull($metric);
@@ -103,7 +73,7 @@ class UpdateBillingTest extends TestCase
             return $task;
         });
 
-        $listener = new \App\Listeners\V2\Vpc\UpdateBilling();
+        $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));
 
         $originalMetric->refresh();
@@ -148,7 +118,7 @@ class UpdateBillingTest extends TestCase
             return $task;
         });
 
-        $listener = new \App\Listeners\V2\Vpc\UpdateBilling();
+        $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));
 
         $originalMetric->refresh();
@@ -157,5 +127,44 @@ class UpdateBillingTest extends TestCase
         $metric = BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced');
         $this->assertNotNull($metric);
         $this->assertEquals(1024, $metric->value);
+    }
+
+
+    public function testDeleteAllInstancesEndsBillingMetric()
+    {
+        $instance = Instance::withoutEvents(function() {
+            return factory(Instance::class)->create([
+                'id' => 'i-' . uniqid(),
+                'vpc_id' => $this->vpc()->id,
+                'ram_capacity' => 1024,
+            ]);
+        });
+
+        $originalMetric = factory(BillingMetric::class)->create([
+            'id' => 'bm-test',
+            'resource_id' => $this->vpc()->id,
+            'vpc_id' => $this->vpc()->id,
+            'key' => 'networking.advanced',
+            'value' => 1024,
+            'start' => '2020-07-07T10:30:00+01:00',
+        ]);
+
+        $task = Model::withoutEvents(function() use ($instance) {
+            $task = new Task([
+                'id' => 'sync-1',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_DELETE
+            ]);
+            $task->resource()->associate($instance);
+            return $task;
+        });
+
+        $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
+        $listener->handle(new \App\Events\V2\Task\Updated($task));
+
+        $originalMetric->refresh();
+        $this->assertNotNull($originalMetric->end);
+
+        $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced'));
     }
 }
