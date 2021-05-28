@@ -283,7 +283,16 @@ class ProcessBilling extends Command
                 }
             }
 
-            // Don't create accounts logs for staff/internal accounts
+            // Don't create accounts logs when zero charges
+            if ($total <= 0) {
+                if ($this->option('debug')) {
+                    $this->info('Reseller #' . $resellerId . ' has no billable charges - skipping accounts log entry.');
+                }
+
+                continue;
+            }
+
+            // Don't create accounts logs for ukfast accounts
             try {
                 $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
                 if ($customer->accountStatus == 'Internal Account') {
@@ -296,11 +305,6 @@ class ProcessBilling extends Command
                 $error = 'Failed to load customer details for for reseller ' . $resellerId;
                 $this->error($error . $exception->getMessage());
                 Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
-            }
-
-            // Don't create accounts logs for zero cost vpcs
-            if ($total <= 0) {
-                continue;
             }
 
             // Min £1 surcharge
