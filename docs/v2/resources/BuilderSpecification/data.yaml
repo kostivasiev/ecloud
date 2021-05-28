@@ -1,0 +1,12 @@
+get:
+  parameters:
+    - $ref: 'parameters/builderSpecificationId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+  tags:
+    - Builder Specifications
