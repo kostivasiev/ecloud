@@ -299,12 +299,12 @@ class ProcessBilling extends Command
             }
 
             // Don't create accounts logs for zero cost vpcs
-            if ($total == 0) {
+            if ($total <= 0) {
                 continue;
             }
 
             // Min £1 surcharge
-            $total = ($total > 0 && $total < 1) ? 1 : $total;
+            $total = ($total < 1) ? 1 : $total;
 
             $bilingAdminClient = app()->make(BillingAdminClient::class);
             $payment = new Payment([
