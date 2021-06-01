@@ -29,7 +29,7 @@ class HostGroupUpdate extends Job
     {
         $this->task = $task;
         $this->model = $this->task->resource;
-        $this->host_group_id = $task->data['volume_id'];
+        $this->host_group_id = $task->data['host_group_id'];
     }
 
     public function handle()
