@@ -51,9 +51,11 @@ class FirewallPolicyController extends BaseController
         $model = app()->make(FirewallPolicy::class);
         $model->fill($request->only(['name', 'sequence', 'router_id']));
 
-        $task = $model->syncSave();
+        $model->withTaskLock(function ($policy) {
+            $policy->save();
+        });
 
-        return $this->responseIdMeta($request, $model->id, 202, $task->id);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function update(UpdateFirewallPolicyRequest $request, string $firewallPolicyId)
@@ -61,18 +63,22 @@ class FirewallPolicyController extends BaseController
         $model = FirewallPolicy::forUser(Auth::user())->findOrFail($firewallPolicyId);
         $model->fill($request->only(['name', 'sequence']));
 
-        $task = $model->syncSave();
+        $model->withTaskLock(function ($policy) {
+            $policy->save();
+        });
 
-        return $this->responseIdMeta($request, $model->id, 202, $task->id);
+        return $this->responseIdMeta($request, $model->id, 202);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)
     {
         $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
 
-        $task = $model->syncDelete();
+        $model->withTaskLock(function ($model) {
+            $model->delete();
+        });
 
-        return $this->responseTaskId($task->id);
+        return response('', 202);
     }
 
     public function tasks(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
