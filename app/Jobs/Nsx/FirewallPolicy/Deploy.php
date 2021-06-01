@@ -6,23 +6,49 @@ use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRulePort;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {
     use Batchable, LoggableModelJob;
 
     private $model;
+    private $data;
 
-    public function __construct(FirewallPolicy $firewallPolicy)
+    public function __construct(FirewallPolicy $firewallPolicy, $data = null)
     {
         $this->model = $firewallPolicy;
+        $this->data = $data;
     }
 
     public function handle()
     {
         $router = $this->model->router;
         $availabilityZone = $router->availabilityZone;
+
+        if (isset($this->data['rules_to_remove'])) {
+            foreach ($this->data['rules_to_remove'] as $removeRuleId) {
+                Log::debug("Removing firewall rule", ['removeRuleId' => $removeRuleId]);
+                try {
+                    $availabilityZone->nsxService()->get(
+                        '/policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id . '/rules/' . $removeRuleId
+                    );
+                } catch (ClientException $e) {
+                    if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
+                        Log::warning("Rule already removed, skipping");
+                        continue;
+                    }
+
+                    throw $e;
+                }
+
+                $availabilityZone->nsxService()->delete(
+                    '/policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id . '/rules/' . $removeRuleId
+                );
+            }
+        }
 
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html

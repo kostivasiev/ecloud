@@ -76,11 +76,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
-        // FirewallRule
-        \App\Events\V2\FirewallRule\Deleted::class => [
-            \App\Listeners\V2\FirewallRule\Undeploy::class,
-        ],
-
         // FloatingIp
         \App\Events\V2\FloatingIp\Saving::class => [
             \App\Listeners\V2\ResourceSyncSaving::class,
