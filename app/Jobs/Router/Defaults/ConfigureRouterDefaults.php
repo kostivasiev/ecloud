@@ -4,6 +4,8 @@ namespace App\Jobs\Router\Defaults;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Router;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Support\Facades\Log;
@@ -30,9 +32,23 @@ class ConfigureRouterDefaults extends Job
             $firewallPolicy->router_id = $this->model->id;
             $firewallPolicy->save();
 
-            dispatch((new AwaitFirewallPolicySync($firewallPolicy))->chain([
-                new CreateFirewallRules($firewallPolicy, $policy),
-            ]));
+            foreach ($policy['rules'] as $rule) {
+                Log::debug('FirewallRule', $rule);
+                $firewallRule = app()->make(FirewallRule::class);
+                $firewallRule->fill($rule);
+                $firewallRule->firewallPolicy()->associate($firewallPolicy);
+                $firewallRule->save();
+
+                foreach ($rule['ports'] as $port) {
+                    Log::debug('FirewallRulePort', $port);
+                    $firewallRulePort = app()->make(FirewallRulePort::class);
+                    $firewallRulePort->fill($port);
+                    $firewallRulePort->firewallRule()->associate($firewallRule);
+                    $firewallRulePort->save();
+                }
+            }
+
+            $firewallPolicy->syncSave();
         }
     }
 }
