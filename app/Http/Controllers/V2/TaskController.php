@@ -15,7 +15,7 @@ class TaskController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = Task::query();
+        $collection = Task::forUser($request->user());
 
         $queryTransformer->config(Task::class)
             ->transform($collection);
@@ -25,10 +25,10 @@ class TaskController extends BaseController
         ));
     }
 
-    public function show(string $taskId)
+    public function show(Request $request, string $taskId)
     {
         return new TaskResource(
-            Task::findOrFail($taskId)
+            Task::forUser($request->user())->findOrFail($taskId)
         );
     }
 }

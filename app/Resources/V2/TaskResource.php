@@ -22,6 +22,7 @@ class TaskResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'status' => $this->status,
+            'resource_id' => $this->resource_id,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new DateTimeZone(config('app.timezone'))
@@ -34,7 +35,6 @@ class TaskResource extends UKFastResource
 
 
         if ($request->user()->isAdmin()) {
-            $data['resource_id'] = $this->resource_id;
             $data['data'] = $this->data;
             $data['completed'] = $this->completed;
             $data['failure_reason'] = $this->failure_reason;

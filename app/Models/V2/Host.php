@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class Host
  * @package App\Models\V2
  */
-class Host extends Model implements Filterable, Sortable
+class Host extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -61,6 +61,11 @@ class Host extends Model implements Filterable, Sortable
     public function hostGroup()
     {
         return $this->belongsTo(HostGroup::class);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->hostGroup->getResellerId();
     }
 
     /**

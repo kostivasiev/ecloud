@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Nic extends Model implements Filterable, Sortable
+class Nic extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, Syncable, Taskable;
 
@@ -46,6 +46,11 @@ class Nic extends Model implements Filterable, Sortable
         'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
+
+    public function getResellerId(): int
+    {
+        return $this->instance->getResellerId();
+    }
 
     public function instance()
     {

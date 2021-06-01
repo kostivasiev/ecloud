@@ -56,7 +56,7 @@ class DeleteVolumesTest extends TestCase
             ]);
             $this->volume = factory(Volume::class)->create([
                 'id' => 'vol-test',
-                'vpc_id' => 'vpc-test',
+                'vpc_id' => $this->vpc()->id,
                 'capacity' => 10,
                 'os_volume' => true,
             ]);

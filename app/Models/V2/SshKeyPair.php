@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class SshKeyPair extends Model implements Filterable, Sortable
+class SshKeyPair extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, DefaultName, SoftDeletes;
 
@@ -37,6 +37,11 @@ class SshKeyPair extends Model implements Filterable, Sortable
         'name',
         'public_key',
     ];
+
+    public function getResellerId(): int
+    {
+        return $this->reseller_id;
+    }
 
     public function instance()
     {
