@@ -4,6 +4,7 @@ namespace Tests\V2\FirewallRule;
 
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -43,10 +44,15 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete('v2/firewall-rules/' . $this->firewallRule->id, [], [
+        Event::fake([\App\Events\V2\Task\Created::class]);
+
+        $this->delete('/v2/firewall-rules/' . $this->firewallRule->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(202);
-        $this->assertNotFalse(FirewallRule::find($this->firewallRule->id));
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return count($event->model->data['rules_to_remove']) == 1 && $event->model->data['rules_to_remove'][0] == $this->firewallRule->id;
+        });
     }
 }
