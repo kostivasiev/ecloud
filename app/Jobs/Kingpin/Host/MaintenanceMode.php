@@ -55,14 +55,16 @@ class MaintenanceMode extends Job
                 ->post(
                     '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress . '/maintenance'
                 );
-        } catch (RequestException $e) {// handle 40x/50x response if host not found
+        } catch (RequestException $exception) {// handle 40x/50x response if host not found
             $message = 'Error while putting Host ' . $host->id . ' into maintenance mode.';
+            if ($exception->getCode() != 404) {
+                $this->fail(new \Exception($message));
+            }
             Log::error($message, [
                 'vpc_id' => $hostGroup->vpc->id,
                 'hostgroup' => $hostGroup->id,
                 'macAddress' => $macAddress
             ]);
-            $this->fail(new \Exception($message));
             return false;
         }
         if (!$response || $response->getStatusCode() !== 200) {
