@@ -21,7 +21,7 @@ class DeleteFirewallPolicies extends Job
     public function handle()
     {
         $this->model->firewallPolicies()->each(function ($fwp) {
-            $fwp->delete();
+            $fwp->syncDelete();
         });
     }
 }
