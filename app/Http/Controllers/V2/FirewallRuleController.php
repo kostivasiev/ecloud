@@ -95,7 +95,6 @@ class FirewallRuleController extends BaseController
                 }
             }
 
-            $firewallRule->firewallPolicy->save();
             return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
@@ -139,7 +138,6 @@ class FirewallRuleController extends BaseController
                 }
             }
 
-            $firewallRule->firewallPolicy->save();
             return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 

@@ -48,7 +48,6 @@ class FirewallRulePortController extends BaseController
             }
 
             $firewallRulePort->save();
-            $firewallRulePort->firewallRule->firewallPolicy->save();
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
@@ -75,7 +74,6 @@ class FirewallRulePortController extends BaseController
             }
 
             $firewallRulePort->save();
-            $firewallRulePort->firewallRule->firewallPolicy->save();
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
@@ -92,7 +90,6 @@ class FirewallRulePortController extends BaseController
             }
 
             $firewallRulePort->delete();
-            $firewallRulePort->firewallRule->firewallPolicy->save();
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
