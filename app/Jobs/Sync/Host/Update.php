@@ -10,6 +10,7 @@ use App\Jobs\Conjurer\Host\CreateProfile;
 use App\Jobs\Conjurer\Host\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Host\CheckOnline;
+use App\Jobs\Kingpin\Host\CheckProfileApplied;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -56,6 +57,7 @@ class Update extends Job
                     new Deploy($host),
                     new PowerOn($host),
                     new CheckOnline($host),
+                    new CheckProfileApplied($host),
                 ],
             ])->dispatch();
         } else {
