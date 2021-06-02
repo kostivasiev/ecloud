@@ -166,4 +166,33 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
             'updated_at' => 'updated_at',
         ];
     }
+
+    public function getAvailableResources()
+    {
+        // Ram calculations
+        $ramCapacity = ($this->hosts->count() * $this->hostSpec->ram_capacity) - ($this->hosts->count() * 2);
+        $instanceRam = $this->instances->sum('ram_capacity') / 1024;
+        $totalAvailable = $ramCapacity - $instanceRam;
+
+        // CPU calculations
+        $physicalCores = $this->hostSpec->cpu_cores;
+        $vcpuCapacity = $this->hosts()->count() * $physicalCores;
+        $vcpuUsed = $this->instances->sum('vcpu_cores');
+        $vcpuAvailable = $vcpuCapacity = $vcpuUsed;
+
+        return [
+            'hosts' => $this->hosts->count(),
+            'instances' => $this->instances->count(),
+            'ram' => [
+                'capacity_gb' => $ramCapacity,
+                'used_gb' => $instanceRam,
+                'available_gb' => $totalAvailable,
+            ],
+            'vcpu' => [
+                'capacity' => $vcpuCapacity,
+                'used' => $vcpuUsed,
+                'available' => $vcpuAvailable,
+            ]
+        ];
+    }
 }
