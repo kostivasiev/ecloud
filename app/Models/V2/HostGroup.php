@@ -176,9 +176,9 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
 
         // CPU calculations
         $physicalCores = $this->hostSpec->cpu_cores;
-        $vcpuCapacity = $this->hosts()->count() * $physicalCores;
+        $vcpuCapacity = $physicalCores * 8;
         $vcpuUsed = $this->instances->sum('vcpu_cores');
-        $vcpuAvailable = $vcpuCapacity = $vcpuUsed;
+        $vcpuAvailable = $vcpuCapacity - $vcpuUsed;
 
         return [
             'hosts' => $this->hosts->count(),
