@@ -46,7 +46,7 @@ class DeployRemoveRulesTest extends TestCase
             ->withArgs(['/policy/api/v1/infra/domains/default/gateway-policies/fwp-test/rules'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
-                    'rules' => [
+                    'results' => [
                         [
                             'id' => 'test-rule-for-removal'
                         ]
@@ -89,7 +89,7 @@ class DeployRemoveRulesTest extends TestCase
             ->withArgs(['/policy/api/v1/infra/domains/default/gateway-policies/fwp-test/rules'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
-                    'rules' => [
+                    'results' => [
                         [
                             'id' => 'test-rule-for-removal'
                         ]
@@ -115,7 +115,7 @@ class DeployRemoveRulesTest extends TestCase
             ->withArgs(['/policy/api/v1/infra/domains/default/gateway-policies/fwp-test/rules'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
-                    'rules' => [
+                    'results' => [
                         [
                             'id' => 'unknown-rule'
                         ]

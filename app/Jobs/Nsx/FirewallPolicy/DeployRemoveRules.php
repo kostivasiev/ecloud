@@ -32,12 +32,10 @@ class DeployRemoveRules extends Job
         $rulesResponseBody = json_decode($rulesResponse->getBody()->getContents());
         $rulesToRemove = [];
 
-        if (isset($rulesResponseBody->rules)) {
-            foreach ($rulesResponseBody->rules as $rule) {
-                $trashedRule = $this->model->firewallRules()->withTrashed()->find($rule->id);
-                if ($trashedRule != null && $trashedRule->trashed()) {
-                    $rulesToRemove[] = $rule->id;
-                }
+        foreach ($rulesResponseBody->results as $result) {
+            $trashedRule = $this->model->firewallRules()->withTrashed()->find($result->id);
+            if ($trashedRule != null && $trashedRule->trashed()) {
+                $rulesToRemove[] = $result->id;
             }
         }
 

@@ -25,8 +25,8 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-                new DeployRemoveRules($this->task->resource),
                 new Deploy($this->task->resource),
+                new DeployRemoveRules($this->task->resource),
                 new DeployCheck($this->task->resource),
             ]
         ])->dispatch();

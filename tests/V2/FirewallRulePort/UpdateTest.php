@@ -4,6 +4,7 @@ namespace Tests\V2\FirewallRulePort;
 
 use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
 use App\Events\V2\FirewallRulePort\Saved as FirewallRulePortSaved;
+use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use GuzzleHttp\Psr7\Response;
@@ -22,18 +23,6 @@ class UpdateTest extends TestCase
 
         $this->availabilityZone();
 
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('patch')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
-
         $this->firewallRule = factory(FirewallRule::class)->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
@@ -41,6 +30,7 @@ class UpdateTest extends TestCase
         $this->firewallRulePort = factory(FirewallRulePort::class)->create([
             'firewall_rule_id' => $this->firewallRule->id,
         ]);
+        Event::fake([Created::class]);
     }
 
     public function testValidDataSucceeds()
@@ -68,6 +58,10 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testUpdateWithICMPValues()
@@ -93,6 +87,10 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testEmptySourceFails()
@@ -110,6 +108,8 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testEmptyDestinationFails()
@@ -127,5 +127,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 }
