@@ -159,7 +159,7 @@ class FirewallRuleController extends BaseController
 
             $firewallRule->delete();
 
-            return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE, ['rules_to_remove' => [$firewallRule->id]]);
+            return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
         return $this->responseIdMeta($request, $firewallRule->id, 202, $task->id);
