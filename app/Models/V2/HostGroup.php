@@ -171,7 +171,7 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
     {
         // Ram calculations
         $ramCapacity = ($this->hosts->count() * $this->hostSpec->ram_capacity) - ($this->hosts->count() * 2);
-        $instanceRam = $this->instances->sum('ram_capacity') / 1024;
+        $instanceRam = $this->instances->sum('ram_capacity');
         $totalAvailable = $ramCapacity - $instanceRam;
 
         // CPU calculations
