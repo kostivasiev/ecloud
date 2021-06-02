@@ -9,7 +9,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CheckOnline extends Job
+class CheckProfileApplied extends Job
 {
     use Batchable, LoggableModelJob;
 
@@ -33,31 +33,30 @@ class CheckOnline extends Job
             '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host/' . $this->model->id
         );
         $response = json_decode($response->getBody()->getContents());
-
         $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
 
-        if (empty($macAddress)) {
-            $message = 'Failed to load eth0 address for host ' . $this->model->id;
-            Log::error($message);
-            $this->fail(new \Exception($message));
-            return false;
-        }
+//        if (empty($macAddress)) {
+//            $message = 'Failed to load eth0 address for host ' . $this->model->id;
+//            Log::error($message);
+//            $this->fail(new \Exception($message));
+//            return false;
+//        }
 
         Log::debug('MAC address: ' . $macAddress);
 
-        try {
+//        try {
             $response = $availabilityZone->kingpinService()->get(
                 '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress
             );
             $response = json_decode($response->getBody()->getContents());
-        } catch (RequestException $exception) {
-            if ($exception->getCode() == 404) {
-                throw new \Exception('Host ' . $this->model->id . ' was not found. Waiting for Host to come online...');
-            }
-        }
+//        } catch (RequestException $exception) {
+//            if ($exception->getCode() == 404) {
+//                throw new \Exception('Host ' . $this->model->id . ' was not found. Waiting for Host to come online...');
+//            }
+//        }
 
-        if ($response->powerState !== 'poweredOn') {
-            throw new \Exception('Host ' . $this->model->id . ' was found. Waiting for Host to power on...');
+        if (!$response->networkProfileApplied) {
+            throw new \Exception('Host ' . $this->model->id . ' found. Waiting for network profile to be applied...');
         }
     }
 }
