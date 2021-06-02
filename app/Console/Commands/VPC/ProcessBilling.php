@@ -57,6 +57,7 @@ class ProcessBilling extends Command
         'throughput.5Gb',
         'throughput.10Gb',
         'floating-ip.count',
+        'networking.advanced',
         // License
         'license.windows',
         'host.license.windows',
