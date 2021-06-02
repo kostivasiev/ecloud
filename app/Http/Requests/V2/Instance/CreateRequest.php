@@ -9,6 +9,7 @@ use App\Models\V2\Network;
 use App\Models\V2\SshKeyPair;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\HasHosts;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsValidRamMultiple;
@@ -77,6 +78,7 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.host_groups,id,deleted_at,NULL',
                 new ExistsForUser(HostGroup::class),
                 new IsResourceAvailable(HostGroup::class),
+                new HasHosts(),
             ],
             'network_id' => [
                 'sometimes',
