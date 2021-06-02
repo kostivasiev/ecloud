@@ -1,0 +1,28 @@
+### Get Collection
+GET https://{{host}}/{{version}}/host-groups
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### Get Item
+
+GET https://{{host}}/{{version}}/host-groups/{{dev_host_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
