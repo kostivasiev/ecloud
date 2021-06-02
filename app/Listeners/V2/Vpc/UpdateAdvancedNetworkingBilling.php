@@ -41,9 +41,10 @@ class UpdateAdvancedNetworkingBilling
                 }
 
                 $currentActiveMetric->setEndDate($time);
-                if ($value == 0) {
-                    return;
-                }
+            }
+
+            if ($value == 0) {
+                return;
             }
 
             $billingMetric = app()->make(BillingMetric::class);
