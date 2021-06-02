@@ -182,7 +182,6 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
 
         return [
             'hosts' => $this->hosts->count(),
-            'instances' => $this->instances->count(),
             'ram' => [
                 'capacity_gb' => $ramCapacity,
                 'used_gb' => $instanceRam,
