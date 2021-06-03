@@ -10,7 +10,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class DeployRemoveRules extends Job
+class UndeployTrashedRules extends Job
 {
     use Batchable, LoggableModelJob;
 
