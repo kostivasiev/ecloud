@@ -53,6 +53,8 @@ class HostGroupUpdate extends Job
             $jobs
         ])->then(function (Batch $batch) use ($task) {
             Log::info("Setting task completed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
+            $task->resource->host_group_id = $task->data['host_group_id'];
+            $task->resource->saveQuietly();
             $task->completed = true;
             $task->save();
         })->catch(function (Batch $batch, Throwable $e) use ($task) {
