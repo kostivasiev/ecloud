@@ -2,8 +2,6 @@
 
 namespace Tests\V2\NetworkRulePort;
 
-use App\Events\V2\NetworkPolicy\Saved;
-use App\Events\V2\NetworkPolicy\Saving;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
@@ -45,6 +43,8 @@ class DeleteTest extends TestCase
     public function testDelete()
     {
         Event::fake([\App\Events\V2\Task\Created::class]);
+        $this->vpc()->advanced_networking = true;
+        $this->vpc()->saveQuietly();
 
         $this->delete('/v2/network-rule-ports/nrp-test')
             ->assertResponseStatus(202);

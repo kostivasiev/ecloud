@@ -39,7 +39,8 @@ class DeleteTest extends TestCase
     public function testDeleteResource()
     {
         Event::fake([\App\Events\V2\Task\Created::class, \App\Events\V2\NetworkRule\Deleted::class]);
-
+        $this->vpc()->advanced_networking = true;
+        $this->vpc()->saveQuietly();
         $this->delete('/v2/network-rules/' . $this->networkRule->id)
             ->assertResponseStatus(202);
 

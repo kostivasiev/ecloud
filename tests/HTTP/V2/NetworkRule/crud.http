@@ -36,7 +36,8 @@ Content-Type: application/json
     "source": "10.0.1.0/32",
     "destination": "10.0.2.0/32",
     "action": "ALLOW",
-    "enabled": true
+    "enabled": true,
+    "direction": "IN_OUT"
 }
 
 > {%

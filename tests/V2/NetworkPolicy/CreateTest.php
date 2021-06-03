@@ -3,6 +3,7 @@ namespace Tests\V2\NetworkPolicy;
 
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Task;
+use Illuminate\Support\Facades\Event;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
@@ -36,6 +37,10 @@ class CreateTest extends TestCase
 
     public function testCreateResource()
     {
+        Event::fake();
+        $this->vpc()->advanced_networking = true;
+        $this->vpc()->saveQuietly();
+
         $data = [
             'name' => 'Test Policy',
             'network_id' => $this->network()->id,
