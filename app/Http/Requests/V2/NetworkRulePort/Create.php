@@ -14,6 +14,7 @@ class Create extends FormRequest
         return [
             'name' => 'nullable|string|max:50',
             'network_rule_id' => [
+                'bail',
                 'required',
                 'string',
                 'exists:ecloud.network_rules,id,deleted_at,NULL',

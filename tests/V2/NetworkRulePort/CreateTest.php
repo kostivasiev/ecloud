@@ -5,6 +5,7 @@ namespace Tests\V2\NetworkRulePort;
 
 use App\Events\V2\NetworkPolicy\Saved;
 use App\Events\V2\NetworkPolicy\Saving;
+use App\Events\V2\Task\Created;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,9 @@ class CreateTest extends TestCase
 
     public function testCreate()
     {
-        Event::fake(\App\Events\V2\Task\Created::class);
+        Event::fake([Saving::class, Saved::class, Created::class]);
+        $this->vpc()->advanced_networking = true;
+        $this->vpc()->saveQuietly();
 
         $this->post('/v2/network-rule-ports', [
             'network_rule_id' => 'nr-test',
