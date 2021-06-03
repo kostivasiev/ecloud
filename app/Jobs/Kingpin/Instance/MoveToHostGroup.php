@@ -38,6 +38,6 @@ class MoveToHostGroup extends Job
             $this->fail($exception);
             return false;
         }
-        Log::debug('Hostgroup ' . $this->hostGroupId . ' has been attached to instance ' . $this->model->id);
+        Log::debug('Instance ' . $this->model->id . ' was moved to Hostgroup ' . $this->hostGroupId);
     }
 }
