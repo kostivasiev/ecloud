@@ -9,6 +9,7 @@ use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Resources\V2\FirewallRulePortResource;
 use App\Resources\V2\FirewallRuleResource;
+use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -79,7 +80,7 @@ class FirewallRuleController extends BaseController
             'enabled'
         ]));
 
-        $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
+        $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
             if (!$firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
@@ -94,10 +95,10 @@ class FirewallRuleController extends BaseController
                 }
             }
 
-            $firewallRule->firewallPolicy->save();
+            return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseIdMeta($request, $firewallRule->id, 202);
+        return $this->responseIdMeta($request, $firewallRule->id, 202, $task->id);
     }
 
     /**
@@ -119,7 +120,7 @@ class FirewallRuleController extends BaseController
             'enabled'
         ]));
 
-        $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
+        $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
             if (!$firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
@@ -137,17 +138,17 @@ class FirewallRuleController extends BaseController
                 }
             }
 
-            $firewallRule->firewallPolicy->save();
+            return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseIdMeta($request, $firewallRule->id, 202);
+        return $this->responseIdMeta($request, $firewallRule->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $firewallRuleId)
     {
         $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
 
-        $firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRule) {
+        $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRule) {
             if (!$firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
@@ -158,9 +159,9 @@ class FirewallRuleController extends BaseController
 
             $firewallRule->delete();
 
-            $firewallRule->firewallPolicy->save();
+            return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return response('', 202);
+        return $this->responseIdMeta($request, $firewallRule->id, 202, $task->id);
     }
 }

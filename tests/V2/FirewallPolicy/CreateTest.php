@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallPolicy;
 
 use App\Events\V2\FirewallPolicy\Saved;
+use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -19,18 +20,7 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $this->availabilityZone();
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('patch')
-            ->andReturn(
-                new Response(200, [], ''),
-            );
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->andReturn(
-                new Response(200, [], json_encode(['publish_status' => 'REALIZED']))
-            );
+        Event::fake([Created::class]);
     }
 
     public function testValidDataSucceeds()
@@ -53,6 +43,10 @@ class CreateTest extends TestCase
         $firewallPolicy = FirewallPolicy::findOrFail($policyId);
         $this->assertEquals($firewallPolicy->name, $data['name']);
         $this->assertEquals($firewallPolicy->sequence, $data['sequence']);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testRouterFailedCausesFail()
@@ -87,5 +81,7 @@ class CreateTest extends TestCase
                 'detail' => 'The specified router id resource is currently in a failed state and cannot be used',
             ]
         )->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 }
