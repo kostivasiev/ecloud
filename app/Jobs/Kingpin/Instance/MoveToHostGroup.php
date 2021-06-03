@@ -25,24 +25,19 @@ class MoveToHostGroup extends Job
     public function handle()
     {
         try {
-            $response = $this->model->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
-            );
+            $this->model->availabilityZone->kingpinService()
+                ->post(
+                    '/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/reschedule',
+                    [
+                        'json' => [
+                            'hostGroupId' => $this->hostGroupId,
+                        ],
+                    ]
+                );
         } catch (RequestException $exception) {
-            $message = 'Failed to retrieve instance ' . $this->model->id . ' from Kingpin';
-            Log::warning(get_class($this) . ' : ' . $message);
-            throw new \Exception($message);
+            $this->fail($exception);
+            return false;
         }
-
-        $this->model->availabilityZone->kingpinService()
-            ->post(
-                '/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/reschedule',
-                [
-                    'json' => [
-                        'hostGroupId' => $this->hostGroupId,
-                    ],
-                ]
-            );
         Log::debug('Hostgroup ' . $this->hostGroupId . ' has been attached to instance ' . $this->model->id);
     }
 }
