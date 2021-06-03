@@ -35,28 +35,15 @@ class CheckProfileApplied extends Job
         $response = json_decode($response->getBody()->getContents());
         $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
 
-//        if (empty($macAddress)) {
-//            $message = 'Failed to load eth0 address for host ' . $this->model->id;
-//            Log::error($message);
-//            $this->fail(new \Exception($message));
-//            return false;
-//        }
-
         Log::debug('MAC address: ' . $macAddress);
 
-//        try {
-            $response = $availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress
-            );
-            $response = json_decode($response->getBody()->getContents());
-//        } catch (RequestException $exception) {
-//            if ($exception->getCode() == 404) {
-//                throw new \Exception('Host ' . $this->model->id . ' was not found. Waiting for Host to come online...');
-//            }
-//        }
-
+        $response = $availabilityZone->kingpinService()->get(
+            '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress
+        );
+        $response = json_decode($response->getBody()->getContents());
         if (!$response->networkProfileApplied) {
-            throw new \Exception('Host ' . $this->model->id . ' found. Waiting for network profile to be applied...');
+            Log::info('Host ' . $this->model->id . ' found. Waiting for network profile to be applied...');
+            $this->release($this->backoff);
         }
     }
 }
