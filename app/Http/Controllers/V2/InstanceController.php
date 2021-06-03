@@ -495,19 +495,11 @@ class InstanceController extends BaseController
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
         $hostGroup = HostGroup::forUser(Auth::user())->findOrFail($request->get('host_group_id'));
 
-        try {
-            $task = $instance->createTaskWithLock(
-                'instance_hostgroup',
-                \App\Jobs\Tasks\Instance\HostGroupUpdate::class,
-                ['host_group_id' => $hostGroup->id]
-            );
-        } catch (\Exception $e) {
-            return response()->json([
-                'title' => 'Request Error',
-                'detail' => 'Failed to make hostgroup modifications to instance ' . $instanceId,
-                'status' => 428,
-            ], 428);
-        }
+        $task = $instance->createTaskWithLock(
+            'instance_hostgroup',
+            \App\Jobs\Tasks\Instance\HostGroupUpdate::class,
+            ['host_group_id' => $hostGroup->id]
+        );
         return $this->responseTaskId($task->id);
     }
 }
