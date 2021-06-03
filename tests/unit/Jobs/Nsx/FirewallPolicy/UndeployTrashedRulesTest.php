@@ -3,7 +3,7 @@
 namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Nsx\FirewallPolicy\Deploy;
-use App\Jobs\Nsx\FirewallPolicy\DeployRemoveRules;
+use App\Jobs\Nsx\FirewallPolicy\UndeployTrashedRules;
 use App\Models\V2\FirewallPolicy;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class DeployRemoveRulesTest extends TestCase
+class UndeployTrashedRulesTest extends TestCase
 {
     protected FirewallPolicy $firewallPolicy;
 
@@ -62,7 +62,7 @@ class DeployRemoveRulesTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRemoveRules($this->firewallPolicy));
+        dispatch(new UndeployTrashedRules($this->firewallPolicy));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -99,7 +99,7 @@ class DeployRemoveRulesTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRemoveRules($this->firewallPolicy));
+        dispatch(new UndeployTrashedRules($this->firewallPolicy));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -125,7 +125,7 @@ class DeployRemoveRulesTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRemoveRules($this->firewallPolicy));
+        dispatch(new UndeployTrashedRules($this->firewallPolicy));
 
         Event::assertNotDispatched(JobFailed::class);
     }
