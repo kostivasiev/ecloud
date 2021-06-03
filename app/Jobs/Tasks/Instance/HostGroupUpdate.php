@@ -41,7 +41,6 @@ class HostGroupUpdate extends Job
         // Setup the jobs
         $jobs = [
             new MoveToHostGroup($this->model, $newHostGroup->id),
-            new UpdateInstance($this->model, $this->host_group_id),
         ];
 
         // If hostSpec changes too, then we need to cyclePower on the instance
