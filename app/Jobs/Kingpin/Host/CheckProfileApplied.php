@@ -43,7 +43,7 @@ class CheckProfileApplied extends Job
         $response = json_decode($response->getBody()->getContents());
         if (!$response->networkProfileApplied) {
             Log::info('Host ' . $this->model->id . ' found. Waiting for network profile to be applied...');
-            $this->release($this->backoff);
+            return $this->release($this->backoff);
         }
     }
 }

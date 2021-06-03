@@ -52,12 +52,14 @@ class CheckOnline extends Job
             $response = json_decode($response->getBody()->getContents());
         } catch (RequestException $exception) {
             if ($exception->getCode() == 404) {
-                throw new \Exception('Host ' . $this->model->id . ' was not found. Waiting for Host to come online...');
+                Log::info('Host ' . $this->model->id . ' was not found. Waiting for Host to come online...');
+                return $this->release($this->backoff);
             }
         }
 
         if ($response->powerState !== 'poweredOn') {
-            throw new \Exception('Host ' . $this->model->id . ' was found. Waiting for Host to power on...');
+            Log::info('Host ' . $this->model->id . ' was found. Waiting for Host to power on...');
+            return $this->release($this->backoff);
         }
     }
 }
