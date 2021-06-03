@@ -74,6 +74,10 @@ return [
     ],
     'gateway' => [],
     'tag' => [
-        'scope' => 'ukfast'
+        'scope' => 'ukfast',
+        'networking' => [
+            'default' => env('TAG_DEFAULT_NETWORKING', 'az-default'),
+            'advanced' => env('TAG_ADVANCED_NETWORKING', 'az-advancedNetworking'),
+        ]
     ]
 ];

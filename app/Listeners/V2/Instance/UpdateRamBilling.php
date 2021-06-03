@@ -5,8 +5,6 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Models\V2\Router;
-use App\Models\V2\Task;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
