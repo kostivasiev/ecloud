@@ -5,6 +5,7 @@ namespace Tests\V2\Instances;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 
@@ -36,8 +37,8 @@ class ChangeHostgroupTest extends TestCase
     public function testInstanceNotOnKingpin()
     {
         $this->kingpinServiceMock()
-            ->shouldReceive('get')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test')
+            ->shouldReceive('post')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test/reschedule')
             ->andThrow(
                 new ClientException(
                     'Not Found',
@@ -55,12 +56,7 @@ class ChangeHostgroupTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
-            [
-                'title' => 'Request Error',
-                'detail' => 'Failed to make hostgroup modifications to instance ' . $this->instance()->id,
-            ]
-        )->assertResponseStatus(428);
+        )->assertResponseStatus(500);
     }
 
     public function testEvent()

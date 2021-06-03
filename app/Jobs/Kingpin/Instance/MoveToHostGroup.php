@@ -24,20 +24,17 @@ class MoveToHostGroup extends Job
 
     public function handle()
     {
-        try {
-            $this->model->availabilityZone->kingpinService()
-                ->post(
-                    '/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/reschedule',
-                    [
-                        'json' => [
-                            'hostGroupId' => $this->hostGroupId,
-                        ],
-                    ]
-                );
-        } catch (RequestException $exception) {
-            $this->fail($exception);
-            return false;
-        }
+        $this->model->availabilityZone->kingpinService()
+            ->post(
+                '/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/reschedule',
+                [
+                    'json' => [
+                        'hostGroupId' => $this->hostGroupId,
+                    ],
+                ]
+            );
+        $this->model->host_group_id = $this->hostGroupId;
+        $this->model->saveQuietly();
         Log::debug('Instance ' . $this->model->id . ' was moved to Hostgroup ' . $this->hostGroupId);
     }
 }
