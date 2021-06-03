@@ -9,7 +9,7 @@ Content-Type: application/json
     "vpc_id": "{{dev_vpc_id}}",
     "availability_zone_id" : "{{dev_availability_zone_id}}",
     "host_spec_id" : "{{dev_host_spec_id}}",
-    "windows_enabled": true
+    "windows_enabled": false
 }
 
 > {%
