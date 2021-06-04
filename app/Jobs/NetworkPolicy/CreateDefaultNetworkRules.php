@@ -8,6 +8,7 @@ use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 use IPLib\Address\AddressInterface;
 use IPLib\Range\Subnet;
 
@@ -45,6 +46,7 @@ class CreateDefaultNetworkRules extends Job
                 }
 
                 $this->model->networkRules()->save($networkRule);
+                Log::info(get_class($this) . ': Created default network rule ' . $rule['name']);
 
                 if (isset($rule['ports'])) {
                     foreach ($rule['ports'] as $port) {
