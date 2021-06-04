@@ -77,7 +77,7 @@ class FirewallRulePortController extends BaseController
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseIdMeta($request, $firewallRulePort->id, 202, $task->id);
+        return $this->responseTaskId($task->id);
     }
 
     public function destroy(Request $request, string $firewallRulePortId)

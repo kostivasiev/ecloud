@@ -58,7 +58,7 @@ class NetworkRulePortController extends BaseController
 
         $task = $resource->networkRule->networkPolicy->syncSave();
 
-        return $this->responseIdMeta($request, $resource->id, 202, $task->id);
+        return $this->responseTaskId($task->id);
     }
 
     public function destroy(Request $request, string $networkRulePortId)

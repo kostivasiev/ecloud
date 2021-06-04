@@ -141,7 +141,7 @@ class FirewallRuleController extends BaseController
             return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseIdMeta($request, $firewallRule->id, 202, $task->id);
+        return $this->responseTaskId($task->id);
     }
 
     public function destroy(Request $request, string $firewallRuleId)
@@ -162,6 +162,6 @@ class FirewallRuleController extends BaseController
             return $firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseIdMeta($request, $firewallRule->id, 202, $task->id);
+        return $this->responseTaskId($task->id);
     }
 }
