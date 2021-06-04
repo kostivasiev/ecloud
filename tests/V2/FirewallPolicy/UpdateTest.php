@@ -44,9 +44,9 @@ class UpdateTest extends TestCase
         )
             ->assertResponseStatus(202);
 
-        $this->policy->refresh();
-        $this->assertEquals($data['name'], $this->policy->name);
-        $this->assertNotEquals($this->oldData['name'], $this->policy->name);
+        $firewallPolicy = FirewallPolicy::findOrFail((json_decode($this->response->getContent()))->data->id);
+        $this->assertEquals($data['name'], $firewallPolicy->name);
+        $this->assertNotEquals($this->oldData['name'], $firewallPolicy->name);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';

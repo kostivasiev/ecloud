@@ -129,5 +129,9 @@ class UpdateTest extends TestCase
             ]
         )
             ->assertResponseStatus(202);
+
+        $volumeId = (json_decode($this->response->getContent()))->data->id;
+        $volume = Volume::find($volumeId);
+        $this->assertNotNull($volume);
     }
 }
