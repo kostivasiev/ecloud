@@ -5,6 +5,7 @@ namespace App\Jobs\NetworkPolicy;
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
+use App\Models\V2\NetworkRulePort;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -46,6 +47,15 @@ class CreateDefaultNetworkRules extends Job
             }
 
             $this->model->networkRules()->save($networkRule);
+
+            if (isset($rule['ports'])) {
+                foreach ($rule['ports'] as $port) {
+                    $networkRulePort = app()->make(NetworkRulePort::class);
+                    $networkRulePort->fill($port);
+                    $networkRulePort->networkRule()->associate($networkRule);
+                    $networkRulePort->save();
+                }
+            }
         }
     }
 }

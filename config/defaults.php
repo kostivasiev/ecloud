@@ -45,6 +45,20 @@ return [
                 'direction' => 'IN',
                 'enabled' => true,
                 'type' => NetworkRule::TYPE_DHCP,
+                'ports' => [
+                    [
+                        // DHCP Server
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 67
+                    ],
+                    [
+                        // DHCP Client
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 68
+                    ],
+                ]
             ],
             'dhcp_egress' => [
                 'name' => 'dhcp_egress',
@@ -55,6 +69,20 @@ return [
                 'direction' => 'OUT',
                 'enabled' => true,
                 'type' => NetworkRule::TYPE_DHCP,
+                'ports' => [
+                    [
+                        // DHCP Server
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 67
+                    ],
+                    [
+                        // DHCP Client
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 68
+                    ],
+                ]
             ],
             'catchall' => [
                 'name' => NetworkRule::TYPE_CATCHALL,
