@@ -12,8 +12,6 @@ class UpdateTest extends TestCase
 {
     protected NetworkPolicy $networkPolicy;
     protected NetworkRule $networkRule;
-    protected NetworkRule $dhcpIngressNetworkRule;
-    protected NetworkRule $dhcpEgressNetworkRule;
 
     public function setUp(): void
     {
@@ -56,38 +54,23 @@ class UpdateTest extends TestCase
 
     public function testCanNotEditDhcpRules()
     {
-        Model::withoutEvents(function () {
-            $this->dhcpIngressNetworkRule = factory(NetworkRule::class)->make([
+        $dhcpNetworkRule = Model::withoutEvents(function () {
+            $dhcpNetworkRule = factory(NetworkRule::class)->make([
                 'id' => 'nr-' . uniqid(),
-                'name' => NetworkRule::TYPE_DHCP_INGRESS,
+                'name' => NetworkRule::TYPE_DHCP,
                 'sequence' => 5001,
                 'source' =>  '10.0.0.2',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
                 'direction' => 'IN',
                 'enabled' => true,
-                'type' => NetworkRule::TYPE_DHCP_INGRESS,
+                'type' => NetworkRule::TYPE_DHCP,
             ]);
 
-            $this->networkPolicy()->networkRules()->save($this->dhcpIngressNetworkRule);
-
-            $this->dhcpEgressNetworkRule = factory(NetworkRule::class)->make([
-                'id' => 'nr-' . uniqid(),
-                'name' => NetworkRule::TYPE_DHCP_EGRESS,
-                'sequence' => 5002,
-                'source' =>  'ANY',
-                'destination' => 'ANY',
-                'action' => 'ALLOW',
-                'direction' => 'OUT',
-                'enabled' => true,
-                'type' => NetworkRule::TYPE_DHCP_EGRESS,
-            ]);
-
-            $this->networkPolicy()->networkRules()->save($this->dhcpEgressNetworkRule);
+            $this->networkPolicy()->networkRules()->save($dhcpNetworkRule);
+            return $dhcpNetworkRule;
         });
 
-        $this->patch('/v2/network-rules/' . $this->dhcpIngressNetworkRule->id)->assertResponseStatus(403);
-
-        $this->patch('/v2/network-rules/' . $this->dhcpEgressNetworkRule->id)->assertResponseStatus(403);
+        $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertResponseStatus(403);
     }
 }

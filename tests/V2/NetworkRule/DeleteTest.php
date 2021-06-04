@@ -48,30 +48,14 @@ class DeleteTest extends TestCase
         Event::assertDispatched(\App\Events\V2\NetworkRule\Deleted::class);
     }
 
-    public function testCanNotDeleteDhcpEgress()
+
+    public function testCanNotDeleteDhcpRules()
     {
         $networkRule = Model::withoutEvents(function () {
             $networkRule = factory(NetworkRule::class)->make([
-                'id' => 'nr-' . NetworkRule::TYPE_DHCP_EGRESS,
+                'id' => 'nr-dhcp',
                 'name' => 'nr-test-1',
-                'type' => NetworkRule::TYPE_DHCP_EGRESS
-            ]);
-
-            $this->networkPolicy()->networkRules()->save($networkRule);
-
-            return $networkRule;
-        });
-
-        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
-    }
-
-    public function testCanNotDeleteDhcpIngress()
-    {
-        $networkRule = Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
-                'id' => 'nr-' . NetworkRule::TYPE_DHCP_INGRESS,
-                'name' => 'nr-test-1',
-                'type' => NetworkRule::TYPE_DHCP_INGRESS
+                'type' => NetworkRule::TYPE_DHCP
             ]);
 
             $this->networkPolicy()->networkRules()->save($networkRule);
