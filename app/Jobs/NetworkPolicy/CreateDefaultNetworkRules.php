@@ -26,7 +26,7 @@ class CreateDefaultNetworkRules extends Job
 
     public function handle()
     {
-        if ($this->model->networkRules()->whereIn('type', [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS])->count() > 0) {
+        if ($this->model->networkRules()->where('type', NetworkRule::TYPE_DHCP)->count() > 0) {
             Log::info('Default network rules already exists, nothing to do');
             return true;
         }
@@ -37,7 +37,7 @@ class CreateDefaultNetworkRules extends Job
         foreach (config('defaults.network_policy.rules') as $rule) {
             $networkRule = app()->make(NetworkRule::class);
             $networkRule->fill($rule);
-            if ($rule['type'] == NetworkRule::TYPE_DHCP_INGRESS) {
+            if ($rule['type'] == NetworkRule::TYPE_DHCP && $rule['direction'] == 'IN') {
                 $networkRule->source = $dhcpServerAddress;
             }
 
