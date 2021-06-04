@@ -52,7 +52,7 @@ class NetworkPolicyController extends BaseController
         // TODO: we don't really need to trigger a sync here.
         $task = $model->syncSave();
 
-        return $this->responseTaskId($task->id);
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $networkPolicyId)

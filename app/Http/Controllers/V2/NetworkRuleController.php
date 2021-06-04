@@ -108,7 +108,7 @@ class NetworkRuleController extends BaseController
             return $networkRule->networkPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseTaskId($task->id);
+        return $this->responseIdMeta($request, $networkRule->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $networkRuleId)

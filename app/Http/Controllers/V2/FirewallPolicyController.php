@@ -63,7 +63,7 @@ class FirewallPolicyController extends BaseController
 
         $task = $model->syncSave();
 
-        return $this->responseTaskId($task->id);
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $firewallPolicyId)
@@ -71,7 +71,6 @@ class FirewallPolicyController extends BaseController
         $model = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
 
         $task = $model->syncDelete();
-
         return $this->responseTaskId($task->id);
     }
 

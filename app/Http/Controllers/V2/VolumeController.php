@@ -112,7 +112,7 @@ class VolumeController extends BaseController
         $volume->fill($request->only($only));
         $task = $volume->syncSave();
 
-        return $this->responseTaskId($task->id);
+        return $this->responseIdMeta($request, $volume->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $volumeId)
