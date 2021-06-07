@@ -10,28 +10,28 @@ use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
+    protected $networkRule;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
-                'id' => 'nr-test-1',
-                'name' => 'nr-test-1',
-            ]);
+        $this->networkRule = factory(NetworkRule::class)->make([
+            'id' => 'nr-test-1',
+            'name' => 'nr-test-1',
+        ]);
 
-            $networkRule->networkRulePorts()->create([
-                'id' => 'nrp-test',
-                'name' => 'nrp-test',
-                'protocol' => 'TCP',
-                'source' => '443',
-                'destination' => '555',
-            ]);
+        $this->networkRule->networkRulePorts()->create([
+            'id' => 'nrp-test',
+            'name' => 'nrp-test',
+            'protocol' => 'TCP',
+            'source' => '443',
+            'destination' => '555',
+        ]);
 
-            $this->networkPolicy()->networkRules()->save($networkRule);
-        });
+        $this->networkPolicy()->networkRules()->save($this->networkRule);
     }
 
     public function testUpdate()
@@ -54,5 +54,16 @@ class UpdateTest extends TestCase
         )->assertResponseStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
+    }
+
+    public function testUpdatePortForDhcpRuleFails()
+    {
+        $this->networkRule->type = NetworkRule::TYPE_DHCP;
+        $this->networkRule->save();
+
+        $this->patch('v2/network-rule-ports/nrp-test', [
+            'source' => '3306',
+            'destination' => '444',
+        ])->assertResponseStatus(403);
     }
 }

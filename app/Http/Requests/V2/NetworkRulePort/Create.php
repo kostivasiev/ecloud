@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\NetworkRulePort;
 
 use App\Models\V2\NetworkRule;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\NetworkRulePort\CanCreatePortForNetworkRule;
 use App\Rules\V2\ValidPortReference;
 use UKFast\FormRequests\FormRequest;
 
@@ -19,6 +20,7 @@ class Create extends FormRequest
                 'string',
                 'exists:ecloud.network_rules,id,deleted_at,NULL',
                 new ExistsForUser(NetworkRule::class),
+                new CanCreatePortForNetworkRule()
             ],
             'protocol' => [
                 'required',
