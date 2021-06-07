@@ -98,8 +98,10 @@ $app->routeMiddleware([
     'customer-max-ssh-key-pairs' => \App\Http\Middleware\IsMaxSshKeyPairForCustomer::class,
     'can-attach-instance-volume' => \App\Http\Middleware\CanAttachInstanceVolume::class,
     'can-detach' => \App\Http\Middleware\CanDetach::class,
-    'can-edit-rule' => \App\Http\Middleware\NetworkRule\CanEdit::class,
-    'can-delete-rule' => \App\Http\Middleware\NetworkRule\CanDelete::class,
+    'network-rule-can-edit' => \App\Http\Middleware\NetworkRule\CanEdit::class,
+    'network-rule-can-delete' => \App\Http\Middleware\NetworkRule\CanDelete::class,
+    'network-rule-port-can-edit' => \App\Http\Middleware\NetworkRulePort\CanEdit::class,
+    'network-rule-port-can-delete' => \App\Http\Middleware\NetworkRulePort\CanDelete::class,
     'can-update-image' => \App\Http\Middleware\image\CanUpdate::class,
     'can-delete-image' => \App\Http\Middleware\image\CanDelete::class,
 ]);

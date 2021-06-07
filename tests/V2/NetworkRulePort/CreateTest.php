@@ -24,21 +24,17 @@ class CreateTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        Model::withoutEvents(function () {
-            $this->networkRule = factory(NetworkRule::class)->make([
-                'id' => 'nr-test',
-                'name' => 'nr-test',
-            ]);
+        $this->networkRule = factory(NetworkRule::class)->make([
+            'id' => 'nr-test',
+            'name' => 'nr-test',
+        ]);
 
-            $this->networkPolicy()->networkRules()->save($this->networkRule);
-        });
+        $this->networkPolicy()->networkRules()->save($this->networkRule);
     }
 
     public function testCreate()
     {
-        Event::fake([Saving::class, Saved::class, Created::class]);
-        $this->vpc()->advanced_networking = true;
-        $this->vpc()->saveQuietly();
+        Event::fake([Created::class]);
 
         $this->post('/v2/network-rule-ports', [
             'network_rule_id' => 'nr-test',
@@ -62,5 +58,31 @@ class CreateTest extends TestCase
         )->assertResponseStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
+    }
+
+    public function testCreatePortForDhcpRuleFails()
+    {
+        $this->networkRule->type = NetworkRule::TYPE_DHCP;
+        $this->networkRule->save();
+
+        $this->post('/v2/network-rule-ports', [
+            'network_rule_id' => 'nr-test',
+            'protocol' => 'TCP',
+            'source' => '443',
+            'destination' => '555',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testCreatePortForCatchallRuleFails()
+    {
+        $this->networkRule->type = NetworkRule::TYPE_CATCHALL;
+        $this->networkRule->save();
+
+        $this->post('/v2/network-rule-ports', [
+            'network_rule_id' => 'nr-test',
+            'protocol' => 'TCP',
+            'source' => '443',
+            'destination' => '555',
+        ])->assertResponseStatus(422);
     }
 }

@@ -22,22 +22,20 @@ class DeleteTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
-                'id' => 'nr-test',
-                'name' => 'nr-test',
-            ]);
+        $this->networkRule = factory(NetworkRule::class)->make([
+            'id' => 'nr-test',
+            'name' => 'nr-test',
+        ]);
 
-            $networkRule->networkRulePorts()->create([
-                'id' => 'nrp-test',
-                'name' => 'nrp-test',
-                'protocol' => 'TCP',
-                'source' => '443',
-                'destination' => '555',
-            ]);
+        $this->networkRule->networkRulePorts()->create([
+            'id' => 'nrp-test',
+            'name' => 'nrp-test',
+            'protocol' => 'TCP',
+            'source' => '443',
+            'destination' => '555',
+        ]);
 
-            $this->networkPolicy()->networkRules()->save($networkRule);
-        });
+        $this->networkPolicy()->networkRules()->save($this->networkRule);
     }
 
     public function testDelete()
@@ -50,5 +48,14 @@ class DeleteTest extends TestCase
             ->assertResponseStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
+    }
+
+    public function testDeletePortForDhcpRuleFails()
+    {
+        $this->networkRule->type = NetworkRule::TYPE_DHCP;
+        $this->networkRule->save();
+
+        $this->delete('/v2/network-rule-ports/nrp-test')
+            ->assertResponseStatus(403);
     }
 }
