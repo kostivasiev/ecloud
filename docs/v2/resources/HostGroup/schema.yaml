@@ -52,15 +52,15 @@ properties:
         properties:
           capacity:
             type: integer
-            description: "The total ram capacity for this host group"
+            description: "The total ram capacity in Gb for this host group"
             example: 2048
           used:
             type: integer
-            description: "The total ram used by hosts in this host group"
+            description: "The total ram used in Gb by hosts in this host group"
             example: 64
           available:
             type: integer
-            description: "The total ram capacity available to this host group"
+            description: "The total ram capacity in Gb available to this host group"
             example: 1984
       vcpu:
         type: object
