@@ -22,14 +22,12 @@ class ComputeUpdate extends Job
 
     public function handle()
     {
-        try {
-            $instanceResponse = $this->model->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
-        } catch (RequestException $exception) {
-            $message = 'Unable to retrieve instance ' . $this->model->id . ' on Vpc ' . $this->model->vpc_id . ', skipping.';
-            Log::warning(get_class($this) . ' : ' . $message);
-            return;
-        }
+        $instanceResponse = $this->model->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
+
         $instanceResponseData = json_decode($instanceResponse->getBody()->getContents());
+        if (!$instanceResponseData) {
+            throw new \Exception('Failed to load data for instance ' . $this->model->id . ', could not decode response');
+        }
 
         $currentVCPUCores = $instanceResponseData->numCPU;
         $currentRAMMiB = $instanceResponseData->ramMiB;

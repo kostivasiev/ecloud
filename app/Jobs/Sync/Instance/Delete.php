@@ -28,7 +28,7 @@ class Delete extends Job
     {
         $this->deleteTaskBatch([
             [
-                new PowerOff($this->task->resource),
+                new PowerOff($this->task->resource, PowerOff::IGNORE_NOT_FOUND),
                 new Undeploy($this->task->resource),
                 new DeleteVolumes($this->task->resource),
                 new DeleteNics($this->task->resource),

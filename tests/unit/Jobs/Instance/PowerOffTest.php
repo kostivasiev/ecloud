@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class PowerOffTest extends TestCase
@@ -36,6 +35,20 @@ class PowerOffTest extends TestCase
 
     public function testPowerOffJobInstanceDoesNotExist()
     {
+        $this->expectException(RequestException::class);
+
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andThrow(
+                new RequestException('Not Found', new Request('GET', 'test'), new Response(404))
+            );
+
+        $job = new PowerOff($this->instance());
+        $job->handle();
+    }
+
+    public function testIgnoreInstanceNotFound()
+    {
         $this->kingpinServiceMock()->expects('get')
             ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
             ->andThrow(
@@ -44,7 +57,9 @@ class PowerOffTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new PowerOff($this->instance()));
+        $job = new PowerOff($this->instance(), PowerOff::IGNORE_NOT_FOUND);
+
+        $job->handle();
 
         Event::assertNotDispatched(JobFailed::class);
     }
