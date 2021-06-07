@@ -49,6 +49,15 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
             'windows_enabled' => 'boolean'
         ];
 
+        $this->appends = [
+            'ram_capacity',
+            'ram_used',
+            'ram_available',
+            'vcpu_capacity',
+            'vcpu_used',
+            'vcpu_available',
+        ];
+
         $this->dispatchesEvents = [
             'saving' => Saving::class,
             'saved' => Saved::class,
@@ -167,31 +176,33 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
         ];
     }
 
-    public function getAvailableResources()
+    public function getRamCapacityAttribute()
     {
-        // Ram calculations
-        $ramCapacity = ($this->hosts->count() * $this->hostSpec->ram_capacity) - ($this->hosts->count() * 2);
-        $instanceRam = $this->instances->sum('ram_capacity') / 1024;
-        $totalAvailable = $ramCapacity - $instanceRam;
+        return ($this->hosts->count() * $this->hostSpec->ram_capacity) - ($this->hosts->count() * 2);
+    }
 
-        // CPU calculations
-        $physicalCores = $this->hostSpec->cpu_cores;
-        $vcpuCapacity = $physicalCores * 8;
-        $vcpuUsed = $this->instances->sum('vcpu_cores');
-        $vcpuAvailable = $vcpuCapacity - $vcpuUsed;
+    public function getRamUsedAttribute()
+    {
+        return $this->instances->sum('ram_capacity') / 1024;
+    }
 
-        return [
-            'hosts' => $this->hosts->count(),
-            'ram' => [
-                'capacity_gb' => $ramCapacity,
-                'used_gb' => $instanceRam,
-                'available_gb' => $totalAvailable,
-            ],
-            'vcpu' => [
-                'capacity' => $vcpuCapacity,
-                'used' => $vcpuUsed,
-                'available' => $vcpuAvailable,
-            ]
-        ];
+    public function getRamAvailableAttribute()
+    {
+        return $this->ram_capacity - $this->ram_used;
+    }
+
+    public function getVcpuCapacityAttribute()
+    {
+        return ($this->hostSpec->cpu_cores * 8) * $this->hosts->count();
+    }
+
+    public function getVcpuUsedAttribute()
+    {
+        return $this->instances->sum('vcpu_cores');
+    }
+
+    public function getVcpuAvailableAttribute()
+    {
+        return $this->vcpu_capacity = $this->vcpu_used;
     }
 }
