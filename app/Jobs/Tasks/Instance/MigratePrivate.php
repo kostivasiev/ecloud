@@ -32,17 +32,11 @@ class MigratePrivate extends Job
 
         $newHostGroup = HostGroup::findOrFail($task->data['host_group_id']);
 
-        $jobs = [
-            new MoveToPrivateHostGroup($this->model, $newHostGroup->id),
-        ];
-
-        // If we go Public -> Private, or Private -> Private & hostSpec changes we need to power cycle the instance
-        if (!$this->model->hostGroup || $this->model->hostGroup->hostSpec->id != $newHostGroup->hostSpec->id) {
-            array_unshift($jobs, new PowerOff($this->model));
-            array_push($jobs, new PowerOn($this->model));
-        }
-
-        $this->updateTaskBatch([$jobs], function () use ($task, $newHostGroup) {
+        $this->updateTaskBatch([
+            [
+                new MoveToPrivateHostGroup($this->model, $newHostGroup->id),
+            ]
+        ], function () use ($task, $newHostGroup) {
             $task->resource->hostGroup()->associate($newHostGroup);
             $task->resource->saveQuietly();
         })->dispatch();

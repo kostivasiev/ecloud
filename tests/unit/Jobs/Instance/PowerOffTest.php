@@ -57,7 +57,7 @@ class PowerOffTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        $job = new PowerOff($this->instance(), PowerOff::IGNORE_NOT_FOUND);
+        $job = new PowerOff($this->instance(), true);
 
         $job->handle();
 

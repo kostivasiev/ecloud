@@ -17,8 +17,6 @@ class PowerOff extends Job
 
     private bool $ignoreNotFound;
 
-    const IGNORE_NOT_FOUND = true;
-
     public function __construct(Instance $instance, $ignoreNotFound = false)
     {
         $this->model = $instance;

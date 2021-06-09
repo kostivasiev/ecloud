@@ -2,8 +2,6 @@
 
 namespace App\Jobs\Tasks\Instance;
 
-use App\Jobs\Instance\PowerOff;
-use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Instance\MoveToPublicHostGroup;
 use App\Models\V2\Instance;
@@ -31,9 +29,7 @@ class MigratePublic extends Job
 
         $this->updateTaskBatch([
             [
-                new PowerOff($this->model),
                 new MoveToPublicHostGroup($this->model),
-                new PowerOn($this->model)
             ]
         ], function () use ($task) {
             $task->resource->hostGroup()->dissociate();

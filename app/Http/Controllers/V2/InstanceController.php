@@ -494,11 +494,10 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
         if ($request->has('host_group_id')) {
-            $hostGroup = HostGroup::forUser(Auth::user())->findOrFail($request->get('host_group_id'));
             $task = $instance->createTaskWithLock(
                 'instance_migrate_private',
                 \App\Jobs\Tasks\Instance\MigratePrivate::class,
-                ['host_group_id' => $hostGroup->id]
+                ['host_group_id' => $request->input('host_group_id')]
             );
         } else {
             $task = $instance->createTaskWithLock(
