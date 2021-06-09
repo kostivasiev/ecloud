@@ -35,11 +35,6 @@ client.test("Request executed successfully", function() {
 %}
 ###
 
-
-
-
-
-
 # 'Internal Account' prices (should be 0)
 GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
 X-consumer-custom-id:  1-1
