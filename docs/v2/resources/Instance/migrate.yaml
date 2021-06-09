@@ -1,5 +1,5 @@
 post:
-  description: Move an instance to a new host group
+  description: Migrate an instance to a new host group
   parameters:
     - $ref: '../../resources/Instance/parameters/instanceId.yaml'
   requestBody:
@@ -10,7 +10,8 @@ post:
           type : object
           properties :
             host_group_id:
-              required: true
+              description: ID of the destinaton private host group
+              required: false
               type: string
               example: hg-abc123
   responses:

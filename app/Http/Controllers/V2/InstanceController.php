@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
-use App\Http\Requests\V2\Instance\HostGroupRequest;
+use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
@@ -490,16 +490,23 @@ class InstanceController extends BaseController
         return response('', 202);
     }
 
-    public function hostGroup(HostGroupRequest $request, $instanceId)
+    public function migrate(MigrateRequest $request, $instanceId)
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
-        $hostGroup = HostGroup::forUser(Auth::user())->findOrFail($request->get('host_group_id'));
+        if ($request->has('host_group_id')) {
+            $hostGroup = HostGroup::forUser(Auth::user())->findOrFail($request->get('host_group_id'));
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_private',
+                \App\Jobs\Tasks\Instance\MigratePrivate::class,
+                ['host_group_id' => $hostGroup->id]
+            );
+        } else {
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_public',
+                \App\Jobs\Tasks\Instance\MigratePublic::class
+            );
+        }
 
-        $task = $instance->createTaskWithLock(
-            'instance_hostgroup',
-            \App\Jobs\Tasks\Instance\HostGroupUpdate::class,
-            ['host_group_id' => $hostGroup->id]
-        );
         return $this->responseTaskId($task->id);
     }
 }

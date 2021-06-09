@@ -22,7 +22,7 @@ use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
-use App\Jobs\Tasks\Instance\HostGroupUpdate;
+use App\Jobs\Tasks\Instance\MigratePrivate;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -67,7 +67,7 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new ComputeUpdate($this->task->resource),
-                    new HostGroupUpdate($this->task),
+                    new MigratePrivate($this->task),
                 ]
             ])->dispatch();
         }

@@ -5,7 +5,7 @@ namespace App\Jobs\Tasks\Instance;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Instance\MoveToHostGroup;
+use App\Jobs\Kingpin\Instance\MoveToPrivateHostGroup;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
@@ -13,7 +13,7 @@ use App\Traits\V2\LoggableModelJob;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Bus\Batchable;
 
-class HostGroupUpdate extends Job
+class MigratePrivate extends Job
 {
     use Batchable, TaskableBatch, LoggableModelJob;
 
@@ -29,21 +29,21 @@ class HostGroupUpdate extends Job
     public function handle()
     {
         $task = $this->task;
-        $originalHostGroup = HostGroup::findOrFail($this->model->host_group_id);
+
         $newHostGroup = HostGroup::findOrFail($task->data['host_group_id']);
 
         $jobs = [
-            new MoveToHostGroup($this->model, $newHostGroup->id),
+            new MoveToPrivateHostGroup($this->model, $newHostGroup->id),
         ];
 
-        // If hostSpec changes too, then we need to cyclePower on the instance
-        if ($originalHostGroup->hostSpec->id != $newHostGroup->hostSpec->id) {
+        // If we go Public -> Private, or Private -> Private & hostSpec changes we need to power cycle the instance
+        if (!$this->model->hostGroup || $this->model->hostGroup->hostSpec->id != $newHostGroup->hostSpec->id) {
             array_unshift($jobs, new PowerOff($this->model));
             array_push($jobs, new PowerOn($this->model));
         }
 
-        $this->updateTaskBatch($jobs, function () use ($task) {
-            $task->resource->host_group_id = $task->data['host_group_id'];
+        $this->updateTaskBatch([$jobs], function () use ($task, $newHostGroup) {
+            $task->resource->hostGroup()->associate($newHostGroup);
             $task->resource->saveQuietly();
         })->dispatch();
     }

@@ -193,8 +193,8 @@ paths:
     $ref: 'resources/Instance/console.yaml'
   '/ecloud/v2/instances/{instanceId}/tasks':
     $ref: 'resources/Instance/tasks-collection.yaml'
-  '/ecloud/v2/instances/{instanceId}/host-group':
-    $ref: 'resources/Instance/host-group.yaml'
+  '/ecloud/v2/instances/{instanceId}/migrate':
+    $ref: 'resources/Instance/migrate.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':
