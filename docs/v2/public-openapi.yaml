@@ -176,13 +176,13 @@ paths:
   '/ecloud/v2/instances/{instanceId}/power-off':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/volume-attach':
-    $ref: 'resources/Instance/poweronoff.yaml'
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/volume-detach':
-    $ref: 'resources/Instance/poweronoff.yaml'
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/power-reset':
-    $ref: 'resources/Instance/volume-attachdetach.yaml'
+    $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-shutdown':
-    $ref: 'resources/Instance/volume-attachdetach.yaml'
+    $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-restart':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/lock':

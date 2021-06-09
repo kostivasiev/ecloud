@@ -169,11 +169,9 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $instance->delete();
-        });
+        $task = $instance->syncDelete();
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     /**

@@ -18,9 +18,12 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->region = factory(Region::class)->create();
-        $this->vpc = factory(Vpc::class)->create([
-            'region_id' => $this->region->id,
-        ]);
+        $this->vpc = Vpc::withoutEvents(function () {
+            return factory(Vpc::class)->create([
+                'id' => 'vpc-test',
+                'region_id' => $this->region->id
+            ]);
+        });
         $this->vpcSupport = factory(VpcSupport::class)->create([
             'vpc_id' => $this->vpc->id
         ]);

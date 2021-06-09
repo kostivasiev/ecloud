@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class FloatingIp extends Model implements Filterable, Sortable
+class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -48,6 +48,11 @@ class FloatingIp extends Model implements Filterable, Sortable
     public function getResourceIdAttribute()
     {
         return ($this->destinationNat()->exists()) ? $this->destinationNat->translated_id : null;
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
     }
 
     public function vpc()

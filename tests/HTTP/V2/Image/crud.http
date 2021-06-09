@@ -18,7 +18,8 @@ Content-Type: application/json
     "public": true,
     "availability_zone_ids": [
         "az-aaaaaaaa"
-    ]
+    ],
+    "visibility": "public"
 }
 
 > {%
@@ -46,7 +47,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/images/{{image_id}}
+GET https://{{host}}/{{version}}/images/img-bbbbbbbb
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0

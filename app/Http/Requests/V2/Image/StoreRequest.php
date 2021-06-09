@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\Image;
 
+use App\Models\V2\Image;
 use UKFast\FormRequests\FormRequest;
 
 class StoreRequest extends FormRequest
@@ -38,6 +39,11 @@ class StoreRequest extends FormRequest
             'public' => [
                 'required',
                 'boolean'
+            ],
+            'visibility' => [
+                'required',
+                'string',
+                'in:' . Image::VISIBILITY_PUBLIC . ','. Image::VISIBILITY_PRIVATE
             ],
         ];
     }

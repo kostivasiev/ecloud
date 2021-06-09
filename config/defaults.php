@@ -37,24 +37,52 @@ return [
     'network_policy' => [
         'rules' => [
             'dhcp_ingress' => [
-                'name' => NetworkRule::TYPE_DHCP_INGRESS,
+                'name' => 'dhcp_ingress',
                 'sequence' => 10000,
                 'source' =>  '10.0.0.2',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
                 'direction' => 'IN',
                 'enabled' => true,
-                'type' => NetworkRule::TYPE_DHCP_INGRESS,
+                'type' => NetworkRule::TYPE_DHCP,
+                'ports' => [
+                    [
+                        // DHCP Server
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 67
+                    ],
+                    [
+                        // DHCP Client
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 68
+                    ],
+                ]
             ],
             'dhcp_egress' => [
-                'name' => NetworkRule::TYPE_DHCP_EGRESS,
+                'name' => 'dhcp_egress',
                 'sequence' => 10001,
                 'source' =>  'ANY',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
                 'direction' => 'OUT',
                 'enabled' => true,
-                'type' => NetworkRule::TYPE_DHCP_EGRESS,
+                'type' => NetworkRule::TYPE_DHCP,
+                'ports' => [
+                    [
+                        // DHCP Server
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 67
+                    ],
+                    [
+                        // DHCP Client
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 68
+                    ],
+                ]
             ],
             'catchall' => [
                 'name' => NetworkRule::TYPE_CATCHALL,
@@ -74,6 +102,10 @@ return [
     ],
     'gateway' => [],
     'tag' => [
-        'scope' => 'ukfast'
+        'scope' => 'ukfast',
+        'networking' => [
+            'default' => env('TAG_DEFAULT_NETWORKING', 'az-default'),
+            'advanced' => env('TAG_ADVANCED_NETWORKING', 'az-advancedNetworking'),
+        ]
     ]
 ];

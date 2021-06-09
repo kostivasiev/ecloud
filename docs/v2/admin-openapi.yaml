@@ -201,3 +201,9 @@ paths:
     $ref: 'resources/HostSpec/admin-collection.yaml'
   '/ecloud/v2/host-specs/{hostSpecId}':
     $ref: 'resources/HostSpec/admin-item.yaml'
+  '/ecloud/v2/builder-specifications':
+    $ref: 'resources/BuilderSpecification/admin-collection.yaml'
+  '/ecloud/v2/builder-specifications/{builderSpecificationId}':
+    $ref: 'resources/BuilderSpecification/admin-item.yaml'
+  '/ecloud/v2/builder-specifications/{builderSpecificationId}/data':
+    $ref: 'resources/BuilderSpecification/data.yaml'

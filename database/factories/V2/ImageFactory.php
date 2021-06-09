@@ -16,5 +16,6 @@ $factory->define(Image::class, function () {
         'platform' => 'Linux',
         'active' => true,
         'public' => true,
+        'visibility' => Image::VISIBILITY_PUBLIC,
     ];
 });

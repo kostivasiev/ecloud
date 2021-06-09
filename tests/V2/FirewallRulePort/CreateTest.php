@@ -2,8 +2,10 @@
 
 namespace Tests\V2\FirewallRulePort;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -17,21 +19,11 @@ class CreateTest extends TestCase
 
         $this->availabilityZone();
 
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('patch')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
-
         $this->firewallRule = factory(FirewallRule::class)->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
+
+        Event::fake([Created::class]);
     }
 
     public function testValidDataSucceeds()
@@ -54,6 +46,10 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testValidICMPDataSucceeds()
@@ -72,6 +68,10 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testSourceANYSucceeds()
@@ -94,6 +94,10 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testDestinationANYSucceeds()
@@ -116,6 +120,10 @@ class CreateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testMissingSourceFails()
@@ -129,6 +137,8 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
         ])->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testMissingDestinationFails()
@@ -142,5 +152,7 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
         ])->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 }
