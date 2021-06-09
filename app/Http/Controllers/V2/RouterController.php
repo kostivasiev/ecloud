@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Router\CreateRequest;
 use App\Http\Requests\V2\Router\UpdateRequest;
-use App\Jobs\Router\Defaults\ConfigureRouterDefaults;
+use App\Jobs\Router\ConfigureRouterDefaults;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;

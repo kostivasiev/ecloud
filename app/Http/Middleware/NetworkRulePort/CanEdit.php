@@ -1,7 +1,8 @@
 <?php
-namespace App\Http\Middleware\NetworkRule;
+namespace App\Http\Middleware\NetworkRulePort;
 
 use App\Models\V2\NetworkRule;
+use App\Models\V2\NetworkRulePort;
 use Closure;
 
 class CanEdit
@@ -13,14 +14,14 @@ class CanEdit
      */
     public function handle($request, Closure $next)
     {
-        $networkRule = NetworkRule::forUser($request->user())->findOrFail($request->route('networkRuleId'));
+        $networkRulePort = NetworkRulePort::forUser($request->user())->findOrFail($request->route('networkRulePortId'));
 
-        if ($networkRule->type == NetworkRule::TYPE_DHCP) {
+        if ($networkRulePort->networkRule->type == NetworkRule::TYPE_DHCP) {
             return response()->json([
                 'errors' => [
                     [
                         'title' => 'Forbidden',
-                        'detail' => 'The specified network rule is not editable',
+                        'detail' => 'The specified network rule port is not editable',
                         'status' => 403,
                     ]
                 ]

@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallPolicy;
 
 use App\Events\V2\FirewallPolicy\Saved;
+use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallPolicy;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
@@ -20,24 +21,12 @@ class UpdateTest extends TestCase
 
         $this->availabilityZone();
 
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('patch')
-            ->andReturn(
-                new Response(200, [], ''),
-            );
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->andReturn(
-                new Response(200, [], json_encode(['publish_status' => 'REALIZED'])),
-                new Response(200, [], json_encode(['publish_status' => 'REALIZED'])),
-            );
-
         $this->oldData = [
             'name' => 'Demo Firewall Policy 1',
             'router_id' => $this->router()->id,
         ];
         $this->policy = factory(FirewallPolicy::class)->create($this->oldData)->first();
+        Event::fake([Created::class]);
     }
 
     public function testValidDataSucceeds()
@@ -58,6 +47,10 @@ class UpdateTest extends TestCase
         $firewallPolicy = FirewallPolicy::findOrFail((json_decode($this->response->getContent()))->data->id);
         $this->assertEquals($data['name'], $firewallPolicy->name);
         $this->assertNotEquals($this->oldData['name'], $firewallPolicy->name);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
 }
