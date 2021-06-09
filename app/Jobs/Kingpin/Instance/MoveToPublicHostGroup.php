@@ -21,6 +21,11 @@ class MoveToPublicHostGroup extends Job
 
     public function handle()
     {
+        if (!$this->model->hostGroup) {
+            Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is already in the Public host group, nothing to do');
+            return;
+        }
+
         $this->model->availabilityZone->kingpinService()
             ->post(
                 '/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/reschedule',
@@ -30,6 +35,6 @@ class MoveToPublicHostGroup extends Job
                     ],
                 ]
             );
-        Log::debug('Instance ' . $this->model->id . ' was moved to Public Host group');
+        Log::debug(get_class($this) . ': Instance ' . $this->model->id . ' was moved to Public Host group');
     }
 }

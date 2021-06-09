@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\Tasks\Instance;
 
 use App\Jobs\Tasks\Instance\MigratePrivate;
 use App\Models\V2\HostGroup;
+use App\Models\V2\HostSpec;
 use App\Models\V2\Task;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
@@ -85,13 +86,18 @@ class MigratePrivateTest extends TestCase
         $this->instance()->hostGroup()->associate($this->hostGroup());
         $this->instance()->saveQuietly();
 
-        $hostGroup = Model::withoutEvents(function () {
+        $hostSpec = factory(HostSpec::class)->create([
+            'id' => 'hs-test2',
+            'name' => 'test-host-spec',
+        ]);
+
+        $hostGroup = Model::withoutEvents(function () use($hostSpec) {
             return factory(HostGroup::class)->create([
                 'id' => 'hg-2',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
-                'host_spec_id' => 'SOMETHING-ELSE',
+                'host_spec_id' => $hostSpec->id,
                 'windows_enabled' => true,
             ]);
         });

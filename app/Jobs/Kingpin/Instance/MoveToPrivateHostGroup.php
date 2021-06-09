@@ -13,7 +13,7 @@ class MoveToPrivateHostGroup extends Job
     use Batchable, LoggableModelJob;
 
     private $model;
-    private $hostGroupId;
+    private string $hostGroupId;
 
     public function __construct(Instance $instance, string $hostGroupId)
     {
@@ -23,6 +23,11 @@ class MoveToPrivateHostGroup extends Job
 
     public function handle()
     {
+        if ($this->model->hostGroup && $this->model->hostGroup->id == $this->hostGroupId) {
+            Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is already in the host group ' . $this->hostGroupId . ', nothing to do');
+            return;
+        }
+
         $this->model->availabilityZone->kingpinService()
             ->post(
                 '/api/v2/vpc/' . $this->model->vpc_id . '/instance/' . $this->model->id . '/reschedule',
