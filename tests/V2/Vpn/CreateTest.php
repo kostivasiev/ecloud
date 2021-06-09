@@ -82,4 +82,28 @@ class CreateTest extends TestCase
         $vpnItem = Vpn::findOrFail($vpnId);
         $this->assertEquals($vpnItem->router_id, $this->router()->id);
     }
+
+    public function testVpnForRouterAlreadyExists()
+    {
+        factory(Vpn::class)->create([
+            'name' => 'First Test VPN',
+            'router_id' => $this->router()->id,
+        ]);
+        $this->post(
+            '/v2/vpns',
+            [
+                'name' => 'Unit Test VPN',
+                'router_id' => $this->router()->id,
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'A VPN already exists for the specified router id',
+            ]
+        )->assertResponseStatus(422);
+    }
 }

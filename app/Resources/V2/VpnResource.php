@@ -26,6 +26,7 @@ class VpnResource extends UKFastResource
             'id' => $this->id,
             'router_id' => $this->router_id,
             'name' => $this->name,
+            'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

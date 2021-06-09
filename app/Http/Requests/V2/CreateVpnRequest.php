@@ -36,9 +36,17 @@ class CreateVpnRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.routers,id,deleted_at,NULL',
+                'unique:ecloud.vpns,router_id,deleted_at,NULL',
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
             ],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'router_id.unique' => 'A VPN already exists for the specified :attribute.',
         ];
     }
 }
