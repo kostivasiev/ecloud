@@ -94,7 +94,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(200);
+        )->assertResponseStatus(202);
 
         $vpnItem = Vpn::findOrFail($this->vpn->id);
         $this->assertEquals($data['router_id'], $vpnItem->router_id);

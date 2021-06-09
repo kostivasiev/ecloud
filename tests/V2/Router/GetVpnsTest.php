@@ -50,7 +50,6 @@ class GetVpnsTest extends TestCase
             ->seeJson([
                 'id'                   => $this->vpn->id,
                 'router_id'            => $this->vpn->router_id,
-                'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
     }
