@@ -9,7 +9,6 @@ use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Bus\Batchable;
 
-
 class CreateImage extends Job
 {
     use TaskableBatch, Batchable, LoggableTaskJob;

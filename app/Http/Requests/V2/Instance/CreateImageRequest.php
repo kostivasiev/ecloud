@@ -14,7 +14,11 @@ class CreateImageRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
+            'name' => [
+                'sometimes',
+                'required',
+                'string'
+            ],
         ];
     }
 }
