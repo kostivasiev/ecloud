@@ -157,10 +157,10 @@ paths:
     $ref: 'resources/Dhcp/item.yaml'
   '/ecloud/v2/dhcps/{dhcpId}/tasks':
     $ref: 'resources/Dhcp/tasks-collection.yaml'
-#  '/ecloud/v2/vpns':
-#    $ref: 'resources/Vpn/collection.yaml'
-#  '/ecloud/v2/vpns/{vpnId}':
-#    $ref: 'resources/Vpn/item.yaml'
+  '/ecloud/v2/vpns':
+    $ref: 'resources/Vpn/collection.yaml'
+  '/ecloud/v2/vpns/{vpnId}':
+    $ref: 'resources/Vpn/item.yaml'
   '/ecloud/v2/instances':
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':

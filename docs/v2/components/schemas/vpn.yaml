@@ -1,8 +1,12 @@
 properties:
   id:
     type: string
-    example: 'dhcp-2b66bb79'
+    example: 'vpn-2b66bb79'
     readOnly: true
+  name:
+    type: string
+    required: true
+    example: 'Office VPN'
   router_id:
     type: string
     required: true
