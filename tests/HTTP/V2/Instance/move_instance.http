@@ -70,7 +70,7 @@ client.global.set("instance_id", response.body.data.id);
 
 
 ### Move the instance to a PRIVATE host group
-POST https://{{host}}/{{version}}/instances/i-08d352cb/migrate
+POST https://{{host}}/{{version}}/instances/{{instance_id}}/migrate
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -80,7 +80,7 @@ Content-Type:  application/json
 }
 
 ### Move the instance to a PUBLIC host group
-POST https://{{host}}/{{version}}/instances/i-08d352cb/migrate
+POST https://{{host}}/{{version}}/instances/{{instance_id}}/migrate
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -93,14 +93,14 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 
-### Cleanup Primary Host
+### Cleanup Host
 DELETE https://{{host}}/{{version}}/hosts/{{host_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 
-### Cleanup Primary Host Group
+### Cleanup Host Group
 DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write

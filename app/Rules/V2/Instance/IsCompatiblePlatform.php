@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Rules\V2\Instance;
-
 
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
