@@ -18,6 +18,7 @@ class UpdateTest extends TestCase
         parent::setUp();
 
         $this->vpn = factory(Vpn::class)->create([
+            'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
     }
@@ -30,6 +31,7 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/vpns/' . $this->vpn->id,
             [
+                'name' => 'Unit Test VPN (Updated)',
                 'router_id' => $this->router()->id,
             ],
             [
@@ -61,6 +63,7 @@ class UpdateTest extends TestCase
         });
 
         $data = [
+            'name' => 'Unit Test VPN (Updated)',
             'router_id' => $this->router()->id,
         ];
         $this->patch(
@@ -81,6 +84,7 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $data = [
+            'name' => 'Unit Test VPN (Updated)',
             'router_id' => $this->router()->id,
         ];
         $this->patch(
@@ -94,5 +98,6 @@ class UpdateTest extends TestCase
 
         $vpnItem = Vpn::findOrFail($this->vpn->id);
         $this->assertEquals($data['router_id'], $vpnItem->router_id);
+        $this->assertEquals($data['name'], $vpnItem->name);
     }
 }

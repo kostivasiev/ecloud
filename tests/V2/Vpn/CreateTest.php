@@ -16,8 +16,8 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/vpns',
             [
+                'name' => 'Unit Test VPN',
                 'router_id' => $this->router()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
             ],
             [
                 'X-consumer-custom-id' => '2-0',
@@ -50,6 +50,7 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/vpns',
             [
+                'name' => 'Unit Test VPN',
                 'router_id' => $this->router()->id,
             ],
             [
@@ -69,13 +70,14 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/vpns',
             [
+                'name' => 'Unit Test VPN',
                 'router_id' => $this->router()->id,
             ],
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
-            ])
-            ->assertResponseStatus(201);
+            ]
+        )->assertResponseStatus(201);
         $vpnId = (json_decode($this->response->getContent()))->data->id;
         $vpnItem = Vpn::findOrFail($vpnId);
         $this->assertEquals($vpnItem->router_id, $this->router()->id);

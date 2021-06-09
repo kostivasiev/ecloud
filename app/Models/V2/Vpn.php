@@ -4,6 +4,10 @@ namespace App\Models\V2;
 
 use App\Events\V2\Vpn\Creating;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
+use App\Traits\V2\Syncable;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -21,18 +25,23 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Vpn extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'vpn';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    public $incrementing = false;
-    public $timestamps = true;
 
-    protected $fillable = [
-        'id',
-        'router_id',
-    ];
+    public function __construct(array $attributes = [])
+    {
+        $this->timestamps = true;
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+        $this->fillable = [
+            'id',
+            'router_id',
+            'name',
+        ];
+        parent::__construct($attributes);
+    }
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
@@ -67,6 +76,7 @@ class Vpn extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
+            $factory->create('name', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -82,6 +92,7 @@ class Vpn extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('router_id'),
+            $factory->create('name'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -106,6 +117,7 @@ class Vpn extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'router_id' => 'router_id',
+            'name' => 'name',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

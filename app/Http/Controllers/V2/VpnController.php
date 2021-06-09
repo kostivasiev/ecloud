@@ -15,7 +15,6 @@ class VpnController extends BaseController
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = Vpn::forUser($request->user());
-
         $queryTransformer->config(Vpn::class)
             ->transform($collection);
 
@@ -33,23 +32,23 @@ class VpnController extends BaseController
 
     public function create(CreateVpnRequest $request)
     {
-        $vpns = new Vpn($request->only(['router_id']));
+        $vpns = new Vpn($request->only(['router_id', 'name']));
         $vpns->save();
         $vpns->refresh();
-        return $this->responseIdMeta($request, $vpns->id, 201);
+        return $this->responseIdMeta($request, $vpns->id, 202);
     }
 
     public function update(UpdateVpnRequest $request, string $vpnId)
     {
         $vpns = Vpn::forUser(Auth::user())->findOrFail($vpnId);
-        $vpns->fill($request->only(['router_id']));
+        $vpns->fill($request->only(['name', 'router_id']));
         $vpns->save();
-        return $this->responseIdMeta($request, $vpns->id, 200);
+        return $this->responseIdMeta($request, $vpns->id, 202);
     }
 
     public function destroy(Request $request, string $vpnId)
     {
         Vpn::forUser($request->user())->findOrFail($vpnId)->delete();
-        return response('', 204);
+        return response('', 202);
     }
 }

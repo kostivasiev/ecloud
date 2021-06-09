@@ -31,6 +31,7 @@ class CreateVpnRequest extends FormRequest
     public function rules()
     {
         return [
+            'name' => 'required|string',
             'router_id' => [
                 'required',
                 'string',
@@ -38,18 +39,6 @@ class CreateVpnRequest extends FormRequest
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
             ],
-        ];
-    }
-
-    /**
-     * Get the validation messages that apply to the request.
-     *
-     * @return array|string[]
-     */
-    public function messages()
-    {
-        return [
-            'router_id.required' => 'The :attribute field is required',
         ];
     }
 }

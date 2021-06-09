@@ -19,6 +19,7 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
         $this->vpn = factory(Vpn::class)->create([
+            'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
     }

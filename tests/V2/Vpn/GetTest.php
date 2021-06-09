@@ -15,6 +15,7 @@ class GetTest extends TestCase
         parent::setUp();
 
         $this->vpn = factory(Vpn::class)->create([
+            'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
     }
@@ -31,7 +32,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
-                'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
     }
@@ -48,7 +48,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
-                'availability_zone_id' => $this->vpn->availability_zone_id,
             ])
             ->assertResponseStatus(200);
     }

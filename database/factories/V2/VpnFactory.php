@@ -5,5 +5,7 @@
 use App\Models\V2\Vpn;
 
 $factory->define(Vpn::class, function () {
-    return [];
+    return [
+        'name' => 'Office VPN',
+    ];
 });
