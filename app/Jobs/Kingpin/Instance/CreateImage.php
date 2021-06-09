@@ -24,7 +24,7 @@ class CreateImage extends Job
 
     public function handle()
     {
-        $response = $this->model->availabilityZone->kingpinService()->post(
+        $this->model->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/template',
             [
                 'json' => [

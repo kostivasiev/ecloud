@@ -41,7 +41,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "Test Image"
+    "name": "Test Image Paul"
 }
 
 > {%
@@ -49,6 +49,21 @@ client.test('API: Image Created', function () {
     client.assert(response.status === 202, '202 response not received');
 });
 client.global.set('image_id', response.body.data.id);
+%}
+
+
+###
+GET https://{{host}}/{{version}}/images/{{image_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 7052-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
 %}
 
 ### Verify image directly via Kingpin

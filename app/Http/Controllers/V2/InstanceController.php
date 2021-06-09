@@ -501,50 +501,26 @@ class InstanceController extends BaseController
             ], 422);
         }
 
-        $image = new Image(array_merge(
-            collect($instance->image->getAttributes())
-                ->only([
-                    'vpc_id',
-                    'logo_uri',
-                    'documentation_uri',
-                    'description',
-                    'platform',
-                    'active',
-                    'publisher',
-                    'appliance_version_id',
-                ])->toArray(),
-            [
-                'name' => $request->get('name'),
-                'visibility' => 'private',
-            ]
-        ));
+        $image = $instance->image->replicate(['vm_template', 'script_template'])
+            ->fill($request->only([
+                'name'
+            ]));
+        $image->visibility = 'private';
+        $image->reseller_id = Auth::user()->resellerId();
         $image->save();
 
-        $volumeCapacity = $instance->volumes->where('os_volume', '=', true)->first()->capacity;
-        $instance->image->imageMetadata->each(function ($metadata) use ($image, $volumeCapacity) {
-            if ($metadata->key == 'ukfast.spec.volume.min') {
-                $metadata->value = $volumeCapacity;
-            }
-            (new ImageMetadata(array_merge(
-                collect($metadata->getAttributes())
-                ->only([
-                    'key' => $metadata->key,
-                    'value' => $metadata->value,
-                ])->toArray(),
-                [
-                    'image_id' => $image->id,
-                ]
-            )))->save();
+        $instance->image->imageMetadata->each(function ($imageMetadata) use ($image) {
+            $meta = $imageMetadata->replicate();
+            $meta->image_id = $image->id;
+            $meta->save();
         });
-        $image->refresh();
-        if ($image->imageMetadata->where('key', '=', 'ukfast.spec.volume.min')->count() <= 0) {
-            (new ImageMetadata([
-                    'image_id' => $image->id,
-                    'key' => 'ukfast.spec.volume.min',
-                    'value' => $volumeCapacity,
-                ]))->save();
-        }
-        $image->refresh();
+
+        $volumeCapacity = $instance->volumes->where('os_volume', '=', true)->first()->capacity;
+
+        ImageMetadata::updateOrCreate(
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min'],
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min', 'value' => $volumeCapacity]
+        );
 
         $task = $instance->createTaskWithLock(
             'image_create',
