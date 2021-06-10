@@ -5,6 +5,7 @@ namespace App\Jobs\Instance;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +23,11 @@ class ComputeUpdate extends Job
     public function handle()
     {
         $instanceResponse = $this->model->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id);
+
         $instanceResponseData = json_decode($instanceResponse->getBody()->getContents());
+        if (!$instanceResponseData) {
+            throw new \Exception('Failed to load data for instance ' . $this->model->id . ', could not decode response');
+        }
 
         $currentVCPUCores = $instanceResponseData->numCPU;
         $currentRAMMiB = $instanceResponseData->ramMiB;

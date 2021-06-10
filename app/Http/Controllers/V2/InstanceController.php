@@ -4,15 +4,17 @@ namespace App\Http\Controllers\V2;
 
 use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
+use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
-use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
+use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
@@ -143,7 +145,6 @@ class InstanceController extends BaseController
             'name',
             'vcpu_cores',
             'ram_capacity',
-            'host_group_id',
         ]));
 
         if ($request->has('backup_enabled') && $this->isAdmin) {
@@ -489,5 +490,24 @@ class InstanceController extends BaseController
 
         // TODO - create an image from an instance
         return response('', 202);
+    }
+
+    public function migrate(MigrateRequest $request, $instanceId)
+    {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
+        if ($request->has('host_group_id')) {
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_private',
+                \App\Jobs\Tasks\Instance\MigratePrivate::class,
+                ['host_group_id' => $request->input('host_group_id')]
+            );
+        } else {
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_public',
+                \App\Jobs\Tasks\Instance\MigratePublic::class
+            );
+        }
+
+        return $this->responseTaskId($task->id);
     }
 }

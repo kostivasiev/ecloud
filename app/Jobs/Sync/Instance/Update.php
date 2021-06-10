@@ -5,8 +5,8 @@ namespace App\Jobs\Sync\Instance;
 use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
-use App\Jobs\Instance\Deploy\AwaitVolumeSync;
 use App\Jobs\Instance\Deploy\AwaitNicSync;
+use App\Jobs\Instance\Deploy\AwaitVolumeSync;
 use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
@@ -22,6 +22,7 @@ use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
+use App\Jobs\Tasks\Instance\MigratePrivate;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -65,7 +66,7 @@ class Update extends Job
         } else {
             $this->updateTaskBatch([
                 [
-                    new ComputeUpdate($this->task->resource),
+                    new ComputeUpdate($this->task->resource)
                 ]
             ])->dispatch();
         }
