@@ -49,8 +49,8 @@ class Update extends Job
         if (!$deployed) {
             $this->updateTaskBatch([
                 [
-                    new CreateLanPolicy($host),
                     new CheckAvailableCompute($host),
+                    new CreateLanPolicy($host),
                     new CreateProfile($host),
                     new CreateAutoDeployRule($host),
                     new Deploy($host),

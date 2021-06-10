@@ -10,31 +10,23 @@ use Tests\TestCase;
 
 class SyncableTest extends TestCase
 {
-    public $model;
-    public $task;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testGetSyncAttributeReturnsLatestSyncData()
     {
-        Model::withoutEvents(function () {
-            $this->model = new TestModel([
-                'id' => 'test-testing'
-            ]);
+        Event::fake(\App\Events\V2\Task\Created::class);
 
-            $this->task = new Task([
-                'id' => 'task-test',
-                'name' => Sync::TASK_NAME_UPDATE,
-                'completed' => true,
-            ]);
-            $this->task->resource()->associate($this->model);
-            $this->task->save();
-        });
+        $model = new SyncableTestModel([
+            'id' => 'test-testing'
+        ]);
 
-        $attribute = $this->model->sync;
+        $task = new Task([
+            'id' => 'task-test',
+            'name' => Sync::TASK_NAME_UPDATE,
+            'completed' => true,
+        ]);
+        $task->resource()->associate($model);
+        $task->save();
+
+        $attribute = $model->sync;
 
         $this->assertEquals(Sync::STATUS_COMPLETE, $attribute->status);
         $this->assertEquals(Sync::TYPE_UPDATE, $attribute->type);
@@ -42,34 +34,32 @@ class SyncableTest extends TestCase
 
     public function testGetSyncAttributeReturnsUnknownWithNoSync()
     {
-        Model::withoutEvents(function () {
-            $this->model = new TestModel([
-                'id' => 'test-testing'
-            ]);
-        });
+        Event::fake(\App\Events\V2\Task\Created::class);
 
-        $attribute = $this->model->sync;
+        $model = new SyncableTestModel([
+            'id' => 'test-testing'
+        ]);
 
-        $this->assertEquals('unknown', $attribute->status);
-        $this->assertEquals('unknown', $attribute->type);
+        $attribute = $model->sync;
+
+        $this->assertEquals('complete', $attribute->status);
+        $this->assertEquals('n/a', $attribute->type);
     }
 
     public function testSyncSave()
     {
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $model = Model::withoutEvents(function() {
-            return new TestModel([
-                'id' => 'test-testing'
-            ]);
-        });
+        $model = new SyncableTestModel([
+            'id' => 'test-testing'
+        ]);
 
         $task = $model->syncSave(['testKey' => 'testVal']);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
 
         $this->assertEquals('sync_update', $task->name);
-        $this->assertEquals('App\Jobs\Sync\TestModel\Update', $task->job);
+        $this->assertEquals('App\Jobs\Sync\SyncableTestModel\Update', $task->job);
         $this->assertEquals(['testKey' => 'testVal'], $task->data);
     }
 
@@ -77,18 +67,33 @@ class SyncableTest extends TestCase
     {
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $model = Model::withoutEvents(function() {
-            return new TestModel([
-                'id' => 'test-testing'
-            ]);
-        });
+        $model = new SyncableTestModel([
+            'id' => 'test-testing'
+        ]);
 
         $task = $model->syncDelete(['testKey' => 'testVal']);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
 
         $this->assertEquals('sync_delete', $task->name);
-        $this->assertEquals('App\Jobs\Sync\TestModel\Delete', $task->job);
+        $this->assertEquals('App\Jobs\Sync\SyncableTestModel\Delete', $task->job);
+        $this->assertEquals(['testKey' => 'testVal'], $task->data);
+    }
+
+    public function testSyncCreate()
+    {
+        Event::fake(\App\Events\V2\Task\Created::class);
+
+        $model = new SyncableTestModel([
+            'id' => 'test-testing'
+        ]);
+
+        $task = $model->syncDelete(['testKey' => 'testVal']);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
+
+        $this->assertEquals('sync_delete', $task->name);
+        $this->assertEquals('App\Jobs\Sync\SyncableTestModel\Delete', $task->job);
         $this->assertEquals(['testKey' => 'testVal'], $task->data);
     }
 }

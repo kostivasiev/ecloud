@@ -57,6 +57,7 @@ class ProcessBilling extends Command
         'throughput.5Gb',
         'throughput.10Gb',
         'floating-ip.count',
+        'networking.advanced',
         // License
         'license.windows',
         'host.license.windows',
@@ -76,69 +77,72 @@ class ProcessBilling extends Command
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
         // Collect and sort VPC metrics by reseller
-        Vpc::get()->each(function ($vpc) {
-            $metrics = $this->getVpcMetrics($vpc->id);
+        Vpc::withTrashed()
+            ->where('deleted_at', '>=', $this->startDate)
+            ->orWhereNull('deleted_at')
+            ->each(function ($vpc) {
+                $metrics = $this->getVpcMetrics($vpc->id);
 
-            if ($metrics->count() == 0) {
-                return true;
-            }
-
-            $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
-                if (!in_array($key, $this->billableMetrics)) {
-                    Log::info('Metric `'.$key.'` not found in billableMetrics');
+                if ($metrics->count() == 0) {
                     return true;
                 }
 
-                $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
-
-                $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
-                    $start = $this->startDate;
-                    $end = $this->endDate;
-
-                    if ($metric->start > $this->startDate) {
-                        $start = Carbon::parse($metric->start, $this->timeZone);
+                $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
+                    if (!in_array($key, $this->billableMetrics)) {
+                        Log::info('Metric `' . $key . '` not found in billableMetrics');
+                        return true;
                     }
 
-                    if (!empty($metric->end) && $metric->end < $this->endDate) {
-                        $end = Carbon::parse($metric->end, $this->timeZone);
-                    }
+                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
 
-                    $hours = $start->diffInHours($end);
+                    $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
+                        $start = $this->startDate;
+                        $end = $this->endDate;
 
-                    // Minimum period is 1 hour
-                    $hours = ($hours < 1) ? 1 : $hours;
+                        if ($metric->start > $this->startDate) {
+                            $start = Carbon::parse($metric->start, $this->timeZone);
+                        }
 
-                    $cost = ($hours * $metric->price) * $metric->value;
+                        if (!empty($metric->end) && $metric->end < $this->endDate) {
+                            $end = Carbon::parse($metric->end, $this->timeZone);
+                        }
 
-                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
+                        $hours = $start->diffInHours($end);
+
+                        // Minimum period is 1 hour
+                        $hours = ($hours < 1) ? 1 : $hours;
+
+                        $cost = ($hours * $metric->price) * $metric->value;
+
+                        $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
+                    });
                 });
-            });
 
-            // VPC Support
-            $this->billing[$vpc->reseller_id][$vpc->id]['support'] = [
-                'enabled' => false,
-                'pro-rata' => false
-            ];
+                // VPC Support
+                $this->billing[$vpc->reseller_id][$vpc->id]['support'] = [
+                    'enabled' => false,
+                    'pro-rata' => false
+                ];
 
-            $vpcSupport = $this->getVpcSupport($vpc->id);
+                $vpcSupport = $this->getVpcSupport($vpc->id);
 
-            if (!empty($vpcSupport)) {
-                $this->billing[$vpc->reseller_id][$vpc->id]['support']['enabled'] = true;
+                if (!empty($vpcSupport)) {
+                    $this->billing[$vpc->reseller_id][$vpc->id]['support']['enabled'] = true;
 
-                // Incomplete month
-                if ($vpcSupport->start_date > $this->startDate) {
-                    $this->billing[$vpc->reseller_id][$vpc->id]['support']['pro-rata'] = true;
+                    // Incomplete month
+                    if ($vpcSupport->start_date > $this->startDate) {
+                        $this->billing[$vpc->reseller_id][$vpc->id]['support']['pro-rata'] = true;
+                    }
                 }
-            }
 
-            if (!array_key_exists('metrics', $this->billing[$vpc->reseller_id][$vpc->id])) {
-                return true;
-            }
+                if (!array_key_exists('metrics', $this->billing[$vpc->reseller_id][$vpc->id])) {
+                    return true;
+                }
 
-            $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
+                $total = array_sum($this->billing[$vpc->reseller_id][$vpc->id]['metrics']);
 
-            $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
-        });
+                $this->billing[$vpc->reseller_id][$vpc->id]['total'] = $total;
+            });
 
         // Calculate the total for all VPC's for each reseller
         foreach ($this->billing as $resellerId => $vpcs) {
@@ -283,7 +287,16 @@ class ProcessBilling extends Command
                 }
             }
 
-            // Don't create accounts logs for staff/internal accounts
+            // Don't create accounts logs when zero charges
+            if ($total <= 0) {
+                if ($this->option('debug')) {
+                    $this->info('Reseller #' . $resellerId . ' has no billable charges - skipping accounts log entry.');
+                }
+
+                continue;
+            }
+
+            // Don't create accounts logs for ukfast accounts
             try {
                 $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
                 if ($customer->accountStatus == 'Internal Account') {
@@ -294,7 +307,7 @@ class ProcessBilling extends Command
                 }
             } catch (\Exception $exception) {
                 $error = 'Failed to load customer details for for reseller ' . $resellerId;
-                $this->error($error . $exception->getMessage());
+                $this->error($error . ' - ' . $exception->getMessage());
                 Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
             }
 

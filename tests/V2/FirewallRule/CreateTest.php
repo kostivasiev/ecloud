@@ -4,6 +4,7 @@ namespace Tests\V2\FirewallRule;
 
 use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
 use App\Events\V2\FirewallRule\Saved as FirewallRuleSaved;
+use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\Task;
@@ -21,18 +22,7 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $this->availabilityZone();
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('patch')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
+        Event::fake([Created::class]);
     }
 
     public function testValidDataSucceeds()
@@ -59,6 +49,10 @@ class CreateTest extends TestCase
             'direction' => 'IN',
             'enabled' => true
         ], 'ecloud')->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testFirewallPolicyFailed()
@@ -93,6 +87,8 @@ class CreateTest extends TestCase
                 'detail' => 'The specified firewall policy id resource is currently in a failed state and cannot be used',
             ]
         )->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testSourceANYSucceeds()
@@ -119,6 +115,10 @@ class CreateTest extends TestCase
             'direction' => 'IN',
             'enabled' => true
         ], 'ecloud')->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testDestinationANYSucceeds()
@@ -145,6 +145,10 @@ class CreateTest extends TestCase
             'direction' => 'IN',
             'enabled' => true
         ], 'ecloud')->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testMissingSourceFails()
@@ -162,6 +166,8 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testMissingDestinationFails()
@@ -179,6 +185,8 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testPortsValidSucceeds()
@@ -203,6 +211,10 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testPortsInvalidFails()
@@ -226,5 +238,7 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(422);
+
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 }

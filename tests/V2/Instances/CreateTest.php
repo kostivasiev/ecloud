@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\ApplianceVersionData;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Task;
@@ -273,6 +274,46 @@ class CreateTest extends TestCase
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified network id resource is currently in a failed state and cannot be used',
+            ]
+        )->assertResponseStatus(422);
+    }
+
+    public function testHostgroupWithNoHostsCausesFail()
+    {
+        $hostGroup = HostGroup::withoutEvents(function () {
+            return factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
+            ]);
+        });
+
+        $data = [
+            'vpc_id' => $this->vpc()->id,
+            'image_id' => $this->image()->id,
+            'network_id' => $this->network()->id,
+            'host_group_id' => $hostGroup->id,
+            'vcpu_cores' => 2,
+            'ram_capacity' => 1024,
+            'volume_capacity' => 30,
+            'volume_iops' => 600,
+        ];
+
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'There are no hosts assigned to the specified host group id',
+                'source' => 'host_group_id',
             ]
         )->assertResponseStatus(422);
     }

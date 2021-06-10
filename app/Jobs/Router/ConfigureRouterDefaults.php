@@ -1,35 +1,37 @@
 <?php
 
-namespace App\Jobs\Router\Defaults;
+namespace App\Jobs\Router;
 
 use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\Router;
 use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateFirewallRules extends Job
+class ConfigureRouterDefaults extends Job
 {
-    use Batchable, LoggableModelJob;
+    use LoggableModelJob;
+
+    private $model;
 
     public $tries = 1;
 
-    private $model;
-    private $policy;
-
-    public function __construct(FirewallPolicy $firewallPolicy, $policy)
+    public function __construct(Router $router)
     {
-        $this->model = $firewallPolicy;
-        $this->policy = $policy;
+        $this->model = $router;
     }
 
     public function handle()
     {
-        $policy = $this->policy;
+        foreach (config('firewall.policies') as $policy) {
+            Log::debug('FirewallPolicy', $policy);
+            $firewallPolicy = app()->make(FirewallPolicy::class);
+            $firewallPolicy->fill($policy);
+            $firewallPolicy->router_id = $this->model->id;
+            $firewallPolicy->save();
 
-        $this->model->withTaskLock(function ($firewallPolicy) use ($policy) {
             foreach ($policy['rules'] as $rule) {
                 Log::debug('FirewallRule', $rule);
                 $firewallRule = app()->make(FirewallRule::class);
@@ -46,7 +48,7 @@ class CreateFirewallRules extends Job
                 }
             }
 
-            $this->model->save();
-        });
+            $firewallPolicy->syncSave();
+        }
     }
 }

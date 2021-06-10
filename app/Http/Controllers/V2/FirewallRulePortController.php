@@ -7,6 +7,7 @@ use App\Http\Requests\V2\FirewallRulePort\Create;
 use App\Http\Requests\V2\FirewallRulePort\Update;
 use App\Models\V2\FirewallRulePort;
 use App\Resources\V2\FirewallRulePortResource;
+use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -33,7 +34,7 @@ class FirewallRulePortController extends BaseController
 
     public function store(Create $request)
     {
-        $resource = new FirewallRulePort($request->only([
+        $firewallRulePort = new FirewallRulePort($request->only([
             'name',
             'firewall_rule_id',
             'protocol',
@@ -41,57 +42,57 @@ class FirewallRulePortController extends BaseController
             'destination'
         ]));
 
-        $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
+        $task = $firewallRulePort->firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRulePort) {
+            if (!$firewallRulePort->firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
-            $resource->save();
-            $resource->firewallRule->firewallPolicy->save();
+            $firewallRulePort->save();
+            return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseIdMeta($request, $resource->getKey(), 202);
+        return $this->responseIdMeta($request, $firewallRulePort->id, 202, $task->id);
     }
 
     public function update(Update $request, string $firewallRulePortId)
     {
-        $resource = FirewallRulePort::forUser(Auth::user())->findOrFail($firewallRulePortId);
-        $resource->fill($request->only([
+        $firewallRulePort = FirewallRulePort::forUser(Auth::user())->findOrFail($firewallRulePortId);
+        $firewallRulePort->fill($request->only([
             'name',
             'protocol',
             'source',
             'destination'
         ]));
         if ($request->has('protocol') && $request->get('protocol') === 'ICMPv4') {
-            $resource->source = null;
-            $resource->destination = null;
+            $firewallRulePort->source = null;
+            $firewallRulePort->destination = null;
         }
 
-        $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
+        $task = $firewallRulePort->firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRulePort) {
+            if (!$firewallRulePort->firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
-            $resource->save();
-            $resource->firewallRule->firewallPolicy->save();
+            $firewallRulePort->save();
+            return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return $this->responseIdMeta($request, $resource->getKey(), 202);
+        return $this->responseIdMeta($request, $firewallRulePort->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $firewallRulePortId)
     {
-        $resource = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
+        $firewallRulePort = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
 
-        $resource->firewallRule->firewallPolicy->withTaskLock(function () use ($resource) {
-            if (!$resource->firewallRule->firewallPolicy->canCreateTask()) {
+        $task = $firewallRulePort->firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRulePort) {
+            if (!$firewallRulePort->firewallRule->firewallPolicy->canCreateTask()) {
                 throw new TaskException();
             }
 
-            $resource->delete();
-            $resource->firewallRule->firewallPolicy->save();
+            $firewallRulePort->delete();
+            return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 }

@@ -24,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class HostGroup
  * @package App\Models\V2
  */
-class HostGroup extends Model implements Filterable, Sortable
+class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, DefaultAvailabilityZone;
 
@@ -57,6 +57,11 @@ class HostGroup extends Model implements Filterable, Sortable
         ];
 
         parent::__construct($attributes);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
     }
 
     public function vpc()

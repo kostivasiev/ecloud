@@ -15,7 +15,7 @@ class CanEdit
     {
         $networkRule = NetworkRule::forUser($request->user())->findOrFail($request->route('networkRuleId'));
 
-        if (in_array($networkRule->type, [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS])) {
+        if ($networkRule->type == NetworkRule::TYPE_DHCP) {
             return response()->json([
                 'errors' => [
                     [

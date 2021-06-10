@@ -109,10 +109,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('network-rules', 'NetworkRuleController@index');
         $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
         $router->post('network-rules', 'NetworkRuleController@store');
-        $router->group(['middleware' => 'can-edit-rule'], function () use ($router) {
+        $router->group(['middleware' => 'network-rule-can-edit'], function () use ($router) {
             $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
         });
-        $router->group(['middleware' => 'can-delete-rule'], function () use ($router) {
+        $router->group(['middleware' => 'network-rule-can-delete'], function () use ($router) {
             $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
         });
     });
@@ -122,8 +122,12 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('network-rule-ports', 'NetworkRulePortController@index');
         $router->get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
         $router->post('network-rule-ports', 'NetworkRulePortController@store');
-        $router->patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
-        $router->delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
+        $router->group(['middleware' => 'network-rule-port-can-edit'], function () use ($router) {
+            $router->patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
+        });
+        $router->group(['middleware' => 'network-rule-port-can-delete'], function () use ($router) {
+            $router->delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
+        });
     });
 
     /** Vpns */
@@ -164,6 +168,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
         $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
+        $router->post('instances/{instanceId}/migrate', 'InstanceController@migrate');
 
         $router->group(['middleware' => 'is-locked'], function () use ($router) {
             $router->patch('instances/{instanceId}', 'InstanceController@update');
@@ -413,8 +418,18 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Task */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+    $router->group([], function () use ($router) {
         $router->get('tasks', 'TaskController@index');
         $router->get('tasks/{taskId}', 'TaskController@show');
+    });
+
+    /** Builder Configurations */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('builder-configurations', 'BuilderConfigurationController@index');
+        $router->get('builder-configurations/{configurationId}', 'BuilderConfigurationController@show');
+        $router->get('builder-configurations/{configurationId}/data', 'BuilderConfigurationController@data');
+        $router->post('builder-configurations', 'BuilderConfigurationController@store');
+        $router->patch('builder-configurations/{configurationId}', 'BuilderConfigurationController@update');
+        $router->delete('builder-configurations/{configurationId}', 'BuilderConfigurationController@destroy');
     });
 });

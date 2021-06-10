@@ -7,6 +7,7 @@ use App\Events\V2\Task\Updated;
 use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -29,6 +30,7 @@ class Task extends Model implements Filterable, Sortable
 
     protected $fillable = [
         'id',
+        'reseller_id',
         'completed',
         'failure_reason',
         'name',
@@ -45,6 +47,20 @@ class Task extends Model implements Filterable, Sortable
         'created' => Created::class,
         'updated' => Updated::class,
     ];
+
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, Consumer $user)
+    {
+        if (!$user->isScoped()) {
+            return $query;
+        }
+        return $query->where('reseller_id', '=', $user->resellerId());
+    }
 
     public function resource()
     {

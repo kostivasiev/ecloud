@@ -48,10 +48,6 @@ class FirewallRule extends Model implements Filterable, Sortable
         'enabled' => 'boolean',
     ];
 
-    protected $dispatchesEvents = [
-        'deleted' => Deleted::class,
-    ];
-
     public function firewallPolicy()
     {
         return $this->belongsTo(FirewallPolicy::class);
