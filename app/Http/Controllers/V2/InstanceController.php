@@ -150,7 +150,11 @@ class InstanceController extends BaseController
         if ($request->has('backup_enabled') && $this->isAdmin) {
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
-        $instance->save();
+
+        $instance->withTaskLock(function ($instance) {
+            $instance->save();
+        });
+
         return $this->responseIdMeta($request, $instance->id, 202);
     }
 

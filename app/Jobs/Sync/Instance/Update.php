@@ -66,8 +66,7 @@ class Update extends Job
         } else {
             $this->updateTaskBatch([
                 [
-                    new ComputeUpdate($this->task->resource),
-                    new MigratePrivate($this->task),
+                    new ComputeUpdate($this->task->resource)
                 ]
             ])->dispatch();
         }
