@@ -244,9 +244,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerOn($instance));
         });
 
@@ -259,9 +256,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerOff($instance));
         });
 
@@ -274,9 +268,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new GuestRestart($instance));
         });
 
@@ -289,9 +280,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new GuestShutdown($instance));
         });
 
@@ -304,9 +292,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerReset($instance));
         });
 

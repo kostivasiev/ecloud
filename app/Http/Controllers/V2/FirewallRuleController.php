@@ -81,10 +81,6 @@ class FirewallRuleController extends BaseController
         ]));
 
         $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
-            if (!$firewallRule->firewallPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $firewallRule->save();
 
             if ($request->has('ports')) {
@@ -121,10 +117,6 @@ class FirewallRuleController extends BaseController
         ]));
 
         $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
-            if (!$firewallRule->firewallPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $firewallRule->save();
 
             if ($request->filled('ports')) {
@@ -149,10 +141,6 @@ class FirewallRuleController extends BaseController
         $firewallRule = FirewallRule::foruser($request->user())->findOrFail($firewallRuleId);
 
         $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRule) {
-            if (!$firewallRule->firewallPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $firewallRule->firewallRulePorts->each(function ($port) {
                 $port->delete();
             });
