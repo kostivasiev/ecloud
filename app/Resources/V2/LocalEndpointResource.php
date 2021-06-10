@@ -6,7 +6,7 @@ use DateTimeZone;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
-class LocalEndpointsResource extends UKFastResource
+class LocalEndpointResource extends UKFastResource
 {
     public function toArray($request)
     {

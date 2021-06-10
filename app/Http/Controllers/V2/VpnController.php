@@ -4,11 +4,14 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateVpnRequest;
 use App\Http\Requests\V2\UpdateVpnRequest;
+use App\Models\V2\LocalEndpoint;
 use App\Models\V2\Vpn;
+use App\Resources\V2\LocalEndpointResource;
 use App\Resources\V2\VpnResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
+use UKFast\Responses\UKFastResource;
 
 class VpnController extends BaseController
 {
@@ -51,5 +54,16 @@ class VpnController extends BaseController
     {
         Vpn::forUser($request->user())->findOrFail($vpnId)->delete();
         return response('', 204);
+    }
+
+    public function localEndpoint(Request $request, QueryTransformer $queryTransformer, string $vpnId)
+    {
+        $collection = Vpn::forUser($request->user())->findOrFail($vpnId)->localEndpoints();
+        $queryTransformer->config(LocalEndpoint::class)
+            ->transform($collection);
+
+        return LocalEndpointResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

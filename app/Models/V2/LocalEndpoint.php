@@ -19,14 +19,11 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class LocalEndpoints extends Model implements Filterable, Sortable, ResellerScopeable
+class LocalEndpoint extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public string $keyPrefix = 'vpnle';
-
-    protected $dispatchesEvents = [
-    ];
 
     public function __construct(array $attributes = [])
     {
@@ -40,9 +37,6 @@ class LocalEndpoints extends Model implements Filterable, Sortable, ResellerScop
             'vpn_id',
             'fip_id',
         ]);
-
-        $this->dispatchesEvents = [
-        ];
 
         parent::__construct($attributes);
     }
@@ -72,7 +66,9 @@ class LocalEndpoints extends Model implements Filterable, Sortable, ResellerScop
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->where('reseller_id', '=', $user->resellerId());
+        return $query->whereHas('vpn.router.vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
     }
 
     /**
