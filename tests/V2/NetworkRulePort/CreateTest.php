@@ -3,8 +3,6 @@
 namespace Tests\V2\NetworkRulePort;
 
 
-use App\Events\V2\NetworkPolicy\Saved;
-use App\Events\V2\NetworkPolicy\Saving;
 use App\Events\V2\Task\Created;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
