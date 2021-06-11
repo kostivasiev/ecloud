@@ -34,16 +34,16 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         $this->fillable([
             'id',
             'name',
-            'vpn_id',
+            'vpn_service_id',
             'fip_id',
         ]);
 
         parent::__construct($attributes);
     }
 
-    public function vpn()
+    public function vpnService()
     {
-        return $this->belongsTo(Vpn::class);
+        return $this->belongsTo(VpnService::class);
     }
 
     public function floatingIp()
@@ -66,7 +66,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('vpn.router.vpc', function ($query) use ($user) {
+        return $query->whereHas('vpnService.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
@@ -80,7 +80,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('vpn_id', Filter::$stringDefaults),
+            $factory->create('vpn_service_id', Filter::$stringDefaults),
             $factory->create('fip_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -97,7 +97,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('vpn_id'),
+            $factory->create('vpn_service_id'),
             $factory->create('fip_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -124,7 +124,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         return [
             'id' => 'id',
             'name' => 'name',
-            'vpn_id' => 'vpn_id',
+            'vpn_service_id' => 'vpn_service_id',
             'fip_id' => 'fip_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
