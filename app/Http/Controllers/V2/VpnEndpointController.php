@@ -5,7 +5,7 @@ use App\Http\Requests\V2\VpnEndpoint\Create;
 use App\Http\Requests\V2\VpnEndpoint\Update;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use App\Resources\V2\VpnEndpointResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,11 +35,11 @@ class VpnEndpointController extends BaseController
     public function store(Create $request)
     {
         $localEndpoint = new VpnEndpoint(
-            $request->only(['name', 'vpn_id', 'fip_id'])
+            $request->only(['name', 'vpn_service_id', 'fip_id'])
         );
         // if no fip_id supplied then create one
         if (!$request->has('fip_id')) {
-            $vpn = Vpn::forUser($request->user())->findOrFail($request->get('vpn_id'));
+            $vpn = VpnService::forUser($request->user())->findOrFail($request->get('vpn_service_id'));
             $floatingIp = app()->make(FloatingIp::class, [
                 'attributes' => [
                     'vpc_id' => $vpn->router->vpc_id,
@@ -55,7 +55,7 @@ class VpnEndpointController extends BaseController
     public function update(Update $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->fill($request->only(['name', 'vpn_id', 'fip_id']));
+        $vpnEndpoint->fill($request->only(['name', 'vpn_service_id', 'fip_id']));
         $vpnEndpoint->save();
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }
