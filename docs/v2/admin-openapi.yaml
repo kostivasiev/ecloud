@@ -79,8 +79,8 @@ components:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
-    VpnId:
-      $ref: 'resources/Vpn/parameters/vpnId.yaml'
+    VpnServiceId:
+      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
     InstanceId:
       $ref: 'resources/Instance/parameters/instanceId.yaml'
     FipId:
@@ -105,8 +105,8 @@ components:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountIdResponse:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
-    VpnIdResponse:
-      $ref: 'resources/Vpn/responses/idResponse.yaml'
+    VpnServiceIdResponse:
+      $ref: 'resources/VpnService/responses/idResponse.yaml'
     InstanceIdResponse:
       $ref: 'resources/Instance/responses/idResponse.yaml'
     FipIdResponse:
