@@ -2,7 +2,7 @@
 namespace App\Http\Requests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use App\Models\V2\VpnEndpoint;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
@@ -16,14 +16,14 @@ class Update extends FormRequest
         $id = $this->route()[2]['vpnEndpointId'];
         return [
             'name' => 'sometimes|required|string',
-            'vpn_id' => [
+            'vpn_service_id' => [
                 'sometimes',
                 'required',
-                Rule::exists(Vpn::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnEndpoint::class, 'vpn_id')
+                Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
+                Rule::unique(VpnEndpoint::class, 'vpn_service_id')
                     ->ignore($id, 'id'),
-                new ExistsForUser(Vpn::class),
-                new IsResourceAvailable(Vpn::class),
+                new ExistsForUser(VpnService::class),
+                new IsResourceAvailable(VpnService::class),
             ],
             'fip_id' => [
                 'sometimes',
