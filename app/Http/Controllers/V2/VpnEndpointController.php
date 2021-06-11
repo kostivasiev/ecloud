@@ -1,40 +1,40 @@
 <?php
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\LocalEndpoint\Create;
-use App\Http\Requests\V2\LocalEndpoint\Update;
+use App\Http\Requests\V2\VpnEndpoint\Create;
+use App\Http\Requests\V2\VpnEndpoint\Update;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\LocalEndpoint;
+use App\Models\V2\VpnEndpoint;
 use App\Models\V2\Vpn;
-use App\Resources\V2\LocalEndpointResource;
+use App\Resources\V2\VpnEndpointResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
-class LocalEndpointController extends BaseController
+class VpnEndpointController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = LocalEndpoint::forUser($request->user());
+        $collection = VpnEndpoint::forUser($request->user());
         (new QueryTransformer($request))
-            ->config(LocalEndpoint::class)
+            ->config(VpnEndpoint::class)
             ->transform($collection);
 
-        return LocalEndpointResource::collection($collection->paginate(
+        return VpnEndpointResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     public function show(Request $request, string $localEndpointId)
     {
-        return new LocalEndpointResource(
-            LocalEndpoint::forUser($request->user())->findOrFail($localEndpointId)
+        return new VpnEndpointResource(
+            VpnEndpoint::forUser($request->user())->findOrFail($localEndpointId)
         );
     }
 
     public function store(Create $request)
     {
-        $localEndpoint = new LocalEndpoint(
+        $localEndpoint = new VpnEndpoint(
             $request->only(['name', 'vpn_id', 'fip_id'])
         );
         // if no fip_id supplied then create one
@@ -54,7 +54,7 @@ class LocalEndpointController extends BaseController
 
     public function update(Update $request, string $localEndpointId)
     {
-        $localEndpoint = LocalEndpoint::forUser(Auth::user())->findOrFail($localEndpointId);
+        $localEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($localEndpointId);
         $localEndpoint->fill($request->only(['name', 'vpn_id', 'fip_id']));
         $localEndpoint->save();
         return $this->responseIdMeta($request, $localEndpoint->id, 202);
@@ -62,7 +62,7 @@ class LocalEndpointController extends BaseController
 
     public function destroy(Request $request, string $localEndpointId)
     {
-        LocalEndpoint::forUser($request->user())->findOrFail($localEndpointId)->delete();
+        VpnEndpoint::forUser($request->user())->findOrFail($localEndpointId)->delete();
         return response('', 204);
     }
 }

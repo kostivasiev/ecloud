@@ -134,7 +134,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('vpns', 'VpnController@index');
         $router->get('vpns/{vpnId}', 'VpnController@show');
-        $router->get('vpns/{vpnId}/local-endpoints', 'VpnController@localEndpoint');
+        $router->get('vpns/{vpnId}/endpoints', 'VpnController@endpoints');
         $router->post('vpns', 'VpnController@create');
         $router->patch('vpns/{vpnId}', 'VpnController@update');
         $router->delete('vpns/{vpnId}', 'VpnController@destroy');
@@ -142,11 +142,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** VPN: Local Endpoints */
     $router->group([], function () use ($router) {
-        $router->get('local-endpoints', 'LocalEndpointController@index');
-        $router->get('local-endpoints/{localEndpointId}', 'LocalEndpointController@show');
-        $router->post('local-endpoints', 'LocalEndpointController@store');
-        $router->patch('local-endpoints/{localEndpointId}', 'LocalEndpointController@update');
-        $router->delete('local-endpoints/{localEndpointId}', 'LocalEndpointController@destroy');
+        $router->get('vpn-endpoints', 'VpnEndpointController@index');
+        $router->get('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@show');
+        $router->post('vpn-endpoints', 'VpnEndpointController@store');
+        $router->patch('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@update');
+        $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
     });
 
     /** Routers */

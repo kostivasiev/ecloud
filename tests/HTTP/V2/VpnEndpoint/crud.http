@@ -1,5 +1,5 @@
 ### Get Collection
-GET https://{{host}}/{{version}}/local-endpoints
+GET https://{{host}}/{{version}}/vpn-endpoints
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -39,7 +39,7 @@ client.log('VPN ID: ' + response.body.data[0].id);
 %}
 
 ### Create Endpoint
-POST https://{{host}}/{{version}}/local-endpoints
+POST https://{{host}}/{{version}}/vpn-endpoints
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -54,12 +54,12 @@ Content-Type:  application/json
 client.test('Collection Retrieved', function () {
     client.assert(response.status === 202, '202 response not received');
 });
-client.global.set('local_endpoint_id', response.body.data.id);
+client.global.set('vpn_endpoint_id', response.body.data.id);
 client.log('Local Endpoint ID: ' + response.body.data.id);
 %}
 
 ### Get Resource
-GET https://{{host}}/{{version}}/local-endpoints/{{local_endpoint_id}}
+GET https://{{host}}/{{version}}/vpn-endpoints/{{vpn_endpoint_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -71,7 +71,7 @@ client.test('Resource Retrieved', function () {
 %}
 
 ### Update Resource
-PATCH https://{{host}}/{{version}}/local-endpoints/{{local_endpoint_id}}
+PATCH https://{{host}}/{{version}}/vpn-endpoints/{{vpn_endpoint_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -87,7 +87,7 @@ client.test('Resource Retrieved', function () {
 %}
 
 ### Verify Update
-GET https://{{host}}/{{version}}/local-endpoints/{{local_endpoint_id}}
+GET https://{{host}}/{{version}}/vpn-endpoints/{{vpn_endpoint_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -100,7 +100,7 @@ client.test('Resource Retrieved', function () {
 %}
 
 ### Delete Resource
-DELETE https://{{host}}/{{version}}/local-endpoints/{{local_endpoint_id}}
+DELETE https://{{host}}/{{version}}/vpn-endpoints/{{vpn_endpoint_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

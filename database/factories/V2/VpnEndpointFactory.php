@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\LocalEndpoint;
+use App\Models\V2\VpnEndpoint;
 
-$factory->define(LocalEndpoint::class, function () {
+$factory->define(VpnEndpoint::class, function () {
     return [
         'name' => 'Endpoint Name',
     ];

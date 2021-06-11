@@ -1,15 +1,15 @@
 <?php
-namespace Tests\V2\LocalEndpoint;
+namespace Tests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
-use App\Models\V2\LocalEndpoint;
+use App\Models\V2\VpnEndpoint;
 use App\Models\V2\Vpn;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
-    protected LocalEndpoint $localEndpoint;
+    protected VpnEndpoint $localEndpoint;
     protected FloatingIp $floatingIp;
     protected Vpn $vpn;
 
@@ -27,7 +27,7 @@ class UpdateTest extends TestCase
         $this->vpn = factory(Vpn::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->localEndpoint = factory(LocalEndpoint::class)->create(
+        $this->localEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Update Test',
                 'vpn_id' => $this->vpn->id,
@@ -78,7 +78,7 @@ class UpdateTest extends TestCase
             ]);
         });
         // Create Local Endpoint
-        factory(LocalEndpoint::class)->create(
+        factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Other LE Test',
                 'vpn_id' => $vpn->id,

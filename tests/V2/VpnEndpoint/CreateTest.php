@@ -1,8 +1,8 @@
 <?php
-namespace Tests\V2\LocalEndpoint;
+namespace Tests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
-use App\Models\V2\LocalEndpoint;
+use App\Models\V2\VpnEndpoint;
 use App\Models\V2\Vpn;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -35,7 +35,7 @@ class CreateTest extends TestCase
             'vpn_id' => $this->vpn->id,
             'fip_id' => $this->floatingIp->id,
         ];
-        $this->post('/v2/local-endpoints', $data)
+        $this->post('/v2/vpn-endpoints', $data)
             ->assertResponseStatus(202);
     }
 
@@ -48,7 +48,7 @@ class CreateTest extends TestCase
                 'ip_address' => '203.0.113.2',
             ]);
         });
-        factory(LocalEndpoint::class)->create([
+        factory(VpnEndpoint::class)->create([
             'name' => 'Original Endpoint',
             'vpn_id' => $this->vpn->id,
             'fip_id' => $floatingIp->id,
@@ -58,11 +58,11 @@ class CreateTest extends TestCase
             'vpn_id' => $this->vpn->id,
             'fip_id' => $this->floatingIp->id,
         ];
-        $this->post('/v2/local-endpoints', $data)
+        $this->post('/v2/vpn-endpoints', $data)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A local endpoint already exists for the specified vpn id',
+                    'detail' => 'A vpn endpoint already exists for the specified vpn id',
                 ]
             )
             ->assertResponseStatus(422);
@@ -73,7 +73,7 @@ class CreateTest extends TestCase
         $vpn = factory(Vpn::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        factory(LocalEndpoint::class)->create([
+        factory(VpnEndpoint::class)->create([
             'name' => 'Original Endpoint',
             'vpn_id' => $vpn->id,
             'fip_id' => $this->floatingIp->id,
@@ -83,11 +83,11 @@ class CreateTest extends TestCase
             'vpn_id' => $this->vpn->id,
             'fip_id' => $this->floatingIp->id,
         ];
-        $this->post('/v2/local-endpoints', $data)
+        $this->post('/v2/vpn-endpoints', $data)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A local endpoint already exists for the specified fip id',
+                    'detail' => 'A vpn endpoint already exists for the specified fip id',
                 ]
             )
             ->assertResponseStatus(422);
@@ -110,11 +110,11 @@ class CreateTest extends TestCase
             'name' => 'Create Test',
             'vpn_id' => $this->vpn->id,
         ];
-        $this->post('/v2/local-endpoints', $data)
+        $this->post('/v2/vpn-endpoints', $data)
             ->assertResponseStatus(202);
 
         $id = json_decode($this->response->getContent())->data->id;
-        $localEndpoint = LocalEndpoint::findOrFail($id);
+        $localEndpoint = VpnEndpoint::findOrFail($id);
         $this->assertEquals($floatingIp->id, $localEndpoint->fip_id);
     }
 }

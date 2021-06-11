@@ -1,15 +1,15 @@
 <?php
-namespace Tests\V2\LocalEndpoint;
+namespace Tests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
-use App\Models\V2\LocalEndpoint;
+use App\Models\V2\VpnEndpoint;
 use App\Models\V2\Vpn;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    protected LocalEndpoint $localEndpoint;
+    protected VpnEndpoint $localEndpoint;
     protected Vpn $vpn;
 
     public function setUp(): void
@@ -26,7 +26,7 @@ class DeleteTest extends TestCase
         $this->vpn = factory(Vpn::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->localEndpoint = factory(LocalEndpoint::class)->create(
+        $this->localEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Get Test',
                 'vpn_id' => $this->vpn->id,
