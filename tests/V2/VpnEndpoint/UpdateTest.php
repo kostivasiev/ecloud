@@ -9,7 +9,7 @@ use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
-    protected VpnEndpoint $localEndpoint;
+    protected VpnEndpoint $vpnEndpoint;
     protected FloatingIp $floatingIp;
     protected Vpn $vpn;
 
@@ -27,7 +27,7 @@ class UpdateTest extends TestCase
         $this->vpn = factory(Vpn::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->localEndpoint = factory(VpnEndpoint::class)->create(
+        $this->vpnEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Update Test',
                 'vpn_id' => $this->vpn->id,
@@ -41,9 +41,9 @@ class UpdateTest extends TestCase
         $data = [
             'name' => 'Updated name',
         ];
-        $this->patch('/v2/local-endpoints/' . $this->localEndpoint->id, $data)
+        $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->seeInDatabase(
-                'local_endpoints',
+                'vpn_endpoints',
                 [
                     'name' => $data['name']
                 ],
@@ -55,11 +55,11 @@ class UpdateTest extends TestCase
     public function testUpdateResourceWithSameData()
     {
         $data = [
-            'name' => $this->localEndpoint->name,
-            'vpn_id' => $this->localEndpoint->vpn_id,
-            'fip_id' => $this->localEndpoint->fip_id,
+            'name' => $this->vpnEndpoint->name,
+            'vpn_id' => $this->vpnEndpoint->vpn_id,
+            'fip_id' => $this->vpnEndpoint->fip_id,
         ];
-        $this->patch('/v2/local-endpoints/' . $this->localEndpoint->id, $data)
+        $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->assertResponseStatus(202);
     }
 
@@ -90,18 +90,18 @@ class UpdateTest extends TestCase
             'vpn_id' => $vpn->id,
             'fip_id' => $floatingIp->id,
         ];
-        $this->patch('/v2/local-endpoints/' . $this->localEndpoint->id, $data)
+        $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A local endpoint already exists for the specified vpn id',
+                    'detail' => 'A vpn endpoint already exists for the specified vpn id',
                     'source' => 'vpn_id',
                 ]
             )
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A local endpoint already exists for the specified fip id',
+                    'detail' => 'A vpn endpoint already exists for the specified fip id',
                     'source' => 'fip_id',
                 ]
             )
