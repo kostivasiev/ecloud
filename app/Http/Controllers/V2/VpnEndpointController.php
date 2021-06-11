@@ -25,10 +25,10 @@ class VpnEndpointController extends BaseController
         ));
     }
 
-    public function show(Request $request, string $localEndpointId)
+    public function show(Request $request, string $vpnEndpointId)
     {
         return new VpnEndpointResource(
-            VpnEndpoint::forUser($request->user())->findOrFail($localEndpointId)
+            VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId)
         );
     }
 
@@ -52,17 +52,17 @@ class VpnEndpointController extends BaseController
         return $this->responseIdMeta($request, $localEndpoint->id, 202);
     }
 
-    public function update(Update $request, string $localEndpointId)
+    public function update(Update $request, string $vpnEndpointId)
     {
-        $localEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($localEndpointId);
-        $localEndpoint->fill($request->only(['name', 'vpn_id', 'fip_id']));
-        $localEndpoint->save();
-        return $this->responseIdMeta($request, $localEndpoint->id, 202);
+        $vpnEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($vpnEndpointId);
+        $vpnEndpoint->fill($request->only(['name', 'vpn_id', 'fip_id']));
+        $vpnEndpoint->save();
+        return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }
 
-    public function destroy(Request $request, string $localEndpointId)
+    public function destroy(Request $request, string $vpnEndpointId)
     {
-        VpnEndpoint::forUser($request->user())->findOrFail($localEndpointId)->delete();
+        VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId)->delete();
         return response('', 204);
     }
 }

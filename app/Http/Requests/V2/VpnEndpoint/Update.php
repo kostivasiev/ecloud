@@ -13,7 +13,7 @@ class Update extends FormRequest
 {
     public function rules()
     {
-        $id = $this->route()[2]['localEndpointId'];
+        $id = $this->route()[2]['vpnEndpointId'];
         return [
             'name' => 'sometimes|required|string',
             'vpn_id' => [
