@@ -23,7 +23,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
-    public string $keyPrefix = 'vpnle';
+    public string $keyPrefix = 'vpne';
 
     public function __construct(array $attributes = [])
     {
