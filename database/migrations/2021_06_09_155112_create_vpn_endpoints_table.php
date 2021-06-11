@@ -16,7 +16,7 @@ class CreateVpnEndpointsTable extends Migration
         Schema::connection('ecloud')->create('vpn_endpoints', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name')->nullable();
-            $table->uuid('vpn_id');
+            $table->uuid('vpn_service_id');
             $table->uuid('fip_id');
             $table->timestamps();
             $table->softDeletes();
