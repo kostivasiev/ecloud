@@ -13,6 +13,8 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use UKFast\Admin\Account\AdminClient as AccountAdminClient;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -179,6 +181,19 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         if ($user->isAdmin()) {
             return $query;
         }
+
+        try {
+            $customer = (app()->make(AccountAdminClient::class))->customers()->getById($user->resellerId());
+            if ($customer->accountStatus == 'Internal Account') {
+                return $query;
+            }
+            if ($customer->accountStatus == 'Staff') {
+                return $query;
+            }
+        } catch (\Exception $exception) {
+            Log::error(get_class($this) . ' : Failed to load customer details for for reseller ' . $user->resellerId(), [$exception->getMessage()]);
+        }
+
         return $query->where('is_public', '=', 1);
     }
 
