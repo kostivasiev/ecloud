@@ -9,12 +9,12 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\TaskResource;
-use App\Resources\V2\VpnResource;
+use App\Resources\V2\VpnServiceResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -79,10 +79,10 @@ class RouterController extends BaseController
     public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->vpns();
-        $queryTransformer->config(Vpn::class)
+        $queryTransformer->config(VpnService::class)
             ->transform($collection);
 
-        return VpnResource::collection($collection->paginate(
+        return VpnServiceResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\V2\Vpn;
+namespace Tests\V2\VpnService;
 
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -14,7 +14,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        $this->vpn = factory(Vpn::class)->create([
+        $this->vpn = factory(VpnService::class)->create([
             'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
@@ -23,7 +23,7 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/vpns',
+            '/v2/vpn-services',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -39,7 +39,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/vpns/' . $this->vpn->id,
+            '/v2/vpn-services/' . $this->vpn->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

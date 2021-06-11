@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpnId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnServiceId'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/Vpn'
+                $ref: '../../public-openapi.yaml#/components/schemas/VpnService'
               meta:
                 type: object
   tags:
-    - Vpns
+    - Vpn Service
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpnId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnServiceId'
   requestBody:
     required: true
     content:
@@ -25,21 +25,21 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/Vpn"
+            - $ref: "../../public-openapi.yaml#/components/schemas/VpnService"
             - type: object
               properties:
                 router_id:
                   required: false
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/VpnIdResponse'
+      $ref: '../../public-openapi.yaml#/components/responses/VpnServiceIdResponse'
   tags:
-    - Vpns
+    - Vpn Service
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpnId'
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnServiceId'
   responses:
     204:
       description: Success
   tags:
-    - Vpns
+    - Vpn Service

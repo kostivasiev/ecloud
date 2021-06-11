@@ -14,7 +14,7 @@ use UKFast\Responses\UKFastResource;
  * @property string created_at
  * @property string updated_at
  */
-class VpnResource extends UKFastResource
+class VpnServiceResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request

@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\VpnService;
 
 use App\Models\V2\Router;
+use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 /**
  * Class CreateVpnsRequest
  * @package App\Http\Requests\V2
  */
-class CreateVpnRequest extends FormRequest
+class Create extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -35,8 +37,8 @@ class CreateVpnRequest extends FormRequest
             'router_id' => [
                 'required',
                 'string',
-                'exists:ecloud.routers,id,deleted_at,NULL',
-                'unique:ecloud.vpns,router_id,deleted_at,NULL',
+                Rule::exists(Router::class, 'id')->whereNull('deleted_at'),
+                Rule::unique(VpnService::class, 'router_id')->whereNull('deleted_at'),
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
             ],

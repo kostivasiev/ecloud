@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\V2\Vpn;
+namespace Tests\V2\VpnService;
 
 use App\Models\V2\Task;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -17,7 +17,7 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
 
-        $this->vpn = factory(Vpn::class)->create([
+        $this->vpn = factory(VpnService::class)->create([
             'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
@@ -29,7 +29,7 @@ class UpdateTest extends TestCase
         $this->vpc()->saveQuietly();
 
         $this->patch(
-            '/v2/vpns/' . $this->vpn->id,
+            '/v2/vpn-services/' . $this->vpn->id,
             [
                 'name' => 'Unit Test VPN (Updated)',
                 'router_id' => $this->router()->id,
@@ -67,7 +67,7 @@ class UpdateTest extends TestCase
             'router_id' => $this->router()->id,
         ];
         $this->patch(
-            '/v2/vpns/' . $this->vpn->id,
+            '/v2/vpn-services/' . $this->vpn->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -88,7 +88,7 @@ class UpdateTest extends TestCase
             'router_id' => $this->router()->id,
         ];
         $this->patch(
-            '/v2/vpns/' . $this->vpn->id,
+            '/v2/vpn-services/' . $this->vpn->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -96,7 +96,7 @@ class UpdateTest extends TestCase
             ]
         )->assertResponseStatus(202);
 
-        $vpnItem = Vpn::findOrFail($this->vpn->id);
+        $vpnItem = VpnService::findOrFail($this->vpn->id);
         $this->assertEquals($data['router_id'], $vpnItem->router_id);
         $this->assertEquals($data['name'], $vpnItem->name);
     }

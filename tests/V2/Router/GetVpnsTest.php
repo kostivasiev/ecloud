@@ -6,7 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -17,7 +17,7 @@ class GetVpnsTest extends TestCase
     protected Region $region;
     protected Router $router;
     protected Vpc $vpc;
-    protected Vpn $vpn;
+    protected VpnService $vpn;
     protected AvailabilityZone $availabilityZone;
 
     public function setUp(): void
@@ -33,7 +33,7 @@ class GetVpnsTest extends TestCase
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
-        $this->vpn = factory(Vpn::class)->create([
+        $this->vpn = factory(VpnService::class)->create([
             'router_id' => $this->router->id,
         ]);
     }

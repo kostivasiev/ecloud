@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\V2\Vpn;
+namespace Tests\V2\VpnService;
 
 use App\Models\V2\Task;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -14,7 +14,7 @@ class CreateTest extends TestCase
     public function testNotUserOwnedRouterIdIsFailed()
     {
         $this->post(
-            '/v2/vpns',
+            '/v2/vpn-services',
             [
                 'name' => 'Unit Test VPN',
                 'router_id' => $this->router()->id,
@@ -48,7 +48,7 @@ class CreateTest extends TestCase
         });
 
         $this->post(
-            '/v2/vpns',
+            '/v2/vpn-services',
             [
                 'name' => 'Unit Test VPN',
                 'router_id' => $this->router()->id,
@@ -68,7 +68,7 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $this->post(
-            '/v2/vpns',
+            '/v2/vpn-services',
             [
                 'name' => 'Unit Test VPN',
                 'router_id' => $this->router()->id,
@@ -79,18 +79,18 @@ class CreateTest extends TestCase
             ]
         )->assertResponseStatus(202);
         $vpnId = (json_decode($this->response->getContent()))->data->id;
-        $vpnItem = Vpn::findOrFail($vpnId);
+        $vpnItem = VpnService::findOrFail($vpnId);
         $this->assertEquals($vpnItem->router_id, $this->router()->id);
     }
 
     public function testVpnForRouterAlreadyExists()
     {
-        factory(Vpn::class)->create([
+        factory(VpnService::class)->create([
             'name' => 'First Test VPN',
             'router_id' => $this->router()->id,
         ]);
         $this->post(
-            '/v2/vpns',
+            '/v2/vpn-services',
             [
                 'name' => 'Unit Test VPN',
                 'router_id' => $this->router()->id,

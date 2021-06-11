@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $dhcpId)
  * @method static forUser(string $user)
  */
-class Vpn extends Model implements Filterable, Sortable
+class VpnService extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
