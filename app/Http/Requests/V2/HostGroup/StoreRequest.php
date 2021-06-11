@@ -26,7 +26,6 @@ class StoreRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
-                //new ExistsForUser(AvailabilityZone::class) // Commented out so that we can UAT into G0
             ],
             'host_spec_id' => [
                 'required',
