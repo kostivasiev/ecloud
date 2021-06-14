@@ -42,14 +42,12 @@ class VpnSession extends Model implements Filterable, Sortable
 
     public function vpnService()
     {
-        // @todo Requires https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/907
-        return $this->belongsTo(VpnService::class);
+        return $this->belongsToMany(VpnService::class);
     }
 
     public function vpnEndpoints()
     {
-        // @todo Requires https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/908
-        // return $this->hasMany(VpnEndpoints::class);
+        return $this->belongsToMany(VpnEndpoint::class);
     }
 
     /**

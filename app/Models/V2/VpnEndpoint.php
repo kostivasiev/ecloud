@@ -41,9 +41,14 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         parent::__construct($attributes);
     }
 
-    public function vpnService()
+    public function vpnServices()
     {
-        return $this->belongsTo(VpnService::class);
+        return $this->belongsToMany(VpnService::class);
+    }
+
+    public function vpnSessions()
+    {
+        return $this->belongsToMany(VpnSession::class);
     }
 
     public function floatingIp()
@@ -66,7 +71,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('vpnService.router.vpc', function ($query) use ($user) {
+        return $query->whereHas('vpnServices.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
