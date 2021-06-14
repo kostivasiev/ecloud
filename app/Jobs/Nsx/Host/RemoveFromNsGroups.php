@@ -67,22 +67,22 @@ class RemoveFromNsGroups extends Job
         }
 
         if ($response->result_count != 1) {
-            $this->fail(new \Exception('Failed to load TransportNode for host ' . $host->id . 'with IP ' . $hostIpAddress));
+            $this->fail(new \Exception('Failed to load TransportNode for host ' . $host->id . ' with IP ' . $hostIpAddress));
             return;
         }
 
-       $transportNoteUuid = $response->results[0]->id;
+       $transportNodeUuid = $response->results[0]->id;
 
        //using the uuid get the ns groups that have the transport node as a member GET https://185.197.63.88/api/v1/search/query?query=resource_type:NSGroup%20AND%20members.value:ebe3adf5-c920-4442-b7fb-573e28d543c1
-       $response = $availabilityZone->nsxService()->get('/api/v1/search/query?query=resource_type:NSGroup%20AND%20members.value:' . $transportNoteUuid);
+       $response = $availabilityZone->nsxService()->get('/api/v1/search/query?query=resource_type:NSGroup%20AND%20members.value:' . $transportNodeUuid);
        $response = json_decode($response->getBody()->getContents());
        if (!$response) {
-           $this->fail(new \Exception('Failed to load NSGroups which contain TransportNode ' . $transportNoteUuid));
+           $this->fail(new \Exception('Failed to load NSGroups which contain TransportNode ' . $transportNodeUuid));
            return;
        }
 
        if ($response->result_count < 1) {
-           $this->fail(new \Exception('No NSGroups found which contain TransportNode ' . $transportNoteUuid));
+           $this->fail(new \Exception('No NSGroups found which contain TransportNode ' . $transportNodeUuid));
            return;
        }
 
@@ -91,8 +91,8 @@ class RemoveFromNsGroups extends Job
        $nsGroups = $response->results;
 
        foreach ($nsGroups as $nsGroup) {
-           $members = collect($nsGroup->members)->filter(function ($member) use ($transportNoteUuid) {
-               return $member->value != $transportNoteUuid;
+           $members = collect($nsGroup->members)->filter(function ($member) use ($transportNodeUuid) {
+               return $member->value != $transportNodeUuid;
            })->toArray();
 
            $nsGroup->members = $members;
