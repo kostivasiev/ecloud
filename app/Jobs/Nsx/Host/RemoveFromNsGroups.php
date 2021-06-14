@@ -77,8 +77,8 @@ class RemoveFromNsGroups extends Job
         $response = $availabilityZone->nsxService()->get('/api/v1/search/query?query=resource_type:NSGroup%20AND%20members.value:' . $transportNodeUuid);
         $response = json_decode($response->getBody()->getContents());
         if (!$response) {
-           $this->fail(new \Exception('Failed to load NSGroups which contain TransportNode ' . $transportNodeUuid));
-           return;
+            $this->fail(new \Exception('Failed to load NSGroups which contain TransportNode ' . $transportNodeUuid));
+            return;
         }
 
         if ($response->result_count < 1) {
@@ -91,20 +91,21 @@ class RemoveFromNsGroups extends Job
         $nsGroups = $response->results;
 
         foreach ($nsGroups as $nsGroup) {
-           $members = collect($nsGroup->members)->filter(function ($member) use ($transportNodeUuid) {
-               return $member->value != $transportNodeUuid;
-           })->toArray();
+            $members = collect($nsGroup->members)->filter(function ($member) use ($transportNodeUuid) {
+                return $member->value != $transportNodeUuid;
+            })->toArray();
 
-           $nsGroup->members = $members;
+            $nsGroup->members = $members;
 
-           $nsGroup->effective_member_count--;
-           $nsGroup->member_count--;
+            $nsGroup->effective_member_count--;
+            $nsGroup->member_count--;
 
-           $availabilityZone->nsxService()->put('/api/v1/ns-groups/' . $nsGroup->id,
-               [
+            $availabilityZone->nsxService()->put(
+                '/api/v1/ns-groups/' . $nsGroup->id,
+                [
                    'json' => $nsGroup
-               ]
-           );
+                ]
+            );
         }
     }
 }
