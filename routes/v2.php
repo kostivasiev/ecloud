@@ -132,11 +132,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Vpns */
     $router->group([], function () use ($router) {
-        $router->get('vpns', 'VpnController@index');
-        $router->get('vpns/{vpnId}', 'VpnController@show');
-        $router->post('vpns', 'VpnController@create');
-        $router->patch('vpns/{vpnId}', 'VpnController@update');
-        $router->delete('vpns/{vpnId}', 'VpnController@destroy');
+        $router->get('vpn-services', 'VpnServiceController@index');
+        $router->get('vpn-services/{vpnServiceId}', 'VpnServiceController@show');
+        $router->post('vpn-services', 'VpnServiceController@create');
+        $router->patch('vpn-services/{vpnServiceId}', 'VpnServiceController@update');
+        $router->delete('vpn-services/{vpnServiceId}', 'VpnServiceController@destroy');
     });
 
     /** Routers */
@@ -168,7 +168,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
         $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
-        $router->post('instances/{instanceId}/migrate', 'InstanceController@migrate');
 
         $router->group(['middleware' => 'is-locked'], function () use ($router) {
             $router->patch('instances/{instanceId}', 'InstanceController@update');
