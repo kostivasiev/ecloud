@@ -5,6 +5,7 @@ use App\Jobs\Nsx\Host\RemoveFromNsGroups;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class RemoveFromNsGroupsTest extends TestCase
@@ -94,18 +95,16 @@ class RemoveFromNsGroupsTest extends TestCase
                 ]));
             });
 
-
-
-        $this->nsxServiceMock()->expects('put')
+       $this->nsxServiceMock()->expects('put')
             ->withArgs([
                 '/api/v1/ns-groups/fc23f2fc-6a45-4dc7-90d2-64db975c1527',
                 [
-                    'json' => [
+                    'json' => (object)[
                         'id' => 'fc23f2fc-6a45-4dc7-90d2-64db975c1527',
                         'members' => [
-                            [
+                            (object)[
                                 "op" => "EQUALS",
-                                "target_resource"=> [
+                                "target_resource"=> (object)[
                                     "is_valid" => true
                                 ],
                                 "target_type"=> "TransportNode",
@@ -115,8 +114,8 @@ class RemoveFromNsGroupsTest extends TestCase
                             ]
                         ],
                         '_revision' => 9,
-                        'effective_member_count' =>  10,
-                        'member_count' =>  10
+                        'effective_member_count' =>  9,
+                        'member_count' =>  9
                     ]
                 ]
             ])
