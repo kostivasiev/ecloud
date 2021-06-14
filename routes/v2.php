@@ -148,6 +148,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
     });
 
+    /** Vpn Sessions */
+    $router->group([], function () use ($router) {
+        $router->get('vpn-sessions', 'VpnSessionController@index');
+        $router->get('vpn-sessions/{vpnSessionId}', 'VpnSessionController@show');
+        $router->post('vpn-sessions', 'VpnSessionController@create');
+        $router->patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
+        $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
+    });
+
     /** Routers */
     $router->group([], function () use ($router) {
         $router->get('routers', 'RouterController@index');
