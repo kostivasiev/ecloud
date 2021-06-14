@@ -3,7 +3,7 @@ namespace Tests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -11,7 +11,7 @@ class UpdateTest extends TestCase
 {
     protected VpnEndpoint $vpnEndpoint;
     protected FloatingIp $floatingIp;
-    protected Vpn $vpn;
+    protected VpnService $vpnService;
 
     public function setUp(): void
     {
@@ -24,13 +24,13 @@ class UpdateTest extends TestCase
                 'ip_address' => '203.0.113.1',
             ]);
         });
-        $this->vpn = factory(Vpn::class)->create([
+        $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Update Test',
-                'vpn_id' => $this->vpn->id,
+                'vpn_service_id' => $this->vpnService->id,
                 'fip_id' => $this->floatingIp->id,
             ]
         );
@@ -56,7 +56,7 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => $this->vpnEndpoint->name,
-            'vpn_id' => $this->vpnEndpoint->vpn_id,
+            'vpn_service_id' => $this->vpnEndpoint->vpn_service_id,
             'fip_id' => $this->vpnEndpoint->fip_id,
         ];
         $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
@@ -66,7 +66,7 @@ class UpdateTest extends TestCase
     public function testUpdateWithDataThatIsAlreadyInUse()
     {
         // Create VPN
-        $vpn = factory(Vpn::class)->create([
+        $vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
         // Create Floating Ip
@@ -81,21 +81,21 @@ class UpdateTest extends TestCase
         factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Other LE Test',
-                'vpn_id' => $vpn->id,
+                'vpn_service_id' => $vpnService->id,
                 'fip_id' => $floatingIp->id,
             ]
         );
         // Update original local endpoint
         $data = [
-            'vpn_id' => $vpn->id,
+            'vpn_service_id' => $vpnService->id,
             'fip_id' => $floatingIp->id,
         ];
         $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified vpn id',
-                    'source' => 'vpn_id',
+                    'detail' => 'A vpn endpoint already exists for the specified vpn service id',
+                    'source' => 'vpn_service_id',
                 ]
             )
             ->seeJson(

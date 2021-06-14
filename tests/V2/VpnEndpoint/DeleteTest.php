@@ -3,14 +3,14 @@ namespace Tests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
     protected VpnEndpoint $localEndpoint;
-    protected Vpn $vpn;
+    protected VpnService $vpnService;
 
     public function setUp(): void
     {
@@ -23,13 +23,13 @@ class DeleteTest extends TestCase
                 'ip_address' => '203.0.113.1',
             ]);
         });
-        $this->vpn = factory(Vpn::class)->create([
+        $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
         $this->localEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Get Test',
-                'vpn_id' => $this->vpn->id,
+                'vpn_service_id' => $this->vpnService->id,
                 'fip_id' => $floatingIp->id,
             ]
         );
@@ -37,18 +37,18 @@ class DeleteTest extends TestCase
 
     public function testDeleteResource()
     {
-        $this->delete('/v2/local-endpoints/' . $this->localEndpoint->id)
+        $this->delete('/v2/vpn-endpoints/' . $this->localEndpoint->id)
             ->assertResponseStatus(204);
     }
 
     public function testDeleteResourceWrongUser()
     {
         $this->be(new Consumer(999, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->delete('/v2/local-endpoints/' . $this->localEndpoint->id)
+        $this->delete('/v2/vpn-endpoints/' . $this->localEndpoint->id)
             ->seeJson(
                 [
                     'title' => 'Not found',
-                    'detail' => 'No Local Endpoint with that ID was found',
+                    'detail' => 'No Vpn Endpoint with that ID was found',
                 ]
             )->assertResponseStatus(404);
     }

@@ -3,14 +3,14 @@ namespace Tests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
 {
     protected FloatingIp $floatingIp;
-    protected Vpn $vpn;
+    protected VpnService $vpnService;
 
     public function setUp(): void
     {
@@ -23,7 +23,7 @@ class CreateTest extends TestCase
                 'ip_address' => '203.0.113.1',
             ]);
         });
-        $this->vpn = factory(Vpn::class)->create([
+        $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
     }
@@ -32,7 +32,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'Create Test',
-            'vpn_id' => $this->vpn->id,
+            'vpn_service_id' => $this->vpnService->id,
             'fip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
@@ -50,19 +50,19 @@ class CreateTest extends TestCase
         });
         factory(VpnEndpoint::class)->create([
             'name' => 'Original Endpoint',
-            'vpn_id' => $this->vpn->id,
+            'vpn_service_id' => $this->vpnService->id,
             'fip_id' => $floatingIp->id,
         ]);
         $data = [
             'name' => 'Create Test',
-            'vpn_id' => $this->vpn->id,
+            'vpn_service_id' => $this->vpnService->id,
             'fip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified vpn id',
+                    'detail' => 'A vpn endpoint already exists for the specified vpn service id',
                 ]
             )
             ->assertResponseStatus(422);
@@ -70,17 +70,17 @@ class CreateTest extends TestCase
 
     public function testCreateResourceFipInUse()
     {
-        $vpn = factory(Vpn::class)->create([
+        $vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
         factory(VpnEndpoint::class)->create([
             'name' => 'Original Endpoint',
-            'vpn_id' => $vpn->id,
+            'vpn_service_id' => $vpnService->id,
             'fip_id' => $this->floatingIp->id,
         ]);
         $data = [
             'name' => 'Create Test',
-            'vpn_id' => $this->vpn->id,
+            'vpn_service_id' => $this->vpnService->id,
             'fip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
@@ -108,7 +108,7 @@ class CreateTest extends TestCase
 
         $data = [
             'name' => 'Create Test',
-            'vpn_id' => $this->vpn->id,
+            'vpn_service_id' => $this->vpnService->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
             ->assertResponseStatus(202);
