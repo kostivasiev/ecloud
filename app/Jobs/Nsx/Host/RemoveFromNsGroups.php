@@ -25,7 +25,7 @@ class RemoveFromNsGroups extends Job
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
-        // On deletion, we need to retrieve NSGroups that a transport node (HOST GROUP) is a member of, and remove it from those groups
+        // On deletion, we need to retrieve NSGroups that a transport node (HOST) is a member of, and remove it from those groups
 
         // Get the host MAC address from Conjurer
         $response = $availabilityZone->conjurerService()->get(
