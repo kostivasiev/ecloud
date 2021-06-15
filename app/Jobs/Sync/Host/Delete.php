@@ -27,6 +27,7 @@ class Delete extends Job
     public function handle()
     {
         $host = $this->task->resource;
+
         $this->deleteTaskBatch([
             [
                 new MaintenanceMode($host),

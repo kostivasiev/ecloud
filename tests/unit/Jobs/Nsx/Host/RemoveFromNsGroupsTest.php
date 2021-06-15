@@ -2,6 +2,8 @@
 namespace Tests\unit\Jobs\Nsx\Host;
 
 use App\Jobs\Nsx\Host\RemoveFromNsGroups;
+use App\Models\V2\Host;
+use App\Models\V2\HostGroup;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
@@ -10,29 +12,47 @@ use Tests\TestCase;
 
 class RemoveFromNsGroupsTest extends TestCase
 {
+    protected $host;
+
+    // TODO: Better test coverage
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->host = Host::withoutEvents(function () {
+            $hostGroup = factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+            ]);
+            return factory(Host::class)->create([
+                'id' => 'h-test',
+                'name' => 'h-test',
+                'host_group_id' => $hostGroup->id,
+                'mac_address' => 'aa:bb:cc:dd:ee:ff',
+            ]);
+        });
+    }
+
+    public function testEmptyMacAddressSkips()
+    {
+        $this->host->mac_address = '';
+        $this->host->saveQuietly();
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new RemoveFromNsGroups($this->host));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
     public function testRemoveFromNsGroups()
     {
-        $this->conjurerServiceMock()
-            ->expects('get')
-            ->withSomeOfArgs(
-                '/api/v2/compute/' . $this->availabilityZone()->ucs_compute_name .
-                '/vpc/' . $this->vpc()->id . '/host/h-test'
-            )->andReturnUsing(function () {
-                return new Response('200', [], json_encode([
-                    'specification' => 'DUAL-4208--32GB',
-                    'name' => 'DUAL-4208--32GB',
-                    'interfaces' => [
-                        [
-                            'name' => 'eth0',
-                            'address' => '00:25:B5:C0:A0:1B',
-                            'type' => 'vNIC'
-                        ]
-                    ]
-                ]));
-            });
-
         $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/vpc-test/hostgroup/hg-test/host/00:25:B5:C0:A0:1B'])
+            ->withArgs(['/api/v2/vpc/vpc-test/hostgroup/hg-test/host/aa:bb:cc:dd:ee:ff'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'name' => '172.19.0.38',
@@ -114,7 +134,6 @@ class RemoveFromNsGroupsTest extends TestCase
                             ]
                         ],
                         '_revision' => 9,
-                        'effective_member_count' =>  9,
                         'member_count' =>  9
                     ]
                 ]
@@ -123,10 +142,9 @@ class RemoveFromNsGroupsTest extends TestCase
                 return new Response(200, [], json_encode([]));
             });
 
-
         Event::fake([JobFailed::class]);
 
-        dispatch(new RemoveFromNsGroups($this->host()));
+        dispatch(new RemoveFromNsGroups($this->host));
 
         Event::assertNotDispatched(JobFailed::class);
     }

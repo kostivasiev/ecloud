@@ -23,15 +23,16 @@ class Deploy extends Job
     public function handle()
     {
         $availabilityZone = $this->model->hostGroup->availabilityZone;
+
+        // Check if the host already exists on the SAN
         try {
-            // Check if the host already exists on the SAN
-            $response = $availabilityZone->artisanService()->get('/api/v2/san/' . $availabilityZone->san_name .'/host/' . $this->model->id);
-            if ($response->getStatusCode() == 200) {
-                Log::info(get_class($this) . ' : Host already exists on the SAN, nothing to do.', ['id' => $this->model->id]);
-                return true;
-            }
+            $availabilityZone->artisanService()->get('/api/v2/san/' . $availabilityZone->san_name .'/host/' . $this->model->id);
+
+            Log::info(get_class($this) . ' : Host already exists on the SAN, nothing to do.', ['id' => $this->model->id]);
+            return true;
+
         } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() != 404) {
                 throw $exception;
             }
         }

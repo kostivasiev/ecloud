@@ -6,6 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Host;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -25,31 +26,26 @@ class RemoveFromNsGroups extends Job
         $host = $this->model;
         $availabilityZone = $host->hostGroup->availabilityZone;
 
+        if (empty($host->mac_address)) {
+            Log::warning("MAC address empty, skipping");
+            return true;
+        }
+
         // On deletion, we need to retrieve NSGroups that a transport node (HOST) is a member of, and remove it from those groups
 
-        // Get the host MAC address from Conjurer
-        $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $this->model->hostGroup->vpc->id .'/host/' . $this->model->id
-        );
-        $response = json_decode($response->getBody()->getContents());
-        if (!$response) {
-            $this->fail(new \Exception('Failed to get host compute profile'));
-            return;
-        }
-
-        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
-
-        if (empty($macAddress)) {
-            $message = 'Failed to load eth0 address for host ' . $this->model->id;
-            Log::error($message);
-            $this->fail(new \Exception($message));
-            return;
-        }
-
         // use that to load host from kingpin - the name is the IP of the node
-        $response = $availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $host->hostGroup->vpc_id . '/hostgroup/' . $host->hostGroup->id . '/host/' . $macAddress
-        );
+        try {
+            $response = $availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $host->hostGroup->vpc_id . '/hostgroup/' . $host->hostGroup->id . '/host/' . $host->mac_address
+            );
+        } catch (RequestException $exception) {
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
+                Log::info("Host doesn't exist, skipping");
+                return true;
+            }
+            throw $exception;
+        }
+
         $response = json_decode($response->getBody()->getContents());
         if (!$response) {
             $this->fail(new \Exception('Failed to retrieve host from Kingpin'));
@@ -66,9 +62,9 @@ class RemoveFromNsGroups extends Job
             return;
         }
 
-        if ($response->result_count != 1) {
-            $this->fail(new \Exception('Failed to load TransportNode for host ' . $host->id . ' with IP ' . $hostIpAddress));
-            return;
+        if ($response->result_count == 0) {
+            Log::warning('TransportNode node with name ' . $hostIpAddress . ' not found, skipping');
+            return true;
         }
 
         $transportNodeUuid = $response->results[0]->id;
@@ -82,23 +78,24 @@ class RemoveFromNsGroups extends Job
         }
 
         if ($response->result_count < 1) {
-            $this->fail(new \Exception('No NSGroups found which contain TransportNode ' . $transportNodeUuid));
-            return;
+            Log::warning('No NSGroups found which contain TransportNode ' . $transportNodeUuid . ', skipping');
+            return true;
         }
-
 
         //loop over the ns groups and PUT the endpoint minus the node profile
         $nsGroups = $response->results;
 
         foreach ($nsGroups as $nsGroup) {
-            $members = collect($nsGroup->members)->filter(function ($member) use ($transportNodeUuid) {
-                return $member->value != $transportNodeUuid;
-            })->toArray();
+            $filteredMembers = [];
+            foreach ($nsGroup->members as $member) {
+                if ($member->value != $transportNodeUuid) {
+                    $filteredMembers[] = $member;
+                }
+            }
 
-            $nsGroup->members = $members;
-
-            $nsGroup->effective_member_count--;
+            $nsGroup->members = $filteredMembers;
             $nsGroup->member_count--;
+            unset($nsGroup->effective_member_count);
 
             $availabilityZone->nsxService()->put(
                 '/api/v1/ns-groups/' . $nsGroup->id,
