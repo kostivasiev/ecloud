@@ -38,6 +38,7 @@ class GetVpnsTest extends TestCase
         ]);
     }
 
+// todo readd test when vpn service routes are updated
 //    public function testGetCollection()
 //    {
 //        $this->get(
