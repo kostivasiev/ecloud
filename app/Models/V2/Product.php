@@ -4,11 +4,13 @@ namespace App\Models\V2;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
+use UKFast\Admin\Account\AdminClient as AccountAdminClient;
 
 /**
  * Class Product
@@ -37,6 +39,10 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
             'product_cost_currency',
             'product_cost_price',
         ]);
+
+        $this->casts = [
+            'product_cost_price' => 'float'
+        ];
     }
 
     const PRODUCT_CATEGORIES = [
@@ -98,6 +104,18 @@ class Product extends V1ModelWrapper implements Filterable, Sortable
             $productPriceCustom = $this->productPriceCustom()->where('product_price_custom_reseller_id', $resellerId)->first();
             if (!empty($productPriceCustom)) {
                 return $productPriceCustom->product_price_custom_sale_price;
+            }
+
+            try {
+                $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
+                if ($customer->accountStatus == 'Internal Account') {
+                    return 0;
+                }
+                if ($customer->accountStatus == 'Staff') {
+                    return (float) $this->attributes['product_cost_price'];
+                }
+            } catch (\Exception $exception) {
+                Log::error(get_class($this) . ' : Failed to load customer details for for reseller ' . $resellerId, [$exception->getMessage()]);
             }
         }
 

@@ -47,10 +47,6 @@ class NetworkRuleController extends BaseController
         ]));
 
         $task = $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
-            if (!$networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $networkRule->save();
 
             if ($request->has('ports')) {
@@ -88,10 +84,6 @@ class NetworkRuleController extends BaseController
         $networkRule->fill($request->only($fillable));
 
         $task = $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
-            if (!$networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $networkRule->save();
 
             if ($request->filled('ports')) {
@@ -116,10 +108,6 @@ class NetworkRuleController extends BaseController
         $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
 
         $task = $networkRule->networkPolicy->withTaskLock(function () use ($networkRule) {
-            if (!$networkRule->networkPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $networkRule->networkRulePorts->each(function ($port) {
                 $port->delete();
             });

@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
@@ -15,11 +16,11 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScopeable
+class VpnSession extends Model implements Filterable, Sortable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
-    public string $keyPrefix = 'np';
+    public $keyPrefix = 'vpns';
 
     public function __construct(array $attributes = [])
     {
@@ -29,47 +30,55 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
         $this->connection = 'ecloud';
         $this->fillable = [
             'id',
-            'network_id',
             'name',
+            'vpn_service_id',
+            'vpn_endpoint_id',
+            'remote_ip',
+            'remote_networks',
+            'local_networks',
         ];
         parent::__construct($attributes);
     }
 
-    public function getResellerId(): int
+    public function vpnService()
     {
-        return $this->network->getResellerId();
+        return $this->belongsToMany(VpnService::class);
     }
 
-    public function network()
+    public function vpnEndpoints()
     {
-        return $this->belongsTo(Network::class);
+        return $this->belongsToMany(VpnEndpoint::class);
     }
 
-    public function networkRules()
-    {
-        return $this->hasMany(NetworkRule::class);
-    }
-
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
+        return $query->whereHas('vpnService.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
 
     /**
      * @param FilterFactory $factory
-     * @return array
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('vpn_service_id', Filter::$stringDefaults),
+            $factory->create('vpn_endpoint_id', Filter::$stringDefaults),
+            $factory->create('remote_ip', Filter::$stringDefaults),
+            $factory->create('remote_networks', Filter::$stringDefaults),
+            $factory->create('local_networks', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -77,15 +86,19 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
 
     /**
      * @param SortFactory $factory
-     * @return array
+     * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('id'),
-            $factory->create('network_id'),
             $factory->create('name'),
+            $factory->create('vpn_service_id'),
+            $factory->create('vpn_endpoint_id'),
+            $factory->create('remote_ip'),
+            $factory->create('remote_networks'),
+            $factory->create('local_networks'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -93,8 +106,7 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
 
     /**
      * @param SortFactory $factory
-     * @return array
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -103,12 +115,19 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
         ];
     }
 
+    /**
+     * @return array|string[]
+     */
     public function databaseNames()
     {
         return [
             'id' => 'id',
-            'network_id' => 'network_id',
             'name' => 'name',
+            'vpn_service_id' => 'vpn_service_id',
+            'vpn_endpoint_id' => 'vpn_endpoint_id',
+            'remote_ip' => 'remote_ip',
+            'remote_networks' => 'remote_networks',
+            'local_networks' => 'local_networks',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

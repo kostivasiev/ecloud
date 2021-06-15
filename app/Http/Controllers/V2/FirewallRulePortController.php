@@ -43,10 +43,6 @@ class FirewallRulePortController extends BaseController
         ]));
 
         $task = $firewallRulePort->firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRulePort) {
-            if (!$firewallRulePort->firewallRule->firewallPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $firewallRulePort->save();
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
@@ -69,10 +65,6 @@ class FirewallRulePortController extends BaseController
         }
 
         $task = $firewallRulePort->firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRulePort) {
-            if (!$firewallRulePort->firewallRule->firewallPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $firewallRulePort->save();
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });
@@ -85,10 +77,6 @@ class FirewallRulePortController extends BaseController
         $firewallRulePort = FirewallRulePort::forUser($request->user())->findOrFail($firewallRulePortId);
 
         $task = $firewallRulePort->firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRulePort) {
-            if (!$firewallRulePort->firewallRule->firewallPolicy->canCreateTask()) {
-                throw new TaskException();
-            }
-
             $firewallRulePort->delete();
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);
         });

@@ -4,10 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Instance\CreateRequest;
-use App\Http\Requests\V2\Instance\HostGroupRequest;
+use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
-use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
+use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
@@ -150,8 +150,12 @@ class InstanceController extends BaseController
         if ($request->has('backup_enabled') && $this->isAdmin) {
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
-        $instance->save();
-        return $this->responseIdMeta($request, $instance->id, 202, $task->id);
+
+        $instance->withTaskLock(function ($instance) {
+            $instance->save();
+        });
+
+        return $this->responseIdMeta($request, $instance->id, 202);
     }
 
     /**
@@ -241,9 +245,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerOn($instance));
         });
 
@@ -256,9 +257,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerOff($instance));
         });
 
@@ -271,9 +269,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new GuestRestart($instance));
         });
 
@@ -286,9 +281,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new GuestShutdown($instance));
         });
 
@@ -301,9 +293,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerReset($instance));
         });
 
@@ -488,18 +477,21 @@ class InstanceController extends BaseController
         return response('', 202);
     }
 
-    public function hostGroup(HostGroupRequest $request, $instanceId)
+    public function migrate(MigrateRequest $request, $instanceId)
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
-        $hostGroup = HostGroup::forUser(Auth::user())->findOrFail($request->get('host_group_id'));
-
-        $task = $instance->createTaskWithLock(
-            'instance_hostgroup',
-            \App\Jobs\Tasks\Instance\HostGroupUpdate::class,
-            ['host_group_id' => $hostGroup->id]
-        );
-        $instance->host_group_id = $hostGroup->id;
-        $instance->saveQuietly();
+        if ($request->has('host_group_id')) {
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_private',
+                \App\Jobs\Tasks\Instance\MigratePrivate::class,
+                ['host_group_id' => $request->input('host_group_id')]
+            );
+        } else {
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_public',
+                \App\Jobs\Tasks\Instance\MigratePublic::class
+            );
+        }
 
         return $this->responseTaskId($task->id);
     }

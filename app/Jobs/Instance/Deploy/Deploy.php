@@ -32,7 +32,7 @@ class Deploy extends Job
         }
 
         $deployData = [
-            'templateName' => $this->model->image->vm_template_name,
+            'templateName' => $this->model->image->vm_template,
             'instanceId' => $this->model->getKey(),
             'numCPU' => $this->model->vcpu_cores,
             'ramMib' => $this->model->ram_capacity,

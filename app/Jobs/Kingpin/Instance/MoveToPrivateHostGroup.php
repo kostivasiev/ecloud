@@ -5,16 +5,15 @@ namespace App\Jobs\Kingpin\Instance;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class MoveToHostGroup extends Job
+class MoveToPrivateHostGroup extends Job
 {
     use Batchable, LoggableModelJob;
 
     private $model;
-    private $hostGroupId;
+    private string $hostGroupId;
 
     public function __construct(Instance $instance, string $hostGroupId)
     {
@@ -24,13 +23,9 @@ class MoveToHostGroup extends Job
 
     public function handle()
     {
-        $response = $this->model->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
-        );
-
-        $json = json_decode($response->getBody()->getContents());
-        if (!$json) {
-            throw new \Exception('Failed to retrieve instance ' . $this->model->id . ' from Kingpin, invalid JSON');
+        if ($this->model->hostGroup && $this->model->hostGroup->id == $this->hostGroupId) {
+            Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is already in the host group ' . $this->hostGroupId . ', nothing to do');
+            return;
         }
 
         $this->model->availabilityZone->kingpinService()
@@ -42,6 +37,6 @@ class MoveToHostGroup extends Job
                     ],
                 ]
             );
-        Log::debug('Hostgroup ' . $this->hostGroupId . ' has been attached to instance ' . $this->model->id);
+        Log::debug('Instance ' . $this->model->id . ' was moved to private host group ' . $this->hostGroupId);
     }
 }

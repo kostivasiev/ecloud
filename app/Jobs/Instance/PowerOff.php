@@ -15,9 +15,12 @@ class PowerOff extends Job
 
     private $model;
 
-    public function __construct(Instance $instance)
+    private bool $ignoreNotFound;
+
+    public function __construct(Instance $instance, $ignoreNotFound = false)
     {
         $this->model = $instance;
+        $this->ignoreNotFound = $ignoreNotFound;
     }
 
     public function handle()
@@ -27,11 +30,11 @@ class PowerOff extends Job
                 '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id
             );
         } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                throw $exception;
+            if ($this->ignoreNotFound && $exception->getCode() == 404) {
+                Log::warning(get_class($this) . ' : Attempted to power off, but instance was not found, skipping.');
+                return;
             }
-            Log::warning(get_class($this) . ' : Attempted to power off, but instance was not found, skipping.');
-            return;
+            throw $exception;
         }
 
         $this->model->availabilityZone->kingpinService()->delete(

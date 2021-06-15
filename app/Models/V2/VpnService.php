@@ -2,8 +2,10 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Vpn\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
@@ -15,11 +17,17 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScopeable
+/**
+ * Class Vpns
+ * @package App\Models\V2
+ * @method static findOrFail(string $dhcpId)
+ * @method static forUser(string $user)
+ */
+class VpnService extends Model implements Filterable, Sortable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
-    public string $keyPrefix = 'np';
+    public $keyPrefix = 'vpn';
 
     public function __construct(array $attributes = [])
     {
@@ -29,46 +37,55 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
         $this->connection = 'ecloud';
         $this->fillable = [
             'id',
-            'network_id',
+            'router_id',
             'name',
         ];
         parent::__construct($attributes);
     }
 
-    public function getResellerId(): int
+    protected $dispatchesEvents = [
+        'creating' => Creating::class,
+    ];
+
+    public function router()
     {
-        return $this->network->getResellerId();
+        return $this->belongsTo(Router::class);
     }
 
-    public function network()
+    public function vpnEndpoints()
     {
-        return $this->belongsTo(Network::class);
+        return $this->belongsToMany(VpnEndpoint::class);
     }
 
-    public function networkRules()
+    public function vpnSessions()
     {
-        return $this->hasMany(NetworkRule::class);
+        return $this->belongsToMany(VpnSession::class);
     }
 
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
+        return $query->whereHas('router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
 
     /**
      * @param FilterFactory $factory
-     * @return array
+     * @return array|Filter[]
      */
     public function filterableColumns(FilterFactory $factory)
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('router_id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -77,14 +94,14 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
 
     /**
      * @param SortFactory $factory
-     * @return array
+     * @return array|\UKFast\DB\Ditto\Sort[]
      * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
      */
     public function sortableColumns(SortFactory $factory)
     {
         return [
             $factory->create('id'),
-            $factory->create('network_id'),
+            $factory->create('router_id'),
             $factory->create('name'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -93,8 +110,7 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
 
     /**
      * @param SortFactory $factory
-     * @return array
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
+     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
      */
     public function defaultSort(SortFactory $factory)
     {
@@ -103,11 +119,14 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
         ];
     }
 
+    /**
+     * @return array|string[]
+     */
     public function databaseNames()
     {
         return [
             'id' => 'id',
-            'network_id' => 'network_id',
+            'router_id' => 'router_id',
             'name' => 'name',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
