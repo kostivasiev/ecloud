@@ -12,6 +12,11 @@ class Update extends FormRequest
 
     protected function rules()
     {
-        return [];
+        return [
+            'name' => 'sometimes|required|string',
+            'remote_ip' => 'sometimes|required|string',
+            'remote_networks' => 'sometimes|required|string',
+            'local_networks' => 'sometimes|required|string',
+        ];
     }
 }
