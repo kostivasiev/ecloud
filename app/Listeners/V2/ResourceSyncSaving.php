@@ -16,10 +16,6 @@ class ResourceSyncSaving
             return true;
         }
 
-        if (!$event->model->canCreateTask()) {
-            throw new TaskException();
-        }
-
         Log::info(get_class($this) . ' : Finished', ['resource_id' => $event->model->id]);
     }
 }

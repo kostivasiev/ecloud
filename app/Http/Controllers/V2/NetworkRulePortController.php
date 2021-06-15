@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\NetworkRulePort\Create;
 use App\Http\Requests\V2\NetworkRulePort\Update;
 use App\Models\V2\NetworkRulePort;
 use App\Resources\V2\NetworkRulePortResource;
+use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -30,43 +32,49 @@ class NetworkRulePortController extends BaseController
 
     public function store(Create $request)
     {
-        $resource = app()->make(NetworkRulePort::class);
-        $resource->fill($request->only([
+        $networkRulePort = app()->make(NetworkRulePort::class);
+        $networkRulePort->fill($request->only([
             'network_rule_id',
             'name',
             'protocol',
             'source',
             'destination',
         ]));
-        $resource->save();
 
-        $task = $resource->networkRule->networkPolicy->syncSave();
+        $task = $networkRulePort->networkRule->networkPolicy->withTaskLock(function ($networkPolicy) use ($networkRulePort) {
+            $networkRulePort->save();
+            return $networkPolicy->createSync(Sync::TYPE_UPDATE);
+        });
 
-        return $this->responseIdMeta($request, $resource->id, 202, $task->id);
+        return $this->responseIdMeta($request, $networkRulePort->id, 202, $task->id);
     }
 
     public function update(Update $request, string $networkRulePortId)
     {
-        $resource = NetworkRulePort::forUser(Auth::user())->findOrFail($networkRulePortId);
-        $resource->fill($request->only([
+        $networkRulePort = NetworkRulePort::forUser(Auth::user())->findOrFail($networkRulePortId);
+        $networkRulePort->fill($request->only([
             'name',
             'protocol',
             'source',
             'destination',
         ]));
-        $resource->save();
 
-        $task = $resource->networkRule->networkPolicy->syncSave();
+        $task = $networkRulePort->networkRule->networkPolicy->withTaskLock(function ($networkPolicy) use ($networkRulePort) {
+            $networkRulePort->save();
+            return $networkPolicy->createSync(Sync::TYPE_UPDATE);
+        });
 
-        return $this->responseIdMeta($request, $resource->id, 202, $task->id);
+        return $this->responseIdMeta($request, $networkRulePort->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $networkRulePortId)
     {
-        $resource = NetworkRulePort::forUser($request->user())->findOrFail($networkRulePortId);
-        $resource->delete();
+        $networkRulePort = NetworkRulePort::forUser($request->user())->findOrFail($networkRulePortId);
 
-        $task = $resource->networkRule->networkPolicy->syncSave();
+        $task = $networkRulePort->networkRule->networkPolicy->withTaskLock(function ($networkPolicy) use ($networkRulePort) {
+            $networkRulePort->delete();
+            return $networkPolicy->createSync(Sync::TYPE_UPDATE);
+        });
 
         return $this->responseTaskId($task->id);
     }

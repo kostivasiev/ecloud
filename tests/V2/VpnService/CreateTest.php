@@ -6,7 +6,6 @@ use App\Models\V2\Task;
 use App\Models\V2\VpnService;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase

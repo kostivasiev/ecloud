@@ -17,7 +17,7 @@ class GetVpnsTest extends TestCase
     protected Region $region;
     protected Router $router;
     protected Vpc $vpc;
-    protected VpnService $vpn;
+    protected VpnService $vpnService;
     protected AvailabilityZone $availabilityZone;
 
     public function setUp(): void
@@ -33,7 +33,7 @@ class GetVpnsTest extends TestCase
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
-        $this->vpn = factory(VpnService::class)->create([
+        $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router->id,
         ]);
     }
@@ -48,10 +48,9 @@ class GetVpnsTest extends TestCase
             ]
         )
             ->seeJson([
-                'id'                   => $this->vpn->id,
-                'router_id'            => $this->vpn->router_id,
+                'id'                   => $this->vpnService->id,
+                'router_id'            => $this->vpnService->router_id,
             ])
             ->assertResponseStatus(200);
     }
-
 }

@@ -1,8 +1,6 @@
 <?php
 namespace Tests\V2\NetworkRule;
 
-use App\Events\V2\NetworkPolicy\Saved;
-use App\Events\V2\NetworkPolicy\Saving;
 use App\Events\V2\Task\Created;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -15,7 +13,7 @@ class CreateTest extends TestCase
 {
     public function testCreateResource()
     {
-        Event::fake([Saving::class, Saved::class, Created::class]);
+        Event::fake([Created::class]);
         $this->vpc()->advanced_networking = true;
         $this->vpc()->saveQuietly();
 
