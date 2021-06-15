@@ -47,6 +47,5 @@ class MaintenanceMode extends Job
         $availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id . '/host/' . $host->mac_address . '/maintenance'
         );
-
     }
 }

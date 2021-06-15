@@ -30,7 +30,6 @@ class Deploy extends Job
 
             Log::info(get_class($this) . ' : Host already exists on the SAN, nothing to do.', ['id' => $this->model->id]);
             return true;
-
         } catch (RequestException $exception) {
             if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() != 404) {
                 throw $exception;
