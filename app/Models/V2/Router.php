@@ -75,7 +75,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
 
     public function vpns()
     {
-        return $this->hasMany(Vpn::class);
+        return $this->hasMany(VpnService::class);
     }
 
     public function firewallPolicies()
