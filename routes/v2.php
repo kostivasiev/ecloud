@@ -130,13 +130,31 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
     });
 
-    /** Vpns */
+    /** Vpn Services */
     $router->group([], function () use ($router) {
-        $router->get('vpns', 'VpnController@index');
-        $router->get('vpns/{vpnId}', 'VpnController@show');
-        $router->post('vpns', 'VpnController@create');
-        $router->patch('vpns/{vpnId}', 'VpnController@update');
-        $router->delete('vpns/{vpnId}', 'VpnController@destroy');
+        $router->get('vpn-services', 'VpnServiceController@index');
+        $router->get('vpn-services/{vpnServiceId}', 'VpnServiceController@show');
+        $router->post('vpn-services', 'VpnServiceController@create');
+        $router->patch('vpn-services/{vpnServiceId}', 'VpnServiceController@update');
+        $router->delete('vpn-services/{vpnServiceId}', 'VpnServiceController@destroy');
+    });
+
+    /** VPN Endpoints */
+    $router->group([], function () use ($router) {
+        $router->get('vpn-endpoints', 'VpnEndpointController@index');
+        $router->get('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@show');
+        $router->post('vpn-endpoints', 'VpnEndpointController@store');
+        $router->patch('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@update');
+        $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
+    });
+
+    /** Vpn Sessions */
+    $router->group([], function () use ($router) {
+        $router->get('vpn-sessions', 'VpnSessionController@index');
+        $router->get('vpn-sessions/{vpnSessionId}', 'VpnSessionController@show');
+        $router->post('vpn-sessions', 'VpnSessionController@create');
+        $router->patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
+        $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
     });
 
     /** Vpn Sessions */
@@ -323,7 +341,7 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
         });
     });
-    
+
     /** Billing Metrics */
     $router->group([], function () use ($router) {
         $router->get('billing-metrics', 'BillingMetricController@index');
