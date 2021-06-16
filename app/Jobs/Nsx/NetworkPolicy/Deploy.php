@@ -52,10 +52,9 @@ class Deploy extends Job
                             'sequence_number' => $rule->sequence,
                             'source_groups' => explode(',', $rule->source),
                             'destination_groups' => explode(',', $rule->destination),
-                            'services' => in_array($rule->type, [NetworkRule::TYPE_DHCP_INGRESS, NetworkRule::TYPE_DHCP_EGRESS]) ? [
-                                '/infra/services/DHCP-Client',
-                                '/infra/services/DHCP-Server'
-                            ] : ['ANY'],
+                            'services' => [
+                                'ANY'
+                            ],
                             'service_entries' => $rule->networkRulePorts->map(function ($port) {
                                 if ($port->protocol == 'ICMPv4') {
                                     return [

@@ -20,8 +20,7 @@ class NetworkRule extends Model implements Filterable, Sortable
 
     public string $keyPrefix = 'nr';
 
-    const TYPE_DHCP_INGRESS = 'dhcp_ingress';
-    const TYPE_DHCP_EGRESS = 'dhcp_egress';
+    const TYPE_DHCP = 'dhcp';
     const TYPE_CATCHALL = 'catchall';
 
     public function __construct(array $attributes = [])
@@ -44,9 +43,6 @@ class NetworkRule extends Model implements Filterable, Sortable
         $this->casts = [
             'sequence' => 'integer',
             'enabled' => 'boolean',
-        ];
-        $this->dispatchesEvents = [
-            'deleted' => Deleted::class,
         ];
         parent::__construct($attributes);
     }
@@ -118,7 +114,7 @@ class NetworkRule extends Model implements Filterable, Sortable
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('name', 'asc'),
+            $factory->create('sequence'),
         ];
     }
 

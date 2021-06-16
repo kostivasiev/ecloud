@@ -43,11 +43,6 @@ class FirewallPolicy extends Model implements Filterable, Sortable, ResellerScop
             'sequence',
             'router_id',
         ];
-        $this->dispatchesEvents = [
-            'saving' => Saving::class,
-            'saved' => Saved::class,
-            'deleting' => Deleting::class,
-        ];
         $this->casts = [
             'sequence' => 'integer'
         ];

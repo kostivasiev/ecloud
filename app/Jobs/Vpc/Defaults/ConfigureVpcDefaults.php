@@ -3,7 +3,7 @@
 namespace App\Jobs\Vpc\Defaults;
 
 use App\Jobs\Job;
-use App\Jobs\Router\Defaults\ConfigureRouterDefaults;
+use App\Jobs\Router\ConfigureRouterDefaults;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Traits\V2\LoggableModelJob;

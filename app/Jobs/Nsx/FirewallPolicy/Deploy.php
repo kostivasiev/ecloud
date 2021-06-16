@@ -6,7 +6,9 @@ use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRulePort;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 
 class Deploy extends Job
 {

@@ -19,20 +19,27 @@ trait TaskableBatch
         };
     }
 
-    public function updateTaskBatch($jobs)
+    public function updateTaskBatch($jobs, ...$callbacks)
     {
         $task = $this->task;
-        $callback = $this->taskBatchExceptionCallback();
+        $exceptionCallback = $this->taskBatchExceptionCallback();
 
-        return Bus::batch($jobs)->then(function (Batch $batch) use ($task) {
+        $batch = Bus::batch($jobs);
+        foreach ($callbacks as $callback) {
+            $batch->then($callback);
+        }
+
+        $batch->then(function (Batch $batch) use ($task) {
             Log::info("Setting task completed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
             $task->completed = true;
             $task->save();
-        })->catch(function (Batch $batch, Throwable $e) use ($task, $callback) {
+        })->catch(function (Batch $batch, Throwable $e) use ($task, $exceptionCallback) {
             Log::warning("Setting task failed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
-            $task->failure_reason = $callback($e);
+            $task->failure_reason = $exceptionCallback($e);
             $task->save();
         });
+
+        return $batch;
     }
 
     public function deleteTaskBatch($jobs)

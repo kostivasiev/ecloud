@@ -5,6 +5,7 @@ namespace App\Http\Requests\V2\NetworkRule;
 use App\Models\V2\NetworkPolicy;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use UKFast\FormRequests\FormRequest;
 
@@ -30,6 +31,7 @@ class Create extends FormRequest
         return [
             'name' => 'nullable|string|max:50',
             'network_policy_id' => [
+                'bail',
                 'required',
                 'string',
                 'exists:ecloud.network_policies,id,deleted_at,NULL',
@@ -58,6 +60,26 @@ class Create extends FormRequest
             ],
             'direction' => 'required|string|in:IN,OUT,IN_OUT',
             'enabled' => 'required|boolean',
+            'ports' => [
+                'sometimes',
+                'present',
+                'array'
+            ],
+            'ports.*.protocol' => [
+                'required',
+                'string',
+                'in:TCP,UDP,ICMPv4'
+            ],
+            'ports.*.source' => [
+                'required_if:ports.*.protocol,TCP,UDP',
+                'string',
+                new ValidFirewallRulePortSourceDestination()
+            ],
+            'ports.*.destination' => [
+                'required_if:ports.*.protocol,TCP,UDP',
+                'string',
+                new ValidFirewallRulePortSourceDestination()
+            ]
         ];
     }
 

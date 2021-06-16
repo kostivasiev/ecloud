@@ -20,7 +20,7 @@ class NsxServiceProvider extends ServiceProvider
                 ->where('name', '=', 'NSX')
                 ->first();
             if (!$credentials) {
-                throw new \Exception(get_class($this) . ' : Failed to find credentials for user ' . config('kingpin.user'));
+                throw new \Exception(get_class($this) . ' : Failed to find credentials for user NSX');
             }
             $auth = base64_encode($credentials->username . ':' . $credentials->password);
             return new NsxService(
