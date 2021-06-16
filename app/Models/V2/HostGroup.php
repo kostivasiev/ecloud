@@ -188,7 +188,12 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
 
     public function getRamAvailableAttribute()
     {
-        return $this->ram_capacity - $this->ram_used;
+        return ($this->ram_capacity - $this->ram_used) - $this->ram_reserved;
+    }
+
+    public function getRamReservedAttribute()
+    {
+        return $this->hosts->count() * 2;
     }
 
     public function getVcpuCapacityAttribute()
@@ -203,6 +208,6 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
 
     public function getVcpuAvailableAttribute()
     {
-        return $this->vcpu_capacity = $this->vcpu_used;
+        return $this->vcpu_capacity - $this->vcpu_used;
     }
 }
