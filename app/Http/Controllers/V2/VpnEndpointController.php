@@ -49,7 +49,7 @@ class VpnEndpointController extends BaseController
             $vpnEndpoint->floating_ip_id = $floatingIp->id;
         }
         $vpnEndpoint->save();
-        $vpnEndpoint->vpnServices()->sync([$request->get('vnp_service_id')]);
+        $vpnEndpoint->vpnServices()->sync([$request->get('vpn_service_id')]);
         $vpnEndpoint->refresh();
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }
@@ -64,7 +64,9 @@ class VpnEndpointController extends BaseController
 
     public function destroy(Request $request, string $vpnEndpointId)
     {
-        VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId)->delete();
+        $vpnEndpoint = VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId);
+        $vpnEndpoint->vpnServices()->detach();
+        $vpnEndpoint->delete();
         return response('', 204);
     }
 }
